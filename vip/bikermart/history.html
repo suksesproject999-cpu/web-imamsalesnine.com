@@ -1,0 +1,2662 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>History Order</title>
+
+
+
+  <style>
+:root {
+
+    --navy: #0f2d6b;
+    --navy-dark: #081c4f;
+
+    --primary: #1976d2;
+    --success: #4caf50;
+    --danger: #f44336;
+
+    --bg: #eceff3;
+    --surface: #ffffff;
+
+    --border: #d6dbe3;
+
+    --text: #2d3748;
+
+    --shadow:
+    0 2px 10px rgba(0,0,0,.08);
+
+  }
+
+    .erp-wrapper {
+
+      padding: 15px;
+
+    }
+
+    .erp-card {
+
+      background: white;
+
+      border: 1px solid var(--border);
+
+      border-radius: 8px;
+
+      box-shadow: var(--shadow);
+
+      overflow: hidden;
+
+    }
+
+    .erp-toolbar {
+
+      padding: 15px;
+
+      display: flex;
+
+      gap: 10px;
+
+      flex-wrap: wrap;
+
+      border-bottom: 1px solid #ddd;
+
+    }
+
+    @media(max-width:768px) {
+
+      .erp-toolbar {
+
+        display: flex;
+        flex-direction: column;
+
+      }
+
+      .erp-toolbar input,
+      .erp-toolbar select,
+      .erp-toolbar button {
+
+        width: 100%;
+        margin: 0;
+
+      }
+
+    }
+
+    .erp-toolbar input,
+    .erp-toolbar select {
+
+      height: 38px;
+
+      padding: 0 12px;
+
+      border: 1px solid #cfd8dc;
+
+      border-radius: 4px;
+
+    }
+
+    @media(max-width:768px) {
+
+      .erp-table {
+        min-width: 900px;
+      }
+
+      .erp-table-area {
+
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+
+      }
+
+    }
+
+    .erp-table {
+      width: 100%;
+      min-width: 700px;
+      border-collapse: collapse;
+      background: white;
+    }
+
+    .erp-table th {
+
+      background: #5e738a;
+
+      color: white;
+
+      padding: 10px;
+
+      font-size: 13px;
+
+    }
+
+    .erp-table td {
+
+      word-break: normal;
+
+      white-space: nowrap;
+
+      padding: 10px;
+
+      border-bottom: 1px solid #eee;
+
+      font-size: 14px;
+
+    }
+
+    .erp-table tbody tr:hover {
+
+      background: #f7fafc;
+
+      cursor: pointer;
+
+    }
+
+    body {
+
+      margin: 0;
+
+      font-family: "Segoe UI",sans-serif;
+
+      background: var(--bg);
+
+      color: var(--text);
+
+    }
+
+
+    .btn {
+      padding: 10px 16px;
+      background: #25D366;
+      border: none;
+      color: white;
+      border-radius: 10px;
+      cursor: pointer;
+      margin: 5px;
+    }
+
+
+    .btn-delete-item {
+
+      background: #f44336;
+
+      color: white;
+
+      border: none;
+
+      padding: 6px 10px;
+
+      border-radius: 4px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+    }
+
+    .btn-delete-item:hover {
+
+      background: #d32f2f;
+
+    }
+
+#invoice-content{
+display:none;
+padding:12px;
+overflow:auto;
+height:100%;
+background:#fff;
+}
+
+
+    .invoice-header {
+
+      text-align: center;
+
+      margin-bottom: 20px;
+    }
+
+    .invoice-header h2 {
+
+      font-size: 30px;
+
+      margin-bottom: 10px;
+    }
+
+    .invoice-header p {
+
+      opacity: 0.9;
+
+      line-height: 1.7;
+    }
+
+    /* =========================
+   🔥 INVOICE ITEM
+========================= */
+
+    .invoice-item {
+
+      padding: 12px 0;
+
+      border-bottom:
+      1px solid rgba(255,255,255,0.08);
+
+      line-height: 1.7;
+    }
+
+    /* =========================
+   🔥 TOTAL
+========================= */
+    .invoice-total {
+
+      margin-top: 20px;
+
+      font-size: 21px;
+
+      font-weight: 900;
+
+      text-align: left;
+
+      color: #16a34a;
+
+      word-break: break-word;
+
+      overflow-wrap: break-word;
+
+      line-height: 1.6;
+
+      padding-right: 10px;
+    }
+
+    /* =========================
+   🔥 STATUS INFO
+========================= */
+
+    .invoice-status {
+
+      margin-top: 18px;
+
+      line-height: 1.9;
+
+      font-size: 15px;
+
+      color: #e2e8f0;
+    }
+
+    /* =========================
+   🔥 ACTION BUTTON
+========================= */
+
+    .invoice-action {
+
+      margin-top: 22px;
+
+      text-align: center;
+    }
+
+    .invoice-action button {
+
+      margin: 5px;
+    }
+
+
+/* =========================================
+🔥 PRINT ONLY INVOICE
+========================================= */
+
+@media print {
+
+body{
+background:#fff !important;
+}
+
+body *{
+visibility:hidden;
+}
+
+#invoice-content,
+#invoice-content *{
+visibility:visible;
+}
+
+#invoice-content{
+position:absolute !important;
+top:0;
+left:0;
+width:100%;
+display:block !important;
+background:#fff !important;
+overflow:visible !important;
+padding:0 !important;
+margin:0 !important;
+}
+
+.invoice-box{
+display:block !important;
+
+width:100% !important;
+max-width:none !important;
+
+height:auto !important;
+max-height:none !important;
+
+overflow:visible !important;
+
+padding:20px !important;
+box-sizing:border-box;
+}
+
+.invoice-table-wrap{
+height:auto !important;
+max-height:none !important;
+overflow:visible !important;
+}
+
+.invoice-footer{
+display:block !important;
+}
+
+.invoice-table{
+width:100% !important;
+table-layout:fixed;
+page-break-inside:auto;
+}
+
+.invoice-table tr{
+page-break-inside:avoid;
+break-inside:avoid;
+}
+
+.invoice-table td,
+.invoice-table th{
+font-size:12px !important;
+word-wrap:break-word;
+overflow-wrap:break-word;
+}
+
+.invoice-action,
+.btn{
+display:none !important;
+}
+
+}
+
+@media print {
+
+.invoice-table th:last-child,
+.invoice-table td:last-child{
+display:none !important;
+}
+
+}
+
+    /* =====================================
+📚 VIP HISTORY MODERN UI
+===================================== */
+
+
+
+    @media print {
+
+      body {
+
+        background: white !important;
+      }
+
+      .modern-faktur {
+
+        width: 100% !important;
+
+        max-width: 100% !important;
+
+        padding: 25px !important;
+
+        box-sizing: border-box;
+
+        overflow: visible !important;
+      }
+
+      .invoice-table {
+
+        width: 100% !important;
+
+        table-layout: fixed;
+      }
+
+      .invoice-table td,
+      .invoice-table th {
+
+        word-wrap: break-word;
+
+        overflow-wrap: break-word;
+
+        font-size: 12px !important;
+      }
+
+      .invoice-total-box {
+
+        width: 100% !important;
+
+        box-sizing: border-box;
+
+        margin-top: 25px;
+      }
+
+      .invoice-summary {
+
+        flex-wrap: wrap;
+      }
+
+    }
+
+    .erp-page-header {
+
+      margin-bottom: 15px;
+
+    }
+
+    .erp-page-header h2 {
+
+      margin: 0;
+
+      font-size: 24px;
+
+      font-weight: 700;
+
+    }
+
+    .erp-subtitle {
+
+      margin-top: 4px;
+
+      font-size: 13px;
+
+      color: #777;
+
+    }
+
+    .badge {
+
+      min-width: 80px;
+
+      text-align: center;
+
+      padding: 6px 12px;
+
+      border-radius: 999px;
+
+      font-size: 12px;
+
+      font-weight: 700;
+
+      display: inline-block;
+
+    }
+
+    .badge-pending {
+
+      background: #fff3cd;
+
+      color: #856404;
+
+    }
+
+    .badge-proses {
+
+      background: #cfe2ff;
+
+      color: #084298;
+
+    }
+
+    .badge-ready {
+
+      background: #d1e7dd;
+
+      color: #0f5132;
+
+    }
+
+    .badge-sebagian {
+      background: #ffe0b2;
+      color: #e65100;
+    }
+
+    .row-sebagian {
+      background: #fff8ef;
+    }
+
+    .row-sebagian td {
+      border-left: 4px solid #ff9800;
+    }
+
+
+    .btn-detail {
+
+      border: none;
+
+      background: #1976d2;
+
+      color: white;
+
+      padding: 8px 14px;
+
+      border-radius: 4px;
+
+      cursor: pointer;
+
+      font-size: 12px;
+
+      font-weight: 600;
+
+    }
+
+    .btn-detail:hover {
+
+      background: #1565c0;
+
+    }
+
+    .erp-table th {
+
+      position: sticky;
+
+      top: 0;
+
+      z-index: 2;
+
+      background: #5e738a;
+
+    }
+
+    .erp-table-area {
+
+      height: calc(100vh - 320px);
+
+      overflow: auto;
+
+      background: white;
+
+      border-top: 2px solid #ddd;
+
+      border-bottom: 1px solid #ddd;
+
+    }
+
+
+    .summary-grid {
+
+      display: grid;
+
+      grid-template-columns:
+      repeat(4,1fr);
+
+      gap: 12px;
+
+    }
+
+    @media(max-width:768px) {
+
+      .summary-grid {
+
+        grid-template-columns:
+        repeat(2,1fr);
+
+      }
+
+    }
+
+    @media(max-width:768px) {
+
+      .summary-card {
+        padding: 12px;
+      }
+
+      .summary-card b {
+        font-size: 20px;
+      }
+
+    }
+
+    .summary-card {
+
+      background: white;
+
+      border: 1px solid #ddd;
+
+      border-radius: 8px;
+
+      padding: 15px;
+
+      box-shadow: var(--shadow);
+
+    }
+
+    .summary-card div {
+
+      font-size: 13px;
+
+      color: #777;
+
+    }
+
+    .summary-card b {
+
+      font-size: 24px;
+
+      display: block;
+
+      margin-top: 8px;
+
+    }
+
+    .erp-doc-info {
+
+      display: grid;
+
+      grid-template-columns:
+      repeat(2,1fr);
+
+      gap: 12px;
+
+      margin-top: 20px;
+
+    }
+
+    .erp-doc-info div {
+
+      background: #f8fafc;
+
+      padding: 12px;
+
+      border-radius: 6px;
+
+      border: 1px solid #e2e8f0;
+
+      color: #334155;
+
+      font-size: 14px;
+
+      display: flex;
+
+      justify-content: center;
+
+      align-items: center;
+
+      text-align: center;
+
+      flex-direction: column;
+
+    }
+
+    .erp-total-box {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      margin-top: 15px;
+
+      padding: 15px;
+
+      background: #f8fafc;
+
+      border: 1px solid #ddd;
+
+      border-radius: 6px;
+
+      font-weight: 700;
+
+    }
+
+    .invoice-box {
+
+background:white;
+
+width:95%;
+
+max-width:1200px;
+
+min-height:90vh;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+border-radius:8px;
+
+padding:20px;
+
+box-sizing:border-box;
+
+}
+
+    .invoice-table {
+
+      width: 100%;
+
+      border-collapse: collapse;
+
+      margin-top: 15px;
+
+    }
+
+    .invoice-table th {
+
+      background: #5e738a;
+
+      color: white;
+
+      padding: 10px;
+
+      text-align: center;
+
+      vertical-align: middle;
+
+    }
+
+    .invoice-table td {
+
+      padding: 10px;
+
+      border-bottom: 1px solid #eee;
+
+      text-align: center;
+
+      vertical-align: middle;
+
+    }
+
+    .erp-table td:first-child {
+
+      font-weight: 600;
+
+      text-align: center !important;
+
+    }
+
+    .erp-table tbody td {
+
+      text-align: center !important;
+
+      vertical-align: middle;
+
+    }
+
+    .erp-table tbody tr {
+
+      transition: .15s;
+
+    }
+
+    .erp-table tbody tr:hover {
+
+      transform: translateY(-1px);
+
+      box-shadow:
+      0 2px 8px rgba(0,0,0,.08);
+
+    }
+
+    .invoice-table-wrap {
+
+flex:1;
+
+overflow-x:auto;
+overflow-y:auto;
+
+margin-top:15px;
+
+}
+
+
+    .brand-title {
+
+      font-size: 26px;
+
+      font-weight: 700;
+
+      margin-bottom: 15px;
+
+      color: #2d3748;
+
+    }
+
+    @media(max-width:768px) {
+
+      .erp-total-box {
+
+        flex-direction: column;
+
+        gap: 10px;
+
+        align-items: flex-start;
+
+      }
+
+    }
+
+    .invoice-footer {
+
+      display: flex;
+
+      justify-content: space-between;
+
+      align-items: flex-end;
+
+      margin-top: 15px;
+
+      gap: 20px;
+
+    }
+
+    .btn {
+
+      padding: 8px 14px;
+
+      font-size: 13px;
+
+      border-radius: 6px;
+
+    }
+
+    .row-pending {
+
+      background: #fffaf0;
+
+    }
+
+    .row-proses {
+
+      background: #f0f7ff;
+
+    }
+
+    .row-ready {
+
+      background: #f4fff6;
+
+    }
+
+    .row-pending:hover {
+
+      background: #fff3cd !important;
+
+    }
+
+    .row-proses:hover {
+
+      background: #dbeafe !important;
+
+    }
+
+    .row-ready:hover {
+
+      background: #dcfce7 !important;
+
+    }
+
+    .total-card {
+
+      border-left: 4px solid #607d8b;
+
+    }
+
+    .pending-card {
+
+      border-left: 4px solid #ff9800;
+
+    }
+
+    .sebagian-card {
+
+      border-left: 4px solid #ff9800;
+
+    }
+
+    .proses-card {
+
+      border-left: 4px solid #2196f3;
+
+    }
+
+    .ready-card {
+
+      border-left: 4px solid #4caf50;
+
+    }
+
+    .row-pending td {
+
+      border-left: 4px solid #ff9800;
+
+    }
+
+    .row-proses td {
+
+      border-left: 4px solid #2196f3;
+
+    }
+
+    .row-ready td {
+
+      border-left: 4px solid #4caf50;
+
+    }
+
+    .vip-layout {
+      display: flex;
+      height: 100vh;
+      background: var(--bg);
+      overflow: hidden;
+    }
+
+    .sidebar {
+      width: 60px;
+      background: linear-gradient(
+      180deg,
+      #0f2d6b,
+      #081c4f
+      );
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 6px;
+      gap: 6px;
+      flex-shrink: 0;
+    }
+
+
+    .sidebar-btn {
+      width: 44px;
+      height: 44px;
+      border: none;
+      background: transparent;
+      color: white;
+      font-size: 20px;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+
+    .sidebar-btn.active {
+      background: #e91e63;
+    }
+
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      min-width: 0;
+    }
+
+    .topbar {
+      height: 40px;
+      background: #f3f3f3;
+      border-bottom: 1px solid #d0d0d0;
+    }
+
+    .erp-tabs {
+      display: flex;
+      height: 100%;
+    }
+
+    .tab.active {
+      height: 40px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      background: #ec407a;
+      color: white;
+      font-weight: 600;
+    }
+
+    #main-content {
+      flex: 1;
+      padding: 12px;
+      overflow-x: hidden;
+      overflow-y: auto;
+    }
+
+    @media(max-width:768px) {
+
+      .sidebar {
+        width: 50px;
+      }
+
+      .sidebar-btn {
+        width: 38px;
+        height: 38px;
+        font-size: 18px;
+      }
+
+      .erp-wrapper {
+        padding: 10px;
+      }
+
+      .erp-page-header {
+        display: none;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+
+
+      .erp-table {
+        min-width: 700px;
+      }
+
+      .tab {
+        font-size: 13px;
+        padding: 0 10px;
+      }
+
+    }
+
+
+    .erp-table-empty {
+
+      height: 100%;
+
+      display: flex;
+
+      align-items: center;
+
+      justify-content: center;
+
+      color: #999;
+
+    }
+
+    .erp-total-box {
+
+      display: flex;
+      justify-content: flex-end;
+      gap: 15px;
+
+      margin-top: auto;
+
+      padding-top: 15px;
+
+    }
+
+    .total-item-box,
+    .grand-total-box {
+
+      min-width: 180px;
+
+      background: #f8fafc;
+
+      border: 1px solid #dbe3ea;
+
+      border-radius: 8px;
+
+      padding: 12px;
+
+      text-align: center;
+
+    }
+
+    .total-item-box b,
+    .grand-total-box b {
+
+      display: block;
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 6px;
+
+    }
+
+    .total-item-box span,
+    .grand-total-box span {
+
+      font-size: 18px;
+      font-weight: 700;
+
+    }
+
+    .grand-total-box span {
+
+      color: #16a34a;
+
+    }
+
+    .badge-delete {
+
+      background: #ffebee;
+
+      color: #c62828;
+
+    }
+
+    .tab {
+      height: 40px;
+      padding: 0 12px;
+      display: flex;
+      align-items: center;
+      background: #d9d9d9;
+      border-right: 1px solid #bdbdbd;
+      cursor: pointer;
+      gap: 8px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="vip-layout">
+
+    <aside class="sidebar">
+
+      <button
+        class="sidebar-btn"
+        onclick="location.href='index.html'">
+        🏠
+      </button>
+
+      <button
+        class="sidebar-btn active">
+        📦
+      </button>
+
+    </aside>
+
+    <main class="main-wrapper">
+
+      <!-- TOP TAB -->
+      <div class="topbar">
+
+        <div
+          class="erp-tabs"
+          id="erp-tabs">
+        </div>
+
+      </div>
+
+      <!-- HISTORY PAGE -->
+      <div id="main-content">
+
+        <div class="erp-wrapper">
+
+          <div class="erp-card">
+
+            <div class="erp-toolbar">
+
+              <input
+              type="date"
+              id="filterDate"
+              onchange="loadData()">
+
+              <select
+                id="filterStatus"
+                onchange="loadData()">
+
+                <option value="all">
+                  Status: Semua
+                </option>
+
+                <option value="pending">
+                  Pending
+                </option>
+
+                <option value="sebagian">
+                  Sebagian Diproses
+                </option>
+
+                <option value="proses">
+                  Proses
+                </option>
+
+                <option value="ready">
+                  Ready
+                </option>
+
+              </select>
+
+              <select
+                id="filterType"
+                onchange="loadData()">
+
+                <option value="all">
+                  Semua Dokumen
+                </option>
+
+                <option value="order">
+                  Pesanan
+                </option>
+
+                <option value="klaim">
+                  Klaim
+                </option>
+
+              </select>
+
+              <input
+              id="searchBox"
+              placeholder="Cari Nomor Invoice..."
+              onkeyup="loadData()">
+
+              <button
+                class="erp-filter-btn"
+                onclick="loadData()">
+                🔍
+              </button>
+
+            </div>
+
+            <div class="summary-grid">
+
+              <div class="summary-card total-card">
+                <div>
+                  Total Dokumen
+                </div>
+                <b id="sum-total">0</b>
+              </div>
+
+              <div class="summary-card pending-card">
+                <div>
+                  Pending
+                </div>
+                <b id="sum-pending">0</b>
+              </div>
+
+              <div class="summary-card sebagian-card">
+                <div>
+                  Sebagian
+                </div>
+                <b id="sum-sebagian">0</b>
+              </div>
+
+              <div class="summary-card proses-card">
+                <div>
+                  Proses
+                </div>
+                <b id="sum-proses">0</b>
+              </div>
+
+              <div class="summary-card ready-card">
+                <div>
+                  Ready
+                </div>
+                <b id="sum-ready">0</b>
+              </div>
+
+            </div>
+
+            <div class="erp-table-area">
+
+              <table class="erp-table">
+
+                <thead>
+
+                  <tr>
+
+                    <th>Invoice</th>
+                    <th>Tanggal</th>
+                    <th>Tipe</th>
+                    <th>Total Item</th>
+                    <th>Total</th>
+                    <th>Status</th>
+
+                  </tr>
+
+                </thead>
+
+                <tbody id="historyBody">
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- DETAIL INVOICE -->
+      <div
+        id="invoice-content"
+        style="
+        display:none;
+        padding:12px;
+        overflow:auto;
+        height:100%;
+        ">
+      </div>
+
+    </main>
+
+  </div>
+
+</body>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+
+<script>
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",
+    authDomain: "apin-web.firebaseapp.com",
+    projectId: "apin-web"
+  };
+
+  if (!firebase.apps.length) {
+    firebase.initializeApp(firebaseConfig);
+  }
+
+  const db = firebase.firestore();
+
+  const VIP_NAME = "BIKERMART";
+
+  function updateActivity() {
+
+    console.log("UPDATE ACTIVITY JALAN");
+
+    db.collection("aktivitas_vip")
+    .doc("BIKERMART")
+    .set({
+
+      nama: "BIKERMART",
+
+      last_active:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+    })
+    .then(()=> {
+
+      console.log("BERHASIL SAVE");
+
+    })
+    .catch(err => {
+
+      console.error("GAGAL SAVE", err);
+
+    });
+
+  }
+
+  let unsubscribe = null;
+  let detailListener = null;
+  let openedTabs = [];
+  let activeTab = "";
+
+
+
+  function isToday(dateString) {
+
+    const today =
+    new Date()
+    .toISOString()
+    .split("T")[0];
+
+    return dateString === today;
+
+  }
+
+
+  async function loadData(useDateFilter = true) {
+
+    const dateFilter = document.getElementById("filterDate").value;
+
+    const statusFilter = document.getElementById("filterStatus").value;
+
+    const typeFilter = document.getElementById("filterType").value;
+
+    const keyword = document
+        .getElementById("searchBox")
+        .value
+        .toLowerCase()
+        .trim();
+
+    const tbody = document.getElementById("historyBody");
+
+    if (unsubscribe) {
+        unsubscribe();
+        unsubscribe = null;
+    }
+
+    tbody.innerHTML = "";
+
+    unsubscribe = db.collection("invoice")
+        .where("nama", "==", "BIKERMART")
+        .orderBy("waktu", "desc")
+        .onSnapshot(async (snapshot) => {
+
+            console.log("RENDER HISTORY :", snapshot.size);
+
+            let totalDoc = 0;
+            let totalPending = 0;
+            let totalSebagian = 0;
+            let totalProses = 0;
+            let totalReady = 0;
+
+            const rows = [];
+
+            for (const doc of snapshot.docs) {
+
+                const d = doc.data();
+
+                const docType = (d.type || "").toLowerCase();
+
+                if (
+                    typeFilter !== "all" &&
+                    docType !== typeFilter
+                ) continue;
+
+                if (
+                    keyword &&
+                    !(d.invoice || "")
+                    .toLowerCase()
+                    .includes(keyword)
+                ) continue;
+
+                if (
+                    useDateFilter &&
+                    dateFilter &&
+                    !isToday(dateFilter)
+                ) {
+
+                    const tanggalDoc =
+                        d.waktu
+                            ? d.waktu
+                                  .toDate()
+                                  .toISOString()
+                                  .split("T")[0]
+                            : "";
+
+                    if (tanggalDoc !== dateFilter)
+                        continue;
+                }
+
+                const detailSnap = await db
+                    .collection("pesanan")
+                    .where("invoice", "==", d.invoice)
+                    .get();
+
+                let pending = 0;
+                let proses = 0;
+                let ready = 0;
+
+                detailSnap.forEach(itemDoc => {
+
+                    const status =
+                        (itemDoc.data().status || "pending")
+                        .toLowerCase();
+
+                    if (status === "pending") {
+
+                        pending++;
+
+                    } else if (status === "proses") {
+
+                        proses++;
+
+                    } else if (status === "ready") {
+
+                        ready++;
+
+                    }
+
+                });
+
+                let finalStatus = "pending";
+
+                if (
+                    ready === detailSnap.size &&
+                    detailSnap.size > 0
+                ) {
+
+                    finalStatus = "ready";
+
+                } else if (
+                    pending === detailSnap.size
+                ) {
+
+                    finalStatus = "pending";
+
+                } else if (
+                    proses === detailSnap.size
+                ) {
+
+                    finalStatus = "proses";
+
+                } else {
+
+                    finalStatus = "sebagian";
+
+                }
+
+                if (
+                    statusFilter !== "all" &&
+                    finalStatus !== statusFilter
+                ) continue;
+
+                totalDoc++;
+
+                if (finalStatus === "pending") {
+
+                    totalPending++;
+
+                } else if (finalStatus === "sebagian") {
+
+                    totalSebagian++;
+
+                } else if (finalStatus === "proses") {
+
+                    totalProses++;
+
+                } else if (finalStatus === "ready") {
+
+                    totalReady++;
+
+                }
+
+                const waktu =
+                    d.waktu
+                        ? d.waktu
+                              .toDate()
+                              .toLocaleDateString("id-ID")
+                        : "-";
+
+                rows.push(`
+<tr
+class="row-${finalStatus}"
+onclick="openInvoiceTab('${d.invoice}')">
+
+<td>${d.invoice || "-"}</td>
+
+<td>${waktu}</td>
+
+<td>${d.type || "-"}</td>
+
+<td>${d.total_item || 0}</td>
+
+<td>
+Rp ${(d.total || 0).toLocaleString("id-ID")}
+</td>
+
+<td>
+
+<span class="badge badge-${finalStatus}">
+
+${d.request_delete
+? "DELETE REQUEST"
+: finalStatus.toUpperCase()}
+
+</span>
+
+</td>
+
+</tr>
+`);
+
+            }
+
+            if (rows.length === 0) {
+
+                tbody.innerHTML = `
+<tr>
+<td colspan="6" class="erp-table-empty">
+Tidak ada dokumen
+</td>
+</tr>
+`;
+
+            } else {
+
+                tbody.innerHTML = rows.join("");
+
+            }
+
+            document.getElementById("sum-total").innerText = totalDoc;
+            document.getElementById("sum-pending").innerText = totalPending;
+            document.getElementById("sum-sebagian").innerText = totalSebagian;
+            document.getElementById("sum-proses").innerText = totalProses;
+            document.getElementById("sum-ready").innerText = totalReady;
+
+        }, (err) => {
+
+            console.error("LOAD HISTORY ERROR :", err);
+
+        });
+
+}
+
+
+
+
+
+
+
+
+  // ================= FAKTUR =================
+
+  async function lihatFaktur(invoiceId) {
+
+    if (detailListener) {
+      detailListener();
+    }
+
+    const invoiceDoc =
+    await db
+    .collection("invoice")
+    .doc(invoiceId)
+    .get();
+
+    if (!invoiceDoc.exists) {
+
+      alert("Invoice tidak ditemukan");
+      return;
+
+    }
+
+    const inv =
+    invoiceDoc.data();
+
+    if (inv.nama !== "BIKERMART") {
+
+      alert("Akses ditolak");
+
+      return;
+
+    }
+
+    detailListener =
+    db.collection("pesanan")
+    .where(
+      "invoice",
+      "==",
+      invoiceId
+    )
+    .where(
+      "nama",
+      "==",
+      VIP_NAME
+    )
+    .onSnapshot(async(detailSnap)=> {
+
+      let total = 0;
+
+      let ready = 0;
+      let proses = 0;
+      let pending = 0;
+
+      let no = 0; // 🔥 DROP DI SINI
+
+      let rows = "";
+
+      detailSnap.forEach(doc => {
+
+        const itemId = doc.id;
+
+        const item = doc.data();
+
+        const deleteRequest =
+        item.request_delete === true;
+
+        no++;
+
+        const status =
+        (item.status || "pending")
+        .toLowerCase();
+
+        let label = "PENDING";
+
+        if (status === "ready") {
+
+          label = "READY";
+          ready++;
+
+        } else if (status === "proses") {
+
+          label = "PROSES";
+          proses++;
+
+        } else {
+
+          pending++;
+
+        }
+
+        total += item.total || 0;
+
+        rows += `
+        <tr>
+
+        <td>${no}</td>
+
+        <td>${item.produk}</td>
+
+        <td>${item.qty}</td>
+
+        <td>${item.satuan}</td>
+
+        <td>
+        Rp ${(item.harga || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td>
+        ${item.diskon || 0}%
+        </td>
+
+        <td>
+        Rp ${(item.total || 0).toLocaleString("id-ID")}
+        </td>
+
+        <td>
+
+        ${
+        deleteRequest
+        ?
+        '<span class="badge badge-delete">DELETE REQUEST</span>':
+        label
+        }
+
+        </td>
+
+        <td>
+        <button
+        class="btn-delete-item"
+        onclick="
+        event.stopPropagation();
+        requestDeleteItem(
+        '${itemId}',
+        '${invoiceId}'
+        )
+        "
+        >
+        🗑
+        </button>
+
+        </td>
+
+        </tr>
+
+        `;
+
+      });
+
+      const waktu =
+
+      inv.waktu
+      ?
+      inv.waktu
+      .toDate()
+      .toLocaleString("id-ID"):
+      "-";
+
+      document
+      .getElementById("invoice-content")
+      .innerHTML = `
+
+      <div class="invoice-box modern-faktur">
+
+      <div class="top-header-flex">
+
+      <div style="
+      width:100%;
+      text-align:center;
+      ">
+
+      <div class="brand-title">
+
+      📄 Detail Dokumen
+
+      </div>
+
+      <div class="erp-doc-info">
+
+      <div>
+      <div class="info-label">No Dokumen</div>
+      <div class="info-value">${invoiceId}</div>
+      </div>
+
+      <div>
+      <div class="info-label">Customer</div>
+      <div class="info-value">${inv.nama}</div>
+      </div>
+
+      <div>
+      <div class="info-label">Tanggal</div>
+      <div class="info-value">${waktu}</div>
+      </div>
+
+      <div>
+      <div class="info-label">Jenis</div>
+      <div class="info-value">${inv.type.toUpperCase()}</div>
+      </div>
+
+      </div>
+
+      </div>
+
+      </div>
+
+      <div class="invoice-table-wrap">
+
+      <table class="invoice-table">
+
+      <thead>
+
+      <tr>
+
+      <th>No</th>
+      <th>Nama Barang</th>
+      <th>Qty</th>
+      <th>Satuan</th>
+      <th>Harga</th>
+      <th>Diskon</th>
+      <th>Total</th>
+      <th>Status</th>
+      <th>Aksi</th>
+
+      </tr>
+
+      </thead>
+
+      <tbody>
+
+      ${rows}
+
+      </tbody>
+
+      </table>
+
+      </div>
+
+      <div class="invoice-footer">
+
+      <div class="invoice-action">
+
+      <button class="btn"
+      onclick="window.print()">
+      🖨️ Print
+      </button>
+
+      <button class="btn"
+      onclick="downloadInvoice()">
+      📥 Download
+      </button>
+
+      <button class="btn"
+      onclick="closeInvoice()">
+      ❌ Tutup
+      </button>
+
+      <button
+      class="btn btn-delete-doc"
+      onclick="
+      requestDeleteInvoice(
+      '${invoiceId}'
+      )
+      "
+      >
+      🗑 Request Hapus
+      </button>
+
+      </div>
+
+      <div class="erp-total-box">
+
+      <div class="total-item-box">
+
+      <b>Total Item</b>
+      <span>${detailSnap.size}</span>
+
+      </div>
+
+      <div class="grand-total-box">
+
+      <b>Grand Total</b>
+      <span>
+      Rp ${total.toLocaleString("id-ID")}
+      </span>
+
+      </div>
+
+      </div>
+
+      </div>
+
+      `;
+
+      document
+      .getElementById("main-content")
+      .style.display = "none";
+
+      document
+      .getElementById("invoice-content")
+      .style.display = "block";
+    }); // tutup onSnapshot
+  }
+  
+  
+
+
+
+
+  function closeInvoice(){
+
+if(detailListener){
+detailListener();
+detailListener = null;
+}
+
+activeTab = "history";
+
+renderTabs();
+
+document.getElementById("invoice-content").style.display = "none";
+document.getElementById("main-content").style.display = "block";
+
+}
+
+
+  function downloadInvoice() {
+
+    const invoice =
+    document.querySelector(".invoice-box");
+
+    if (!invoice) {
+
+      alert("Invoice tidak ditemukan 😭");
+
+      return;
+
+    }
+
+    // 🔥 clone biar bersih
+    const clone =
+invoice.cloneNode(true);
+
+clone.querySelectorAll(".btn-delete-item")
+.forEach(el => el.remove());
+
+const aksiHeader =
+clone.querySelector("th:last-child");
+
+if(aksiHeader){
+aksiHeader.remove();
+}
+
+clone.querySelectorAll("tr")
+.forEach(row=>{
+
+const lastCell =
+row.querySelector("td:last-child");
+
+if(lastCell){
+lastCell.remove();
+}
+
+});
+
+    // 🔥 buang tombol
+    const actions =
+    clone.querySelector(".invoice-action");
+
+    if (actions) {
+
+      actions.remove();
+
+    }
+
+    // 🔥 wrapper khusus PDF
+    const wrapper =
+    document.createElement("div");
+
+    wrapper.style.padding = "20px";
+    wrapper.style.background = "#ffffff";
+
+    wrapper.appendChild(clone);
+
+    document.body.appendChild(wrapper);
+
+    const opt = {
+
+      margin: 0.3,
+
+      filename:
+      "invoice-" + Date.now() + ".pdf",
+
+      image: {
+        type: "jpeg",
+        quality: 1
+      },
+
+      html2canvas: {
+
+scale: 2,
+
+useCORS: true,
+
+scrollX: 0,
+
+scrollY: 0,
+
+windowWidth: wrapper.scrollWidth,
+
+windowHeight: wrapper.scrollHeight
+
+},
+
+      jsPDF: {
+
+        unit: "in",
+
+        format: "a4",
+
+        orientation:"portrait"
+
+      },
+
+      pagebreak:{
+mode:["css","legacy"]
+}
+
+    };
+
+    html2pdf()
+    .set(opt)
+    .from(wrapper)
+    .save()
+    .then(() => {
+
+      wrapper.remove();
+
+    });
+
+  }
+
+
+  async function recalculateInvoice(
+    invoiceId
+  ) {
+
+    const snap =
+    await db
+    .collection("pesanan")
+    .where(
+      "invoice",
+      "==",
+      invoiceId
+    )
+    .where(
+      "nama",
+      "==",
+      VIP_NAME
+    )
+    .get();
+
+    let totalItem = 0;
+    let grandTotal = 0;
+
+    snap.forEach(doc => {
+
+      const item =
+      doc.data();
+
+      totalItem++;
+
+      grandTotal +=
+      item.total || 0;
+
+    });
+
+    if (totalItem === 0) {
+
+      await db
+      .collection("invoice")
+      .doc(invoiceId)
+      .delete();
+
+      closeInvoice();
+
+      loadData();
+
+      return;
+
+    }
+
+    await db
+    .collection("invoice")
+    .doc(invoiceId)
+    .update({
+
+      total_item: totalItem,
+
+      total: grandTotal
+
+    });
+
+  }
+
+  async function requestDeleteInvoice(
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Kirim request hapus dokumen?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      console.log("STEP 1");
+
+      await db
+      .collection("invoice")
+      .doc(invoiceId)
+      .set({
+
+        request_delete: true,
+
+        request_delete_at:
+        firebase.firestore
+        .FieldValue
+        .serverTimestamp(),
+
+        request_delete_by: "VIP"
+
+      }, {
+        merge: true
+      });
+
+      console.log("STEP 2");
+
+      const snap =
+      await db
+      .collection("pesanan")
+      .where(
+        "invoice",
+        "==",
+        invoiceId
+      )
+      .where(
+        "nama",
+        "==",
+        VIP_NAME
+      )
+      .get();
+
+      console.log(
+        "STEP 3",
+        snap.size
+      );
+
+      const batch =
+      db.batch();
+
+      snap.forEach(doc => {
+
+        batch.update(doc.ref, {
+
+          request_delete: true,
+
+          request_delete_invoice: true,
+
+          request_delete_at:
+          firebase.firestore
+          .FieldValue
+          .serverTimestamp(),
+
+          request_delete_by: "VIP"
+
+        });
+
+      });
+
+      console.log("STEP 4");
+
+      await batch.commit();
+
+      console.log("STEP 5");
+
+      alert(
+        "Request hapus berhasil dikirim"
+      );
+
+    }
+    catch(err) {
+
+      console.error(
+        "ERROR DELETE:",
+        err
+      );
+
+      alert(
+        "Gagal mengirim request"
+      );
+
+    }
+
+  }
+
+  async function requestDeleteItem(
+    itemId,
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Kirim request hapus item ini?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      await db
+      .collection("pesanan")
+      .doc(itemId)
+      .update({
+
+        request_delete: true,
+
+        request_delete_at:
+        firebase.firestore
+        .FieldValue
+        .serverTimestamp(),
+
+        request_delete_by: "VIP"
+
+      });
+
+      alert(
+        "Request hapus item berhasil dikirim"
+      );
+
+      lihatFaktur(
+        invoiceId
+      );
+
+    }
+    catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal kirim request"
+      );
+
+    }
+
+  }
+
+
+  async function hapusDokumen(
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Hapus seluruh dokumen ini?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      const snap =
+      await db
+      .collection("pesanan")
+      .where(
+        "invoice",
+        "==",
+        invoiceId
+      )
+      .get();
+
+      const batch =
+      db.batch();
+
+      snap.forEach(doc => {
+
+        batch.delete(
+          doc.ref
+        );
+
+      });
+
+      batch.delete(
+        db.collection("invoice")
+        .doc(invoiceId)
+      );
+
+      await batch.commit();
+
+      alert(
+        "Dokumen berhasil dihapus"
+      );
+
+      closeInvoice();
+
+      loadData();
+
+    }
+    catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal menghapus dokumen"
+      );
+
+    }
+
+  }
+
+  async function hapusItem(
+    itemId,
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Hapus item ini?"
+      )
+    ) {
+      return;
+    }
+
+    try {
+
+      await db
+      .collection("pesanan")
+      .doc(itemId)
+      .delete();
+
+      await recalculateInvoice(
+        invoiceId
+      );
+
+      alert(
+        "Item berhasil dihapus"
+      );
+
+      lihatFaktur(
+        invoiceId
+      );
+
+      loadData();
+
+    }
+    catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal menghapus item"
+      );
+
+    }
+
+  }
+
+
+  async function manualRefresh(btn) {
+
+    btn.classList.add("loading");
+
+    btn.innerText =
+    "⏳ Refreshing...";
+
+    try {
+
+      await loadData();
+
+    }
+
+    catch(err) {
+
+      console.log(err);
+
+    }
+
+    setTimeout(()=> {
+
+      btn.classList.remove(
+        "loading"
+      );
+
+      btn.innerText =
+      "🔄 Refresh";
+
+    }, 1000);
+
+  }
+
+  window.addEventListener(
+    "load",
+    ()=> {
+
+      document
+      .getElementById("searchBox")
+      .focus();
+
+    }
+  );
+
+  setTimeout(()=> {
+
+    const search =
+    document.getElementById(
+      "searchBox"
+    );
+
+    if (search) {
+
+      search.focus();
+
+    }
+
+  }, 300);
+
+
+  window.addEventListener("load", ()=> {
+
+    const today =
+    new Date()
+    .toISOString()
+    .split("T")[0];
+
+    document.getElementById(
+      "filterDate"
+    ).value = today;
+
+    loadData(false);
+
+  });
+
+  setInterval(()=> {
+
+    updateActivity();
+
+  }, 30000);
+
+  // FILTER AUTO CHANGE
+  document.getElementById(
+    "filterDate"
+  ).addEventListener(
+    "change",
+    loadData
+  );
+
+  document.getElementById(
+    "filterStatus"
+  ).addEventListener(
+    "change",
+    loadData
+  );
+
+  document.getElementById(
+    "filterType"
+  ).addEventListener(
+    "change",
+    loadData
+  );
+
+  function openInvoiceTab(invoiceId) {
+
+    const exist =
+    openedTabs.find(
+      t => t.id === invoiceId
+    );
+
+    if (!exist) {
+
+      openedTabs.push({
+        id: invoiceId,
+        title: invoiceId
+      });
+
+    }
+
+    activeTab = invoiceId;
+
+    renderTabs();
+
+    lihatFaktur(invoiceId);
+
+  }
+
+
+
+
+  function renderTabs() {
+
+    const wrap =
+    document.getElementById("erp-tabs");
+
+    if (!wrap) return;
+
+    wrap.innerHTML = "";
+
+    openedTabs.forEach(tab => {
+
+      wrap.innerHTML += `
+
+      <div
+      class="
+      tab
+      ${activeTab === tab.id ? "active": ""}
+      "
+      >
+
+      <span
+      onclick="
+      switchTab('${tab.id}')
+      "
+      >
+
+      ${tab.title}
+
+      </span>
+
+      ${
+      tab.id !== "history"
+      ?
+      `
+      <span
+      style="
+      margin-left:8px;
+      cursor:pointer;
+      color:white;
+      font-weight:bold;
+      "
+      onclick="
+      event.stopPropagation();
+      closeTab('${tab.id}')
+      "
+      >
+      ✕
+      </span>
+      `:
+      ""
+      }
+
+      </div>
+
+      `;
+
+    });
+
+  }
+
+  function closeTab(tabId) {
+
+    openedTabs =
+    openedTabs.filter(
+      t => t.id !== tabId
+    );
+
+    if (activeTab === tabId) {
+
+      activeTab = "history";
+
+      closeInvoice();
+
+    }
+
+    renderTabs();
+
+  }
+
+  function switchTab(tabId) {
+
+    activeTab = tabId;
+
+    renderTabs();
+
+    if (tabId === "history") {
+
+      document
+      .getElementById("main-content")
+      .style.display = "block";
+
+      document
+      .getElementById("invoice-content")
+      .style.display = "none";
+
+      return;
+
+    }
+
+    lihatFaktur(tabId);
+
+  }
+  
+  openedTabs = [
+{
+id:"history",
+title:"History Dokumen"
+}
+];
+
+activeTab = "history";
+
+renderTabs();
+
+
+</script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,4069 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin-V5 Dashboard</title>
+<link rel="stylesheet" href="style.css">
+
+<style>
+.status-btn .btn{
+
+  opacity:0.4;
+
+  transition:0.2s;
+}
+
+.status-text{
+  margin-top:6px;
+  font-size:12px;
+  font-weight:bold;
+}
+
+.status-text.pending{ color:red; }
+.status-text.proses{ color:orange; }
+.status-text.ready{ color:limegreen; }
+
+/* 🔥 TAMBAH DI DALAM <style> */
+
+.vip-wrapper{
+
+  position:relative;
+
+  left:auto;
+
+  top:auto;
+
+  width:100%;
+
+  background:#fff;
+
+  border:1px solid #d0d0d0;
+
+  border-radius:4px;
+
+  padding:12px;
+
+  box-shadow:none;
+
+}
+
+.vip-title{
+
+  font-size:14px;
+
+  font-weight:600;
+
+  color:#444;
+
+  margin-bottom:10px;
+
+  border-bottom:2px solid #e54770;
+
+  padding-bottom:6px;
+}
+
+.vip-search{
+
+width:100%;
+
+height:30px;
+
+padding:0 10px;
+
+background:white;
+
+border:1px solid #ccc;
+
+color:#333;
+
+font-size:12px;
+
+margin-bottom:10px;
+}
+
+.vip-grid{
+
+  display:grid;
+
+  gap:18px;
+}
+
+.vip-card{
+
+background:#dff2d8;
+
+border:1px solid #a6d4a1;
+
+border-left:none;
+
+border-radius:4px;
+
+padding:10px;
+}
+
+.vip-name{
+
+font-size:13px;
+
+font-weight:600;
+
+color:#444;
+
+margin-bottom:10px;
+}
+
+.vip-btn-wrap{
+
+  display:flex;
+
+  gap:12px;
+
+  flex-wrap:wrap;
+}
+
+.vip-btn{
+
+  border:none;
+
+  padding:13px 18px;
+
+  border-radius:14px;
+
+  color:white;
+
+  font-weight:bold;
+
+  cursor:pointer;
+}
+
+.vip-dashboard{
+
+  background:#22c55e;
+}
+
+.vip-history{
+
+  background:#3b82f6;
+}
+
+.vip-status{
+
+  margin-top:14px;
+
+  font-size:13px;
+
+  opacity:.7;
+}
+
+@media(max-width:600px){
+
+  .vip-name{
+    font-size:20px;
+  }
+
+  .vip-btn{
+    width:100%;
+  }
+
+}
+
+/* =====================================
+🤖 IMAMGPT SCOPED UI
+NO COLLISION VERSION
+===================================== */
+
+.imam-ai-container{
+
+background:#ffffff;
+
+border:1px solid #d0d0d0;
+
+border-radius:4px;
+
+box-shadow:none;
+
+margin:8px;
+}
+
+/* HEADER */
+
+.imam-ai-header{
+
+height:35px;
+
+padding:0 10px;
+
+display:flex;
+
+align-items:center;
+
+background:#5f7793;
+
+color:white;
+
+font-size:12px;
+
+font-weight:600;
+}
+
+/* CHAT AREA */
+
+#imam-chat-box{
+
+  height:340px;
+
+  overflow-y:auto;
+
+  padding:20px;
+
+  scroll-behavior:smooth;
+
+}
+
+/* USER */
+
+.imam-user-msg{
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  margin-left:auto;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  box-shadow:
+  0 6px 18px rgba(37,99,235,.35);
+
+  word-break:break-word;
+
+}
+
+/* AI */
+
+.imam-ai-msg{
+
+  background:
+  rgba(30,41,59,.95);
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  border:
+  1px solid rgba(255,255,255,.04);
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,.25);
+
+  word-break:break-word;
+
+}
+
+/* IMAGE */
+
+.imam-ai-msg img{
+
+  width:100%;
+
+  margin-top:14px;
+
+  border-radius:4px;
+
+  display:block;
+
+}
+
+/* INPUT */
+
+.imam-chat-input-wrap{
+
+  display:flex;
+
+  align-items:flex-end;
+
+  gap:12px;
+
+  padding:18px;
+
+  background:
+  rgba(17,24,39,.96);
+
+}
+
+/* TEXTAREA */
+#imam-ai-input{
+
+  flex:1;
+
+  min-height:60px;
+
+  max-height:180px;
+
+  overflow-y:auto;
+
+  border:none;
+
+  outline:none;
+
+  border-radius:18px;
+
+  padding:14px 16px;
+
+  background:
+  rgba(30,41,59,.95);
+
+  color:white;
+
+  resize:none;
+
+  font-size:14px;
+
+  line-height:1.5;
+
+  box-sizing:border-box;
+
+}
+
+/* BUTTON */
+
+.imam-chat-input-wrap button{
+
+  width:62px;
+
+  height:62px;
+
+  border:none;
+
+  border-radius:18px;
+
+  background:
+  linear-gradient(
+    135deg,
+    #22c55e,
+    #16a34a
+  );
+
+  color:white;
+
+  font-size:24px;
+
+  cursor:pointer;
+
+  flex-shrink:0;
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  .imam-ai-container{
+
+    border-radius:24px;
+
+  }
+
+  .imam-ai-header{
+
+    font-size:20px;
+
+  }
+
+  #imam-chat-box{
+
+    height:300px;
+
+  }
+
+}
+
+/* =========================
+TYPING ANIMATION
+========================= */
+
+.typing{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+}
+
+.typing span{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:white;
+
+  opacity:.5;
+
+  animation:bounce 1s infinite;
+
+}
+
+.typing span:nth-child(2){
+
+  animation-delay:.2s;
+
+}
+
+.typing span:nth-child(3){
+
+  animation-delay:.4s;
+
+}
+
+@keyframes bounce{
+
+  0%,100%{
+
+    transform:translateY(0);
+
+    opacity:.3;
+
+  }
+
+  50%{
+
+    transform:translateY(-4px);
+
+    opacity:1;
+
+  }
+
+}
+
+.ai-action{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:14px;
+
+}
+
+.copy-btn,
+.download-btn{
+
+  border:none;
+
+  background:#1e293b;
+
+  color:white;
+
+  padding:10px 14px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-size:13px;
+
+  transition:.2s;
+
+}
+
+.copy-btn:hover,
+.download-btn:hover{
+
+  transform:translateY(-2px);
+
+  background:#334155;
+
+}
+
+.image-upload-wrap{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+}
+
+.image-upload-wrap input{
+
+  color:white;
+
+  font-size:13px;
+
+}
+
+.upload-btn{
+
+  width:58px;
+
+  height:58px;
+
+  border-radius:16px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:
+  rgba(255,255,255,.08);
+
+  cursor:pointer;
+
+  font-size:24px;
+
+  flex-shrink:0;
+
+}
+
+#preview-box{
+
+  padding:
+  12px 18px 0 18px;
+
+}
+
+#preview-box img{
+
+  width:90px;
+
+  border-radius:14px;
+
+  margin-top:8px;
+
+  display:block;
+
+  box-shadow:
+  0 6px 20px rgba(0,0,0,.25);
+
+}
+
+.preview-card{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+  rgba(255,255,255,.05);
+
+  padding:10px;
+
+  border-radius:16px;
+
+  width:fit-content;
+
+}
+
+.preview-card img{
+
+  width:70px;
+
+  height:70px;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+}
+
+/* =====================================
+📚 FINAL ADMIN INVOICE UI
+===================================== */
+
+.invoice-group{
+
+background:transparent;
+
+border:1px solid #d0d0d0;
+
+border-radius:4px;
+
+box-shadow:none;
+
+padding:0;
+
+margin-bottom:8px;
+
+}
+
+/* HEADER */
+.invoice-header{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-start;
+
+  gap:14px;
+
+  background:#f7f7f7;
+
+  padding:10px;
+
+  border-bottom:1px solid #ddd;
+
+}
+
+/* LEFT */
+.invoice-header-left{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:4px;
+
+}
+
+/* INVOICE */
+
+.invoice-title{
+
+font-size:13px;
+
+font-weight:600;
+
+color:#333;
+
+}
+
+/* INFO */
+
+.invoice-info{
+
+  display:flex;
+
+  flex-direction:column;
+
+  gap:2px;
+
+}
+
+.invoice-info .vip-name{
+
+color:#333;
+
+font-size:12px;
+
+font-weight:600;
+
+}
+
+.invoice-info .vip-date{
+
+  color:#94a3b8;
+
+  font-size:13px;
+
+  margin-top:2px;
+
+  display:block;
+
+}
+
+/* TOGGLE */
+
+.collapse-btn{
+
+width:28px;
+
+height:28px;
+
+font-size:12px;
+
+border-radius:3px;
+
+}
+
+.collapse-btn:hover{
+
+  background:#334155;
+  
+  transform:translateY(-2px);
+
+}
+
+/* SUMMARY */
+
+.invoice-summary{
+
+  display:flex;
+
+  gap:12px;
+
+  margin-top:20px;
+
+  flex-wrap:wrap;
+
+}
+
+.summary-box{
+
+background:#f0f0f0;
+
+border:1px solid #ddd;
+
+border-radius:3px;
+
+padding:5px 8px;
+
+font-size:11px;
+
+}
+
+.summary-ready{
+
+  color:#22c55e;
+
+}
+
+.summary-proses{
+
+  color:#facc15;
+
+}
+
+.summary-pending{
+
+  color:#ef4444;
+
+}
+
+/* CONTENT */
+
+.invoice-content{
+
+  display:none;
+
+  margin-top:18px;
+
+}
+
+/* ITEM */
+
+.invoice-item{
+
+background:white;
+
+border-bottom:1px solid #eee;
+
+border-radius:0;
+
+padding:10px;
+
+margin:0;
+}
+
+/* PRODUCT */
+
+.invoice-order{
+  color:#333;
+  font-size:12px;
+  font-weight:600;
+  line-height:1.5;
+}
+
+/* STATUS */
+
+.status-text.pending{
+
+  color:#ef4444;
+
+}
+
+.status-text.proses{
+
+  color:#facc15;
+
+}
+
+.status-text.ready{
+
+  color:#22c55e;
+
+}
+
+/* ACTION */
+
+.action-wrapper{
+
+  display:flex;
+
+  justify-content:space-between;
+
+  align-items:flex-end;
+
+  gap:14px;
+
+}
+
+/* STATUS BUTTON */
+
+.status-btn{
+
+  display:flex;
+
+  gap:10px;
+
+}
+
+.status-btn .btn{
+
+width:28px;
+
+height:28px;
+
+font-size:12px;
+
+border-radius:3px;
+
+}
+
+.status-btn .btn:hover{
+
+  transform:translateY(-2px);
+
+}
+
+/* ACTIVE */
+
+.active-red{
+
+  background:#ef4444 !important;
+
+}
+
+.active-yellow{
+
+  background:#facc15 !important;
+
+}
+
+.active-green{
+
+  background:#22c55e !important;
+
+}
+
+/* DELETE */
+
+.delete-side{
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+
+  gap:4px;
+
+}
+
+.delete-label{
+
+  font-size:13px;
+
+  font-weight:900;
+
+  color:#94a3b8;
+
+  letter-spacing:.5px;
+
+}
+
+.delete-btn-admin{
+
+width:28px;
+
+height:28px;
+
+font-size:12px;
+
+border-radius:3px;
+
+}
+
+.delete-btn-admin:hover{
+
+  background:#dc2626;
+
+  transform:translateY(-2px);
+
+}
+
+/* REQUEST DELETE */
+
+.invoice-delete-alert{
+
+  margin-top:14px;
+
+  background:#7f1d1d;
+
+  border-radius:14px;
+
+  padding:14px;
+
+  color:white;
+
+  font-size:13px;
+
+  line-height:1.6;
+
+}
+
+.invoice-delete-action{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:12px;
+
+}
+
+.approve-btn{
+
+  background:#16a34a;
+
+  color:white;
+
+  border:none;
+
+  padding:10px 14px;
+
+  border-radius:10px;
+
+  font-weight:700;
+
+}
+
+.reject-btn{
+
+  background:#334155;
+
+  color:white;
+
+  border:none;
+
+  padding:10px 14px;
+
+  border-radius:10px;
+
+  font-weight:700;
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+  .invoice-title{
+    font-size:12px;
+  }
+
+  .invoice-info .vip-name{
+    font-size:11px;
+  }
+
+  .summary-box{
+    font-size:10px;
+    padding:3px 6px;
+  }
+
+  .status-btn .btn,
+  .delete-btn-admin{
+    width:28px;
+    height:28px;
+    font-size:12px;
+  }
+
+}
+
+.vip-active-name{
+  color:#ffffff !important;
+  font-size:14px !important;
+  font-weight:700 !important;
+}
+
+.erp-layout{
+display:flex;
+min-height:100vh;
+}
+
+.erp-sidebar{
+width:52px;
+background:linear-gradient(
+180deg,
+#153d7a,
+#0b2d61
+);
+display:flex;
+flex-direction:column;
+align-items:center;
+}
+
+.erp-logo{
+height:50px;
+display:flex;
+align-items:center;
+justify-content:center;
+color:white;
+font-size:20px;
+}
+
+.erp-menu{
+width:100%;
+}
+
+.erp-menu button{
+width:100%;
+height:48px;
+border:none;
+background:none;
+color:white;
+cursor:pointer;
+font-size:18px;
+}
+
+.erp-menu button:hover{
+background:#e64874;
+}
+
+.erp-main{
+flex:1;
+overflow-y:auto;
+overflow-x:hidden;
+background:transparent;
+padding-bottom:80px;
+}
+
+#data{
+padding-bottom:120px;
+}
+
+
+.erp-tabs{
+height:35px;
+display:flex;
+align-items:center;
+background:#ededed;
+border-bottom:1px solid #d0d0d0;
+}
+
+.erp-tab{
+padding:8px 14px;
+font-size:13px;
+border-right:1px solid #cfcfcf;
+}
+
+.erp-tab.active{
+background:#e54770;
+color:white;
+font-weight:bold;
+}
+
+body{
+
+background:transparent;
+
+font-family:
+Segoe UI,
+Tahoma,
+Arial,
+sans-serif;
+
+font-size:12px;
+
+}
+
+.page-section{
+  display:none;
+}
+
+.page-section.active{
+  display:block;
+}
+
+.erp-menu button.active{
+  background:#e54770;
+}
+
+.erp-menu button{
+  transition:.2s;
+}
+
+.erp-menu button:active{
+  transform:scale(.95);
+}
+
+#top-tabs{
+
+  overflow-x:auto;
+
+  white-space:nowrap;
+
+}
+
+#top-tabs .erp-tab{
+
+  flex-shrink:0;
+
+}
+
+#data{
+padding-bottom:120px;
+}
+
+</style>
+
+</head>
+
+<body>
+  
+  <div class="erp-layout">
+
+<div class="erp-sidebar">
+
+<div class="erp-logo">
+⚙
+</div>
+
+<div class="erp-menu">
+
+<button class="menu-btn active"
+onclick="showPage('page-dashboard',this)">
+🏠
+</button>
+
+<button class="menu-btn"
+onclick="showPage('page-stok',this)">
+📦
+</button>
+
+<button class="menu-btn"
+onclick="showPage('page-order',this)">
+🛒
+</button>
+
+<button class="menu-btn"
+onclick="showPage('page-vip',this)">
+👤
+</button>
+
+<button class="menu-btn"
+onclick="showPage('page-ai',this)">
+🤖
+</button>
+
+</div>
+
+</div>
+
+<div class="erp-main">
+  
+<div class="erp-tabs" id="top-tabs"></div>
+
+<div class="header">
+  <h1>📊 IMAM SALES | VVIP</h1>
+  <div id="live-clock">Loading...</div>
+</div>
+
+<!-- DASHBOARD -->
+<div id="page-dashboard" class="page-section active">
+
+  <div class="card">
+
+    <h3 id="vip-active-title">
+      👥 Pengguna Aktif
+    </h3>
+
+    <div id="vip-active-list"></div>
+
+  </div>
+
+</div>
+
+
+<!-- STOK -->
+<div id="page-stok" class="page-section">
+
+  <div class="card stok-card">
+
+    <h3>📦 Kontrol Stok Produk</h3>
+
+    <input type="text"
+      placeholder="🔍 Cari produk..."
+      onkeyup="searchProduk(this.value)">
+
+    <br><br>
+
+    <label>
+      <input type="checkbox" onclick="toggleAll(this)">
+      Pilih Semua
+    </label>
+
+    <div id="stok-list"></div>
+
+    <div class="stok-footer">
+      <button onclick="bulkUpdate('tersedia')">
+        🟢 SET TERSEDIA
+      </button>
+
+      <button onclick="bulkUpdate('kosong')">
+        🔴 SET KOSONG
+      </button>
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- ORDER -->
+<div id="page-order" class="page-section">
+
+  <div class="control">
+
+    <select id="filterBulan" onchange="loadData()">
+      <option value="">📅 Bulan Ini</option>
+      <option value="1">Januari</option>
+      <option value="2">Februari</option>
+      <option value="3">Maret</option>
+      <option value="4">April</option>
+      <option value="5">Mei</option>
+      <option value="6">Juni</option>
+      <option value="7">Juli</option>
+      <option value="8">Agustus</option>
+      <option value="9">September</option>
+      <option value="10">Oktober</option>
+      <option value="11">November</option>
+      <option value="12">Desember</option>
+    </select>
+
+    <select id="filterVIP" onchange="saveFilter()">
+      <option value="all">Semua VIP</option>
+    </select>
+
+    <select id="filterStatus" onchange="saveFilter()">
+      <option value="all">Semua Status</option>
+      <option value="pending">🔴 Pending</option>
+      <option value="proses">🟡 Proses</option>
+      <option value="ready">🟢 Ready</option>
+    </select>
+
+    <input
+      type="text"
+      id="search"
+      placeholder="🔍 Cari produk..."
+      onkeyup="saveFilter()"
+    >
+
+    <button onclick="refreshOrder()">
+      🔄 REFRESH
+    </button>
+
+  </div>
+
+  <div class="card order-card">
+
+    <h3>📊 Data Order</h3>
+
+    <div id="data" class="content"></div>
+
+  </div>
+
+</div>
+
+
+<!-- VIP -->
+<div id="page-vip" class="page-section">
+
+  <div id="vip-control-container"></div>
+
+</div>
+
+
+<!-- AI -->
+<div id="page-ai" class="page-section">
+
+  <div class="imam-ai-container">
+
+    <div class="imam-ai-header">
+      🤖 ImamGPT Assistant
+    </div>
+
+    <div id="imam-chat-box"></div>
+
+  <!-- 🔥 PREVIEW AREA -->
+  <div id="preview-box"></div>
+
+  <!-- INPUT AREA -->
+  <div class="imam-chat-input-wrap">
+
+    <div class="imam-image-upload-wrap">
+
+      <label
+        for="image-upload"
+        class="upload-btn"
+      >
+        🖼️
+      </label>
+
+      <input
+        type="file"
+        id="image-upload"
+        accept="image/*"
+        hidden=""
+      >
+
+    </div>
+
+    <textarea
+      id="imam-ai-input"
+      placeholder="Tanya ImamGPT..."
+    ></textarea>
+
+    <button onclick="tanyaAI()">
+      🚀
+    </button>
+
+  </div>
+
+ </div>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+
+const URL = "https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec";
+
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",
+  authDomain: "apin-web.firebaseapp.com",
+  projectId: "apin-web"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+const vipPath = {
+
+  "DISTRIBUTOR":"imamsales",
+
+  "WARUNG LED":"warungled",
+
+  "LESTARI MOTOR":"lestarimotor",
+
+  "BIKERMART":"bikermart",
+
+  "OXY":"oxy",
+
+  "KARYA BAKTI VARIASI":"karyabaktivariasi",
+
+  "SUMBER MANDIRI PONTIANAK":"sumbermandiri",
+
+  "RAGAM VARIASI":"ragamvariasi",
+
+  "BINTANG JAYA MOTOR":"bintangjayamotor",
+
+  "3H MOTOSPORT":"3hmotor",
+
+  "SANLED":"sanled",
+
+  "MULI MOTOR MERAUKE":"mulimotormerauke",
+
+  "ISTANA MOTOR VARIASI":"istanamotor",
+
+  "DAMNSPEED":"damnspeed"
+
+};
+
+let allData = [];
+let firstLoad = true;
+let unsubscribePesanan = null;
+let openedInvoices = {};
+let currentVIPFilter = "all";
+let currentStatusFilter = "all";
+let currentSearchKeyword = "";
+let renderTimer = null;
+let isRendering = false;
+
+const tabsConfig = {
+
+  'page-dashboard':[
+    'Dashboard',
+    'Aktivitas',
+    'Statistik'
+  ],
+
+  'page-stok':[
+  'Produk',
+  'Stok Tersedia',
+  'Stok Kosong'
+],
+
+  'page-order':[
+  'Semua Order',
+  'Pending',
+  'Proses',
+  'Ready'
+],
+
+  'page-vip':[
+    'VIP Control',
+    'Dashboard VIP',
+    'History'
+  ],
+
+  'page-ai':[
+    'Chat',
+    'Generate',
+    'Riwayat'
+  ]
+
+};
+
+
+
+// ================= UPDATE STATUS =================
+async function updateStatus(row,status){
+
+  const card =
+  document.querySelector(
+    `[data-row='${row}']`
+  );
+
+  if(card){
+
+    card.querySelectorAll(".btn")
+    .forEach(b=>{
+
+      b.classList.remove(
+        "active-red",
+        "active-yellow",
+        "active-green"
+      );
+
+    });
+
+    if(status==="pending"){
+
+      card.querySelectorAll(".btn")[0]
+      .classList.add("active-red");
+
+    }
+
+    if(status==="proses"){
+
+      card.querySelectorAll(".btn")[1]
+      .classList.add("active-yellow");
+
+    }
+
+    if(status==="ready"){
+
+      card.querySelectorAll(".btn")[2]
+      .classList.add("active-green");
+
+    }
+
+    let txt =
+    card.querySelector(".status-text");
+
+    if(txt){
+
+      txt.className =
+      "status-text " + status;
+
+      if(status==="pending"){
+        txt.innerText="🔴 PENDING";
+      }
+
+      else if(status==="proses"){
+        txt.innerText="🟡 PROSES";
+      }
+
+      else if(status==="ready"){
+        txt.innerText="🟢 READY";
+      }
+      
+      const invoiceCard =
+card.closest(".invoice-group");
+
+  let ready =
+invoiceCard.querySelectorAll(
+'.status-text.ready'
+).length;
+
+let proses =
+invoiceCard.querySelectorAll(
+'.status-text.proses'
+).length;
+
+let pending =
+invoiceCard.querySelectorAll(
+'.status-text.pending'
+).length;
+
+invoiceCard.querySelector(
+".invoice-summary"
+).innerHTML = `
+
+<div class="summary-box">
+  🟢 READY
+  <span class="summary-ready">
+    ${ready}
+  </span>
+</div>
+
+<div class="summary-box">
+  🟡 PROSES
+  <span class="summary-proses">
+    ${proses}
+  </span>
+</div>
+
+<div class="summary-box">
+  🔴 PENDING
+  <span class="summary-pending">
+    ${pending}
+  </span>
+</div>
+
+`;
+
+  }
+
+}
+
+// ==========================
+// UPDATE STATUS FIRESTORE
+// ==========================
+await db.collection("pesanan")
+.doc(row)
+.update({
+    status: status
+});
+
+// Ambil data terbaru
+const pesananDoc = await db
+    .collection("pesanan")
+    .doc(row)
+    .get();
+
+if (!pesananDoc.exists) return;
+
+const item = pesananDoc.data();
+
+const timerRef = db
+    .collection("pengatur_waktu_delete")
+    .doc(item.invoice);
+
+// ==========================
+// JIKA STATUS = PENDING
+// HAPUS TIMER
+// ==========================
+if (status === "pending") {
+
+    const timerSnap = await timerRef.get();
+
+    if (timerSnap.exists) {
+
+        await timerRef.delete();
+
+        console.log("🗑 Timer dihapus :", item.invoice);
+
+    }
+
+}
+
+// ==========================
+// JIKA STATUS = PROSES
+// BUAT TIMER
+// ==========================
+else if (status === "proses") {
+
+    const timerSnap = await timerRef.get();
+
+    if (!timerSnap.exists) {
+
+        await timerRef.set({
+
+            faktur: item.invoice,
+
+            nama: item.nama,
+
+            created_at:
+            firebase.firestore.FieldValue.serverTimestamp(),
+
+            hari_kadaluwarsa: 7,
+
+            status: "running"
+
+        });
+
+        console.log("✅ Timer dibuat :", item.invoice);
+
+    }
+
+}
+
+// ==========================
+// UPDATE TIMESTAMP INVOICE
+// ==========================
+await db
+.collection("invoice")
+.doc(item.invoice)
+.update({
+
+    updated_at:
+    firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
+}
+
+
+
+async function cekPengaturWaktuDelete(){
+
+    const now = new Date();
+
+    const snap = await db
+    .collection("pengatur_waktu_delete")
+    .where("status","==","running")
+    .get();
+
+    for(const doc of snap.docs){
+
+        const data = doc.data();
+
+        if(!data.created_at) continue;
+
+        const mulai = data.created_at.toDate();
+
+        const expired = new Date(mulai);
+
+        expired.setDate(
+            expired.getDate() + (data.hari_kadaluwarsa || 7)
+        );
+
+        if(now >= expired){
+
+            console.log(
+                "Timer habis:",
+                data.faktur
+            );
+
+            // nanti STEP 3 isi di sini
+            const invoiceId = data.faktur;
+            
+            
+            // ===========================
+        // CEK DULU INVOICE
+        // ===========================
+        const invoiceRef = db.collection("invoice").doc(invoiceId);
+        const invoiceSnap = await invoiceRef.get();
+
+        if (!invoiceSnap.exists) {
+
+            await doc.ref.update({
+                status: "not_found"
+            });
+
+            continue;
+        }
+
+        const invoiceData = invoiceSnap.data();
+
+        if (invoiceData.request_delete === true) {
+
+            await doc.ref.update({
+                status: "finished",
+                finished_at: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            continue;
+        }
+            
+            
+
+// ===========================
+// UPDATE INVOICE
+// ===========================
+await db
+.collection("invoice")
+.doc(invoiceId)
+.set({
+
+    request_delete: true,
+
+    request_delete_at:
+    firebase.firestore.FieldValue.serverTimestamp(),
+
+    request_delete_by: "SYSTEM AUTO"
+
+},{
+    merge:true
+});
+
+// ===========================
+// UPDATE SEMUA ITEM PESANAN
+// ===========================
+const pesananSnap = await db
+.collection("pesanan")
+.where("invoice","==",invoiceId)
+.get();
+
+const batch = db.batch();
+
+pesananSnap.forEach(itemDoc=>{
+
+    batch.update(itemDoc.ref,{
+
+        request_delete:true,
+
+        request_delete_invoice:true,
+
+        request_delete_at:
+        firebase.firestore.FieldValue.serverTimestamp(),
+
+        request_delete_by:"SYSTEM AUTO"
+
+    });
+
+});
+
+await batch.commit();
+
+// ===========================
+// TIMER SELESAI
+// ===========================
+await doc.ref.update({
+
+    status:"finished",
+
+    finished_at:
+    firebase.firestore.FieldValue.serverTimestamp()
+
+});
+
+console.log(
+    "✅ AUTO DELETE REQUEST:",
+    invoiceId
+);
+
+        }
+
+    }
+
+}
+
+
+setInterval(()=>{
+
+    cekPengaturWaktuDelete();
+
+},60000);
+
+
+
+
+// ================= LOAD DATA =================
+function loadData(){
+
+  const currentVIP =
+  document.getElementById("filterVIP").value;
+
+  const currentStatus =
+  document.getElementById("filterStatus").value;
+
+  const currentSearch =
+  document.getElementById("search").value;
+
+  const bulanFilter =
+  document.getElementById("filterBulan").value;
+
+  if(unsubscribePesanan){
+
+  unsubscribePesanan();
+
+}
+
+unsubscribePesanan = db
+.collection("pesanan")
+.orderBy("waktu","desc")
+.onSnapshot(snapshot => {
+
+    clearTimeout(renderTimer);
+
+    renderTimer = setTimeout(() => {
+
+        allData = [];
+
+        snapshot.forEach(doc => {
+
+            let item = doc.data();
+
+            const existingCard =
+            document.querySelector(
+            `[data-row='${doc.id}']`
+            );
+
+            if(existingCard){
+
+                const statusText =
+                existingCard.querySelector(".status-text");
+
+                if(statusText){
+
+                    statusText.className =
+                    "status-text " + item.status;
+
+                    statusText.innerText =
+
+                    item.status === "ready"
+
+                    ? "🟢 READY"
+
+                    :
+
+                    item.status === "proses"
+
+                    ? "🟡 PROSES"
+
+                    :
+
+                    "🔴 PENDING";
+
+                }
+
+            }
+
+            if(!item.waktu) return;
+
+            if(bulanFilter){
+
+                const bulanData =
+                item.waktu
+                .toDate()
+                .getMonth()+1;
+
+                if(parseInt(bulanFilter)!==bulanData){
+
+                    return;
+
+                }
+
+            }
+
+            allData.push({
+
+                ...item,
+
+                rowIndex:doc.id
+
+            });
+
+        });
+
+        let vipSet =
+        new Set(
+            allData.map(x=>x.nama)
+        );
+
+        let vipSelect =
+        document.getElementById("filterVIP");
+
+        vipSelect.innerHTML =
+        `<option value="all">
+        Semua VIP
+        </option>`;
+
+        vipSet.forEach(v=>{
+
+            vipSelect.innerHTML +=
+            `<option value="${v}">
+            ${v}
+            </option>`;
+
+        });
+
+        vipSelect.value =
+        currentVIPFilter;
+
+        document.getElementById(
+        "filterStatus"
+        ).value =
+        currentStatusFilter;
+
+        document.getElementById(
+        "search"
+        ).value =
+        currentSearchKeyword;
+
+        render();
+
+        firstLoad = false;
+
+    },100);
+
+});
+
+}
+
+// ================= RENDER =================
+function render(keepScroll = true){
+  
+  if(isRendering) return;
+
+    isRendering = true;
+  
+  let vipFilter =
+currentVIPFilter;
+
+let statusFilter =
+currentStatusFilter;
+
+let keyword =
+currentSearchKeyword
+.toLowerCase();
+
+  const container =
+document.getElementById("data");
+
+const oldScroll =
+container.scrollTop;
+
+  container.innerHTML = "";
+
+  // 🔥 GROUP INVOICE
+  let invoices = {};
+
+  allData.forEach(item => {
+
+    if(!item.order) return;
+
+    if(item.status === "selesai")
+    return;
+
+    if(
+      vipFilter !== "all" &&
+      item.nama !== vipFilter
+    ) return;
+
+    if(
+      statusFilter !== "all" &&
+      item.status !== statusFilter
+    ) return;
+
+    if(
+      !item.order
+      .toLowerCase()
+      .includes(keyword)
+    ) return;
+
+    let invoice =
+    item.invoice || "NO-INVOICE";
+
+    if(!invoices[invoice]){
+
+      invoices[invoice] = [];
+
+    }
+
+    invoices[invoice].push(item);
+
+  });
+
+  const renderedInvoice = new Set();
+
+  // 🔥 LOOP INVOICE
+  Object.keys(invoices)
+  .forEach(invoice => {
+    
+  if(renderedInvoice.has(invoice)){
+    return;
+}
+
+renderedInvoice.add(invoice);
+
+    let items =
+    invoices[invoice];
+
+    let first =
+    items[0];
+    
+    let invoiceDelete =
+items.some(x =>
+
+  x.request_delete_invoice === true
+
+);
+
+    let ready = 0;
+    let proses = 0;
+    let pending = 0;
+
+    let htmlItems = "";
+
+    items.forEach(item => {
+
+      let warna = "#ef4444";
+      let label = "PENDING";
+
+      if(item.status === "ready"){
+
+        warna = "#22c55e";
+        label = "READY";
+        ready++;
+
+      }
+
+      else if(
+        item.status === "proses"
+      ){
+
+        warna = "#facc15";
+        label = "PROSES";
+        proses++;
+
+      }
+
+      else{
+
+        pending++;
+
+      }
+
+      htmlItems += `
+
+      <div
+class="invoice-item"
+data-row="${item.rowIndex}"
+>
+
+        <div class="invoice-order">
+          📦 ${item.order}
+        </div>
+
+        <div
+        class="status-text ${item.status}"
+        >
+
+          ${label}
+
+        </div>
+<div class="action-wrapper">
+
+  <div class="status-btn">
+
+    <button
+    class="btn ${
+    item.status==="pending"
+    ? "active-red"
+    : ""
+    }"
+    onclick="
+    updateStatus(
+      '${item.rowIndex}',
+      'pending'
+    )"
+    >
+    🔴
+    </button>
+
+    <button
+    class="btn ${
+    item.status==="proses"
+    ? "active-yellow"
+    : ""
+    }"
+    onclick="
+    updateStatus(
+      '${item.rowIndex}',
+      'proses'
+    )"
+    >
+    🟡
+    </button>
+
+    <button
+    class="btn ${
+    item.status==="ready"
+    ? "active-green"
+    : ""
+    }"
+    onclick="
+    updateStatus(
+      '${item.rowIndex}',
+      'ready'
+    )"
+    >
+    🟢
+    </button>
+
+  </div>
+
+  <div class="delete-side">
+
+  <div class="delete-label">
+    DELETE
+  </div>
+
+  <button
+class="delete-btn-admin"
+onclick="
+handleDeleteItem(
+'${item.rowIndex}',
+${item.request_delete_invoice === true}
+)
+"
+>
+🗑️
+</button>
+
+</div>
+
+</div>
+
+        ${
+          item.request_delete
+          ?
+
+          `
+          <div style="
+          background:#ef4444;
+          padding:8px;
+          border-radius:10px;
+          margin-top:10px;
+          font-size:12px;
+          font-weight:bold;
+          ">
+
+          ⚠️ VIP REQUEST DELETE
+
+          </div>
+
+          <button
+          onclick="
+          cancelDelete(
+            '${item.rowIndex}'
+          )"
+          style="
+          background:#334155;
+          color:white;
+          margin-top:8px;
+          "
+          >
+
+          ❌ Tolak Request
+
+          </button>
+          `
+
+          :
+
+          ""
+
+        }
+
+      </div>
+
+      `;
+
+    });
+
+    let div =
+    document.createElement("div");
+
+    div.className =
+"card invoice-group";
+
+div.dataset.invoice =
+invoice;
+
+    div.innerHTML = `
+
+<div class="invoice-header">
+
+  <div class="invoice-header-left">
+
+    <div class="invoice-title">
+      🧾 ${invoice}
+    </div>
+
+    <div class="invoice-info">
+
+      <div class="vip-name">
+        👤 ${first.nama}
+      </div>
+
+      <div class="vip-date">
+        🕒 ${
+          first.waktu
+          ?
+          first.waktu.toDate().toLocaleString(
+            "id-ID"
+          )
+          :
+          "-"
+        }
+      </div>
+
+    </div>
+
+  </div>
+
+  <button
+  class="collapse-btn"
+  onclick="toggleInvoice(this)"
+>
+  ${
+    openedInvoices[invoice]
+    ? "▼"
+    : "▶"
+  }
+</button>
+
+</div>
+
+${
+  items.some(
+    x => x.request_delete_invoice
+  )
+?
+
+`
+<div class="invoice-delete-alert">
+
+  🚨 VIP REQUEST DELETE INVOICE
+
+  <br><br>
+
+  <button
+  class="btn"
+  onclick="
+    approveDeleteInvoice(
+      '${invoice}'
+    )
+  "
+>
+  ✅ TERIMA
+</button>
+
+<button
+  class="btn"
+  onclick="
+    rejectDeleteInvoice(
+      '${invoice}'
+    )
+  "
+>
+  ❌ TOLAK
+</button>
+
+  
+</div>
+`
+
+:
+
+""
+}
+
+<div class="invoice-summary">
+
+  <div class="summary-box">
+    🟢 READY
+    <span class="summary-ready">
+      ${ready}
+    </span>
+  </div>
+
+  <div class="summary-box">
+    🟡 PROSES
+    <span class="summary-proses">
+      ${proses}
+    </span>
+  </div>
+
+  <div class="summary-box">
+    🔴 PENDING
+    <span class="summary-pending">
+      ${pending}
+    </span>
+  </div>
+
+</div>
+
+<div
+  class="invoice-content"
+  style="
+  display:
+  ${
+    openedInvoices[invoice]
+    ? "block"
+    : "none"
+  };
+  "
+>
+
+  ${htmlItems}
+
+</div>
+
+`;
+
+    container.appendChild(div);
+
+  });
+  
+  if(keepScroll){
+
+  requestAnimationFrame(()=>{
+
+    container.scrollTop =
+    oldScroll;
+
+  });
+
+}
+
+    isRendering = false;
+
+
+}
+  
+function saveFilter(){
+
+  currentVIPFilter =
+  document.getElementById(
+    "filterVIP"
+  ).value;
+
+  currentStatusFilter =
+  document.getElementById(
+    "filterStatus"
+  ).value;
+
+  currentSearchKeyword =
+  document.getElementById(
+    "search"
+  ).value;
+
+  render();
+
+}
+  
+function toggleInvoice(btn){
+
+  const card =
+  btn.closest(".invoice-group");
+
+  const invoice =
+  card.dataset.invoice;
+
+  const content =
+  card.querySelector(
+    ".invoice-content"
+  );
+
+  if(content.style.display==="block"){
+
+    content.style.display="none";
+
+    btn.innerText="▶";
+
+    delete openedInvoices[invoice];
+
+  }
+
+  else{
+
+    content.style.display="block";
+
+    btn.innerText="▼";
+
+    openedInvoices[invoice] = true;
+
+  }
+
+}
+
+// ================= STOK ADMIN =================
+
+function loadStokAdmin(){
+
+  db.collection("stok")
+  .orderBy("nama")
+
+  .onSnapshot(snapshot => {
+
+    let data = [];
+
+    snapshot.forEach(doc => {
+
+      data.push({
+
+        id: doc.id,
+        ...doc.data()
+
+      });
+
+    });
+
+    renderStok(data);
+
+  });
+
+}
+
+function loadVIPActivity(){
+
+  db.collection("aktivitas_vip")
+  .onSnapshot(snapshot=>{
+
+    let html = "";
+
+    const now = Date.now();
+
+    snapshot.forEach(doc=>{
+
+      const item = doc.data();
+      
+      console.log(item);
+
+
+      if(!item.last_active) return;
+
+const activeTime =
+item.last_active;
+
+const last =
+activeTime.toDate().getTime();
+
+const diff =
+Math.floor(
+  (now - last)/1000
+);
+
+const online = diff < 60;
+
+const jamAktif =
+activeTime.toDate().toLocaleTimeString(
+'id-ID',
+{
+  hour:'2-digit',
+  minute:'2-digit'
+});
+
+      let status = "Offline";
+
+      if(diff < 60){
+
+  status = "< 1 Menit";
+
+}
+else if(diff < 3600){
+
+  status =
+  Math.floor(diff/60) +
+  " Menit";
+
+}
+else if(diff < 86400){
+
+  status =
+  Math.floor(diff/3600) +
+  " Jam";
+
+}
+else{
+
+  status =
+  Math.floor(diff/86400) +
+  " Hari";
+
+}
+      
+    html += `
+
+<div style="
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:10px 8px;
+background:#0f172a;
+border-bottom:1px solid rgba(255,255,255,.05);
+">
+
+  <div style="
+  display:flex;
+  align-items:center;
+  gap:10px;
+  ">
+
+    <div style="
+width:42px;
+height:42px;
+border-radius:50%;
+background:#e5e7eb;
+display:flex;
+align-items:center;
+justify-content:center;
+color:#9ca3af;
+font-size:22px;
+position:relative;
+">
+
+👤
+
+<div style="
+position:absolute;
+bottom:0;
+right:0;
+width:10px;
+height:10px;
+background:${
+  online
+  ? '#22c55e'
+  : '#9ca3af'
+};
+border-radius:50%;
+border:2px solid white;
+">
+</div>
+
+</div>
+
+    <div>
+
+      <div class="vip-active-name">
+  ${item.nama}
+</div>
+
+      <div style="
+      font-size:12px;
+      color:#cbd5e1;
+      margin-top:2px;
+      ">
+        🕒 ${jamAktif}
+      </div>
+
+    </div>
+
+  </div>
+
+  <div style="
+  font-size:12px;
+  color:#cbd5e1;
+  ">
+    ${status}
+  </div>
+
+</div>
+
+`;
+
+    });
+
+    document.getElementById(
+  "vip-active-list"
+).innerHTML = html;
+
+document.getElementById(
+  "vip-active-title"
+).innerHTML =
+`👥 Pengguna Aktif (${snapshot.size})`;
+
+  });
+
+}
+
+function renderStok(data){
+
+  let container =
+  document.getElementById(
+    "stok-list"
+  );
+
+  container.innerHTML = "";
+  
+  const currentSearch =
+document.querySelector(
+'.stok-card input[type="text"]'
+).value.toLowerCase();
+
+  data.forEach(item => {
+
+    let warna =
+    item.kosong
+    ? "red"
+    : "limegreen";
+
+    let icon =
+    item.kosong
+    ? "🔴"
+    : "🟢";
+
+    let div =
+    document.createElement("div");
+
+    div.className = "stok-item";
+
+div.dataset.status =
+item.kosong
+? "kosong"
+: "tersedia";
+    
+    if(
+!item.nama
+.toLowerCase()
+.includes(currentSearch)
+){
+
+  div.style.display = "none";
+
+}
+
+    div.innerHTML = `
+
+    <div style="
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:6px 0;
+      border-bottom:
+      1px solid rgba(255,255,255,.05);
+    ">
+
+      <div style="
+        display:flex;
+        align-items:center;
+        gap:8px;
+      ">
+
+        <input
+          type="checkbox"
+          value="${item.id}"
+        >
+
+        <span style="
+          color:${warna};
+          font-size:14px;
+        ">
+
+          ${icon} ${item.nama}
+
+        </span>
+
+      </div>
+
+      <div
+        class="toggle ${!item.kosong ? 'active' : ''}"
+
+        onclick="
+          toggleStok(
+            '${item.id}',
+            '${item.nama}',
+            ${item.kosong}
+          )
+        "
+      >
+
+        <div class="
+          circle
+          ${!item.kosong ? 'on' : ''}
+        ">
+
+        </div>
+
+      </div>
+
+    </div>
+
+    `;
+
+    container.appendChild(div);
+
+  });
+  
+
+}
+
+// UPDATE PER ITEM
+function updateStok(produk, status){
+
+  fetch(URL +
+    "?mode=updateStok" +
+    "&produk=" + encodeURIComponent(produk) +
+    "&status=" + status
+  )
+  .then(() => loadStokAdmin());
+
+}
+
+
+// SEARCH
+function searchProduk(val){
+
+  val =
+  val.toLowerCase();
+
+  document
+  .querySelectorAll(".stok-item")
+
+  .forEach(div => {
+
+    let text =
+    div.innerText
+    .toLowerCase();
+
+    div.style.display =
+    text.includes(val)
+    ? "block"
+    : "none";
+
+  });
+
+}
+
+
+// GET SELECTED
+function getSelected(){
+
+  let checked =
+
+  document.querySelectorAll(
+    "#stok-list input:checked"
+  );
+
+  return [...checked]
+  .map(cb => cb.value);
+
+}
+
+
+// BULK UPDATE
+async function bulkUpdate(status){
+
+  let selected =
+  getSelected();
+
+  if(selected.length === 0){
+
+    alert(
+      "Pilih produk dulu bro 😏"
+    );
+
+    return;
+
+  }
+
+  let kosong =
+  status === "kosong";
+
+  let namaProduk = [];
+
+  for(const id of selected){
+
+    const ref =
+    db.collection("stok")
+    .doc(id);
+
+    const snap =
+    await ref.get();
+
+    const data =
+    snap.data();
+
+    namaProduk.push(
+      data.nama
+    );
+
+    await ref.update({
+
+      kosong: kosong
+
+    });
+
+  }
+
+  // 🔥 NOTIF WA
+  fetch(
+
+    URL +
+    "?mode=notifStokBulk" +
+    "&status=" +
+    status +
+    "&produk=" +
+    encodeURIComponent(
+      JSON.stringify(
+        namaProduk
+      )
+    )
+
+  );
+
+  alert(
+    "Bulk update berhasil 😎🔥"
+  );
+
+}
+
+function toggleStok(
+  id,
+  nama,
+  kosong
+){
+
+  let newKosong =
+  !kosong;
+
+  // 🔥 UPDATE FIREBASE
+  db.collection("stok")
+  .doc(id)
+  .update({
+
+    kosong:newKosong
+
+  });
+
+  // 🔥 STATUS TEXT
+  let statusText =
+  newKosong
+  ? "kosong"
+  : "tersedia";
+
+  // 🔥 KIRIM NOTIF WA
+  fetch(
+
+    URL +
+    "?mode=notifStok" +
+    "&produk=" +
+    encodeURIComponent(nama) +
+    "&status=" +
+    statusText
+
+  );
+
+}
+
+// SELECT ALL
+function toggleAll(el){
+
+  document.querySelectorAll("#stok-list input")
+    .forEach(cb => cb.checked = el.checked);
+
+}
+
+
+// ================= AUTO LOAD =================
+loadData();
+loadStokAdmin();
+loadVIPActivity();
+
+function renderVIPControl(){
+
+  let vipList =
+  Object.keys(vipPath);
+
+  let html = `
+
+  <div class="vip-wrapper">
+
+    <div class="vip-title">
+
+      👑 VIP CONTROL PANEL
+
+    </div>
+
+    <input
+      type="text"
+      class="vip-search"
+      id="vipSearch"
+      placeholder="🔍 Cari VIP..."
+      onkeyup="filterVIP()"
+    >
+
+    <div class="vip-grid">
+
+  `;
+
+  vipList.forEach(vip => {
+
+    html += `
+
+    <div
+    class="vip-card"
+    data-vip="${vip.toLowerCase()}">
+
+      <div class="vip-name">
+
+        👑 ${vip}
+
+      </div>
+
+      <div class="vip-btn-wrap">
+
+        <button
+        class="
+        vip-btn
+        vip-dashboard
+        "
+        onclick="
+        bukaDashboard('${vip}')
+        ">
+
+          🚀 Dashboard
+
+        </button>
+
+        <button
+        class="
+        vip-btn
+        vip-history
+        "
+        onclick="
+        bukaHistory('${vip}')
+        ">
+
+          📦 History
+
+        </button>
+
+      </div>
+
+      <div class="vip-status">
+
+        🟢 VIP ACTIVE
+
+      </div>
+
+    </div>
+
+    `;
+
+  });
+
+  html += `
+    </div>
+  </div>
+  `;
+
+  let container =
+
+document.getElementById(
+"vip-control-container"
+);
+
+
+container.innerHTML = html;
+
+}
+
+function bukaDashboard(vip){
+
+  let path =
+  vipPath[vip];
+
+  if(!path){
+
+    alert(
+      "Folder VIP belum ada 😭"
+    );
+
+    return;
+  }
+
+  window.open(
+    "/vip/" + path + "/"
+  );
+
+}
+
+function bukaHistory(vip){
+
+  let path =
+  vipPath[vip];
+
+  if(!path){
+
+    alert(
+      "History VIP belum ada 😭"
+    );
+
+    return;
+  }
+
+  window.open(
+
+    "/vip/" +
+    path +
+    "/history.html"
+
+  );
+
+}
+
+function filterVIP(){
+
+  let keyword =
+
+  document
+  .getElementById(
+    "vipSearch"
+  )
+  .value
+  .toLowerCase();
+
+  let cards =
+
+  document
+  .querySelectorAll(
+    ".vip-card"
+  );
+
+  cards.forEach(card => {
+
+    let vip =
+
+    card
+    .getAttribute(
+      "data-vip"
+    );
+
+    if(vip.includes(keyword)){
+
+      card.style.display =
+      "block";
+
+    } else {
+
+      card.style.display =
+      "none";
+
+    }
+
+  });
+
+}
+
+
+// ================= JAM =================
+function updateJam(){
+  const now = new Date();
+
+  const waktu = now.toLocaleString('id-ID', {
+    day:'2-digit',
+    month:'long',
+    year:'numeric',
+    hour:'2-digit',
+    minute:'2-digit',
+    second:'2-digit'
+  });
+
+  let jam = now.getHours();
+  let greeting = "Halo";
+
+  if(jam < 12) greeting = "Selamat pagi";
+  else if(jam < 18) greeting = "Selamat sore";
+  else greeting = "Selamat malam";
+
+  document.getElementById("live-clock").innerText =
+    greeting + ", Bro 😎\n🕒 " + waktu;
+}
+
+updateJam();
+setInterval(updateJam,1000);
+
+
+
+function handleDeleteItem(
+rowId,
+requestDeleteInvoice
+){
+
+if(requestDeleteInvoice){
+
+alert(
+"Invoice sedang request delete. Gunakan TERIMA atau TOLAK."
+);
+
+return;
+
+}
+
+if(confirm(
+"Hapus item ini?"
+)){
+
+deleteData(rowId);
+
+}
+
+}
+
+
+async function deleteData(row){
+
+  if(!confirm(
+    "Yakin mau hapus data ini?"
+  )) return;
+
+  const docSnap =
+await db.collection("pesanan")
+.doc(row)
+.get();
+
+const item =
+docSnap.data();
+
+const invoiceId =
+item.invoice;
+
+  await db.collection("pesanan")
+  .doc(row)
+  .delete();
+  
+  const sisa =
+await db
+.collection("pesanan")
+.where(
+  "invoice",
+  "==",
+  invoiceId
+)
+.get();
+
+if(sisa.empty){
+
+  await db
+  .collection("invoice")
+  .doc(invoiceId)
+  .delete();
+
+}
+
+  const card =
+  document.querySelector(
+    `[data-row='${row}']`
+  );
+
+  if(card){
+
+    const invoiceGroup =
+    card.closest(".invoice-group");
+
+    card.remove();
+
+    // kalau invoice kosong
+    if(
+      invoiceGroup.querySelectorAll(
+        ".invoice-item"
+      ).length === 0
+    ){
+
+      invoiceGroup.remove();
+
+    }
+
+  }
+
+}
+
+let memory = [];
+
+let uploadedFile = null;
+
+let uploadedBase64 = null;
+
+document
+.getElementById("image-upload")
+.addEventListener(
+  "change",
+  function(e){
+
+    uploadedFile =
+    e.target.files[0];
+
+    if(!uploadedFile) return;
+
+    const reader =
+    new FileReader();
+
+    reader.onload = function(event){
+
+      uploadedBase64 =
+      event.target.result;
+
+      console.log(
+        "BASE64 READY:",
+        uploadedBase64
+      );
+
+      document
+      .getElementById(
+        "preview-box"
+      )
+      
+.innerHTML = `
+
+<div class="preview-card">
+
+  <img
+    src="${uploadedBase64}"
+    style="
+      width:70px;
+      height:70px;
+      object-fit:cover;
+      border-radius:12px;
+    "
+  >
+
+  <div style="flex:1;">
+    📎 ${uploadedFile.name}
+  </div>
+
+  <button
+    onclick="window.removeUpload()"
+    style="
+      border:none;
+      background:#ef4444;
+      color:white;
+      width:28px;
+      height:28px;
+      border-radius:50%;
+      cursor:pointer;
+      font-weight:bold;
+    "
+  >
+    ✕
+  </button>
+
+</div>
+
+  `;
+
+ };
+
+window.removeUpload = function(){
+
+  uploadedFile = null;
+
+  uploadedBase64 = null;
+
+  document.getElementById(
+    "image-upload"
+  ).value = "";
+
+  document.getElementById(
+    "preview-box"
+  ).innerHTML = "";
+
+}
+    reader.onerror = function(err){
+
+      console.log(
+        "FILEREADER ERROR:",
+        err
+      );
+
+    };
+
+    reader.readAsDataURL(
+      uploadedFile
+    );
+
+  }
+);
+
+async function tanyaAI(){
+
+  const input =
+  document.getElementById("imam-ai-input");
+
+  const message =
+  input.value.trim();
+  
+  const currentImage =
+uploadedBase64;
+
+  if(
+  !message &&
+  !uploadedFile
+) return;
+
+  const chatBox =
+  document.getElementById("imam-chat-box");
+
+  // USER MESSAGE
+
+  chatBox.innerHTML += `
+
+  <div class="imam-user-msg">
+
+    ${message || ""}
+
+    ${
+      currentImage
+      ?
+      `
+      <img
+        src="${currentImage}"
+        style="
+          width:100%;
+          margin-top:12px;
+          border-radius:16px;
+        "
+      >
+      `
+      :
+      ""
+    }
+
+  </div>
+
+`;
+
+  input.value = "";
+  
+  chatBox.scrollTop =
+  chatBox.scrollHeight;
+
+  memory.push({
+    role:"user",
+    content:message
+  });
+
+  // LOADING
+
+  const loadingId =
+  "loading-" + Date.now();
+
+  chatBox.innerHTML += `
+
+    <div
+      class="imam-ai-msg"
+      id="${loadingId}"
+    >
+
+      <div class="typing">
+
+        <span></span>
+        <span></span>
+        <span></span>
+
+      </div>
+
+    </div>
+
+  `;
+
+  chatBox.scrollTop =
+  chatBox.scrollHeight;
+
+  try {
+
+    const formData =
+new FormData();
+
+formData.append(
+  "admin",
+  "IMAM SALES | ALL VVIP"
+);
+
+formData.append(
+  "message",
+  message
+);
+
+formData.append(
+  "memory",
+  JSON.stringify(memory)
+);
+
+// TODO:
+// aktifkan lagi jika AI analyst order dipakai
+
+// formData.append(
+//   "orders",
+//   JSON.stringify(allData)
+// );
+
+if(uploadedFile){
+
+  formData.append(
+    "image",
+    uploadedFile
+  );
+
+}
+
+const res = await fetch(
+
+  "/.netlify/functions/chat",
+
+  {
+
+    method:"POST",
+
+    body:formData
+
+  }
+
+);
+
+    if(!res.ok){
+
+      throw new Error(
+        "HTTP ERROR " + res.status
+      );
+
+    }
+
+    const data =
+    await res.json();
+    
+    uploadedFile = null;
+uploadedBase64 = null;
+
+document.getElementById(
+  "image-upload"
+).value = "";
+
+document.getElementById(
+  "preview-box"
+).innerHTML = "";
+    
+    console.log(
+      "AI RESPONSE:",
+      data
+    );
+
+    let aiText =
+
+      data.reply
+      || "❌ AI gagal jawab";
+
+    let imageHtml = "";
+
+    if(data.image){
+
+      imageHtml = `
+
+        <div style="margin-top:15px;">
+
+          <img
+            src="${data.image}"
+            style="
+              width:100%;
+              border-radius:18px;
+              margin-top:10px;
+              box-shadow:
+              0 10px 25px rgba(0,0,0,.35);
+            "
+          >
+
+        </div>
+
+      `;
+
+    }
+
+    const loadingBubble =
+    document.getElementById(
+      loadingId
+    );
+    
+if(loadingBubble){
+
+  loadingBubble.outerHTML = `
+
+<div class="imam-ai-msg">
+
+  <div id="${loadingId}-text"></div>
+
+  ${imageHtml}
+
+  <div class="ai-action">
+
+    <button
+      onclick="copyAI(this)"
+      class="copy-btn"
+    >
+      📋 Copy
+    </button>
+
+    ${
+      data.image
+      ?
+      `
+      <button
+        onclick="downloadImage('${data.image}')"
+        class="download-btn"
+      >
+        📥 Download
+      </button>
+      `
+      :
+      ""
+    }
+
+  </div>
+
+</div>
+
+`;
+
+  const streamTarget =
+
+  document.getElementById(
+    `${loadingId}-text`
+  );
+
+  await streamText(
+  streamTarget,
+  aiText
+);
+
+}
+
+memory.push({
+
+  role:"assistant",
+
+  content:aiText
+
+});
+
+chatBox.scrollTop =
+chatBox.scrollHeight;
+
+  } catch(err){
+
+    console.log(
+      "FRONTEND ERROR:",
+      err
+    );
+
+    const loadingBubble =
+    document.getElementById(
+      loadingId
+    );
+
+    if(loadingBubble){
+
+      loadingBubble.outerHTML = `
+
+        <div class="imam-ai-msg">
+
+          ❌ SERVER ERROR
+
+          <br><br>
+
+          ${err.message}
+
+        </div>
+
+      `;
+
+    }
+
+    chatBox.scrollTop =
+    chatBox.scrollHeight;
+
+  }
+
+}
+
+// AUTO RESIZE
+
+const imamInput =
+
+document.getElementById(
+  "imam-ai-input"
+);
+
+imamInput.addEventListener(
+  "input",
+  () => {
+
+    imamInput.style.height =
+    "auto";
+
+    imamInput.style.height =
+    imamInput.scrollHeight + "px";
+
+  }
+);
+
+async function streamText(
+  element,
+  text
+){
+
+  let current = "";
+
+  for(
+    let i = 0;
+    i < text.length;
+    i++
+  ){
+
+    current += text[i];
+
+    element.innerHTML =
+    marked.parse(current);
+
+    await new Promise(
+      resolve =>
+      setTimeout(resolve, 1)
+    );
+
+  }
+
+}
+
+function downloadImage(imageSrc){
+
+  const link =
+  document.createElement("a");
+
+  link.href = imageSrc;
+
+  link.download =
+  "imamgpt-image.png";
+
+  document.body.appendChild(link);
+
+  link.click();
+
+  document.body.removeChild(link);
+
+}
+
+function copyAI(btn){
+
+  const text =
+
+  btn.parentElement
+  .parentElement
+  .innerText;
+
+  navigator.clipboard.writeText(text);
+
+  btn.innerText = "✅ Copied";
+
+  setTimeout(() => {
+
+    btn.innerText = "📋 Copy";
+
+  }, 1500);
+
+}
+
+async function cancelDelete(id){
+
+  const doc = await db
+  .collection("pesanan")
+  .doc(id)
+  .get();
+
+  const data = doc.data();
+
+  if(!data.invoice) return;
+
+  const snap = await db
+  .collection("pesanan")
+  .where("invoice","==",data.invoice)
+  .get();
+
+  let batch = db.batch();
+
+  snap.forEach(d => {
+
+    batch.update(d.ref,{
+
+      request_delete:false,
+      request_delete_invoice:false
+
+    });
+
+  });
+
+  await batch.commit();
+
+  // 🔥 HILANGKAN UI LANGSUNG TANPA RENDER
+  document.querySelectorAll(
+    ".invoice-delete-alert"
+  ).forEach(el=>{
+
+    el.remove();
+
+  });
+
+  document.querySelectorAll(
+  "[data-row]"
+).forEach(card=>{
+
+  const redNotif =
+  [...card.querySelectorAll("div")]
+  .find(el =>
+
+    el.innerText.includes(
+      "VIP REQUEST DELETE"
+    )
+
+  );
+
+  if(redNotif){
+
+    redNotif.remove();
+
+  }
+
+  const rejectBtn =
+  card.querySelector(
+    "button[onclick*='cancelDelete']"
+  );
+
+  if(rejectBtn){
+
+    rejectBtn.remove();
+
+  }
+
+});
+
+}
+
+async function approveDeleteInvoice(invoice){
+
+  if(
+    !confirm(
+      "Terima request delete invoice ini?"
+    )
+  ) return;
+
+  const invoiceDoc =
+await db
+.collection("invoice")
+.doc(invoice)
+.get();
+
+const inv =
+invoiceDoc.data();
+
+const snapshot =
+await db
+.collection("pesanan")
+.where(
+ "invoice",
+ "==",
+ invoice
+)
+.where(
+ "nama",
+ "==",
+ inv.nama
+)
+.get();
+
+  const batch = db.batch();
+
+  snapshot.forEach(doc=>{
+
+    batch.delete(doc.ref);
+
+  });
+  
+  batch.delete(
+ db.collection("invoice")
+ .doc(invoice)
+);
+
+  await batch.commit();
+
+  alert(
+    "Invoice berhasil dihapus 😎"
+  );
+   
+}
+
+
+async function rejectDeleteInvoice(invoice){
+
+  if(
+    !confirm(
+      "Tolak request delete invoice ini?"
+    )
+  ) return;
+
+  const invoiceDoc =
+await db
+.collection("invoice")
+.doc(invoice)
+.get();
+
+const inv =
+invoiceDoc.data();
+
+const snapshot =
+await db
+.collection("pesanan")
+.where(
+ "invoice",
+ "==",
+ invoice
+)
+.where(
+ "nama",
+ "==",
+ inv.nama
+)
+.get();
+
+  const batch = db.batch();
+
+  snapshot.forEach(doc=>{
+
+    batch.update(doc.ref,{
+
+      request_delete_invoice:false,
+      request_delete:false
+
+    });
+
+  });
+
+  await batch.commit();
+
+  alert(
+    "Request delete ditolak 😎"
+  );
+
+await db
+.collection("invoice")
+.doc(invoice)
+.update({
+
+ request_delete:false
+
+});
+
+}
+
+function refreshOrder(){
+
+  const btn = event.target;
+
+  btn.innerText =
+  "⏳ REFRESHING...";
+
+  loadData();
+
+  setTimeout(()=>{
+
+    btn.innerText =
+    "🔄 REFRESH";
+
+  },1000);
+
+}
+
+function showPage(pageId, btn){
+
+  document
+    .querySelectorAll('.page-section')
+    .forEach(page=>{
+      page.classList.remove('active');
+    });
+
+  document
+    .getElementById(pageId)
+    .classList.add('active');
+
+  document
+    .querySelectorAll('.menu-btn')
+    .forEach(b=>{
+      b.classList.remove('active');
+    });
+
+  if(btn){
+    btn.classList.add('active');
+  }
+
+  const tabs =
+  document.getElementById('top-tabs');
+
+  tabs.innerHTML = '';
+
+  tabsConfig[pageId].forEach((tab,index)=>{
+
+  tabs.innerHTML += `
+    <div
+      class="erp-tab ${index===0?'active':''}"
+      onclick="handleTopTab('${pageId}','${tab}',this)"
+    >
+      ${tab}
+    </div>
+  `;
+
+});
+
+  if(pageId==='page-vip'){
+    renderVIPControl();
+  }
+  
+}
+
+showPage(
+  'page-dashboard',
+  document.querySelector('.menu-btn')
+);
+
+function handleTopTab(pageId, tab, el){
+
+  document
+  .querySelectorAll('#top-tabs .erp-tab')
+  .forEach(t=>t.classList.remove('active'));
+
+  el.classList.add('active');
+
+  // ORDER
+  if(pageId === 'page-order'){
+
+    if(tab === 'Semua Order'){
+      currentStatusFilter = 'all';
+    }
+
+    else if(tab === 'Pending'){
+      currentStatusFilter = 'pending';
+    }
+
+    else if(tab === 'Proses'){
+      currentStatusFilter = 'proses';
+    }
+
+    else if(tab === 'Ready'){
+      currentStatusFilter = 'ready';
+    }
+
+    document.getElementById(
+      'filterStatus'
+    ).value = currentStatusFilter;
+
+    render();
+  }
+
+  // STOK
+  if(pageId === 'page-stok'){
+
+    if(tab === 'Produk'){
+
+      document
+      .querySelectorAll('.stok-item')
+      .forEach(item=>{
+        item.style.display='block';
+      });
+
+    }
+
+    else if(tab === 'Stok Tersedia'){
+
+      document
+      .querySelectorAll('.stok-item')
+      .forEach(item=>{
+
+        item.style.display =
+        item.dataset.status === 'tersedia'
+        ? 'block'
+        : 'none';
+
+      });
+
+    }
+
+    else if(tab === 'Stok Kosong'){
+
+      document
+      .querySelectorAll('.stok-item')
+      .forEach(item=>{
+
+        item.style.display =
+        item.dataset.status === 'kosong'
+        ? 'block'
+        : 'none';
+
+      });
+
+    }
+
+  }
+
+}
+
+
+
+</script>
+
+<div class="footer">
+©2026 Imam Salesfr • Nine Autoseries
+</div>
+
+</div>
+</div>
+
+</body>
+</html>
