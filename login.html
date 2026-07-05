@@ -3,221 +3,28 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Imamsalesnine.com</title>
+<title>Login Imamsalesnine</title>
 
-<style>
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:Arial,sans-serif;
-}
-
-body{
-height:100vh;
-display:flex;
-justify-content:center;
-align-items:center;
-background:linear-gradient(135deg,#0f172a,#1e293b);
-}
-
-.card{
-width:360px;
-background:rgba(255,255,255,.08);
-backdrop-filter:blur(12px);
-padding:30px;
-border-radius:20px;
-box-shadow:0 0 30px rgba(0,0,0,.4);
-}
-
-h2{
-color:#fff;
-text-align:center;
-margin-bottom:20px;
-}
-
-input{
-width:100%;
-padding:14px;
-margin:10px 0;
-border:none;
-border-radius:10px;
-font-size:16px;
-}
-
-button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:10px;
-background:#8CC63F;
-color:white;
-font-size:16px;
-cursor:pointer;
-margin-top:10px;
-}
-
-button:hover{
-background:#8CC63F;
-}
-
-#error{
-margin-top:15px;
-text-align:center;
-color:#ff6b6b;
-}
-
-#loading{
-display:none;
-margin-top:15px;
-text-align:center;
-color:white;
-}
-</style>
-
+<link rel="stylesheet" href="style.css">
 </head>
+
 <body>
 
-<div class="card">
+<div class="card" id="card">
 
-<h2>Imamsalesnine.com</h2>
+  <h2>Imamsalesnine.com</h2>
 
-<input
-id="username"
-placeholder="Username">
+  <input id="username" placeholder="Username">
+  <input id="password" type="password" placeholder="Password">
 
-<input
-id="password"
-type="password"
-placeholder="Password">
+  <button onclick="login()" id="loginBtn">LOGIN</button>
 
-<button onclick="login()">
-LOGIN
-</button>
-
-<div id="loading">
-Memproses...
-</div>
-
-<div id="error"></div>
+  <div id="loading" class="loader"></div>
+  <div id="error"></div>
 
 </div>
 
-<script>
-
-async function login(){
-
-    const error = document.getElementById("error");
-    const loading = document.getElementById("loading");
-
-    error.innerHTML = "";
-    loading.style.display = "block";
-
-    const username =
-    document.getElementById("username").value.trim();
-
-    const password =
-    document.getElementById("password").value;
-
-    try{
-
-        const res = await fetch(
-            "/.netlify/functions/login",
-            {
-
-                method:"POST",
-
-                headers:{
-                    "Content-Type":"application/json"
-                },
-
-                body:JSON.stringify({
-
-                    username,
-                    password
-
-                })
-
-            }
-        );
-
-        const data = await res.json();
-        
-        loading.style.display = "none";
-
-        if(data.success){
-
-    localStorage.setItem(
-        "token",
-        data.token
-    );
-
-    localStorage.setItem(
-        "role",
-        data.role
-    );
-
-    if(data.role==="admin"){
-
-        window.location.href =
-        "admin-v5/index.html";
-
-        return;
-
-    }
-
-    if(data.role==="vip"){
-
-        localStorage.setItem(
-            "vipFolder",
-            data.folder
-        );
-
-        localStorage.setItem(
-            "vipName",
-            data.nama
-        );
-
-        window.location.href =
-        "vip/"+data.folder+"/index.html";
-
-        return;
-
-    }
-
-}else{
-
-            error.innerHTML =
-            data.message || "Login gagal";
-
-        }
-
-    }catch(err){
-
-        loading.style.display="none";
-
-        error.innerHTML =
-        "Server tidak dapat dihubungi.";
-
-    }
-
-}
-
-document
-.getElementById("password")
-.addEventListener(
-"keydown",
-function(e){
-
-    if(e.key==="Enter"){
-
-        login();
-
-    }
-
-});
-
-</script>
+<script src="login.js"></script>
 
 </body>
 </html>

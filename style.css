@@ -1,0 +1,145 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Segoe UI", sans-serif;
+}
+
+/* BACKGROUND ANIMASI */
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+
+  background: linear-gradient(-45deg, #0f172a, #1e293b, #0b1220, #1b2a41);
+  background-size: 400% 400%;
+  animation: gradientMove 10s ease infinite;
+}
+
+@keyframes gradientMove{
+  0%{background-position:0% 50%}
+  50%{background-position:100% 50%}
+  100%{background-position:0% 50%}
+}
+
+/* CARD */
+.card{
+  width:100%;
+  max-width:380px;
+  background: rgba(255,255,255,0.07);
+  backdrop-filter: blur(20px);
+  border: 1px solid rgba(255,255,255,0.12);
+  padding:28px;
+  border-radius:20px;
+  box-shadow: 0 25px 80px rgba(0,0,0,0.5);
+  color:white;
+  animation: slideIn 0.6s ease;
+}
+
+@keyframes slideIn{
+  from{
+    opacity:0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to{
+    opacity:1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+h2{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+/* INPUT */
+input{
+  width:100%;
+  padding:14px;
+  margin:10px 0;
+  border-radius:12px;
+  border:1px solid rgba(255,255,255,0.15);
+  background: rgba(0,0,0,0.25);
+  color:white;
+  outline:none;
+}
+
+input:focus{
+  border-color:#8CC63F;
+  box-shadow:0 0 0 3px rgba(140,198,63,0.25);
+}
+
+/* BUTTON */
+button{
+  width:100%;
+  padding:14px;
+  margin-top:12px;
+  border:none;
+  border-radius:12px;
+  background: linear-gradient(135deg,#8CC63F,#a6e34b);
+  font-weight:800;
+  cursor:pointer;
+  transition:0.3s;
+  box-shadow: 0 0 20px rgba(140,198,63,0.35);
+}
+
+button:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 0 35px rgba(140,198,63,0.6);
+}
+
+/* ERROR SHAKE */
+@keyframes shake{
+  0%,100%{transform:translateX(0)}
+  25%{transform:translateX(-6px)}
+  50%{transform:translateX(6px)}
+  75%{transform:translateX(-6px)}
+}
+
+.shake{
+  animation: shake 0.3s ease;
+  border:1px solid #ff4d4d !important;
+}
+
+/* SUCCESS SLIDE */
+.success{
+  animation: successSlide 0.5s ease forwards;
+}
+
+@keyframes successSlide{
+  0%{transform:scale(1);opacity:1}
+  100%{transform:scale(1.1) translateY(-50px);opacity:0}
+}
+
+/* LOADER */
+.loader{
+  width:18px;
+  height:18px;
+  border:3px solid rgba(255,255,255,0.2);
+  border-top:3px solid #8CC63F;
+  border-radius:50%;
+  animation: spin 0.8s linear infinite;
+  margin:10px auto;
+  display:none;
+}
+
+@keyframes spin{
+  0%{transform:rotate(0deg)}
+  100%{transform:rotate(360deg)}
+}
+
+/* ERROR TEXT */
+#error{
+  text-align:center;
+  margin-top:10px;
+  color:#ff4d4d;
+}
+
+/* MOBILE */
+@media(max-width:480px){
+  .card{
+    padding:22px;
+  }
+}
