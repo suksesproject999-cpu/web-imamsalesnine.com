@@ -1,4 +1,4 @@
-const { verifyToken } = require("./auth");
+const { verifyToken } = require("./utils/auth");
 
 exports.handler = async (event) => {
 
