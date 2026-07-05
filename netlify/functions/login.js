@@ -51,7 +51,7 @@ exports.handler = async (event) => {
       jwtSecret,
 
       {
-        expiresIn: "24h"
+        expiresIn: "30m"
       }
 
     );
@@ -72,7 +72,7 @@ exports.handler = async (event) => {
 
             issued_at:new Date().toISOString(),
 
-            expires_in:"24h"
+            expires_in:"30m"
 
         }
 
