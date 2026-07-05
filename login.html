@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Login Admin</title>
+<title>Imamsalesnine.com</title>
 
 <style>
 *{
@@ -150,22 +150,45 @@ alert(JSON.stringify(data, null, 2));
 
         if(data.success){
 
-            // simpan JWT
-            localStorage.setItem(
-                "token",
-                data.token
-            );
+    localStorage.setItem(
+        "token",
+        data.token
+    );
 
-            // simpan role
-            localStorage.setItem(
-                "role",
-                data.role
-            );
+    localStorage.setItem(
+        "role",
+        data.role
+    );
 
-            window.location.href =
-            "admin-v5/index.html";
+    if(data.role==="admin"){
 
-        }else{
+        window.location.href =
+        "admin-v5/index.html";
+
+        return;
+
+    }
+
+    if(data.role==="vip"){
+
+        localStorage.setItem(
+            "vipFolder",
+            data.folder
+        );
+
+        localStorage.setItem(
+            "vipName",
+            data.nama
+        );
+
+        window.location.href =
+        "vip/"+data.folder+"/index.html";
+
+        return;
+
+    }
+
+}else{
 
             error.innerHTML =
             data.message || "Login gagal";

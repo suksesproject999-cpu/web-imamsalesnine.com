@@ -19,6 +19,9 @@ exports.handler = async (event) => {
     const adminUser = process.env.ADMIN_USER;
     const adminPass = process.env.ADMIN_PASS;
     const jwtSecret = process.env.JWT_SECRET;
+    const vipAccounts = JSON.parse(
+    process.env.VIP_ACCOUNTS || "[]"
+);
 
     if (!adminUser || !adminPass || !jwtSecret) {
       return {
@@ -79,6 +82,66 @@ exports.handler = async (event) => {
       })
 
     };
+    
+    
+    const vip = vipAccounts.find(
+
+    item =>
+
+        item.username === username &&
+        item.password === password
+
+);
+
+
+if (vip) {
+
+    const token = jwt.sign(
+
+        {
+
+            role: "vip",
+
+            username: vip.username,
+
+            folder: vip.folder,
+
+            nama: vip.nama
+
+        },
+
+        jwtSecret,
+
+        {
+
+            expiresIn: "30m"
+
+        }
+
+    );
+
+    return {
+
+        statusCode: 200,
+
+        body: JSON.stringify({
+
+            success: true,
+
+            role: "vip",
+
+            nama: vip.nama,
+
+            folder: vip.folder,
+
+            token
+
+        })
+
+    };
+
+}
+    
 
   } catch (err) {
 
