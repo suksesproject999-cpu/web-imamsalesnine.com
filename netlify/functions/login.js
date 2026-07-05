@@ -19,9 +19,7 @@ exports.handler = async (event) => {
     const adminUser = process.env.ADMIN_USER;
     const adminPass = process.env.ADMIN_PASS;
     const jwtSecret = process.env.JWT_SECRET;
-    const vipAccounts = JSON.parse(
-    process.env.VIP_ACCOUNTS || "[]"
-);
+    const vipAccounts = JSON.parse(process.env.VIP_ACCOUNTS || "[]");
 
     if (!adminUser || !adminPass || !jwtSecret) {
       return {
@@ -33,130 +31,90 @@ exports.handler = async (event) => {
       };
     }
 
-    if (username !== adminUser || password !== adminPass) {
+    // ==========================
+    // LOGIN ADMIN
+    // ==========================
+    if (
+      username === adminUser &&
+      password === adminPass
+    ) {
+
+      const token = jwt.sign(
+        {
+          role: "admin"
+        },
+        jwtSecret,
+        {
+          expiresIn: "30m"
+        }
+      );
 
       return {
-        statusCode: 401,
+        statusCode: 200,
         body: JSON.stringify({
-          success: false,
-          message: "Username atau password salah"
+          success: true,
+          role: "admin",
+          token
         })
       };
 
     }
 
-    const token = jwt.sign(
-
-      {
-        role: "admin"
-      },
-
-      jwtSecret,
-
-      {
-        expiresIn: "30m"
-      }
-
+    // ==========================
+    // LOGIN VIP
+    // ==========================
+    const vip = vipAccounts.find(item =>
+      item.username === username &&
+      item.password === password
     );
 
-    return {
+    if (vip) {
 
-      statusCode: 200,
-
-      body: JSON.stringify({
-
-        success: true,
-
-        role: "admin",
-
-        token,
-        
-        debug:{
-
-            issued_at:new Date().toISOString(),
-
-            expires_in:"30m"
-
-        }
-
-      })
-
-    };
-    
-    
-    const vip = vipAccounts.find(
-
-    item =>
-
-        item.username === username &&
-        item.password === password
-
-);
-
-
-if (vip) {
-
-    const token = jwt.sign(
-
+      const token = jwt.sign(
         {
-
-            role: "vip",
-
-            username: vip.username,
-
-            folder: vip.folder,
-
-            nama: vip.nama
-
+          role: "vip",
+          username: vip.username,
+          folder: vip.folder,
+          nama: vip.nama
         },
-
         jwtSecret,
-
         {
-
-            expiresIn: "30m"
-
+          expiresIn: "30m"
         }
+      );
 
-    );
-
-    return {
-
+      return {
         statusCode: 200,
-
         body: JSON.stringify({
-
-            success: true,
-
-            role: "vip",
-
-            nama: vip.nama,
-
-            folder: vip.folder,
-
-            token
-
+          success: true,
+          role: "vip",
+          nama: vip.nama,
+          folder: vip.folder,
+          token
         })
+      };
 
+    }
+
+    // ==========================
+    // LOGIN GAGAL
+    // ==========================
+    return {
+      statusCode: 401,
+      body: JSON.stringify({
+        success: false,
+        message: "Username atau password salah"
+      })
     };
-
-}
-    
 
   } catch (err) {
 
     return {
-
       statusCode: 500,
-
       body: JSON.stringify({
-
         success: false,
-
         message: "Internal Server Error"
-
       })
-
     };
 
   }
