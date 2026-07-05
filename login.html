@@ -107,48 +107,92 @@ Memproses...
 
 async function login(){
 
-document.getElementById("error").innerHTML="";
-document.getElementById("loading").style.display="block";
+    const error = document.getElementById("error");
+    const loading = document.getElementById("loading");
 
-const username=document.getElementById("username").value;
-const password=document.getElementById("password").value;
+    error.innerHTML = "";
+    loading.style.display = "block";
 
-const res=await fetch("/.netlify/functions/login",{
+    const username =
+    document.getElementById("username").value.trim();
 
-method:"POST",
+    const password =
+    document.getElementById("password").value;
 
-headers:{
-"Content-Type":"application/json"
-},
+    try{
 
-body:JSON.stringify({
-username,
-password
-})
+        const res = await fetch(
+            "/.netlify/functions/login",
+            {
+
+                method:"POST",
+
+                headers:{
+                    "Content-Type":"application/json"
+                },
+
+                body:JSON.stringify({
+
+                    username,
+                    password
+
+                })
+
+            }
+        );
+
+        const data = await res.json();
+
+        loading.style.display = "none";
+
+        if(data.success){
+
+            // simpan JWT
+            localStorage.setItem(
+                "token",
+                data.token
+            );
+
+            // simpan role
+            localStorage.setItem(
+                "role",
+                data.role
+            );
+
+            window.location.href =
+            "admin-v5/index.html";
+
+        }else{
+
+            error.innerHTML =
+            data.message || "Login gagal";
+
+        }
+
+    }catch(err){
+
+        loading.style.display="none";
+
+        error.innerHTML =
+        "Server tidak dapat dihubungi.";
+
+    }
+
+}
+
+document
+.getElementById("password")
+.addEventListener(
+"keydown",
+function(e){
+
+    if(e.key==="Enter"){
+
+        login();
+
+    }
 
 });
-
-const data=await res.json();
-
-document.getElementById("loading").style.display="none";
-
-if(data.success){
-
-localStorage.setItem("role",data.role);
-
-// TEMPEL DI SINI
-localStorage.setItem("adminLogin","true");
-
-
-window.location.href = "admin-v5/index.html";
-
-}else{
-
-document.getElementById("error").innerHTML=data.message;
-
-}
-
-}
 
 </script>
 
