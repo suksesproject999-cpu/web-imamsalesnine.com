@@ -33,11 +33,11 @@ async function login(){
 
       setTimeout(()=>{
 
-        if(data.role==="admin"){
-          window.location.href="admin-v5/index.html";
-        }else{
-          window.location.href="vip/"+data.folder+"/index.html";
-        }
+        if(data.role === "admin"){
+  window.location.href = "/admin";
+}else{
+  window.location.href = "/vip/" + data.folder;
+}
 
       },500);
 
