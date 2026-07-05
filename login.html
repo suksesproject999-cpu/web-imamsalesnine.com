@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login Admin</title>
+
+<style>
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+height:100vh;
+display:flex;
+justify-content:center;
+align-items:center;
+background:linear-gradient(135deg,#0f172a,#1e293b);
+}
+
+.card{
+width:360px;
+background:rgba(255,255,255,.08);
+backdrop-filter:blur(12px);
+padding:30px;
+border-radius:20px;
+box-shadow:0 0 30px rgba(0,0,0,.4);
+}
+
+h2{
+color:#fff;
+text-align:center;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:14px;
+margin:10px 0;
+border:none;
+border-radius:10px;
+font-size:16px;
+}
+
+button{
+width:100%;
+padding:14px;
+border:none;
+border-radius:10px;
+background:#8CC63F;
+color:white;
+font-size:16px;
+cursor:pointer;
+margin-top:10px;
+}
+
+button:hover{
+background:#8CC63F;
+}
+
+#error{
+margin-top:15px;
+text-align:center;
+color:#ff6b6b;
+}
+
+#loading{
+display:none;
+margin-top:15px;
+text-align:center;
+color:white;
+}
+</style>
+
+</head>
+<body>
+
+<div class="card">
+
+<h2>Admin Login</h2>
+
+<input
+id="username"
+placeholder="Username">
+
+<input
+id="password"
+type="password"
+placeholder="Password">
+
+<button onclick="login()">
+LOGIN
+</button>
+
+<div id="loading">
+Memproses...
+</div>
+
+<div id="error"></div>
+
+</div>
+
+<script>
+
+async function login(){
+
+document.getElementById("error").innerHTML="";
+document.getElementById("loading").style.display="block";
+
+const username=document.getElementById("username").value;
+const password=document.getElementById("password").value;
+
+const res=await fetch("/.netlify/functions/login",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+username,
+password
+})
+
+});
+
+const data=await res.json();
+
+document.getElementById("loading").style.display="none";
+
+if(data.success){
+
+localStorage.setItem("role",data.role);
+
+window.location.href="admin.html";
+
+}else{
+
+document.getElementById("error").innerHTML=data.message;
+
+}
+
+}
+
+</script>
+
+</body>
+</html>
