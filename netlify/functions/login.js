@@ -66,7 +66,15 @@ exports.handler = async (event) => {
 
         role: "admin",
 
-        token
+        token,
+        
+        debug:{
+
+            issued_at:new Date().toISOString(),
+
+            expires_in:"24h"
+
+        }
 
       })
 
