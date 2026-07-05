@@ -1373,6 +1373,12 @@ onclick="showPage('page-ai',this)">
   </div>
 
  </div>
+ 
+ <script>
+if (localStorage.getItem("adminLogin") !== "true") {
+    window.location.href = "/login.html";
+}
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
@@ -4056,7 +4062,35 @@ function handleTopTab(pageId, tab, el){
 
 
 
+function logout(){
+
+    localStorage.removeItem("adminLogin");
+    localStorage.removeItem("role");
+
+    window.location.href="/login.html";
+
+}
+
+
+
 </script>
+
+<div style="padding:20px;text-align:center;">
+    <button onclick="logout()" style="
+        padding:12px 30px;
+        background:#dc2626;
+        color:#fff;
+        border:none;
+        border-radius:8px;
+        cursor:pointer;
+        font-size:16px;
+        font-weight:bold;
+    ">
+        🚪 Logout
+    </button>
+</div>
+
+
 
 <div class="footer">
 ©2026 Imam Salesfr • Nine Autoseries
