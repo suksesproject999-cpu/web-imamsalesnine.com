@@ -32,6 +32,8 @@
                     }
                 }
             );
+            
+            const data = await res.json();
 
             if (!res.ok) {
 
@@ -40,6 +42,55 @@
                 return;
 
             }
+            
+            // ==========================
+// PROTEKSI FOLDER VIP
+// ==========================
+
+if (data.user.role === "vip") {
+
+    const urlParts =
+        window.location.pathname.split("/");
+
+    const currentFolder =
+        urlParts[2];
+
+    if (currentFolder !== data.user.folder) {
+
+        localStorage.clear();
+
+        window.location.href = "/login";
+
+        return;
+
+    }
+
+}
+
+
+// ==========================
+// PROTEKSI ROLE
+// ==========================
+
+const path = window.location.pathname;
+
+// VIP tidak boleh ke admin
+if (path.startsWith("/admin") && data.user.role !== "admin") {
+
+    localStorage.clear();
+    window.location.href = "/login";
+    return;
+
+}
+
+// Admin tidak boleh ke VIP
+if (path.startsWith("/vip") && data.user.role === "admin") {
+
+    localStorage.clear();
+    window.location.href = "/login";
+    return;
+
+}
 
         } catch (err) {
 
