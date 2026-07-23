@@ -31,6 +31,57 @@ function normalize(text) {
 }
 
 
+function getScore(product, keyword) {
+
+    let score = 0;
+
+    const nama = normalize(product.nama);
+    const sku = normalize(product.sku);
+    const brand = normalize(product.brand);
+    const kategori = normalize(product.kategori);
+    const deskripsi = normalize(product.deskripsi);
+
+    const varian = (product.varian || [])
+        .map(v => normalize(v))
+        .join(" ");
+
+    if (nama.includes(keyword)) score += 100;
+    if (sku.includes(keyword)) score += 90;
+    if (brand.includes(keyword)) score += 70;
+    if (kategori.includes(keyword)) score += 60;
+    if (varian.includes(keyword)) score += 50;
+    if (deskripsi.includes(keyword)) score += 30;
+
+    return score;
+}
+
+
+
+
+function formatProduct(product) {
+
+    return `
+Nama       : ${product.nama}
+Brand      : ${product.brand}
+Kategori   : ${product.kategori}
+SKU        : ${product.sku}
+Harga      : ${product.harga || "Belum tersedia"}
+Deskripsi  : ${product.deskripsi}
+
+Varian:
+${(product.varian || []).map(v => "- " + v).join("\n")}
+
+Whatsapp:
+${product.whatsapp}
+
+----------------------------------------
+`;
+
+}
+
+
+
+
 exports.handler = async(event) => {
 
   try {
@@ -163,41 +214,36 @@ if(files.image){
 }
 
 
-// ↓ DROP DI SINI
-let keyword = normalize(message);
+const matchedProducts = products
+    .map(product => ({
+        product,
+        score: getScore(product, keyword)
+    }))
+    .filter(item => item.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .map(item => item.product)
+    .slice(0, 10);
+    
+    
+    
+    
+    const askType =
+/(type|tipe|seri|model|apa saja|list|macam)/i.test(message);
 
-keyword = keyword
-    .replace(/foglamp/g, "fog lamp")
-    .replace(/lampukabut/g, "fog lamp")
-    .replace(/headlamp/g, "headlight")
-    .replace(/biled/g, "projector");
+const askPrice =
+/(harga|price|berapa)/i.test(message);
 
-// ↓ BARU LANJUT KE FILTER
-const matchedProducts = products.filter(product => {
+const askSpec =
+/(spesifikasi|spec|fitur|kelebihan)/i.test(message);
 
-    const nama = normalize(product.nama);
-    const sku = normalize(product.sku);
-    const brand = normalize(product.brand);
-    const kategori = normalize(product.kategori);
-    const deskripsi = normalize(product.deskripsi);
+const askCompare =
+/(beda|perbedaan|vs|bandingkan)/i.test(message);
 
-    const varian = (product.varian || [])
-        .map(v => normalize(v))
-        .join(" ");
+const askAvailability =
+/(ada|tersedia|ready|stok)/i.test(message);
 
-    return (
-        keyword.includes(nama) ||
-        keyword.includes(sku) ||
-        keyword.includes(brand) ||
-        keyword.includes(kategori) ||
-        keyword.includes(deskripsi) ||
-        keyword.includes(varian) ||
 
-        nama.includes(keyword) ||
-        sku.includes(keyword)
-    );
 
-});
 
 
     // =====================
@@ -217,27 +263,52 @@ if(
 
 let productContext = "";
 
-if(matchedProducts.length){
+if (matchedProducts.length) {
 
-    productContext = `
+    if (askType) {
+
+        const uniqueNames = [...new Set(
+            matchedProducts.map(p => p.nama)
+        )];
+
+        productContext = `
+User meminta daftar tipe.
+
+Daftar tipe yang ditemukan:
+
+${uniqueNames.map(n => "- " + n).join("\n")}
+
+Jawablah HANYA berdasarkan daftar di atas.
+Jangan menambahkan tipe yang tidak ada.
+`;
+
+    } else {
+
+        productContext = `
 DATA PRODUK RESMI
 
-${JSON.stringify(matchedProducts.slice(0,5),null,2)}
+${matchedProducts.slice(0,5).map(formatProduct).join("\n")}
+`;
+    }
 
-Gunakan data produk di atas sebagai referensi utama.
+}
 
-Jika user bertanya mengenai:
-- harga
-- spesifikasi
-- deskripsi
-- varian
-- kategori
-- sku
+DATA PRODUK RESMI
 
-Jawablah berdasarkan data tersebut.
+Gunakan HANYA data produk di atas.
 
-Jika harga kosong,
-katakan harga belum tersedia dan arahkan user menghubungi sales.
+Dilarang membuat:
+- nama produk baru
+- tipe baru
+- harga baru
+- spesifikasi baru
+- varian baru
+
+Jika informasi tidak ada,
+katakan:
+"Informasi tersebut belum tersedia pada database produk."
+
+Jangan menggunakan pengetahuan umum jika DATA PRODUK RESMI tersedia.
 `;
 
 }
@@ -526,7 +597,8 @@ jawab secara pintar dan natural.
       systemPrompt += productContext;
 
     }
-
+    
+  
 // =====================
 // OPENAI REQUEST
 // =====================
