@@ -6133,38 +6133,56 @@ document.getElementById("aiModal").addEventListener("click",function(e){
 });
 
 
-function sendAI(){
+async function sendAI(){
 
-    const input=document.getElementById("aiInput");
-
-    const text=input.value.trim();
+    const input = document.getElementById("aiInput");
+    const text = input.value.trim();
 
     if(!text) return;
 
-    const body=document.getElementById("aiMessages");
+    const body = document.getElementById("aiMessages");
 
-    body.innerHTML+=`
+    body.innerHTML += `
         <div class="ai-message user">
             ${text}
         </div>
     `;
 
-    input.value="";
+    input.value = "";
+    body.scrollTop = body.scrollHeight;
 
-    body.scrollTop=body.scrollHeight;
+    const loading = document.createElement("div");
+    loading.className = "ai-message bot";
+    loading.innerHTML = "🤖 Mengetik...";
+    body.appendChild(loading);
 
-    setTimeout(()=>{
+    try{
 
-        body.innerHTML+=`
-            <div class="ai-message bot">
-                🤖 Terima kasih.<br>
-                AI sedang dalam tahap pengembangan.
-            </div>
-        `;
+        const formData = new FormData();
 
-        body.scrollTop=body.scrollHeight;
+        formData.append("vip","PUBLIC");
+        formData.append("message",text);
+        formData.append("memory","[]");
+        formData.append("orders","[]");
 
-    },600);
+        const res = await fetch("/.netlify/functions/chat",{
+            method:"POST",
+            body:formData
+        });
+
+        const data = await res.json();
+
+        loading.innerHTML = data.reply || "Maaf, AI tidak memberikan jawaban.";
+
+    }catch(err){
+
+        loading.innerHTML = "❌ AI sedang tidak dapat dihubungi.";
+
+        console.error(err);
+
+    }
+
+    body.scrollTop = body.scrollHeight;
 
 }
 
