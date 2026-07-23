@@ -27,11 +27,13 @@ const products = JSON.parse(
 function normalize(text) {
     return String(text || "")
         .toLowerCase()
-        .replace(/[^a-z0-9]/g, "");
+        .replace(/[^a-z0-9\s]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
 }
 
 
-function getScore(product, keyword) {
+function getScore(product, tokens)
 
     let score = 0;
 
@@ -45,12 +47,27 @@ function getScore(product, keyword) {
         .map(v => normalize(v))
         .join(" ");
 
-    if (nama.includes(keyword)) score += 100;
-    if (sku.includes(keyword)) score += 90;
-    if (brand.includes(keyword)) score += 70;
-    if (kategori.includes(keyword)) score += 60;
-    if (varian.includes(keyword)) score += 50;
-    if (deskripsi.includes(keyword)) score += 30;
+    tokens.forEach(token => {
+
+    if (nama.includes(token))
+        score += 100;
+
+    if (sku.includes(token))
+        score += 90;
+
+    if (brand.includes(token))
+        score += 70;
+
+    if (kategori.includes(token))
+        score += 60;
+
+    if (varian.includes(token))
+        score += 50;
+
+    if (deskripsi.includes(token))
+        score += 30;
+
+});
 
     return score;
 }
@@ -221,12 +238,16 @@ keyword = keyword
     .replace(/lampukabut/g, "fog lamp")
     .replace(/headlamp/g, "headlight")
     .replace(/biled/g, "projector");
+    
+    const tokens = keyword
+    .split(" ")
+    .filter(Boolean);
 
 
 const matchedProducts = products
     .map(product => ({
         product,
-        score: getScore(product, keyword)
+        score: getScore(product, tokens)
     }))
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
