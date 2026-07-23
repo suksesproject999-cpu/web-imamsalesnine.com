@@ -32,6 +32,25 @@ function normalize(text) {
         .trim();
 }
 
+
+
+function applyAlias(text) {
+
+    let result = normalize(text);
+
+    Object.entries(ALIAS).forEach(([key, value]) => {
+
+        result = result.replaceAll(key, value);
+
+    });
+
+    return result;
+
+}
+
+
+
+
 const STOP_WORDS = [
     "beda",
     "perbedaan",
@@ -56,20 +75,53 @@ const STOP_WORDS = [
 ];
 
 
+const ALIAS = {
+
+    "lampukabut": "foglamp",
+    "lampu kabut": "foglamp",
+    "fog lamp": "foglamp",
+
+    "headlamp": "headlight",
+    "lampu depan": "headlight",
+    "lampu utama": "headlight",
+
+    "biled": "projector",
+    "projie": "projector",
+    "projie": "projector",
+    "proyektor": "projector",
+
+    "tembak": "shooting light",
+    "sorot": "shooting light",
+
+    "sein": "indicator",
+
+    "rem": "stop lamp",
+
+    "plafon": "interior",
+
+    "senja": "t10"
+
+};
+
+
 function getScore(product, tokens) {
 
     let score = 0;
     let matchedToken = 0;
 
-    const nama = normalize(product.nama);
-    const sku = normalize(product.sku);
-    const brand = normalize(product.brand);
-    const kategori = normalize(product.kategori);
-    const deskripsi = normalize(product.deskripsi);
+    const nama = applyAlias(product.nama);
+    
+    const sku = applyAlias(product.sku);
+
+    const brand = applyAlias(product.brand);
+
+    const kategori = applyAlias(product.kategori);
+
+  const deskripsi = applyAlias(product.deskripsi);
 
     const varian = (product.varian || [])
-        .map(v => normalize(v))
-        .join(" ");
+    .map(v => applyAlias(v))
+    .join(" ");
         
         const fullQuery = tokens.join(" ");
 
@@ -270,7 +322,7 @@ if(files.image){
 }
 
 
-let keyword = normalize(message);
+let keyword = applyAlias(message);
 
 keyword = keyword
     .replace(/foglamp/g, "fog lamp")
