@@ -25,7 +25,7 @@ const products = JSON.parse(
 
 
 function normalize(text) {
-    return text
+    return String(text || "")
         .toLowerCase()
         .replace(/[^a-z0-9]/g, "");
 }
@@ -162,7 +162,6 @@ if(files.image){
 
 }
 
-const message = fields.message || "";
 
 // ↓ DROP DI SINI
 let keyword = normalize(message);
