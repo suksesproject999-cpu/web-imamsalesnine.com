@@ -214,6 +214,15 @@ if(files.image){
 }
 
 
+let keyword = normalize(message);
+
+keyword = keyword
+    .replace(/foglamp/g, "fog lamp")
+    .replace(/lampukabut/g, "fog lamp")
+    .replace(/headlamp/g, "headlight")
+    .replace(/biled/g, "projector");
+
+
 const matchedProducts = products
     .map(product => ({
         product,
@@ -265,53 +274,60 @@ let productContext = "";
 
 if (matchedProducts.length) {
 
-    if (askType) {
+    if (askCompare) {
 
-        const uniqueNames = [...new Set(
-            matchedProducts.map(p => p.nama)
-        )];
+    productContext = `
+User meminta PERBANDINGAN produk.
 
-        productContext = `
+Bandingkan produk berikut berdasarkan data resmi.
+
+${matchedProducts
+    .slice(0,5)
+    .map(formatProduct)
+    .join("\n")}
+
+Buat tabel perbandingan yang berisi:
+
+- Nama Produk
+- Kategori
+- Varian
+- Deskripsi
+- Harga
+
+Jangan menambahkan spesifikasi yang tidak ada pada data.
+`;
+
+} else if (askType) {
+
+    const uniqueNames = [...new Set(
+        matchedProducts.map(p => p.nama)
+    )];
+
+    productContext = `
 User meminta daftar tipe.
-
-Daftar tipe yang ditemukan:
 
 ${uniqueNames.map(n => "- " + n).join("\n")}
 
-Jawablah HANYA berdasarkan daftar di atas.
-Jangan menambahkan tipe yang tidak ada.
+Jawablah hanya berdasarkan daftar di atas.
 `;
 
-    } else {
+} else {
 
-        productContext = `
+    productContext = `
 DATA PRODUK RESMI
 
-${matchedProducts.slice(0,5).map(formatProduct).join("\n")}
+${matchedProducts
+    .slice(0,5)
+    .map(formatProduct)
+    .join("\n")}
+
+Gunakan hanya data di atas.
 `;
-    }
 
 }
 
-DATA PRODUK RESMI
-
-Gunakan HANYA data produk di atas.
-
-Dilarang membuat:
-- nama produk baru
-- tipe baru
-- harga baru
-- spesifikasi baru
-- varian baru
-
-Jika informasi tidak ada,
-katakan:
-"Informasi tersebut belum tersedia pada database produk."
-
-Jangan menggunakan pengetahuan umum jika DATA PRODUK RESMI tersedia.
-`;
-
 }
+
 
     // =====================
     // SYSTEM PROMPT
@@ -513,6 +529,22 @@ berikan analisa mendalam,bahwa imamsalesnine.com adalah sebuah website yang dibu
 
 Jika user bertanya umum:
 jawab secara pintar dan natural.
+
+Jika user meminta perbedaan beberapa produk:
+
+- buat tabel perbandingan
+- bandingkan hanya berdasarkan DATA PRODUK RESMI
+- jangan menambahkan fitur, spesifikasi, atau varian yang tidak ada pada data
+- jika ada informasi yang kosong, tuliskan "Belum tersedia"
+
+Jika DATA PRODUK RESMI tersedia:
+
+- gunakan hanya data tersebut sebagai referensi
+- jangan menggunakan pengetahuan umum
+- jangan membuat nama produk baru
+- jangan membuat harga baru
+- jangan membuat spesifikasi baru
+- jangan membuat varian baru
 
 `;
 
