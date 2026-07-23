@@ -33,7 +33,7 @@ function normalize(text) {
 }
 
 
-function getScore(product, tokens)
+function getScore(product, tokens) {
 
     let score = 0;
 
@@ -49,25 +49,14 @@ function getScore(product, tokens)
 
     tokens.forEach(token => {
 
-    if (nama.includes(token))
-        score += 100;
+        if (nama.includes(token)) score += 100;
+        if (sku.includes(token)) score += 90;
+        if (brand.includes(token)) score += 70;
+        if (kategori.includes(token)) score += 60;
+        if (varian.includes(token)) score += 50;
+        if (deskripsi.includes(token)) score += 30;
 
-    if (sku.includes(token))
-        score += 90;
-
-    if (brand.includes(token))
-        score += 70;
-
-    if (kategori.includes(token))
-        score += 60;
-
-    if (varian.includes(token))
-        score += 50;
-
-    if (deskripsi.includes(token))
-        score += 30;
-
-});
+    });
 
     return score;
 }
@@ -239,9 +228,11 @@ keyword = keyword
     .replace(/headlamp/g, "headlight")
     .replace(/biled/g, "projector");
     
-    const tokens = keyword
-    .split(" ")
-    .filter(Boolean);
+    const tokens = [...new Set(
+    keyword
+        .split(/\s+/)
+        .filter(token => token.length > 1)
+)];
 
 
 const matchedProducts = products
