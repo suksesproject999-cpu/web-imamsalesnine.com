@@ -14,6 +14,23 @@ require("formidable");
 const { Readable } =
 require("stream");
 
+const path = require("path");
+
+const products = JSON.parse(
+    fs.readFileSync(
+        path.join(process.cwd(),"produk.json"),
+        "utf8"
+    )
+);
+
+
+function normalize(text) {
+    return text
+        .toLowerCase()
+        .replace(/[^a-z0-9]/g, "");
+}
+
+
 exports.handler = async(event) => {
 
   try {
@@ -144,6 +161,46 @@ if(files.image){
   `data:${imageFile.mimetype};base64,${base64}`;
 
 }
+
+const message = fields.message || "";
+
+// ↓ DROP DI SINI
+let keyword = normalize(message);
+
+keyword = keyword
+    .replace(/foglamp/g, "fog lamp")
+    .replace(/lampukabut/g, "fog lamp")
+    .replace(/headlamp/g, "headlight")
+    .replace(/biled/g, "projector");
+
+// ↓ BARU LANJUT KE FILTER
+const matchedProducts = products.filter(product => {
+
+    const nama = normalize(product.nama);
+    const sku = normalize(product.sku);
+    const brand = normalize(product.brand);
+    const kategori = normalize(product.kategori);
+    const deskripsi = normalize(product.deskripsi);
+
+    const varian = (product.varian || [])
+        .map(v => normalize(v))
+        .join(" ");
+
+    return (
+        keyword.includes(nama) ||
+        keyword.includes(sku) ||
+        keyword.includes(brand) ||
+        keyword.includes(kategori) ||
+        keyword.includes(deskripsi) ||
+        keyword.includes(varian) ||
+
+        nama.includes(keyword) ||
+        sku.includes(keyword)
+    );
+
+});
+
+
     // =====================
 // PILIH MODEL AI
 // =====================
@@ -155,6 +212,34 @@ if(
 ){
 
   model = "gpt-4.1";
+
+}
+
+
+let productContext = "";
+
+if(matchedProducts.length){
+
+    productContext = `
+DATA PRODUK RESMI
+
+${JSON.stringify(matchedProducts.slice(0,5),null,2)}
+
+Gunakan data produk di atas sebagai referensi utama.
+
+Jika user bertanya mengenai:
+- harga
+- spesifikasi
+- deskripsi
+- varian
+- kategori
+- sku
+
+Jawablah berdasarkan data tersebut.
+
+Jika harga kosong,
+katakan harga belum tersedia dan arahkan user menghubungi sales.
+`;
 
 }
 
@@ -360,6 +445,8 @@ Jika user bertanya umum:
 jawab secara pintar dan natural.
 
 `;
+
+systemPrompt += productContext;
     // =====================
     // OWNER MODE
     // =====================
@@ -436,6 +523,8 @@ Jika user bertanya umum:
 jawab secara pintar dan natural.
 
       `;
+      
+      systemPrompt += productContext;
 
     }
 
