@@ -6172,7 +6172,9 @@ async function sendAI(){
 
         const data = await res.json();
 
-        loading.innerHTML = data.reply || "Maaf, AI tidak memberikan jawaban.";
+        loading.innerHTML = marked.parse(
+    data.reply || "Maaf, AI tidak memberikan jawaban."
+);
 
     }catch(err){
 
