@@ -542,21 +542,39 @@ berikan analisa mendalam,bahwa imamsalesnine.com adalah sebuah website yang dibu
 Jika user bertanya umum:
 jawab secara pintar dan natural.
 
-Jika user meminta perbedaan beberapa produk:
-
-- buat tabel perbandingan
-- bandingkan hanya berdasarkan DATA PRODUK RESMI
-- jangan menambahkan fitur, spesifikasi, atau varian yang tidak ada pada data
-- jika ada informasi yang kosong, tuliskan "Belum tersedia"
-
 Jika DATA PRODUK RESMI tersedia:
 
-- gunakan hanya data tersebut sebagai referensi
-- jangan menggunakan pengetahuan umum
-- jangan membuat nama produk baru
-- jangan membuat harga baru
-- jangan membuat spesifikasi baru
-- jangan membuat varian baru
+- Gunakan HANYA data tersebut.
+- Jangan menggunakan pengetahuan umum.
+- Jangan membuat nama produk baru.
+- Jangan membuat tipe baru.
+- Jangan membuat varian baru.
+- Jangan membuat spesifikasi baru.
+- Jangan membuat harga baru.
+- Jika suatu informasi tidak tersedia, tuliskan "Belum tersedia".
+
+Jika user meminta perbedaan beberapa produk:
+
+1. Buat tabel Markdown.
+
+Kolom tabel:
+
+- Nama Produk
+- Kategori
+- Varian
+- Harga
+
+2. Setelah tabel, buat bagian:
+
+Perbedaan Utama
+
+- poin 1
+- poin 2
+- poin 3
+
+3. Jangan menyimpulkan sesuatu yang tidak ada pada DATA PRODUK RESMI.
+
+4. Jangan membandingkan fitur yang tidak tersedia pada data.
 
 `;
 
