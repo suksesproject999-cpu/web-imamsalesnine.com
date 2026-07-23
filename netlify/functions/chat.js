@@ -32,10 +32,34 @@ function normalize(text) {
         .trim();
 }
 
+const STOP_WORDS = [
+    "beda",
+    "perbedaan",
+    "vs",
+    "dan",
+    "dengan",
+    "yang",
+    "apa",
+    "aja",
+    "saja",
+    "ada",
+    "kah",
+    "untuk",
+    "harga",
+    "berapa",
+    "tipe",
+    "type",
+    "seri",
+    "model",
+    "produk",
+    "lampu"
+];
+
 
 function getScore(product, tokens) {
 
     let score = 0;
+    let matchedToken = 0;
 
     const nama = normalize(product.nama);
     const sku = normalize(product.sku);
@@ -46,17 +70,43 @@ function getScore(product, tokens) {
     const varian = (product.varian || [])
         .map(v => normalize(v))
         .join(" ");
+        
+        const fullQuery = tokens.join(" ");
+
+if (nama === fullQuery)
+    score += 1000;
 
     tokens.forEach(token => {
 
-        if (nama.includes(token)) score += 100;
-        if (sku.includes(token)) score += 90;
+        if (nama.includes(token)) {
+
+    score += 100;
+    matchedToken++;
+
+}
+        if (sku.includes(token)) {
+
+    score += 90;
+    matchedToken++;
+
+}
         if (brand.includes(token)) score += 70;
         if (kategori.includes(token)) score += 60;
-        if (varian.includes(token)) score += 50;
+        if (varian.includes(token)) {
+
+    score += 50;
+    matchedToken++;
+
+}
         if (deskripsi.includes(token)) score += 30;
 
     });
+    
+    if (matchedToken >= 2)
+    score += 150;
+
+if (matchedToken >= 3)
+    score += 250;
 
     return score;
 }
@@ -229,9 +279,16 @@ keyword = keyword
     .replace(/biled/g, "projector");
     
     const tokens = [...new Set(
+
     keyword
         .split(/\s+/)
-        .filter(token => token.length > 1)
+        .filter(token =>
+
+            token.length > 1 &&
+            !STOP_WORDS.includes(token)
+
+        )
+
 )];
 
 
