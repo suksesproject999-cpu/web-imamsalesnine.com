@@ -420,17 +420,63 @@ Jangan menambahkan spesifikasi yang tidak ada pada data.
 
 } else if (askType) {
 
-    const uniqueNames = [...new Set(
-        matchedProducts.map(p => p.nama)
-    )];
+    if (matchedProducts.length === 1) {
 
-    productContext = `
-User meminta daftar tipe.
+        const p = matchedProducts[0];
+
+        productContext = `
+DATA PRODUK RESMI
+
+Nama Produk:
+${p.nama}
+
+Brand:
+${p.brand}
+
+Kategori:
+${p.kategori}
+
+SKU:
+${p.sku}
+
+Varian:
+${(p.varian || []).join(", ") || "Belum tersedia"}
+
+Harga:
+${p.harga || "Belum tersedia"}
+
+Deskripsi:
+${p.deskripsi}
+
+Whatsapp:
+${p.whatsapp}
+
+User meminta informasi tipe.
+
+Karena hanya ditemukan SATU produk, JANGAN membuat tabel.
+
+Tampilkan dalam format yang rapi menggunakan heading dan bullet point.
+`;
+
+    } else {
+
+        const uniqueNames = [...new Set(
+            matchedProducts.map(p => p.nama)
+        )];
+
+        productContext = `
+DATA PRODUK RESMI
+
+Daftar Produk:
 
 ${uniqueNames.map(n => "- " + n).join("\n")}
 
-Jawablah hanya berdasarkan daftar di atas.
+User meminta daftar tipe.
+
+Jika terdapat lebih dari satu produk, tampilkan dalam bentuk daftar yang rapi.
 `;
+
+    }
 
 } else {
 
