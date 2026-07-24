@@ -3128,6 +3128,46 @@ width:100%;
 }
 
 
+.ai-product-grid{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+
+gap:16px;
+
+margin-top:15px;
+
+}
+
+
+
+.ai-grid-card{
+
+background:#fff;
+
+padding:18px;
+
+border-radius:16px;
+
+border:1px solid #ececec;
+
+box-shadow:0 8px 22px rgba(0,0,0,.08);
+
+}
+
+
+
+.ai-grid-card h3{
+
+margin-bottom:14px;
+
+font-size:18px;
+
+color:#222;
+
+}
+
 
 
 
@@ -6466,6 +6506,89 @@ class="ai-wa-btn">
 
 
 
+function isMarkdownTable(reply){
+
+    return /^\|.+\|/m.test(reply);
+
+}
+
+
+
+
+function parseMarkdownTable(markdown){
+
+    const lines = markdown
+        .trim()
+        .split("\n")
+        .filter(line => line.startsWith("|"));
+
+    if(lines.length < 3) return [];
+
+    const headers = lines[0]
+        .split("|")
+        .map(v=>v.trim())
+        .filter(Boolean);
+
+    return lines
+        .slice(2)
+        .map(line=>{
+
+            const cols = line
+                .split("|")
+                .map(v=>v.trim())
+                .filter(Boolean);
+
+            const obj = {};
+
+            headers.forEach((h,i)=>{
+
+                obj[h]=cols[i]||"";
+
+            });
+
+            return obj;
+
+        });
+
+}
+
+
+
+
+
+function renderProductGrid(products){
+
+    return `
+
+<div class="ai-product-grid">
+
+${products.map(p=>`
+
+<div class="ai-grid-card">
+
+<h3>${p["Nama Produk"]||"-"}</h3>
+
+<p><b>Kategori</b><br>${p.Kategori||"-"}</p>
+
+<p><b>Varian</b><br>${p.Varian||"-"}</p>
+
+<p class="price">${p.Harga||"-"}</p>
+
+</div>
+
+`).join("")}
+
+</div>
+
+`;
+
+}
+
+
+
+
+
+
 
 
 
@@ -6473,11 +6596,17 @@ function renderAIReply(reply){
 
     if(isProductReply(reply)){
 
-        const product=
+        return renderProductCard(
+            parseProductReply(reply)
+        );
 
-        parseProductReply(reply);
+    }
 
-        return renderProductCard(product);
+    if(isMarkdownTable(reply)){
+
+        return renderProductGrid(
+            parseMarkdownTable(reply)
+        );
 
     }
 
