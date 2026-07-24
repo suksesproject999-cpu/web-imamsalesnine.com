@@ -3169,6 +3169,23 @@ color:#222;
 }
 
 
+.ai-description{
+
+margin-top:20px;
+
+padding:20px;
+
+background:#fff;
+
+border-radius:16px;
+
+border:1px solid #ececec;
+
+line-height:1.8;
+
+}
+
+
 
 
 </style>
@@ -6517,19 +6534,46 @@ function isMarkdownTable(reply){
 
 function parseMarkdownTable(markdown){
 
-    const lines = markdown
-        .trim()
-        .split("\n")
-        .filter(line => line.startsWith("|"));
+    const lines = markdown.split("\n");
 
-    if(lines.length < 3) return [];
+    const tableLines = [];
+    const textLines = [];
 
-    const headers = lines[0]
+    let inTable = false;
+
+    lines.forEach(line=>{
+
+        if(line.trim().startsWith("|")){
+
+            inTable = true;
+            tableLines.push(line);
+
+        }else{
+
+            if(inTable && line.trim()===""){
+                return;
+            }
+
+            if(inTable){
+                textLines.push(line);
+            }
+
+        }
+
+    });
+
+    if(tableLines.length < 3){
+
+        return null;
+
+    }
+
+    const headers = tableLines[0]
         .split("|")
         .map(v=>v.trim())
         .filter(Boolean);
 
-    return lines
+    const products = tableLines
         .slice(2)
         .map(line=>{
 
@@ -6538,7 +6582,7 @@ function parseMarkdownTable(markdown){
                 .map(v=>v.trim())
                 .filter(Boolean);
 
-            const obj = {};
+            const obj={};
 
             headers.forEach((h,i)=>{
 
@@ -6550,19 +6594,27 @@ function parseMarkdownTable(markdown){
 
         });
 
+    return{
+
+        products,
+
+        description:textLines.join("\n").trim()
+
+    };
+
 }
 
 
 
 
 
-function renderProductGrid(products){
+function renderProductGrid(result){
 
     return `
 
 <div class="ai-product-grid">
 
-${products.map(p=>`
+${result.products.map(p=>`
 
 <div class="ai-grid-card">
 
@@ -6579,6 +6631,28 @@ ${products.map(p=>`
 `).join("")}
 
 </div>
+
+${
+
+result.description
+
+?
+
+`
+
+<div class="ai-description">
+
+${marked.parse(result.description)}
+
+</div>
+
+`
+
+:
+
+""
+
+}
 
 `;
 
@@ -6604,9 +6678,14 @@ function renderAIReply(reply){
 
     if(isMarkdownTable(reply)){
 
-        return renderProductGrid(
-            parseMarkdownTable(reply)
-        );
+        const table =
+        parseMarkdownTable(reply);
+
+        if(table){
+
+            return renderProductGrid(table);
+
+        }
 
     }
 
