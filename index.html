@@ -6331,9 +6331,16 @@ document.getElementById("aiModal").addEventListener("click",function(e){
 
 function isProductReply(reply){
 
-    return reply.includes("Nama Produk:")
-        && reply.includes("Brand:")
-        && reply.includes("Kategori:");
+    const fields = [
+        "Nama Produk",
+        "Brand",
+        "Kategori",
+        "SKU"
+    ];
+
+    return fields.every(field =>
+        new RegExp(field,"i").test(reply)
+    );
 
 }
 
@@ -6359,7 +6366,7 @@ function parseProductReply(reply){
 
         const regex=new RegExp(
 
-field+":\\s*([\\s\\S]*?)(?=\\n[A-Za-z ]+:|$)"
+field + "\\s*:\\s*([\\s\\S]*?)(?=\\n[A-Za-z ]+\\s*:|$)"
 
         );
 
