@@ -189,6 +189,40 @@ ${product.whatsapp}
 
 
 
+function formatProductCard(product) {
+    return `
+DATA PRODUK RESMI
+
+Nama Produk:
+${product.nama}
+
+Brand:
+${product.brand}
+
+Kategori:
+${product.kategori}
+
+SKU:
+${product.sku}
+
+Varian:
+${(product.varian || []).join(", ") || "Belum tersedia"}
+
+Harga:
+${product.harga || "Belum tersedia"}
+
+Deskripsi:
+${product.deskripsi}
+
+Whatsapp:
+${product.whatsapp}
+`;
+}
+
+
+
+
+
 
 exports.handler = async(event) => {
 
@@ -424,32 +458,8 @@ Jangan menambahkan spesifikasi yang tidak ada pada data.
 
         const p = matchedProducts[0];
 
-        productContext = `
-DATA PRODUK RESMI
-
-Nama Produk:
-${p.nama}
-
-Brand:
-${p.brand}
-
-Kategori:
-${p.kategori}
-
-SKU:
-${p.sku}
-
-Varian:
-${(p.varian || []).join(", ") || "Belum tersedia"}
-
-Harga:
-${p.harga || "Belum tersedia"}
-
-Deskripsi:
-${p.deskripsi}
-
-Whatsapp:
-${p.whatsapp}
+productContext = `
+${formatProductCard(p)}
 
 User meminta informasi tipe.
 
@@ -480,7 +490,19 @@ Jika terdapat lebih dari satu produk, tampilkan dalam bentuk daftar yang rapi.
 
 } else {
 
-    productContext = `
+    if (matchedProducts.length === 1) {
+
+        const p = matchedProducts[0];
+
+productContext = `
+${formatProductCard(p)}
+
+Tampilkan sebagai kartu (card), jangan gunakan tabel.
+`;
+
+    } else {
+
+        productContext = `
 DATA PRODUK RESMI
 
 ${matchedProducts
@@ -488,10 +510,10 @@ ${matchedProducts
     .map(formatProduct)
     .join("\n")}
 
-Gunakan hanya data di atas.
+Jika terdapat lebih dari satu produk, tampilkan dalam daftar yang rapi.
 `;
 
-}
+    }
 
 }
 
@@ -699,7 +721,7 @@ jawab secara pintar dan natural.
 
 Jika DATA PRODUK RESMI tersedia:
 
-- Gunakan HANYA data tersebut.
+- Gunakan HANYA data tersebut sebagai referensi.
 - Jangan menggunakan pengetahuan umum.
 - Jangan membuat nama produk baru.
 - Jangan membuat tipe baru.
@@ -707,6 +729,25 @@ Jika DATA PRODUK RESMI tersedia:
 - Jangan membuat spesifikasi baru.
 - Jangan membuat harga baru.
 - Jika suatu informasi tidak tersedia, tuliskan "Belum tersedia".
+
+FORMAT JAWABAN:
+
+Jika hanya ada SATU produk:
+- Jangan membuat tabel.
+- Tampilkan dalam format kartu (card) yang rapi.
+- Gunakan heading seperti:
+  Nama Produk
+  Brand
+  Kategori
+  SKU
+  Varian
+  Harga
+  Deskripsi
+- Untuk varian gunakan bullet list bila lebih dari satu.
+
+Jika terdapat DUA atau lebih produk:
+- Gunakan tabel Markdown.
+- Setelah tabel, tambahkan bagian "Perbedaan Utama" bila memang user meminta perbandingan.
 
 Jika user meminta perbedaan beberapa produk:
 
