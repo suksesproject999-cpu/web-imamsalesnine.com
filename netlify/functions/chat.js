@@ -437,7 +437,7 @@ User meminta PERBANDINGAN produk.
 Bandingkan produk berikut berdasarkan data resmi.
 
 ${matchedProducts
-    .slice(0,5)
+    .slice(0,20)
     .map(formatProduct)
     .join("\n")}
 
