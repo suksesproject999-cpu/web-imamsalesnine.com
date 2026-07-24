@@ -506,7 +506,7 @@ Tampilkan sebagai kartu (card), jangan gunakan tabel.
 DATA PRODUK RESMI
 
 ${matchedProducts
-    .slice(0,5)
+    .slice(0,20)
     .map(formatProduct)
     .join("\n")}
 
