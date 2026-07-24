@@ -2995,6 +2995,142 @@ font-size:14px;
 
 
 
+.ai-product-card{
+
+background:#fff;
+
+border-radius:16px;
+
+padding:18px;
+
+margin-top:10px;
+
+border:1px solid #ececec;
+
+box-shadow:0 8px 24px rgba(0,0,0,.08);
+
+}
+
+
+
+.ai-product-title{
+
+font-size:22px;
+
+font-weight:700;
+
+margin-bottom:18px;
+
+color:#222;
+
+}
+
+
+
+.ai-product-item{
+
+margin-bottom:15px;
+
+line-height:1.6;
+
+}
+
+
+
+
+.price{
+
+font-size:24px;
+
+font-weight:bold;
+
+color:#8CC63F;
+
+}
+
+
+
+
+.variant-container{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:8px;
+
+margin-top:8px;
+
+}
+
+
+
+.variant-chip{
+
+background:#eef7e8;
+
+color:#4f8d17;
+
+padding:8px 14px;
+
+border-radius:999px;
+
+font-size:13px;
+
+font-weight:600;
+
+border:1px solid #d7eac5;
+
+}
+
+
+.ai-product-action{
+
+margin-top:20px;
+
+}
+
+
+.ai-wa-btn{
+
+display:block;
+
+text-align:center;
+
+background:#8CC63F;
+
+color:#fff;
+
+padding:14px;
+
+border-radius:12px;
+
+font-weight:700;
+
+text-decoration:none;
+
+transition:.25s;
+
+}
+
+.ai-wa-btn:hover{
+
+background:#1faa59;
+
+transform:translateY(-2px);
+
+}
+
+.ai-wa-btn{
+
+width:100%;
+
+}
+
+
+
+
+
 </style>
 
 
@@ -6136,6 +6272,227 @@ document.getElementById("aiModal").addEventListener("click",function(e){
 
 
 
+function isProductReply(reply){
+
+    return reply.includes("Nama Produk:")
+        && reply.includes("Brand:")
+        && reply.includes("Kategori:");
+
+}
+
+
+
+
+function parseProductReply(reply){
+
+    const data={};
+
+    const fields=[
+        "Nama Produk",
+        "Brand",
+        "Kategori",
+        "SKU",
+        "Varian",
+        "Harga",
+        "Deskripsi",
+        "Whatsapp"
+    ];
+
+    fields.forEach(field=>{
+
+        const regex=new RegExp(
+
+field+":\\s*([\\s\\S]*?)(?=\\n[A-Za-z ]+:|$)"
+
+        );
+
+        const match=reply.match(regex);
+
+        data[field]=match
+            ? match[1].trim()
+            : "";
+
+    });
+
+    return data;
+
+}
+
+
+
+
+
+function renderVariants(text){
+
+    if(!text)
+        return "<span>Tidak tersedia</span>";
+
+    return text
+
+        .split(",")
+
+        .map(v=>v.trim())
+
+        .filter(Boolean)
+
+        .map(v=>
+
+`<span class="variant-chip">${v}</span>`
+
+        )
+
+        .join("");
+
+}
+
+
+
+
+
+
+function renderProductCard(product){
+
+return `
+
+<div class="ai-product-card">
+
+<div class="ai-product-title">
+
+${product["Nama Produk"]}
+
+</div>
+
+<div class="ai-product-item">
+
+<b>Brand</b>
+
+<div>
+
+${product.Brand}
+
+</div>
+
+</div>
+
+<div class="ai-product-item">
+
+<b>Kategori</b>
+
+<div>
+
+${product.Kategori}
+
+</div>
+
+</div>
+
+<div class="ai-product-item">
+
+<b>SKU</b>
+
+<div>
+
+${product.SKU}
+
+</div>
+
+</div>
+
+<div class="ai-product-item">
+
+<b>Harga</b>
+
+<div class="price">
+
+${product.Harga}
+
+</div>
+
+</div>
+
+
+
+
+<div class="ai-product-item">
+
+<b>Varian</b>
+
+<div class="variant-container">
+
+${renderVariants(product.Varian)}
+
+</div>
+
+</div>
+
+
+
+<div class="ai-product-item">
+
+<b>Deskripsi</b>
+
+<div>
+
+${product.Deskripsi}
+
+</div>
+
+</div>
+
+
+<div class="ai-product-action">
+
+<a
+
+href="${product.Whatsapp}"
+
+target="_blank"
+
+class="ai-wa-btn">
+
+💬 Konsultasi Sekarang
+
+</a>
+
+</div>
+
+
+
+</div>
+
+`;
+
+}
+
+
+
+
+
+
+function renderAIReply(reply){
+
+    if(isProductReply(reply)){
+
+        const product=
+
+        parseProductReply(reply);
+
+        return renderProductCard(product);
+
+    }
+
+    return marked.parse(reply);
+
+}
+
+
+
+
+
+
+
+
+
 
 
 async function sendAI(){
@@ -6177,7 +6534,7 @@ async function sendAI(){
 
         const data = await res.json();
 
-        loading.innerHTML = marked.parse(
+        loading.innerHTML = renderAIReply(
     data.reply || "Maaf, AI tidak memberikan jawaban."
 );
 
