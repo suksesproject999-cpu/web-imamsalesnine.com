@@ -386,7 +386,7 @@ const matchedProducts = products
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .map(item => item.product)
-    .slice(0, 10);
+    .slice(0, 20);
     
     
     
