@@ -174,7 +174,7 @@ Brand      : ${product.brand}
 Kategori   : ${product.kategori}
 SKU        : ${product.sku}
 Gambar     : ${product.gambar}
-Harga      : ${product.harga || "Belum tersedia"}
+Harga      : ${product.harga || "tersedia"}
 Deskripsi  : ${product.deskripsi}
 
 Varian:
