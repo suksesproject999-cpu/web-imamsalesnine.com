@@ -389,7 +389,7 @@ const matchedProducts = products
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
     .map(item => item.product)
-    .slice(0, 20);
+    .slice(0, 50);
     
     
     
@@ -440,7 +440,7 @@ User meminta PERBANDINGAN produk.
 Bandingkan produk berikut berdasarkan data resmi.
 
 ${matchedProducts
-    .slice(0,20)
+    .slice(0,50)
     .map(formatProduct)
     .join("\n")}
 
@@ -510,7 +510,7 @@ Tampilkan sebagai kartu (card), jangan gunakan tabel.
 DATA PRODUK RESMI
 
 ${matchedProducts
-    .slice(0,20)
+    .slice(0,50)
     .map(formatProduct)
     .join("\n")}
 
