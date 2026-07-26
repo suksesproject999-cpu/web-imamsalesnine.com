@@ -173,6 +173,7 @@ Nama       : ${product.nama}
 Brand      : ${product.brand}
 Kategori   : ${product.kategori}
 SKU        : ${product.sku}
+Gambar     : ${product.gambar}
 Harga      : ${product.harga || "Belum tersedia"}
 Deskripsi  : ${product.deskripsi}
 
@@ -204,6 +205,8 @@ ${product.kategori}
 
 SKU:
 ${product.sku}
+
+Gambar: ${product.gambar}
 
 Varian:
 ${(product.varian || []).join(", ") || "Belum tersedia"}
@@ -739,6 +742,7 @@ Jika hanya ada SATU produk:
 - Tampilkan dalam format kartu (card) yang rapi.
 - Gunakan heading seperti:
   Nama Produk
+  Gambar
   Brand
   Kategori
   SKU
@@ -758,6 +762,7 @@ Jika user meminta perbedaan beberapa produk:
 Kolom tabel:
 
 - Nama Produk
+- Gambar
 - Kategori
 - Varian
 - Harga
