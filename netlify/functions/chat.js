@@ -447,6 +447,7 @@ ${matchedProducts
 Buat tabel perbandingan yang berisi:
 
 - Nama Produk
+- Gambar
 - Kategori
 - Varian
 - Deskripsi
