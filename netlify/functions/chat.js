@@ -174,7 +174,7 @@ Brand      : ${product.brand}
 Kategori   : ${product.kategori}
 SKU        : ${product.sku}
 Gambar     : ${product.gambar}
-Harga      : ${product.harga || "tersedia"}
+Harga      : ${product.harga || "Tersedia"}
 Deskripsi  : ${product.deskripsi}
 
 Varian:
@@ -212,7 +212,7 @@ Varian:
 ${(product.varian || []).join(", ") || "Belum tersedia"}
 
 Harga:
-${product.harga || "Belum tersedia"}
+${product.harga || "Tersedia"}
 
 Deskripsi:
 ${product.deskripsi}
