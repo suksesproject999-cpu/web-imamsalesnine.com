@@ -931,6 +931,80 @@ gap:15px;
   border-radius:15px;
 }
 
+.gallery-main{
+
+width:100%;
+
+max-width:450px;
+
+margin:auto;
+
+}
+
+.gallery-main img{
+
+width:100%;
+
+aspect-ratio:1/1;
+
+object-fit:contain;
+
+background:#fff;
+
+border-radius:16px;
+
+border:1px solid #eee;
+
+}
+
+.gallery-thumb{
+
+display:flex;
+
+gap:10px;
+
+justify-content:center;
+
+flex-wrap:wrap;
+
+margin-top:15px;
+
+}
+
+.gallery-thumb img{
+
+width:80px;
+
+height:80px;
+
+object-fit:cover;
+
+border-radius:12px;
+
+border:2px solid transparent;
+
+cursor:pointer;
+
+transition:.25s;
+
+background:#fff;
+
+}
+
+.gallery-thumb img:hover{
+
+border-color:#8CC63F;
+
+transform:scale(1.05);
+
+}
+
+.gallery-thumb img.active{
+
+border-color:#8CC63F;
+
+}
+
 .product-detail h2{
   margin:20px 0 10px;
 }
@@ -3323,6 +3397,23 @@ box-sizing:border-box;
 }
 
 
+.spec-box ul{
+
+margin:0;
+
+padding-left:20px;
+
+}
+
+.spec-box li{
+
+margin-bottom:10px;
+
+line-height:1.7;
+
+}
+
+
 
 
 </style>
@@ -4440,82 +4531,304 @@ function showProduct(nama){
     document.getElementById("product-grid-auto");
 
   container.innerHTML = `
-    <div class="product-detail">
 
-      <img
-        src="${product.gambar}"
-        alt="${product.nama}"
-      >
+  <div class="product-detail">
 
-      <h2>${product.nama}</h2>
+    <div class="product-header">
 
-      <h4>${product.brand}</h4>
+      <div class="gallery-main">
 
-      <p>${product.deskripsi}</p>
+<img
+id="mainProductImage"
+src="${product.gambar}"
+alt="${product.nama}">
 
-      <div class="product-options">
+<div class="gallery-thumb">
 
-  <div class="option-group">
-    <label><strong>Varian</strong></label>
-    <select id="varian">
-      ${(product.varian || [])
-        .map(v => `<option value="${v}">${v}</option>`)
-        .join("")}
-    </select>
-  </div>
+<img
+class="active"
+src="${product.gambar}"
+onclick="changeGallery(this)"
+>
 
-  <div class="option-group">
-    <label><strong>Qty</strong></label>
+${
+(product.gallery || [])
+.map(img=>`
 
-    <div class="qty-box">
-      <button onclick="changeInputQty(-1)">➖</button>
+<img
+src="${img}"
+onclick="changeGallery(this)"
+>
 
-      <input
-        id="qty"
-        type="number"
-        value="1"
-        min="1">
-
-    <button onclick="changeInputQty(1)">➕</button>
-    </div>
-
-  </div>
+`)
+.join("")
+}
 
 </div>
 
-      <div class="spec-box">
-        ${product.spesifikasi || "Spesifikasi belum tersedia."}
-      </div>
+</div>
 
-      <div class="detail-buttons">
+      <div class="product-info">
 
-        <button
-  class="btn"
-  onclick="addToCart(${product.id})">
-  🛒 Tambah ke Keranjang
-</button>
+        <h2>${product.nama}</h2>
 
-<a
-    class="btn secondary"
-    href="${product.whatsapp}"
-    target="_blank"
-  >
-    💬 Chat Langsung
-  </a>
+        <h4>${product.brand || "-"}</h4>
 
-        <button
-          class="btn secondary"
-          onclick="openCategory('${product.kategori}')"
-        >
-          ⬅ Kembali
-        </button>
+        <div class="price">
+
+        ${
+          product.harga?.promo
+          ? `
+            Rp ${product.harga.promo.toLocaleString("id-ID")}
+            <br>
+            <small style="color:#888;font-size:16px;">
+              <del>
+              Rp ${product.harga.normal.toLocaleString("id-ID")}
+              </del>
+            </small>
+          `
+          : `
+            Rp ${(product.harga?.normal || 0).toLocaleString("id-ID")}
+          `
+        }
+
+        </div>
+
+        <div class="stock-badge">
+          ${product.stok?.status || "Ready"}
+        </div>
+
+        <p>
+          ${product.deskripsi || ""}
+        </p>
 
       </div>
 
     </div>
+
+
+    <div class="product-options">
+
+      <div class="option-group">
+
+        <label><strong>Varian</strong></label>
+
+        <select id="varian">
+
+        ${
+          (product.varian?.length
+            ? product.varian
+            : ["Default"])
+          .map(v=>`
+            <option value="${v}">
+              ${v}
+            </option>
+          `).join("")
+        }
+
+        </select>
+
+      </div>
+
+      <div class="option-group">
+
+        <label><strong>Qty</strong></label>
+
+        <div class="qty-box">
+
+          <button onclick="changeInputQty(-1)">➖</button>
+
+          <input
+            id="qty"
+            type="number"
+            value="1"
+            min="1">
+
+          <button onclick="changeInputQty(1)">➕</button>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <h3>Spesifikasi</h3>
+
+    <div class="spec-box">
+
+      ${
+      product.spesifikasi
+      ?
+      Object.entries(product.spesifikasi)
+      .map(([key,value])=>`
+        <p>
+          <strong>${key}</strong> :
+          ${value}
+        </p>
+      `).join("")
+      :
+      "Spesifikasi belum tersedia."
+      }
+
+    </div>
+
+
+    <h3 style="margin-top:25px">
+      ✅ Keunggulan
+    </h3>
+
+    <div class="spec-box">
+
+      ${
+      product.keunggulan?.length
+      ?
+      `
+      <ul>
+
+      ${
+      product.keunggulan
+      .map(item=>`<li>${item}</li>`)
+      .join("")
+      }
+
+      </ul>
+      `
+      :
+      "Keunggulan belum tersedia."
+      }
+
+    </div>
+
+
+    <h3 style="margin-top:25px">
+      Aplikasi Kendaraan
+    </h3>
+
+    <div class="spec-box">
+
+      <strong>Jenis Kendaraan</strong>
+
+      <div class="variant-list">
+
+      ${
+      (product.aplikasi?.jenis || [])
+      .map(item=>`<span>${item}</span>`)
+      .join("")
+      }
+
+      </div>
+
+      <br>
+
+      <strong>Kompatibel Dengan</strong>
+
+      <div class="variant-list">
+
+      ${
+      (product.aplikasi?.kendaraan || [])
+      .map(item=>`<span>${item}</span>`)
+      .join("")
+      }
+
+      </div>
+
+    </div>
+
+
+    <h3 style="margin-top:25px">
+      Isi Paket
+    </h3>
+
+    <div class="spec-box">
+
+      ${
+      product.isi_paket?.length
+      ?
+      `
+      <ul>
+
+      ${
+      product.isi_paket
+      .map(item=>`<li>${item}</li>`)
+      .join("")
+      }
+
+      </ul>
+      `
+      :
+      "Isi paket belum tersedia."
+      }
+
+    </div>
+
+
+    <h3 style="margin-top:25px">
+      Garansi
+    </h3>
+
+    <div class="spec-box">
+
+      ${product.garansi?.lama || "Tidak tersedia"}
+
+    </div>
+
+
+    <div class="detail-buttons">
+
+      <button
+        class="btn"
+        onclick="addToCart(${product.id})">
+
+        🛒 Tambah ke Keranjang
+
+      </button>
+
+      <a
+        class="btn secondary"
+        href="${product.whatsapp}"
+        target="_blank">
+
+        💬 Chat Langsung
+
+      </a>
+
+      <button
+        class="btn secondary"
+        onclick="openCategory('${product.kategori}')">
+
+        ⬅ Kembali
+
+      </button>
+
+    </div>
+
+  </div>
+
   `;
 
 }
+
+
+
+
+function changeGallery(el){
+
+const main =
+document.getElementById("mainProductImage");
+
+main.src = el.src;
+
+document
+.querySelectorAll(".gallery-thumb img")
+.forEach(img=>img.classList.remove("active"));
+
+el.classList.add("active");
+
+}
+
+
+
 
 function saveCart() {
   localStorage.setItem("cart", JSON.stringify(cart));
@@ -4569,7 +4882,7 @@ function addToCart(id) {
       kategori: product.kategori,
       varian: varian,
       qty: qty,
-      harga: product.harga || null
+      harga: product.harga?.promo ?? product.harga?.normal ?? 0
     });
 
   }
