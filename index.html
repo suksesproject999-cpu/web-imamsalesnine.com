@@ -3414,6 +3414,54 @@ line-height:1.7;
 }
 
 
+.variant-buttons{
+
+display:flex;
+
+flex-wrap:wrap;
+
+gap:10px;
+
+margin-top:10px;
+
+}
+
+.variant-btn{
+
+padding:10px 18px;
+
+border:2px solid #ddd;
+
+border-radius:999px;
+
+background:#fff;
+
+cursor:pointer;
+
+transition:.25s;
+
+font-weight:600;
+
+}
+
+.variant-btn:hover{
+
+border-color:#8CC63F;
+
+color:#8CC63F;
+
+}
+
+.variant-btn.active{
+
+background:#8CC63F;
+
+color:#fff;
+
+border-color:#8CC63F;
+
+}
+
 
 
 </style>
@@ -4618,20 +4666,32 @@ Rp ${(product.harga?.normal ?? 0).toLocaleString("id-ID")}
 
         <label><strong>Varian</strong></label>
 
-        <select id="varian">
+        <div id="variantContainer" class="variant-buttons">
 
-        ${
-          (product.varian?.length
-            ? product.varian
-            : ["Default"])
-          .map(v=>`
-            <option value="${v}">
-              ${v}
-            </option>
-          `).join("")
-        }
+${
+(product.varian?.length
+? product.varian
+: ["Default"])
+.map((v,index)=>`
 
-        </select>
+<button
+type="button"
+class="variant-btn ${index===0?"active":""}"
+onclick="selectVariant(this,'${v}')">
+
+${v}
+
+</button>
+
+`).join("")
+}
+
+</div>
+
+<input
+type="hidden"
+id="varian"
+value="${product.varian?.[0] || "Default"}">
 
       </div>
 
@@ -4844,6 +4904,26 @@ document
 el.classList.add("active");
 
 }
+
+
+
+
+
+function selectVariant(btn,value){
+
+document
+.querySelectorAll(".variant-btn")
+.forEach(b=>b.classList.remove("active"));
+
+btn.classList.add("active");
+
+document
+.getElementById("varian")
+.value=value;
+
+}
+
+
 
 
 
