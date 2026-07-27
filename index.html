@@ -4541,7 +4541,9 @@ function showProduct(nama){
 <img
 id="mainProductImage"
 src="${product.gambar}"
-alt="${product.nama}">
+alt="${product.nama}"
+loading="lazy"
+onerror="this.src='images/no-image.png'">
 
 <div class="gallery-thumb">
 
@@ -4577,20 +4579,23 @@ onclick="changeGallery(this)"
         <div class="price">
 
         ${
-          product.harga?.promo
-          ? `
-            Rp ${product.harga.promo.toLocaleString("id-ID")}
-            <br>
-            <small style="color:#888;font-size:16px;">
-              <del>
-              Rp ${product.harga.normal.toLocaleString("id-ID")}
-              </del>
-            </small>
-          `
-          : `
-            Rp ${(product.harga?.normal || 0).toLocaleString("id-ID")}
-          `
-        }
+product.harga?.promo
+? `
+Rp ${product.harga.promo.toLocaleString("id-ID")}
+
+<br>
+
+<small style="color:#888;font-size:16px">
+<del>
+Rp ${(product.harga.normal ?? product.harga.promo).toLocaleString("id-ID")}
+</del>
+</small>
+`
+:
+`
+Rp ${(product.harga?.normal ?? 0).toLocaleString("id-ID")}
+`
+}
 
         </div>
 
@@ -4639,10 +4644,18 @@ onclick="changeGallery(this)"
           <button onclick="changeInputQty(-1)">➖</button>
 
           <input
-            id="qty"
-            type="number"
-            value="1"
-            min="1">
+
+id="qty"
+
+type="number"
+
+value="1"
+
+min="1"
+
+max="${product.stok?.qty || 999}"
+
+>
 
           <button onclick="changeInputQty(1)">➕</button>
 
@@ -4658,18 +4671,23 @@ onclick="changeGallery(this)"
     <div class="spec-box">
 
       ${
-      product.spesifikasi
-      ?
-      Object.entries(product.spesifikasi)
-      .map(([key,value])=>`
-        <p>
-          <strong>${key}</strong> :
-          ${value}
-        </p>
-      `).join("")
-      :
-      "Spesifikasi belum tersedia."
-      }
+Object.entries(product.spesifikasi)
+.map(([key,value])=>`
+
+<p>
+
+<strong>${key}</strong> :
+
+${
+Array.isArray(value)
+? value.join(", ")
+: value
+}
+
+</p>
+
+`).join("")
+}
 
     </div>
 
@@ -4786,7 +4804,7 @@ onclick="changeGallery(this)"
 
       <a
         class="btn secondary"
-        href="${product.whatsapp}"
+        href="${product.whatsapp || '#'}"
         target="_blank">
 
         💬 Chat Langsung
