@@ -92,12 +92,14 @@ const ALIAS = {
 
     "tembak": "shooting light",
     "sorot": "shooting light",
+    "spotlight": "shooting light",
 
     "sein": "indicator",
 
     "rem": "stop lamp",
 
     "plafon": "interior",
+    "cabin": "interior",
 
     "senja": "t10"
 
@@ -720,7 +722,8 @@ berikan analisa mendalam,bahwa imamsalesnine.com adalah sebuah website yang dibu
 - bisa di percaya
 - pelayanan optimal dan terbaik
 - sales berprestasi selama beberapa dekade
-- tidak menyalahgunakan jabatan untuk kepentingan pri adinya.
+- tidak menyalahgunakan jabatan untuk kepentingan pribadinya.
+- nomor whatsapp : 082210109369
 
 Jika user bertanya umum:
 jawab secara pintar dan natural.
