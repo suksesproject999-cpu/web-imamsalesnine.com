@@ -3542,10 +3542,10 @@ width:100%;
 }
 
 .product-title{
+position:relative;
 display:flex;
-justify-content:space-between;
 align-items:flex-start;
-gap:16px;
+padding-right:70px;
 }
 
 .product-title h2{
@@ -3557,15 +3557,26 @@ margin:0;
 }
 
 .wishlist-btn{
+position:absolute;
+top:0;
+right:0;
+
 width:52px;
 height:52px;
+
 border:none;
 border-radius:50%;
 background:#f5f5f5;
+
 font-size:24px;
 cursor:pointer;
+
+display:flex;
+align-items:center;
+justify-content:center;
+
 transition:.25s;
-flex-shrink:0;
+z-index:10;
 }
 
 .wishlist-btn:hover{
@@ -4365,6 +4376,41 @@ padding:18px;
 }
 
 /* ===== End Product Detail V2 ===== */
+
+
+
+.back-products{
+margin-bottom:12px;
+}
+
+.back-products button{
+
+background:none;
+
+border:none;
+
+padding:0;
+
+color:#8CC63F;
+
+font-size:15px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.back-products button:hover{
+
+transform:translateX(-4px);
+
+color:#6ea72b;
+
+}
+
 
 
 
@@ -5500,6 +5546,8 @@ function openCategory(kategori){
 let wishlist=
 JSON.parse(localStorage.getItem("wishlist")||"[]");
 
+let lastCategory = "";
+
 function toggleWishlist(id){
 
 if(wishlist.includes(id)){
@@ -5527,13 +5575,34 @@ allProducts.find(p=>p.id===id).nama
 
 
 
+
+
+function backToProducts(){
+
+if(lastCategory){
+
+openCategory(lastCategory);
+
+}else{
+
+renderCategories();
+
+}
+
+}
+
+
+
 function showProduct(nama){
+  
 
 const product = allProducts.find(
 p => p.nama === nama
 );
 
 if(!product) return;
+
+lastCategory = product.kategori;
 
 const container =
 document.getElementById("product-grid-auto");
@@ -5591,6 +5660,16 @@ RIGHT COLUMN
 ========================= -->
 
 <div class="product-info">
+
+<div class="back-products">
+
+<button onclick="backToProducts()">
+
+← Kembali ke Produk
+
+</button>
+
+</div>
 
 <div class="product-title">
 
@@ -5741,16 +5820,12 @@ onclick="changeQty(-1)">
 </button>
 
 <input
-
 id="qty"
-
 type="number"
-
 value="1"
-
 min="1"
-
-readonly>
+inputmode="numeric"
+oninput="validateQty(this)">
 
 <button
 type="button"
@@ -5796,7 +5871,7 @@ target="_blank">
 
 class="btn"
 
-onclick="shareProduct()">
+onclick="shareProduct(${product.id})">
 
 📤 Bagikan Produk
 
@@ -6055,6 +6130,53 @@ class="product-grid">
 renderRelated(product);
 
 saveRecent(product);
+
+}
+
+
+
+
+
+function shareProduct(id){
+
+const product =
+allProducts.find(p=>p.id===id);
+
+if(!product) return;
+
+const url = location.href;
+
+if(navigator.share){
+
+navigator.share({
+
+title:product.nama,
+
+text:product.deskripsi,
+
+url:url
+
+}).catch(()=>{});
+
+}else{
+
+navigator.clipboard.writeText(url);
+
+Swal.fire({
+
+icon:"success",
+
+title:"Berhasil",
+
+text:"Link produk berhasil disalin.",
+
+timer:1800,
+
+showConfirmButton:false
+
+});
+
+}
 
 }
 
@@ -6678,39 +6800,42 @@ function renderCart(){
 }
 
 
+function changeQty(step){
 
+const qty =
+document.getElementById("qty");
 
-function changeInputQty(step) {
+if(!qty) return;
 
-  const input = document.getElementById("qty");
-  if (!input) return;
+let value =
+parseInt(qty.value) || 1;
 
-  let value = parseInt(input.value) || 1;
+value += step;
 
-  value += step;
-
-  if (value < 1) value = 1;
-
-  input.value = value;
+if(value < 1){
+value = 1;
 }
 
-function changeQty(index, change) {
-  cart[index].qty += change;
+qty.value = value;
 
-  // Jangan sampai qty kurang dari 1
-  if (cart[index].qty < 1) {
-    cart[index].qty = 1;
-  }
-
-  // Simpan ke localStorage
-  localStorage.setItem("cart", JSON.stringify(cart));
-
-  // Update badge keranjang
-  updateCartCount();
-
-  // Render ulang keranjang
-  renderCart();
 }
+
+
+
+function validateQty(input){
+
+let value = parseInt(input.value);
+
+if(isNaN(value) || value < 1){
+
+input.value = 1;
+
+}
+
+}
+
+
+
 
 
 
