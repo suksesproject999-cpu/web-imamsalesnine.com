@@ -6761,11 +6761,11 @@ function renderCart(){
 
                 <br>
 
-                <button onclick="changeQty(${index},-1)">
+                <button onclick="changeCartQty(${index},-1)">
                     ➖
                 </button>
 
-                <button onclick="changeQty(${index},1)">
+                <button onclick="changeCartQty(${index},1)">
                     ➕
                 </button>
 
@@ -6798,6 +6798,25 @@ function renderCart(){
     });
 
 }
+
+
+
+function changeCartQty(index, change){
+
+  cart[index].qty += change;
+
+  // Jangan sampai kurang dari 1
+  if(cart[index].qty < 1){
+    cart[index].qty = 1;
+  }
+
+  saveCart();
+  renderCart();
+
+}
+
+
+
 
 
 function changeQty(step){
