@@ -3464,6 +3464,50 @@ border-color:#8CC63F;
 
 
 
+
+
+.product-title{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+gap:15px;
+
+}
+
+.wishlist-btn{
+
+width:48px;
+
+height:48px;
+
+border:none;
+
+border-radius:50%;
+
+background:#f5f5f5;
+
+font-size:24px;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.wishlist-btn:hover{
+
+background:#ffe5e5;
+
+transform:scale(1.1);
+
+}
+
+
+
 </style>
 
 
@@ -4567,6 +4611,40 @@ function openCategory(kategori){
 
 }
 
+
+
+
+
+let wishlist=
+JSON.parse(localStorage.getItem("wishlist")||"[]");
+
+function toggleWishlist(id){
+
+if(wishlist.includes(id)){
+
+wishlist=
+wishlist.filter(i=>i!==id);
+
+}else{
+
+wishlist.push(id);
+
+}
+
+localStorage.setItem(
+"wishlist",
+JSON.stringify(wishlist)
+);
+
+showProduct(
+allProducts.find(p=>p.id===id).nama
+);
+
+}
+
+
+
+
 function showProduct(nama){
 
   const product = allProducts.find(
@@ -4618,44 +4696,53 @@ onclick="changeGallery(this)"
 
 </div>
 
-      <div class="product-info">
+     <div class="product-info">
 
-        <h2>${product.nama}</h2>
+  <div class="product-title">
 
-        <h4>${product.brand || "-"}</h4>
+    <h2>${product.nama}</h2>
 
-        <div class="price">
+    <button
+      class="wishlist-btn"
+      onclick="toggleWishlist(${product.id})">
 
-        ${
-product.harga?.promo
-? `
-Rp ${product.harga.promo.toLocaleString("id-ID")}
+      ${wishlist.includes(product.id) ? "❤️" : "🤍"}
 
-<br>
+    </button>
 
-<small style="color:#888;font-size:16px">
-<del>
-Rp ${(product.harga.normal ?? product.harga.promo).toLocaleString("id-ID")}
-</del>
-</small>
-`
-:
-`
-Rp ${(product.harga?.normal ?? 0).toLocaleString("id-ID")}
-`
-}
+  </div>
 
-        </div>
+  <h4>${product.brand || "-"}</h4>
 
-        <div class="stock-badge">
-          ${product.stok?.status || "Ready"}
-        </div>
+  <div class="price">
 
-        <p>
-          ${product.deskripsi || ""}
-        </p>
+    ${
+      product.harga?.promo
+      ? `
+      Rp ${product.harga.promo.toLocaleString("id-ID")}
+      <br>
+      <small style="color:#888;font-size:16px">
+        <del>
+          Rp ${(product.harga.normal ?? product.harga.promo).toLocaleString("id-ID")}
+        </del>
+      </small>
+      `
+      : `
+      Rp ${(product.harga?.normal ?? 0).toLocaleString("id-ID")}
+      `
+    }
 
-      </div>
+  </div>
+
+  <div class="stock-badge">
+    ${product.stok?.status || "Ready"}
+  </div>
+
+  <p>
+    ${product.deskripsi || ""}
+  </p>
+
+</div>
 
     </div>
 
@@ -4854,36 +4941,72 @@ Array.isArray(value)
 
     <div class="detail-buttons">
 
-      <button
-        class="btn"
-        onclick="addToCart(${product.id})">
+  <button
+    class="btn"
+    onclick="addToCart(${product.id})">
 
-        🛒 Tambah ke Keranjang
+    🛒 Tambah ke Keranjang
 
-      </button>
+  </button>
 
-      <a
-        class="btn secondary"
-        href="${product.whatsapp || '#'}"
-        target="_blank">
+  <a
+    class="btn secondary"
+    href="${product.whatsapp || '#'}"
+    target="_blank">
 
-        💬 Chat Langsung
+    💬 Chat Langsung
 
-      </a>
+  </a>
 
-      <button
-        class="btn secondary"
-        onclick="openCategory('${product.kategori}')">
+  <button
+    class="btn secondary"
+    onclick="shareProduct(${product.id})">
 
-        ⬅ Kembali
+    🔗 Bagikan
 
-      </button>
+  </button>
 
-    </div>
+  <button
+    class="btn secondary"
+    onclick="openCategory('${product.kategori}')">
+
+    ⬅ Kembali
+
+  </button>
+
+</div>
 
   </div>
 
   `;
+
+}
+
+
+
+
+function shareProduct(id){
+
+  const product = allProducts.find(p => p.id === id);
+  if(!product) return;
+
+  const url = location.href;
+
+  if(navigator.share){
+
+    navigator.share({
+      title: product.nama,
+      text: product.deskripsi,
+      url
+    });
+
+  }else{
+
+    navigator.clipboard.writeText(url);
+
+    alert("✅ Link produk berhasil disalin.");
+
+  }
 
 }
 
