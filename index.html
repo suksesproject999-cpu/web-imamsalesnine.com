@@ -5143,10 +5143,12 @@ Array.isArray(value)
 
 let galleryImages = [];
 let currentImage = 0;
+let zoom = 1;
 
-function openLightbox(){
+function openLightbox(index = 0){
 
 galleryImages = [
+
 document.getElementById("mainProductImage").src,
 
 ...Array.from(
@@ -5157,26 +5159,67 @@ document.querySelectorAll(".gallery-thumb img")
 
 ];
 
-currentImage=0;
+currentImage = index;
 
-showLightbox();
+// Reset Zoom
+zoom = 1;
+
+const img =
+document.getElementById("lightboxImg");
+
+img.style.transform = "scale(1)";
 
 document
 .getElementById("lightbox")
 .classList.add("show");
 
+showLightbox();
+
 }
 
 function showLightbox(){
 
-document
-.getElementById("lightboxImg")
-.src=galleryImages[currentImage];
+const img =
+document.getElementById("lightboxImg");
+
+// Reset Zoom tiap pindah gambar
+zoom = 1;
+img.style.transform = "scale(1)";
+
+img.src = galleryImages[currentImage];
 
 document
 .getElementById("lightboxCounter")
-.innerHTML=
-`${currentImage+1} / ${galleryImages.length}`;
+.textContent =
+`${currentImage + 1} / ${galleryImages.length}`;
+
+}
+
+function nextImage(){
+
+currentImage++;
+
+if(currentImage >= galleryImages.length){
+
+currentImage = 0;
+
+}
+
+showLightbox();
+
+}
+
+function prevImage(){
+
+currentImage--;
+
+if(currentImage < 0){
+
+currentImage = galleryImages.length - 1;
+
+}
+
+showLightbox();
 
 }
 
@@ -5186,36 +5229,52 @@ document
 .getElementById("lightbox")
 .classList.remove("show");
 
-}
+zoom = 1;
 
-function prevImage(){
-
-currentImage--;
-
-if(currentImage<0){
-
-currentImage=
-galleryImages.length-1;
+document
+.getElementById("lightboxImg")
+.style.transform = "scale(1)";
 
 }
 
-showLightbox();
+
+
+
+const lightboxImg =
+document.getElementById("lightboxImg");
+
+lightboxImg.addEventListener("wheel",e=>{
+
+e.preventDefault();
+
+zoom += e.deltaY < 0 ? .2 : -.2;
+
+zoom = Math.max(1,Math.min(4,zoom));
+
+lightboxImg.style.transform =
+`scale(${zoom})`;
+
+});
+
+let lastTap = 0;
+
+lightboxImg.addEventListener("touchend",()=>{
+
+const now = Date.now();
+
+if(now-lastTap<300){
+
+zoom = zoom===1 ? 2 : 1;
+
+lightboxImg.style.transform =
+`scale(${zoom})`;
 
 }
 
-function nextImage(){
+lastTap = now;
 
-currentImage++;
+});
 
-if(currentImage>=galleryImages.length){
-
-currentImage=0;
-
-}
-
-showLightbox();
-
-}
 
 
 
