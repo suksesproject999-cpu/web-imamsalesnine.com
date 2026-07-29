@@ -5932,6 +5932,253 @@ align-items:center;
 
 
 
+.product-highlights span{
+
+display:flex;
+align-items:center;
+gap:8px;
+
+padding:10px 16px;
+
+border-radius:999px;
+
+background:#f6f9ef;
+
+color:#5a8e1c;
+
+font-weight:600;
+
+}
+
+.product-highlights i{
+
+font-size:15px;
+
+color:#8CC63F;
+
+}
+
+
+
+
+.ai-header h2{
+
+display:flex;
+align-items:center;
+gap:12px;
+
+}
+
+.ai-header h2 i{
+
+font-size:22px;
+color:#fff;
+
+}
+
+.ai-close{
+
+width:42px;
+height:42px;
+
+display:flex;
+justify-content:center;
+align-items:center;
+
+border:none;
+border-radius:50%;
+
+background:rgba(255,255,255,.18);
+
+color:#fff;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.ai-close:hover{
+
+background:#fff;
+color:#8CC63F;
+
+transform:rotate(90deg);
+
+}
+
+
+.brand-breadcrumb span{
+
+display:flex;
+align-items:center;
+gap:8px;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.brand-breadcrumb span i{
+
+font-size:14px;
+
+color:#8CC63F;
+
+transition:.25s;
+
+}
+
+.brand-breadcrumb span:hover{
+
+color:#8CC63F;
+
+transform:translateX(3px);
+
+}
+
+.brand-breadcrumb span:hover i{
+
+transform:scale(1.15);
+
+}
+
+
+
+.checkout-form h2{
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:12px;
+
+font-size:32px;
+font-weight:800;
+
+}
+
+.checkout-form h2 i{
+
+color:#8CC63F;
+
+font-size:28px;
+
+}
+
+
+.form-card h3{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+font-size:22px;
+font-weight:700;
+
+margin-bottom:20px;
+
+}
+
+.form-card h3 i{
+
+color:#8CC63F;
+font-size:20px;
+
+}
+
+
+
+.form-card h3{
+
+display:flex;
+align-items:center;
+gap:10px;
+
+font-size:22px;
+font-weight:700;
+
+margin-bottom:20px;
+
+}
+
+.form-card h3 i{
+
+color:#8CC63F;
+font-size:20px;
+
+}
+
+
+
+
+.form-card h3{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    font-size:22px;
+    font-weight:700;
+
+    margin-bottom:20px;
+}
+
+.form-card h3 i{
+    width:22px;
+    text-align:center;
+
+    color:#8CC63F;
+    font-size:20px;
+}
+
+
+
+.cart-empty h2{
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:12px;
+
+font-size:32px;
+font-weight:800;
+
+margin-bottom:16px;
+
+}
+
+.cart-empty h2 i{
+
+color:#8CC63F;
+font-size:28px;
+
+}
+
+
+.cart-header h2{
+
+display:flex;
+justify-content:center;
+align-items:center;
+gap:12px;
+
+font-size:32px;
+font-weight:800;
+
+margin-bottom:16px;
+
+}
+
+.cart-header h2 i{
+
+color:#8CC63F;
+font-size:28px;
+
+}
+
+
+
+
 </style>
 
 
@@ -6193,7 +6440,7 @@ Produk unggulan untuk kebutuhan pencahayaan dan aksesoris kendaraan.
 
 <div class="card video-card">
 
-<h3>🎥 Video Produk</h3>
+<h3>Video Produk</h3>
 
 <p class="video-desc">
 Lihat performa, tingkat kecerahan, dan kualitas pencahayaan produk kami secara langsung.
@@ -6205,7 +6452,11 @@ Browser Anda tidak mendukung video.
 </video>
 
 <a href="https://wa.me/6282210109369" class="btn btn-full">
-🛒 Tanya Produk Ini
+  
+  
+<i class="fa-solid fa-cart-shopping"></i>
+
+ Tanya Produk Ini
 </a>
 
 </div>
@@ -6724,11 +6975,24 @@ box-shadow:0 0 8px #35d04b;
 
         <div class="ai-header">
 
-            <h2>🤖 Imam AI</h2>
+    <h2>
 
-            <button type="button" onclick="closeAI()">✕</button>
+<i class="fa-solid fa-wand-magic-sparkles"></i>
 
-        </div>
+Imam AI
+
+</h2>
+
+    <button
+        type="button"
+        class="ai-close"
+        onclick="closeAI()">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
 
         <div id="aiMessages" class="ai-body">
 
@@ -7085,8 +7349,12 @@ function openCategory(kategori){
         <div class="brand-breadcrumb">
 
             <span onclick="renderCategories()">
-                🏬 Shopping Mall
-            </span>
+
+    <i class="fa-solid fa-shop"></i>
+
+    Shopping Mall
+
+</span>
 
             <span class="separator">›</span>
 
@@ -7595,13 +7863,25 @@ Hemat Rp ${(product.harga.normal-product.harga.promo).toLocaleString("id-ID")}
 
 <div class="product-highlights">
 
-<span>🟢 ${product.stok?.status || "Ready"}</span>
+<span>
+<i class="fa-solid fa-circle-check"></i>
+${product.stok?.status || "Ready"}
+</span>
 
-<span>🛡 ${product.garansi?.lama || "-"}</span>
+<span>
+<i class="fa-solid fa-shield-halved"></i>
+${product.garansi?.lama || "-"}
+</span>
 
-<span>⭐ 4.9 Rating</span>
+<span>
+<i class="fa-solid fa-star"></i>
+4.9 Rating
+</span>
 
-<span>🚚 Seluruh Indonesia</span>
+<span>
+<i class="fa-solid fa-truck-fast"></i>
+Seluruh Indonesia
+</span>
 
 </div>
 
@@ -7716,7 +7996,7 @@ class="btn"
 
 onclick="addToCart(${product.id})">
 
-🛒 Tambah ke Keranjang
+Tambah ke Keranjang
 
 </button>
 
@@ -7728,7 +8008,7 @@ href="${product.whatsapp}"
 
 target="_blank">
 
-💬 Chat Sekarang
+Chat
 
 </a>
 
@@ -7738,7 +8018,7 @@ class="btn"
 
 onclick="shareProduct(${product.id})">
 
-📤 Bagikan Produk
+Bagikan Produk
 
 </button>
 
@@ -8530,7 +8810,13 @@ function renderCart(){
 
         <div class="cart-empty">
 
-            <h2>🛒 Keranjang Belanja</h2>
+    <h2>
+
+        <i class="fa-solid fa-cart-shopping"></i>
+
+        Keranjang Belanja
+
+    </h2>
 
             <p>Keranjang masih kosong.</p>
 
@@ -8589,7 +8875,13 @@ function renderCart(){
 
             <div>
 
-                <h2>🛒 Keranjang Belanja</h2>
+                <h2>
+
+        <i class="fa-solid fa-cart-shopping"></i>
+
+        Keranjang Belanja
+
+    </h2>
 
                 <p>${cart.length} Produk dalam keranjang</p>
 
@@ -8598,8 +8890,8 @@ function renderCart(){
             <button
                 class="btn secondary"
                 onclick="clearCart()">
-
-                🗑️ Kosongkan
+                <i class="fa-solid fa-trash"></i>
+                 Kosongkan
 
             </button>
 
@@ -8659,8 +8951,8 @@ function renderCart(){
                 <button
                     class="btn"
                     onclick="checkoutForm()">
-
-                    ✅ Checkout
+                    
+                   Checkout
 
                 </button>
 
@@ -8772,13 +9064,13 @@ function renderCart(){
         </div>
 
         <button
-        class="cart-delete"
+class="cart-delete"
+onclick="removeCart(${index})">
 
-        onclick="removeCart(${index})">
+<i class="fa-solid fa-trash"></i>
+<span>Hapus</span>
 
-        🗑 Hapus
-
-        </button>
+</button>
 
     </div>
 
@@ -8937,11 +9229,24 @@ summaryHTML += `
   container.innerHTML = `
 <div class="checkout-form">
 
-  <h2>📝 Checkout</h2>
+    <h2>
+
+        <i class="fa-solid fa-credit-card"></i>
+
+        Checkout
+
+    </h2>
 
   <!-- Ringkasan -->
   <div class="form-card">
-    <h3>🛒 Ringkasan Pesanan</h3>
+
+    <h3>
+
+        <i class="fa-solid fa-clipboard-list"></i>
+
+        Ringkasan Pesanan
+
+    </h3>
     <div id="checkout-summary">
       ${summaryHTML}
     </div>
@@ -8949,7 +9254,13 @@ summaryHTML += `
 
   <!-- Data Pembeli -->
   <div class="form-card">
-    <h3>👤 Data Pembeli</h3>
+    <h3>
+
+        <i class="fa-solid fa-user"></i>
+
+        Data Pembeli
+
+    </h3>
 
     <input id="nama"
            placeholder="Nama Lengkap"
@@ -8966,7 +9277,13 @@ summaryHTML += `
 
   <!-- Alamat -->
   <div class="form-card">
-    <h3>📍 Alamat Pengiriman</h3>
+    <h3>
+
+        <i class="fa-solid fa-location-dot"></i>
+
+        Alamat Pengiriman
+
+    </h3>
 
     <input id="provinsi"
            placeholder="Provinsi"
@@ -8986,7 +9303,13 @@ summaryHTML += `
 
   <!-- Pengiriman -->
   <div class="form-card">
-    <h3>🚚 Pengiriman</h3>
+    <h3>
+
+        <i class="fa-solid fa-truck-fast"></i>
+
+        Pengiriman
+
+    </h3>
 
     <select id="ekspedisi">
   <option value="J&T" ${customer.ekspedisi === "J&T" ? "selected" : ""}>J&T</option>
@@ -8998,16 +9321,30 @@ summaryHTML += `
 
   <!-- Catatan -->
   <div class="form-card">
-    <h3>📝 Catatan</h3>
+
+    <h3>
+
+        <i class="fa-solid fa-note-sticky"></i>
+
+        Catatan
+
+    </h3>
 
     <textarea
-      id="catatan"
-      placeholder="Contoh: Mohon packing menggunakan bubble wrap"></textarea>
-  </div>
+        id="catatan"
+        placeholder="Contoh: Mohon packing menggunakan bubble wrap"></textarea>
+
+</div>
   
   <div class="form-card">
 
-  <h3>📜 Syarat & Ketentuan</h3>
+    <h3>
+
+        <i class="fa-solid fa-file-contract"></i>
+
+        Syarat & Ketentuan
+
+    </h3>
 
   <div class="terms-box">
 
@@ -9022,11 +9359,13 @@ summaryHTML += `
 
     <p>5. Pesanan yang telah dibayar akan diproses sesuai antrean dan kebijakan Distributor kami.</p>
     
-    <p>6. Kesalahan penulisan alamat, nomor telepon, atau data pengiriman yang diinput pembeli menjadi tanggung jawab pembeli.</p>
+    <p>6. Apabila stok produk yang dipesan kebetulan tidak tersedia oleh distributor kami,maka kami yang akan mengambil alih proses pengiriman tersebut.</p>
     
-    <p>7. Klaim kerusakan atau kekurangan barang wajib disertai video unboxing tanpa jeda sejak paket diterima.</p>
+    <p>7. Kesalahan penulisan alamat, nomor telepon, atau data pengiriman yang diinput pembeli menjadi tanggung jawab pembeli.</p>
     
-    <p>8. Dengan melanjutkan pemesanan, saya menyatakan telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan.</p>
+    <p>8. Klaim kerusakan atau kekurangan barang wajib disertai video unboxing tanpa jeda sejak paket diterima.</p>
+    
+    <p>9. Dengan melanjutkan pemesanan, saya menyatakan telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan.</p>
 
   </div>
 
