@@ -10844,14 +10844,21 @@ if (!/^08\d{8,13}$/.test(waClean)) {
     ekspedisi
   });
   
+  const summary = getCartSummary();
+
+const totalItem = summary.totalItem;
+const subtotal = summary.subtotal;
+const voucherName = summary.voucherName;
+const discount = summary.discount;
+const totalBayar = summary.totalBayar;
+  
   let tabelPesanan = "";
-let totalItem = 0;
+
 
 cart.forEach((item, index) => {
 
-  totalItem += item.qty;
 
-  const harga = item.harga
+ const harga = item.harga
     ? `Rp ${item.harga.toLocaleString("id-ID")}`
     : "-";
 
@@ -10920,9 +10927,12 @@ ${tabelPesanan}
 Total Jenis Produk : ${cart.length}
 Total Item         : ${totalItem}
 
-📝 CATATAN
+Subtotal           : Rp ${subtotal.toLocaleString("id-ID")}
+Voucher            : ${voucherName || "-"}
+Diskon             : Rp ${discount.toLocaleString("id-ID")}
+Total Bayar        : Rp ${totalBayar.toLocaleString("id-ID")}
 
-${catatan || "-"}
+📝 CATATAN
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
