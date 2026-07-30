@@ -10477,8 +10477,6 @@ function checkoutForm() {
 
   const customer = getCustomerData();
   
-  const container = document.getElementById("product-grid-auto");
-  
   const summary = getCartSummary();
   
   let summaryHTML = "";
@@ -10601,7 +10599,7 @@ summaryHTML += `
 `;
 
 
-  container.innerHTML = `
+  let html = `
 <div class="checkout-form">
 
     <h2>
@@ -10769,6 +10767,10 @@ summaryHTML += `
 
 </div>
 `;
+
+
+renderPage(html);
+
 }
 
 
