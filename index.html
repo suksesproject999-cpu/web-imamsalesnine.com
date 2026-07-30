@@ -6543,17 +6543,74 @@ font-size:13px;
 
 
 .voucher-card.active{
-    border:2px solid #22c55e;
-    box-shadow:0 0 18px rgba(34,197,94,.25);
+    border:2px solid #8CC63F;
+    background:#F7FBEF;
+    box-shadow:0 8px 24px rgba(140,198,63,.12);
+    transform:translateY(-2px);
 }
 
 .voucher-btn.active{
-    background:#22c55e;
+    background:#999;
+    border-color:#8CC63F;
     color:#fff;
 }
 
 
 
+.summary-row.total{
+    margin-top:12px;
+    padding-top:12px;
+    border-top:1px solid #e5e7eb;
+    font-size:18px;
+    font-weight:700;
+}
+
+.summary-row.total strong{
+    color:#8CC63F;
+}
+
+
+#toast{
+    position:fixed;
+    bottom:25px;
+    left:50%;
+    transform:translateX(-50%) translateY(100px);
+    min-width:280px;
+    max-width:90%;
+    padding:14px 18px;
+    border-radius:12px;
+    color:#fff;
+    font-size:14px;
+    font-weight:600;
+    text-align:center;
+    opacity:0;
+    visibility:hidden;
+    transition:.35s ease;
+    z-index:999999;
+    box-shadow:0 10px 25px rgba(0,0,0,.25);
+}
+
+#toast.show{
+    opacity:1;
+    visibility:visible;
+    transform:translateX(-50%) translateY(0);
+}
+
+#toast.success{
+    background:#8CC63F;
+}
+
+#toast.error{
+    background:#dc2626;
+}
+
+#toast.warning{
+    background:#f59e0b;
+}
+
+#toast.info{
+    background:#2563eb;
+}
 
 
 </style>
@@ -8059,31 +8116,62 @@ function showSkeleton(){
 
 let selectedVoucherId = null;
 
-function selectVoucher(button) {
+function selectVoucher(button){
 
-    // Card yang diklik
     const currentCard = button.closest(".voucher-card");
+    const currentId = currentCard.dataset.id;
 
-    // Ambil ID voucher
-    selectedVoucherId = currentCard.dataset.id;
+    // ==========================
+    // TOGGLE OFF
+    // ==========================
+    if(selectedVoucherId === currentId){
 
-    // Reset semua voucher
-    document.querySelectorAll(".voucher-card").forEach(card => {
+        selectedVoucherId = null;
+
+        localStorage.removeItem("selectedVoucher");
+
+        currentCard.classList.remove("active");
+
+        button.classList.remove("active");
+        button.innerHTML = "Gunakan";
+
+        const badge = currentCard.querySelector(".badge-text");
+        if(badge){
+            badge.textContent = "HOT";
+        }
+        
+        showToast(
+    "Voucher dibatalkan.",
+    "info"
+);
+
+        return;
+    }
+
+    // ==========================
+    // RESET SEMUA VOUCHER
+    // ==========================
+    document.querySelectorAll(".voucher-card").forEach(card=>{
 
         card.classList.remove("active");
 
         const btn = card.querySelector(".voucher-btn");
+
         btn.classList.remove("active");
         btn.innerHTML = "Gunakan";
 
-        const badge = card.querySelector(".voucher-badge span");
-        if (badge) {
-            badge.innerHTML = "HOT";
+        const badge = card.querySelector(".badge-text");
+        if(badge){
+            badge.textContent = "HOT";
         }
 
     });
 
-    // Aktifkan voucher yang dipilih
+    // ==========================
+    // AKTIFKAN VOUCHER
+    // ==========================
+    selectedVoucherId = currentId;
+
     currentCard.classList.add("active");
 
     button.classList.add("active");
@@ -8092,13 +8180,27 @@ function selectVoucher(button) {
         Digunakan
     `;
 
-    // Ubah badge
-    const currentBadge = currentCard.querySelector(".voucher-badge span");
-    if (currentBadge) {
-        currentBadge.innerHTML = "DIGUNAKAN";
+    const badge = currentCard.querySelector(".badge-text");
+    if(badge){
+        badge.textContent = "DIGUNAKAN";
     }
 
-    console.log("Voucher dipilih :", selectedVoucherId);
+    // Simpan ke localStorage
+    localStorage.setItem(
+    "selectedVoucher",
+    JSON.stringify({
+        id: currentCard.dataset.id,
+        discount: Number(currentCard.dataset.discount),
+        min: Number(currentCard.dataset.min),
+        type: currentCard.dataset.type,
+        expired: currentCard.dataset.expired
+    })
+);
+
+showToast(
+    "Voucher berhasil digunakan.",
+    "success"
+);
 
 }
 
@@ -9388,17 +9490,66 @@ function renderCart(){
 
     }
 
-    // ==========================
-    // HITUNG SUBTOTAL
-    // ==========================
+    // 1. Hitung subtotal
+let subtotal = 0;
 
-    let subtotal = 0;
+cart.forEach(item => {
+    subtotal += item.harga * item.qty;
+});
 
-    cart.forEach(item=>{
+// 2. Ambil voucher
+const voucher = JSON.parse(
+    localStorage.getItem("selectedVoucher")
+);
 
-        subtotal += (item.harga || 0) * item.qty;
+let discount = 0;
+let voucherName = "-";
 
-    });
+// 3. Validasi voucher
+if (voucher) {
+
+    const isMinValid = subtotal >= voucher.min;
+    const isExpired = new Date() > new Date(voucher.expired);
+
+    if (isMinValid && !isExpired) {
+
+        discount = voucher.discount;
+        voucherName = voucher.id;
+
+    } else {
+
+        localStorage.removeItem("selectedVoucher");
+
+        discount = 0;
+        voucherName = "-";
+
+        if (!isMinValid) {
+
+            showToast(
+    `Minimal belanja ${voucher.min.toLocaleString("id-ID",{
+        style:"currency",
+        currency:"IDR"
+    })}`,
+    "warning"
+);
+
+        } else if (isExpired) {
+
+            showToast(
+    "Voucher sudah kedaluwarsa.",
+    "error"
+);
+
+        }
+
+    }
+
+}
+
+// 4. Hitung total bayar
+const totalBayar = subtotal - discount;
+
+// 5. Baru gunakan totalBayar di HTML
 
     // ==========================
     // HALAMAN KERANJANG
@@ -9476,7 +9627,26 @@ function renderCart(){
                     </strong>
 
                 </div>
+                
+                <div class="summary-row">
+    <span>Voucher Digunakan</span>
+    <strong>
+        ${voucherName}
+    </strong>
+</div>
 
+<div class="summary-row">
+    <span>Voucher</span>
+    <strong>
+        - ${discount.toLocaleString("id-ID",{
+            style:"currency",
+            currency:"IDR"
+        })}
+    </strong>
+</div>
+                
+                
+              
                 <div class="summary-row">
 
                     <span>Ongkir</span>
@@ -9486,6 +9656,21 @@ function renderCart(){
                 </div>
 
                 <hr>
+                
+                <div class="summary-row total">
+
+    <span><strong>Total Bayar</strong></span>
+
+    <strong>
+
+        ${totalBayar.toLocaleString("id-ID",{
+            style:"currency",
+            currency:"IDR"
+        })}
+
+    </strong>
+
+</div>
 
                 <button
                     class="btn"
@@ -9639,6 +9824,36 @@ onclick="removeCart(${index})">
 
 
 
+let toastTimer;
+
+function showToast(message,type="info"){
+
+    const toast=document.getElementById("toast");
+
+    clearTimeout(toastTimer);
+
+    toast.className="";
+
+    toast.classList.add(type);
+
+    toast.innerHTML=message;
+
+    toast.classList.add("show");
+
+    toastTimer=setTimeout(()=>{
+
+        toast.classList.remove("show");
+
+    },3000);
+
+}
+
+
+
+
+
+
+
 function changeCartQty(index, change){
 
   cart[index].qty += change;
@@ -9739,6 +9954,10 @@ function getCustomerData() {
 }
 
 function checkoutForm() {
+  
+  const voucher = JSON.parse(
+    localStorage.getItem("selectedVoucher")
+);
 
   const customer = getCustomerData();
   
@@ -11899,6 +12118,7 @@ document.getElementById("aiInput")
 
 </script>
 
+<div id="toast"></div>
 
 </body>
 </html>
