@@ -9433,6 +9433,473 @@ function addToCart(id) {
 });
 }
 
+/*
+
+function calculateCartSummary(){
+
+    let subtotal = 0;
+    let totalItem = 0;
+
+    cart.forEach(item=>{
+
+        const harga = Number(item.harga || 0);
+        const qty = Number(item.qty || 0);
+
+        subtotal += harga * qty;
+        totalItem += qty;
+
+    });
+
+    const voucher =
+    localStorage.getItem("voucher") || "";
+
+    let discount = 0;
+
+    if(voucher === "HEMAT10"){
+
+        discount = subtotal * 0.10;
+
+    }else if(voucher === "HEMAT20"){
+
+        discount = subtotal * 0.20;
+
+    }
+
+    const shipping =
+    subtotal > 0 ? 15000 : 0;
+
+    const grandTotal =
+    subtotal - discount + shipping;
+
+    return{
+
+        totalItem,
+        subtotal,
+        voucher,
+        discount,
+        shipping,
+        grandTotal
+
+    };
+
+}
+
+
+function formatRupiah(angka){
+
+    angka = Number(angka) || 0;
+
+    return "Rp " + angka.toLocaleString("id-ID");
+
+}
+
+
+function renderCart(){
+
+    currentPage = "cart";
+    
+    const container =
+    document.getElementById("product-grid-auto");
+
+    // ==========================
+    // KERANJANG KOSONG
+    // ==========================
+
+    if(cart.length === 0){
+
+        container.innerHTML = `
+
+        <div class="cart-empty">
+
+            <h2>
+
+                <i class="fa-solid fa-cart-shopping"></i>
+
+                Keranjang Belanja
+
+            </h2>
+
+            <p>Keranjang masih kosong.</p>
+
+            <button
+                id="backShopping"
+                class="btn"
+                onclick="renderCategories()">
+
+                ⬅ Kembali Belanja
+
+            </button>
+
+        </div>
+
+        `;
+
+        requestAnimationFrame(()=>{
+
+            container.scrollIntoView({
+
+                behavior:"smooth",
+
+                block:"start"
+
+            });
+
+        });
+
+        return;
+
+    }
+
+    // ==========================
+    // RINGKASAN KERANJANG
+    // ==========================
+
+    const summary = calculateCartSummary();
+
+    let totalItem = 0;
+
+    cart.forEach(item=>{
+
+        totalItem += item.qty;
+
+    });
+
+    container.innerHTML = `
+
+    <div class="cart-page">
+
+        <div class="cart-header">
+
+            <div>
+
+                <h2>
+
+                    <i class="fa-solid fa-cart-shopping"></i>
+
+                    Keranjang Belanja
+
+                </h2>
+
+                <p>${totalItem} Item dalam keranjang</p>
+
+            </div>
+
+            <button
+                class="btn secondary"
+                onclick="clearCart()">
+
+                <i class="fa-solid fa-trash"></i>
+
+                Kosongkan
+
+            </button>
+
+        </div>
+
+        <div class="cart-layout">
+
+            <div class="cart-products">
+
+                <div id="cart-list"></div>
+
+            </div>
+
+            <aside class="cart-summary">
+
+                <h3>Ringkasan Pesanan</h3>
+
+                <div class="summary-row">
+
+                    <span>Total Item</span>
+
+                    <strong>${summary.totalItem}</strong>
+
+                </div>
+
+                <div class="summary-row">
+
+                    <span>Subtotal</span>
+
+                    <strong>
+
+                        ${formatRupiah(summary.subtotal)}
+
+                    </strong>
+
+                </div>
+
+                <div class="summary-row">
+
+                    <span>Voucher</span>
+
+                    <strong>
+
+                        ${summary.voucher || "-"}
+
+                    </strong>
+
+                </div>
+
+                <div class="summary-row">
+
+                    <span>Diskon</span>
+
+                    <strong>
+
+                        - ${formatRupiah(summary.discount)}
+
+                    </strong>
+
+                </div>
+
+                <div class="summary-row">
+
+                    <span>Ongkir</span>
+
+                    <strong>
+
+                        ${formatRupiah(summary.shipping)}
+
+                    </strong>
+
+                </div>
+
+                <hr>
+
+                <div class="summary-row total">
+
+                    <span><strong>Total Bayar</strong></span>
+
+                    <strong>
+
+                        ${formatRupiah(summary.grandTotal)}
+
+                    </strong>
+
+                </div>
+
+                <button
+                    class="btn"
+                    onclick="checkoutForm()">
+
+                    Checkout
+
+                </button>
+
+                <button
+                    id="backShopping"
+                    class="btn secondary"
+                    onclick="renderCategories()">
+
+                    ⬅ Lanjut Belanja
+
+                </button>
+
+            </aside>
+
+        </div>
+
+    </div>
+
+    `;
+
+        // ==========================
+    // LIST PRODUK
+    // ==========================
+
+    cart.forEach((item,index)=>{
+
+        list.innerHTML += `
+
+<div class="cart-item">
+
+    <div class="cart-image">
+
+        <img src="${item.gambar}" alt="${item.nama}">
+
+    </div>
+
+    <div class="cart-info">
+
+        <h3>${item.nama}</h3>
+
+        <p class="cart-brand">
+
+            ${item.brand || "-"}
+
+        </p>
+
+        <p>
+
+            <strong>Varian :</strong>
+
+            ${item.varian}
+
+        </p>
+
+        <p>
+
+            <strong>Harga :</strong>
+
+            ${formatRupiah(item.harga || 0)}
+
+        </p>
+
+    </div>
+
+    <div class="cart-side">
+
+        <div class="cart-qty">
+
+            <button
+                onclick="changeCartQty(${index},-1)">
+
+                −
+
+            </button>
+
+            <span>
+
+                ${item.qty}
+
+            </span>
+
+            <button
+                onclick="changeCartQty(${index},1)">
+
+                +
+
+            </button>
+
+        </div>
+
+        <div class="cart-total">
+
+            ${formatRupiah((item.harga || 0) * item.qty)}
+
+        </div>
+
+        <button
+            class="cart-delete"
+            onclick="removeCart(${index})">
+
+            <i class="fa-solid fa-trash"></i>
+
+            <span>Hapus</span>
+
+        </button>
+
+    </div>
+
+</div>
+
+        `;
+
+    });
+
+    // ==========================
+    // SCROLL
+    // ==========================
+
+    requestAnimationFrame(()=>{
+
+        container.scrollIntoView({
+
+            behavior:"smooth",
+
+            block:"start"
+
+        });
+
+    });
+
+}
+
+
+*/
+
+
+function formatRupiah(angka){
+
+    angka = Number(angka) || 0;
+
+    return "Rp " + angka.toLocaleString("id-ID");
+
+}
+
+
+
+function getCartSummary(){
+
+    // Hitung subtotal
+    let subtotal = 0;
+
+    let totalItem = 0;
+
+cart.forEach(item=>{
+    subtotal += item.harga * item.qty;
+    totalItem += item.qty;
+});
+
+    // Ambil voucher
+    const voucher = JSON.parse(
+        localStorage.getItem("selectedVoucher")
+    );
+
+    let discount = 0;
+    let voucherName = "-";
+
+    if(voucher){
+
+        const isMinValid =
+        subtotal >= voucher.min;
+
+        const isExpired =
+        new Date() > new Date(voucher.expired);
+
+        if(isMinValid && !isExpired){
+
+            discount = voucher.discount;
+            voucherName = voucher.id;
+
+        }else{
+
+            localStorage.removeItem(
+                "selectedVoucher"
+            );
+
+            discount = 0;
+            voucherName = "-";
+
+        }
+
+    }
+
+    const totalBayar =
+    subtotal - discount;
+
+    return{
+
+        subtotal,
+
+        discount,
+
+        voucherName,
+
+        totalBayar,
+
+        totalItem,
+
+        voucher
+
+    };
+
+}
+
+
+
+
+
 
 
 function renderCart(){
@@ -9490,64 +9957,12 @@ function renderCart(){
 
     }
 
-    // 1. Hitung subtotal
-let subtotal = 0;
+const summary = getCartSummary();
 
-cart.forEach(item => {
-    subtotal += item.harga * item.qty;
-});
-
-// 2. Ambil voucher
-const voucher = JSON.parse(
-    localStorage.getItem("selectedVoucher")
-);
-
-let discount = 0;
-let voucherName = "-";
-
-// 3. Validasi voucher
-if (voucher) {
-
-    const isMinValid = subtotal >= voucher.min;
-    const isExpired = new Date() > new Date(voucher.expired);
-
-    if (isMinValid && !isExpired) {
-
-        discount = voucher.discount;
-        voucherName = voucher.id;
-
-    } else {
-
-        localStorage.removeItem("selectedVoucher");
-
-        discount = 0;
-        voucherName = "-";
-
-        if (!isMinValid) {
-
-            showToast(
-    `Minimal belanja ${voucher.min.toLocaleString("id-ID",{
-        style:"currency",
-        currency:"IDR"
-    })}`,
-    "warning"
-);
-
-        } else if (isExpired) {
-
-            showToast(
-    "Voucher sudah kedaluwarsa.",
-    "error"
-);
-
-        }
-
-    }
-
-}
-
-// 4. Hitung total bayar
-const totalBayar = subtotal - discount;
+const subtotal = summary.subtotal;
+const discount = summary.discount;
+const voucherName = summary.voucherName;
+const totalBayar = summary.totalBayar;
 
 // 5. Baru gunakan totalBayar di HTML
 
@@ -9824,6 +10239,8 @@ onclick="removeCart(${index})">
 
 
 
+
+
 let toastTimer;
 
 function showToast(message,type="info"){
@@ -9956,34 +10373,133 @@ function getCustomerData() {
 
 function checkoutForm() {
   
-  const voucher = JSON.parse(
-    localStorage.getItem("selectedVoucher")
-);
+
 
   const customer = getCustomerData();
   
   const container = document.getElementById("product-grid-auto");
   
+  const summary = getCartSummary();
+  
   let summaryHTML = "";
-let totalItem = 0;
 
-cart.forEach((item, index) => {
-    totalItem += item.qty;
+const totalItem = summary.totalItem;
+const subtotal = summary.subtotal;
+const voucherName = summary.voucherName;
+const discount = summary.discount;
+const totalBayar = summary.totalBayar;
+
+cart.forEach((item,index)=>{
+
+    
 
     summaryHTML += `
-        <div class="summary-item">
-            <strong>${index + 1}. ${item.nama}</strong><br>
-            <small>Varian: ${item.varian}</small><br>
-            <small>Qty: ${item.qty}</small>
-        </div>
+
+    <div class="summary-item">
+
+        <strong>${index+1}. ${item.nama}</strong><br>
+
+        <small>Varian : ${item.varian}</small><br>
+
+        <small>Harga : ${formatRupiah(item.harga)}</small><br>
+
+        <small>Qty : ${item.qty}</small>
+
+    </div>
+
     `;
 });
 
+const voucher =
+JSON.parse(localStorage.getItem("selectedVoucher"));
+
+
+const voucherCode =
+voucher ? voucher.id : "-";
+
+
+
+const grandTotal =
+subtotal - discount;
+
+
 summaryHTML += `
-    <div class="summary-total">
-        <strong>Total Item: ${totalItem}</strong>
-    </div>
+
+<hr>
+
+<div class="summary-row">
+
+    <span>Jumlah Produk</span>
+
+    <strong>${totalItem}</strong>
+
+</div>
+
+<div class="summary-row">
+
+    <span>Subtotal</span>
+
+    <strong>
+
+        ${subtotal.toLocaleString("id-ID",{
+            style:"currency",
+            currency:"IDR"
+        })}
+
+    </strong>
+
+</div>
+
+<div class="summary-row">
+
+    <span>Voucher Digunakan</span>
+
+    <strong>${voucherName}</strong>
+
+</div>
+
+<div class="summary-row">
+
+    <span>Voucher</span>
+
+    <strong>
+
+        - ${discount.toLocaleString("id-ID",{
+            style:"currency",
+            currency:"IDR"
+        })}
+
+    </strong>
+
+</div>
+
+<div class="summary-row">
+
+    <span>Ongkir</span>
+
+    <strong>Dihitung saat checkout</strong>
+
+</div>
+
+<hr>
+
+<div class="summary-row total">
+
+    <span><strong>Total Bayar</strong></span>
+
+    <strong>
+
+        ${totalBayar.toLocaleString("id-ID",{
+            style:"currency",
+            currency:"IDR"
+        })}
+
+    </strong>
+
+</div>
+
 `;
+
 
   container.innerHTML = `
 <div class="checkout-form">
@@ -10154,6 +10670,10 @@ summaryHTML += `
 </div>
 `;
 }
+
+
+
+
 
 function sendWhatsAppOrder() {
   
