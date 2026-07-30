@@ -6613,6 +6613,22 @@ font-size:13px;
 }
 
 
+
+
+#shoppingMallHero{
+    scroll-margin-top:90px;
+}
+
+@media(max-width:768px){
+    #shoppingMallHero{
+        scroll-margin-top:120px;
+    }
+}
+
+
+
+
+
 </style>
 
 
@@ -6898,7 +6914,7 @@ Browser Anda tidak mendukung video.
 </div>
 
   <!-- TAMBAHAN BARU -->
-  <div class="mall-hero">
+<div class="mall-hero" id="shoppingMallHero">
 
 <div class="mall-glow"></div>
 
@@ -7669,31 +7685,30 @@ fetch("produk.json")
   
   function tampilkanHasil(products){
 
-  const container =
-    document.getElementById("product-grid-auto");
+    let html = "";
 
-  container.innerHTML = "";
+    products.forEach(product=>{
 
-  products.forEach(product => {
+        html += `
+        <div class="product-card"
+             onclick="showProduct('${product.nama}')">
 
-    container.innerHTML += `
-      <div class="product-card"
-           onclick="showProduct('${product.nama}')">
+            <img src="${product.gambar}" alt="${product.nama}">
 
-        <img src="${product.gambar}" alt="${product.nama}">
+            <div class="product-card-body">
 
-        <div class="product-card-body">
+                <h3>${product.nama}</h3>
 
-          <h3>${product.nama}</h3>
+                <p>${product.brand || ""}</p>
 
-          <p>${product.brand || ""}</p>
+            </div>
 
         </div>
+        `;
 
-      </div>
-    `;
+    });
 
-  });
+    renderPage(html);
 
 }
   
@@ -7721,12 +7736,9 @@ fetch("produk.json")
   function renderCategories(){
     
     
-    currentPage = "catalog";
+  currentPage = "catalog";
 
-  const container =
-    document.getElementById("product-grid-auto");
-
-  container.innerHTML = "";
+  let html="";
 
   const kategoriUnik =
     [...new Set(allProducts.map(p => p.kategori))];
@@ -7738,7 +7750,7 @@ fetch("produk.json")
         p=>p.kategori===kat
       ).length;
 
-    container.innerHTML += `
+    html += `
 <div class="product-card" onclick="openCategory('${kat}')">
 
     <div class="product-card-body">
@@ -7761,12 +7773,16 @@ fetch("produk.json")
 `;
 
   });
+  
+  renderPage(html, false);
 
 }
 
-function openCategory(kategori){
 
-    const container = document.getElementById("product-grid-auto");
+
+
+
+function openCategory(kategori){
 
     const products = allProducts.filter(
         p => p.kategori === kategori
@@ -7774,7 +7790,7 @@ function openCategory(kategori){
 
     const jumlah = products.length;
 
-    container.innerHTML = `
+    let html = `
 
     <div class="brand-page">
 
@@ -8017,6 +8033,8 @@ Berlaku hingga
 
     `;
     
+    renderPage(html);
+    
     showSkeleton();
 
 setTimeout(()=>{
@@ -8067,6 +8085,8 @@ function filterProduct(){
         break;
 
     }
+    
+    
 
     renderProductList(hasil);
 
@@ -8079,6 +8099,8 @@ function filterProduct(){
 
 
 function showSkeleton(){
+
+    
 
     const list=document.getElementById("category-products");
 
@@ -8362,6 +8384,70 @@ renderCategories();
 
 
 
+/*function renderPage(html){
+
+    const container =
+    document.getElementById("product-grid-auto");
+
+    container.innerHTML = html;
+
+    requestAnimationFrame(()=>{
+
+        const hero =
+        document.getElementById("shoppingMallHero");
+
+        if(!hero) return;
+
+        const header =
+        document.querySelector(".header");
+
+        const y =
+        hero.getBoundingClientRect().top +
+        window.pageYOffset -
+        header.offsetHeight;
+
+        window.scrollTo({
+            top:y,
+            behavior:"smooth"
+        });
+
+    });
+
+}
+*/
+
+
+function renderPage(html, autoScroll = true){
+
+    document.getElementById("product-grid-auto").innerHTML = html;
+
+    if(!autoScroll) return;
+
+    requestAnimationFrame(()=>{
+
+        const hero = document.getElementById("shoppingMallHero");
+        if(!hero) return;
+
+        const header = document.querySelector(".header");
+
+        const y =
+        hero.getBoundingClientRect().top +
+        window.pageYOffset -
+        header.offsetHeight;
+
+        window.scrollTo({
+            top: y,
+            behavior: "smooth"
+        });
+
+    });
+
+}
+
+
+
+
+
 function showProduct(nama){
   
 
@@ -8373,10 +8459,7 @@ if(!product) return;
 
 lastCategory = product.kategori;
 
-const container =
-document.getElementById("product-grid-auto");
-
-container.innerHTML = `
+let html = `
 
 <div class="product-detail">
 
@@ -8912,6 +8995,8 @@ class="product-grid">
 </div>
 
 `;
+
+renderPage(html);
 
 renderRelated(product);
 
