@@ -6542,6 +6542,18 @@ font-size:13px;
 
 
 
+.voucher-card.active{
+    border:2px solid #22c55e;
+    box-shadow:0 0 18px rgba(34,197,94,.25);
+}
+
+.voucher-btn.active{
+    background:#22c55e;
+    color:#fff;
+}
+
+
+
 
 
 </style>
@@ -7767,7 +7779,7 @@ function openCategory(kategori){
 
 Voucher
 
-<span>6</span>
+<span class="voucher-count">6 Voucher</span>
 
 </h3>
 
@@ -7776,17 +7788,25 @@ Voucher
     <div class="voucher-slider">
 
         <!-- Voucher nanti di sini -->
-        <div class="voucher-card">
+        <div
+class="voucher-card"
+
+data-id="BELANJA50"
+
+data-discount="50000"
+
+data-min="500000"
+
+data-type="shopping"
+
+data-expired="2026-12-31">
         
         <div class="voucher-top">
 
     <span class="voucher-badge hot">
-
-        <i class="fa-solid fa-fire"></i>
-
-        HOT
-
-    </span>
+    <i class="fa-solid fa-fire"></i>
+    <span class="badge-text">HOT</span>
+</span>
 
     <span class="voucher-price">
 
@@ -7797,14 +7817,15 @@ Voucher
 </div>
 
     <div class="voucher-left">
-
+    
+    
         <div class="voucher-icon">
 
             <i class="fa-solid fa-tags"></i>
 
         </div>
         
-        <div class="voucher-divider"></div>
+        
 
         <div class="voucher-content">
 
@@ -7836,17 +7857,24 @@ Berlaku hingga
 
 </small>
 
+
+<small class="voucher-limit">
+
+1 Voucher / Akun
+
+</small>
+
 </div>
 
     </div>
     
-    
+    <div class="voucher-divider"></div>
 
-    <button>
-
-        Gunakan
-
-    </button>
+    <button
+    class="voucher-btn"
+    onclick="selectVoucher(this)">
+    Gunakan
+</button>
 
 </div>
 
@@ -7939,6 +7967,8 @@ setTimeout(()=>{
     renderProductList(products);
 
 },300);
+
+
     
 
     const searchInput=document.getElementById("brandSearch");
@@ -8025,6 +8055,52 @@ function showSkeleton(){
 
 }
 
+
+
+let selectedVoucherId = null;
+
+function selectVoucher(button) {
+
+    // Card yang diklik
+    const currentCard = button.closest(".voucher-card");
+
+    // Ambil ID voucher
+    selectedVoucherId = currentCard.dataset.id;
+
+    // Reset semua voucher
+    document.querySelectorAll(".voucher-card").forEach(card => {
+
+        card.classList.remove("active");
+
+        const btn = card.querySelector(".voucher-btn");
+        btn.classList.remove("active");
+        btn.innerHTML = "Gunakan";
+
+        const badge = card.querySelector(".voucher-badge span");
+        if (badge) {
+            badge.innerHTML = "HOT";
+        }
+
+    });
+
+    // Aktifkan voucher yang dipilih
+    currentCard.classList.add("active");
+
+    button.classList.add("active");
+    button.innerHTML = `
+        <i class="fa-solid fa-check"></i>
+        Digunakan
+    `;
+
+    // Ubah badge
+    const currentBadge = currentCard.querySelector(".voucher-badge span");
+    if (currentBadge) {
+        currentBadge.innerHTML = "DIGUNAKAN";
+    }
+
+    console.log("Voucher dipilih :", selectedVoucherId);
+
+}
 
 
 
