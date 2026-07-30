@@ -8606,12 +8606,12 @@ onclick="changeQty(-1)">
 </button>
 
 <input
-id="qty"
-type="number"
-value="1"
-min="1"
-inputmode="numeric"
-oninput="validateQty(this)">
+    id="qty"
+    type="number"
+    value="1"
+    min="1"
+    inputmode="numeric"
+    onblur="validateQty(this)">
 
 <button
 type="button"
@@ -9874,21 +9874,22 @@ function changeCartQty(index, change){
 
 function changeQty(step){
 
-const qty =
-document.getElementById("qty");
+    const qty = document.getElementById("qty");
 
-if(!qty) return;
+    if(!qty) return;
 
-let value =
-parseInt(qty.value) || 1;
+    let value = parseInt(qty.value) || 1;
 
-value += step;
+    value += step;
 
-if(value < 1){
-value = 1;
-}
+    if(value < 1){
+        value = 1;
+    }
 
-qty.value = value;
+    qty.value = value;
+
+    // Sinkronkan dengan validasi
+    validateQty(qty);
 
 }
 
@@ -9896,14 +9897,14 @@ qty.value = value;
 
 function validateQty(input){
 
-let value = parseInt(input.value);
+    let value = parseInt(input.value);
 
-if(isNaN(value) || value < 1){
+    if (isNaN(value) || value < 1){
+        input.value = 1;
+        return;
+    }
 
-input.value = 1;
-
-}
-
+    input.value = value;
 }
 
 
