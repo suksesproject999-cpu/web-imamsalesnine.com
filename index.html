@@ -6046,7 +6046,7 @@ transform:scale(1.15);
 
 
 
-.checkout-form h2{
+/*.checkout-form h2{
 
 display:flex;
 justify-content:center;
@@ -6057,7 +6057,7 @@ font-size:32px;
 font-weight:800;
 
 }
-
+*/
 .checkout-form h2 i{
 
 color:#8CC63F;
@@ -9849,31 +9849,46 @@ cart.forEach(item=>{
     let discount = 0;
     let voucherName = "-";
 
-    if(voucher){
+    // 3. Validasi voucher
+if (voucher) {
 
-        const isMinValid =
-        subtotal >= voucher.min;
+    const isMinValid = subtotal >= voucher.min;
+    const isExpired = new Date() > new Date(voucher.expired);
 
-        const isExpired =
-        new Date() > new Date(voucher.expired);
+    if (isMinValid && !isExpired) {
 
-        if(isMinValid && !isExpired){
+        discount = voucher.discount;
+        voucherName = voucher.id;
 
-            discount = voucher.discount;
-            voucherName = voucher.id;
+    } else {
 
-        }else{
+        localStorage.removeItem("selectedVoucher");
 
-            localStorage.removeItem(
-                "selectedVoucher"
+        discount = 0;
+        voucherName = "-";
+
+        if (!isMinValid) {
+
+            showToast(
+                `Minimal belanja ${voucher.min.toLocaleString("id-ID",{
+                    style:"currency",
+                    currency:"IDR"
+                })}`,
+                "warning"
             );
 
-            discount = 0;
-            voucherName = "-";
+        } else if (isExpired) {
+
+            showToast(
+                "Voucher sudah kedaluwarsa.",
+                "error"
+            );
 
         }
 
     }
+
+}
 
     const totalBayar =
     subtotal - discount;
