@@ -8207,16 +8207,12 @@ function selectVoucher(button){
         badge.textContent = "DIGUNAKAN";
     }
 
-    // Simpan ke localStorage
-    localStorage.setItem(
+    const voucher =
+vouchers.find(v => v.id === currentId);
+
+localStorage.setItem(
     "selectedVoucher",
-    JSON.stringify({
-        id: currentCard.dataset.id,
-        discount: Number(currentCard.dataset.discount),
-        min: Number(currentCard.dataset.min),
-        type: currentCard.dataset.type,
-        expired: currentCard.dataset.expired
-    })
+    JSON.stringify(voucher)
 );
 
 showToast(
@@ -8450,6 +8446,7 @@ function renderPage(html, autoScroll = true){
 
 function showProduct(nama){
   
+currentPage = "product";
 
 const product = allProducts.find(
 p => p.nama === nama
