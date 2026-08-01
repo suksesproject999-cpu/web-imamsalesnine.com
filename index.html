@@ -7193,6 +7193,65 @@ font-size:13px;
 }
 
 
+.search-box{
+    position:relative;
+}
+
+.search-box i{
+    position:absolute;
+    left:16px;
+    top:50%;
+    transform:translateY(-50%);
+    color:#9ca3af;
+    font-size:15px;
+}
+
+.search-box input{
+    padding-left:45px;
+}
+
+
+
+.search-box{
+    position: relative;
+    width: 100%;
+}
+
+.search-box i{
+    position: absolute;
+    left: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9ca3af;
+    font-size: 15px;
+    pointer-events: none;
+}
+
+.search-box input{
+    width: 100%;
+    padding: 12px 16px 12px 45px;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    font-size: 14px;
+}
+
+h3{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+}
+
+h3 i{
+    color:#f59e0b;
+}
+
+
+
+h2 i{
+    color:#8CC63F;
+}
+
 
 
 
@@ -7367,18 +7426,10 @@ Kami membuka peluang kerjasama reseller dan mitra usaha di seluruh Indonesia.
 
 <div class="slide-track">
 
-<img src="images/portofolio1.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio2.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio3.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio4.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio5.jpg" loading="lazy" onclick="openImg(this)">
 
-<!-- 20 FOTO -->
-<img src="images/portofolio1.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio2.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio3.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio4.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio5.jpg" loading="lazy" onclick="openImg(this)">
+
+<!-- 15 FOTO -->
+
 <img src="images/portofolio6.jpg" loading="lazy" onclick="openImg(this)">
 <img src="images/portofolio7.jpg" loading="lazy" onclick="openImg(this)">
 <img src="images/portofolio8.jpg" loading="lazy" onclick="openImg(this)">
@@ -7396,11 +7447,7 @@ Kami membuka peluang kerjasama reseller dan mitra usaha di seluruh Indonesia.
 <img src="images/portofolio20.jpg" loading="lazy" onclick="openImg(this)">
 
 <!-- DUPLIKAT -->
-<img src="images/portofolio1.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio2.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio3.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio4.jpg" loading="lazy" onclick="openImg(this)">
-<img src="images/portofolio5.jpg" loading="lazy" onclick="openImg(this)">
+
 <img src="images/portofolio6.jpg" loading="lazy" onclick="openImg(this)">
 <img src="images/portofolio7.jpg" loading="lazy" onclick="openImg(this)">
 <img src="images/portofolio8.jpg" loading="lazy" onclick="openImg(this)">
@@ -7566,10 +7613,14 @@ Z"/>
 
 <div class="mall-search">
 
+<div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
     <input
         type="text"
         id="searchInput"
-        placeholder="🔍 Cari lampu LED, Projector, Foglamp...">
+        placeholder="Cari lampu LED, Projector, Foglamp...">
+
+</div>
 
 </div>
 
@@ -8606,11 +8657,14 @@ Berlaku hingga
 
             </button>
 
-            <input
-                type="text"
-                id="brandSearch"
-                placeholder="🔍 Cari produk ${kategori}..."
-            >
+            <div class="search-box">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input
+        type="text"
+        id="brandSearch"
+        placeholder="Cari produk ${kategori}..."
+    >
+</div>
 
             <select id="sortProduct">
 
@@ -8902,10 +8956,9 @@ function renderProductList(data){
         <div class="empty-state">
 
             <h3>
-
-                🔍 Produk tidak ditemukan
-
-            </h3>
+    <i class="fa-regular fa-face-frown"></i>
+    Produk tidak ditemukan
+</h3>
 
             <p>
 
@@ -9591,9 +9644,8 @@ Berdasarkan ribuan pelanggan
 <section>
 
 <h2>
-
-🔥 Produk Terkait
-
+    <i class="fa-solid fa-layer-group"></i>
+    Produk Terkait
 </h2>
 
 <div
@@ -9609,9 +9661,8 @@ class="product-grid">
 <section>
 
 <h2>
-
-🕒 Terakhir Dilihat
-
+    <i class="fa-solid fa-clock-rotate-left"></i>
+    Terakhir Dilihat
 </h2>
 
 <div
@@ -11389,12 +11440,14 @@ summaryHTML += `
   <!-- Tombol -->
   <div class="checkout-actions">
     <button class="btn" onclick="sendWhatsAppOrder()">
-      📲 Kirim Pesanan
-    </button>
+    <i class="fa-solid fa-paper-plane"></i>
+    Kirim Pesanan
+</button>
 
     <button class="btn secondary" onclick="renderCart()">
-      ⬅ Kembali ke Keranjang
-    </button>
+    <i class="fa-solid fa-chevron-left"></i>
+    Kembali ke Keranjang
+</button>
   </div>
 
 </div>
@@ -12787,9 +12840,8 @@ class="comment-modal">
 <div class="comment-header">
 
 <h2>
-
-💬 Komentar Pengunjung
-
+    <i class="fa-solid fa-comments"></i>
+    Komentar Pengunjung
 </h2>
 
 <button
@@ -13332,8 +13384,8 @@ async function sendAI(){
     body.scrollTop = body.scrollHeight;
 
     const loading = document.createElement("div");
-    loading.className = "ai-message bot";
-    loading.innerHTML = "🤖 Mengetik...";
+loading.className = "ai-message bot";
+loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang berpikir...';
     body.appendChild(loading);
 
     try{
