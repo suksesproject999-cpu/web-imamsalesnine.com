@@ -7642,6 +7642,37 @@ background:#79b52f;
 }
 
 
+.sticky-price-box{
+
+display:flex;
+
+flex-direction:column;
+
+}
+
+#stickyNormalPrice{
+
+font-size:12px;
+
+color:#888;
+
+text-decoration:line-through;
+
+line-height:1;
+
+}
+
+#stickyPrice{
+
+font-size:18px;
+
+font-weight:700;
+
+color:#8CC63F;
+
+}
+
+
 
 </style>
 
@@ -10345,9 +10376,21 @@ STICKY CHECKOUT
 
     <span id="stickyName"></span>
 
-    <strong id="stickyPrice">
-        Rp 0
+    <div class="sticky-price-box">
+
+    <small
+    id="stickyNormalPrice">
+
+    </small>
+
+    <strong
+    id="stickyPrice">
+
+    Rp 0
+
     </strong>
+
+</div>
 
 </div>
 
@@ -10373,10 +10416,31 @@ renderPage(html);
 
 const stickyPrice = document.getElementById("stickyPrice");
 
-if (stickyPrice) {
-    stickyPrice.textContent = formatRupiah(
-        product.harga.promo || product.harga.normal
-    );
+const stickyNormal =
+document.getElementById("stickyNormalPrice");
+
+if(stickyPrice && stickyNormal){
+
+    const promo =
+    product.harga?.promo || 0;
+
+    const normal =
+    product.harga?.normal || promo;
+
+    stickyPrice.textContent =
+    formatRupiah(promo);
+
+    if(normal > promo){
+
+        stickyNormal.textContent =
+        formatRupiah(normal);
+
+    }else{
+
+        stickyNormal.textContent = "";
+
+    }
+
 }
 
 const stickyImage = document.getElementById("stickyImage");
