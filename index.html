@@ -7506,6 +7506,141 @@ h2 i{
 }
 
 
+/* =======================================
+   STICKY CHECKOUT
+======================================= */
+
+.sticky-checkout{
+
+position:fixed;
+
+left:0;
+
+right:0;
+
+bottom:0;
+
+background:#ffffff;
+
+padding:14px;
+
+padding-bottom:calc(14px + env(safe-area-inset-bottom));
+
+box-shadow:0 -8px 25px rgba(0,0,0,.08);
+
+transform:translateY(120%);
+
+opacity:0;
+
+pointer-events:none;
+
+transition:
+transform .30s ease,
+opacity .30s ease;
+
+z-index:9998;
+
+}
+
+.sticky-checkout.show{
+
+transform:translateY(0);
+
+opacity:1;
+
+pointer-events:auto;
+
+}
+
+#stickyBuyBtn{
+
+width:100%;
+
+height:56px;
+
+border:none;
+
+border-radius:16px;
+
+background:#8CC63F;
+
+color:#fff;
+
+font-size:17px;
+
+font-weight:700;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+#stickyBuyBtn:active{
+
+transform:scale(.98);
+
+}
+
+#stickyBuyBtn:hover{
+
+background:#79b52f;
+
+}
+
+
+.sticky-product{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.sticky-product img{
+
+    width:52px;
+
+    height:52px;
+
+    border-radius:10px;
+
+    object-fit:cover;
+
+    flex-shrink:0;
+
+    border:1px solid #e5e5e5;
+
+}
+
+.sticky-info{
+
+    display:flex;
+
+    flex-direction:column;
+
+}
+
+.sticky-info small{
+
+    font-size:11px;
+
+    color:#888;
+
+}
+
+.sticky-info strong{
+
+    font-size:16px;
+
+    color:#111;
+
+    font-weight:700;
+
+}
+
 
 
 </style>
@@ -8841,6 +8976,7 @@ let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 let currentPage = "catalog";
 
+
 fetch("produk.json")
   .then(res => res.json())
   .then(data => {
@@ -9532,7 +9668,8 @@ function renderProductList(data){
 
 
 
-
+let currentProduct = null;
+let selectedVariant = null;
 
 let wishlist=
 JSON.parse(localStorage.getItem("wishlist")||"[]");
@@ -9657,6 +9794,8 @@ p => p.nama === nama
 );
 
 if(!product) return;
+
+currentProduct = product;
 
 lastCategory = product.kategori;
 
@@ -10189,6 +10328,41 @@ class="product-grid">
 
 </section>
 
+<!-- =======================================
+STICKY CHECKOUT
+======================================= -->
+
+<div id="stickyCheckout" class="sticky-checkout">
+
+    <div class="sticky-product">
+
+        <img
+            id="stickyImage"
+            src=""
+            alt="Produk">
+
+        <div class="sticky-info">
+
+    <span id="stickyName"></span>
+
+    <strong id="stickyPrice">
+        Rp 0
+    </strong>
+
+</div>
+
+    </div>
+
+    <button
+        id="stickyBuyBtn"
+        onclick="stickyBuyNow()">
+
+        BELI SEKARANG
+
+    </button>
+
+</div>
+
 </div>
 
 </div>
@@ -10196,6 +10370,29 @@ class="product-grid">
 `;
 
 renderPage(html);
+
+const stickyPrice = document.getElementById("stickyPrice");
+
+if (stickyPrice) {
+    stickyPrice.textContent = formatRupiah(
+        product.harga.promo || product.harga.normal
+    );
+}
+
+const stickyImage = document.getElementById("stickyImage");
+
+if (stickyImage) {
+    stickyImage.src = product.gambar;
+    stickyImage.alt = product.nama;
+}
+
+const stickyName = document.getElementById("stickyName");
+
+if (stickyName) {
+    stickyName.textContent = product.nama;
+}
+
+initStickyCheckout();
 
 renderRelated(product);
 
@@ -10626,6 +10823,8 @@ el.classList.add("active");
 
 
 function selectVariant(btn,value){
+  
+selectedVariant = variant;
 
 document
 .querySelectorAll(".variant-btn")
@@ -10717,390 +10916,7 @@ function addToCart(id) {
 });
 }
 
-/*
 
-function calculateCartSummary(){
-
-    let subtotal = 0;
-    let totalItem = 0;
-
-    cart.forEach(item=>{
-
-        const harga = Number(item.harga || 0);
-        const qty = Number(item.qty || 0);
-
-        subtotal += harga * qty;
-        totalItem += qty;
-
-    });
-
-    const voucher =
-    localStorage.getItem("voucher") || "";
-
-    let discount = 0;
-
-    if(voucher === "HEMAT10"){
-
-        discount = subtotal * 0.10;
-
-    }else if(voucher === "HEMAT20"){
-
-        discount = subtotal * 0.20;
-
-    }
-
-    const shipping =
-    subtotal > 0 ? 15000 : 0;
-
-    const grandTotal =
-    subtotal - discount + shipping;
-
-    return{
-
-        totalItem,
-        subtotal,
-        voucher,
-        discount,
-        shipping,
-        grandTotal
-
-    };
-
-}
-
-
-function formatRupiah(angka){
-
-    angka = Number(angka) || 0;
-
-    return "Rp " + angka.toLocaleString("id-ID");
-
-}
-
-
-function renderCart(){
-
-    currentPage = "cart";
-    
-    const container =
-    document.getElementById("product-grid-auto");
-
-    // ==========================
-    // KERANJANG KOSONG
-    // ==========================
-
-    if(cart.length === 0){
-
-        container.innerHTML = `
-
-        <div class="cart-empty">
-
-            <h2>
-
-                <i class="fa-solid fa-cart-shopping"></i>
-
-                Keranjang Belanja
-
-            </h2>
-
-            <p>Keranjang masih kosong.</p>
-
-            <button
-                id="backShopping"
-                class="btn"
-                onclick="renderCategories()">
-
-                ⬅ Kembali Belanja
-
-            </button>
-
-        </div>
-
-        `;
-
-        requestAnimationFrame(()=>{
-
-            container.scrollIntoView({
-
-                behavior:"smooth",
-
-                block:"start"
-
-            });
-
-        });
-
-        return;
-
-    }
-
-    // ==========================
-    // RINGKASAN KERANJANG
-    // ==========================
-
-    const summary = calculateCartSummary();
-
-    let totalItem = 0;
-
-    cart.forEach(item=>{
-
-        totalItem += item.qty;
-
-    });
-
-    container.innerHTML = `
-
-    <div class="cart-page">
-
-        <div class="cart-header">
-
-            <div>
-
-                <h2>
-
-                    <i class="fa-solid fa-cart-shopping"></i>
-
-                    Keranjang Belanja
-
-                </h2>
-
-                <p>${totalItem} Item dalam keranjang</p>
-
-            </div>
-
-            <button
-                class="btn secondary"
-                onclick="clearCart()">
-
-                <i class="fa-solid fa-trash"></i>
-
-                Kosongkan
-
-            </button>
-
-        </div>
-
-        <div class="cart-layout">
-
-            <div class="cart-products">
-
-                <div id="cart-list"></div>
-
-            </div>
-
-            <aside class="cart-summary">
-
-                <h3>Ringkasan Pesanan</h3>
-
-                <div class="summary-row">
-
-                    <span>Total Item</span>
-
-                    <strong>${summary.totalItem}</strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                    <span>Subtotal</span>
-
-                    <strong>
-
-                        ${formatRupiah(summary.subtotal)}
-
-                    </strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                    <span>Voucher</span>
-
-                    <strong>
-
-                        ${summary.voucher || "-"}
-
-                    </strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                    <span>Diskon</span>
-
-                    <strong>
-
-                        - ${formatRupiah(summary.discount)}
-
-                    </strong>
-
-                </div>
-
-                <div class="summary-row">
-
-                    <span>Ongkir</span>
-
-                    <strong>
-
-                        ${formatRupiah(summary.shipping)}
-
-                    </strong>
-
-                </div>
-
-                <hr>
-
-                <div class="summary-row total">
-
-                    <span><strong>Total Bayar</strong></span>
-
-                    <strong>
-
-                        ${formatRupiah(summary.grandTotal)}
-
-                    </strong>
-
-                </div>
-
-                <button
-                    class="btn"
-                    onclick="checkoutForm()">
-
-                    Checkout
-
-                </button>
-
-                <button
-                    id="backShopping"
-                    class="btn secondary"
-                    onclick="renderCategories()">
-
-                    ⬅ Lanjut Belanja
-
-                </button>
-
-            </aside>
-
-        </div>
-
-    </div>
-
-    `;
-
-        // ==========================
-    // LIST PRODUK
-    // ==========================
-
-    cart.forEach((item,index)=>{
-
-        list.innerHTML += `
-
-<div class="cart-item">
-
-    <div class="cart-image">
-
-        <img src="${item.gambar}" alt="${item.nama}">
-
-    </div>
-
-    <div class="cart-info">
-
-        <h3>${item.nama}</h3>
-
-        <p class="cart-brand">
-
-            ${item.brand || "-"}
-
-        </p>
-
-        <p>
-
-            <strong>Varian :</strong>
-
-            ${item.varian}
-
-        </p>
-
-        <p>
-
-            <strong>Harga :</strong>
-
-            ${formatRupiah(item.harga || 0)}
-
-        </p>
-
-    </div>
-
-    <div class="cart-side">
-
-        <div class="cart-qty">
-
-            <button
-                onclick="changeCartQty(${index},-1)">
-
-                −
-
-            </button>
-
-            <span>
-
-                ${item.qty}
-
-            </span>
-
-            <button
-                onclick="changeCartQty(${index},1)">
-
-                +
-
-            </button>
-
-        </div>
-
-        <div class="cart-total">
-
-            ${formatRupiah((item.harga || 0) * item.qty)}
-
-        </div>
-
-        <button
-            class="cart-delete"
-            onclick="removeCart(${index})">
-
-            <i class="fa-solid fa-trash"></i>
-
-            <span>Hapus</span>
-
-        </button>
-
-    </div>
-
-</div>
-
-        `;
-
-    });
-
-    // ==========================
-    // SCROLL
-    // ==========================
-
-    requestAnimationFrame(()=>{
-
-        container.scrollIntoView({
-
-            behavior:"smooth",
-
-            block:"start"
-
-        });
-
-    });
-
-}
-
-
-*/
 
 
 function formatRupiah(angka){
@@ -13949,9 +13765,152 @@ document.getElementById("aiInput")
 
 });
 
+
+
+let stickyScrollHandler = null;
+
+function initStickyCheckout(){
+
+    const sticky = document.getElementById("stickyCheckout");
+    const buyActions = document.querySelector(".buy-actions");
+
+    if(!sticky || !buyActions) return;
+
+    if(stickyScrollHandler){
+
+        window.removeEventListener(
+            "scroll",
+            stickyScrollHandler
+        );
+
+        window.removeEventListener(
+            "resize",
+            stickyScrollHandler
+        );
+
+    }
+
+    stickyScrollHandler = function(){
+
+        const rect = buyActions.getBoundingClientRect();
+
+        const ctaVisible =
+            rect.top <= window.innerHeight &&
+            rect.bottom >= 0;
+
+        if(window.scrollY > 250 && !ctaVisible){
+
+            sticky.classList.add("show");
+
+        }else{
+
+            sticky.classList.remove("show");
+
+        }
+
+    };
+
+    window.addEventListener(
+        "scroll",
+        stickyScrollHandler
+    );
+
+    window.addEventListener(
+        "resize",
+        stickyScrollHandler
+    );
+
+    stickyScrollHandler();
+
+}
+
+function stickyBuyNow(){
+
+    if(!currentProduct) return;
+
+    directCheckout(currentProduct);
+
+}
+
+
+function directCheckout(product){
+  
+  const varian =
+document.getElementById("varian")?.value || "-";
+
+if(
+    document.getElementById("varian") &&
+    varian === "-"
+){
+
+    Swal.fire({
+        icon:"warning",
+        title:"Pilih Varian",
+        text:"Silakan pilih varian terlebih dahulu."
+    });
+
+    return;
+
+}
+
+let qty =
+parseInt(
+document.getElementById("qty")?.value
+)||1;
+
+if(qty < 1){
+
+qty = 1;
+
+}
+
+    // RESET CART
+    cart=[];
+
+    cart = [
+
+{
+
+id:product.id,
+
+nama:product.nama,
+
+gambar:product.gambar,
+
+brand:product.brand,
+
+kategori:product.kategori,
+
+varian:varian,
+
+qty:qty,
+
+harga:product.harga?.promo ??
+      product.harga?.normal ??
+      0
+
+}
+
+];
+
+    localStorage.setItem(
+        "cart",
+        JSON.stringify(cart)
+    );
+
+    saveCart();
+
+checkoutForm();
+
+}
+
+
+
 </script>
 
 <div id="toast"></div>
+
+
 
 </body>
 </html>
