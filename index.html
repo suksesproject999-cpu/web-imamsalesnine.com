@@ -7687,6 +7687,83 @@ display:block;
 }
 
 
+.sticky-qty{
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+gap:12px;
+
+margin-top:12px;
+
+}
+
+.sticky-qty button{
+
+width:34px;
+
+height:34px;
+
+border:none;
+
+border-radius:8px;
+
+background:#f3f3f3;
+
+font-size:18px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+}
+
+#stickyQty{
+
+min-width:30px;
+
+text-align:center;
+
+font-weight:700;
+
+font-size:16px;
+
+}
+
+.sticky-total{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+margin-top:12px;
+
+padding-top:10px;
+
+border-top:1px solid #ececec;
+
+font-size:15px;
+
+font-weight:600;
+
+}
+
+#stickyTotal{
+
+color:#8CC63F;
+
+font-size:18px;
+
+}
+
+
+
+
 </style>
 
 
@@ -10410,6 +10487,46 @@ STICKY CHECKOUT
 </div>
 
     </div>
+    
+    <div class="sticky-qty">
+
+    <button
+        type="button"
+        onclick="stickyQtyMinus()">
+
+        −
+
+    </button>
+
+    <span id="stickyQty">
+
+        1
+
+    </span>
+
+    <button
+        type="button"
+        onclick="stickyQtyPlus()">
+
+        +
+
+    </button>
+
+</div>
+
+<div class="sticky-total">
+
+    Total
+
+    <strong id="stickyTotal">
+
+        Rp0
+
+    </strong>
+
+</div>
+    
+    
 
     <button
         id="stickyBuyBtn"
@@ -10484,6 +10601,8 @@ if(stickyVariant){
 
 }
 
+
+updateStickySummary();
 
 initStickyCheckout();
 
@@ -11523,6 +11642,8 @@ function changeQty(step){
 
     // Sinkronkan dengan validasi
     validateQty(qty);
+    
+    updateStickySummary();
 
 }
 
@@ -13924,6 +14045,89 @@ function initStickyCheckout(){
     stickyScrollHandler();
 
 }
+
+
+
+function stickyQtyPlus(){
+
+    const qtyInput =
+    document.getElementById("qty");
+
+    if(!qtyInput) return;
+
+    qtyInput.value =
+    parseInt(qtyInput.value || 1) + 1;
+
+    updateStickySummary();
+
+}
+
+
+
+
+function stickyQtyMinus(){
+
+    const qtyInput =
+    document.getElementById("qty");
+
+    if(!qtyInput) return;
+
+    let qty =
+    parseInt(qtyInput.value || 1);
+
+    if(qty > 1){
+
+        qty--;
+
+    }
+
+    qtyInput.value = qty;
+
+    updateStickySummary();
+
+}
+
+
+
+function updateStickySummary(){
+
+    if(!currentProduct) return;
+
+    const qty =
+    parseInt(
+        document.getElementById("qty")?.value
+    ) || 1;
+
+    const harga =
+    currentProduct.harga?.promo ??
+    currentProduct.harga?.normal ??
+    0;
+
+    const stickyQty =
+    document.getElementById("stickyQty");
+
+    if(stickyQty){
+
+        stickyQty.textContent = qty;
+
+    }
+
+    const stickyTotal =
+    document.getElementById("stickyTotal");
+
+    if(stickyTotal){
+
+        stickyTotal.textContent =
+        formatRupiah(harga * qty);
+
+    }
+
+}
+
+
+
+
+
 
 function stickyBuyNow(){
 
