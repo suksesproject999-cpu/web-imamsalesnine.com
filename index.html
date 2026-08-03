@@ -7674,6 +7674,19 @@ color:#8CC63F;
 
 
 
+#stickyVariant{
+
+font-size:12px;
+
+color:#777;
+
+margin-top:2px;
+
+display:block;
+
+}
+
+
 </style>
 
 
@@ -10375,6 +10388,8 @@ STICKY CHECKOUT
         <div class="sticky-info">
 
     <span id="stickyName"></span>
+    
+    <span id="stickyVariant"></span>
 
     <div class="sticky-price-box">
 
@@ -10454,7 +10469,21 @@ const stickyName = document.getElementById("stickyName");
 
 if (stickyName) {
     stickyName.textContent = product.nama;
+    
 }
+    const stickyVariant =
+document.getElementById("stickyVariant");
+
+const selectedVarian =
+document.getElementById("varian")?.value || "";
+
+if(stickyVariant){
+
+    stickyVariant.textContent =
+    selectedVarian;
+
+}
+
 
 initStickyCheckout();
 
@@ -10900,9 +10929,17 @@ function selectVariant(btn,value){
     .getElementById("varian")
     .value = value;
 
+const stickyVariant =
+document.getElementById("stickyVariant");
+
+if(stickyVariant){
+
+    stickyVariant.textContent =
+    value;
+
 }
 
-
+}
 
 
 
