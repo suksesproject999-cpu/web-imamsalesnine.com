@@ -10724,7 +10724,7 @@ stroke-linejoin="round">
     </small>
 
     <strong
-    id="stickyPrice">
+    id="stickyTotal">
 
     Rp 0
 
@@ -14524,14 +14524,11 @@ if(
 
 }
 
-let qty =
-parseInt(
-document.getElementById("qty")?.value
-)||1;
+let qty = selectedQty;
 
 if(qty < 1){
 
-qty = 1;
+    qty = 1;
 
 }
 
@@ -14804,9 +14801,7 @@ Total
 <strong>
 
 ${formatRupiah(
-promo * (
-parseInt(document.getElementById("qty")?.value || 1)
-)
+promo * selectedQty
 )}
 
 </strong>
