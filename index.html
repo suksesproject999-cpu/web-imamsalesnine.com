@@ -8057,6 +8057,83 @@ transform:scale(.92);
 }
 
 
+.sticky-actions-action{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+width:100%;
+
+}
+
+.sticky-cart-action-btn{
+
+flex:1;
+
+height:52px;
+
+border:2px solid #8CC63F;
+
+background:#fff;
+
+color:#6EA62A;
+
+border-radius:16px;
+
+font-size:16px;
+
+font-weight:700;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+cursor:pointer;
+
+transition:.25s;
+
+}
+
+.sticky-buy-action-btn{
+
+flex:1;
+
+height:52px;
+
+border:none;
+
+background:#8CC63F;
+
+color:#fff;
+
+border-radius:16px;
+
+font-size:16px;
+
+font-weight:700;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+cursor:pointer;
+
+transition:.25s;
+
+box-shadow:
+0 6px 18px rgba(140,198,63,.25);
+
+}
+
+
+
 </style>
 
 
@@ -11320,6 +11397,21 @@ function selectVariant(btn,value){
     .value = value;
 
     updateStickySummary();
+    
+    stickyActionMode = true;
+
+updateStickyMode();
+
+const sticky =
+document.getElementById("stickyCheckout");
+
+if(sticky){
+
+    sticky.classList.add("show");
+
+    document.body.classList.add("sticky-active");
+
+}
 
 }
 
@@ -14245,6 +14337,7 @@ let stickyClosed = false;
 let stickyScrollHandler = null;
 let purchaseMode = "cart";
 let selectedQty = 1;
+let stickyActionMode = false;
 
 function initStickyCheckout(){
 
@@ -14306,20 +14399,20 @@ function initStickyCheckout(){
         const testimonialVisible =
         testimonialRect.top <= 120;
 
-        if(
-            passedVariant &&
-            !testimonialVisible
-        ){
+if(
+    passedVariant &&
+    !testimonialVisible
+){
 
-            sticky.classList.add("show");
-            document.body.classList.add("sticky-active");
+    sticky.classList.add("show");
+    document.body.classList.add("sticky-active");
 
-        }else{
+}else{
 
-            sticky.classList.remove("show");
-            document.body.classList.remove("sticky-active");
+    sticky.classList.remove("show");
+    document.body.classList.remove("sticky-active");
 
-        }
+}
 
     };
 
@@ -14500,6 +14593,8 @@ function stickyBuyNow(){
     if(!currentProduct) return;
 
     directCheckout(currentProduct);
+    
+    
 
 }
 
@@ -14600,7 +14695,13 @@ document
 .getElementById("purchaseSheet")
 .classList.add("show");
 
+stickyActionMode = false;
+
+updateStickyMode();
 }
+
+
+
 
 function openBuySheet(){
 
@@ -14612,7 +14713,14 @@ document
 .getElementById("purchaseSheet")
 .classList.add("show");
 
+stickyActionMode = false;
+
+updateStickyMode();
+
 }
+
+
+
 
 function closePurchaseSheet(){
 
@@ -14862,14 +14970,25 @@ function confirmAddToCart(){
     if(!currentProduct) return;
 
     addToCart(currentProduct.id);
+    
+    stickyActionMode = false;
+
+    updateStickyMode();
 
 }
+
+
+
 
 function confirmBuyNow(){
 
     closePurchaseSheet();
 
     stickyBuyNow();
+    
+    stickyActionMode = false;
+
+    updateStickyMode();
 
 }
 
@@ -14930,6 +15049,77 @@ function openStickyWhatsApp(){
         url,
         "_blank"
     );
+
+}
+
+function updateStickyMode(){
+
+    const actions =
+    document.querySelector(".sticky-actions");
+
+    if(!actions) return;
+
+    if(stickyActionMode){
+
+        if(stickyActionMode){
+
+    actions.innerHTML=`
+
+<div class="sticky-actions-action">
+
+    <button
+    class="sticky-cart-action-btn"
+    onclick="openCartSheet()">
+
+        Masukkan Keranjang
+
+    </button>
+
+    <button
+    class="sticky-buy-action-btn"
+    onclick="openBuySheet()">
+
+        BELI SEKARANG
+
+    </button>
+
+</div>
+
+`;
+
+}
+
+    }else{
+
+        actions.innerHTML=`
+
+<button
+class="sticky-icon-btn"
+onclick="openStickyWhatsApp()">
+
+<i class="fa-solid fa-comments"></i>
+
+</button>
+
+<button
+class="sticky-icon-btn"
+onclick="openCartSheet()">
+
+<i class="fa-solid fa-cart-shopping"></i>
+
+</button>
+
+<button
+class="sticky-buy-btn"
+onclick="openBuySheet()">
+
+BELI SEKARANG
+
+</button>
+
+`;
+
+    }
 
 }
 
