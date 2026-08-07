@@ -312,12 +312,7 @@ text-align:center;
 padding-top:80px;
 }
 
-.bg-video{
-position:absolute;
-width:100%;
-height:100%;
-object-fit:cover;
-}
+
 
 .bg-video{
 position:absolute;
@@ -691,7 +686,7 @@ opacity:1;
 }
 }
 
-..product-list{
+.product-list{
 
 list-style:none;
 
@@ -8133,6 +8128,313 @@ box-shadow:
 }
 
 
+/* ===========================================
+   HAMBURGER MENU FINAL V3
+=========================================== */
+
+.navbar{
+    position:relative;
+}
+
+/* Tombol */
+
+.menu-btn{
+
+position:absolute;
+
+top:18px;
+right:18px;
+
+width:52px;
+height:52px;
+
+padding:0;
+
+border:none;
+
+background:rgba(255,255,255,.08);
+
+backdrop-filter:blur(15px);
+
+border-radius:16px;
+
+display:flex;
+flex-direction:column;
+
+justify-content:center;
+align-items:center;
+
+gap:6px;
+
+cursor:pointer;
+
+transition:
+background .3s,
+transform .3s,
+box-shadow .3s;
+
+z-index:99999;
+
+}
+
+.menu-btn:hover{
+
+background:rgba(140,198,63,.15);
+
+box-shadow:
+0 10px 30px rgba(140,198,63,.18);
+
+}
+
+/* 3 Garis */
+
+.menu-btn span{
+
+display:block;
+
+width:26px;
+height:3px;
+
+background:#fff;
+
+border-radius:999px;
+
+transform-origin:center;
+
+transition:
+transform .35s cubic-bezier(.68,-0.6,.32,1.6),
+opacity .25s,
+width .25s;
+
+}
+
+/* OPEN */
+
+.menu-btn.active span:nth-child(1){
+
+transform:
+translateY(9px)
+rotate(45deg);
+
+}
+
+.menu-btn.active span:nth-child(2){
+
+opacity:0;
+
+transform:scaleX(0);
+
+}
+
+.menu-btn.active span:nth-child(3){
+
+transform:
+translateY(-9px)
+rotate(-45deg);
+
+}
+
+/* Overlay */
+
+.menu-overlay{
+
+position:fixed;
+inset:0;
+
+background:rgba(0,0,0,.28);
+
+backdrop-filter:blur(4px);
+
+opacity:0;
+visibility:hidden;
+
+transition:.3s;
+
+z-index:99990;
+
+}
+
+.menu-overlay.show{
+
+opacity:1;
+
+visibility:visible;
+
+}
+
+/* Dropdown */
+
+.top-menu{
+
+position:fixed;
+
+top:82px;
+right:18px;
+
+width:300px;
+
+background:rgba(255,255,255,.96);
+
+backdrop-filter:blur(22px);
+
+border-radius:22px;
+
+box-shadow:
+0 20px 55px rgba(0,0,0,.22);
+
+overflow:hidden;
+
+opacity:0;
+
+visibility:hidden;
+
+transform:
+translateY(-15px)
+scale(.94);
+
+transition:
+opacity .28s,
+transform .28s,
+visibility .28s;
+
+z-index:99995;
+
+}
+
+.top-menu.show{
+
+opacity:1;
+
+visibility:visible;
+
+transform:
+translateY(0)
+scale(1);
+
+}
+
+/* Header */
+
+.menu-title{
+
+padding:18px 22px;
+
+font-size:18px;
+
+font-weight:700;
+
+color:#222;
+
+background:#f8f8f8;
+
+border-bottom:1px solid #ececec;
+
+}
+
+/* Item */
+
+.top-menu a{
+
+display:flex;
+
+align-items:center;
+
+gap:14px;
+
+padding:16px 22px;
+
+text-decoration:none;
+
+font-weight:600;
+
+color:#333;
+
+transition:.25s;
+
+}
+
+.top-menu a:hover{
+
+background:#eef8df;
+
+color:#5A8E1C;
+
+padding-left:28px;
+
+}
+
+.top-menu a i{
+
+width:24px;
+
+font-size:18px;
+
+color:#8CC63F;
+
+text-align:center;
+
+}
+
+.top-menu hr{
+
+border:none;
+
+height:1px;
+
+background:#ececec;
+
+margin:6px 0;
+
+}
+
+.badge{
+
+margin-left:auto;
+
+padding:5px 10px;
+
+background:#ff4d4f;
+
+color:#fff;
+
+border-radius:999px;
+
+font-size:11px;
+
+font-weight:700;
+
+}
+
+/* Mobile */
+
+@media(max-width:768px){
+
+.menu-btn{
+
+top:16px;
+
+right:14px;
+
+width:48px;
+height:48px;
+
+}
+
+.top-menu{
+
+top:74px;
+
+right:10px;
+
+width:calc(100% - 20px);
+
+border-radius:20px;
+
+}
+
+}
+
+
 
 </style>
 
@@ -8166,19 +8468,78 @@ Sales Representative • nine autoseries
 
 </a>
 
+<div class="header-actions">
+    <button id="menuBtn" class="menu-btn">
+
+    <span></span>
+    <span></span>
+    <span></span>
+
+</button>
+</div>
+
 
 <ul class="menu">
 <li><a href="#about">Tentang</a></li>
 <li><a href="#product">Produk</a></li>
 <li><a href="#testimoni">Testimoni</a></li>
 <li><a href="#faq">FAQ</a></li>
-<li><a href="legal.html">Legal</a></li>
 <li><a href="#contact">Kontak</a></li>
 </ul>
+
+
 
 </nav>
 
 </header>
+
+<!-- Overlay -->
+<div id="menuOverlay" class="menu-overlay"></div>
+
+<!-- Dropdown -->
+<div id="topMenu" class="top-menu">
+
+    <div class="menu-title">Menu</div>
+    
+  
+    <a href="#shoppingMallHero">
+        <i class="fa-solid fa-store"></i>
+        Shopping Mall
+    </a>
+    
+    
+    <a href="#" onclick="goCart(); return false;">
+        <i class="fa-solid fa-cart-shopping"></i>
+        Keranjang
+    </a>
+
+    <a href="#" onclick="openAI(); return false;">
+        <i class="fa-solid fa-robot"></i>
+        AI Assistant
+    </a>
+
+  
+  
+    <a href="/vip/">
+        <i class="fa-solid fa-crown"></i>
+        Member VVIP
+    </a>
+    
+    
+    
+    <a href="https://wa.me/6282210109369">
+        <i class="fa-solid fa-headset"></i>
+        Konsultasi
+    </a>
+    
+    
+
+    <a href="legal.html">
+        <i class="fa-solid fa-scale-balanced"></i>
+        Legal
+    </a>
+
+</div>
 
 <section class="hero">
 
@@ -8206,7 +8567,7 @@ Lampu LED Terang Maksimal Untuk Motor & Mobil Anda
 Garansi Resmi • Harga Kompetitif • Siap Kirim Seluruh Indonesia
 </p>
 
-<div class="hero-buttons">
+<!--<div class="hero-buttons">
 
     <a href="https://wa.me/6282210109369" class="btn">
 
@@ -8224,7 +8585,7 @@ Garansi Resmi • Harga Kompetitif • Siap Kirim Seluruh Indonesia
 
     </a>
 
-</div>
+</div>-->
 
 <div class="trust-badges">
 <span>✔ Garansi</span>
@@ -9202,20 +9563,6 @@ onclick="openAI()">
     
     <!-- WhatsApp -->
 
-<div class="social-item">
-
-<a
-href="https://wa.me/6282210109369"
-target="_blank">
-
-<i
-class="fa-brands fa-whatsapp action-icon wa-icon">
-</i>
-
-</a>
-
-</div>
-
 
 <div class="social-item">
 
@@ -9374,7 +9721,7 @@ return window.innerWidth <= 768 ? 1 : 3;
 function updateSlider(){
 
 const slideWidth =
-slides[0].offsetWidth + 20;
+slides[0].offsetWidth + 15;
 
 track.style.transform =
 `translateX(-${index * slideWidth}px)`;
@@ -9551,7 +9898,8 @@ fetch("produk.json")
   "LX-TRIX": "assets/brands/lx-trix.png",
   "SECURICLE": "assets/brands/securicle.png",
   "SOUNDBLAX": "assets/brands/soundblax.png",
-  "NINE POWER": "assets/brands/9power.png"
+  "NINE POWER": "assets/brands/9power.png",
+  "CADY": "assets/brands/cady.png" // jika nanti ada
 };
   
   
@@ -15124,6 +15472,54 @@ BELI SEKARANG
 }
 
 
+document.addEventListener("DOMContentLoaded", () => {
+
+    const btn = document.getElementById("menuBtn");
+    const menu = document.getElementById("topMenu");
+    const overlay = document.getElementById("menuOverlay");
+
+    if (!btn || !menu || !overlay) {
+        console.error("Element menu tidak ditemukan");
+        return;
+    }
+
+    // Tutup menu
+    function closeMenu() {
+        btn.classList.remove("active");
+        menu.classList.remove("show");
+        overlay.classList.remove("show");
+    }
+
+    // Buka / Tutup menu
+    btn.addEventListener("click", () => {
+
+        btn.classList.toggle("active");
+        menu.classList.toggle("show");
+        overlay.classList.toggle("show");
+
+    });
+
+    // Klik area gelap
+    overlay.addEventListener("click", closeMenu);
+
+    // Tekan tombol ESC
+    document.addEventListener("keydown", (e) => {
+
+        if (e.key === "Escape") {
+            closeMenu();
+        }
+
+    });
+
+    // Klik semua item menu
+    document.querySelectorAll("#topMenu a").forEach(link => {
+
+        link.addEventListener("click", closeMenu);
+
+    });
+
+});
+
 
 
 </script>
@@ -15153,6 +15549,7 @@ class="purchase-panel">
 </div>
 
 </div>
+
 
 </body>
 </html>
