@@ -8436,6 +8436,39 @@ border-radius:20px;
 
 
 
+/* ==========================
+   DARK MODE
+========================== */
+
+body.dark-mode{
+    background:#0F1115;
+    color:#fff;
+}
+
+body.dark-mode .header{
+    background:#111;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+body.dark-mode .hero{
+    background:#121212;
+}
+
+body.dark-mode .product-card{
+    background:#1B1F26;
+    border:1px solid #2D323D;
+}
+
+body.dark-mode .product-card h3,
+body.dark-mode .product-card p{
+    color:#fff;
+}
+
+/* dst... */
+
+
+
+
 </style>
 
 
@@ -8538,6 +8571,14 @@ Sales Representative • nine autoseries
         <i class="fa-solid fa-scale-balanced"></i>
         Legal
     </a>
+    
+    
+    <a href="#" id="themeToggle">
+    <i class="fa-solid fa-moon" id="themeIcon"></i>
+    <span id="themeText">Mode Gelap</span>
+</a>
+    
+    
 
 </div>
 
@@ -9579,7 +9620,7 @@ box-shadow:0 0 8px #35d04b;
 
 <span id="onlineCount">
 
-3
+100
 
 </span>
 
@@ -15517,6 +15558,56 @@ document.addEventListener("DOMContentLoaded", () => {
         link.addEventListener("click", closeMenu);
 
     });
+
+});
+
+
+
+
+
+/* ===============================
+   THEME MODE
+================================ */
+
+const themeToggle = document.getElementById("themeToggle");
+const themeIcon = document.getElementById("themeIcon");
+const themeText = document.getElementById("themeText");
+
+// Load Theme
+if(localStorage.getItem("theme") === "dark"){
+
+    document.body.classList.add("dark-mode");
+
+    themeIcon.className = "fa-solid fa-sun";
+
+    themeText.textContent = "Mode Terang";
+
+}
+
+// Toggle Theme
+themeToggle.addEventListener("click",function(e){
+
+    e.preventDefault();
+
+    document.body.classList.toggle("dark-mode");
+
+    if(document.body.classList.contains("dark-mode")){
+
+        localStorage.setItem("theme","dark");
+
+        themeIcon.className = "fa-solid fa-sun";
+
+        themeText.textContent = "Mode Terang";
+
+    }else{
+
+        localStorage.setItem("theme","light");
+
+        themeIcon.className = "fa-solid fa-moon";
+
+        themeText.textContent = "Mode Gelap";
+
+    }
 
 });
 
