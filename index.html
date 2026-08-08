@@ -24,7 +24,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <link rel="icon" href="favicon.png">
 
 
-
+  
+  
 <style>
 
 *{
@@ -10374,11 +10375,59 @@ body video{
 
 
 
+.voucher-status{
+
+    display:block;
+
+    margin-top:8px;
+
+    font-size:13px;
+
+    font-weight:700;
+
+}
+
+.voucher-ready{
+
+    color:#5b9d1c;
+
+}
+
+.voucher-pending{
+
+    color:#f39c12;
+
+}
+
+.voucher-card.active{
+
+    border-color:#8CC63F;
+
+    box-shadow:
+        0 0 0 3px
+        rgba(140,198,63,.15);
+
+}
+
+.voucher-btn.active{
+
+    background:#8CC63F;
+
+    color:#fff;
+
+}
 
 
 
 
 
+  
+  
+  
+  
+  
+  
+  
 </style>
 
 
@@ -11756,6 +11805,74 @@ let fuse;
 let cart = JSON.parse(localStorage.getItem("cart")) || [];
 
 
+// ==========================================
+// DATABASE VOUCHER
+// ==========================================
+// ==========================================
+// DATABASE VOUCHER
+// ==========================================
+
+const vouchers = [
+
+    {
+        id: "BELANJA50",
+        name: "Voucher Belanja",
+        description: "Potongan Belanja Rp5.000",
+        type: "product_fixed",
+
+        discount: 5000,
+        min: 500000,
+        maxDiscount: null,
+
+        expired: "2026-12-31",
+
+        icon: "fa-tags",
+        badge: "HOT",
+
+        limit: "1 Voucher / Akun"
+    },
+
+
+    {
+        id: "DISKON10",
+        name: "Diskon Produk 10%",
+        description: "Diskon produk 10%",
+        type: "product_percent",
+
+        discount: 10,
+        min: 100000,
+        maxDiscount: 500,
+
+        expired: "2026-12-31",
+
+        icon: "fa-percent",
+        badge: "PROMO",
+
+        limit: "1 Voucher / Akun"
+    },
+
+
+    {
+        id: "ONGKIR5",
+        name: "Diskon Ongkir",
+        description: "Potongan Ongkir Rp5.000",
+        type: "shipping_fixed",
+
+        discount: 5000,
+        min: 500000,
+        maxDiscount: null,
+
+        expired: "2026-12-31",
+
+        icon: "fa-truck",
+        badge: "HEMAT",
+
+        limit: "1 Voucher / Akun"
+    }
+
+];
+
+
 let currentPage = "catalog";
 
 
@@ -11901,6 +12018,185 @@ fetch("produk.json")
 
 
 
+function formatTanggalVoucher(tanggal){
+
+    const date =
+        new Date(
+            tanggal + "T00:00:00"
+        );
+
+    return date.toLocaleDateString(
+        "id-ID",
+        {
+            day: "2-digit",
+            month: "short",
+            year: "numeric"
+        }
+    );
+
+}
+
+
+function renderVoucherCards(){
+
+    return vouchers.map(voucher => {
+
+        let priceText;
+
+
+        // ==========================================
+        // TAMPILAN NILAI VOUCHER
+        // ==========================================
+
+        if(
+            voucher.type ===
+            "product_percent"
+        ){
+
+            priceText =
+                `${voucher.discount}%`;
+
+        }else{
+
+            priceText =
+                formatRupiah(
+                    voucher.discount
+                );
+
+        }
+
+
+        return `
+
+        <div
+            class="voucher-card"
+
+            data-id="${voucher.id}"
+
+            data-discount="${voucher.discount}"
+
+            data-min="${voucher.min}"
+
+            data-type="${voucher.type}"
+
+            data-expired="${voucher.expired}"
+        >
+
+            <div class="voucher-top">
+
+                <span class="voucher-badge hot">
+
+                    <i class="fa-solid fa-fire"></i>
+
+                    <span class="badge-text">
+
+                        ${voucher.badge}
+
+                    </span>
+
+                </span>
+
+
+                <span class="voucher-price">
+
+                    ${priceText}
+
+                </span>
+
+            </div>
+
+
+            <div class="voucher-left">
+
+                <div class="voucher-icon">
+
+                    <i
+                        class="fa-solid
+                        ${voucher.icon}">
+                    </i>
+
+                </div>
+
+
+                <div class="voucher-content">
+
+                    <h4>
+
+                        ${voucher.name}
+
+                    </h4>
+
+
+                    <p>
+
+                        ${voucher.description}
+
+                    </p>
+
+
+                    <small>
+
+                        Min. belanja
+                        ${formatRupiah(
+                            voucher.min
+                        )}
+
+                    </small>
+
+
+                    <small
+                        class="voucher-expired">
+
+                        <i
+                            class="fa-regular
+                            fa-clock">
+                        </i>
+
+                        Berlaku hingga
+
+                        ${formatTanggalVoucher(
+                            voucher.expired
+                        )}
+
+                    </small>
+
+
+                    <small
+                        class="voucher-limit">
+
+                        ${voucher.limit}
+
+                    </small>
+
+                </div>
+
+            </div>
+
+
+            <div class="voucher-divider"></div>
+
+
+            <button
+                class="voucher-btn"
+                onclick="selectVoucher(this)"
+            >
+
+                Gunakan
+
+            </button>
+
+        </div>
+
+        `;
+
+    }).join("");
+
+}
+
+
+
+
+
 
 
 function openCategory(kategori){
@@ -11969,106 +12265,24 @@ function openCategory(kategori){
 
         <h3>
 
-<i class="fa-solid fa-ticket"></i>
+            <i class="fa-solid fa-ticket"></i>
 
-Voucher
+            Voucher
 
-<span class="voucher-count">6 Voucher</span>
+            <span class="voucher-count">
+                ${vouchers.length} Voucher
+            </span>
 
-</h3>
+        </h3>
 
     </div>
+
 
     <div class="voucher-slider">
 
-        <!-- Voucher nanti di sini -->
-        <div
-class="voucher-card"
-
-data-id="BELANJA50"
-
-data-discount="50000"
-
-data-min="500000"
-
-data-type="shopping"
-
-data-expired="2026-12-31">
-        
-        <div class="voucher-top">
-
-    <span class="voucher-badge hot">
-    <i class="fa-solid fa-fire"></i>
-    <span class="badge-text">HOT</span>
-</span>
-
-    <span class="voucher-price">
-
-        Rp50.000
-
-    </span>
-
-</div>
-
-    <div class="voucher-left">
-    
-    
-        <div class="voucher-icon">
-
-            <i class="fa-solid fa-tags"></i>
-
-        </div>
-        
-        
-
-        <div class="voucher-content">
-
-<h4>
-
-Voucher Belanja
-
-</h4>
-
-<p>
-
-Potongan Belanja
-
-</p>
-
-<small>
-
-Min. belanja Rp500.000
-
-</small>
-
-<small class="voucher-expired">
-
-<i class="fa-regular fa-clock"></i>
-
-Berlaku hingga
-
-31 Des 2026
-
-</small>
-
-
-<small class="voucher-limit">
-
-1 Voucher / Akun
-
-</small>
-
-</div>
+        ${renderVoucherCards()}
 
     </div>
-    
-    <div class="voucher-divider"></div>
-
-    <button
-    class="voucher-btn"
-    onclick="selectVoucher(this)">
-    Gunakan
-</button>
 
 </div>
 
@@ -12158,8 +12372,15 @@ Berlaku hingga
     `;
     
     renderPage(html);
-    
-    showSkeleton();
+
+// Restore voucher yang sebelumnya dipilih
+requestAnimationFrame(()=>{
+
+    restoreVoucherUI();
+
+});
+
+showSkeleton();
 
 setTimeout(()=>{
 
@@ -12260,91 +12481,307 @@ function showSkeleton(){
 
 
 
-let selectedVoucherId = null;
+
+
+function getSelectedVouchers(){
+
+    let selected = {};
+
+    try{
+
+        selected =
+            JSON.parse(
+                localStorage.getItem(
+                    "selectedVouchers"
+                )
+            ) || {};
+
+    }catch(error){
+
+        selected = {};
+
+    }
+
+    return selected;
+
+}
+
+
+function saveSelectedVouchers(selected){
+
+    localStorage.setItem(
+        "selectedVouchers",
+        JSON.stringify(selected)
+    );
+
+}
+
 
 function selectVoucher(button){
 
-    const currentCard = button.closest(".voucher-card");
-    const currentId = currentCard.dataset.id;
+    const currentCard =
+        button.closest(".voucher-card");
 
-    // ==========================
-    // TOGGLE OFF
-    // ==========================
-    if(selectedVoucherId === currentId){
+    if(!currentCard) return;
 
-        selectedVoucherId = null;
 
-        localStorage.removeItem("selectedVoucher");
+    const currentId =
+        currentCard.dataset.id;
 
-        currentCard.classList.remove("active");
 
-        button.classList.remove("active");
-        button.innerHTML = "Gunakan";
+    const voucher =
+        vouchers.find(
+            v => v.id === currentId
+        );
 
-        const badge = currentCard.querySelector(".badge-text");
-        if(badge){
-            badge.textContent = "HOT";
-        }
-        
+
+    if(!voucher){
+
         showToast(
-    "Voucher dibatalkan.",
-    "info"
-);
+            "Voucher tidak ditemukan.",
+            "error"
+        );
 
         return;
+
     }
 
-    // ==========================
-    // RESET SEMUA VOUCHER
-    // ==========================
-    document.querySelectorAll(".voucher-card").forEach(card=>{
 
-        card.classList.remove("active");
+    // ======================================
+    // CEK EXPIRED
+    // ======================================
 
-        const btn = card.querySelector(".voucher-btn");
+    const isExpired =
+        voucher.expired &&
+        new Date() >
+        new Date(
+            voucher.expired +
+            "T23:59:59"
+        );
 
-        btn.classList.remove("active");
-        btn.innerHTML = "Gunakan";
 
-        const badge = card.querySelector(".badge-text");
-        if(badge){
-            badge.textContent = "HOT";
-        }
+    if(isExpired){
+
+        showToast(
+            "Voucher sudah kedaluwarsa.",
+            "error"
+        );
+
+        return;
+
+    }
+
+
+    // ======================================
+    // AMBIL VOUCHER TERPILIH
+    // ======================================
+
+    const selected =
+        getSelectedVouchers();
+
+
+    // ======================================
+    // TENTUKAN SLOT
+    // ======================================
+
+    const slot =
+        voucher.type === "shipping_fixed"
+            ? "shipping"
+            : "product";
+
+
+    // ======================================
+    // KLIK VOUCHER YANG SAMA
+    // → BATALKAN
+    // ======================================
+
+    if(
+        selected[slot] &&
+        selected[slot].id === currentId
+    ){
+
+        delete selected[slot];
+
+        saveSelectedVouchers(
+            selected
+        );
+
+        restoreVoucherUI();
+
+        showToast(
+            "Voucher dibatalkan.",
+            "info"
+        );
+
+        return;
+
+    }
+
+
+    // ======================================
+    // SIMPAN VOUCHER
+    // ======================================
+
+    selected[slot] =
+        voucher;
+
+
+    saveSelectedVouchers(
+        selected
+    );
+
+
+    // ======================================
+    // REFRESH SEMUA UI VOUCHER
+    // ======================================
+
+    restoreVoucherUI();
+
+
+    // ======================================
+    // CEK MINIMUM
+    // ======================================
+
+    let subtotal = 0;
+
+
+    cart.forEach(item => {
+
+        subtotal +=
+            (Number(item.harga) || 0) *
+            (Number(item.qty) || 0);
 
     });
 
-    // ==========================
-    // AKTIFKAN VOUCHER
-    // ==========================
-    selectedVoucherId = currentId;
 
-    currentCard.classList.add("active");
+    const kurang =
+        Math.max(
+            0,
+            Number(voucher.min) -
+            subtotal
+        );
 
-    button.classList.add("active");
-    button.innerHTML = `
-        <i class="fa-solid fa-check"></i>
-        Digunakan
-    `;
 
-    const badge = currentCard.querySelector(".badge-text");
-    if(badge){
-        badge.textContent = "DIGUNAKAN";
+    if(kurang > 0){
+
+        showToast(
+            `Voucher dipilih. Belanja lagi ${formatRupiah(kurang)} untuk mengaktifkan.`,
+            "info"
+        );
+
+    }else{
+
+        showToast(
+            "Voucher berhasil digunakan.",
+            "success"
+        );
+
     }
 
-    const voucher =
-vouchers.find(v => v.id === currentId);
+}
 
-localStorage.setItem(
-    "selectedVoucher",
-    JSON.stringify(voucher)
-);
 
-showToast(
-    "Voucher berhasil digunakan.",
-    "success"
-);
+
+
+
+
+
+function restoreVoucherUI(){
+
+    const selected =
+        getSelectedVouchers();
+
+
+    document
+        .querySelectorAll(
+            ".voucher-card"
+        )
+        .forEach(card => {
+
+            const id =
+                card.dataset.id;
+
+
+            const voucher =
+                vouchers.find(
+                    v => v.id === id
+                );
+
+
+            if(!voucher) return;
+
+
+            const button =
+                card.querySelector(
+                    ".voucher-btn"
+                );
+
+
+            const badge =
+                card.querySelector(
+                    ".badge-text"
+                );
+
+
+            const slot =
+                voucher.type ===
+                "shipping_fixed"
+                    ? "shipping"
+                    : "product";
+
+
+            const activeVoucher =
+                selected[slot];
+
+
+            const isSelected =
+                activeVoucher &&
+                activeVoucher.id === id;
+
+
+            card.classList.toggle(
+                "active",
+                !!isSelected
+            );
+
+
+            if(button){
+
+                button.classList.toggle(
+                    "active",
+                    !!isSelected
+                );
+
+
+                button.innerHTML =
+                    isSelected
+                        ? `
+                            <i class="fa-solid fa-check"></i>
+                            Dipilih
+                          `
+                        : "Gunakan";
+
+            }
+
+
+            if(badge){
+
+                badge.textContent =
+                    isSelected
+                        ? "DIPILIH"
+                        : voucher.badge;
+
+            }
+
+        });
 
 }
+
+
+
+
+
+
 
 
 
@@ -12504,37 +12941,7 @@ renderCategories();
 
 
 
-/*function renderPage(html){
 
-    const container =
-    document.getElementById("product-grid-auto");
-
-    container.innerHTML = html;
-
-    requestAnimationFrame(()=>{
-
-        const hero =
-        document.getElementById("shoppingMallHero");
-
-        if(!hero) return;
-
-        const header =
-        document.querySelector(".header");
-
-        const y =
-        hero.getBoundingClientRect().top +
-        window.pageYOffset -
-        header.offsetHeight;
-
-        window.scrollTo({
-            top:y,
-            behavior:"smooth"
-        });
-
-    });
-
-}
-*/
 
 
 function renderPage(html, autoScroll = true){
@@ -13795,81 +14202,218 @@ function formatRupiah(angka){
 
 function getCartSummary(){
 
-    // Hitung subtotal
     let subtotal = 0;
 
     let totalItem = 0;
 
-cart.forEach(item=>{
-    subtotal += item.harga * item.qty;
-    totalItem += item.qty;
-});
 
-    // Ambil voucher
-    const voucher = JSON.parse(
-        localStorage.getItem("selectedVoucher")
-    );
+    cart.forEach(item => {
 
-    let discount = 0;
-    let voucherName = "-";
+        subtotal +=
+            (Number(item.harga) || 0) *
+            (Number(item.qty) || 0);
 
-    // 3. Validasi voucher
-if (voucher) {
+        totalItem +=
+            Number(item.qty) || 0;
 
-    const isMinValid = subtotal >= voucher.min;
-    const isExpired = new Date() > new Date(voucher.expired);
+    });
 
-    if (isMinValid && !isExpired) {
 
-        discount = voucher.discount;
-        voucherName = voucher.id;
+    const selected =
+        getSelectedVouchers();
 
-    } else {
 
-        localStorage.removeItem("selectedVoucher");
+    let productDiscount = 0;
 
-        discount = 0;
-        voucherName = "-";
+    let shippingDiscount = 0;
 
-        if (!isMinValid) {
 
-            showToast(
-                `Minimal belanja ${voucher.min.toLocaleString("id-ID",{
-                    style:"currency",
-                    currency:"IDR"
-                })}`,
-                "warning"
+    let productVoucherName = "-";
+
+    let shippingVoucherName = "-";
+
+
+    let productVoucher = null;
+
+    let shippingVoucher = null;
+
+
+    // ======================================
+    // PRODUCT VOUCHER
+    // ======================================
+
+    if(selected.product){
+
+        const voucher =
+            selected.product;
+
+
+        const expired =
+            voucher.expired &&
+            new Date() >
+            new Date(
+                voucher.expired +
+                "T23:59:59"
             );
 
-        } else if (isExpired) {
 
-            showToast(
-                "Voucher sudah kedaluwarsa.",
-                "error"
-            );
+        if(!expired){
+
+            productVoucher =
+                voucher;
+
+
+            productVoucherName =
+                voucher.id;
+
+
+            if(
+                subtotal >=
+                Number(voucher.min)
+            ){
+
+                if(
+                    voucher.type ===
+                    "product_fixed"
+                ){
+
+                    productDiscount =
+                        Math.min(
+                            Number(
+                                voucher.discount
+                            ) || 0,
+                            subtotal
+                        );
+
+                }
+
+
+                else if(
+                    voucher.type ===
+                    "product_percent"
+                ){
+
+                    productDiscount =
+                        subtotal *
+                        (
+                            Number(
+                                voucher.discount
+                            ) || 0
+                        ) /
+                        100;
+
+
+                    if(
+                        voucher.maxDiscount !== null &&
+                        voucher.maxDiscount !== undefined
+                    ){
+
+                        productDiscount =
+                            Math.min(
+                                productDiscount,
+                                Number(
+                                    voucher.maxDiscount
+                                )
+                            );
+
+                    }
+
+
+                    productDiscount =
+                        Math.floor(
+                            productDiscount
+                        );
+
+                }
+
+            }
 
         }
 
     }
 
-}
+
+    // ======================================
+    // SHIPPING VOUCHER
+    // ======================================
+
+    if(selected.shipping){
+
+        const voucher =
+            selected.shipping;
+
+
+        const expired =
+            voucher.expired &&
+            new Date() >
+            new Date(
+                voucher.expired +
+                "T23:59:59"
+            );
+
+
+        if(!expired){
+
+            shippingVoucher =
+                voucher;
+
+
+            shippingVoucherName =
+                voucher.id;
+
+
+            // Ongkir belum diketahui admin.
+            // Jadi voucher dicatat,
+            // tapi belum dipotong dari total.
+
+            if(
+                subtotal >=
+                Number(voucher.min)
+            ){
+
+                shippingDiscount =
+                    Number(
+                        voucher.discount
+                    ) || 0;
+
+            }
+
+        }
+
+    }
+
+
+    // ======================================
+    // TOTAL BELANJA
+    // ======================================
 
     const totalBayar =
-    subtotal - discount;
+        Math.max(
+            0,
+            subtotal -
+            productDiscount
+        );
 
-    return{
+
+    return {
 
         subtotal,
 
-        discount,
+        productDiscount,
 
-        voucherName,
+        shippingDiscount,
+
+        productVoucherName,
+
+        shippingVoucherName,
+
+        productVoucher,
+
+        shippingVoucher,
 
         totalBayar,
 
-        totalItem,
-
-        voucher
+        totalItem
 
     };
 
@@ -13938,10 +14482,23 @@ function renderCart(){
 
 const summary = getCartSummary();
 
-const subtotal = summary.subtotal;
-const discount = summary.discount;
-const voucherName = summary.voucherName;
-const totalBayar = summary.totalBayar;
+const subtotal =
+    summary.subtotal;
+
+const productDiscount =
+    summary.productDiscount;
+
+const shippingDiscount =
+    summary.shippingDiscount;
+
+const productVoucherName =
+    summary.productVoucherName;
+
+const shippingVoucherName =
+    summary.shippingVoucherName;
+
+const totalBayar =
+    summary.totalBayar;
 
 // 5. Baru gunakan totalBayar di HTML
 
@@ -14022,49 +14579,99 @@ const totalBayar = summary.totalBayar;
 
                 </div>
                 
-                <div class="summary-row">
-    <span>Voucher Digunakan</span>
+               <div class="summary-row">
+
+    <span>Voucher Produk</span>
+
     <strong>
-        ${voucherName}
+        ${productVoucherName}
     </strong>
+
 </div>
+
 
 <div class="summary-row">
-    <span>Voucher</span>
-    <strong>
-        - ${discount.toLocaleString("id-ID",{
-            style:"currency",
-            currency:"IDR"
-        })}
-    </strong>
-</div>
-                
-                
-              
-                <div class="summary-row">
 
-                    <span>Ongkir</span>
-
-                    <strong>Dihitung saat checkout</strong>
-
-                </div>
-
-                <hr>
-                
-                <div class="summary-row total">
-
-    <span><strong>Total Bayar</strong></span>
+    <span>Diskon Produk</span>
 
     <strong>
 
-        ${totalBayar.toLocaleString("id-ID",{
-            style:"currency",
-            currency:"IDR"
-        })}
+        - ${productDiscount.toLocaleString(
+            "id-ID",
+            {
+                style:"currency",
+                currency:"IDR"
+            }
+        )}
 
     </strong>
 
 </div>
+
+
+<div class="summary-row">
+
+    <span>Voucher Ongkir</span>
+
+    <strong>
+        ${shippingVoucherName}
+    </strong>
+
+</div>
+
+
+<div class="summary-row">
+
+    <span>Diskon Ongkir</span>
+
+    <strong>
+
+        - ${shippingDiscount.toLocaleString(
+            "id-ID",
+            {
+                style:"currency",
+                currency:"IDR"
+            }
+        )}
+
+    </strong>
+
+</div>
+
+
+<div class="summary-row">
+
+    <span>Ongkos Kirim</span>
+
+    <strong>
+        Dihitung Admin
+    </strong>
+
+</div>
+
+
+
+<div class="summary-row total">
+
+    <span>
+        <strong>Total Belanja</strong>
+    </span>
+
+    <strong>
+
+        ${totalBayar.toLocaleString(
+            "id-ID",
+            {
+                style:"currency",
+                currency:"IDR"
+            }
+        )}
+
+    </strong>
+
+</div>
+
+
 
                 <button
                     class="btn"
@@ -14171,13 +14778,13 @@ const totalBayar = summary.totalBayar;
 
         <div class="cart-total">
 
-            ${((item.harga||0)*item.qty).toLocaleString("id-ID",{
-
-                style:"currency",
-
-                currency:"IDR"
-
-            })}
+            ${(
+    Number(item.harga || 0) *
+    Number(item.qty || 0)
+).toLocaleString("id-ID",{
+    style:"currency",
+    currency:"IDR"
+})}
 
         </div>
 
@@ -14343,307 +14950,632 @@ function getCustomerData() {
   ) || {};
 }
 
-function checkoutForm() {
-  
+function checkoutForm(){
+
+    if(cart.length === 0){
+
+        Swal.fire({
+            icon:"info",
+            text:"Keranjang masih kosong."
+        });
+
+        return;
+
+    }
 
 
-  const customer = getCustomerData();
-  
-  const summary = getCartSummary();
-  
-  let summaryHTML = "";
+    const customer =
+        getCustomerData();
 
-const totalItem = summary.totalItem;
-const subtotal = summary.subtotal;
-const voucherName = summary.voucherName;
-const discount = summary.discount;
-const totalBayar = summary.totalBayar;
 
-cart.forEach((item,index)=>{
+    const summary =
+        getCartSummary();
 
-    
+
+    // ==========================================
+    // SUMMARY BARU
+    // ==========================================
+
+    const totalItem =
+        summary.totalItem;
+
+    const subtotal =
+        summary.subtotal;
+
+    const productDiscount =
+        summary.productDiscount;
+
+    const shippingDiscount =
+        summary.shippingDiscount;
+
+    const productVoucherName =
+        summary.productVoucherName;
+
+    const shippingVoucherName =
+        summary.shippingVoucherName;
+
+    const totalBayar =
+        summary.totalBayar;
+
+
+    // ==========================================
+    // DETAIL PRODUK
+    // ==========================================
+
+    let summaryHTML = "";
+
+
+    cart.forEach((item,index)=>{
+
+        summaryHTML += `
+
+        <div class="summary-item">
+
+            <strong>
+
+                ${index + 1}.
+                ${item.nama}
+
+            </strong>
+
+            <br>
+
+            <small>
+
+                Varian :
+                ${item.varian}
+
+            </small>
+
+            <br>
+
+            <small>
+
+                Harga :
+                ${formatRupiah(item.harga)}
+
+            </small>
+
+            <br>
+
+            <small>
+
+                Qty :
+                ${item.qty}
+
+            </small>
+
+            <br>
+
+            <small>
+
+                Subtotal :
+                ${formatRupiah(
+                    item.harga * item.qty
+                )}
+
+            </small>
+
+        </div>
+
+        `;
+
+    });
+
+
+    // ==========================================
+    // RINGKASAN VOUCHER
+    // ==========================================
 
     summaryHTML += `
 
-    <div class="summary-item">
+        <div class="summary-row">
 
-        <strong>${index+1}. ${item.nama}</strong><br>
+            <span>
 
-        <small>Varian : ${item.varian}</small><br>
+                Jumlah Item
 
-        <small>Harga : ${formatRupiah(item.harga)}</small><br>
+            </span>
 
-        <small>Qty : ${item.qty}</small>
+            <strong>
+
+                ${totalItem}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Subtotal Produk
+
+            </span>
+
+            <strong>
+
+                ${formatRupiah(
+                    subtotal
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Voucher Produk
+
+            </span>
+
+            <strong>
+
+                ${productVoucherName || "-"}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Diskon Produk
+
+            </span>
+
+            <strong>
+
+                - ${formatRupiah(
+                    productDiscount
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Voucher Ongkir
+
+            </span>
+
+            <strong>
+
+                ${shippingVoucherName || "-"}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Diskon Ongkir
+
+            </span>
+
+            <strong>
+
+                - ${formatRupiah(
+                    shippingDiscount
+                )}
+
+            </strong>
+
+        </div>
+
+
+        <div class="summary-row">
+
+            <span>
+
+                Ongkos Kirim
+
+            </span>
+
+            <strong>
+
+                Dihitung Admin
+
+            </strong>
+
+        </div>
+
+
+        <hr>
+
+
+        <div class="summary-row total">
+
+            <span>
+
+                <strong>
+
+                    Total Belanja
+
+                </strong>
+
+            </span>
+
+
+            <strong>
+
+                ${formatRupiah(
+                    totalBayar
+                )}
+
+            </strong>
+
+        </div>
+
+    `;
+
+
+    // ==========================================
+    // HTML CHECKOUT
+    // ==========================================
+
+    const html = `
+
+    <div class="checkout-form">
+
+
+        <h2>
+
+            <i class="fa-solid fa-cart-shopping"></i>
+
+            Checkout
+
+        </h2>
+
+
+        <!-- ==========================
+             RINGKASAN PESANAN
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-clipboard-list"></i>
+
+                Ringkasan Pesanan
+
+            </h3>
+
+
+            <div id="checkout-summary">
+
+                ${summaryHTML}
+
+            </div>
+
+        </div>
+
+
+        <!-- ==========================
+             DATA PEMBELI
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-user"></i>
+
+                Data Pembeli
+
+            </h3>
+
+
+            <input
+                id="nama"
+                placeholder="Nama Lengkap"
+                value="${customer.nama || ""}"
+            >
+
+
+            <input
+                id="wa"
+                placeholder="Nomor WhatsApp"
+                value="${customer.wa || ""}"
+            >
+
+
+            <input
+                id="email"
+                placeholder="Email (Opsional)"
+                value="${customer.email || ""}"
+            >
+
+        </div>
+
+
+        <!-- ==========================
+             ALAMAT
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-location-dot"></i>
+
+                Alamat Pengiriman
+
+            </h3>
+
+
+            <input
+                id="provinsi"
+                placeholder="Provinsi"
+                value="${customer.provinsi || ""}"
+            >
+
+
+            <input
+                id="kota"
+                placeholder="Kota / Kabupaten"
+                value="${customer.kota || ""}"
+            >
+
+
+            <input
+                id="kodepos"
+                placeholder="Kode Pos"
+                value="${customer.kodepos || ""}"
+            >
+
+
+            <textarea
+                id="alamat"
+                placeholder="Alamat Lengkap"
+            >${customer.alamat || ""}</textarea>
+
+        </div>
+
+
+        <!-- ==========================
+             PENGIRIMAN
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-truck-fast"></i>
+
+                Pengiriman
+
+            </h3>
+
+
+            <select id="ekspedisi">
+
+                <option
+                    value="J&T"
+                    ${
+                        customer.ekspedisi === "J&T"
+                        ? "selected"
+                        : ""
+                    }
+                >
+                    J&T
+                </option>
+
+
+                <option
+                    value="JNE"
+                    ${
+                        customer.ekspedisi === "JNE"
+                        ? "selected"
+                        : ""
+                    }
+                >
+                    JNE
+                </option>
+
+
+                <option
+                    value="SiCepat"
+                    ${
+                        customer.ekspedisi === "SiCepat"
+                        ? "selected"
+                        : ""
+                    }
+                >
+                    SiCepat
+                </option>
+
+
+                <option
+                    value="AnterAja"
+                    ${
+                        customer.ekspedisi === "AnterAja"
+                        ? "selected"
+                        : ""
+                    }
+                >
+                    AnterAja
+                </option>
+
+            </select>
+
+        </div>
+
+
+        <!-- ==========================
+             CATATAN
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-note-sticky"></i>
+
+                Catatan
+
+            </h3>
+
+
+            <textarea
+                id="catatan"
+                placeholder="Contoh: Mohon packing menggunakan bubble wrap"
+            ></textarea>
+
+        </div>
+
+
+        <!-- ==========================
+             SYARAT & KETENTUAN
+        =========================== -->
+
+        <div class="form-card">
+
+            <h3>
+
+                <i class="fa-solid fa-file-contract"></i>
+
+                Syarat & Ketentuan
+
+            </h3>
+
+
+            <div class="terms-box">
+
+                <p>
+                    1. Data yang saya isi adalah benar
+                    dan dapat dipertanggungjawabkan.
+                </p>
+
+
+                <p>
+                    2. Saya memahami bahwa harga akhir
+                    akan dikonfirmasi oleh admin setelah
+                    pengecekan stok dan ongkos kirim.
+                </p>
+
+
+                <p>
+                    3. Saya memahami bahwa warna,
+                    bentuk, dan tampilan produk pada foto
+                    dapat sedikit berbeda karena
+                    pencahayaan dan perangkat yang digunakan.
+                </p>
+
+
+                <p>
+                    4. Saya wajib memeriksa kembali
+                    detail pesanan sebelum melakukan pembayaran.
+                </p>
+
+
+                <p>
+                    5. Pesanan yang telah dibayar akan
+                    diproses sesuai antrean dan kebijakan
+                    Distributor kami.
+                </p>
+
+
+                <p>
+                    6. Apabila stok produk yang dipesan
+                    kebetulan tidak tersedia oleh distributor
+                    kami, maka kami yang akan mengambil alih
+                    proses pengiriman tersebut.
+                </p>
+
+
+                <p>
+                    7. Kesalahan penulisan alamat,
+                    nomor telepon, atau data pengiriman
+                    yang diinput pembeli menjadi tanggung
+                    jawab pembeli.
+                </p>
+
+
+                <p>
+                    8. Klaim kerusakan atau kekurangan
+                    barang wajib disertai video unboxing
+                    tanpa jeda sejak paket diterima.
+                </p>
+
+
+                <p>
+                    9. Dengan melanjutkan pemesanan,
+                    saya menyatakan telah membaca,
+                    memahami, dan menyetujui seluruh
+                    syarat dan ketentuan.
+                </p>
+
+            </div>
+
+
+            <label class="agreement-box">
+
+                <input
+                    type="checkbox"
+                    id="agreeTerms"
+                >
+
+                Saya telah membaca dan menyetujui
+                syarat & ketentuan di atas.
+
+            </label>
+
+        </div>
+
+
+        <!-- ==========================
+             ACTION
+        =========================== -->
+
+        <div class="checkout-actions">
+
+            <button
+                class="btn"
+                onclick="sendWhatsAppOrder()"
+            >
+
+                <i class="fa-solid fa-paper-plane"></i>
+
+                Kirim Pesanan
+
+            </button>
+
+
+            <button
+                class="btn secondary"
+                onclick="renderCart()"
+            >
+
+                <i class="fa-solid fa-chevron-left"></i>
+
+                Kembali ke Keranjang
+
+            </button>
+
+        </div>
+
 
     </div>
 
     `;
-});
 
-const voucher =
-JSON.parse(localStorage.getItem("selectedVoucher"));
 
-
-const voucherCode =
-voucher ? voucher.id : "-";
-
-
-
-const grandTotal =
-subtotal - discount;
-
-
-summaryHTML += `
-
-<hr>
-
-<div class="summary-row">
-
-    <span>Jumlah Produk</span>
-
-    <strong>${totalItem}</strong>
-
-</div>
-
-<div class="summary-row">
-
-    <span>Subtotal</span>
-
-    <strong>
-
-        ${subtotal.toLocaleString("id-ID",{
-            style:"currency",
-            currency:"IDR"
-        })}
-
-    </strong>
-
-</div>
-
-<div class="summary-row">
-
-    <span>Voucher Digunakan</span>
-
-    <strong>${voucherName}</strong>
-
-</div>
-
-<div class="summary-row">
-
-    <span>Voucher</span>
-
-    <strong>
-
-        - ${discount.toLocaleString("id-ID",{
-            style:"currency",
-            currency:"IDR"
-        })}
-
-    </strong>
-
-</div>
-
-<div class="summary-row">
-
-    <span>Ongkir</span>
-
-    <strong>Dihitung saat checkout</strong>
-
-</div>
-
-<hr>
-
-<div class="summary-row total">
-
-    <span><strong>Total Bayar</strong></span>
-
-    <strong>
-
-        ${totalBayar.toLocaleString("id-ID",{
-            style:"currency",
-            currency:"IDR"
-        })}
-
-    </strong>
-
-</div>
-
-`;
-
-
-  let html = `
-<div class="checkout-form">
-
-    <h2>
-
-        <i class="fa-solid fa-credit-card"></i>
-
-        Checkout
-
-    </h2>
-
-  <!-- Ringkasan -->
-  <div class="form-card">
-
-    <h3>
-
-        <i class="fa-solid fa-clipboard-list"></i>
-
-        Ringkasan Pesanan
-
-    </h3>
-    <div id="checkout-summary">
-      ${summaryHTML}
-    </div>
-  </div>
-
-  <!-- Data Pembeli -->
-  <div class="form-card">
-    <h3>
-
-        <i class="fa-solid fa-user"></i>
-
-        Data Pembeli
-
-    </h3>
-
-    <input id="nama"
-           placeholder="Nama Lengkap"
-           value="${customer.nama || ""}">
-
-    <input id="wa"
-           placeholder="Nomor WhatsApp"
-           value="${customer.wa || ""}">
-
-    <input id="email"
-           placeholder="Email (Opsional)"
-           value="${customer.email || ""}">
-  </div>
-
-  <!-- Alamat -->
-  <div class="form-card">
-    <h3>
-
-        <i class="fa-solid fa-location-dot"></i>
-
-        Alamat Pengiriman
-
-    </h3>
-
-    <input id="provinsi"
-           placeholder="Provinsi"
-           value="${customer.provinsi || ""}">
-
-    <input id="kota"
-           placeholder="Kota / Kabupaten"
-           value="${customer.kota || ""}">
-
-    <input id="kodepos"
-           placeholder="Kode Pos"
-           value="${customer.kodepos || ""}">
-
-    <textarea id="alamat"
-              placeholder="Alamat Lengkap">${customer.alamat || ""}</textarea>
-  </div>
-
-  <!-- Pengiriman -->
-  <div class="form-card">
-    <h3>
-
-        <i class="fa-solid fa-truck-fast"></i>
-
-        Pengiriman
-
-    </h3>
-
-    <select id="ekspedisi">
-  <option value="J&T" ${customer.ekspedisi === "J&T" ? "selected" : ""}>J&T</option>
-  <option value="JNE" ${customer.ekspedisi === "JNE" ? "selected" : ""}>JNE</option>
-  <option value="SiCepat" ${customer.ekspedisi === "SiCepat" ? "selected" : ""}>SiCepat</option>
-  <option value="AnterAja" ${customer.ekspedisi === "AnterAja" ? "selected" : ""}>AnterAja</option>
-</select>
-  </div>
-
-  <!-- Catatan -->
-  <div class="form-card">
-
-    <h3>
-
-        <i class="fa-solid fa-note-sticky"></i>
-
-        Catatan
-
-    </h3>
-
-    <textarea
-        id="catatan"
-        placeholder="Contoh: Mohon packing menggunakan bubble wrap"></textarea>
-
-</div>
-  
-  <div class="form-card">
-
-    <h3>
-
-        <i class="fa-solid fa-file-contract"></i>
-
-        Syarat & Ketentuan
-
-    </h3>
-
-  <div class="terms-box">
-
-    <p>1. Data yang saya isi adalah benar dan dapat dipertanggungjawabkan.</p>
-
-    <p>2. Saya memahami bahwa harga akhir akan dikonfirmasi oleh admin setelah pengecekan stok dan ongkos kirim.</p>
-
-    <p>3. Saya memahami bahwa warna, bentuk, dan tampilan produk pada foto dapat sedikit berbeda karena pencahayaan dan perangkat yang digunakan.</p>
-
-    <p>4. Saya wajib memeriksa kembali detail pesanan sebelum melakukan pembayaran.
-</p>
-
-    <p>5. Pesanan yang telah dibayar akan diproses sesuai antrean dan kebijakan Distributor kami.</p>
-    
-    <p>6. Apabila stok produk yang dipesan kebetulan tidak tersedia oleh distributor kami,maka kami yang akan mengambil alih proses pengiriman tersebut.</p>
-    
-    <p>7. Kesalahan penulisan alamat, nomor telepon, atau data pengiriman yang diinput pembeli menjadi tanggung jawab pembeli.</p>
-    
-    <p>8. Klaim kerusakan atau kekurangan barang wajib disertai video unboxing tanpa jeda sejak paket diterima.</p>
-    
-    <p>9. Dengan melanjutkan pemesanan, saya menyatakan telah membaca, memahami, dan menyetujui seluruh syarat dan ketentuan.</p>
-
-  </div>
-
-  <label class="agreement-box">
-
-    <input
-      type="checkbox"
-      id="agreeTerms">
-
-    Saya telah membaca dan menyetujui syarat & ketentuan di atas.
-
-  </label>
-
-</div>
-
-  <!-- Tombol -->
-  <div class="checkout-actions">
-    <button class="btn" onclick="sendWhatsAppOrder()">
-    <i class="fa-solid fa-paper-plane"></i>
-    Kirim Pesanan
-</button>
-
-    <button class="btn secondary" onclick="renderCart()">
-    <i class="fa-solid fa-chevron-left"></i>
-    Kembali ke Keranjang
-</button>
-  </div>
-
-</div>
-`;
-
-
-renderPage(html);
+    renderPage(html);
 
 }
 
@@ -14722,31 +15654,41 @@ if (!/^08\d{8,13}$/.test(waClean)) {
 
 const totalItem = summary.totalItem;
 const subtotal = summary.subtotal;
-const voucherName = summary.voucherName;
-const discount = summary.discount;
-const totalBayar = summary.totalBayar;
+const productVoucherName =
+    summary.productVoucherName;
+
+const shippingVoucherName =
+    summary.shippingVoucherName;
+
+const productDiscount =
+    summary.productDiscount;
+
+const shippingDiscount =
+    summary.shippingDiscount;
+
+const totalBayar =
+    summary.totalBayar;
   
   let tabelPesanan = "";
 
-
 cart.forEach((item, index) => {
 
+    const harga =
+        Number(item.harga) || 0;
 
- const harga = item.harga
-    ? `Rp ${item.harga.toLocaleString("id-ID")}`
-    : "-";
+    const qty =
+        Number(item.qty) || 0;
 
-  const subtotal = item.harga
-    ? `Rp ${(item.harga * item.qty).toLocaleString("id-ID")}`
-    : "-";
+    const subtotal =
+        harga * qty;
 
-  tabelPesanan += `
+    tabelPesanan += `
 ${index + 1}. ${item.nama}
 
-    Varian  : ${item.varian}
-    Qty     : ${item.qty}
-    Harga   : ${harga}
-    Subtotal: ${subtotal}
+    Varian  : ${item.varian || "-"}
+    Qty     : ${qty}
+    Harga   : Rp ${harga.toLocaleString("id-ID")}
+    Subtotal: Rp ${subtotal.toLocaleString("id-ID")}
 
 `;
 });
@@ -14756,64 +15698,22 @@ new Date().toLocaleString("id-ID");
 
   let pesan = `
 
-Halo Imamsalesnine.com 👋
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📋 FORM PEMESANAN
-
-Tanggal Order : ${waktuOrder}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-👤 DATA PEMBELI
-
-Nama      : ${nama}
-No. WA    : ${wa}
-Email     : ${email || "-"}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-📍 ALAMAT PENGIRIMAN
-
-Provinsi  : ${provinsi}
-Kota      : ${kota}
-Kode Pos  : ${kodepos}
-
-Alamat :
-
-${alamat}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🚚 PENGIRIMAN
-
-Ekspedisi : ${ekspedisi}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
-
-🛒 DETAIL PESANAN
-
-${tabelPesanan}
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━
+...
 
 Total Jenis Produk : ${cart.length}
 Total Item         : ${totalItem}
 
-Subtotal           : Rp ${subtotal.toLocaleString("id-ID")}
-Voucher            : ${voucherName || "-"}
-Diskon             : Rp ${discount.toLocaleString("id-ID")}
-Total Bayar        : Rp ${totalBayar.toLocaleString("id-ID")}
+Subtotal Produk    : Rp ${subtotal.toLocaleString("id-ID")}
 
-📝 CATATAN
+Voucher Produk     : ${productVoucherName || "-"}
+Diskon Produk      : Rp ${productDiscount.toLocaleString("id-ID")}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━
+Voucher Ongkir     : ${shippingVoucherName || "-"}
+Diskon Ongkir      : Rp ${shippingDiscount.toLocaleString("id-ID")}
 
-📜 PERSETUJUAN
+Total Belanja      : Rp ${totalBayar.toLocaleString("id-ID")}
 
-✓ Saya telah membaca dan menyetujui
-  seluruh syarat & ketentuan pemesanan.
+Ongkos Kirim       : Dihitung Admin
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━
 
