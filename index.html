@@ -8128,343 +8128,857 @@ box-shadow:
 }
 
 
-/* ===========================================
-   HAMBURGER MENU FINAL V3
-=========================================== */
 
-.navbar{
-    position:relative;
+
+/* ============================================================
+   IMAM_SALESFR — PREMIUM MENU SYSTEM V4
+   ☰  ⇄  ✕
+   Dropdown + Overlay + Dark Mode
+============================================================ */
+
+
+/* ============================================================
+   1. HEADER
+============================================================ */
+
+.header{
+
+    position:fixed;
+
+    top:0;
+    left:0;
+
+    width:100%;
+
+    z-index:100001;
+
 }
 
-/* Tombol */
+
+/* Navbar menjadi anchor untuk tombol hamburger */
+
+.navbar{
+
+    position:relative;
+
+}
+
+
+/* ============================================================
+   2. HAMBURGER BUTTON
+============================================================ */
 
 .menu-btn{
 
-position:absolute;
+    position:absolute;
 
-top:18px;
-right:18px;
+    top:18px;
+    right:18px;
 
-width:52px;
-height:52px;
+    width:52px;
+    height:52px;
 
-padding:0;
+    padding:0;
 
-border:none;
+    border:0;
 
-background:rgba(255,255,255,.08);
+    outline:none;
 
-backdrop-filter:blur(15px);
+    border-radius:16px;
 
-border-radius:16px;
+    background:rgba(255,255,255,.08);
 
-display:flex;
-flex-direction:column;
+    color:#fff;
 
-justify-content:center;
-align-items:center;
+    display:flex;
 
-gap:6px;
+    flex-direction:column;
 
-cursor:pointer;
+    align-items:center;
 
-transition:
-background .3s,
-transform .3s,
-box-shadow .3s;
+    justify-content:center;
 
-z-index:99999;
+    gap:6px;
+
+    cursor:pointer;
+
+    z-index:100003;
+
+    -webkit-tap-highlight-color:transparent;
+
+    backdrop-filter:blur(14px);
+
+    -webkit-backdrop-filter:blur(14px);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.12);
+
+    transition:
+        background .3s ease,
+        box-shadow .3s ease,
+        transform .3s ease;
 
 }
 
-.menu-btn:hover{
 
-background:rgba(140,198,63,.15);
-
-box-shadow:
-0 10px 30px rgba(140,198,63,.18);
-
-}
-
-/* 3 Garis */
+/* ============================================================
+   3. HAMBURGER LINES
+============================================================ */
 
 .menu-btn span{
 
-display:block;
+    display:block;
 
-width:26px;
-height:3px;
+    width:27px;
+    height:3px;
 
-background:#fff;
+    background:#fff;
 
-border-radius:999px;
+    border-radius:999px;
 
-transform-origin:center;
+    flex-shrink:0;
 
-transition:
-transform .35s cubic-bezier(.68,-0.6,.32,1.6),
-opacity .25s,
-width .25s;
+    transform-origin:center;
+
+    transition:
+        transform .42s cubic-bezier(.68,-.6,.32,1.6),
+        opacity .22s ease,
+        width .3s ease,
+        background .3s ease;
 
 }
 
-/* OPEN */
+
+/* ============================================================
+   4. HAMBURGER HOVER
+============================================================ */
+
+.menu-btn:hover{
+
+    background:
+        rgba(140,198,63,.16);
+
+    box-shadow:
+        0 10px 30px rgba(0,0,0,.18),
+        0 0 22px rgba(140,198,63,.12);
+
+}
+
+
+/* ============================================================
+   5. HAMBURGER ACTIVE
+   ☰ → ✕
+============================================================ */
+
+.menu-btn.active{
+
+    background:
+        rgba(140,198,63,.16);
+
+}
+
+
+/* GARIS 1 */
 
 .menu-btn.active span:nth-child(1){
 
-transform:
-translateY(9px)
-rotate(45deg);
+    transform:
+        translateY(9px)
+        rotate(45deg);
 
 }
+
+
+/* GARIS 2 */
 
 .menu-btn.active span:nth-child(2){
 
-opacity:0;
+    opacity:0;
 
-transform:scaleX(0);
+    transform:
+        scaleX(0);
 
 }
+
+
+/* GARIS 3 */
 
 .menu-btn.active span:nth-child(3){
 
-transform:
-translateY(-9px)
-rotate(-45deg);
+    transform:
+        translateY(-9px)
+        rotate(-45deg);
 
 }
 
-/* Overlay */
+
+/* ============================================================
+   6. OVERLAY
+============================================================ */
 
 .menu-overlay{
 
-position:fixed;
-inset:0;
+    position:fixed;
 
-background:rgba(0,0,0,.28);
+    inset:0;
 
-backdrop-filter:blur(4px);
+    width:100%;
+    height:100%;
 
-opacity:0;
-visibility:hidden;
+    background:
+        rgba(0,0,0,.42);
 
-transition:.3s;
+    backdrop-filter:blur(5px);
 
-z-index:99990;
+    -webkit-backdrop-filter:blur(5px);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+    z-index:99998;
+
+    transition:
+        opacity .32s ease,
+        visibility .32s ease;
 
 }
+
+
+/* Overlay aktif */
 
 .menu-overlay.show{
 
-opacity:1;
+    opacity:1;
 
-visibility:visible;
+    visibility:visible;
+
+    pointer-events:auto;
 
 }
 
-/* Dropdown */
+
+/* ============================================================
+   7. DROPDOWN CONTAINER
+============================================================ */
 
 .top-menu{
 
-position:fixed;
+    position:fixed;
 
-top:82px;
-right:18px;
+    top:82px;
+    right:18px;
 
-width:300px;
+    width:330px;
 
-background:rgba(255,255,255,.96);
+    max-width:
+        calc(100vw - 36px);
 
-backdrop-filter:blur(22px);
+    max-height:
+        calc(100vh - 100px);
 
-border-radius:22px;
+    overflow-y:auto;
 
-box-shadow:
-0 20px 55px rgba(0,0,0,.22);
+    overflow-x:hidden;
 
-overflow:hidden;
+    background:
+        rgba(255,255,255,.97);
 
-opacity:0;
+    backdrop-filter:blur(24px);
 
-visibility:hidden;
+    -webkit-backdrop-filter:blur(24px);
 
-transform:
-translateY(-15px)
-scale(.94);
+    border:1px solid rgba(255,255,255,.75);
 
-transition:
-opacity .28s,
-transform .28s,
-visibility .28s;
+    border-radius:24px;
 
-z-index:99995;
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.25),
+        0 8px 25px rgba(0,0,0,.08);
+
+    opacity:0;
+
+    visibility:hidden;
+
+    pointer-events:none;
+
+    transform:
+        translateY(-18px)
+        scale(.94);
+
+    transform-origin:
+        top right;
+
+    z-index:100000;
+
+    transition:
+        opacity .28s ease,
+        transform .42s cubic-bezier(.22,1,.36,1),
+        visibility .28s ease;
 
 }
+
+
+/* ============================================================
+   8. DROPDOWN ACTIVE
+============================================================ */
 
 .top-menu.show{
 
-opacity:1;
+    opacity:1;
 
-visibility:visible;
+    visibility:visible;
 
-transform:
-translateY(0)
-scale(1);
+    pointer-events:auto;
+
+    transform:
+        translateY(0)
+        scale(1);
 
 }
 
-/* Header */
+
+/* ============================================================
+   9. MENU HEADER
+============================================================ */
+
+.menu-header{
+
+    width:100%;
+
+    min-height:76px;
+
+    padding:
+        18px 22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:flex-start;
+
+    border-bottom:
+        1px solid #ececec;
+
+}
+
+
+/* ============================================================
+   10. MENU TITLE
+============================================================ */
 
 .menu-title{
 
-padding:18px 22px;
+    margin:0;
 
-font-size:18px;
+    padding:0;
 
-font-weight:700;
+    font-size:24px;
 
-color:#222;
+    line-height:1.2;
 
-background:#f8f8f8;
+    font-weight:800;
 
-border-bottom:1px solid #ececec;
+    color:#292929;
 
 }
 
-/* Item */
+
+/* ============================================================
+   11. MENU LINKS
+============================================================ */
 
 .top-menu a{
 
-display:flex;
+    position:relative;
 
-align-items:center;
+    width:100%;
 
-gap:14px;
+    min-height:64px;
 
-padding:16px 22px;
+    padding:
+        15px 22px;
 
-text-decoration:none;
+    display:flex;
 
-font-weight:600;
+    align-items:center;
 
-color:#333;
+    gap:16px;
 
-transition:.25s;
+    color:#333;
+
+    text-decoration:none;
+
+    font-size:17px;
+
+    font-weight:600;
+
+    background:transparent;
+
+    overflow:hidden;
+
+    transition:
+        background .22s ease,
+        color .22s ease,
+        padding-left .25s ease;
 
 }
 
-.top-menu a:hover{
 
-background:#eef8df;
-
-color:#5A8E1C;
-
-padding-left:28px;
-
-}
+/* ============================================================
+   12. MENU ICON
+============================================================ */
 
 .top-menu a i{
 
-width:24px;
+    width:28px;
 
-font-size:18px;
+    min-width:28px;
 
-color:#8CC63F;
+    text-align:center;
 
-text-align:center;
+    font-size:20px;
+
+    color:#8CC63F;
+
+    transition:
+        transform .25s ease,
+        color .25s ease;
 
 }
+
+
+/* ============================================================
+   13. MENU HOVER
+============================================================ */
+
+.top-menu a:hover{
+
+    background:
+        #eef8df;
+
+    color:
+        #5a8e1c;
+
+    padding-left:28px;
+
+}
+
+
+.top-menu a:hover i{
+
+    color:
+        #6fa52d;
+
+    transform:
+        scale(1.12);
+
+}
+
+
+/* ============================================================
+   14. MENU ACTIVE / TAP
+============================================================ */
+
+.top-menu a:active{
+
+    background:
+        #e5f5d2;
+
+    transform:
+        scale(.99);
+
+}
+
+
+/* ============================================================
+   15. OPTIONAL SEPARATOR
+============================================================ */
 
 .top-menu hr{
 
-border:none;
+    width:
+        calc(100% - 40px);
 
-height:1px;
+    height:1px;
 
-background:#ececec;
+    margin:
+        6px 20px;
 
-margin:6px 0;
+    padding:0;
 
-}
+    border:0;
 
-.badge{
-
-margin-left:auto;
-
-padding:5px 10px;
-
-background:#ff4d4f;
-
-color:#fff;
-
-border-radius:999px;
-
-font-size:11px;
-
-font-weight:700;
+    background:#ececec;
 
 }
 
-/* Mobile */
 
-@media(max-width:768px){
+/* ============================================================
+   16. SCROLLBAR DROPDOWN
+============================================================ */
 
-.menu-btn{
+.top-menu::-webkit-scrollbar{
 
-top:16px;
-
-right:14px;
-
-width:48px;
-height:48px;
+    width:5px;
 
 }
+
+
+.top-menu::-webkit-scrollbar-track{
+
+    background:transparent;
+
+}
+
+
+.top-menu::-webkit-scrollbar-thumb{
+
+    background:
+        rgba(140,198,63,.65);
+
+    border-radius:999px;
+
+}
+
 
 .top-menu{
 
-top:74px;
+    scrollbar-width:thin;
 
-right:10px;
-
-width:calc(100% - 20px);
-
-border-radius:20px;
-
-}
+    scrollbar-color:
+        rgba(140,198,63,.65)
+        transparent;
 
 }
 
 
+/* ============================================================
+   17. BODY LOCK SAAT MENU OPEN
+============================================================ */
 
-/* ==========================
-   DARK MODE
-========================== */
+body.menu-open{
 
-body.dark-mode{
-    background:#0F1115;
+    overflow:hidden;
+
+}
+
+
+/* ============================================================
+   18. DARK MODE — DROPDOWN
+============================================================ */
+
+body.dark-mode .top-menu{
+
+    background:
+        rgba(25,28,34,.97);
+
+    border-color:
+        rgba(255,255,255,.08);
+
+    box-shadow:
+        0 30px 80px rgba(0,0,0,.55),
+        0 8px 30px rgba(0,0,0,.3);
+
+}
+
+
+body.dark-mode .menu-header{
+
+    border-bottom-color:
+        rgba(255,255,255,.08);
+
+}
+
+
+body.dark-mode .menu-title{
+
     color:#fff;
+
 }
 
-body.dark-mode .header{
-    background:#111;
-    border-bottom:1px solid rgba(255,255,255,.08);
+
+body.dark-mode .top-menu a{
+
+    color:#eeeeee;
+
 }
 
-body.dark-mode .hero{
-    background:#121212;
+
+body.dark-mode .top-menu a:hover{
+
+    background:
+        rgba(140,198,63,.12);
+
+    color:
+        #9ddd4d;
+
 }
 
-body.dark-mode .product-card{
-    background:#1B1F26;
-    border:1px solid #2D323D;
+
+body.dark-mode .top-menu a:active{
+
+    background:
+        rgba(140,198,63,.18);
+
 }
 
-body.dark-mode .product-card h3,
-body.dark-mode .product-card p{
-    color:#fff;
+
+body.dark-mode .top-menu hr{
+
+    background:
+        rgba(255,255,255,.08);
+
 }
 
-/* dst... */
+
+/* ============================================================
+   19. DARK MODE — HAMBURGER
+============================================================ */
+
+body.dark-mode .menu-btn{
+
+    background:
+        rgba(255,255,255,.08);
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.3);
+
+}
+
+
+body.dark-mode .menu-btn:hover{
+
+    background:
+        rgba(140,198,63,.16);
+
+}
+
+
+body.dark-mode .menu-btn span{
+
+    background:#fff;
+
+}
+
+
+/* ============================================================
+   20. MOBILE
+============================================================ */
+
+@media(max-width:768px){
+
+    .menu-btn{
+
+        top:16px;
+
+        right:14px;
+
+        width:50px;
+
+        height:50px;
+
+        border-radius:15px;
+
+    }
+
+
+    .menu-btn span{
+
+        width:26px;
+
+        height:3px;
+
+    }
+
+
+    .top-menu{
+
+        top:76px;
+
+        right:10px;
+
+        width:
+            calc(100vw - 20px);
+
+        max-width:
+            calc(100vw - 20px);
+
+        max-height:
+            calc(100vh - 90px);
+
+        border-radius:22px;
+
+    }
+
+
+    .menu-header{
+
+        min-height:72px;
+
+        padding:
+            18px 22px;
+
+    }
+
+
+    .menu-title{
+
+        font-size:22px;
+
+    }
+
+
+    .top-menu a{
+
+        min-height:62px;
+
+        padding:
+            15px 22px;
+
+        font-size:16px;
+
+    }
+
+
+    .top-menu a:hover{
+
+        padding-left:26px;
+
+    }
+
+}
+
+
+/* ============================================================
+   21. SMALL MOBILE
+============================================================ */
+
+@media(max-width:420px){
+
+    .menu-btn{
+
+        right:12px;
+
+        width:48px;
+
+        height:48px;
+
+    }
+
+
+    .top-menu{
+
+        top:72px;
+
+        right:8px;
+
+        width:
+            calc(100vw - 16px);
+
+        max-width:
+            calc(100vw - 16px);
+
+        border-radius:21px;
+
+    }
+
+
+    .menu-header{
+
+        min-height:68px;
+
+        padding:
+            16px 20px;
+
+    }
+
+
+    .menu-title{
+
+        font-size:21px;
+
+    }
+
+
+    .top-menu a{
+
+        min-height:60px;
+
+        padding:
+            14px 20px;
+
+        gap:15px;
+
+        font-size:15.5px;
+
+    }
+
+
+    .top-menu a i{
+
+        width:27px;
+
+        min-width:27px;
+
+        font-size:19px;
+
+    }
+
+}
+
+
+/* ============================================================
+   22. ACCESSIBILITY
+============================================================ */
+
+.menu-btn:focus-visible{
+
+    outline:
+        3px solid rgba(140,198,63,.55);
+
+    outline-offset:
+        3px;
+
+}
+
+
+.top-menu a:focus-visible{
+
+    outline:
+        2px solid #8CC63F;
+
+    outline-offset:
+        -2px;
+
+}
+
+
+/* ============================================================
+   23. REDUCE MOTION
+============================================================ */
+
+@media(prefers-reduced-motion:reduce){
+
+    .menu-btn,
+    .menu-btn span,
+    .top-menu,
+    .menu-overlay,
+    .top-menu a,
+    .top-menu a i{
+
+        transition:none !important;
+
+    }
+
+}
+
+
+
+
+
 
 
 
@@ -8502,12 +9016,10 @@ Sales Representative • nine autoseries
 </a>
 
 <div class="header-actions">
-    <button id="menuBtn" class="menu-btn">
-
+    <button id="menuBtn" class="menu-btn" aria-label="Buka menu" aria-expanded="false">
     <span></span>
     <span></span>
     <span></span>
-
 </button>
 </div>
 
@@ -8526,15 +9038,31 @@ Sales Representative • nine autoseries
 
 </header>
 
-<!-- Overlay -->
+<!--
 <div id="menuOverlay" class="menu-overlay"></div>
 
-<!-- Dropdown -->
+
 <div id="topMenu" class="top-menu">
 
-    <div class="menu-title">Menu</div>
     
-  
+    
+    <div class="menu-header">
+
+    <div class="menu-title">
+
+        Menu
+
+    </div>
+
+    <button id="closeMenuBtn">
+
+        <i class="fa-solid fa-xmark"></i>
+
+    </button>
+
+</div>
+    
+  <!--
     <a href="#shoppingMallHero">
         <i class="fa-solid fa-store"></i>
         Shopping Mall
@@ -8578,6 +9106,52 @@ Sales Representative • nine autoseries
     <span id="themeText">Mode Gelap</span>
 </a>
     
+    --->
+    
+    <div id="menuOverlay" class="menu-overlay"></div>
+
+<div id="topMenu" class="top-menu">
+
+    <div class="menu-header">
+        <div class="menu-title">Menu</div>
+    </div>
+
+    <a href="#shoppingMallHero">
+        <i class="fa-solid fa-store"></i>
+        <span>Shopping Mall</span>
+    </a>
+
+    <a href="#" onclick="openAI(); return false;">
+        <i class="fa-solid fa-robot"></i>
+        <span>AI Assistant</span>
+    </a>
+
+    <a href="#" onclick="goCart(); return false;">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span>Keranjang</span>
+    </a>
+
+    <a href="/vip/">
+        <i class="fa-solid fa-crown"></i>
+        <span>Member VVIP</span>
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-headset"></i>
+        <span>Konsultasi</span>
+    </a>
+
+    <a href="legal.html">
+        <i class="fa-solid fa-scale-balanced"></i>
+        <span>Legal</span>
+    </a>
+
+    <a href="#" id="themeToggle">
+        <i class="fa-solid fa-moon" id="themeIcon"></i>
+        <span id="themeText">Mode Gelap</span>
+    </a>
+
+</div>
     
 
 </div>
@@ -15513,103 +16087,301 @@ BELI SEKARANG
 }
 
 
+/* =====================================================
+   PREMIUM MENU V4
+===================================================== */
+
 document.addEventListener("DOMContentLoaded", () => {
 
-    const btn = document.getElementById("menuBtn");
-    const menu = document.getElementById("topMenu");
-    const overlay = document.getElementById("menuOverlay");
+    const btn =
+        document.getElementById("menuBtn");
+
+    const menu =
+        document.getElementById("topMenu");
+
+    const overlay =
+        document.getElementById("menuOverlay");
+
+    const themeToggle =
+        document.getElementById("themeToggle");
+
+    const themeIcon =
+        document.getElementById("themeIcon");
+
+    const themeText =
+        document.getElementById("themeText");
+
+
+    /* ================================================
+       CHECK ELEMENT
+    ================================================ */
 
     if (!btn || !menu || !overlay) {
-        console.error("Element menu tidak ditemukan");
+
+        console.error(
+            "Premium Menu: element tidak ditemukan."
+        );
+
         return;
+
     }
 
-    // Tutup menu
-    function closeMenu() {
+
+    /* ================================================
+       OPEN MENU
+    ================================================ */
+
+    function openMenu(){
+
+        btn.classList.add("active");
+
+        menu.classList.add("show");
+
+        overlay.classList.add("show");
+
+        btn.setAttribute(
+            "aria-expanded",
+            "true"
+        );
+
+        btn.setAttribute(
+            "aria-label",
+            "Tutup menu"
+        );
+
+        document.body.classList.add(
+            "menu-open"
+        );
+
+    }
+
+
+    /* ================================================
+       CLOSE MENU
+    ================================================ */
+
+    function closeMenu(){
+
         btn.classList.remove("active");
+
         menu.classList.remove("show");
+
         overlay.classList.remove("show");
+
+        btn.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+        btn.setAttribute(
+            "aria-label",
+            "Buka menu"
+        );
+
+        document.body.classList.remove(
+            "menu-open"
+        );
+
     }
 
-    // Buka / Tutup menu
+
+    /* ================================================
+       TOGGLE
+    ================================================ */
+
     btn.addEventListener("click", () => {
 
-        btn.classList.toggle("active");
-        menu.classList.toggle("show");
-        overlay.classList.toggle("show");
+        const isOpen =
+            menu.classList.contains("show");
 
-    });
+        if(isOpen){
 
-    // Klik area gelap
-    overlay.addEventListener("click", closeMenu);
-
-    // Tekan tombol ESC
-    document.addEventListener("keydown", (e) => {
-
-        if (e.key === "Escape") {
             closeMenu();
+
+        }else{
+
+            openMenu();
+
         }
 
     });
 
-    // Klik semua item menu
-    document.querySelectorAll("#topMenu a").forEach(link => {
 
-        link.addEventListener("click", closeMenu);
+    /* ================================================
+       OVERLAY
+    ================================================ */
 
-    });
-
-});
-
-
-
+    overlay.addEventListener(
+        "click",
+        closeMenu
+    );
 
 
-/* ===============================
-   THEME MODE
-================================ */
+    /* ================================================
+       ESC
+    ================================================ */
 
-const themeToggle = document.getElementById("themeToggle");
-const themeIcon = document.getElementById("themeIcon");
-const themeText = document.getElementById("themeText");
+    document.addEventListener(
+        "keydown",
+        (event) => {
 
-// Load Theme
-if(localStorage.getItem("theme") === "dark"){
+            if(
+                event.key === "Escape" &&
+                menu.classList.contains("show")
+            ){
 
-    document.body.classList.add("dark-mode");
+                closeMenu();
 
-    themeIcon.className = "fa-solid fa-sun";
+                btn.focus();
 
-    themeText.textContent = "Mode Terang";
+            }
 
-}
+        }
+    );
 
-// Toggle Theme
-themeToggle.addEventListener("click",function(e){
 
-    e.preventDefault();
+    /* ================================================
+       MENU LINKS
+    ================================================ */
 
-    document.body.classList.toggle("dark-mode");
+    document
+        .querySelectorAll("#topMenu a")
+        .forEach(link => {
 
-    if(document.body.classList.contains("dark-mode")){
+            link.addEventListener(
+                "click",
+                () => {
 
-        localStorage.setItem("theme","dark");
+                    /*
+                       Beri waktu sedikit supaya
+                       animasi klik terasa natural.
+                    */
 
-        themeIcon.className = "fa-solid fa-sun";
+                    setTimeout(
+                        closeMenu,
+                        80
+                    );
 
-        themeText.textContent = "Mode Terang";
+                }
+            );
 
-    }else{
+        });
 
-        localStorage.setItem("theme","light");
 
-        themeIcon.className = "fa-solid fa-moon";
+    /* ================================================
+       DARK MODE
+    ================================================ */
 
-        themeText.textContent = "Mode Gelap";
+    function updateThemeUI(){
+
+        if(
+            document.body.classList.contains(
+                "dark-mode"
+            )
+        ){
+
+            if(themeIcon){
+
+                themeIcon.className =
+                    "fa-solid fa-sun";
+
+            }
+
+            if(themeText){
+
+                themeText.textContent =
+                    "Mode Terang";
+
+            }
+
+        }else{
+
+            if(themeIcon){
+
+                themeIcon.className =
+                    "fa-solid fa-moon";
+
+            }
+
+            if(themeText){
+
+                themeText.textContent =
+                    "Mode Gelap";
+
+            }
+
+        }
 
     }
 
+
+    /* LOAD THEME */
+
+    const savedTheme =
+        localStorage.getItem("theme");
+
+    if(savedTheme === "dark"){
+
+        document.body.classList.add(
+            "dark-mode"
+        );
+
+    }
+
+    updateThemeUI();
+
+
+    /* TOGGLE THEME */
+
+    if(themeToggle){
+
+        themeToggle.addEventListener(
+            "click",
+            (event) => {
+
+                event.preventDefault();
+
+                document.body.classList.toggle(
+                    "dark-mode"
+                );
+
+
+                const dark =
+                    document.body.classList.contains(
+                        "dark-mode"
+                    );
+
+
+                localStorage.setItem(
+                    "theme",
+                    dark
+                        ? "dark"
+                        : "light"
+                );
+
+
+                updateThemeUI();
+
+
+                /*
+                   Tutup dropdown setelah
+                   mode dipilih.
+                */
+
+                setTimeout(
+                    closeMenu,
+                    100
+                );
+
+            }
+        );
+
+    }
+
+
 });
+
+
 
 
 
