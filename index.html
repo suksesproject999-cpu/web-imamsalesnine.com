@@ -11080,6 +11080,14 @@ font-size:13px;
 
 }
 
+.marketplace-price-old{
+    margin-left:8px;
+    color:#999;
+    font-size:14px;
+    font-weight:500;
+    text-decoration:line-through;
+}
+
 
 
 
@@ -12616,84 +12624,35 @@ fetch("produk.json")
     }
 
 
-    // Pakai renderer marketplace yang sama
+    // ==========================================
+    // RENDER CARD MARKETPLACE
+    // ==========================================
+
     products.forEach(product => {
 
-        const harga =
-            Number(
-                product.harga?.promo ??
-                product.harga?.normal ??
-                0
-            );
-
-
-        container.innerHTML += `
-
-        <div
-            class="product-card marketplace-card"
-            onclick="showProduct('${product.nama}')"
-        >
-
-            ${getProductBadge(product)}
-
-
-            <div class="marketplace-image-wrap">
-
-                <img
-                    src="${product.gambar}"
-                    alt="${product.nama}"
-                    loading="lazy"
-                >
-
-            </div>
-
-
-            <div class="product-card-body">
-
-                <small class="product-brand">
-                    ${product.brand || ""}
-                </small>
-
-
-                <h3 class="marketplace-product-name">
-                    ${product.nama}
-                </h3>
-
-
-                <div class="marketplace-price">
-
-                    ${harga.toLocaleString(
-                        "id-ID",
-                        {
-                            style:"currency",
-                            currency:"IDR",
-                            minimumFractionDigits:0
-                        }
-                    )}
-
-                </div>
-
-
-                <div class="product-voucher-info">
-
-                    <i class="fa-solid fa-ticket"></i>
-
-                    <span>
-                        Voucher tersedia
-                    </span>
-
-                </div>
-
-            </div>
-
-        </div>
-
-        `;
+        container.innerHTML +=
+            renderMarketplaceCard(product);
 
     });
 
 
-    // Scroll ke hasil
+    // ==========================================
+    // UPDATE JUMLAH TERJUAL
+    // ==========================================
+
+    products.forEach(product => {
+
+        updateProductSold(
+            product.id
+        );
+
+    });
+
+
+    // ==========================================
+    // SCROLL KE HASIL
+    // ==========================================
+
     requestAnimationFrame(() => {
 
         container.scrollIntoView({
@@ -12702,8 +12661,6 @@ fetch("produk.json")
         });
 
     });
-    
-    renderPage(html);
 
 }
   
@@ -13826,6 +13783,133 @@ function getProductBadge(product){
 
 
 
+function renderMarketplaceCard(product){
+
+    const harga =
+        Number(
+            product.harga?.promo ??
+            product.harga?.normal ??
+            0
+        );
+
+    const hargaNormal =
+        Number(
+            product.harga?.normal ??
+            0
+        );
+
+    const hasDiscount =
+        hargaNormal > harga;
+
+
+    return `
+
+    <div
+        class="product-card marketplace-card"
+        onclick="showProduct('${product.nama}')"
+    >
+
+        ${getProductBadge(product)}
+
+
+        <div class="marketplace-image-wrap">
+
+            <img
+                src="${product.gambar}"
+                alt="${product.nama}"
+                loading="lazy"
+            >
+
+        </div>
+
+
+        <div class="product-card-body">
+
+            <small class="product-brand">
+                ${product.brand || ""}
+            </small>
+
+
+            <h3 class="marketplace-product-name">
+                ${product.nama}
+            </h3>
+
+
+            <div class="product-meta">
+
+                <span class="product-rating">
+                    ⭐ -
+                </span>
+
+                <span
+                    class="product-sold"
+                    data-sold-product="${product.id}"
+                >
+                    0 terjual
+                </span>
+
+            </div>
+
+
+            <div class="marketplace-price">
+
+                ${harga.toLocaleString(
+                    "id-ID",
+                    {
+                        style:"currency",
+                        currency:"IDR",
+                        minimumFractionDigits:0
+                    }
+                )}
+
+                ${
+                    hasDiscount
+                    ? `
+                        <span class="marketplace-price-old">
+
+                            ${hargaNormal.toLocaleString(
+                                "id-ID",
+                                {
+                                    style:"currency",
+                                    currency:"IDR",
+                                    minimumFractionDigits:0
+                                }
+                            )}
+
+                        </span>
+                    `
+                    : ""
+                }
+
+            </div>
+
+
+            <div class="product-voucher-info">
+
+                <i class="fa-solid fa-ticket"></i>
+
+                <span>
+                    Voucher tersedia
+                </span>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    `;
+
+}
+
+
+
+
+
+
+
+
+
 
 function renderProductList(
     data,
@@ -13879,11 +13963,25 @@ function renderProductList(
         // ==============================
 
         const harga =
-    Number(
-        product.harga?.promo ??
-        product.harga?.normal ??
-        0
-    );
+            Number(
+                product.harga?.promo ??
+                product.harga?.normal ??
+                0
+            );
+
+
+        // ==============================
+        // HARGA NORMAL / CORET
+        // ==============================
+
+        const hargaNormal =
+            Number(
+                product.harga?.normal ??
+                0
+            );
+
+        const hasDiscount =
+            hargaNormal > harga;
 
 
         // ==============================
@@ -13942,6 +14040,26 @@ function renderProductList(
                 </h3>
 
 
+                <!-- RATING & TERJUAL -->
+
+                <div class="product-meta">
+
+                    <span class="product-rating">
+                        ⭐ -
+                    </span>
+
+                    <span
+                        class="product-sold"
+                        data-sold-product="${product.id}"
+                    >
+                        0 terjual
+                    </span>
+
+                </div>
+
+
+                <!-- HARGA -->
+
                 <div class="marketplace-price">
 
                     ${harga.toLocaleString(
@@ -13953,6 +14071,23 @@ function renderProductList(
                         }
                     )}
 
+                    ${
+                        hasDiscount
+                        ? `
+                            <span class="marketplace-price-old">
+    ${hargaNormal.toLocaleString(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            minimumFractionDigits:0
+        }
+    )}
+</span>
+                          `
+                        : ""
+                    }
+
                 </div>
 
 
@@ -13963,6 +14098,19 @@ function renderProductList(
         </div>
 
         `;
+
+    });
+
+
+    // ==========================================
+    // AMBIL DATA TERJUAL DARI FIRESTORE
+    // ==========================================
+
+    data.forEach(product => {
+
+        updateProductSold(
+            product.id
+        );
 
     });
 
@@ -14898,49 +15046,56 @@ showConfirmButton:false
 
 function renderRelated(product){
 
-const box=document.getElementById("relatedProducts");
+    const box =
+        document.getElementById(
+            "relatedProducts"
+        );
 
-if(!box)return;
+    if(!box) return;
 
-const related=
 
-allProducts
+    const related =
+        allProducts
+        .filter(p =>
+            p.kategori === product.kategori &&
+            p.id !== product.id
+        )
+        .slice(0, 4);
 
-.filter(p=>
 
-p.kategori===product.kategori
+    box.innerHTML = "";
 
-&& p.id!==product.id
 
-)
+    if(!related.length){
 
-.slice(0,4);
+        return;
 
-box.innerHTML="";
+    }
 
-related.forEach(item=>{
 
-box.innerHTML+=`
+    // ==========================================
+    // RENDER CARD MARKETPLACE
+    // ==========================================
 
-<div
-class="product-card"
-onclick="showProduct('${item.nama}')">
+    related.forEach(item => {
 
-<img src="${item.gambar}">
+        box.innerHTML +=
+            renderMarketplaceCard(item);
 
-<div class="product-card-body">
+    });
 
-<h3>${item.nama}</h3>
 
-<p>${item.brand||""}</p>
+    // ==========================================
+    // UPDATE JUMLAH TERJUAL
+    // ==========================================
 
-</div>
+    related.forEach(item => {
 
-</div>
+        updateProductSold(
+            item.id
+        );
 
-`;
-
-});
+    });
 
 }
 
@@ -14948,37 +15103,42 @@ onclick="showProduct('${item.nama}')">
 
 function saveRecent(product){
 
-let recent=
+    if(!product || !product.id) return;
 
-JSON.parse(
 
-localStorage.getItem("recentProducts")
+    let recent =
+        JSON.parse(
+            localStorage.getItem(
+                "recentProducts"
+            ) || "[]"
+        );
 
-||"[]"
 
-);
+    // Hapus produk yang sama
+    recent =
+        recent.filter(
+            p => p.id !== product.id
+        );
 
-recent=
 
-recent.filter(
+    // Masukkan produk terbaru ke paling depan
+    recent.unshift(product);
 
-p=>p.id!==product.id
 
-);
+    // Maksimal 6 produk terakhir
+    recent =
+        recent.slice(0, 6);
 
-recent.unshift(product);
 
-recent=recent.slice(0,6);
+    // Simpan
+    localStorage.setItem(
+        "recentProducts",
+        JSON.stringify(recent)
+    );
 
-localStorage.setItem(
 
-"recentProducts",
-
-JSON.stringify(recent)
-
-);
-
-renderRecent();
+    // Render ulang
+    renderRecent();
 
 }
 
@@ -14986,53 +15146,55 @@ renderRecent();
 
 function renderRecent(){
 
-const box=
+    const box =
+        document.getElementById(
+            "recentProducts"
+        );
 
-document.getElementById(
+    if(!box) return;
 
-"recentProducts"
 
-);
+    const recent =
+        JSON.parse(
+            localStorage.getItem(
+                "recentProducts"
+            ) || "[]"
+        );
 
-if(!box)return;
 
-const recent=
+    box.innerHTML = "";
 
-JSON.parse(
 
-localStorage.getItem(
+    if(!recent.length){
 
-"recentProducts"
+        return;
 
-)||"[]"
+    }
 
-);
 
-box.innerHTML="";
+    // ==========================================
+    // RENDER CARD MARKETPLACE
+    // ==========================================
 
-recent.forEach(item=>{
+    recent.forEach(item => {
 
-box.innerHTML+=`
+        box.innerHTML +=
+            renderMarketplaceCard(item);
 
-<div
-class="product-card"
-onclick="showProduct('${item.nama}')">
+    });
 
-<img src="${item.gambar}">
 
-<div class="product-card-body">
+    // ==========================================
+    // UPDATE JUMLAH TERJUAL
+    // ==========================================
 
-<h3>${item.nama}</h3>
+    recent.forEach(item => {
 
-<p>${item.brand||""}</p>
+        updateProductSold(
+            item.id
+        );
 
-</div>
-
-</div>
-
-`;
-
-});
+    });
 
 }
 
@@ -15385,6 +15547,108 @@ function formatRupiah(angka){
     return "Rp " + angka.toLocaleString("id-ID");
 
 }
+
+
+
+
+
+async function getProductSold(productId){
+
+    try{
+
+        const doc =
+            await db
+                .collection("statistik_produk")
+                .doc(String(productId))
+                .get();
+
+
+        if(!doc.exists){
+
+            return 0;
+
+        }
+
+
+        const data =
+            doc.data();
+
+
+        return Number(
+            data.terjual || 0
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil statistik produk:",
+            error
+        );
+
+        return 0;
+
+    }
+
+}
+
+
+
+
+
+async function incrementProductSold(productId, qty){
+
+    const jumlah =
+        Number(qty) || 0;
+
+    if(!productId || jumlah <= 0){
+        return;
+    }
+
+    await db
+        .collection("statistik_produk")
+        .doc(String(productId))
+        .set({
+
+            terjual:
+                firebase.firestore.FieldValue.increment(
+                    jumlah
+                )
+
+        },{
+
+            merge:true
+
+        });
+
+}
+
+
+
+
+
+
+
+async function updateProductSold(productId){
+
+    const sold =
+        await getProductSold(productId);
+
+    const element =
+        document.querySelector(
+            `[data-sold-product="${productId}"]`
+        );
+
+    if(!element) return;
+
+    element.textContent =
+        `${sold.toLocaleString("id-ID")} terjual`;
+
+}
+
+
+
+
 
 
 
@@ -16965,48 +17229,115 @@ Terima kasih.
   const nomorAdmin = "6282210109369";
 
   Swal.fire({
+
     title:"Pesanan berhasil dibuat",
+
     text:"Buka WhatsApp sekarang?",
+
     icon:"success",
+
     showCancelButton:true,
+
     confirmButtonText:"Buka WhatsApp",
+
     cancelButtonText:"Batal",
+
     confirmButtonColor:"#8CC63F"
-}).then((result)=>{
 
-    if(result.isConfirmed){
+}).then(async (result)=>{
 
-    window.open(
-        `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`,
-        "_blank"
-    );
+    if(!result.isConfirmed){
 
+        // User batal
+        // Jangan ubah cart
+        // Jangan tambah terjual
+        // Jangan reset voucher
 
-    // ======================================
-    // RESET ORDER
-    // ======================================
+        return;
 
-    cart = [];
-
-    saveCart();
-
-    updateCartCount();
+    }
 
 
-    // ======================================
-    // RESET VOUCHER
-    // ======================================
+    try{
 
-    clearSelectedVouchers();
+        // ==========================================
+        // 1. TAMBAHKAN TERJUAL PER PRODUK
+        // ==========================================
+
+        await Promise.all(
+
+            cart.map(item =>
+
+                incrementProductSold(
+                    item.id,
+                    item.qty
+                )
+
+            )
+
+        );
 
 
-    // ======================================
-    // KEMBALI KE KATALOG
-    // ======================================
+        // ==========================================
+        // 2. BUKA WHATSAPP
+        // ==========================================
 
-    renderCategories();
+        window.open(
 
-}
+            `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`,
+
+            "_blank"
+
+        );
+
+
+        // ==========================================
+        // 3. KOSONGKAN KERANJANG
+        // ==========================================
+
+        cart = [];
+
+        saveCart();
+
+        updateCartCount();
+
+
+        // ==========================================
+        // 4. RESET VOUCHER AKTIF
+        // ==========================================
+
+        clearSelectedVouchers();
+
+
+        // ==========================================
+        // 5. KEMBALI KE KATALOG
+        // ==========================================
+
+        renderCategories();
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal memperbarui jumlah terjual:",
+            error
+        );
+
+
+        Swal.fire({
+
+            icon:"error",
+
+            title:"Pesanan belum diproses",
+
+            text:
+                "Data penjualan gagal diperbarui. Keranjang tetap disimpan. Silakan coba lagi.",
+
+            confirmButtonColor:"#8CC63F"
+
+        });
+
+    }
 
 });
 
