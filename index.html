@@ -14294,6 +14294,25 @@ RIGHT COLUMN
 
 <h2>${product.nama}</h2>
 
+
+
+<div class="product-detail-meta">
+
+    <span>
+        ⭐ -
+    </span>
+
+    <span
+        class="detail-product-sold"
+        data-detail-sold="${product.id}"
+    >
+        0 terjual
+    </span>
+
+</div>
+
+
+
 <button
 class="wishlist-btn"
 onclick="toggleWishlist(${product.id})">
@@ -14315,6 +14334,8 @@ ${product.harga?.promo ? `
 </div>
 
 ` : ""}
+
+
 
 <div class="price">
 
@@ -14939,6 +14960,10 @@ initStickyCheckout();
 renderRelated(product);
 
 saveRecent(product);
+
+updateDetailProductSold(
+    product.id
+);
 
 }
 
@@ -15645,6 +15670,27 @@ async function updateProductSold(productId){
         `${sold.toLocaleString("id-ID")} terjual`;
 
 }
+
+
+
+
+async function updateDetailProductSold(productId){
+
+    const sold =
+        await getProductSold(productId);
+
+    const element =
+        document.querySelector(
+            `[data-detail-sold="${productId}"]`
+        );
+
+    if(!element) return;
+
+    element.textContent =
+        `${sold.toLocaleString("id-ID")} terjual`;
+
+}
+
 
 
 
@@ -19357,6 +19403,8 @@ function updateStickySummary(){
         formatRupiah(promo * qty);
 
     }
+    
+    
 
 }
 
