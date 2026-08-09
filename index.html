@@ -11132,6 +11132,56 @@ font-size:13px;
 }
 
 
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 12px 0;
+}
+
+.rating-stars .fa-star {
+    font-size: 30px;
+    color: #d9d9d9;
+    cursor: pointer;
+    transition:
+        color 0.2s ease,
+        transform 0.15s ease;
+}
+
+.rating-stars .fa-star:hover {
+    transform: scale(1.15);
+}
+
+.rating-stars .fa-star.selected {
+    color: #FFC107;
+}
+
+
+
+.btn-submit-rating {
+    margin-top: 10px;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 20px;
+    background: #8CC63F;
+    color: #fff;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.btn-submit-rating:hover {
+    background: #76ad32;
+    transform: translateY(-1px);
+}
+
+
+
+
+
+
+
   
   
 </style>
@@ -14391,44 +14441,49 @@ RIGHT COLUMN
         Beri rating produk ini
     </p>
 
-    <div class="rating-stars">
+    <div class="rating-stars" id="rating-stars-${product.id}">
 
-        <button
-            type="button"
-            onclick="submitProductRating(${product.id}, 1)"
-        >
-            ⭐
-        </button>
+    <i
+        class="fa-solid fa-star"
+        data-star="1"
+        onclick="selectProductRating(${product.id}, 1)"
+    ></i>
 
-        <button
-            type="button"
-            onclick="submitProductRating(${product.id}, 2)"
-        >
-            ⭐
-        </button>
+    <i
+        class="fa-solid fa-star"
+        data-star="2"
+        onclick="selectProductRating(${product.id}, 2)"
+    ></i>
 
-        <button
-            type="button"
-            onclick="submitProductRating(${product.id}, 3)"
-        >
-            ⭐
-        </button>
+    <i
+        class="fa-solid fa-star"
+        data-star="3"
+        onclick="selectProductRating(${product.id}, 3)"
+    ></i>
 
-        <button
-            type="button"
-            onclick="submitProductRating(${product.id}, 4)"
-        >
-            ⭐
-        </button>
+    <i
+        class="fa-solid fa-star"
+        data-star="4"
+        onclick="selectProductRating(${product.id}, 4)"
+    ></i>
 
-        <button
-            type="button"
-            onclick="submitProductRating(${product.id}, 5)"
-        >
-            ⭐
-        </button>
+    <i
+        class="fa-solid fa-star"
+        data-star="5"
+        onclick="selectProductRating(${product.id}, 5)"
+    ></i>
 
-    </div>
+</div>
+
+<button
+    type="button"
+    class="btn-submit-rating"
+    onclick="confirmProductRating(${product.id})"
+>
+    Kirim Rating
+</button>
+
+
 
 </div>
 
@@ -14506,9 +14561,16 @@ ${product.stok?.status || "Ready"}
 ${product.garansi?.lama || "-"}
 </span>
 
-<span>
-<i class="fa-solid fa-star"></i>
-4.9 Rating
+<span
+    class="product-feature"
+    data-detail-rating-badge="${product.id}"
+>
+    <i class="fa-solid fa-star"></i>
+    ${
+        ratingData.count > 0
+            ? ratingData.rating.toFixed(1)
+            : "-"
+    } Rating
 </span>
 
 <span>
@@ -16214,6 +16276,10 @@ async function submitProductRating(productId, rating){
         await updateDetailProductRating(
             productId
         );
+        
+        await updateDetailRatingBadge(
+    productId
+);
 
 
         // ==========================================
@@ -16326,6 +16392,128 @@ async function submitProductRating(productId, rating){
 }
 
 
+
+
+
+async function updateDetailRatingBadge(productId){
+
+    const data =
+        await getProductRating(productId);
+
+    const element =
+        document.querySelector(
+            `[data-detail-rating-badge="${productId}"]`
+        );
+
+    if(!element) return;
+
+    if(data.count <= 0){
+
+        element.textContent =
+            "⭐ - Rating";
+
+        return;
+
+    }
+
+    element.textContent =
+        `⭐ ${data.rating.toFixed(1)} Rating`;
+
+}
+
+
+function selectProductRating(productId, rating){
+
+    const stars =
+        document.querySelectorAll(
+            `#rating-stars-${productId} .fa-star`
+        );
+
+    if(!stars.length) return;
+
+
+    stars.forEach(star => {
+
+        const starNumber =
+            Number(
+                star.dataset.star
+            );
+
+        if(starNumber <= rating){
+
+            star.classList.add(
+                "selected"
+            );
+
+        }else{
+
+            star.classList.remove(
+                "selected"
+            );
+
+        }
+
+    });
+
+
+    // Simpan pilihan sementara
+    const ratingKey =
+        `selected_rating_${productId}`;
+
+    localStorage.setItem(
+        ratingKey,
+        String(rating)
+    );
+
+}
+
+
+
+
+async function confirmProductRating(productId){
+
+    const rating =
+        Number(
+            localStorage.getItem(
+                `selected_rating_${productId}`
+            )
+        );
+
+
+    if(
+        !Number.isInteger(rating) ||
+        rating < 1 ||
+        rating > 5
+    ){
+
+        await Swal.fire({
+
+            icon: "warning",
+
+            title: "Pilih Rating",
+
+            text: "Silakan pilih 1 sampai 5 bintang terlebih dahulu.",
+
+            confirmButtonColor: "#8CC63F"
+
+        });
+
+        return;
+
+    }
+
+
+    await submitProductRating(
+        productId,
+        rating
+    );
+
+
+    localStorage.removeItem(
+        `selected_rating_${productId}`
+    );
+
+}
 
 
 
