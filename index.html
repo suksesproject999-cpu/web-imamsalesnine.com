@@ -12362,6 +12362,18 @@ function renderVoucherCards(){
                         )}
 
                     </small>
+                    
+                    
+                    
+                   ${voucher.maxDiscount
+    ? `
+        <small class="voucher-max">
+            Maks. potongan ${formatRupiah(voucher.maxDiscount)}
+        </small>
+      `
+    : ""
+}
+                    
 
 
                     <small
@@ -12795,6 +12807,16 @@ function saveSelectedVouchers(selected){
     );
 
 }
+
+
+function clearSelectedVouchers(){
+
+    localStorage.removeItem(
+        "selectedVouchers"
+    );
+
+}
+
 
 
 function selectVoucher(button){
@@ -16227,17 +16249,37 @@ Terima kasih.
 
     if(result.isConfirmed){
 
-        window.open(
-            `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`,
-            "_blank"
-        );
+    window.open(
+        `https://wa.me/${nomorAdmin}?text=${encodeURIComponent(pesan)}`,
+        "_blank"
+    );
 
-        cart = [];
-        saveCart();
-        updateCartCount();
-        renderCategories();
 
-    }
+    // ======================================
+    // RESET ORDER
+    // ======================================
+
+    cart = [];
+
+    saveCart();
+
+    updateCartCount();
+
+
+    // ======================================
+    // RESET VOUCHER
+    // ======================================
+
+    clearSelectedVouchers();
+
+
+    // ======================================
+    // KEMBALI KE KATALOG
+    // ======================================
+
+    renderCategories();
+
+}
 
 });
 
