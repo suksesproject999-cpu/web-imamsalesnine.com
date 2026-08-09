@@ -11089,7 +11089,47 @@ font-size:13px;
 }
 
 
+.product-detail-meta {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
+.product-detail-meta .meta-divider {
+    color: #aaa;
+}
+
+
+
+.product-rating-action {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.product-rating-action p {
+    margin-bottom: 10px;
+    color: #777;
+}
+
+.rating-stars {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+}
+
+.rating-stars button {
+    border: none;
+    background: transparent;
+    font-size: 28px;
+    cursor: pointer;
+    transition: transform .15s ease;
+}
+
+.rating-stars button:hover {
+    transform: scale(1.15);
+}
 
 
   
@@ -12642,13 +12682,14 @@ fetch("produk.json")
 
     products.forEach(product => {
 
-        updateProductSold(
-            product.id
-        );
+    updateProductSold(product.id);
 
-    });
+    updateProductRating(product.id);
+
+});
 
 
+        
     // ==========================================
     // SCROLL KE HASIL
     // ==========================================
@@ -13835,20 +13876,25 @@ function renderMarketplaceCard(product){
             </h3>
 
 
-            <div class="product-meta">
+           <div class="product-meta">
 
-                <span class="product-rating">
-                    ⭐ -
-                </span>
+    <span
+        class="product-rating"
+        data-rating-product="${product.id}"
+    >
+        ⭐ -
+    </span>
 
-                <span
-                    class="product-sold"
-                    data-sold-product="${product.id}"
-                >
-                    0 terjual
-                </span>
+    <span class="meta-divider">•</span>
 
-            </div>
+    <span
+        class="product-sold"
+        data-sold-product="${product.id}"
+    >
+        0 terjual
+    </span>
+
+</div>
 
 
             <div class="marketplace-price">
@@ -14044,18 +14090,21 @@ function renderProductList(
 
                 <div class="product-meta">
 
-                    <span class="product-rating">
-                        ⭐ -
-                    </span>
+    <span
+        class="product-rating"
+        data-rating-product="${product.id}"
+    >
+        ⭐ -
+    </span>
 
-                    <span
-                        class="product-sold"
-                        data-sold-product="${product.id}"
-                    >
-                        0 terjual
-                    </span>
+    <span
+        class="product-sold"
+        data-sold-product="${product.id}"
+    >
+        0 terjual
+    </span>
 
-                </div>
+</div>
 
 
                 <!-- HARGA -->
@@ -14113,6 +14162,16 @@ function renderProductList(
         );
 
     });
+    
+    
+    data.forEach(product => {
+
+    updateProductRating(
+        product.id
+    );
+
+});
+
 
 }
 
@@ -14208,7 +14267,7 @@ function renderPage(html, autoScroll = true){
 
 
 
-function showProduct(nama){
+async function showProduct(nama){
   
 currentPage = "product";
 
@@ -14225,6 +14284,12 @@ selectedQty = 1;
 stickyClosed = false;
 
 lastCategory = product.kategori;
+
+const sold =
+    await getProductSold(product.id);
+
+const ratingData =
+    await getProductRating(product.id);
 
 let html = `
 
@@ -14298,16 +14363,72 @@ RIGHT COLUMN
 
 <div class="product-detail-meta">
 
-    <span>
-        ⭐ -
+    <span
+        data-detail-rating="${product.id}"
+    >
+        ${
+            ratingData.count > 0
+                ? `⭐ ${ratingData.rating.toFixed(1)} Rating`
+                : "⭐ - Rating"
+        }
     </span>
+
+    <span class="meta-divider">•</span>
 
     <span
         class="detail-product-sold"
         data-detail-sold="${product.id}"
     >
-        0 terjual
+        ${sold.toLocaleString("id-ID")} terjual
     </span>
+
+</div>
+
+
+<div class="product-rating-action">
+
+    <p>
+        Beri rating produk ini
+    </p>
+
+    <div class="rating-stars">
+
+        <button
+            type="button"
+            onclick="submitProductRating(${product.id}, 1)"
+        >
+            ⭐
+        </button>
+
+        <button
+            type="button"
+            onclick="submitProductRating(${product.id}, 2)"
+        >
+            ⭐
+        </button>
+
+        <button
+            type="button"
+            onclick="submitProductRating(${product.id}, 3)"
+        >
+            ⭐
+        </button>
+
+        <button
+            type="button"
+            onclick="submitProductRating(${product.id}, 4)"
+        >
+            ⭐
+        </button>
+
+        <button
+            type="button"
+            onclick="submitProductRating(${product.id}, 5)"
+        >
+            ⭐
+        </button>
+
+    </div>
 
 </div>
 
@@ -14952,6 +15073,7 @@ if(stickyVariant){
 
 }
 
+renderPage(html);
 
 updateStickySummary();
 
@@ -14961,9 +15083,7 @@ renderRelated(product);
 
 saveRecent(product);
 
-updateDetailProductSold(
-    product.id
-);
+
 
 }
 
@@ -15116,11 +15236,11 @@ function renderRelated(product){
 
     related.forEach(item => {
 
-        updateProductSold(
-            item.id
-        );
+    updateProductSold(item.id);
 
-    });
+    updateProductRating(item.id);
+
+});
 
 }
 
@@ -15128,7 +15248,7 @@ function renderRelated(product){
 
 function saveRecent(product){
 
-    if(!product || !product.id) return;
+    if(!product || product.id == null) return;
 
 
     let recent =
@@ -15139,30 +15259,59 @@ function saveRecent(product){
         );
 
 
-    // Hapus produk yang sama
+    // ==========================================
+    // PAKAI DATA PRODUK TERBARU
+    // ==========================================
+
+    const freshProduct =
+        allProducts.find(
+            p => String(p.id) === String(product.id)
+        ) || product;
+
+
+    // ==========================================
+    // HAPUS PRODUK YANG SAMA
+    // ==========================================
+
     recent =
         recent.filter(
-            p => p.id !== product.id
+            p =>
+                String(p.id) !==
+                String(freshProduct.id)
         );
 
 
-    // Masukkan produk terbaru ke paling depan
-    recent.unshift(product);
+    // ==========================================
+    // MASUKKAN TERBARU KE DEPAN
+    // ==========================================
+
+    recent.unshift(
+        freshProduct
+    );
 
 
-    // Maksimal 6 produk terakhir
+    // ==========================================
+    // MAKSIMAL 6
+    // ==========================================
+
     recent =
         recent.slice(0, 6);
 
 
-    // Simpan
+    // ==========================================
+    // SIMPAN
+    // ==========================================
+
     localStorage.setItem(
         "recentProducts",
         JSON.stringify(recent)
     );
 
 
-    // Render ulang
+    // ==========================================
+    // RENDER ULANG
+    // ==========================================
+
     renderRecent();
 
 }
@@ -15215,11 +15364,12 @@ function renderRecent(){
 
     recent.forEach(item => {
 
-        updateProductSold(
-            item.id
-        );
+    updateProductSold(item.id);
 
-    });
+    updateProductRating(item.id);
+
+});
+    
 
 }
 
@@ -15620,6 +15770,571 @@ async function getProductSold(productId){
 
 
 
+async function getProductRating(productId){
+
+    try{
+
+        const doc =
+            await db
+                .collection("statistik_produk")
+                .doc(String(productId))
+                .get();
+
+        if(!doc.exists){
+
+            return {
+                rating: 0,
+                count: 0
+            };
+
+        }
+
+        const data =
+            doc.data();
+
+        const total =
+            Number(data.ratingTotal || 0);
+
+        const count =
+            Number(data.ratingCount || 0);
+
+        if(count <= 0){
+
+            return {
+                rating: 0,
+                count: 0
+            };
+
+        }
+
+        const rawRating =
+            total / count;
+
+        // ==========================================
+        // BATAS MAKSIMAL RATING
+        // ==========================================
+
+        const rating =
+            Math.min(
+                5,
+                Math.max(
+                    0,
+                    Math.round(rawRating * 10) / 10
+                )
+            );
+
+        return {
+            rating,
+            count
+        };
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil rating produk:",
+            error
+        );
+
+        return {
+            rating: 0,
+            count: 0
+        };
+
+    }
+
+}
+
+
+
+async function updateProductRating(productId){
+
+    const data =
+        await getProductRating(productId);
+
+    const elements =
+        document.querySelectorAll(
+            `[data-rating-product="${productId}"]`
+        );
+
+    if(!elements.length) return;
+
+
+    elements.forEach(element => {
+
+        if(data.count <= 0){
+
+            element.textContent =
+                "⭐ -";
+
+            return;
+
+        }
+
+
+        element.textContent =
+            `⭐ ${data.rating.toFixed(1)}`;
+
+    });
+
+}
+
+
+
+
+async function updateDetailProductRating(productId){
+
+    const data =
+        await getProductRating(productId);
+
+    const element =
+        document.querySelector(
+            `[data-detail-rating="${productId}"]`
+        );
+
+    if(!element) return;
+
+
+    if(data.count <= 0){
+
+        element.textContent =
+            "⭐ - Rating";
+
+        return;
+
+    }
+
+
+    element.textContent =
+        `⭐ ${data.rating.toFixed(1)} Rating`;
+
+}
+
+
+
+
+
+
+async function submitProductRating(productId, rating){
+
+    try{
+
+        // ==========================================
+        // VALIDASI PRODUCT
+        // ==========================================
+
+        if(productId == null){
+
+            await Swal.fire({
+
+                icon: "error",
+
+                title: "Produk Tidak Ditemukan",
+
+                text: "Produk yang ingin kamu beri rating tidak ditemukan.",
+
+                confirmButtonText: "OK",
+
+                confirmButtonColor: "#8CC63F"
+
+            });
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // VALIDASI RATING
+        // ==========================================
+
+        rating =
+            Number(rating);
+
+
+        if(
+            !Number.isInteger(rating) ||
+            rating < 1 ||
+            rating > 5
+        ){
+
+            await Swal.fire({
+
+                icon: "warning",
+
+                title: "Rating Tidak Valid",
+
+                text: "Rating hanya boleh antara 1 sampai 5.",
+
+                confirmButtonText: "Mengerti",
+
+                confirmButtonColor: "#8CC63F"
+
+            });
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // CEK SUDAH PERNAH RATING
+        // ==========================================
+
+        const ratingKey =
+            `rated_product_${productId}`;
+
+
+        if(
+            localStorage.getItem(
+                ratingKey
+            )
+        ){
+
+            await Swal.fire({
+
+                icon: "info",
+
+                title: "Sudah Memberikan Rating",
+
+                text:
+                    "Kamu sudah memberikan rating untuk produk ini.",
+
+                confirmButtonText: "OK",
+
+                confirmButtonColor: "#8CC63F"
+
+            });
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // REFERENSI FIRESTORE
+        // ==========================================
+
+        const ref =
+            db
+                .collection("statistik_produk")
+                .doc(
+                    String(productId)
+                );
+
+
+        // ==========================================
+        // TRANSACTION
+        // ==========================================
+
+        await db.runTransaction(
+            async transaction => {
+
+                const doc =
+                    await transaction.get(
+                        ref
+                    );
+
+
+                // ==================================
+                // DOCUMENT BELUM ADA
+                // ==================================
+
+                if(!doc.exists){
+
+                    transaction.set(
+                        ref,
+                        {
+
+                            terjual: 0,
+
+                            ratingTotal:
+                                rating,
+
+                            ratingCount:
+                                1
+
+                        }
+                    );
+
+                    return;
+
+                }
+
+
+                // ==================================
+                // DATA LAMA
+                // ==================================
+
+                const data =
+                    doc.data();
+
+
+                const oldTotal =
+                    Number(
+                        data.ratingTotal || 0
+                    );
+
+
+                const oldCount =
+                    Number(
+                        data.ratingCount || 0
+                    );
+
+
+                // ==================================
+                // VALIDASI DATA LAMA
+                // ==================================
+
+                if(
+                    !Number.isFinite(
+                        oldTotal
+                    ) ||
+
+                    !Number.isFinite(
+                        oldCount
+                    ) ||
+
+                    oldTotal < 0 ||
+
+                    oldCount < 0 ||
+
+                    !Number.isInteger(
+                        oldCount
+                    )
+                ){
+
+                    throw new Error(
+                        "DATA_RATING_INVALID"
+                    );
+
+                }
+
+
+                // ==================================
+                // HITUNG DATA BARU
+                // ==================================
+
+                const newTotal =
+                    oldTotal + rating;
+
+
+                const newCount =
+                    oldCount + 1;
+
+
+                // ==================================
+                // VALIDASI DATA BARU
+                // ==================================
+
+                if(
+                    !Number.isFinite(
+                        newTotal
+                    ) ||
+
+                    !Number.isFinite(
+                        newCount
+                    ) ||
+
+                    newTotal < 0 ||
+
+                    newCount <= 0
+                ){
+
+                    throw new Error(
+                        "DATA_RATING_BARU_INVALID"
+                    );
+
+                }
+
+
+                // ==================================
+                // CEK MAKSIMAL 5.0
+                // ==================================
+
+                const newAverage =
+                    newTotal /
+                    newCount;
+
+
+                if(
+                    newAverage > 5
+                ){
+
+                    throw new Error(
+                        "RATING_MAX_5"
+                    );
+
+                }
+
+
+                // ==================================
+                // SIMPAN
+                // ==================================
+
+                transaction.update(
+                    ref,
+                    {
+
+                        ratingTotal:
+                            newTotal,
+
+                        ratingCount:
+                            newCount
+
+                    }
+                );
+
+            }
+        );
+
+
+        // ==========================================
+        // SIMPAN STATUS SUDAH RATING
+        // ==========================================
+
+        localStorage.setItem(
+            ratingKey,
+            "1"
+        );
+
+
+        // ==========================================
+        // UPDATE CARD
+        // ==========================================
+
+        await updateProductRating(
+            productId
+        );
+
+
+        // ==========================================
+        // UPDATE SHOW PRODUCT
+        // ==========================================
+
+        await updateDetailProductRating(
+            productId
+        );
+
+
+        // ==========================================
+        // BERHASIL
+        // ==========================================
+
+        await Swal.fire({
+
+            icon: "success",
+
+            title: "Rating Berhasil!",
+
+            text:
+                "Terima kasih sudah memberikan rating untuk produk ini. ⭐",
+
+            confirmButtonText: "Mantap!",
+
+            confirmButtonColor: "#8CC63F"
+
+        });
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengirim rating produk:",
+            error
+        );
+
+
+        // ==========================================
+        // ERROR RATING > 5
+        // ==========================================
+
+        if(
+            error.message ===
+            "RATING_MAX_5"
+        ){
+
+            await Swal.fire({
+
+                icon: "warning",
+
+                title: "Rating Tidak Valid",
+
+                text:
+                    "Rating produk tidak boleh melebihi 5.0.",
+
+                confirmButtonText: "OK",
+
+                confirmButtonColor: "#8CC63F"
+
+            });
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // DATA RATING RUSAK
+        // ==========================================
+
+        if(
+            error.message ===
+            "DATA_RATING_INVALID"
+        ){
+
+            await Swal.fire({
+
+                icon: "error",
+
+                title: "Data Rating Bermasalah",
+
+                text:
+                    "Data rating produk tidak valid dan tidak dapat diperbarui.",
+
+                confirmButtonText: "OK",
+
+                confirmButtonColor: "#d33"
+
+            });
+
+            return;
+
+        }
+
+
+        // ==========================================
+        // ERROR LAINNYA
+        // ==========================================
+
+        await Swal.fire({
+
+            icon: "error",
+
+            title: "Rating Gagal",
+
+            text:
+                "Rating belum berhasil dikirim. Silakan coba lagi.",
+
+            confirmButtonText: "Coba Lagi",
+
+            confirmButtonColor: "#8CC63F"
+
+        });
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
+
+
 
 async function incrementProductSold(productId, qty){
 
@@ -15659,15 +16374,19 @@ async function updateProductSold(productId){
     const sold =
         await getProductSold(productId);
 
-    const element =
-        document.querySelector(
+    const elements =
+        document.querySelectorAll(
             `[data-sold-product="${productId}"]`
         );
 
-    if(!element) return;
+    if(!elements.length) return;
 
-    element.textContent =
-        `${sold.toLocaleString("id-ID")} terjual`;
+    elements.forEach(element => {
+
+        element.textContent =
+            `${sold.toLocaleString("id-ID")} terjual`;
+
+    });
 
 }
 
