@@ -14552,8 +14552,13 @@ Hemat Rp ${(product.harga.normal-product.harga.promo).toLocaleString("id-ID")}
 <div class="product-highlights">
 
 <span>
-<i class="fa-solid fa-circle-check"></i>
-${product.stok?.status || "Ready"}
+    <i class="fa-solid fa-circle-check"></i>
+
+    ${
+        product.stok?.qty === "limited edition"
+            ? `${product.stok?.status || "Ready"} • limited edition`
+            : `${product.stok?.status || "Ready"}`
+    }
 </span>
 
 <span>
