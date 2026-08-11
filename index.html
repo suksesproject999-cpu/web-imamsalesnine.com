@@ -13056,6 +13056,139 @@ function renderVoucherCards(){
 
 
 
+function renderCategorySearchResults(products){
+
+    const list =
+        document.getElementById(
+            "category-products"
+        );
+
+    if(!list) return;
+
+
+    if(!products.length){
+
+        list.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>Produk tidak ditemukan</h3>
+
+                <p>Coba kata kunci lain.</p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        products
+            .map(product =>
+                renderMarketplaceCard(product)
+            )
+            .join("");
+
+
+    requestAnimationFrame(() => {
+
+        products.forEach(product => {
+
+            updateProductSold(product.id);
+
+            updateProductRating(product.id);
+
+        });
+
+        updateAllProductBadges();
+
+    });
+
+}
+
+
+
+function debounce(fn, delay = 120){
+
+    let timer;
+
+    return function(...args){
+
+        clearTimeout(timer);
+
+        timer = setTimeout(() => {
+
+            fn.apply(this, args);
+
+        }, delay);
+
+    };
+
+}
+
+
+
+
+function renderCategorySearchResults(products){
+
+    const list =
+        document.getElementById(
+            "category-products"
+        );
+
+    if(!list) return;
+
+
+    if(!products.length){
+
+        list.innerHTML = `
+
+            <div class="empty-state">
+
+                <h3>Produk tidak ditemukan</h3>
+
+                <p>Coba kata kunci lain.</p>
+
+            </div>
+
+        `;
+
+        return;
+
+    }
+
+
+    list.innerHTML =
+        products
+            .map(product =>
+                renderMarketplaceCard(product)
+            )
+            .join("");
+
+
+    requestAnimationFrame(() => {
+
+        products.forEach(product => {
+
+            updateProductSold(product.id);
+
+            updateProductRating(product.id);
+
+        });
+
+        updateAllProductBadges();
+
+    });
+
+}
+
+
+
+
+
 
 
 
@@ -13318,7 +13451,10 @@ const sortSelect=document.getElementById("sortProduct");
 
 renderProductList(products);
 
-searchInput.addEventListener("input",filterProduct);
+searchInput.addEventListener(
+    "input",
+    debounce(filterProduct, 120)
+);
 
 sortSelect.addEventListener("change",filterProduct);
 
@@ -13382,7 +13518,7 @@ function filterProduct(){
     }
 
 
-    renderProductList(hasil);
+    renderCategorySearchResults(hasil);
 
 }
 
