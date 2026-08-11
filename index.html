@@ -13322,6 +13322,74 @@ searchInput.addEventListener("input",filterProduct);
 
 sortSelect.addEventListener("change",filterProduct);
 
+
+
+function filterProduct(){
+
+    const keyword =
+        searchInput.value
+            .toLowerCase()
+            .trim();
+
+
+    let hasil =
+        products.filter(p =>
+
+            p.nama
+                .toLowerCase()
+                .includes(keyword)
+
+            ||
+
+            (p.brand || "")
+                .toLowerCase()
+                .includes(keyword)
+
+            ||
+
+            (p.deskripsi || "")
+                .toLowerCase()
+                .includes(keyword)
+
+        );
+
+
+    switch(sortSelect.value){
+
+        case "az":
+
+            hasil.sort(
+                (a,b) =>
+                    a.nama.localeCompare(
+                        b.nama
+                    )
+            );
+
+        break;
+
+
+        case "za":
+
+            hasil.sort(
+                (a,b) =>
+                    b.nama.localeCompare(
+                        a.nama
+                    )
+            );
+
+        break;
+
+    }
+
+
+    renderProductList(hasil);
+
+}
+
+}
+
+
+/*
 function filterProduct(){
 
     const keyword=searchInput.value.toLowerCase();
@@ -13352,12 +13420,12 @@ function filterProduct(){
 
     }
     
-  
+  renderProductList(hasil);
 
 }
 
 }
-
+*/
 
 
 
