@@ -13469,35 +13469,46 @@ function filterProduct(){
 
 
     let hasil =
-        products.filter(p =>
+        products.filter(product => {
 
-            p.nama
-                .toLowerCase()
-                .includes(keyword)
+            const nama =
+                String(product.nama || "")
+                    .toLowerCase();
 
-            ||
+            const brand =
+                String(product.brand || "")
+                    .toLowerCase();
 
-            (p.brand || "")
-                .toLowerCase()
-                .includes(keyword)
+            const deskripsi =
+                String(product.deskripsi || "")
+                    .toLowerCase();
 
-            ||
 
-            (p.deskripsi || "")
-                .toLowerCase()
-                .includes(keyword)
+            return (
+                nama.includes(keyword) ||
+                brand.includes(keyword) ||
+                deskripsi.includes(keyword)
+            );
 
-        );
+        });
 
+
+    // ==========================================
+    // SORTING
+    // ==========================================
 
     switch(sortSelect.value){
 
         case "az":
 
-            hasil.sort(
-                (a,b) =>
-                    a.nama.localeCompare(
-                        b.nama
+            hasil.sort((a, b) =>
+                String(a.nama || "")
+                    .localeCompare(
+                        String(b.nama || ""),
+                        "id",
+                        {
+                            sensitivity: "base"
+                        }
                     )
             );
 
@@ -13506,10 +13517,14 @@ function filterProduct(){
 
         case "za":
 
-            hasil.sort(
-                (a,b) =>
-                    b.nama.localeCompare(
-                        a.nama
+            hasil.sort((a, b) =>
+                String(b.nama || "")
+                    .localeCompare(
+                        String(a.nama || ""),
+                        "id",
+                        {
+                            sensitivity: "base"
+                        }
                     )
             );
 
@@ -13517,6 +13532,10 @@ function filterProduct(){
 
     }
 
+
+    // ==========================================
+    // RENDER RINGAN
+    // ==========================================
 
     renderCategorySearchResults(hasil);
 
