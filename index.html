@@ -5876,6 +5876,36 @@ background:#e74c3c;
 }
 
 
+.detail-product-badge {
+    position: relative;
+    width: 100%;
+    height: auto;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0 0 18px 0;
+    padding: 0;
+
+    z-index: 1;
+}
+
+.detail-product-badge .badge {
+    position: static !important;
+
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    margin: 0 !important;
+    transform: none !important;
+
+    z-index: 1;
+}
+
+
+
 
 
 .skeleton-card{
@@ -12738,7 +12768,7 @@ fetch("produk.json")
 
 });
 
-
+updateAllProductBadges();
         
     // ==========================================
     // SCROLL KE HASIL
@@ -12830,6 +12860,8 @@ pageContainer.classList.remove(
   });
   
   renderPage(html, false);
+  
+  
 
 }
 
@@ -13320,9 +13352,7 @@ function filterProduct(){
 
     }
     
-    
-
-    renderProductList(hasil);
+  
 
 }
 
@@ -13874,6 +13904,350 @@ function getProductBadge(product){
 
 
 
+
+
+
+async function getProductStats(productId){
+
+    try{
+
+        const doc =
+            await db
+                .collection("statistik_produk")
+                .doc(String(productId))
+                .get();
+
+        if(!doc.exists){
+
+            return {
+                badge: "",
+                terjual: 0,
+                ratingTotal: 0,
+                ratingCount: 0
+            };
+
+        }
+
+        const data =
+            doc.data();
+
+        return {
+
+            badge:
+                data.badge || "",
+
+            terjual:
+                Number(data.terjual || 0),
+
+            ratingTotal:
+                Number(data.ratingTotal || 0),
+
+            ratingCount:
+                Number(data.ratingCount || 0)
+
+        };
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil statistik produk:",
+            error
+        );
+
+        return {
+            badge: "",
+            terjual: 0,
+            ratingTotal: 0,
+            ratingCount: 0
+        };
+
+    }
+
+}
+
+
+
+
+
+function renderBadge(badge){
+
+    switch(badge){
+
+        case "new":
+            return '<span class="badge new">NEW</span>';
+
+        case "promo":
+            return '<span class="badge promo">PROMO</span>';
+
+        case "best":
+            return '<span class="badge best">BEST SELLER</span>';
+
+        default:
+            return "";
+
+    }
+
+}
+
+
+async function getProductStatsForCard(product){
+
+    const stats =
+        await getProductStats(
+            product.id
+        );
+
+    return {
+        product,
+        stats
+    };
+
+}
+
+
+
+
+async function renderMarketplaceCardWithStats(product){
+
+    try{
+
+        const stats =
+            await getProductStats(
+                product.id
+            );
+
+
+        // ==========================================
+        // BADGE DARI FIRESTORE
+        // ==========================================
+
+        const badge =
+            renderBadge(
+                stats.badge
+            );
+
+
+        // ==========================================
+        // RENDER CARD DASAR
+        // ==========================================
+
+        return `
+
+        <div
+            class="product-card marketplace-card"
+            onclick="showProduct('${product.nama}')"
+        >
+
+            ${badge}
+
+
+            <div class="marketplace-image-wrap">
+
+                <img
+                    src="${product.gambar}"
+                    alt="${product.nama}"
+                    loading="lazy"
+                >
+
+            </div>
+
+
+            <div class="product-card-body">
+
+                <small class="product-brand">
+                    ${product.brand || ""}
+                </small>
+
+
+                <h3 class="marketplace-product-name">
+                    ${product.nama}
+                </h3>
+
+
+                <div class="marketplace-price">
+
+                    ${
+                        Number(
+                            product.harga?.promo ??
+                            product.harga?.normal ??
+                            0
+                        ).toLocaleString(
+                            "id-ID",
+                            {
+                                style: "currency",
+                                currency: "IDR",
+                                minimumFractionDigits: 0
+                            }
+                        )
+                    }
+
+                </div>
+
+
+                <div class="product-voucher-info">
+
+                    <i class="fa-solid fa-ticket"></i>
+
+                    <span>
+                        Voucher tersedia
+                    </span>
+
+                </div>
+
+            </div>
+
+        </div>
+
+        `;
+
+    }catch(error){
+
+        console.error(
+            "Gagal render marketplace card:",
+            error
+        );
+
+
+        return "";
+
+    }
+
+}
+
+
+
+
+
+async function updateProductBadge(productId){
+
+    try{
+
+        const stats =
+            await getProductStats(
+                productId
+            );
+
+
+        const element =
+            document.querySelector(
+                `[data-badge-product="${productId}"]`
+            );
+
+
+        if(!element) return;
+
+
+        element.innerHTML =
+            renderBadge(
+                stats.badge
+            );
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil badge produk:",
+            error
+        );
+
+    }
+
+}
+
+
+async function updateAllProductBadges(){
+
+    const elements =
+        document.querySelectorAll(
+            "[data-badge-product]"
+        );
+
+    if(!elements.length) return;
+
+
+    await Promise.all(
+
+        [...elements].map(
+            async element => {
+
+                const productId =
+                    element.dataset.badgeProduct;
+
+
+                try{
+
+                    const stats =
+                        await getProductStats(
+                            productId
+                        );
+
+
+                    element.innerHTML =
+                        renderBadge(
+                            stats.badge
+                        );
+
+
+                }catch(error){
+
+                    console.error(
+                        "Gagal update badge:",
+                        productId,
+                        error
+                    );
+
+                }
+
+            }
+        )
+
+    );
+
+}
+
+
+
+
+async function updateDetailProductBadge(productId){
+
+    try{
+
+        const stats =
+            await getProductStats(
+                productId
+            );
+
+        const element =
+            document.querySelector(
+                `[data-detail-badge="${productId}"]`
+            );
+
+        if(!element) return;
+
+        element.innerHTML =
+            renderBadge(
+                stats.badge
+            );
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil badge detail produk:",
+            error
+        );
+
+    }
+
+}
+
+
+
+
+
+
+
+
+
 function renderMarketplaceCard(product){
 
     const harga =
@@ -13900,7 +14274,10 @@ function renderMarketplaceCard(product){
         onclick="showProduct('${product.nama}')"
     >
 
-        ${getProductBadge(product)}
+       <span
+    class="product-badge-placeholder"
+    data-badge-product="${product.id}"
+></span>
 
 
         <div class="marketplace-image-wrap">
@@ -14050,9 +14427,7 @@ function renderProductList(
         // BADGE PRODUK
         // ==============================
 
-        const badge =
-            getProductBadge(product);
-
+        
 
         // ==============================
         // HARGA
@@ -14110,7 +14485,10 @@ function renderProductList(
             onclick="showProduct('${product.nama}')"
         >
 
-            ${badge}
+            <span
+    class="product-badge-placeholder"
+    data-badge-product="${product.id}"
+></span>
 
 
             <div class="marketplace-image-wrap">
@@ -14200,7 +14578,7 @@ function renderProductList(
 
     });
 
-
+      
     // ==========================================
     // AMBIL DATA TERJUAL DARI FIRESTORE
     // ==========================================
@@ -14222,6 +14600,7 @@ function renderProductList(
 
 });
 
+updateAllProductBadges();
 
 }
 
@@ -14406,6 +14785,11 @@ RIGHT COLUMN
 </div>
 
 <div class="product-title">
+
+<div
+    class="detail-product-badge"
+    data-detail-badge="${product.id}"
+></div>
 
 <h2>${product.nama}</h2>
 
@@ -15150,6 +15534,8 @@ renderRelated(product);
 
 saveRecent(product);
 
+updateDetailProductBadge(product.id);
+
 
 
 }
@@ -15296,7 +15682,7 @@ function renderRelated(product){
 
     });
 
-
+    updateAllProductBadges();
     // ==========================================
     // UPDATE JUMLAH TERJUAL
     // ==========================================
@@ -15423,6 +15809,8 @@ function renderRecent(){
             renderMarketplaceCard(item);
 
     });
+    
+    updateAllProductBadges();
 
 
     // ==========================================
