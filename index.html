@@ -19214,6 +19214,7 @@ Terima kasih.
 
         );
 
+        await updateTopSellingRanking();
 
         // ==========================================
         // 2. BUKA WHATSAPP
@@ -19279,6 +19280,153 @@ Terima kasih.
 });
 
 }
+
+
+
+
+async function updateTopSellingRanking(){
+
+    try{
+
+        // ==========================================
+        // AMBIL TOP 3 SAAT INI
+        // ==========================================
+
+        const currentTopIds =
+            [...topSellingProductIds];
+
+
+        // ==========================================
+        // AMBIL PRODUK YANG BARU TERJUAL
+        // ==========================================
+
+        const candidateIds =
+            [
+                ...new Set([
+                    ...currentTopIds,
+                    ...cart.map(
+                        item => Number(item.id)
+                    )
+                ])
+            ];
+
+
+        // ==========================================
+        // AMBIL JUMLAH TERJUAL TERBARU
+        // ==========================================
+
+        const hasil =
+            await Promise.all(
+
+                candidateIds.map(
+                    async productId => {
+
+                        const sold =
+                            await getProductSold(
+                                productId
+                            );
+
+                        return {
+
+                            id: Number(
+                                productId
+                            ),
+
+                            terjual:
+                                Number(
+                                    sold || 0
+                                )
+
+                        };
+
+                    }
+                )
+
+            );
+
+
+        // ==========================================
+        // SORT TERBANYAK
+        // ==========================================
+
+        hasil.sort(
+            (a,b) =>
+                b.terjual - a.terjual
+        );
+
+
+        // ==========================================
+        // AMBIL TOP 3
+        // ==========================================
+
+        const top3 =
+            hasil.slice(0,3);
+
+
+        const newTopIds =
+            top3.map(
+                product =>
+                    Number(product.id)
+            );
+
+
+        // ==========================================
+        // UPDATE FIRESTORE
+        // ==========================================
+
+        await db
+            .collection(
+                "marketplace_config"
+            )
+            .doc(
+                "top_selling"
+            )
+            .set({
+
+                productIds:
+                    newTopIds,
+
+                limit: 3,
+
+                updatedAt:
+                    firebase.firestore
+                        .FieldValue
+                        .serverTimestamp()
+
+            },{
+                merge:true
+            });
+
+
+        // ==========================================
+        // UPDATE CACHE
+        // ==========================================
+
+        topSellingProductIds =
+            new Set(
+                newTopIds
+            );
+
+
+        console.log(
+            "🏆 Top Selling diperbarui:",
+            newTopIds
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal memperbarui Top Selling:",
+            error
+        );
+
+    }
+
+}
+
+
+
 
 
 
