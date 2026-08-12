@@ -16677,7 +16677,7 @@ async function getTopSellingFromFirestore(){
 
 
 
-function getTopSellingProducts(data, limit = 3){
+function getTopSellingProducts(data, limit = 15){
 
     return [...data]
         .sort((a, b) =>
@@ -19360,7 +19360,7 @@ async function updateTopSellingRanking(){
         // ==========================================
 
         const top3 =
-            hasil.slice(0,3);
+            hasil.slice(0,15);
 
 
         const newTopIds =
@@ -19386,7 +19386,7 @@ async function updateTopSellingRanking(){
                 productIds:
                     newTopIds,
 
-                limit: 3,
+                limit: 15,
 
                 updatedAt:
                     firebase.firestore
