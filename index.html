@@ -11278,10 +11278,13 @@ Sales Representative • nine autoseries
         <div class="menu-title">Menu</div>
     </div>
 
-    <a href="#shoppingMallHero">
-        <i class="fa-solid fa-store"></i>
-        <span>Shopping Mall</span>
-    </a>
+<a
+    href="#shoppingMallHero"
+    onclick="scrollToShoppingMall(event)"
+>
+    <i class="fa-solid fa-store"></i>
+    <span>Shopping Mall</span>
+</a>
 
     <a href="#" onclick="openAI(); return false;">
         <i class="fa-solid fa-robot"></i>
@@ -14953,6 +14956,26 @@ function renderPage(html, autoScroll = true){
             behavior: "smooth"
         });
 
+    });
+
+}
+
+
+
+function scrollToShoppingMall(event){
+
+    event.preventDefault();
+
+    const target =
+        document.getElementById(
+            "shoppingMallHero"
+        );
+
+    if(!target) return;
+
+    target.scrollIntoView({
+        behavior: "smooth",
+        block: "start"
     });
 
 }
