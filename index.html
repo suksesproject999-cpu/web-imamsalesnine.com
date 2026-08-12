@@ -14605,20 +14605,25 @@ function renderMarketplaceCard(product){
 
 
 
-
-
 function renderProductList(
     data,
     containerId = "category-products"
 ){
 
     const list =
-        document.getElementById(containerId);
+        document.getElementById(
+            containerId
+        );
 
     if(!list) return;
 
+
     list.innerHTML = "";
 
+
+    // ==========================================
+    // PRODUK KOSONG
+    // ==========================================
 
     if(data.length === 0){
 
@@ -14644,17 +14649,19 @@ function renderProductList(
     }
 
 
+    // ==========================================
+    // BUILD HTML SEKALIGUS
+    // ==========================================
+
+    let html = "";
+
+
     data.forEach(product => {
 
-        // ==============================
-        // BADGE PRODUK
-        // ==============================
 
-        
-
-        // ==============================
+        // ==========================================
         // HARGA
-        // ==============================
+        // ==========================================
 
         const harga =
             Number(
@@ -14664,9 +14671,9 @@ function renderProductList(
             );
 
 
-        // ==============================
+        // ==========================================
         // HARGA NORMAL / CORET
-        // ==============================
+        // ==========================================
 
         const hargaNormal =
             Number(
@@ -14674,13 +14681,14 @@ function renderProductList(
                 0
             );
 
+
         const hasDiscount =
             hargaNormal > harga;
 
 
-        // ==============================
+        // ==========================================
         // VOUCHER
-        // ==============================
+        // ==========================================
 
         const voucherInfo = `
 
@@ -14697,11 +14705,11 @@ function renderProductList(
         `;
 
 
-        // ==============================
+        // ==========================================
         // CARD
-        // ==============================
+        // ==========================================
 
-        list.innerHTML += `
+        html += `
 
         <div
             class="product-card marketplace-card"
@@ -14709,9 +14717,9 @@ function renderProductList(
         >
 
             <span
-    class="product-badge-placeholder"
-    data-badge-product="${product.id}"
-></span>
+                class="product-badge-placeholder"
+                data-badge-product="${product.id}"
+            ></span>
 
 
             <div class="marketplace-image-wrap">
@@ -14741,21 +14749,21 @@ function renderProductList(
 
                 <div class="product-meta">
 
-    <span
-        class="product-rating"
-        data-rating-product="${product.id}"
-    >
-        ⭐ -
-    </span>
+                    <span
+                        class="product-rating"
+                        data-rating-product="${product.id}"
+                    >
+                        ⭐ -
+                    </span>
 
-    <span
-        class="product-sold"
-        data-sold-product="${product.id}"
-    >
-        0 terjual
-    </span>
+                    <span
+                        class="product-sold"
+                        data-sold-product="${product.id}"
+                    >
+                        0 TERJUAL
+                    </span>
 
-</div>
+                </div>
 
 
                 <!-- HARGA -->
@@ -14771,20 +14779,27 @@ function renderProductList(
                         }
                     )}
 
+
                     ${
                         hasDiscount
                         ? `
-                            <span class="marketplace-price-old">
-    ${hargaNormal.toLocaleString(
-        "id-ID",
-        {
-            style:"currency",
-            currency:"IDR",
-            minimumFractionDigits:0
-        }
-    )}
-</span>
-                          `
+
+                            <span
+                                class="marketplace-price-old"
+                            >
+
+                                ${hargaNormal.toLocaleString(
+                                    "id-ID",
+                                    {
+                                        style:"currency",
+                                        currency:"IDR",
+                                        minimumFractionDigits:0
+                                    }
+                                )}
+
+                            </span>
+
+                        `
                         : ""
                     }
 
@@ -14801,31 +14816,58 @@ function renderProductList(
 
     });
 
-      
+
     // ==========================================
-    // AMBIL DATA TERJUAL DARI FIRESTORE
+    // MASUKKAN SEMUA CARD SEKALI SAJA
     // ==========================================
 
-    data.forEach(product => {
+    list.innerHTML = html;
 
-        updateProductSold(
-            product.id
-        );
+
+    // ==========================================
+    // UPDATE DATA TAMBAHAN SETELAH CARD TAMPIL
+    // ==========================================
+
+    requestAnimationFrame(() => {
+
+
+        // ==========================================
+        // JUMLAH TERJUAL
+        // ==========================================
+
+        data.forEach(product => {
+
+            updateProductSold(
+                product.id
+            );
+
+        });
+
+
+        // ==========================================
+        // RATING
+        // ==========================================
+
+        data.forEach(product => {
+
+            updateProductRating(
+                product.id
+            );
+
+        });
+
+
+        // ==========================================
+        // BADGE FIRESTORE
+        // ==========================================
+
+        updateAllProductBadges();
 
     });
-    
-    
-    data.forEach(product => {
-
-    updateProductRating(
-        product.id
-    );
-
-});
-
-updateAllProductBadges();
 
 }
+
+
 
 
 
