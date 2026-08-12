@@ -5905,6 +5905,22 @@ background:#e74c3c;
 }
 
 
+.badge.best-selling {
+    background: linear-gradient(
+        135deg,
+        #ffb300,
+        #ff8f00
+    );
+
+    color: #fff;
+
+    font-weight: 700;
+
+    box-shadow:
+        0 3px 8px rgba(255, 143, 0, 0.25);
+}
+
+
 
 
 
@@ -11278,13 +11294,10 @@ Sales Representative • nine autoseries
         <div class="menu-title">Menu</div>
     </div>
 
-<a
-    href="#shoppingMallHero"
-    onclick="scrollToShoppingMall(event)"
->
-    <i class="fa-solid fa-store"></i>
-    <span>Shopping Mall</span>
-</a>
+    <a href="#shoppingMallHero">
+        <i class="fa-solid fa-store"></i>
+        <span>Shopping Mall</span>
+    </a>
 
     <a href="#" onclick="openAI(); return false;">
         <i class="fa-solid fa-robot"></i>
@@ -12664,12 +12677,18 @@ const vouchers = [
 
 let currentPage = "catalog";
 
+let topSellingProductIds = new Set();
+
+let topSellingPromise = null;
+
 
 fetch("produk.json")
   .then(res => res.json())
   .then(data => {
 
     allProducts = data;
+    
+    loadTopSellingProducts();
 
     fuse = new Fuse(allProducts, {
   keys: [
@@ -14200,15 +14219,43 @@ function renderBadge(badge){
     switch(badge){
 
         case "new":
-            return '<span class="badge new">NEW</span>';
+
+            return `
+                <span class="badge new">
+                    NEW
+                </span>
+            `;
+
 
         case "promo":
-            return '<span class="badge promo">PROMO</span>';
+
+            return `
+                <span class="badge promo">
+                    PROMO
+                </span>
+            `;
+
 
         case "best":
-            return '<span class="badge best">BEST SELLER</span>';
+
+            return `
+                <span class="badge best">
+                    BEST SELLER
+                </span>
+            `;
+
+
+        case "best-selling":
+
+            return `
+                <span class="badge best-selling">
+                    🏆 TERLARIS
+                </span>
+            `;
+
 
         default:
+
             return "";
 
     }
@@ -14383,6 +14430,21 @@ async function updateProductBadge(productId){
 
 async function updateAllProductBadges(){
 
+    // ==================================
+    // TUNGGU RANKING TERLARIS SIAP
+    // ==================================
+
+    if(topSellingPromise){
+
+        await topSellingPromise;
+
+    }
+
+
+    // ==================================
+    // AMBIL SEMUA PLACEHOLDER BADGE
+    // ==================================
+
     const elements =
         document.querySelectorAll(
             "[data-badge-product]"
@@ -14391,16 +14453,46 @@ async function updateAllProductBadges(){
     if(!elements.length) return;
 
 
+    // ==================================
+    // PROSES SEMUA BADGE
+    // ==================================
+
     await Promise.all(
 
         [...elements].map(
             async element => {
 
                 const productId =
-                    element.dataset.badgeProduct;
+                    Number(
+                        element.dataset.badgeProduct
+                    );
 
 
                 try{
+
+                    // ==================================
+                    // 🏆 PRIORITAS 1 — TERLARIS
+                    // ==================================
+
+                    if(
+                        topSellingProductIds.has(
+                            productId
+                        )
+                    ){
+
+                        element.innerHTML =
+                            renderBadge(
+                                "best-selling"
+                            );
+
+                        return;
+
+                    }
+
+
+                    // ==================================
+                    // BADGE FIRESTORE
+                    // ==================================
 
                     const stats =
                         await getProductStats(
@@ -14438,10 +14530,20 @@ async function updateDetailProductBadge(productId){
 
     try{
 
-        const stats =
-            await getProductStats(
-                productId
-            );
+        // ==================================
+        // TUNGGU RANKING TERLARIS SIAP
+        // ==================================
+
+        if(topSellingPromise){
+
+            await topSellingPromise;
+
+        }
+
+
+        // ==================================
+        // CARI ELEMENT BADGE DETAIL
+        // ==================================
 
         const element =
             document.querySelector(
@@ -14450,10 +14552,44 @@ async function updateDetailProductBadge(productId){
 
         if(!element) return;
 
+
+        // ==================================
+        // 🏆 PRIORITAS 1 — TERLARIS
+        // ==================================
+
+        const id =
+            Number(productId);
+
+
+        if(
+            topSellingProductIds.has(id)
+        ){
+
+            element.innerHTML =
+                renderBadge(
+                    "best-selling"
+                );
+
+            return;
+
+        }
+
+
+        // ==================================
+        // BADGE FIRESTORE
+        // ==================================
+
+        const stats =
+            await getProductStats(
+                productId
+            );
+
+
         element.innerHTML =
             renderBadge(
                 stats.badge
             );
+
 
     }catch(error){
 
@@ -14956,26 +15092,6 @@ function renderPage(html, autoScroll = true){
             behavior: "smooth"
         });
 
-    });
-
-}
-
-
-
-function scrollToShoppingMall(event){
-
-    event.preventDefault();
-
-    const target =
-        document.getElementById(
-            "shoppingMallHero"
-        );
-
-    if(!target) return;
-
-    target.scrollIntoView({
-        behavior: "smooth",
-        block: "start"
     });
 
 }
@@ -16465,6 +16581,168 @@ function formatRupiah(angka){
     return "Rp " + angka.toLocaleString("id-ID");
 
 }
+
+
+
+
+async function getAllProductSold(){
+
+    const hasil = [];
+
+    for(const product of allProducts){
+
+        const sold =
+            await getProductSold(
+                product.id
+            );
+
+        hasil.push({
+
+            id: product.id,
+
+            nama: product.nama,
+
+            terjual: Number(
+                sold || 0
+            )
+
+        });
+
+    }
+
+    return hasil;
+
+}
+
+
+
+
+async function getTopSellingFromFirestore(){
+
+    try{
+
+        const snapshot =
+            await db
+                .collection("marketplace_config")
+                .doc("top_selling")
+                .get();
+
+
+        if(!snapshot.exists){
+
+            console.warn(
+                "Dokumen top_selling tidak ditemukan."
+            );
+
+            return [];
+
+        }
+
+
+        const data =
+            snapshot.data();
+
+
+        console.log(
+            "DATA TOP SELLING:",
+            data
+        );
+
+
+        return Array.isArray(
+            data.productIds
+        )
+            ? data.productIds.map(
+                id => Number(id)
+            )
+            : [];
+
+
+    }catch(error){
+
+        console.error(
+            "Gagal mengambil Top Selling:",
+            error
+        );
+
+        return [];
+
+    }
+
+}
+
+
+
+
+
+
+
+function getTopSellingProducts(data, limit = 3){
+
+    return [...data]
+        .sort((a, b) =>
+            Number(b.terjual || 0) -
+            Number(a.terjual || 0)
+        )
+        .slice(0, limit);
+
+}
+
+
+
+
+function loadTopSellingProducts(){
+
+    topSellingPromise = (async () => {
+
+        try{
+
+            // ==================================
+            // AMBIL TOP SELLING DARI FIRESTORE
+            // CUMA 1 READ
+            // ==================================
+
+            const productIds =
+                await getTopSellingFromFirestore();
+
+
+            // ==================================
+            // SIMPAN KE CACHE MEMORY
+            // ==================================
+
+            topSellingProductIds =
+                new Set(
+                    productIds.map(
+                        id => Number(id)
+                    )
+                );
+
+
+            console.log(
+                "🏆 Top Selling:",
+                [...topSellingProductIds]
+            );
+
+
+        }catch(error){
+
+            console.error(
+                "Gagal memuat Top Selling:",
+                error
+            );
+
+        }
+
+    })();
+
+
+    return topSellingPromise;
+
+}
+
+
+
+
 
 
 
