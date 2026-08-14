@@ -11228,6 +11228,623 @@ font-size:13px;
 
 
 
+
+/* =========================================================
+   =========================================================
+
+        IMAM_SALESFR
+        CINEMATIC ENTRY GATE
+        FINAL VERSION
+
+   =========================================================
+   ========================================================= */
+
+
+/* =========================================================
+   MAIN LOADER
+========================================================= */
+
+.page-loader{
+
+    position:fixed;
+
+    inset:0;
+
+    width:100%;
+    height:100%;
+
+    z-index:999999999;
+
+    overflow:hidden;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#0b0b0b;
+
+    pointer-events:auto;
+
+}
+
+
+/* =========================================================
+   CINEMATIC CURTAINS
+========================================================= */
+
+.loader-curtain{
+
+    position:absolute;
+
+    left:0;
+
+    width:100%;
+
+    height:50%;
+
+    background:#0b0b0b;
+
+    z-index:1;
+
+    transition:
+        transform 1.15s
+        cubic-bezier(.76,0,.24,1);
+
+    will-change:transform;
+
+}
+
+
+.loader-curtain-top{
+
+    top:0;
+
+    transform:translateY(0);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.025);
+
+}
+
+
+.loader-curtain-bottom{
+
+    bottom:0;
+
+    transform:translateY(0);
+
+    border-top:
+        1px solid
+        rgba(255,255,255,.025);
+
+}
+
+
+/* =========================================================
+   SUBTLE GREEN ATMOSPHERE
+========================================================= */
+
+.page-loader::after{
+
+    content:"";
+
+    position:absolute;
+
+    width:520px;
+    height:520px;
+
+    border-radius:50%;
+
+    background:
+        radial-gradient(
+            circle,
+            rgba(140,198,63,.075) 0%,
+            rgba(140,198,63,.025) 35%,
+            transparent 70%
+        );
+
+    top:50%;
+    left:50%;
+
+    transform:
+        translate(-50%,-50%);
+
+    z-index:2;
+
+    pointer-events:none;
+
+}
+
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.loader-content{
+
+    position:relative;
+
+    z-index:10;
+
+    width:min(720px,82vw);
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.loader-brand{
+
+    display:flex;
+
+    align-items:stretch;
+
+    width:100%;
+
+    margin-bottom:48px;
+
+    opacity:0;
+
+    transform:
+        translateY(25px);
+
+    animation:
+        loaderBrandReveal
+        1.05s
+        cubic-bezier(.16,1,.3,1)
+        .35s
+        forwards;
+
+}
+
+
+/* =========================================================
+   GREEN VERTICAL BRAND LINE
+========================================================= */
+
+.loader-brand-line{
+
+    flex:0 0 7px;
+
+    min-height:94px;
+
+    margin-right:24px;
+
+    background:#8CC63F;
+
+    border-radius:0;
+
+    box-shadow:
+        0 0 22px
+        rgba(140,198,63,.18);
+
+}
+
+
+/* =========================================================
+   BRAND TEXT
+========================================================= */
+
+.loader-brand-text{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+}
+
+
+/* =========================================================
+   MAIN BRAND
+========================================================= */
+
+.loader-name{
+
+    color:#fff;
+
+    font-family:
+        'Poppins',
+        sans-serif;
+
+    font-size:
+        clamp(
+            2.5rem,
+            6vw,
+            4.4rem
+        );
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:-1.5px;
+
+    white-space:nowrap;
+
+}
+
+
+/* =========================================================
+   SECONDARY BRAND
+========================================================= */
+
+.loader-role{
+
+    margin-top:11px;
+
+    color:#8CC63F;
+
+    font-family:
+        'Poppins',
+        sans-serif;
+
+    font-size:
+        clamp(
+            .95rem,
+            2vw,
+            1.35rem
+        );
+
+    line-height:1.3;
+
+    font-weight:600;
+
+}
+
+
+.loader-role span{
+
+    display:inline-block;
+
+    padding:
+        0 4px;
+
+    color:#8CC63F;
+
+}
+
+
+/* =========================================================
+   PROGRESS BAR
+========================================================= */
+
+.loader-progress{
+
+    position:relative;
+
+    width:100%;
+
+    height:3px;
+
+    overflow:hidden;
+
+    background:
+        rgba(255,255,255,.10);
+
+    border-radius:999px;
+
+    opacity:0;
+
+    animation:
+        loaderFadeIn
+        .8s
+        ease
+        1.15s
+        forwards;
+
+}
+
+
+#loaderProgressBar{
+
+    width:0%;
+
+    height:100%;
+
+    background:
+        linear-gradient(
+            90deg,
+            #6ea72b,
+            #8CC63F,
+            #b7ef70
+        );
+
+    border-radius:999px;
+
+    box-shadow:
+        0 0 14px
+        rgba(140,198,63,.55);
+
+    transition:
+        width .25s
+        cubic-bezier(.16,1,.3,1);
+
+}
+
+
+/* =========================================================
+   META
+========================================================= */
+
+.loader-meta{
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-top:12px;
+
+    color:
+        rgba(255,255,255,.38);
+
+    font-family:
+        'Poppins',
+        sans-serif;
+
+    font-size:10px;
+
+    font-weight:600;
+
+    letter-spacing:1.5px;
+
+    opacity:0;
+
+    animation:
+        loaderFadeIn
+        .8s
+        ease
+        1.3s
+        forwards;
+
+}
+
+
+#loaderPercent{
+
+    color:#8CC63F;
+
+    font-variant-numeric:
+        tabular-nums;
+
+}
+
+
+/* =========================================================
+   OPENING ANIMATION
+========================================================= */
+
+.page-loader.loader-opening{
+
+    pointer-events:none;
+
+}
+
+
+.page-loader.loader-opening
+.loader-curtain-top{
+
+    transform:
+        translateY(-100%);
+
+}
+
+
+.page-loader.loader-opening
+.loader-curtain-bottom{
+
+    transform:
+        translateY(100%);
+
+}
+
+
+.page-loader.loader-opening
+.loader-content{
+
+    opacity:0;
+
+    transform:
+        translateY(-8px)
+        scale(.98);
+
+    transition:
+        opacity .55s ease,
+        transform .75s
+        cubic-bezier(.16,1,.3,1);
+
+}
+
+
+/* =========================================================
+   BRAND ENTRANCE
+========================================================= */
+
+@keyframes loaderBrandReveal{
+
+    0%{
+
+        opacity:0;
+
+        transform:
+            translateY(25px);
+
+    }
+
+    100%{
+
+        opacity:1;
+
+        transform:
+            translateY(0);
+
+    }
+
+}
+
+
+/* =========================================================
+   FADE IN
+========================================================= */
+
+@keyframes loaderFadeIn{
+
+    from{
+
+        opacity:0;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:768px){
+
+    .loader-content{
+
+        width:82vw;
+
+    }
+
+
+    .loader-brand{
+
+        margin-bottom:38px;
+
+    }
+
+
+    .loader-brand-line{
+
+        flex-basis:5px;
+
+        min-height:76px;
+
+        margin-right:16px;
+
+    }
+
+
+    .loader-name{
+
+        font-size:
+            2.35rem;
+
+        letter-spacing:-1px;
+
+    }
+
+
+    .loader-role{
+
+        margin-top:8px;
+
+        font-size:
+            .82rem;
+
+    }
+
+
+    .loader-meta{
+
+        font-size:8px;
+
+        letter-spacing:1px;
+
+    }
+
+}
+
+
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+
+@media(max-width:420px){
+
+    .loader-name{
+
+        font-size:
+            2rem;
+
+    }
+
+
+    .loader-role{
+
+        font-size:
+            .74rem;
+
+    }
+
+
+    .loader-brand-line{
+
+        min-height:68px;
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    .loader-brand,
+    .loader-progress,
+    .loader-meta{
+
+        animation:none !important;
+
+        opacity:1;
+
+        transform:none;
+
+    }
+
+
+    .loader-curtain{
+
+        transition:none !important;
+
+    }
+
+}
+
+
+
+
+
+
   
   
 </style>
@@ -11240,7 +11857,65 @@ font-size:13px;
 
 </head>
 
-<body>
+<!-- =========================================================
+     IMAM_SALESFR — CINEMATIC ENTRY GATE
+========================================================= -->
+
+<div
+  id="pageLoader"
+  class="page-loader"
+  aria-label="Memuat Imam Sales"
+>
+
+  <!-- Cinematic curtains -->
+  <div class="loader-curtain loader-curtain-top"></div>
+  <div class="loader-curtain loader-curtain-bottom"></div>
+
+  <div class="loader-content">
+
+    <div class="loader-brand">
+
+      <div class="loader-brand-line"></div>
+
+      <div class="loader-brand-text">
+
+        <div class="loader-name">
+          Imam_salesfr
+        </div>
+
+        <div class="loader-role">
+          Sales Representative
+          <span>•</span>
+          nine autoseries
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="loader-progress">
+
+      <div id="loaderProgressBar"></div>
+
+    </div>
+
+    <div class="loader-meta">
+
+      <span>PREPARING EXPERIENCE</span>
+
+      <span id="loaderPercent">
+        0%
+      </span>
+
+    </div>
+
+  </div>
+
+</div>
+  
+  
+  
+  
 
 <header class="header">
 
@@ -22313,6 +22988,297 @@ class="purchase-panel">
 </div>
 
 </div>
+
+
+
+<script>
+/* =========================================================
+   =========================================================
+
+        IMAM_SALESFR
+        CINEMATIC ENTRY GATE
+        FINAL ENGINE
+
+   =========================================================
+   ========================================================= */
+
+(function(){
+
+    'use strict';
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const loader =
+        document.getElementById('pageLoader');
+
+    const progressBar =
+        document.getElementById(
+            'loaderProgressBar'
+        );
+
+    const percent =
+        document.getElementById(
+            'loaderPercent'
+        );
+
+
+    if(
+        !loader ||
+        !progressBar ||
+        !percent
+    ){
+
+        return;
+
+    }
+
+
+    /* =====================================================
+       CONFIGURATION
+    ===================================================== */
+
+    const MIN_DISPLAY_TIME = 5200;
+
+    const FINAL_HOLD_TIME = 650;
+
+    const CURTAIN_DURATION = 1150;
+
+
+    /* =====================================================
+       STATE
+    ===================================================== */
+
+    const startTime =
+        performance.now();
+
+    let progress = 0;
+
+    let pageLoaded = false;
+
+    let finishing = false;
+
+
+    /* =====================================================
+       PROGRESS
+    ===================================================== */
+
+    function updateProgress(value){
+
+        progress =
+            Math.min(
+                Math.max(value,0),
+                100
+            );
+
+        progressBar.style.width =
+            progress + '%';
+
+        percent.textContent =
+            Math.round(progress) + '%';
+
+    }
+
+
+    /* =====================================================
+       INITIAL STATE
+    ===================================================== */
+
+    updateProgress(3);
+
+
+    /* =====================================================
+       SIMULATED VISUAL PROGRESS
+
+       Sengaja tidak langsung 100%.
+       Maksimal berhenti sekitar 88%
+       sampai halaman benar-benar siap.
+    ===================================================== */
+
+    const progressTimer =
+        setInterval(function(){
+
+            if(progress >= 88){
+
+                return;
+
+            }
+
+
+            const remaining =
+                88 - progress;
+
+
+            const step =
+                Math.max(
+                    .7,
+                    remaining * .045
+                );
+
+
+            updateProgress(
+                progress + step
+            );
+
+
+        },180);
+
+
+    /* =====================================================
+       PAGE LOAD
+    ===================================================== */
+
+    function markPageLoaded(){
+
+        pageLoaded = true;
+
+        tryFinish();
+
+    }
+
+
+    /* =====================================================
+       FINISH CHECK
+    ===================================================== */
+
+    function tryFinish(){
+
+        if(finishing){
+
+            return;
+
+        }
+
+
+        if(!pageLoaded){
+
+            return;
+
+        }
+
+
+        const elapsed =
+            performance.now()
+            - startTime;
+
+
+        const remaining =
+            MIN_DISPLAY_TIME
+            - elapsed;
+
+
+        if(remaining > 0){
+
+            setTimeout(
+                tryFinish,
+                remaining
+            );
+
+            return;
+
+        }
+
+
+        finishLoader();
+
+    }
+
+
+    /* =====================================================
+       FINISH LOADER
+    ===================================================== */
+
+    function finishLoader(){
+
+        if(finishing){
+
+            return;
+
+        }
+
+
+        finishing = true;
+
+
+        clearInterval(
+            progressTimer
+        );
+
+
+        /*
+         * Finish progress.
+         */
+
+        updateProgress(100);
+
+
+        /*
+         * Hold 100% sebentar.
+         * Ini yang bikin opening terasa
+         * intentional, bukan loading error.
+         */
+
+        setTimeout(function(){
+
+            /*
+             * Aktifkan curtain opening.
+             */
+
+            loader.classList.add(
+                'loader-opening'
+            );
+
+
+            /*
+             * Setelah curtain selesai,
+             * hapus loader dari DOM.
+             */
+
+            setTimeout(function(){
+
+                if(loader){
+
+                    loader.remove();
+
+                }
+
+            },CURTAIN_DURATION + 100);
+
+
+        },FINAL_HOLD_TIME);
+
+    }
+
+
+    /* =====================================================
+       DETECT PAGE READY
+    ===================================================== */
+
+    if(
+        document.readyState ===
+        'complete'
+    ){
+
+        markPageLoaded();
+
+    }else{
+
+        window.addEventListener(
+            'load',
+            markPageLoaded,
+            {
+                once:true
+            }
+        );
+
+    }
+
+
+})();
+</script>
+
 
 
 </body>

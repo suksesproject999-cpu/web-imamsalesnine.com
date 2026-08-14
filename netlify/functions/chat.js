@@ -532,7 +532,7 @@ Jika terdapat lebih dari satu produk, tampilkan dalam daftar yang rapi.
 
     let systemPrompt = `
 
-Kamu adalah ImamGPT.
+Kamu adalah Imam AI.
 
 AI super cerdas modern
 yang membantu user
