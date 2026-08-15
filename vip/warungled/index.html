@@ -2884,9 +2884,22 @@ div.innerHTML = kosong
   div.onclick = () => {
 
   if(mode === "order" && kosong){
-    alert("Stok produk ini lagi kosong bro 😏");
+
+    Swal.fire({
+        icon: "warning",
+        title: "Stok Produk Kosong",
+        text: "Produk ini sedang tidak tersedia untuk dipesan.",
+        confirmButtonText: "Mengerti",
+        confirmButtonColor: "#8CC63F",
+        customClass: {
+            popup: "swal-vip-popup",
+            title: "swal-vip-title",
+            confirmButton: "swal-vip-confirm"
+        }
+    });
+
     return;
-  }
+}
 
   tambahItem(item);
 
@@ -3321,15 +3334,32 @@ function kirimWA(){
   if(
     !window.stokData ||
     window.stokData.length === 0
-  ){
-    alert("Stok belum siap bro 😏");
-    return;
-  }
+){
 
-  if(cart.length===0){
-    alert("Belum ada item bro 😏");
+    Swal.fire({
+        icon: "warning",
+        title: "Stok Belum Siap",
+        text: "Data stok belum siap bro 😏",
+        confirmButtonText: "Oke",
+        confirmButtonColor: "#8CC63F"
+    });
+
     return;
-  }
+}
+
+
+if(cart.length === 0){
+
+    Swal.fire({
+        icon: "warning",
+        title: "Belum Ada Item",
+        text: "Keranjang masih kosong bro 😏",
+        confirmButtonText: "Oke",
+        confirmButtonColor: "#8CC63F"
+    });
+
+    return;
+}
 
   let tersedia = [];
   let kosong = [];
@@ -5228,6 +5258,8 @@ showPage("dashboard");
 
  <!-- 🔥 SCRIPT PALING BAWAH -->
   <script src="/vip/global.js"></script>
+  
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 </body>
 </html>
