@@ -11841,7 +11841,15 @@ font-size:13px;
 }
 
 
+/* =========================================================
+   IMAM SALES — SKIP INTRO AFTER FIRST VISIT
+========================================================= */
 
+html.imam-sales-loader-seen #pageLoader{
+
+    display:none !important;
+
+}
 
 
 
@@ -11854,6 +11862,39 @@ font-size:13px;
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+
+
+<script>
+(function(){
+
+    try{
+
+        if(
+            localStorage.getItem(
+                "imamSalesIntroSeen"
+            ) === "true"
+        ){
+
+            document.documentElement.classList.add(
+                "imam-sales-loader-seen"
+            );
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "Loader storage unavailable:",
+            error
+        );
+
+    }
+
+})();
+</script>
+
+
 
 </head>
 
@@ -22997,7 +23038,7 @@ class="purchase-panel">
 
         IMAM_SALESFR
         CINEMATIC ENTRY GATE
-        FINAL ENGINE
+        GLOBAL FIRST-VISIT ENGINE
 
    =========================================================
    ========================================================= */
@@ -23008,11 +23049,72 @@ class="purchase-panel">
 
 
     /* =====================================================
+       STORAGE KEY
+    ===================================================== */
+
+    const INTRO_KEY =
+        "imamSalesIntroSeen";
+
+
+    /* =====================================================
+       CEK APAKAH INTRO SUDAH PERNAH DITAMPILKAN
+    ===================================================== */
+
+    let alreadySeen = false;
+
+
+    try{
+
+        alreadySeen =
+            localStorage.getItem(
+                INTRO_KEY
+            ) === "true";
+
+    }catch(error){
+
+        /*
+         * Kalau storage tidak tersedia,
+         * loader tetap berjalan normal.
+         */
+
+        alreadySeen = false;
+
+    }
+
+
+    /* =====================================================
+       KALAU SUDAH PERNAH MELIHAT
+       JANGAN JALANKAN LOADER LAGI
+    ===================================================== */
+
+    if(alreadySeen){
+
+        const existingLoader =
+            document.getElementById(
+                "pageLoader"
+            );
+
+
+        if(existingLoader){
+
+            existingLoader.remove();
+
+        }
+
+
+        return;
+
+    }
+
+
+    /* =====================================================
        ELEMENTS
     ===================================================== */
 
     const loader =
-        document.getElementById('pageLoader');
+        document.getElementById(
+            'pageLoader'
+        );
 
     const progressBar =
         document.getElementById(
@@ -23040,11 +23142,14 @@ class="purchase-panel">
        CONFIGURATION
     ===================================================== */
 
-    const MIN_DISPLAY_TIME = 5200;
+    const MIN_DISPLAY_TIME =
+        5200;
 
-    const FINAL_HOLD_TIME = 650;
+    const FINAL_HOLD_TIME =
+        650;
 
-    const CURTAIN_DURATION = 1150;
+    const CURTAIN_DURATION =
+        1150;
 
 
     /* =====================================================
@@ -23083,18 +23188,14 @@ class="purchase-panel">
 
 
     /* =====================================================
-       INITIAL STATE
+       INITIAL
     ===================================================== */
 
     updateProgress(3);
 
 
     /* =====================================================
-       SIMULATED VISUAL PROGRESS
-
-       Sengaja tidak langsung 100%.
-       Maksimal berhenti sekitar 88%
-       sampai halaman benar-benar siap.
+       VISUAL PROGRESS
     ===================================================== */
 
     const progressTimer =
@@ -23127,7 +23228,7 @@ class="purchase-panel">
 
 
     /* =====================================================
-       PAGE LOAD
+       PAGE READY
     ===================================================== */
 
     function markPageLoaded(){
@@ -23187,7 +23288,7 @@ class="purchase-panel">
 
 
     /* =====================================================
-       FINISH LOADER
+       FINISH
     ===================================================== */
 
     function finishLoader(){
@@ -23207,34 +23308,49 @@ class="purchase-panel">
         );
 
 
-        /*
-         * Finish progress.
-         */
-
         updateProgress(100);
 
 
-        /*
-         * Hold 100% sebentar.
-         * Ini yang bikin opening terasa
-         * intentional, bukan loading error.
-         */
+        /* =================================================
+           TANDAI SEBAGAI SUDAH PERNAH MELIHAT INTRO
+
+           PENTING:
+           Kita simpan sebelum curtain selesai.
+           Jadi browser langsung tahu bahwa intro
+           sudah pernah diberikan.
+        ================================================= */
+
+        try{
+
+            localStorage.setItem(
+                INTRO_KEY,
+                "true"
+            );
+
+        }catch(error){
+
+            console.warn(
+                "Tidak bisa menyimpan status intro:",
+                error
+            );
+
+        }
+
+
+        /* =================================================
+           HOLD
+        ================================================= */
 
         setTimeout(function(){
-
-            /*
-             * Aktifkan curtain opening.
-             */
 
             loader.classList.add(
                 'loader-opening'
             );
 
 
-            /*
-             * Setelah curtain selesai,
-             * hapus loader dari DOM.
-             */
+            /* =============================================
+               CLEANUP
+            ============================================= */
 
             setTimeout(function(){
 
@@ -23253,7 +23369,7 @@ class="purchase-panel">
 
 
     /* =====================================================
-       DETECT PAGE READY
+       WAIT FOR PAGE
     ===================================================== */
 
     if(
