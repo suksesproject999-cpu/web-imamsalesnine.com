@@ -1143,28 +1143,46 @@ margin-top:15px;
       cursor: pointer;
       gap: 8px;
     }
+    
+    
+    
+    
+    .btn i.fa-spinner { animation: spinRefresh 1s linear infinite; } @keyframes spinRefresh { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    
+    
+    
+    
+    
 
   </style>
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" >
+  
+  
+  
 </head>
 
 <body>
 
   <div class="vip-layout">
 
-    <aside class="sidebar">
+    
+<aside class="sidebar">
 
-      <button
-    class="sidebar-btn"
-    onclick="location.href='/vip/imamsales'">
-    🏠
-</button>
+    <button
+        class="sidebar-btn"
+        onclick="location.href='/vip/imamsales'">
+        <i class="fa-solid fa-house"></i>
+    </button>
 
-      <button
+    <button
         class="sidebar-btn active">
-        📦
-      </button>
+        <i class="fa-solid fa-box-open"></i>
+    </button>
 
-    </aside>
+</aside>
+
 
     <main class="main-wrapper">
 
@@ -1768,18 +1786,21 @@ Tidak ada dokumen
         </td>
 
         <td>
-        <button
-        class="btn-delete-item"
-        onclick="
-        event.stopPropagation();
-        requestDeleteItem(
-        '${itemId}',
-        '${invoiceId}'
-        )
-        "
-        >
-        🗑
-        </button>
+        
+<button
+    class="btn-delete-item"
+    onclick="
+    event.stopPropagation();
+    requestDeleteItem(
+    '${itemId}',
+    '${invoiceId}'
+    )
+    "
+>
+    <i class="fa-solid fa-trash-can"></i>
+</button>
+
+
 
         </td>
 
@@ -1811,11 +1832,14 @@ Tidak ada dokumen
       text-align:center;
       ">
 
-      <div class="brand-title">
+      
+<div class="brand-title">
 
-      📄 Detail Dokumen
+    <i class="fa-solid fa-file-lines"></i> Detail Dokumen
 
-      </div>
+</div>
+
+
 
       <div class="erp-doc-info">
 
@@ -1879,35 +1903,38 @@ Tidak ada dokumen
 
       <div class="invoice-footer">
 
-      <div class="invoice-action">
+      
+<div class="invoice-action">
 
-      <button class="btn"
-      onclick="window.print()">
-      🖨️ Print
-      </button>
+    <button class="btn"
+    onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Print
+    </button>
 
-      <button class="btn"
-      onclick="downloadInvoice()">
-      📥 Download
-      </button>
+    <button class="btn"
+    onclick="downloadInvoice()">
+        <i class="fa-solid fa-download"></i> Download
+    </button>
 
-      <button class="btn"
-      onclick="closeInvoice()">
-      ❌ Tutup
-      </button>
+    <button class="btn"
+    onclick="closeInvoice()">
+        <i class="fa-solid fa-xmark"></i> Tutup
+    </button>
 
-      <button
-      class="btn btn-delete-doc"
-      onclick="
-      requestDeleteInvoice(
-      '${invoiceId}'
-      )
-      "
-      >
-      🗑 Request Hapus
-      </button>
+    <button
+        class="btn btn-delete-doc"
+        onclick="
+        requestDeleteInvoice(
+        '${invoiceId}'
+        )
+        "
+    >
+        <i class="fa-solid fa-trash-can"></i> Request Hapus
+    </button>
 
-      </div>
+</div>
+
+
 
       <div class="erp-total-box">
 
@@ -2416,9 +2443,8 @@ mode:["css","legacy"]
 
     btn.classList.add("loading");
 
-    btn.innerText =
-    "⏳ Refreshing...";
-
+    btn.innerHTML = '<i class="fa-solid fa-spinner"></i> Refreshing...';
+    
     try {
 
       await loadData();
@@ -2437,8 +2463,11 @@ mode:["css","legacy"]
         "loading"
       );
 
-      btn.innerText =
-      "🔄 Refresh";
+      
+btn.innerHTML =
+    '<i class="fa-solid fa-rotate"></i> Refresh';
+
+
 
     }, 1000);
 
