@@ -419,15 +419,9 @@ const askAvailability =
 // PILIH MODEL AI
 // =====================
 
-let model = "gpt-4.1";
+let model = "gpt-5.6";
 
-if(
-  message.includes("/sales")
-){
 
-  model = "gpt-4.1";
-
-}
 
 
 let productContext = "";
@@ -1611,31 +1605,7 @@ Prioritas:
 6. Cinematic realism
 7. Creative enhancement
 
-`;
 
-
-// =====================
-// PRODUCT CONTEXT
-// =====================
-
-systemPrompt += productContext;
-
-
-// =====================
-// OWNER / SALES MODE
-// =====================
-
-if(
-  message.includes("/sales")
-){
-
-  systemPrompt += `
-
-==================================================
-SALES MODE
-==================================================
-
-Kamu sekarang masuk SALES MODE.
 
 Fokus pada:
 
@@ -1854,7 +1824,7 @@ Jika tidak tersedia:
 
 `;
 
-}
+systemPrompt += productContext;
 
 
 // =====================
@@ -2089,7 +2059,7 @@ if(uploadedImage){
 
       body:JSON.stringify({
 
-        model:"gpt-4.1",
+        model:"gpt-5.6",
 
         messages:[
 
