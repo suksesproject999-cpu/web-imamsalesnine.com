@@ -3382,7 +3382,7 @@ ${reply}
 
                 visualContext +
                 "\n\n" +
-                imagePrompt,
+                ${reply},
 
               size:
               "1024x1024",
