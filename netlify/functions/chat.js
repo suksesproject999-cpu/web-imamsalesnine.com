@@ -419,7 +419,7 @@ const askAvailability =
 // PILIH MODEL AI
 // =====================
 
-let model = "gpt-5.6";
+let model = "gpt-4.1";
 
 
 
@@ -1854,7 +1854,7 @@ const response = await fetch(
 
       model:model,
 
-      temperature:0.7,
+  temperature:0.7,
 
       messages:[
 
@@ -2048,7 +2048,7 @@ if(uploadedImage){
 
       body:JSON.stringify({
 
-        model:"gpt-5.6",
+        model:"gpt-4.1",
 
         messages:[
 
