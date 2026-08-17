@@ -2494,6 +2494,150 @@ gunakan format produk yang sudah ditentukan.
 Untuk chat biasa:
 jawab natural.
 
+
+==================================================
+REFERENCE IMAGE MASTER PRIORITY
+==================================================
+
+When a reference image is provided, the reference
+image is the PRIMARY VISUAL SOURCE OF TRUTH.
+
+Do not treat the reference as inspiration.
+
+Treat it as the exact subject that must be
+preserved while changing only what the user asks.
+
+==================================================
+REFERENCE IDENTITY LOCK
+==================================================
+
+Preserve the reference subject's:
+
+- exact identity
+- silhouette
+- proportions
+- geometry
+- contours
+- dimensions relationship
+- colors
+- color distribution
+- materials
+- surface texture
+- distinctive physical details
+- logo
+- logo position
+- text appearance
+- buttons
+- ports
+- connectors
+- screws
+- vents
+- holes
+- seams
+- edges
+- recognizable imperfections
+
+Do not redesign the reference subject.
+
+Do not reinterpret it.
+
+Do not create a similar generic object.
+
+Do not replace it with another product.
+
+Do not create a futuristic version.
+
+Do not create a premium redesign.
+
+==================================================
+REFERENCE TRANSFORMATION RULE
+==================================================
+
+The reference subject remains unchanged.
+
+Only the following may change when requested:
+
+- environment
+- location
+- background
+- camera position
+- framing
+- lighting
+- weather
+- atmosphere
+- surrounding objects
+- interaction
+- action
+- composition
+
+The physical identity of the reference subject
+must remain consistent.
+
+==================================================
+VISUAL MATCH PRIORITY
+==================================================
+
+When reference image exists:
+
+REFERENCE IDENTITY
+>
+USER REQUEST
+>
+PRODUCT ACCURACY
+>
+COMPOSITION
+>
+LIGHTING
+>
+CINEMATIC STYLE
+
+Never sacrifice reference identity
+for cinematic styling.
+
+==================================================
+REALISTIC INTEGRATION
+==================================================
+
+When placing the reference subject
+into a new environment:
+
+match:
+
+- perspective
+- scale
+- camera viewpoint
+- lighting direction
+- color temperature
+- contact shadows
+- reflections
+- ambient occlusion
+- depth of field
+- atmospheric perspective
+
+The subject must look physically present
+inside the new environment.
+
+Do not make the reference subject
+look pasted, floating, composited,
+or artificially inserted.
+
+==================================================
+REFERENCE IMAGE OUTPUT
+==================================================
+
+If a reference image is provided,
+the final image prompt must explicitly
+instruct the image model to preserve
+the reference subject's identity and
+visible physical characteristics.
+
+The image model receives the reference
+image directly.
+
+The prompt describes ONLY the desired
+transformation and scene.
+
+==================================================
 ==================================================
 QUALITY CONTROL
 ==================================================
@@ -2513,6 +2657,8 @@ periksa:
 10. Negative prompt relevan.
 11. final_prompt konsisten dengan JSON.
 12. Tidak ada fakta produk yang dikarang.
+
+
 
 ==================================================
 FINAL PRIORITY
@@ -2942,9 +3088,28 @@ imageIntentWords.some(word =>
 
 );
 
-const isImageRequest =
+const promptLooksLikeImage =
+  lowerMsg.length > 80 &&
+  (
+    lowerMsg.includes("photorealistic") ||
+    lowerMsg.includes("ultra-realistic") ||
+    lowerMsg.includes("cinematic") ||
+    lowerMsg.includes("photograph") ||
+    lowerMsg.includes("macro photography") ||
+    lowerMsg.includes("professional photography") ||
+    lowerMsg.includes("depth of field") ||
+    lowerMsg.includes("cinematic lighting") ||
+    lowerMsg.includes("realistic lighting")
+  );
 
-hasImageKeyword && hasIntent;
+
+const isImageRequest =
+  (
+    hasImageKeyword &&
+    hasIntent
+  )
+  ||
+  promptLooksLikeImage;
 
 console.log("IS IMAGE:", isImageRequest);
 console.log("MESSAGE:", message);
@@ -3025,100 +3190,304 @@ if(uploadedImage){
 // IMAGE GENERATION
 // =====================
 
+
+
+
+// =====================
+// IMAGE GENERATION
+// =====================
+
 let image = null;
 
 if(isImageRequest){
 
   try {
 
-    const controller =
-new AbortController();
+    let imageResponse;
 
-const timeout =
-setTimeout(
-  () => controller.abort(),
-  60000
-);
+    // ==================================================
+    // REFERENCE IMAGE MODE
+    // ==================================================
 
-const imageResponse = await fetch(
+    if(uploadedImage){
 
-      "https://api.openai.com/v1/images/generations",
+      console.log(
+        "IMAGE MODE: REFERENCE EDIT"
+      );
 
-      {
 
-        method:"POST",
-        
-        signal: controller.signal,
+      // uploadedImage berbentuk:
+      // data:image/jpeg;base64,AAAA...
 
-        headers:{
+      const match =
+        uploadedImage.match(
+          /^data:(.+?);base64,(.+)$/
+        );
 
-          "Content-Type":
-          "application/json",
 
-          "Authorization":
-          `Bearer ${process.env.OPENAI_API_KEY}`
+      if(!match){
 
-        },
-
-        body:JSON.stringify({
-
-          model:"gpt-image-1",
-
-          prompt:
-visualContext +
-"\n\n" +
-reply,
-
-          size:"1024x1024",
-          
-          quality:"low"
-
-        })
+        throw new Error(
+          "Reference image format tidak valid"
+        );
 
       }
 
-    );
-    
+
+      const mimeType =
+        match[1];
+
+      const base64Data =
+        match[2];
+
+
+      const imageBuffer =
+        Buffer.from(
+          base64Data,
+          "base64"
+        );
+
+
+      // Node 18+ / Netlify
+      const formData =
+        new FormData();
+
+
+      formData.append(
+        "model",
+        "gpt-image-1"
+      );
+
+
+      formData.append(
+        "image",
+        new Blob(
+          [
+            imageBuffer
+          ],
+          {
+            type:mimeType
+          }
+        ),
+        "reference-image"
+      );
+
+
+      formData.append(
+        "prompt",
+
+        `
+PRESERVE THE REFERENCE SUBJECT.
+
+The uploaded image is the primary
+visual source of truth.
+
+Preserve the exact identity,
+silhouette, proportions, geometry,
+colors, materials, recognizable details,
+logo and physical design of the reference.
+
+Do not redesign, reinterpret,
+replace, or invent a different subject.
+
+Apply ONLY the transformation requested
+by the user.
+
+Create the requested scene with
+physically realistic integration,
+correct perspective, realistic scale,
+natural contact shadows, reflections,
+lighting interaction and depth.
+
+USER REQUEST:
+
+${imagePrompt}
+        `.trim()
+      );
+
+
+      formData.append(
+        "size",
+        "1024x1024"
+      );
+
+
+      formData.append(
+        "quality",
+        "low"
+      );
+
+
+      imageResponse =
+        await fetch(
+
+          "https://api.openai.com/v1/images/edits",
+
+          {
+
+            method:"POST",
+
+            headers:{
+
+              "Authorization":
+              `Bearer ${process.env.OPENAI_API_KEY}`
+
+            },
+
+            body:formData
+
+          }
+
+        );
+
+    }
+
+
+    // ==================================================
+    // NORMAL IMAGE MODE
+    // ==================================================
+
+    else{
+
+      console.log(
+        "IMAGE MODE: TEXT TO IMAGE"
+      );
+
+
+      imageResponse =
+        await fetch(
+
+          "https://api.openai.com/v1/images/generations",
+
+          {
+
+            method:"POST",
+
+            headers:{
+
+              "Content-Type":
+              "application/json",
+
+              "Authorization":
+              `Bearer ${process.env.OPENAI_API_KEY}`
+
+            },
+
+            body:JSON.stringify({
+
+              model:
+              "gpt-image-1",
+
+              prompt:
+
+                visualContext +
+                "\n\n" +
+                imagePrompt,
+
+              size:
+              "1024x1024",
+
+              quality:
+              "low"
+
+            })
+
+          }
+
+        );
+
+    }
+
+
+    // ==================================================
+    // READ RESPONSE
+    // ==================================================
+
     const raw =
-await imageResponse.text();
+      await imageResponse.text();
 
-clearTimeout(timeout);
 
-let imageData = {};
+    let imageData = {};
 
-try {
 
-  imageData =
-  JSON.parse(raw);
+    try{
 
-} catch(parseErr){
+      imageData =
+        JSON.parse(raw);
 
-  console.log(
-    "IMAGE PARSE ERROR:",
-    raw
-  );
+    }catch(error){
 
-}
+      console.log(
+        "IMAGE RESPONSE INVALID:",
+        raw
+      );
 
-    if(imageData.error){
+      throw new Error(
+        "Response image API tidak valid"
+      );
 
-  console.log(
-    "OPENAI IMAGE ERROR:",
-    imageData.error
-  );
+    }
 
-}
 
-    console.log("IMAGE GENERATED");
+    // ==================================================
+    // ERROR
+    // ==================================================
 
-      const imageBase64 =
-imageData?.data?.[0]?.b64_json;
+    if(!imageResponse.ok){
 
-image = imageBase64
-? `data:image/png;base64,${imageBase64}`
-: null;
+      console.log(
+        "OPENAI IMAGE ERROR:",
+        JSON.stringify(
+          imageData,
+          null,
+          2
+        )
+      );
 
-  } catch(imageErr){
+      throw new Error(
+        imageData?.error?.message ||
+        "Image generation gagal"
+      );
+
+    }
+
+
+    // ==================================================
+    // GET IMAGE
+    // ==================================================
+
+    const imageBase64 =
+      imageData?.data?.[0]?.b64_json;
+
+
+    if(!imageBase64){
+
+      console.log(
+        "IMAGE DATA KOSONG:",
+        JSON.stringify(
+          imageData,
+          null,
+          2
+        )
+      );
+
+      throw new Error(
+        "OpenAI tidak mengembalikan gambar"
+      );
+
+    }
+
+
+    image =
+      `data:image/png;base64,${imageBase64}`;
+
+
+    console.log(
+      "IMAGE GENERATED SUCCESSFULLY"
+    );
+
+
+  }catch(imageErr){
 
     console.log(
       "IMAGE ERROR:",
@@ -3128,6 +3497,9 @@ image = imageBase64
   }
 
 }
+
+
+
 
 // =====================
 // RETURN KE FRONTEND
