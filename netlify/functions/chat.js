@@ -1827,17 +1827,6 @@ Jika tidak tersedia:
 systemPrompt += productContext;
 
 
-// =====================
-// FINAL PRODUCT CONTEXT
-// =====================
-
-// Product context sengaja hanya ditambahkan
-// SATU KALI di atas.
-// Jangan tambahkan productContext lagi di sini.
-
-
-
-
   
 // =====================
 // OPENAI REQUEST
@@ -1864,6 +1853,8 @@ const response = await fetch(
     body:JSON.stringify({
 
       model:model,
+
+      temperature:0.7,
 
       messages:[
 
