@@ -2172,14 +2172,7 @@ if(isImageRequest){
 
   try {
 
-    const controller =
-      new AbortController();
-
-    const timeout =
-      setTimeout(
-        () => controller.abort(),
-        60000
-      );
+    
 
     const imageResponse =
       await fetch(
@@ -2187,7 +2180,7 @@ if(isImageRequest){
         {
           method:"POST",
 
-          signal:controller.signal,
+          
 
           headers:{
             "Content-Type":
@@ -2217,7 +2210,7 @@ if(isImageRequest){
     const raw =
       await imageResponse.text();
 
-    clearTimeout(timeout);
+    
 
     let imageData = {};
 
