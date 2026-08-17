@@ -3382,7 +3382,7 @@ ${reply}
 
                 visualContext +
                 "\n\n" +
-                ${reply},
+                reply,
 
               size:
               "1024x1024",
