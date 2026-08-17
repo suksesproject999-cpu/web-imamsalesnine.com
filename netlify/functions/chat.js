@@ -1865,8 +1865,6 @@ const response = await fetch(
 
       model:model,
 
-      temperature:0.7,
-
       messages:[
 
 {
