@@ -1803,7 +1803,7 @@ Nomor WhatsApp:
 SALES PRODUCT INTEGRITY
 ==================================================
 
-Walaupun berada di SALES MODE:
+Dalam memberikan informasi produk
 
 DATA PRODUK RESMI tetap menjadi
 sumber utama fakta produk.
