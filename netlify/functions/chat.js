@@ -2173,91 +2173,130 @@ if(isImageRequest){
   try {
 
     const controller =
-new AbortController();
+      new AbortController();
 
-const timeout =
-setTimeout(
-  () => controller.abort(),
-  60000
-);
+    const timeout =
+      setTimeout(
+        () => controller.abort(),
+        60000
+      );
 
-const imageResponse = await fetch(
+    const imageResponse =
+      await fetch(
+        "https://api.openai.com/v1/images/generations",
+        {
+          method:"POST",
 
-      "https://api.openai.com/v1/images/generations",
+          signal:controller.signal,
 
-      {
+          headers:{
+            "Content-Type":
+              "application/json",
 
-        method:"POST",
-        
-        signal: controller.signal,
+            "Authorization":
+              `Bearer ${process.env.OPENAI_API_KEY}`
+          },
 
-        headers:{
+          body:JSON.stringify({
 
-          "Content-Type":
-          "application/json",
+            model:"gpt-image-1",
 
-          "Authorization":
-          `Bearer ${process.env.OPENAI_API_KEY}`
+            prompt:
+              visualContext +
+              "\n\n" +
+              imagePrompt,
 
-        },
+            size:"1024x1024",
 
-        body:JSON.stringify({
+            quality:"low"
 
-          model:"gpt-image-1",
+          })
+        }
+      );
 
-          prompt:
-visualContext +
-"\n\n" +
-imagePrompt,
-
-          size:"1024x1024",
-          
-          quality:"low"
-
-        })
-
-      }
-
-    );
-    
     const raw =
-await imageResponse.text();
+      await imageResponse.text();
 
-clearTimeout(timeout);
+    clearTimeout(timeout);
 
-let imageData = {};
+    let imageData = {};
 
-try {
+    try {
 
-  imageData =
-  JSON.parse(raw);
+      imageData =
+        JSON.parse(raw);
 
-} catch(parseErr){
+    } catch(parseErr){
 
-  console.log(
-    "IMAGE PARSE ERROR:",
-    raw
-  );
+      console.log(
+        "IMAGE RESPONSE BUKAN JSON:",
+        raw
+      );
 
-}
+      throw new Error(
+        "Response image API tidak valid"
+      );
 
-    if(imageData.error){
+    }
 
-  console.log(
-    "OPENAI IMAGE ERROR:",
-    imageData.error
-  );
 
-}
+    // =====================
+    // CEK ERROR OPENAI
+    // =====================
 
-    console.log("IMAGE GENERATED");
+    if(!imageResponse.ok){
 
-      const imageBase64 =
-imageData?.data?.[0]?.b64_json;
+      console.log(
+        "OPENAI IMAGE ERROR:",
+        JSON.stringify(
+          imageData,
+          null,
+          2
+        )
+      );
 
-image = imageBase64
-? `data:image/png;base64,${imageBase64}`
-: null;
+      throw new Error(
+        imageData?.error?.message ||
+        "Image generation gagal"
+      );
+
+    }
+
+
+    // =====================
+    // AMBIL BASE64
+    // =====================
+
+    const imageBase64 =
+      imageData?.data?.[0]?.b64_json;
+
+
+    if(!imageBase64){
+
+      console.log(
+        "IMAGE DATA KOSONG:",
+        JSON.stringify(
+          imageData,
+          null,
+          2
+        )
+      );
+
+      throw new Error(
+        "OpenAI tidak mengembalikan gambar"
+      );
+
+    }
+
+
+    image =
+      `data:image/png;base64,${imageBase64}`;
+
+
+    console.log(
+      "IMAGE GENERATED SUCCESSFULLY"
+    );
+
 
   } catch(imageErr){
 
@@ -2269,6 +2308,11 @@ image = imageBase64
   }
 
 }
+
+
+
+
+
 
 // =====================
 // RETURN KE FRONTEND
