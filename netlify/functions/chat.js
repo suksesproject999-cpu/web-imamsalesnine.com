@@ -3301,9 +3301,9 @@ lighting interaction and depth.
 
 USER REQUEST:
 
-${imagePrompt}
-        `.trim()
-      );
+${reply}
+  `.trim()
+);
 
 
       formData.append(
