@@ -1797,7 +1797,7 @@ Jelaskan poin:
 
 Nomor WhatsApp:
 
-082210109369
+https://wa.me/6282210109369
 
 ==================================================
 SALES PRODUCT INTEGRITY
@@ -2113,183 +2113,96 @@ if(uploadedImage){
 
 let image = null;
 
-
-
-// =====================
-// EXTRACT FINAL IMAGE PROMPT
-// =====================
-
-let imagePrompt = reply;
-
-try {
-
-  const parsedPrompt =
-    JSON.parse(reply);
-
-  // SINGLE IMAGE
-  if(
-    parsedPrompt &&
-    typeof parsedPrompt.final_prompt === "string" &&
-    parsedPrompt.final_prompt.trim()
-  ){
-
-    imagePrompt =
-      parsedPrompt.final_prompt;
-
-  }
-
-  // MULTI SCENE / STORYBOARD
-  else if(
-    parsedPrompt &&
-    Array.isArray(parsedPrompt.scenes)
-  ){
-
-    imagePrompt =
-      parsedPrompt.scenes
-        .map(scene =>
-          scene.final_prompt || ""
-        )
-        .filter(Boolean)
-        .join("\n\n");
-
-  }
-
-} catch(error){
-
-  // Backward compatibility:
-  // kalau AI menghasilkan plain text,
-  // gunakan reply seperti sistem lama.
-
-  imagePrompt = reply;
-
-}
-
-
-
-
-
 if(isImageRequest){
 
   try {
 
-    
+    const controller =
+new AbortController();
 
-    const imageResponse =
-      await fetch(
-        "https://api.openai.com/v1/images/generations",
-        {
-          method:"POST",
+const timeout =
+setTimeout(
+  () => controller.abort(),
+  60000
+);
 
+const imageResponse = await fetch(
+
+      "https://api.openai.com/v1/images/generations",
+
+      {
+
+        method:"POST",
+        
+        signal: controller.signal,
+
+        headers:{
+
+          "Content-Type":
+          "application/json",
+
+          "Authorization":
+          `Bearer ${process.env.OPENAI_API_KEY}`
+
+        },
+
+        body:JSON.stringify({
+
+          model:"gpt-image-1",
+
+          prompt:
+visualContext +
+"\n\n" +
+reply,
+
+          size:"1024x1024",
           
+          quality:"low"
 
-          headers:{
-            "Content-Type":
-              "application/json",
+        })
 
-            "Authorization":
-              `Bearer ${process.env.OPENAI_API_KEY}`
-          },
+      }
 
-          body:JSON.stringify({
-
-            model:"gpt-image-1",
-
-            prompt:
-              visualContext +
-              "\n\n" +
-              imagePrompt,
-
-            size:"1024x1024",
-
-            quality:"low"
-
-          })
-        }
-      );
-
-    const raw =
-      await imageResponse.text();
-
-    
-
-    let imageData = {};
-
-    try {
-
-      imageData =
-        JSON.parse(raw);
-
-    } catch(parseErr){
-
-      console.log(
-        "IMAGE RESPONSE BUKAN JSON:",
-        raw
-      );
-
-      throw new Error(
-        "Response image API tidak valid"
-      );
-
-    }
-
-
-    // =====================
-    // CEK ERROR OPENAI
-    // =====================
-
-    if(!imageResponse.ok){
-
-      console.log(
-        "OPENAI IMAGE ERROR:",
-        JSON.stringify(
-          imageData,
-          null,
-          2
-        )
-      );
-
-      throw new Error(
-        imageData?.error?.message ||
-        "Image generation gagal"
-      );
-
-    }
-
-
-    // =====================
-    // AMBIL BASE64
-    // =====================
-
-    const imageBase64 =
-      imageData?.data?.[0]?.b64_json;
-
-
-    if(!imageBase64){
-
-      console.log(
-        "IMAGE DATA KOSONG:",
-        JSON.stringify(
-          imageData,
-          null,
-          2
-        )
-      );
-
-      throw new Error(
-        "OpenAI tidak mengembalikan gambar"
-      );
-
-    }
-
-
-    image =
-      `data:image/png;base64,${imageBase64}`;
-
-
-    console.log(
-      "IMAGE GENERATED SUCCESSFULLY"
     );
+    
+    const raw =
+await imageResponse.text();
 
+clearTimeout(timeout);
+
+let imageData = {};
+
+try {
+
+  imageData =
+  JSON.parse(raw);
+
+} catch(parseErr){
+
+  console.log(
+    "IMAGE PARSE ERROR:",
+    raw
+  );
+
+}
+
+    if(imageData.error){
+
+  console.log(
+    "OPENAI IMAGE ERROR:",
+    imageData.error
+  );
+
+}
+
+    console.log("IMAGE GENERATED");
+
+      const imageBase64 =
+imageData?.data?.[0]?.b64_json;
+
+image = imageBase64
+? `data:image/png;base64,${imageBase64}`
+: null;
 
   } catch(imageErr){
 
@@ -2301,11 +2214,6 @@ if(isImageRequest){
   }
 
 }
-
-
-
-
-
 
 // =====================
 // RETURN KE FRONTEND
