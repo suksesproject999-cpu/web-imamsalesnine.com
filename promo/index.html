@@ -12,74 +12,134 @@
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
+
+
 <style>
 
+
+
 /* =========================================================
-   CORE
-========================================================= */
+   IMAM_SALESFR — PROMO STUDIO
+   PREMIUM FULL STYLE
+   MATCHED TO EXISTING index.html
+   ========================================================= */
 
 :root{
     --lime:#8CC63F;
     --lime-dark:#72A82F;
     --lime-soft:rgba(140,198,63,.12);
+    --lime-glow:rgba(140,198,63,.18);
 
     --orange:#FF7A1A;
-    --orange-dark:#E95D0C;
+    --orange-light:#FF9141;
+    --orange-dark:#E9630C;
 
     --bg:#050705;
-    --panel:#0A0D0A;
-    --panel-2:#0D120E;
+    --bg-2:#070907;
+    --panel:#090D0A;
+    --panel-2:#0C120D;
+    --panel-3:#101610;
 
     --white:#F5F7F3;
-    --muted:#858D84;
-    --muted-2:#646C63;
+    --white-soft:#DCE1DA;
 
-    --border:rgba(255,255,255,.09);
+    --muted:#7D857C;
+    --muted-2:#626A62;
+
+    --border:rgba(255,255,255,.085);
+    --border-strong:rgba(255,255,255,.14);
+    --border-lime:rgba(140,198,63,.42);
+
+    --radius-sm:10px;
+    --radius-md:14px;
+    --radius-lg:20px;
 
     --shadow:
-        0 30px 90px rgba(0,0,0,.42);
+        0 25px 80px rgba(0,0,0,.42);
+
+    --font:
+        Poppins,
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
 }
 
-*{
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*,
+*::before,
+*::after{
     box-sizing:border-box;
-    margin:0;
-    padding:0;
 }
 
 html{
+    margin:0;
+    padding:0;
+
+    min-height:100%;
+
     background:var(--bg);
+
     scroll-behavior:smooth;
 }
 
 body{
+    margin:0;
+    padding:0;
+
     min-height:100vh;
+
     overflow-x:hidden;
 
     background:
         radial-gradient(
             circle at 50% -10%,
-            rgba(140,198,63,.07),
-            transparent 35%
+            rgba(140,198,63,.075),
+            transparent 34%
         ),
-        var(--bg);
+        linear-gradient(
+            180deg,
+            #050705 0%,
+            #060906 100%
+        );
 
     color:var(--white);
 
-    font-family:
-        Poppins,
-        Arial,
-        sans-serif;
+    font-family:var(--font);
 
     -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
 }
 
 button,
-input{
-    font-family:inherit;
+input,
+select,
+textarea{
+    font:inherit;
 }
 
 button{
     -webkit-tap-highlight-color:transparent;
+}
+
+button,
+select{
+    cursor:pointer;
+}
+
+img{
+    max-width:100%;
+}
+
+a{
+    color:inherit;
+    text-decoration:none;
 }
 
 
@@ -89,40 +149,60 @@ button{
 
 .topbar{
     position:sticky;
+
     top:0;
+
     z-index:1000;
 
     width:100%;
 
+    min-height:78px;
+
     padding:
-        14px
-        clamp(18px,3vw,32px);
+        13px
+        clamp(16px,3vw,32px);
 
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
 
+    gap:20px;
+
     background:
-        rgba(5,7,5,.94);
+        rgba(5,7,5,.95);
 
     border-bottom:
-        1px solid var(--border);
+        1px solid rgba(255,255,255,.065);
 
-    backdrop-filter:blur(20px);
-    -webkit-backdrop-filter:blur(20px);
+    backdrop-filter:
+        blur(22px)
+        saturate(130%);
+
+    -webkit-backdrop-filter:
+        blur(22px)
+        saturate(130%);
 }
+
+
+/* =========================================================
+   HEADER BRAND
+========================================================= */
 
 .brand-name{
     color:#fff;
 
     font-size:
-        clamp(21px,2.6vw,29px);
+        clamp(21px,2.5vw,30px);
 
-    line-height:1;
+    line-height:.95;
 
-    font-weight:800;
+    font-weight:900;
 
-    letter-spacing:-1.2px;
+    letter-spacing:-1.5px;
+
+    white-space:nowrap;
 }
 
 .brand-sub{
@@ -131,25 +211,39 @@ button{
     color:var(--lime);
 
     font-size:
-        clamp(9px,1vw,11px);
+        clamp(8px,1vw,11px);
 
     line-height:1;
 
     font-weight:600;
 
-    letter-spacing:1.3px;
+    letter-spacing:
+        clamp(.7px,.15vw,1.4px);
+
+    white-space:nowrap;
 }
+
+
+/* =========================================================
+   HEADER ACTIONS
+========================================================= */
 
 .header-actions{
     display:flex;
+
+    align-items:center;
+
     gap:9px;
+
+    flex-shrink:0;
 }
 
 .header-btn{
-    width:48px;
-    height:48px;
+    width:49px;
+    height:49px;
 
     display:grid;
+
     place-items:center;
 
     border:
@@ -157,24 +251,41 @@ button{
 
     border-radius:15px;
 
-    background:#090D0A;
+    background:#080C09;
 
     color:#fff;
 
-    cursor:pointer;
-
-    transition:.2s ease;
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease;
 }
 
 .header-btn:hover{
     border-color:
-        rgba(140,198,63,.4);
+        var(--border-lime);
+
+    transform:
+        translateY(-1px);
 }
 
 .header-btn.primary{
-    color:#10150C;
+    color:#0B1007;
+
     background:var(--lime);
+
     border-color:var(--lime);
+
+    box-shadow:
+        0 8px 25px
+        rgba(140,198,63,.12);
+}
+
+.header-btn.primary:hover{
+    background:#98D848;
+
+    border-color:#98D848;
 }
 
 .header-btn svg{
@@ -189,6 +300,7 @@ button{
 
 main{
     width:100%;
+
     padding:
         18px
         18px
@@ -197,7 +309,8 @@ main{
 
 .container{
     width:min(100%,1200px);
-    margin:auto;
+
+    margin:0 auto;
 }
 
 
@@ -211,9 +324,20 @@ main{
 
 .stage{
     width:100%;
+
     display:flex;
+
+    align-items:flex-start;
+
     justify-content:center;
+
+    position:relative;
 }
+
+
+/* =========================================================
+   PROMO CANVAS BASE
+========================================================= */
 
 .promo-canvas{
     position:relative;
@@ -221,34 +345,101 @@ main{
     width:100%;
 
     overflow:hidden;
+
     isolation:isolate;
 
-    background:#070907;
+    background:
+        radial-gradient(
+            circle at 50% 10%,
+            rgba(140,198,63,.055),
+            transparent 34%
+        ),
+        #070907;
 
     border:
-        1px solid var(--border);
+        1px solid rgba(255,255,255,.095);
 
-    box-shadow:var(--shadow);
+    box-shadow:
+        var(--shadow);
 }
 
 
 /* =========================================================
-   RATIO
+   RATIOS
 ========================================================= */
 
 .stage.ratio-916 .promo-canvas{
     width:min(100%,520px);
+
     aspect-ratio:9 / 16;
 }
 
 .stage.ratio-45 .promo-canvas{
     width:min(100%,760px);
+
     aspect-ratio:4 / 5;
 }
 
 .stage.ratio-169 .promo-canvas{
     width:100%;
+
     aspect-ratio:16 / 9;
+}
+
+
+/* =========================================================
+   PRODUCT VISUAL
+========================================================= */
+
+.product-visual{
+    position:absolute;
+
+    z-index:1;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    overflow:hidden;
+}
+
+
+/* 9:16 */
+
+.stage.ratio-916 .product-visual{
+    top:0;
+
+    left:0;
+    right:0;
+
+    height:57%;
+}
+
+
+/* 4:5 */
+
+.stage.ratio-45 .product-visual{
+    top:0;
+
+    left:0;
+    right:0;
+
+    height:61%;
+}
+
+
+/* 16:9 */
+
+.stage.ratio-169 .product-visual{
+    top:0;
+
+    left:0;
+
+    width:58%;
+
+    height:100%;
 }
 
 
@@ -256,61 +447,43 @@ main{
    PRODUCT IMAGE
 ========================================================= */
 
-.product-visual{
-    position:absolute;
-    z-index:1;
-
-    display:flex;
-    align-items:center;
-    justify-content:center;
-
-    overflow:hidden;
-}
-
-.stage.ratio-916 .product-visual{
-    top:0;
-    left:0;
-    right:0;
-    height:57%;
-}
-
-.stage.ratio-45 .product-visual{
-    top:0;
-    left:0;
-    right:0;
-    height:61%;
-}
-
-.stage.ratio-169 .product-visual{
-    top:0;
-    left:0;
-    width:58%;
-    height:100%;
-}
-
 .product-image{
     width:100%;
     height:100%;
 
     padding:5%;
 
+    display:block;
+
     object-fit:contain;
+
     object-position:center;
 
-    display:block;
+    user-select:none;
+
+    -webkit-user-drag:none;
 }
+
+
+/* =========================================================
+   VISUAL GRADIENT
+========================================================= */
 
 .visual-gradient{
     position:absolute;
+
     inset:0;
+
+    z-index:3;
+
     pointer-events:none;
 
     background:
         linear-gradient(
             to bottom,
-            transparent 48%,
-            rgba(5,7,5,.06) 60%,
-            rgba(5,7,5,.72) 88%,
+            transparent 45%,
+            rgba(5,7,5,.05) 58%,
+            rgba(5,7,5,.55) 82%,
             #070907 100%
         );
 }
@@ -319,524 +492,130 @@ main{
     background:
         linear-gradient(
             to right,
-            transparent 38%,
-            rgba(5,7,5,.2) 52%,
+            transparent 34%,
+            rgba(5,7,5,.12) 48%,
+            rgba(5,7,5,.65) 70%,
             #070907 100%
         );
 }
 
 
-
 /* =========================================================
-   FINAL PROMO BADGE SYSTEM
-   Ratio-aware / No overlap / No collision
+   PROMO BADGE
+   SMALL + PREMIUM + RATIO SAFE
 ========================================================= */
 
 .promo-badge{
     position:absolute;
-    z-index:30;
+
+    z-index:40;
 
     width:max-content;
-    max-width:calc(100% - 40px);
 
-    height:44px;
+    max-width:34%;
 
-    padding:0 21px;
+    height:36px;
+
+    min-width:108px;
+
+    padding:
+        0 16px;
 
     display:flex;
+
     align-items:center;
+
     justify-content:center;
-    gap:10px;
+
+    gap:9px;
 
     border-radius:999px;
 
     background:
         linear-gradient(
             135deg,
-            #FF9141 0%,
-            #FF7A1A 55%,
-            #F36A0D 100%
+            var(--orange-light) 0%,
+            var(--orange) 58%,
+            var(--orange-dark) 100%
         );
 
-    color:#170A02;
+    color:#190B03;
 
-    font-size:11px;
-    font-weight:900;
+    font-size:9px;
+
+    font-weight:950;
 
     line-height:1;
 
-    letter-spacing:4px;
+    letter-spacing:3.4px;
 
     white-space:nowrap;
 
     box-shadow:
-        0 12px 30px rgba(255,122,26,.20);
+        0 10px 28px
+        rgba(255,122,26,.19);
 
     pointer-events:none;
-
-    /*
-      Jangan pakai transform untuk posisi badge.
-      Posisi dikontrol penuh per ratio.
-    */
 }
-
-
-/* DOT */
 
 .promo-badge::before{
     content:"";
 
-    width:9px;
-    height:9px;
+    width:7px;
+    height:7px;
 
-    flex:0 0 9px;
+    flex:0 0 7px;
 
     border-radius:50%;
 
-    background:#170A02;
+    background:#190B03;
 }
 
 
 /* =========================================================
-   9:16 — STORY
-=========================================================
-
-   PHOTO
-   ─────────────────
-   0%
-   │
-   │ image
-   │
-   57%
-   ├────────────────
-   │
-   │ badge zone
-   │
-   66%
-   ├────────────────
-   │
-   │ brand
-   │ title
-   │ price
-   │
+   BADGE — 9:16
 ========================================================= */
 
 .stage.ratio-916 .promo-badge{
-
-    top:calc(57% + 14px);
-
-    left:8%;
-
-}
-
-
-/*
-   Product info TIDAK lagi menggunakan bottom.
-   Kita kasih posisi TOP supaya benar-benar
-   punya zona sendiri setelah badge.
-*/
-
-.stage.ratio-916 .product-info{
-
-    top:calc(57% + 76px);
+    top:calc(57% + 13px);
 
     left:8%;
-    right:7%;
 
-    bottom:auto;
+    height:34px;
 
-}
-
-
-/*
-   Brand punya jarak aman dari badge.
-*/
-
-.stage.ratio-916 .product-brand{
-
-    margin-top:0;
-
-}
-
-
-/*
-   Judul
-*/
-
-.stage.ratio-916 .product-name{
-
-    margin-top:10px;
-
-    max-width:94%;
-
-}
-
-
-/*
-   Harga
-*/
-
-.stage.ratio-916 .price-block{
-
-    margin-top:19px;
-
+    min-width:106px;
 }
 
 
 /* =========================================================
-   4:5 — FEED
-=========================================================
-
-   PHOTO
-   ─────────────────
-   0%
-   │
-   │ image
-   │
-   61%
-   ├────────────────
-   │
-   │ badge
-   │
-   69%
-   ├────────────────
-   │
-   │ brand
-   │ title
-   │ price
+   BADGE — 4:5
 ========================================================= */
 
 .stage.ratio-45 .promo-badge{
-
     top:calc(61% + 13px);
 
     left:7%;
 
-}
+    height:35px;
 
-
-/*
-   Ini bagian penting.
-
-   Screenshot lo sebelumnya:
-   badge masuk ke area judul.
-
-   Sekarang product-info dimulai SETELAH
-   zona badge.
-*/
-
-.stage.ratio-45 .product-info{
-
-    top:calc(61% + 74px);
-
-    left:7%;
-    right:7%;
-
-    bottom:auto;
-
-}
-
-
-.stage.ratio-45 .product-brand{
-
-    margin-top:0;
-
-}
-
-
-.stage.ratio-45 .product-name{
-
-    margin-top:10px;
-
-    max-width:93%;
-
-}
-
-
-.stage.ratio-45 .price-block{
-
-    margin-top:18px;
-
+    min-width:108px;
 }
 
 
 /* =========================================================
-   16:9 — LANDSCAPE
-=========================================================
-
-   FOTO                     INFO
-   ┌──────────────────┐     ┌───────────────┐
-   │                  │     │    PROMO      │
-   │      IMAGE       │     │               │
-   │                  │     │ NINE LUXIMOS  │
-   │                  │     │ PRODUCT       │
-   │                  │     │               │
-   └──────────────────┘     │ PRICE         │
-                            └───────────────┘
-
-   Badge TIDAK lagi masuk area foto.
+   BADGE — 16:9
 ========================================================= */
 
 .stage.ratio-169 .promo-badge{
-
     top:8%;
 
-    left:60%;
+    left:62%;
 
-}
+    height:34px;
 
+    min-width:104px;
 
-/*
-   Info dimulai di bawah badge.
-*/
-
-.stage.ratio-169 .product-info{
-
-    top:calc(8% + 65px);
-
-    left:60%;
-    right:6%;
-
-    bottom:auto;
-
-}
-
-
-.stage.ratio-169 .product-brand{
-
-    margin-top:0;
-
-}
-
-
-.stage.ratio-169 .product-name{
-
-    margin-top:10px;
-
-    max-width:91%;
-
-}
-
-
-.stage.ratio-169 .price-block{
-
-    margin-top:18px;
-
-}
-
-
-/* =========================================================
-   BADGE RESPONSIVE
-========================================================= */
-
-@media(max-width:600px){
-
-    .promo-badge{
-
-        height:38px;
-
-        padding:0 16px;
-
-        gap:8px;
-
-        font-size:8px;
-
-        letter-spacing:3px;
-
-        box-shadow:
-            0 10px 25px
-            rgba(255,122,26,.18);
-
-    }
-
-
-    .promo-badge::before{
-
-        width:8px;
-        height:8px;
-
-        flex-basis:8px;
-
-    }
-
-
-    /* -----------------------------------------------
-       9:16 MOBILE
-    ----------------------------------------------- */
-
-    .stage.ratio-916 .promo-badge{
-
-        top:calc(57% + 10px);
-
-        left:8%;
-
-    }
-
-
-    .stage.ratio-916 .product-info{
-
-        top:calc(57% + 62px);
-
-        left:8%;
-        right:7%;
-
-    }
-
-
-    .stage.ratio-916 .product-name{
-
-        margin-top:8px;
-
-    }
-
-
-    .stage.ratio-916 .price-block{
-
-        margin-top:16px;
-
-    }
-
-
-    /* -----------------------------------------------
-       4:5 MOBILE
-    ----------------------------------------------- */
-
-    .stage.ratio-45 .promo-badge{
-
-        top:calc(61% + 9px);
-
-        left:7%;
-
-    }
-
-
-    .stage.ratio-45 .product-info{
-
-        top:calc(61% + 60px);
-
-        left:7%;
-        right:7%;
-
-    }
-
-
-    .stage.ratio-45 .product-name{
-
-        margin-top:8px;
-
-    }
-
-
-    .stage.ratio-45 .price-block{
-
-        margin-top:15px;
-
-    }
-
-
-    /* -----------------------------------------------
-       16:9 MOBILE
-    ----------------------------------------------- */
-
-    .stage.ratio-169 .promo-badge{
-
-        top:7%;
-
-        left:60%;
-
-        height:34px;
-
-        padding:0 13px;
-
-        font-size:7px;
-
-        letter-spacing:2.5px;
-
-    }
-
-
-    .stage.ratio-169 .promo-badge::before{
-
-        width:7px;
-        height:7px;
-
-        flex-basis:7px;
-
-    }
-
-
-    .stage.ratio-169 .product-info{
-
-        top:calc(7% + 54px);
-
-        left:60%;
-
-        right:5%;
-
-    }
-
-}
-
-
-/* =========================================================
-   SMALL PHONE
-========================================================= */
-
-@media(max-width:380px){
-
-    .stage.ratio-916 .promo-badge{
-
-        top:calc(57% + 8px);
-
-        left:7%;
-
-        height:35px;
-
-        padding:0 14px;
-
-        font-size:7px;
-
-        letter-spacing:2.5px;
-
-    }
-
-
-    .stage.ratio-916 .product-info{
-
-        top:calc(57% + 55px);
-
-        left:7%;
-        right:6%;
-
-    }
-
-
-    .stage.ratio-45 .promo-badge{
-
-        top:calc(61% + 7px);
-
-        left:7%;
-
-        height:35px;
-
-        padding:0 14px;
-
-        font-size:7px;
-
-        letter-spacing:2.5px;
-
-    }
-
-
-    .stage.ratio-45 .product-info{
-
-        top:calc(61% + 53px);
-
-        left:7%;
-        right:6%;
-
-    }
-
+    max-width:30%;
 }
 
 
@@ -846,34 +625,57 @@ main{
 
 .product-info{
     position:absolute;
+
     z-index:20;
+
+    min-width:0;
+
+    overflow:visible;
 }
 
 
-/* 9:16 */
+/* =========================================================
+   INFO — 9:16
+========================================================= */
 
 .stage.ratio-916 .product-info{
+    top:calc(57% + 67px);
+
     left:8%;
+
     right:7%;
-    bottom:12%;
+
+    bottom:auto;
 }
 
 
-/* 4:5 */
+/* =========================================================
+   INFO — 4:5
+========================================================= */
 
 .stage.ratio-45 .product-info{
+    top:calc(61% + 67px);
+
     left:7%;
+
     right:7%;
-    bottom:11%;
+
+    bottom:auto;
 }
 
 
-/* 16:9 */
+/* =========================================================
+   INFO — 16:9
+========================================================= */
 
 .stage.ratio-169 .product-info{
-    left:58%;
+    top:calc(8% + 54px);
+
+    left:62%;
+
     right:6%;
-    bottom:13%;
+
+    bottom:7%;
 }
 
 
@@ -882,141 +684,209 @@ main{
 ========================================================= */
 
 .product-brand{
+    margin:0;
+
     color:var(--lime);
 
     font-size:
         clamp(9px,1vw,12px);
 
-    font-weight:900;
+    line-height:1.1;
 
-    letter-spacing:3.4px;
+    font-weight:950;
+
+    letter-spacing:
+        clamp(2.4px,.3vw,3.6px);
 
     text-transform:uppercase;
 
-    line-height:1.1;
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 }
 
 
 /* =========================================================
-   TITLE
+   PRODUCT TITLE
 ========================================================= */
 
 .product-name{
-    margin-top:10px;
+    margin:
+        9px 0 0;
 
     color:#fff;
 
-    font-weight:900;
+    font-weight:950;
 
-    letter-spacing:-1.8px;
+    letter-spacing:
+        clamp(-1.8px,-.14vw,-.8px);
 
-    line-height:1.02;
+    line-height:.98;
+
+    max-width:100%;
 
     text-wrap:balance;
 
-    max-width:100%;
+    overflow:hidden;
+
+    word-break:normal;
+
+    overflow-wrap:normal;
 }
 
 
-/*
-    Judul tidak lagi bebas membesar.
-
-    Setiap ratio punya batas sendiri.
-*/
+/* 9:16 */
 
 .stage.ratio-916 .product-name{
     font-size:
-        clamp(27px,6vw,48px);
+        clamp(26px,5.8vw,43px);
 
-    max-width:96%;
+    max-width:95%;
+
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+
+    -webkit-line-clamp:2;
 }
+
+
+/* 4:5 */
 
 .stage.ratio-45 .product-name{
     font-size:
-        clamp(30px,5vw,52px);
+        clamp(29px,4.15vw,52px);
 
-    max-width:94%;
+    max-width:95%;
+
+    display:-webkit-box;
+
+    -webkit-box-orient:vertical;
+
+    -webkit-line-clamp:2;
 }
+
+
+/* 16:9 */
 
 .stage.ratio-169 .product-name{
     font-size:
-        clamp(26px,3.4vw,48px);
+        clamp(24px,3.15vw,45px);
 
-    max-width:92%;
-}
+    max-width:96%;
 
-
-/*
-    Batasi maksimal 2 baris.
-*/
-
-.product-name{
     display:-webkit-box;
-    -webkit-box-orient:vertical;
-    -webkit-line-clamp:2;
 
-    overflow:hidden;
+    -webkit-box-orient:vertical;
+
+    -webkit-line-clamp:3;
 }
 
 
 /* =========================================================
-   PRICE
+   PRICE BLOCK
 ========================================================= */
 
 .price-block{
-    margin-top:21px;
+    margin-top:18px;
+
+    min-width:0;
 }
 
 .price-label{
-    color:#7E877D;
+    margin:0;
 
-    font-size:10px;
+    color:#7C857D;
+
+    font-size:9px;
+
+    line-height:1;
 
     font-weight:900;
 
-    letter-spacing:2.8px;
+    letter-spacing:3px;
 
     text-transform:uppercase;
 }
 
+
+/* =========================================================
+   PROMO PRICE
+========================================================= */
+
 .price-promo{
-    margin-top:5px;
+    margin-top:8px;
 
     color:#fff;
 
-    font-weight:900;
+    font-weight:950;
 
-    line-height:.95;
+    letter-spacing:-2px;
 
-    letter-spacing:-2.6px;
+    line-height:.94;
+
+    white-space:nowrap;
 }
+
+
+/* 9:16 */
 
 .stage.ratio-916 .price-promo{
     font-size:
-        clamp(36px,7vw,57px);
+        clamp(35px,7.8vw,52px);
 }
+
+
+/* 4:5 */
 
 .stage.ratio-45 .price-promo{
     font-size:
-        clamp(38px,6vw,59px);
+        clamp(38px,5.5vw,62px);
 }
+
+
+/* 16:9 */
 
 .stage.ratio-169 .price-promo{
     font-size:
-        clamp(32px,4.2vw,54px);
+        clamp(31px,3.9vw,55px);
 }
 
-.price-meta{
-    display:flex;
-    align-items:center;
-    gap:15px;
 
-    margin-top:9px;
+/* =========================================================
+   PRICE META
+========================================================= */
+
+.price-meta{
+    margin-top:10px;
+
+    min-height:18px;
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:12px;
+
+    overflow:visible;
 }
 
 .price-normal{
-    color:#717970;
+    color:#666E67;
+
     font-size:11px;
+
+    line-height:1;
+
+    white-space:nowrap;
+}
+
+.price-normal s{
+    text-decoration-thickness:1px;
 }
 
 .discount{
@@ -1024,45 +894,62 @@ main{
 
     font-size:11px;
 
-    font-weight:900;
+    font-weight:950;
+
+    line-height:1;
+
+    white-space:nowrap;
+}
+
+
+/* =========================================================
+   CAPTURE BRAND
+========================================================= */
+
+.capture-hide{
+    pointer-events:none;
+}
+
+.capture-mode .capture-hide{
+    display:none !important;
 }
 
 
 /* =========================================================
    CONTROL STRIP
-   INI YANG MENGHINDARI TOMBOL RASIO KETUMPUK
 ========================================================= */
 
 .control-strip{
-    width:100%;
+    margin-top:13px;
 
-    margin-top:12px;
-
-    padding:
-        13px 15px;
+    padding:14px;
 
     display:grid;
 
     grid-template-columns:
-        1fr
-        auto
-        auto;
+        minmax(260px,1.05fr)
+        minmax(260px,1fr)
+        minmax(190px,.7fr);
 
     align-items:center;
 
-    gap:16px;
+    gap:12px;
 
     border:
         1px solid var(--border);
 
-    border-radius:17px;
+    border-radius:
+        var(--radius-lg);
 
     background:
         linear-gradient(
             145deg,
-            rgba(255,255,255,.035),
-            rgba(255,255,255,.012)
+            #0B100C,
+            #070A08
         );
+
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.18);
 }
 
 
@@ -1071,34 +958,54 @@ main{
 ========================================================= */
 
 .ratio-group{
-    display:flex;
+    min-width:0;
+
+    display:grid;
+
+    grid-template-columns:
+        auto
+        repeat(3,minmax(0,1fr));
+
     align-items:center;
+
     gap:7px;
 }
 
 .ratio-caption{
-    margin-right:4px;
-
-    color:#707970;
+    color:#717970;
 
     font-size:8px;
 
-    font-weight:800;
+    font-weight:950;
 
-    letter-spacing:1.2px;
+    letter-spacing:2px;
+
+    line-height:1;
 
     text-transform:uppercase;
+
+    white-space:nowrap;
 }
 
+
+/* =========================================================
+   RATIO BUTTON
+========================================================= */
+
 .ratio-btn{
-    min-width:76px;
+    min-width:0;
+
     height:48px;
 
-    padding:0 12px;
+    padding:
+        0 9px;
 
     display:flex;
+
     align-items:center;
+
     justify-content:center;
+
     gap:7px;
 
     border:
@@ -1108,16 +1015,21 @@ main{
 
     background:#080C09;
 
-    color:#D5DAD2;
+    color:#B7BEB7;
 
-    cursor:pointer;
-
-    transition:.2s ease;
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
 }
 
 .ratio-btn:hover{
     border-color:
-        rgba(140,198,63,.4);
+        rgba(140,198,63,.35);
+
+    transform:
+        translateY(-1px);
 }
 
 .ratio-btn.active{
@@ -1126,21 +1038,28 @@ main{
     border-color:var(--lime);
 
     background:
-        rgba(140,198,63,.06);
+        rgba(140,198,63,.075);
 
     box-shadow:
-        inset 0 0 0 1px
-        rgba(140,198,63,.15);
+        inset 0 0 22px
+        rgba(140,198,63,.035);
 }
 
+
+/* =========================================================
+   RATIO ICON
+========================================================= */
+
 .ratio-icon{
-    width:14px;
-    height:17px;
+    width:13px;
+    height:18px;
+
+    flex:0 0 auto;
 
     border:
         1.5px solid currentColor;
 
-    border-radius:2px;
+    border-radius:3px;
 }
 
 .ratio-btn[data-ratio="45"] .ratio-icon{
@@ -1149,28 +1068,45 @@ main{
 }
 
 .ratio-btn[data-ratio="169"] .ratio-icon{
-    width:18px;
-    height:11px;
+    width:21px;
+    height:12px;
 }
 
+
+/* =========================================================
+   RATIO TEXT
+========================================================= */
+
 .ratio-text{
+    min-width:0;
+
     display:flex;
+
     flex-direction:column;
+
     align-items:flex-start;
-    line-height:1.1;
+
+    line-height:1.05;
 }
 
 .ratio-value{
-    font-size:10px;
-    font-weight:900;
+    font-size:9px;
+
+    font-weight:950;
+
+    white-space:nowrap;
 }
 
 .ratio-use{
     margin-top:3px;
 
-    color:#777F77;
+    color:#737B73;
 
     font-size:7px;
+
+    font-weight:600;
+
+    white-space:nowrap;
 }
 
 
@@ -1180,7 +1116,11 @@ main{
 
 .navigation{
     display:flex;
+
     align-items:center;
+
+    justify-content:center;
+
     gap:7px;
 }
 
@@ -1188,7 +1128,10 @@ main{
     width:48px;
     height:48px;
 
+    flex:0 0 48px;
+
     display:grid;
+
     place-items:center;
 
     border:
@@ -1200,12 +1143,18 @@ main{
 
     color:#fff;
 
-    cursor:pointer;
+    transition:
+        border-color .18s ease,
+        transform .18s ease,
+        background .18s ease;
 }
 
 .nav-btn:hover{
     border-color:
         rgba(140,198,63,.4);
+
+    transform:
+        translateY(-1px);
 }
 
 .nav-btn svg{
@@ -1214,14 +1163,17 @@ main{
 }
 
 .slide-count{
-    min-width:44px;
+    min-width:46px;
+
+    color:#AAB2AA;
 
     text-align:center;
 
-    color:#B0B7AE;
-
     font-size:10px;
-    font-weight:700;
+
+    font-weight:800;
+
+    white-space:nowrap;
 }
 
 
@@ -1230,42 +1182,64 @@ main{
 ========================================================= */
 
 .download-btn{
+    min-width:0;
+
     height:48px;
 
     padding:
-        0 18px;
+        0 17px;
 
     display:flex;
+
     align-items:center;
+
     justify-content:center;
+
     gap:8px;
 
     border:0;
 
     border-radius:12px;
 
-    background:var(--lime);
+    background:
+        linear-gradient(
+            135deg,
+            #98D848,
+            var(--lime)
+        );
 
-    color:#11150C;
+    color:#0B1007;
 
     font-size:10px;
-    font-weight:900;
 
-    cursor:pointer;
+    font-weight:950;
 
-    white-space:nowrap;
+    letter-spacing:.4px;
 
-    transition:.2s ease;
+    box-shadow:
+        0 10px 25px
+        rgba(140,198,63,.10);
+
+    transition:
+        filter .18s ease,
+        transform .18s ease;
 }
 
 .download-btn:hover{
-    background:#9AD74A;
-    transform:translateY(-1px);
+    filter:brightness(1.06);
+
+    transform:
+        translateY(-1px);
+}
+
+.download-btn:active{
+    transform:
+        translateY(0);
 }
 
 .download-btn svg{
-    width:17px;
-    height:17px;
+    width:18px;
+    height:18px;
 }
 
 
@@ -1274,61 +1248,94 @@ main{
 ========================================================= */
 
 .manager{
-    margin-top:12px;
+    margin-top:13px;
 
     padding:
-        26px 22px 22px;
+        22px;
 
     border:
         1px solid var(--border);
 
-    border-radius:17px;
+    border-radius:
+        var(--radius-lg);
 
     background:
+        radial-gradient(
+            circle at 88% 0%,
+            rgba(140,198,63,.055),
+            transparent 32%
+        ),
         linear-gradient(
             145deg,
-            rgba(8,15,9,.98),
-            rgba(5,9,6,.98)
+            #0A100B,
+            #070A08
         );
+
+    box-shadow:
+        0 20px 60px rgba(0,0,0,.20);
 }
+
+
+/* =========================================================
+   SECTION LABEL
+========================================================= */
 
 .section-label{
     color:var(--lime);
 
     font-size:10px;
 
-    font-weight:900;
+    font-weight:950;
 
-    letter-spacing:3px;
+    letter-spacing:3.5px;
+
+    line-height:1;
 
     text-transform:uppercase;
 }
 
+
+/* =========================================================
+   MANAGER HEADING
+========================================================= */
+
 .manager-heading{
-    margin-top:7px;
+    margin-top:8px;
 
     display:flex;
-    align-items:center;
+
+    align-items:flex-end;
+
     justify-content:space-between;
 
-    gap:20px;
+    gap:18px;
 }
 
 .manager-title{
+    margin:0;
+
     color:#fff;
 
     font-size:
-        clamp(22px,3vw,31px);
+        clamp(23px,2.7vw,36px);
 
-    font-weight:800;
+    line-height:1;
 
-    letter-spacing:-1.2px;
+    font-weight:950;
+
+    letter-spacing:-1.4px;
 }
 
 .manager-summary{
-    color:#757E75;
+    flex-shrink:0;
 
-    font-size:10px;
+    color:#707870;
+
+    font-size:11px;
+
+    line-height:1.2;
+
+    white-space:nowrap;
 }
 
 .manager-summary strong{
@@ -1344,13 +1351,14 @@ main{
     margin-top:20px;
 
     display:flex;
+
     flex-wrap:wrap;
 
     gap:8px;
 }
 
 .tool-btn{
-    height:42px;
+    min-height:42px;
 
     padding:
         0 16px;
@@ -1365,16 +1373,23 @@ main{
     color:#fff;
 
     font-size:9px;
-    font-weight:800;
 
-    cursor:pointer;
+    font-weight:850;
 
-    transition:.2s ease;
+    line-height:1;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        transform .18s ease;
 }
 
 .tool-btn:hover{
     border-color:
         rgba(140,198,63,.4);
+
+    transform:
+        translateY(-1px);
 }
 
 .tool-btn.primary{
@@ -1383,6 +1398,12 @@ main{
     background:var(--lime);
 
     border-color:var(--lime);
+}
+
+.tool-btn.primary:hover{
+    background:#98D848;
+
+    border-color:#98D848;
 }
 
 
@@ -1394,6 +1415,7 @@ main{
     margin-top:18px;
 
     display:flex;
+
     justify-content:flex-end;
 }
 
@@ -1417,11 +1439,23 @@ main{
     color:#fff;
 
     font-size:10px;
+
+    transition:
+        border-color .18s ease,
+        box-shadow .18s ease;
+}
+
+.search::placeholder{
+    color:#596159;
 }
 
 .search:focus{
     border-color:
         rgba(140,198,63,.5);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(140,198,63,.06);
 }
 
 
@@ -1445,11 +1479,13 @@ main{
 
 
 /* =========================================================
-   PRODUCT CARD
+   PRODUCT SELECT CARD
 ========================================================= */
 
 .select-card{
     position:relative;
+
+    min-width:0;
 
     min-height:215px;
 
@@ -1460,15 +1496,24 @@ main{
 
     border-radius:14px;
 
-    background:#080C09;
+    background:
+        linear-gradient(
+            145deg,
+            #090E0A,
+            #070A08
+        );
 
     cursor:pointer;
 
-    transition:.2s ease;
+    transition:
+        transform .18s ease,
+        border-color .18s ease,
+        box-shadow .18s ease;
 }
 
 .select-card:hover{
-    transform:translateY(-2px);
+    transform:
+        translateY(-2px);
 
     border-color:
         rgba(140,198,63,.35);
@@ -1478,8 +1523,16 @@ main{
     border-color:var(--lime);
 
     box-shadow:
-        0 0 0 1px var(--lime);
+        0 0 0 1px
+        rgba(140,198,63,.22),
+        0 12px 28px
+        rgba(0,0,0,.18);
 }
+
+
+/* =========================================================
+   SELECT IMAGE
+========================================================= */
 
 .select-image{
     position:absolute;
@@ -1491,10 +1544,14 @@ main{
     height:125px;
 
     display:flex;
+
     align-items:center;
+
     justify-content:center;
 
-    background:#080B08;
+    overflow:hidden;
+
+    background:#070A08;
 }
 
 .select-image img{
@@ -1510,7 +1567,10 @@ main{
     content:"";
 
     position:absolute;
+
     inset:0;
+
+    pointer-events:none;
 
     background:
         linear-gradient(
@@ -1519,6 +1579,11 @@ main{
             #080C09 100%
         );
 }
+
+
+/* =========================================================
+   CHECK
+========================================================= */
 
 .check{
     position:absolute;
@@ -1532,22 +1597,30 @@ main{
     height:20px;
 
     display:grid;
+
     place-items:center;
 
     border:
-        1px solid rgba(255,255,255,.18);
+        1px solid
+        rgba(255,255,255,.18);
 
     border-radius:5px;
 
     background:
-        rgba(0,0,0,.55);
+        rgba(0,0,0,.58);
 
     color:transparent;
+
+    transition:
+        background .18s ease,
+        border-color .18s ease;
 }
 
 .select-card.selected .check{
     color:#11150C;
+
     background:var(--lime);
+
     border-color:var(--lime);
 }
 
@@ -1556,25 +1629,53 @@ main{
     height:12px;
 }
 
+
+/* =========================================================
+   SELECT INFO
+========================================================= */
+
 .select-info{
     position:absolute;
 
-    left:12px;
-    right:12px;
+    left:11px;
+    right:11px;
+
     bottom:11px;
+
+    z-index:4;
+
+    min-width:0;
 }
+
+
+/* =========================================================
+   SELECT BRAND
+========================================================= */
 
 .select-brand{
     color:var(--lime);
 
     font-size:7px;
 
-    font-weight:900;
+    font-weight:950;
 
     letter-spacing:1.8px;
 
+    line-height:1.1;
+
     text-transform:uppercase;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 }
+
+
+/* =========================================================
+   SELECT NAME
+========================================================= */
 
 .select-name{
     margin-top:4px;
@@ -1585,14 +1686,21 @@ main{
 
     line-height:1.25;
 
-    font-weight:700;
+    font-weight:750;
 
     display:-webkit-box;
+
     -webkit-box-orient:vertical;
+
     -webkit-line-clamp:2;
 
     overflow:hidden;
 }
+
+
+/* =========================================================
+   SELECT PRICE
+========================================================= */
 
 .select-price{
     margin-top:6px;
@@ -1601,7 +1709,15 @@ main{
 
     font-size:11px;
 
-    font-weight:900;
+    line-height:1;
+
+    font-weight:950;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 }
 
 .select-old{
@@ -1612,6 +1728,7 @@ main{
     font-size:8px;
 
     font-weight:500;
+
     text-decoration:line-through;
 }
 
@@ -1622,7 +1739,7 @@ main{
 
     font-size:8px;
 
-    font-weight:900;
+    font-weight:950;
 }
 
 
@@ -1639,8 +1756,12 @@ main{
         1px solid var(--border);
 
     display:flex;
+
     align-items:center;
+
     justify-content:space-between;
+
+    gap:15px;
 
     color:#757E75;
 
@@ -1653,17 +1774,23 @@ main{
 
 
 /* =========================================================
-   ERROR / LOADING
+   LOADING
 ========================================================= */
 
 .loading{
+    width:100%;
+
     min-height:500px;
 
     display:grid;
+
     place-items:center;
 
     border:
         1px solid var(--border);
+
+    background:
+        #070907;
 }
 
 .spinner{
@@ -1673,9 +1800,11 @@ main{
     margin:auto;
 
     border:
-        3px solid rgba(255,255,255,.08);
+        3px solid
+        rgba(255,255,255,.08);
 
-    border-top-color:var(--lime);
+    border-top-color:
+        var(--lime);
 
     border-radius:50%;
 
@@ -1684,22 +1813,35 @@ main{
 }
 
 @keyframes spin{
+
     to{
         transform:rotate(360deg);
     }
+
 }
 
+
+/* =========================================================
+   ERROR
+========================================================= */
+
 .error{
+    width:100%;
+
     padding:30px;
 
     color:#FF9B9B;
 
     border:
-        1px solid rgba(255,100,100,.2);
+        1px solid
+        rgba(255,100,100,.2);
 
     border-radius:18px;
 
-    background:rgba(50,5,5,.25);
+    background:
+        rgba(50,5,5,.25);
+
+    line-height:1.55;
 }
 
 .error strong{
@@ -1717,7 +1859,7 @@ main{
 
     background:#030503;
 
-    color:#ccc;
+    color:#CCC;
 
     font-size:10px;
 }
@@ -1742,7 +1884,8 @@ main{
         11px 17px;
 
     border:
-        1px solid rgba(140,198,63,.25);
+        1px solid
+        rgba(140,198,63,.25);
 
     border-radius:999px;
 
@@ -1752,6 +1895,7 @@ main{
     color:#fff;
 
     font-size:10px;
+
     font-weight:700;
 
     transform:
@@ -1761,7 +1905,9 @@ main{
 
     pointer-events:none;
 
-    transition:.25s ease;
+    transition:
+        opacity .25s ease,
+        transform .25s ease;
 }
 
 .toast.show{
@@ -1773,42 +1919,43 @@ main{
 
 
 /* =========================================================
-   CAPTURE
-========================================================= */
-
-.capture-mode .capture-hide{
-    display:none !important;
-}
-
-
-/* =========================================================
    FULLSCREEN
 ========================================================= */
 
 :fullscreen .promo-canvas{
     width:100vw !important;
+
     height:100vh !important;
 
     aspect-ratio:auto !important;
 
     border:0;
+
+    border-radius:0;
 }
 
 
 /* =========================================================
-   RESPONSIVE TABLET
+   TABLET
 ========================================================= */
 
 @media(max-width:900px){
 
+    main{
+        padding:
+            14px
+            14px
+            70px;
+    }
+
     .control-strip{
         grid-template-columns:1fr;
+
         gap:11px;
     }
 
     .ratio-group{
-        justify-content:center;
-        flex-wrap:wrap;
+        width:100%;
     }
 
     .navigation{
@@ -1819,14 +1966,60 @@ main{
         width:100%;
     }
 
+    .manager-heading{
+        align-items:flex-start;
+    }
+
+    .product-grid{
+        grid-template-columns:
+            repeat(
+                auto-fill,
+                minmax(155px,1fr)
+            );
+    }
+
 }
 
 
 /* =========================================================
-   RESPONSIVE MOBILE
+   MOBILE
 ========================================================= */
 
 @media(max-width:600px){
+
+    .topbar{
+        min-height:68px;
+
+        padding:
+            11px
+            14px;
+    }
+
+    .brand-name{
+        font-size:20px;
+
+        letter-spacing:-1px;
+    }
+
+    .brand-sub{
+        margin-top:6px;
+
+        font-size:8px;
+
+        letter-spacing:.7px;
+    }
+
+    .header-actions{
+        gap:6px;
+    }
+
+    .header-btn{
+        width:43px;
+        height:43px;
+
+        border-radius:13px;
+    }
+
 
     main{
         padding:
@@ -1835,98 +2028,348 @@ main{
             70px;
     }
 
-    .topbar{
-        padding:
-            12px 16px;
+
+    /* ==========================================
+       9:16
+    ========================================== */
+
+    .stage.ratio-916 .promo-canvas{
+        width:min(100%,520px);
     }
 
-    .brand-name{
-        font-size:19px;
-    }
-
-    .brand-sub{
-        font-size:8px;
-        letter-spacing:.8px;
-    }
-
-    .header-btn{
-        width:43px;
-        height:43px;
-        border-radius:13px;
+    .stage.ratio-916 .product-visual{
+        height:56%;
     }
 
     .stage.ratio-916 .promo-badge{
-        top:18px;
-        left:18px;
+        top:calc(56% + 10px);
+
+        left:7%;
+
+        height:32px;
+
+        min-width:99px;
+
+        padding:
+            0 12px;
+
+        font-size:7px;
+
+        letter-spacing:2.5px;
     }
 
-    .promo-badge{
-        height:39px;
-        padding:0 17px;
-        font-size:9px;
-        letter-spacing:3px;
+    .stage.ratio-916 .promo-badge::before{
+        width:6px;
+        height:6px;
+
+        flex-basis:6px;
     }
 
     .stage.ratio-916 .product-info{
-        left:8%;
-        right:7%;
-        bottom:13%;
+        top:calc(56% + 54px);
+
+        left:7%;
+
+        right:6%;
     }
 
     .stage.ratio-916 .product-name{
-        font-size:
-            clamp(26px,7.5vw,41px);
+        margin-top:8px;
 
-        letter-spacing:-1.5px;
+        font-size:
+            clamp(
+                25px,
+                7vw,
+                39px
+            );
+
+        letter-spacing:-1.2px;
+
+        -webkit-line-clamp:2;
+    }
+
+    .stage.ratio-916 .price-block{
+        margin-top:15px;
     }
 
     .stage.ratio-916 .price-promo{
         font-size:
-            clamp(34px,9vw,47px);
+            clamp(
+                33px,
+                9vw,
+                46px
+            );
+    }
+
+
+    /* ==========================================
+       4:5
+    ========================================== */
+
+    .stage.ratio-45 .product-visual{
+        height:59%;
+    }
+
+    .stage.ratio-45 .promo-badge{
+        top:calc(59% + 10px);
+
+        left:7%;
+
+        height:32px;
+
+        min-width:101px;
+
+        padding:
+            0 12px;
+
+        font-size:7px;
+
+        letter-spacing:2.5px;
+    }
+
+    .stage.ratio-45 .product-info{
+        top:calc(59% + 54px);
+
+        left:7%;
+
+        right:7%;
+    }
+
+    .stage.ratio-45 .product-name{
+        margin-top:8px;
+
+        font-size:
+            clamp(
+                27px,
+                6.2vw,
+                43px
+            );
+
+        letter-spacing:-1.3px;
+
+        -webkit-line-clamp:2;
+    }
+
+    .stage.ratio-45 .price-block{
+        margin-top:15px;
+    }
+
+    .stage.ratio-45 .price-promo{
+        font-size:
+            clamp(
+                34px,
+                7.6vw,
+                50px
+            );
+    }
+
+
+    /* ==========================================
+       16:9
+    ========================================== */
+
+    .stage.ratio-169 .product-visual{
+        width:57%;
+    }
+
+    .stage.ratio-169 .promo-badge{
+        top:7%;
+
+        left:61%;
+
+        height:30px;
+
+        min-width:92px;
+
+        padding:
+            0 10px;
+
+        font-size:6.5px;
+
+        letter-spacing:2.1px;
+    }
+
+    .stage.ratio-169 .promo-badge::before{
+        width:6px;
+        height:6px;
+
+        flex-basis:6px;
+    }
+
+    .stage.ratio-169 .product-info{
+        top:calc(7% + 48px);
+
+        left:61%;
+
+        right:4%;
+    }
+
+    .stage.ratio-169 .product-brand{
+        font-size:7px;
+
+        letter-spacing:2px;
+    }
+
+    .stage.ratio-169 .product-name{
+        margin-top:7px;
+
+        font-size:
+            clamp(
+                20px,
+                4.8vw,
+                30px
+            );
+
+        letter-spacing:-.8px;
+
+        -webkit-line-clamp:3;
+    }
+
+    .stage.ratio-169 .price-block{
+        margin-top:12px;
+    }
+
+    .stage.ratio-169 .price-promo{
+        font-size:
+            clamp(
+                25px,
+                6vw,
+                38px
+            );
+    }
+
+    .stage.ratio-169 .price-normal,
+    .stage.ratio-169 .discount{
+        font-size:8px;
+    }
+
+
+    /* ==========================================
+       CONTROL STRIP
+    ========================================== */
+
+    .control-strip{
+        padding:12px;
+
+        border-radius:17px;
     }
 
     .ratio-group{
-        justify-content:flex-start;
+        display:grid;
+
+        grid-template-columns:
+            1fr
+            1fr
+            1fr;
+
+        gap:7px;
     }
 
     .ratio-caption{
-        width:100%;
-        margin:0 0 2px;
+        grid-column:1 / -1;
+
+        margin-bottom:1px;
     }
 
     .ratio-btn{
-        flex:1;
+        width:100%;
+
         min-width:0;
-        padding:0 7px;
+
+        height:53px;
+
+        padding:
+            0 7px;
+
+        border-radius:13px;
+
+        gap:7px;
     }
 
     .ratio-use{
         display:none;
     }
 
+    .ratio-value{
+        font-size:10px;
+    }
+
     .navigation{
         width:100%;
+
+        display:grid;
+
+        grid-template-columns:
+            1fr
+            1fr
+            1fr
+            auto;
+
+        gap:7px;
     }
 
     .nav-btn{
-        flex:1;
+        width:100%;
+
+        flex:initial;
+
+        min-width:0;
     }
 
     .slide-count{
-        flex:0 0 48px;
+        min-width:42px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
     }
+
+
+    /* ==========================================
+       MANAGER
+    ========================================== */
 
     .manager{
         padding:
-            22px 15px 17px;
+            21px
+            14px
+            17px;
     }
 
     .manager-heading{
         display:block;
     }
 
+    .manager-title{
+        font-size:25px;
+
+        line-height:1.02;
+    }
+
     .manager-summary{
-        margin-top:7px;
+        margin-top:8px;
+
+        white-space:normal;
+    }
+
+    .manager-toolbar{
+        display:grid;
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:7px;
+    }
+
+    .tool-btn{
+        width:100%;
+
+        min-height:44px;
+
+        padding:
+            0 8px;
     }
 
     .search-row{
@@ -1939,32 +2382,45 @@ main{
 
     .product-grid{
         grid-template-columns:
-            repeat(2,1fr);
+            repeat(2,minmax(0,1fr));
 
         gap:8px;
     }
 
     .select-card{
         min-height:195px;
+
+        border-radius:12px;
     }
 
     .select-image{
         height:112px;
     }
 
-    .manager-toolbar{
-        display:grid;
+    .select-info{
+        left:9px;
+        right:9px;
 
-        grid-template-columns:
-            repeat(2,1fr);
+        bottom:9px;
     }
 
-    .tool-btn{
-        width:100%;
+    .select-name{
+        font-size:10px;
+    }
+
+    .select-price{
+        font-size:10px;
+    }
+
+    .select-old,
+    .select-discount{
+        font-size:7px;
     }
 
     .manager-footer{
         display:block;
+
+        line-height:1.4;
     }
 
     .manager-footer > * + *{
@@ -1975,13 +2431,13 @@ main{
 
 
 /* =========================================================
-   VERY SMALL
+   SMALL PHONE
 ========================================================= */
 
 @media(max-width:380px){
 
     .brand-name{
-        font-size:17px;
+        font-size:18px;
     }
 
     .brand-sub{
@@ -1993,21 +2449,217 @@ main{
         height:40px;
     }
 
+
+    /* 9:16 */
+
+    .stage.ratio-916 .promo-badge{
+        top:calc(56% + 8px);
+
+        left:6.5%;
+
+        height:30px;
+
+        min-width:94px;
+
+        padding:0 10px;
+
+        font-size:6.7px;
+
+        letter-spacing:2.2px;
+    }
+
+    .stage.ratio-916 .product-info{
+        top:calc(56% + 49px);
+
+        left:6.5%;
+
+        right:6%;
+    }
+
     .stage.ratio-916 .product-name{
-        font-size:25px;
+        font-size:24px;
     }
 
     .stage.ratio-916 .price-promo{
-        font-size:34px;
+        font-size:31px;
     }
 
+
+    /* 4:5 */
+
+    .stage.ratio-45 .promo-badge{
+        top:calc(59% + 8px);
+
+        left:6%;
+
+        height:30px;
+
+        min-width:94px;
+
+        padding:0 10px;
+
+        font-size:6.7px;
+
+        letter-spacing:2.2px;
+    }
+
+    .stage.ratio-45 .product-info{
+        top:calc(59% + 49px);
+
+        left:6%;
+
+        right:6%;
+    }
+
+    .stage.ratio-45 .product-name{
+        font-size:24px;
+    }
+
+    .stage.ratio-45 .price-promo{
+        font-size:32px;
+    }
+
+
+    /* 16:9 */
+
+    .stage.ratio-169 .promo-badge{
+        top:6.5%;
+
+        left:60%;
+
+        min-width:88px;
+
+        height:28px;
+
+        font-size:6.2px;
+
+        letter-spacing:1.9px;
+    }
+
+    .stage.ratio-169 .product-info{
+        top:calc(6.5% + 45px);
+
+        left:60%;
+
+        right:4%;
+    }
+
+    .stage.ratio-169 .product-name{
+        font-size:19px;
+    }
+
+    .stage.ratio-169 .price-promo{
+        font-size:24px;
+    }
+
+
+    /* controls */
+
     .ratio-btn{
-        height:44px;
+        height:48px;
+    }
+
+    .ratio-icon{
+        width:12px;
+        height:17px;
+    }
+
+    .ratio-btn[data-ratio="45"] .ratio-icon{
+        width:14px;
+        height:17px;
+    }
+
+    .ratio-btn[data-ratio="169"] .ratio-icon{
+        width:19px;
+        height:11px;
+    }
+
+    .nav-btn{
+        height:46px;
+    }
+
+    .download-btn{
+        height:50px;
+
+        font-size:9px;
     }
 
 }
 
+
+/* =========================================================
+   LANDSCAPE PHONE
+========================================================= */
+
+@media(
+    max-width:900px
+) and (
+    orientation:landscape
+){
+
+    .stage.ratio-169 .promo-canvas{
+        max-height:
+            calc(100vh - 155px);
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+
+        animation:none !important;
+
+        transition:none !important;
+
+        scroll-behavior:auto !important;
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+    .topbar,
+    .control-strip,
+    .manager,
+    .toast{
+        display:none !important;
+    }
+
+    main{
+        padding:0;
+    }
+
+    .promo-canvas{
+        box-shadow:none;
+    }
+
+}
+
+
+
+
+
+
+
+
+  
 </style>
+
+
+  
 </head>
 
 
@@ -3815,8 +4467,10 @@ document
     fullscreen;
 
 
+
 /* =========================================================
-   DOWNLOAD STATUS
+   PREMIUM DOWNLOAD STATUS
+   Reliable PNG export
 ========================================================= */
 
 async function downloadStatus(){
@@ -3826,6 +4480,10 @@ async function downloadStatus(){
             "promoCanvas"
         );
 
+
+    /* -----------------------------------------------------
+       VALIDASI PREVIEW
+    ----------------------------------------------------- */
 
     if(!canvas){
 
@@ -3838,19 +4496,106 @@ async function downloadStatus(){
     }
 
 
-    if(
-        typeof html2canvas ===
-        "undefined"
-    ){
+    /* -----------------------------------------------------
+       VALIDASI PRODUK
+    ----------------------------------------------------- */
+
+    const product =
+        promoProducts[
+            currentIndex
+        ];
+
+
+    if(!product){
 
         showToast(
-            "Engine download belum tersedia."
+            "Produk promo belum tersedia."
         );
 
         return;
 
     }
 
+
+    /* -----------------------------------------------------
+       VALIDASI ENGINE
+    ----------------------------------------------------- */
+
+    if(
+        typeof window.html2canvas !==
+        "function"
+    ){
+
+        showToast(
+            "Engine export belum tersedia."
+        );
+
+        console.error(
+            "[PROMO DOWNLOAD] html2canvas tidak tersedia."
+        );
+
+        return;
+
+    }
+
+
+    /* -----------------------------------------------------
+       LOCK BUTTON
+    ----------------------------------------------------- */
+
+    const button =
+        document.getElementById(
+            "downloadBtn"
+        );
+
+
+    if(button.dataset.downloading === "1"){
+
+        return;
+
+    }
+
+
+    button.dataset.downloading = "1";
+
+
+    const originalHTML =
+        button.innerHTML;
+
+
+    button.innerHTML = `
+
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            style="
+                animation:
+                promoSpin .8s linear infinite;
+            "
+        >
+            <circle
+                cx="12"
+                cy="12"
+                r="9"
+                stroke-opacity=".25"
+            ></circle>
+
+            <path
+                d="M21 12a9 9 0 0 0-9-9"
+            ></path>
+
+        </svg>
+
+        MEMBUAT STATUS...
+
+    `;
+
+
+    /* -----------------------------------------------------
+       TOAST
+    ----------------------------------------------------- */
 
     showToast(
         "Membuat gambar status..."
@@ -3859,65 +4604,244 @@ async function downloadStatus(){
 
     try{
 
-        document.body.classList.add(
-            "capture-mode"
+        /* =================================================
+           1. PASTIKAN IMAGE SELESAI LOAD
+        ================================================= */
+
+        const images =
+            Array.from(
+                canvas.querySelectorAll(
+                    "img"
+                )
+            );
+
+
+        await Promise.all(
+
+            images.map(
+                img => {
+
+                    if(
+                        img.complete &&
+                        img.naturalWidth > 0
+                    ){
+
+                        return Promise.resolve();
+
+                    }
+
+
+                    return new Promise(
+                        resolve => {
+
+                            const done =
+                                () => {
+
+                                    img.removeEventListener(
+                                        "load",
+                                        done
+                                    );
+
+                                    img.removeEventListener(
+                                        "error",
+                                        done
+                                    );
+
+                                    resolve();
+
+                                };
+
+
+                            img.addEventListener(
+                                "load",
+                                done,
+                                {
+                                    once:true
+                                }
+                            );
+
+
+                            img.addEventListener(
+                                "error",
+                                done,
+                                {
+                                    once:true
+                                }
+
+                            );
+
+                        }
+                    );
+
+                }
+            )
+
         );
+
+
+        /* =================================================
+           2. TUNGGU FONT + PAINT
+        ================================================= */
+
+        if(
+            document.fonts &&
+            document.fonts.ready
+        ){
+
+            await document.fonts.ready;
+
+        }
 
 
         await new Promise(
             resolve =>
                 requestAnimationFrame(
-                    resolve
+                    ()=>{
+                        requestAnimationFrame(
+                            resolve
+                        );
+                    }
                 )
         );
 
 
+        /* =================================================
+           3. MASUK CAPTURE MODE
+        ================================================= */
+
+        document.body.classList.add(
+            "capture-mode"
+        );
+
+
+        /* =================================================
+           4. CAPTURE
+        ================================================= */
+
         const result =
-            await html2canvas(
+            await window.html2canvas(
                 canvas,
                 {
 
                     backgroundColor:
                         "#070907",
 
-                    scale:2.5,
+                    scale:
+                        Math.min(
+                            3,
+                            Math.max(
+                                2,
+                                window.devicePixelRatio || 1
+                            )
+                        ),
 
                     useCORS:true,
 
                     allowTaint:false,
 
+                    imageTimeout:20000,
+
                     logging:false,
 
-                    imageTimeout:15000
+                    removeContainer:true,
+
+                    foreignObjectRendering:false,
+
+                    scrollX:0,
+
+                    scrollY:0,
+
+                    windowWidth:
+                        document.documentElement
+                        .clientWidth,
+
+                    windowHeight:
+                        document.documentElement
+                        .clientHeight
 
                 }
             );
 
+
+        /* =================================================
+           5. KELUARKAN CAPTURE MODE
+        ================================================= */
 
         document.body.classList.remove(
             "capture-mode"
         );
 
 
-        const product =
-            promoProducts[
-                currentIndex
-            ];
-
+        /* =================================================
+           6. BUAT FILENAME
+        ================================================= */
 
         const ratio =
             currentRatio === "916"
-            ? "9x16"
-            : currentRatio === "45"
-                ? "4x5"
-                : "16x9";
+                ? "9x16"
+                : currentRatio === "45"
+                    ? "4x5"
+                    : "16x9";
+
+
+        const title =
+            makeDisplayTitle(
+                product
+            );
 
 
         const filename =
-            `PROMO-${slug(
-                makeDisplayTitle(product)
-            )}-${ratio}.png`;
+            `PROMO-${slug(title)}-${ratio}.png`;
 
+
+        /* =================================================
+           7. CONVERT KE BLOB
+           Lebih stabil daripada toDataURL()
+        ================================================= */
+
+        const blob =
+            await new Promise(
+                (resolve,reject)=>{
+
+                    result.toBlob(
+                        blob => {
+
+                            if(blob){
+
+                                resolve(blob);
+
+                            }else{
+
+                                reject(
+                                    new Error(
+                                        "Gagal membuat PNG blob."
+                                    )
+                                );
+
+                            }
+
+                        },
+                        "image/png",
+                        1
+                    );
+
+                }
+            );
+
+
+        /* =================================================
+           8. BUAT OBJECT URL
+        ================================================= */
+
+        const url =
+            URL.createObjectURL(
+                blob
+            );
+
+
+        /* =================================================
+           9. DOWNLOAD
+        ================================================= */
 
         const link =
             document.createElement(
@@ -3925,41 +4849,104 @@ async function downloadStatus(){
             );
 
 
+        link.style.display =
+            "none";
+
+        link.href =
+            url;
+
         link.download =
             filename;
 
+        link.setAttribute(
+            "download",
+            filename
+        );
 
-        link.href =
-            result.toDataURL(
-                "image/png"
-            );
+
+        document.body.appendChild(
+            link
+        );
 
 
         link.click();
 
 
+        /* -------------------------------------------------
+           Cleanup
+        ------------------------------------------------- */
+
+        setTimeout(
+            ()=>{
+
+                link.remove();
+
+                URL.revokeObjectURL(
+                    url
+                );
+
+            },
+            1500
+        );
+
+
+        /* =================================================
+           10. BERHASIL
+        ================================================= */
+
         showToast(
-            "Status berhasil didownload."
+            "Status berhasil didownload ✓"
         );
 
 
     }catch(error){
+
+        console.error(
+            "[PROMO DOWNLOAD ERROR]",
+            error
+        );
+
 
         document.body.classList.remove(
             "capture-mode"
         );
 
 
-        console.error(error);
-
-
         showToast(
-            "Gagal membuat gambar."
+            "Gagal membuat gambar status."
         );
+
+
+    }finally{
+
+        /* -------------------------------------------------
+           UNLOCK BUTTON
+        ------------------------------------------------- */
+
+        button.dataset.downloading =
+            "0";
+
+
+        button.innerHTML =
+            originalHTML;
 
     }
 
 }
+
+
+/* =========================================================
+   DOWNLOAD BUTTON
+========================================================= */
+
+document
+.getElementById(
+    "downloadBtn"
+)
+.addEventListener(
+    "click",
+    downloadStatus
+);
 
 
 document
