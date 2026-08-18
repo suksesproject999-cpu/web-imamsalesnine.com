@@ -1,0 +1,2648 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+
+<title>Promo — Imam_salesfr</title>
+
+<style>
+:root{
+    --lime:#8bd136;
+    --lime-dark:#6da92b;
+    --bg:#050705;
+    --panel:#0b100c;
+    --panel-2:#0e140f;
+    --border:rgba(255,255,255,.10);
+    --text:#f4f7f3;
+    --muted:#858c84;
+    --danger:#ff5757;
+}
+
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+
+html,
+body{
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+    color:var(--text);
+    font-family:
+        Inter,
+        system-ui,
+        -apple-system,
+        BlinkMacSystemFont,
+        "Segoe UI",
+        sans-serif;
+}
+
+body{
+    overflow-x:hidden;
+}
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.topbar{
+    position:sticky;
+    top:0;
+    z-index:1000;
+
+    height:108px;
+
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+
+    padding:
+        20px
+        max(24px, env(safe-area-inset-right))
+        20px
+        max(24px, env(safe-area-inset-left));
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(5,7,5,.98),
+            rgba(5,7,5,.92)
+        );
+
+    border-bottom:1px solid var(--border);
+
+    backdrop-filter:blur(20px);
+}
+
+.brand{
+    display:flex;
+    align-items:center;
+    gap:16px;
+}
+
+.brand-mark{
+    width:68px;
+    height:68px;
+
+    display:grid;
+    place-items:center;
+
+    border-radius:19px;
+
+    background:var(--lime);
+    color:#10150d;
+
+    font-size:30px;
+    font-weight:900;
+
+    box-shadow:
+        0 0 30px rgba(139,209,54,.15);
+}
+
+.brand-text h1{
+    font-size:22px;
+    line-height:1;
+    font-weight:900;
+    letter-spacing:-.7px;
+}
+
+.brand-text p{
+    margin-top:9px;
+
+    font-size:12px;
+    color:var(--muted);
+
+    letter-spacing:1px;
+}
+
+.brand-text p span{
+    color:var(--lime);
+}
+
+/* header controls */
+
+.header-controls{
+    display:flex;
+    align-items:center;
+    gap:12px;
+}
+
+.icon-btn{
+    width:68px;
+    height:68px;
+
+    border:1px solid var(--border);
+    border-radius:18px;
+
+    background:#0d110e;
+    color:white;
+
+    display:grid;
+    place-items:center;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+.icon-btn:hover{
+    border-color:rgba(139,209,54,.5);
+    transform:translateY(-2px);
+}
+
+.icon-btn svg{
+    width:22px;
+    height:22px;
+}
+
+.icon-btn.primary{
+    background:var(--lime);
+    color:#11160d;
+    border-color:var(--lime);
+}
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main{
+    width:100%;
+    padding:0 24px 90px;
+}
+
+.promo-wrapper{
+    width:min(100%, 1180px);
+    margin:0 auto;
+}
+
+/* =========================================================
+   STAGE
+========================================================= */
+
+.stage{
+    position:relative;
+
+    width:100%;
+
+    margin:0 auto;
+
+    display:flex;
+    justify-content:center;
+}
+
+.slide{
+    position:relative;
+
+    width:100%;
+
+    min-height:calc(100vh - 108px);
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at 50% 40%,
+            rgba(100,180,40,.12),
+            transparent 34%
+        ),
+        #080d09;
+
+    border-left:1px solid var(--border);
+    border-right:1px solid var(--border);
+    border-bottom:1px solid var(--border);
+
+    isolation:isolate;
+}
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+.product-image-layer{
+    position:absolute;
+    inset:0;
+
+    z-index:-1;
+
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:
+        radial-gradient(
+            circle at center,
+            rgba(120,190,50,.18),
+            transparent 43%
+        ),
+        #090e0a;
+}
+
+.product-image{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    opacity:.78;
+
+    filter:
+        saturate(.95)
+        contrast(1.04);
+
+    transition:
+        opacity .35s ease,
+        transform .8s cubic-bezier(.2,.7,.2,1);
+}
+
+.slide.active .product-image{
+    transform:scale(1.01);
+}
+
+/*
+  Overlay supaya text tetap jelas
+*/
+
+.image-overlay{
+    position:absolute;
+    inset:0;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(3,6,4,.10) 0%,
+            rgba(3,6,4,.05) 30%,
+            rgba(3,6,4,.40) 57%,
+            rgba(3,6,4,.96) 91%,
+            #050705 100%
+        );
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.slide-content{
+    min-height:calc(100vh - 108px);
+
+    display:flex;
+    flex-direction:column;
+    justify-content:flex-end;
+
+    padding:
+        clamp(32px,5vw,70px)
+        clamp(30px,5vw,70px)
+        110px;
+}
+
+/* promo badge */
+
+.promo-badge{
+    align-self:flex-start;
+
+    display:inline-flex;
+    align-items:center;
+    gap:9px;
+
+    padding:13px 20px;
+
+    border-radius:999px;
+
+    background:var(--lime);
+    color:#11160d;
+
+    font-size:13px;
+    font-weight:950;
+
+    letter-spacing:2px;
+    text-transform:uppercase;
+
+    box-shadow:
+        0 12px 35px rgba(139,209,54,.17);
+
+    margin-bottom:auto;
+}
+
+.promo-badge::before{
+    content:"";
+    width:8px;
+    height:8px;
+
+    border-radius:50%;
+
+    background:#18210f;
+}
+
+/* product brand */
+
+.product-brand{
+    margin-top:auto;
+
+    color:var(--lime);
+
+    font-size:13px;
+    font-weight:900;
+
+    letter-spacing:4px;
+    text-transform:uppercase;
+}
+
+/* product name */
+
+.product-name{
+    margin-top:14px;
+
+    max-width:900px;
+
+    font-size:
+        clamp(38px, 6vw, 76px);
+
+    line-height:.94;
+
+    font-weight:950;
+
+    letter-spacing:-3px;
+
+    text-transform:uppercase;
+}
+
+/* description */
+
+.product-description{
+    max-width:700px;
+
+    margin-top:22px;
+
+    color:#b7beb6;
+
+    font-size:
+        clamp(14px,1.7vw,18px);
+
+    line-height:1.65;
+}
+
+/* price */
+
+.price-area{
+    margin-top:27px;
+}
+
+.price-label{
+    font-size:12px;
+    font-weight:800;
+
+    color:#8d958b;
+
+    letter-spacing:1px;
+    text-transform:uppercase;
+}
+
+.price-promo{
+    margin-top:4px;
+
+    font-size:
+        clamp(38px,5vw,64px);
+
+    line-height:1;
+
+    font-weight:950;
+
+    letter-spacing:-2px;
+
+    color:white;
+}
+
+.price-normal{
+    margin-top:9px;
+
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    color:#7e857e;
+
+    font-size:14px;
+}
+
+.price-normal s{
+    opacity:.8;
+}
+
+.discount{
+    color:var(--lime);
+
+    font-weight:900;
+}
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+.progress-wrap{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    z-index:20;
+
+    height:4px;
+
+    background:rgba(255,255,255,.08);
+}
+
+.progress{
+    height:100%;
+
+    width:0%;
+
+    background:var(--lime);
+
+    transition:
+        width .1s linear;
+}
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.slide-controls{
+    position:absolute;
+
+    right:28px;
+    bottom:28px;
+
+    z-index:30;
+
+    display:flex;
+    gap:10px;
+}
+
+.slide-btn{
+    width:58px;
+    height:58px;
+
+    border-radius:17px;
+
+    border:1px solid rgba(255,255,255,.14);
+
+    background:rgba(7,10,8,.78);
+
+    color:white;
+
+    display:grid;
+    place-items:center;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(15px);
+
+    transition:.25s ease;
+}
+
+.slide-btn:hover{
+    background:var(--lime);
+    color:#11160d;
+    border-color:var(--lime);
+}
+
+.slide-btn svg{
+    width:22px;
+    height:22px;
+}
+
+/* =========================================================
+   FORMAT SELECTOR
+========================================================= */
+
+.format-selector{
+    position:absolute;
+
+    left:28px;
+    bottom:28px;
+
+    z-index:30;
+
+    display:flex;
+    gap:8px;
+}
+
+.format-btn{
+    min-width:65px;
+    height:48px;
+
+    padding:0 14px;
+
+    border-radius:14px;
+
+    border:1px solid rgba(255,255,255,.12);
+
+    background:rgba(7,10,8,.75);
+
+    color:#9da49c;
+
+    font-size:12px;
+    font-weight:900;
+
+    cursor:pointer;
+
+    backdrop-filter:blur(15px);
+
+    transition:.25s ease;
+}
+
+.format-btn.active{
+    background:var(--lime);
+    color:#11160d;
+
+    border-color:var(--lime);
+}
+
+/* =========================================================
+   EDITOR SECTION
+========================================================= */
+
+.editor-section{
+    margin-top:80px;
+
+    padding:0 8px;
+}
+
+.section-label{
+    color:var(--lime);
+
+    font-size:12px;
+    font-weight:950;
+
+    letter-spacing:4px;
+
+    text-transform:uppercase;
+}
+
+.section-title{
+    margin-top:12px;
+
+    font-size:clamp(25px,4vw,40px);
+
+    font-weight:950;
+
+    letter-spacing:-1px;
+}
+
+.editor-card{
+    margin-top:26px;
+
+    padding:26px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(255,255,255,.035),
+            rgba(255,255,255,.015)
+        );
+
+    border:1px solid var(--border);
+
+    border-radius:24px;
+}
+
+.editor-row{
+    display:grid;
+
+    grid-template-columns:
+        1fr
+        180px
+        auto;
+
+    gap:12px;
+
+    align-items:end;
+}
+
+.field{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+}
+
+.field label{
+    color:#8f978e;
+
+    font-size:11px;
+    font-weight:800;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+}
+
+.field select{
+    width:100%;
+    height:48px;
+
+    padding:0 14px;
+
+    color:white;
+
+    background:#080c09;
+
+    border:1px solid var(--border);
+
+    border-radius:13px;
+
+    outline:none;
+}
+
+.save-btn{
+    height:48px;
+
+    padding:0 20px;
+
+    border:0;
+    border-radius:13px;
+
+    background:var(--lime);
+    color:#10150d;
+
+    font-weight:950;
+
+    cursor:pointer;
+}
+
+/* =========================================================
+   THUMBNAILS
+========================================================= */
+
+.thumbnails{
+    display:grid;
+
+    grid-template-columns:
+        repeat(auto-fill,minmax(180px,1fr));
+
+    gap:12px;
+
+    margin-top:26px;
+}
+
+.thumb{
+    position:relative;
+
+    height:110px;
+
+    overflow:hidden;
+
+    border-radius:15px;
+
+    border:1px solid var(--border);
+
+    background:#090d0a;
+
+    cursor:pointer;
+
+    transition:.25s ease;
+}
+
+.thumb:hover{
+    transform:translateY(-3px);
+    border-color:rgba(139,209,54,.5);
+}
+
+.thumb.active{
+    border-color:var(--lime);
+
+    box-shadow:
+        0 0 0 1px var(--lime);
+}
+
+.thumb img{
+    width:100%;
+    height:100%;
+
+    object-fit:cover;
+
+    opacity:.72;
+}
+
+.thumb-info{
+    position:absolute;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    padding:12px;
+
+    background:
+        linear-gradient(
+            transparent,
+            rgba(0,0,0,.9)
+        );
+
+    font-size:11px;
+    font-weight:800;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* =========================================================
+   LOADING / ERROR
+========================================================= */
+
+.loading{
+    min-height:calc(100vh - 108px);
+
+    display:grid;
+    place-items:center;
+
+    color:#818980;
+
+    font-size:14px;
+}
+
+.loading-spinner{
+    width:35px;
+    height:35px;
+
+    margin:0 auto 16px;
+
+    border:3px solid rgba(255,255,255,.12);
+
+    border-top-color:var(--lime);
+
+    border-radius:50%;
+
+    animation:
+        spin .8s linear infinite;
+}
+
+@keyframes spin{
+    to{
+        transform:rotate(360deg);
+    }
+}
+
+.error-box{
+    padding:35px;
+
+    margin:30px;
+
+    border:1px solid rgba(255,80,80,.25);
+
+    background:rgba(255,60,60,.05);
+
+    border-radius:20px;
+
+    color:#ff9a9a;
+
+    line-height:1.7;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:800px){
+
+    .topbar{
+        height:88px;
+
+        padding:
+            12px
+            16px;
+    }
+
+    .brand-mark{
+        width:54px;
+        height:54px;
+
+        border-radius:16px;
+
+        font-size:24px;
+    }
+
+    .brand-text h1{
+        font-size:18px;
+    }
+
+    .brand-text p{
+        margin-top:6px;
+        font-size:10px;
+    }
+
+    .header-controls{
+        gap:7px;
+    }
+
+    .icon-btn{
+        width:50px;
+        height:50px;
+        border-radius:15px;
+    }
+
+    main{
+        padding:0 12px 60px;
+    }
+
+    .slide{
+        min-height:calc(100vh - 88px);
+    }
+
+    .slide-content{
+        min-height:calc(100vh - 88px);
+
+        padding:
+            25px
+            22px
+            95px;
+    }
+
+    .product-name{
+        letter-spacing:-1.8px;
+    }
+
+    .product-description{
+        line-height:1.5;
+    }
+
+    .slide-controls{
+        right:18px;
+        bottom:18px;
+    }
+
+    .slide-btn{
+        width:48px;
+        height:48px;
+        border-radius:14px;
+    }
+
+    .format-selector{
+        left:18px;
+        bottom:18px;
+
+        gap:5px;
+    }
+
+    .format-btn{
+        min-width:54px;
+        height:42px;
+
+        padding:0 9px;
+
+        font-size:10px;
+    }
+
+    .editor-row{
+        grid-template-columns:1fr;
+    }
+
+    .editor-section{
+        margin-top:55px;
+    }
+
+    .thumbnails{
+        grid-template-columns:
+            repeat(2,1fr);
+    }
+}
+
+@media(max-width:500px){
+
+    .brand-text p{
+        display:none;
+    }
+
+    .header-controls .settings-btn{
+        display:none;
+    }
+
+    .promo-badge{
+        padding:11px 16px;
+        font-size:11px;
+    }
+
+    .product-brand{
+        font-size:11px;
+        letter-spacing:3px;
+    }
+
+    .price-promo{
+        font-size:38px;
+    }
+
+    .price-normal{
+        font-size:12px;
+    }
+}
+
+/* =========================================================
+   PORTRAIT 9:16
+========================================================= */
+
+.format-916 .slide{
+    aspect-ratio:9 / 16;
+
+    min-height:auto;
+
+    max-height:calc(100vh - 120px);
+}
+
+.format-916 .slide-content{
+    min-height:auto;
+    height:100%;
+
+    aspect-ratio:9 / 16;
+}
+
+.format-916 .product-image{
+    object-fit:cover;
+}
+
+/* =========================================================
+   4:5
+========================================================= */
+
+.format-45 .slide{
+    aspect-ratio:4 / 5;
+
+    min-height:auto;
+}
+
+.format-45 .slide-content{
+    min-height:auto;
+    height:100%;
+
+    aspect-ratio:4 / 5;
+}
+
+/* =========================================================
+   16:9
+========================================================= */
+
+.format-169 .slide{
+    aspect-ratio:16 / 9;
+
+    min-height:auto;
+}
+
+.format-169 .slide-content{
+    min-height:auto;
+    height:100%;
+
+    aspect-ratio:16 / 9;
+}
+
+/* =========================================================
+   PRINT / SCREENSHOT MODE
+========================================================= */
+
+.capture-mode .topbar,
+.capture-mode .editor-section{
+    display:none;
+}
+
+.capture-mode main{
+    padding:0;
+}
+
+.capture-mode .slide{
+    border:0;
+    width:100vw;
+    height:100vh;
+    max-height:none;
+}
+
+.capture-mode .slide-content{
+    height:100%;
+}
+
+</style>
+</head>
+
+<body>
+
+<!-- =======================================================
+     HEADER
+======================================================= -->
+
+<header class="topbar">
+
+    <div class="brand">
+
+        <div class="brand-mark">
+            I
+        </div>
+
+        <div class="brand-text">
+
+            <h1>Imam_salesfr</h1>
+
+            <p>
+                Sales Representative
+                <span>•</span>
+                nine autoseries
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="header-controls">
+
+        <button
+            class="icon-btn settings-btn"
+            id="settingsBtn"
+            title="Editor">
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="1.8">
+
+                <path d="M4 7h16"/>
+                <path d="M4 12h16"/>
+                <path d="M4 17h16"/>
+
+                <circle cx="9" cy="7" r="2"/>
+                <circle cx="15" cy="12" r="2"/>
+                <circle cx="10" cy="17" r="2"/>
+
+            </svg>
+
+        </button>
+
+
+        <button
+            class="icon-btn"
+            id="playBtn"
+            title="Play / Pause">
+
+            <svg
+                id="playIcon"
+                viewBox="0 0 24 24"
+                fill="currentColor">
+
+                <path d="M8 5v14l11-7z"/>
+
+            </svg>
+
+        </button>
+
+
+        <button
+            class="icon-btn primary"
+            id="fullscreenBtn"
+            title="Fullscreen">
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2">
+
+                <path d="M8 3H3v5"/>
+                <path d="M16 3h5v5"/>
+                <path d="M8 21H3v-5"/>
+                <path d="M21 16v5h-5"/>
+
+            </svg>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<main>
+
+<div class="promo-wrapper">
+
+    <!-- ===================================================
+         STAGE
+    ==================================================== -->
+
+    <section class="stage" id="stage">
+
+        <div class="loading" id="loading">
+
+            <div>
+                <div class="loading-spinner"></div>
+
+                Memuat produk promo...
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- ===================================================
+         EDITOR
+    ==================================================== -->
+
+    <section
+        class="editor-section"
+        id="editorSection">
+
+        <div class="section-label">
+            Promo Editor
+        </div>
+
+        <h2 class="section-title">
+            Pilih produk untuk ditampilkan
+        </h2>
+
+        <div class="editor-card">
+
+            <div class="editor-row">
+
+                <div class="field">
+
+                    <label>
+                        Produk
+                    </label>
+
+                    <select id="productSelect">
+                        <option>
+                            Memuat produk...
+                        </option>
+                    </select>
+
+                </div>
+
+
+                <div class="field">
+
+                    <label>
+                        Format
+                    </label>
+
+                    <select id="formatSelect">
+
+                        <option value="916">
+                            9:16 — Status WA
+                        </option>
+
+                        <option value="45">
+                            4:5 — Feed
+                        </option>
+
+                        <option value="169">
+                            16:9 — Landscape
+                        </option>
+
+                    </select>
+
+                </div>
+
+
+                <button
+                    class="save-btn"
+                    id="saveBtn">
+
+                    Simpan Tampilan
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="thumbnails"
+            id="thumbnails">
+        </div>
+
+    </section>
+
+</div>
+
+</main>
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const CONFIG = {
+
+    PRODUCT_JSON:
+        "../produk.json",
+
+    IMAGE_ROOT:
+        "../",
+
+    SLIDE_DURATION:
+        6500,
+
+    /*
+     * Kosong = otomatis ambil produk
+     * yang memiliki promo aktif.
+     */
+    PROMO_PRODUCT_IDS: []
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let products = [];
+
+let promoProducts = [];
+
+let currentIndex = 0;
+
+let playing = true;
+
+let timer = null;
+
+let progressTimer = null;
+
+let startedAt = 0;
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const stage =
+    document.getElementById("stage");
+
+const loading =
+    document.getElementById("loading");
+
+const productSelect =
+    document.getElementById("productSelect");
+
+const thumbnails =
+    document.getElementById("thumbnails");
+
+const formatSelect =
+    document.getElementById("formatSelect");
+
+const playBtn =
+    document.getElementById("playBtn");
+
+const playIcon =
+    document.getElementById("playIcon");
+
+const fullscreenBtn =
+    document.getElementById("fullscreenBtn");
+
+const settingsBtn =
+    document.getElementById("settingsBtn");
+
+const saveBtn =
+    document.getElementById("saveBtn");
+
+const editorSection =
+    document.getElementById("editorSection");
+
+
+/* =========================================================
+   LOAD JSON
+========================================================= */
+
+async function loadProducts(){
+
+    try{
+
+        console.log(
+            "[PROMO] Loading:",
+            CONFIG.PRODUCT_JSON
+        );
+
+        const response =
+            await fetch(
+                CONFIG.PRODUCT_JSON,
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(!response.ok){
+
+            throw new Error(
+                `HTTP ${response.status} ${response.statusText}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        if(!Array.isArray(data)){
+
+            throw new Error(
+                "produk.json harus berupa array."
+            );
+
+        }
+
+
+        products =
+            data;
+
+
+        console.log(
+            "[PROMO] Database:",
+            products.length,
+            "produk"
+        );
+
+
+        /*
+         * Kalau ID ditentukan,
+         * gunakan ID tersebut.
+         */
+
+        if(
+            CONFIG.PROMO_PRODUCT_IDS.length > 0
+        ){
+
+            promoProducts =
+                CONFIG.PROMO_PRODUCT_IDS
+                .map(id =>
+                    products.find(
+                        p =>
+                            Number(p.id)
+                            === Number(id)
+                    )
+                )
+                .filter(
+                    p =>
+                        p &&
+                        isPromoProduct(p)
+                );
+
+        }
+
+
+        /*
+         * Kalau tidak menentukan ID,
+         * otomatis ambil produk promo.
+         */
+
+        if(
+            !promoProducts.length
+        ){
+
+            promoProducts =
+                products.filter(
+                    isPromoProduct
+                );
+
+        }
+
+
+        /*
+         * Maksimal 20 slide
+         */
+
+        promoProducts =
+            promoProducts.slice(
+                0,
+                20
+            );
+
+
+        if(
+            !promoProducts.length
+        ){
+
+            throw new Error(
+                "Tidak ditemukan produk promo aktif."
+            );
+
+        }
+
+
+        buildProductSelect();
+
+        buildThumbnails();
+
+        renderSlide();
+
+        restartTimer();
+
+
+    }catch(error){
+
+        console.error(
+            "[PROMO] Gagal:",
+            error
+        );
+
+
+        stage.innerHTML = `
+
+            <div class="error-box">
+
+                <strong>
+                    Gagal memuat produk.
+                </strong>
+
+                <br><br>
+
+                ${escapeHtml(
+                    error.message
+                )}
+
+                <br><br>
+
+                <small>
+                    Pastikan halaman promo sudah
+                    dijalankan dari domain utama.
+                </small>
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+
+
+
+function isPromoProduct(product){
+
+    if(!product){
+        return false;
+    }
+
+    const harga =
+        product.harga;
+
+    if(!harga){
+        return false;
+    }
+
+    const normal =
+        Number(harga.normal) || 0;
+
+    const promo =
+        Number(harga.promo) || 0;
+
+    return (
+        harga.status === "Aktif" &&
+        normal > 0 &&
+        promo > 0 &&
+        promo < normal &&
+        product.gambar
+    );
+
+}
+
+/* =========================================================
+   IMAGE PATH
+========================================================= */
+function getProductImage(product){
+
+    if(
+        !product ||
+        !product.gambar
+    ){
+
+        return "";
+
+    }
+
+    return new URL(
+        "../" +
+        String(product.gambar)
+            .replace(/^\/+/, ""),
+        document.baseURI
+    ).href;
+
+}
+
+
+/* =========================================================
+   IMAGE FALLBACK
+========================================================= */
+
+function handleImageError(img){
+
+    img.onerror = null;
+
+    img.style.display = "none";
+
+    const layer =
+        img.closest(
+            ".product-image-layer"
+        );
+
+    if(layer){
+
+        layer.innerHTML += `
+            <div style="
+                position:absolute;
+                inset:0;
+                display:grid;
+                place-items:center;
+                color:#75aa38;
+                font-size:clamp(28px,5vw,60px);
+                font-weight:900;
+                text-align:center;
+                padding:30px;
+            ">
+                IMAGE NOT FOUND
+            </div>
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   BUILD SELECT
+========================================================= */
+
+function buildProductSelect(){
+
+    productSelect.innerHTML = "";
+
+    promoProducts.forEach(
+        (product,index)=>{
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+            option.value = index;
+
+            option.textContent =
+                `${index + 1}. ${product.nama}`;
+
+            productSelect.appendChild(
+                option
+            );
+
+        }
+    );
+
+    productSelect.value =
+        currentIndex;
+
+}
+
+
+/* =========================================================
+   BUILD THUMBNAILS
+========================================================= */
+
+function buildThumbnails(){
+
+    thumbnails.innerHTML = "";
+
+    promoProducts.forEach(
+        (product,index)=>{
+
+            const thumb =
+                document.createElement(
+                    "button"
+                );
+
+            thumb.className =
+                "thumb";
+
+            if(
+                index === currentIndex
+            ){
+
+                thumb.classList.add(
+                    "active"
+                );
+
+            }
+
+            thumb.innerHTML = `
+
+                <img
+                    src="${escapeAttribute(
+                        getProductImage(product)
+                    )}"
+                    alt=""
+                    onerror="handleImageError(this)"
+                >
+
+                <div class="thumb-info">
+                    ${escapeHtml(product.nama)}
+                </div>
+
+            `;
+
+
+            thumb.addEventListener(
+                "click",
+                ()=>{
+
+                    currentIndex =
+                        index;
+
+                    renderSlide();
+
+                    restartTimer();
+
+                }
+            );
+
+
+            thumbnails.appendChild(
+                thumb
+            );
+
+        }
+    );
+
+}
+
+
+/* =========================================================
+   RENDER SLIDE
+========================================================= */
+
+function renderSlide(){
+
+    if(!promoProducts.length){
+
+        stage.innerHTML = `
+            <div class="error-box">
+                Tidak ada produk promo.
+            </div>
+        `;
+
+        return;
+
+    }
+
+
+    const product =
+        promoProducts[
+            currentIndex
+        ];
+
+
+    const normal =
+        Number(
+            product?.harga?.normal || 0
+        );
+
+    const promo =
+        Number(
+            product?.harga?.promo || 0
+        );
+
+
+    /*
+     * Badge PROMO selalu ditampilkan.
+     */
+
+    const discount =
+        normal > 0 && promo > 0
+            ? Math.round(
+                ((normal - promo) / normal) * 100
+            )
+            : 0;
+
+
+    const image =
+        getProductImage(product);
+
+
+    stage.innerHTML = `
+
+        <article
+            class="slide active"
+            id="currentSlide">
+
+            <div class="product-image-layer">
+
+                ${
+                    image
+                    ?
+                    `
+                    <img
+                        class="product-image"
+                        src="${escapeAttribute(image)}"
+                        alt="${escapeAttribute(product.nama)}"
+                        onerror="handleImageError(this)"
+                    >
+                    `
+                    :
+                    `
+                    <div style="
+                        width:100%;
+                        height:100%;
+                        display:grid;
+                        place-items:center;
+                        color:#75aa38;
+                        font-size:40px;
+                        font-weight:900;
+                    ">
+                        IMAGE NOT FOUND
+                    </div>
+                    `
+                }
+
+                <div class="image-overlay"></div>
+
+            </div>
+
+
+            <div class="slide-content">
+
+                <div class="promo-badge">
+                    PROMO
+                </div>
+
+
+                <div>
+
+                    <div class="product-brand">
+                        ${escapeHtml(
+                            product.brand ||
+                            "NINE LUXIMOS"
+                        )}
+                    </div>
+
+
+                    <h2 class="product-name">
+                        ${escapeHtml(
+                            product.nama ||
+                            "Produk"
+                        )}
+                    </h2>
+
+
+                    <p class="product-description">
+                        ${escapeHtml(
+                            product.deskripsi ||
+                            "Harga promo spesial untuk produk pilihan."
+                        )}
+                    </p>
+
+
+                    <div class="price-area">
+
+                        <div class="price-label">
+                            Harga Promo
+                        </div>
+
+                        <div class="price-promo">
+                            ${formatRupiah(promo)}
+                        </div>
+
+
+                        <div class="price-normal">
+
+                            <s>
+                                ${formatRupiah(normal)}
+                            </s>
+
+                            ${
+                                discount > 0
+                                ?
+                                `
+                                <span class="discount">
+                                    Hemat ${discount}%
+                                </span>
+                                `
+                                :
+                                ""
+                            }
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- NAVIGATION -->
+
+            <div class="slide-controls">
+
+                <button
+                    class="slide-btn"
+                    onclick="previousSlide()"
+                    title="Sebelumnya">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="m15 18-6-6 6-6"/>
+
+                    </svg>
+
+                </button>
+
+
+                <button
+                    class="slide-btn"
+                    onclick="togglePlay()"
+                    title="Play / Pause">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="currentColor">
+
+                        ${
+                            playing
+                            ?
+                            `<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>`
+                            :
+                            `<path d="M8 5v14l11-7z"/>`
+                        }
+
+                    </svg>
+
+                </button>
+
+
+                <button
+                    class="slide-btn"
+                    onclick="nextSlide()"
+                    title="Berikutnya">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="m9 18 6-6-6-6"/>
+
+                    </svg>
+
+                </button>
+
+
+                <button
+                    class="slide-btn"
+                    onclick="toggleFullscreen()"
+                    title="Fullscreen">
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2">
+
+                        <path d="M8 3H3v5"/>
+                        <path d="M16 3h5v5"/>
+                        <path d="M8 21H3v-5"/>
+                        <path d="M21 16v5h-5"/>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            <!-- FORMAT -->
+
+            <div class="format-selector">
+
+                <button
+                    class="format-btn ${
+                        currentFormat() === "916"
+                        ? "active"
+                        : ""
+                    }"
+                    onclick="setFormat('916')">
+
+                    9:16
+
+                </button>
+
+
+                <button
+                    class="format-btn ${
+                        currentFormat() === "45"
+                        ? "active"
+                        : ""
+                    }"
+                    onclick="setFormat('45')">
+
+                    4:5
+
+                </button>
+
+
+                <button
+                    class="format-btn ${
+                        currentFormat() === "169"
+                        ? "active"
+                        : ""
+                    }"
+                    onclick="setFormat('169')">
+
+                    16:9
+
+                </button>
+
+            </div>
+
+
+            <div
+                class="progress-wrap">
+
+                <div
+                    class="progress"
+                    id="progress">
+                </div>
+
+            </div>
+
+        </article>
+
+    `;
+
+
+    productSelect.value =
+        currentIndex;
+
+
+    updateThumbnails();
+
+    applyFormat(
+        currentFormat()
+    );
+
+    startProgress();
+
+}
+
+
+/* =========================================================
+   FORMAT
+========================================================= */
+
+let selectedFormat =
+    localStorage.getItem(
+        "promoFormat"
+    ) || "916";
+
+
+function currentFormat(){
+
+    return selectedFormat;
+
+}
+
+
+function setFormat(format){
+
+    selectedFormat =
+        format;
+
+    localStorage.setItem(
+        "promoFormat",
+        format
+    );
+
+    formatSelect.value =
+        format;
+
+    applyFormat(format);
+
+}
+
+
+function applyFormat(format){
+
+    document.body.classList.remove(
+        "format-916",
+        "format-45",
+        "format-169"
+    );
+
+    document.body.classList.add(
+        "format-" + format
+    );
+
+}
+
+
+/* =========================================================
+   NEXT / PREVIOUS
+========================================================= */
+
+function nextSlide(){
+
+    if(!promoProducts.length){
+        return;
+    }
+
+    currentIndex =
+        (
+            currentIndex + 1
+        ) %
+        promoProducts.length;
+
+    renderSlide();
+
+}
+
+
+function previousSlide(){
+
+    if(!promoProducts.length){
+        return;
+    }
+
+    currentIndex =
+        (
+            currentIndex -
+            1 +
+            promoProducts.length
+        ) %
+        promoProducts.length;
+
+    renderSlide();
+
+}
+
+
+/* =========================================================
+   AUTOPLAY
+========================================================= */
+
+function startTimer(){
+
+    stopTimer();
+
+    if(!playing){
+        return;
+    }
+
+    timer =
+        setTimeout(
+            ()=>{
+                nextSlide();
+                startTimer();
+            },
+            CONFIG.SLIDE_DURATION
+        );
+
+}
+
+
+function stopTimer(){
+
+    if(timer){
+
+        clearTimeout(timer);
+
+        timer = null;
+
+    }
+
+}
+
+
+function restartTimer(){
+
+    stopTimer();
+
+    startTimer();
+
+}
+
+
+/* =========================================================
+   PROGRESS
+========================================================= */
+
+function startProgress(){
+
+    if(progressTimer){
+
+        clearInterval(
+            progressTimer
+        );
+
+    }
+
+
+    const progress =
+        document.getElementById(
+            "progress"
+        );
+
+
+    if(!progress){
+        return;
+    }
+
+
+    let elapsed = 0;
+
+    progress.style.width =
+        "0%";
+
+
+    progressTimer =
+        setInterval(
+            ()=>{
+
+                if(!playing){
+
+                    return;
+
+                }
+
+                elapsed += 100;
+
+                const percent =
+                    Math.min(
+                        100,
+                        (
+                            elapsed /
+                            CONFIG.SLIDE_DURATION
+                        ) * 100
+                    );
+
+                progress.style.width =
+                    percent + "%";
+
+            },
+            100
+        );
+
+}
+
+
+/* =========================================================
+   PLAY / PAUSE
+========================================================= */
+
+function togglePlay(){
+
+    playing =
+        !playing;
+
+
+    updatePlayButton();
+
+    if(playing){
+
+        restartTimer();
+
+    }else{
+
+        stopTimer();
+
+    }
+
+}
+
+
+function updatePlayButton(){
+
+    playIcon.innerHTML =
+        playing
+        ?
+        `<path d="M7 5h4v14H7zM13 5h4v14h-4z"/>`
+        :
+        `<path d="M8 5v14l11-7z"/>`;
+
+}
+
+
+/* =========================================================
+   THUMBNAIL UPDATE
+========================================================= */
+
+function updateThumbnails(){
+
+    document
+        .querySelectorAll(
+            ".thumb"
+        )
+        .forEach(
+            (thumb,index)=>{
+
+                thumb.classList.toggle(
+                    "active",
+                    index === currentIndex
+                );
+
+            }
+        );
+
+}
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+function toggleFullscreen(){
+
+    const slide =
+        document.getElementById(
+            "currentSlide"
+        );
+
+
+    if(!slide){
+        return;
+    }
+
+
+    if(
+        document.fullscreenElement
+    ){
+
+        document.exitFullscreen();
+
+        return;
+
+    }
+
+
+    if(
+        slide.requestFullscreen
+    ){
+
+        slide.requestFullscreen();
+
+    }
+
+}
+
+
+fullscreenBtn.addEventListener(
+    "click",
+    toggleFullscreen
+);
+
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+settingsBtn.addEventListener(
+    "click",
+    ()=>{
+
+        editorSection.scrollIntoView({
+            behavior:"smooth"
+        });
+
+    }
+);
+
+
+productSelect.addEventListener(
+    "change",
+    ()=>{
+
+        currentIndex =
+            Number(
+                productSelect.value
+            );
+
+        renderSlide();
+
+        restartTimer();
+
+    }
+);
+
+
+formatSelect.addEventListener(
+    "change",
+    ()=>{
+
+        setFormat(
+            formatSelect.value
+        );
+
+    }
+);
+
+
+saveBtn.addEventListener(
+    "click",
+    ()=>{
+
+        /*
+         * Tidak mengubah produk.json.
+         *
+         * Hanya menyimpan produk terakhir
+         * dan format tampilan di browser.
+         */
+
+        localStorage.setItem(
+            "promoLastProduct",
+            String(currentIndex)
+        );
+
+        localStorage.setItem(
+            "promoFormat",
+            selectedFormat
+        );
+
+
+        saveBtn.textContent =
+            "✓ Tersimpan";
+
+
+        setTimeout(
+            ()=>{
+
+                saveBtn.textContent =
+                    "Simpan Tampilan";
+
+            },
+            1400
+        );
+
+    }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event=>{
+
+        if(event.key === "ArrowRight"){
+
+            nextSlide();
+
+        }
+
+        if(event.key === "ArrowLeft"){
+
+            previousSlide();
+
+        }
+
+        if(event.key === " "){
+
+            event.preventDefault();
+
+            togglePlay();
+
+        }
+
+        if(
+            event.key.toLowerCase()
+            === "f"
+        ){
+
+            toggleFullscreen();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   TOUCH SWIPE
+========================================================= */
+
+let touchStartX = 0;
+
+let touchEndX = 0;
+
+
+stage.addEventListener(
+    "touchstart",
+    event=>{
+
+        touchStartX =
+            event.changedTouches[0].screenX;
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+stage.addEventListener(
+    "touchend",
+    event=>{
+
+        touchEndX =
+            event.changedTouches[0].screenX;
+
+
+        const distance =
+            touchEndX -
+            touchStartX;
+
+
+        if(
+            Math.abs(distance) < 50
+        ){
+
+            return;
+
+        }
+
+
+        if(distance < 0){
+
+            nextSlide();
+
+        }else{
+
+            previousSlide();
+
+        }
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+/* =========================================================
+   FORMAT INITIAL
+========================================================= */
+
+formatSelect.value =
+    selectedFormat;
+
+applyFormat(
+    selectedFormat
+);
+
+
+/* =========================================================
+   AUTO LOAD
+========================================================= */
+
+loadProducts();
+
+
+/* =========================================================
+   START PLAY
+========================================================= */
+
+playBtn.addEventListener(
+    "click",
+    togglePlay
+);
+
+
+/* =========================================================
+   TIMER AFTER LOAD
+========================================================= */
+
+const originalRenderSlide =
+    renderSlide;
+
+
+/*
+ * Timer dimulai setelah JSON berhasil
+ * dan slide sudah tersedia.
+ */
+
+function beginAutoplay(){
+
+    if(playing){
+
+        startTimer();
+
+    }
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function formatRupiah(value){
+
+    const number =
+        Number(value) || 0;
+
+
+    return new Intl.NumberFormat(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            maximumFractionDigits:0
+        }
+    ).format(number);
+
+}
+
+
+function escapeHtml(value){
+
+    if(
+        value === null ||
+        value === undefined
+    ){
+
+        return "";
+
+    }
+
+
+    return String(value)
+        .replace(
+            /&/g,
+            "&amp;"
+        )
+        .replace(
+            /</g,
+            "&lt;"
+        )
+        .replace(
+            />/g,
+            "&gt;"
+        )
+        .replace(
+            /"/g,
+            "&quot;"
+        )
+        .replace(
+            /'/g,
+            "&#039;"
+        );
+
+}
+
+
+function escapeAttribute(value){
+
+    return escapeHtml(value);
+
+}
+
+
+/* =========================================================
+   OVERRIDE LOAD AUTOPLAY
+========================================================= */
+
+const _renderSlide =
+    renderSlide;
+
+
+/*
+ * Jalankan timer sedikit setelah
+ * halaman selesai.
+ */
+
+setTimeout(
+    ()=>{
+        if(
+            promoProducts.length
+        ){
+
+            startTimer();
+
+        }
+    },
+    1000
+);
+
+</script>
+
+</body>
+</html>
