@@ -2651,7 +2651,38 @@ main{
 
 
 
+/* =========================================================
+   DOWNLOAD LOADING
+========================================================= */
 
+@keyframes promoSpin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+.download-btn{
+    position:relative;
+
+    overflow:hidden;
+
+    touch-action:manipulation;
+
+    -webkit-user-select:none;
+    user-select:none;
+}
+
+.download-btn:disabled{
+    opacity:.65;
+
+    cursor:wait;
+}
+
+.download-btn svg{
+    flex:0 0 auto;
+}
 
 
 
@@ -4469,21 +4500,29 @@ document
 
 
 /* =========================================================
-   PREMIUM DOWNLOAD STATUS
-   Reliable PNG export
+   DOWNLOAD STATUS — STABLE VERSION
 ========================================================= */
 
+let isDownloadingStatus = false;
+
 async function downloadStatus(){
+
+    /* =========================================
+       PREVENT DOUBLE CLICK / DOUBLE CAPTURE
+    ========================================= */
+
+    if(isDownloadingStatus){
+
+        return;
+
+    }
+
 
     const canvas =
         document.getElementById(
             "promoCanvas"
         );
 
-
-    /* -----------------------------------------------------
-       VALIDASI PREVIEW
-    ----------------------------------------------------- */
 
     if(!canvas){
 
@@ -4496,9 +4535,23 @@ async function downloadStatus(){
     }
 
 
-    /* -----------------------------------------------------
-       VALIDASI PRODUK
-    ----------------------------------------------------- */
+    if(
+        typeof html2canvas !==
+        "function"
+    ){
+
+        showToast(
+            "Engine download belum tersedia."
+        );
+
+        console.error(
+            "[PROMO] html2canvas tidak ditemukan."
+        );
+
+        return;
+
+    }
+
 
     const product =
         promoProducts[
@@ -4517,31 +4570,12 @@ async function downloadStatus(){
     }
 
 
-    /* -----------------------------------------------------
-       VALIDASI ENGINE
-    ----------------------------------------------------- */
+    /* =========================================
+       LOCK
+    ========================================= */
 
-    if(
-        typeof window.html2canvas !==
-        "function"
-    ){
+    isDownloadingStatus = true;
 
-        showToast(
-            "Engine export belum tersedia."
-        );
-
-        console.error(
-            "[PROMO DOWNLOAD] html2canvas tidak tersedia."
-        );
-
-        return;
-
-    }
-
-
-    /* -----------------------------------------------------
-       LOCK BUTTON
-    ----------------------------------------------------- */
 
     const button =
         document.getElementById(
@@ -4549,64 +4583,59 @@ async function downloadStatus(){
         );
 
 
-    if(button.dataset.downloading === "1"){
+    const originalHTML =
+        button
+        ? button.innerHTML
+        : "";
 
-        return;
+
+    if(button){
+
+        button.disabled = true;
+
+        button.style.pointerEvents =
+            "none";
+
+        button.innerHTML = `
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                style="
+                    width:17px;
+                    height:17px;
+                    animation:promoSpin .8s linear infinite;
+                "
+            >
+                <circle
+                    cx="12"
+                    cy="12"
+                    r="9"
+                    stroke-opacity=".25"
+                ></circle>
+
+                <path
+                    d="M21 12a9 9 0 0 0-9-9"
+                ></path>
+            </svg>
+
+            MEMBUAT...
+        `;
 
     }
 
 
-    button.dataset.downloading = "1";
-
-
-    const originalHTML =
-        button.innerHTML;
-
-
-    button.innerHTML = `
-
-        <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            style="
-                animation:
-                promoSpin .8s linear infinite;
-            "
-        >
-            <circle
-                cx="12"
-                cy="12"
-                r="9"
-                stroke-opacity=".25"
-            ></circle>
-
-            <path
-                d="M21 12a9 9 0 0 0-9-9"
-            ></path>
-
-        </svg>
-
-        MEMBUAT STATUS...
-
-    `;
-
-
-    /* -----------------------------------------------------
-       TOAST
-    ----------------------------------------------------- */
-
     showToast(
-        "Membuat gambar status..."
+        "Membuat status..."
     );
 
 
     try{
 
-        /* =================================================
-           1. PASTIKAN IMAGE SELESAI LOAD
-        ================================================= */
+        /* =====================================
+           PASTIKAN IMAGE SUDAH SELESAI
+        ===================================== */
 
         const images =
             Array.from(
@@ -4622,8 +4651,7 @@ async function downloadStatus(){
                 img => {
 
                     if(
-                        img.complete &&
-                        img.naturalWidth > 0
+                        img.complete
                     ){
 
                         return Promise.resolve();
@@ -4634,27 +4662,15 @@ async function downloadStatus(){
                     return new Promise(
                         resolve => {
 
-                            const done =
-                                () => {
-
-                                    img.removeEventListener(
-                                        "load",
-                                        done
-                                    );
-
-                                    img.removeEventListener(
-                                        "error",
-                                        done
-                                    );
-
+                            const finish =
+                                ()=>{
                                     resolve();
-
                                 };
 
 
                             img.addEventListener(
                                 "load",
-                                done,
+                                finish,
                                 {
                                     once:true
                                 }
@@ -4663,11 +4679,10 @@ async function downloadStatus(){
 
                             img.addEventListener(
                                 "error",
-                                done,
+                                finish,
                                 {
                                     once:true
                                 }
-
                             );
 
                         }
@@ -4679,9 +4694,9 @@ async function downloadStatus(){
         );
 
 
-        /* =================================================
-           2. TUNGGU FONT + PAINT
-        ================================================= */
+        /* =====================================
+           FONT READY
+        ===================================== */
 
         if(
             document.fonts &&
@@ -4692,6 +4707,10 @@ async function downloadStatus(){
 
         }
 
+
+        /* =====================================
+           PAINT
+        ===================================== */
 
         await new Promise(
             resolve =>
@@ -4705,21 +4724,12 @@ async function downloadStatus(){
         );
 
 
-        /* =================================================
-           3. MASUK CAPTURE MODE
-        ================================================= */
+        /* =====================================
+           CAPTURE
+        ===================================== */
 
-        document.body.classList.add(
-            "capture-mode"
-        );
-
-
-        /* =================================================
-           4. CAPTURE
-        ================================================= */
-
-        const result =
-            await window.html2canvas(
+        const capturePromise =
+            html2canvas(
                 canvas,
                 {
 
@@ -4728,18 +4738,15 @@ async function downloadStatus(){
 
                     scale:
                         Math.min(
-                            3,
-                            Math.max(
-                                2,
-                                window.devicePixelRatio || 1
-                            )
+                            2,
+                            window.devicePixelRatio || 1
                         ),
 
                     useCORS:true,
 
                     allowTaint:false,
 
-                    imageTimeout:20000,
+                    imageTimeout:8000,
 
                     logging:false,
 
@@ -4749,32 +4756,53 @@ async function downloadStatus(){
 
                     scrollX:0,
 
-                    scrollY:0,
-
-                    windowWidth:
-                        document.documentElement
-                        .clientWidth,
-
-                    windowHeight:
-                        document.documentElement
-                        .clientHeight
+                    scrollY:0
 
                 }
             );
 
 
-        /* =================================================
-           5. KELUARKAN CAPTURE MODE
-        ================================================= */
+        /* =====================================
+           HARD TIMEOUT
+           Jangan pernah muter selamanya
+        ===================================== */
 
-        document.body.classList.remove(
-            "capture-mode"
-        );
+        const timeoutPromise =
+            new Promise(
+                (
+                    _,
+                    reject
+                ) => {
+
+                    setTimeout(
+                        ()=>{
+
+                            reject(
+                                new Error(
+                                    "EXPORT_TIMEOUT"
+                                )
+                            );
+
+                        },
+                        12000
+                    );
+
+                }
+            );
 
 
-        /* =================================================
-           6. BUAT FILENAME
-        ================================================= */
+        const result =
+            await Promise.race(
+                [
+                    capturePromise,
+                    timeoutPromise
+                ]
+            );
+
+
+        /* =====================================
+           FILE NAME
+        ===================================== */
 
         const ratio =
             currentRatio === "916"
@@ -4784,37 +4812,39 @@ async function downloadStatus(){
                     : "16x9";
 
 
-        const title =
-            makeDisplayTitle(
-                product
-            );
-
-
         const filename =
-            `PROMO-${slug(title)}-${ratio}.png`;
+            `PROMO-${slug(
+                makeDisplayTitle(
+                    product
+                )
+            )}-${ratio}.png`;
 
 
-        /* =================================================
-           7. CONVERT KE BLOB
-           Lebih stabil daripada toDataURL()
-        ================================================= */
+        /* =====================================
+           CANVAS → BLOB
+        ===================================== */
 
         const blob =
             await new Promise(
-                (resolve,reject)=>{
+                (
+                    resolve,
+                    reject
+                ) => {
 
                     result.toBlob(
                         blob => {
 
                             if(blob){
 
-                                resolve(blob);
+                                resolve(
+                                    blob
+                                );
 
                             }else{
 
                                 reject(
                                     new Error(
-                                        "Gagal membuat PNG blob."
+                                        "BLOB_FAILED"
                                     )
                                 );
 
@@ -4829,9 +4859,9 @@ async function downloadStatus(){
             );
 
 
-        /* =================================================
-           8. BUAT OBJECT URL
-        ================================================= */
+        /* =====================================
+           DOWNLOAD
+        ===================================== */
 
         const url =
             URL.createObjectURL(
@@ -4839,18 +4869,11 @@ async function downloadStatus(){
             );
 
 
-        /* =================================================
-           9. DOWNLOAD
-        ================================================= */
-
         const link =
             document.createElement(
                 "a"
             );
 
-
-        link.style.display =
-            "none";
 
         link.href =
             url;
@@ -4858,10 +4881,8 @@ async function downloadStatus(){
         link.download =
             filename;
 
-        link.setAttribute(
-            "download",
-            filename
-        );
+        link.style.display =
+            "none";
 
 
         document.body.appendChild(
@@ -4872,9 +4893,9 @@ async function downloadStatus(){
         link.click();
 
 
-        /* -------------------------------------------------
-           Cleanup
-        ------------------------------------------------- */
+        /* =====================================
+           CLEANUP
+        ===================================== */
 
         setTimeout(
             ()=>{
@@ -4886,13 +4907,9 @@ async function downloadStatus(){
                 );
 
             },
-            1500
+            1000
         );
 
-
-        /* =================================================
-           10. BERHASIL
-        ================================================= */
 
         showToast(
             "Status berhasil didownload ✓"
@@ -4902,33 +4919,50 @@ async function downloadStatus(){
     }catch(error){
 
         console.error(
-            "[PROMO DOWNLOAD ERROR]",
+            "[PROMO DOWNLOAD]",
             error
         );
 
 
-        document.body.classList.remove(
-            "capture-mode"
-        );
+        if(
+            error.message ===
+            "EXPORT_TIMEOUT"
+        ){
 
+            showToast(
+                "Export terlalu lama. Coba ulang."
+            );
 
-        showToast(
-            "Gagal membuat gambar status."
-        );
+        }else{
 
+            showToast(
+                "Gagal membuat status."
+            );
+
+        }
 
     }finally{
 
-        /* -------------------------------------------------
-           UNLOCK BUTTON
-        ------------------------------------------------- */
+        /* =====================================
+           UNLOCK
+        ===================================== */
 
-        button.dataset.downloading =
-            "0";
+        isDownloadingStatus =
+            false;
 
 
-        button.innerHTML =
-            originalHTML;
+        if(button){
+
+            button.disabled =
+                false;
+
+            button.style.pointerEvents =
+                "";
+
+            button.innerHTML =
+                originalHTML;
+
+        }
 
     }
 
@@ -4936,26 +4970,21 @@ async function downloadStatus(){
 
 
 /* =========================================================
-   DOWNLOAD BUTTON
+   SATU-SATUNYA HANDLER DOWNLOAD
 ========================================================= */
 
-document
-.getElementById(
-    "downloadBtn"
-)
-.addEventListener(
-    "click",
-    downloadStatus
-);
+const downloadButton =
+    document.getElementById(
+        "downloadBtn"
+    );
 
 
-document
-.getElementById(
-    "downloadBtn"
-)
-.onclick =
-    downloadStatus;
+if(downloadButton){
 
+    downloadButton.onclick =
+        downloadStatus;
+
+}
 
 /* =========================================================
    SELECT ALL
