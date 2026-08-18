@@ -460,33 +460,32 @@ main{
 ========================================================= */
 
 .visual-gradient{
-
     position:absolute;
-
     inset:0;
-
     z-index:3;
-
     pointer-events:none;
 
     background:
         linear-gradient(
             to bottom,
-            transparent 40%,
-            rgba(5,7,5,.08) 55%,
-            rgba(5,7,5,.58) 83%,
+            rgba(5,7,5,0) 48%,
+            rgba(5,7,5,.015) 62%,
+            rgba(5,7,5,.10) 76%,
+            rgba(5,7,5,.42) 91%,
             #070907 100%
         );
 }
 
-.stage.ratio-169 .visual-gradient{
 
+/* LANDSCAPE */
+.stage.ratio-169 .visual-gradient{
     background:
         linear-gradient(
             to right,
-            transparent 30%,
-            rgba(5,7,5,.08) 45%,
-            rgba(5,7,5,.7) 70%,
+            rgba(5,7,5,0) 48%,
+            rgba(5,7,5,.015) 61%,
+            rgba(5,7,5,.08) 75%,
+            rgba(5,7,5,.38) 92%,
             #070907 100%
         );
 }
@@ -2481,6 +2480,257 @@ main{
     }
 }
 
+
+.product-image{
+    filter:none !important;
+    opacity:1 !important;
+    mix-blend-mode:normal !important;
+}
+
+
+
+
+
+/* =========================================================
+   CINEMATIC WINDOW REVEAL
+========================================================= */
+
+.promo-canvas{
+    --transition-duration:620ms;
+}
+
+
+/* panel penutup */
+
+.promo-canvas::after{
+
+    content:"";
+
+    position:absolute;
+
+    z-index:200;
+
+    inset:0;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            90deg,
+            #050705 0%,
+            #0a0e09 48%,
+            #050705 100%
+        );
+
+    transform:
+        scaleX(0);
+
+    transform-origin:
+        right center;
+
+    opacity:0;
+
+}
+
+
+/* keluar */
+
+.promo-canvas.slide-out::after{
+
+    opacity:1;
+
+    transform:
+        scaleX(1);
+
+    transform-origin:
+        right center;
+
+    transition:
+        transform
+        260ms
+        cubic-bezier(.76,0,.24,1),
+        opacity
+        180ms
+        ease;
+}
+
+
+/* buka dari kiri */
+
+.promo-canvas.slide-in::after{
+
+    opacity:1;
+
+    transform:
+        scaleX(0);
+
+    transform-origin:
+        left center;
+
+    transition:
+        transform
+        420ms
+        cubic-bezier(.16,1,.3,1),
+        opacity
+        180ms
+        ease;
+}
+
+
+/* isi produk ikut sedikit cinematic movement */
+
+.promo-canvas.slide-content
+.product-visual{
+
+    animation:
+        promoWindowVisual
+        650ms
+        cubic-bezier(.16,1,.3,1)
+        both;
+}
+
+
+.promo-canvas.slide-content
+.product-info{
+
+    animation:
+        promoWindowInfo
+        580ms
+        cubic-bezier(.16,1,.3,1)
+        90ms
+        both;
+}
+
+
+.promo-canvas.slide-content
+.promo-badge{
+
+    animation:
+        promoWindowBadge
+        500ms
+        cubic-bezier(.16,1,.3,1)
+        100ms
+        both;
+}
+
+
+@keyframes promoWindowVisual{
+
+    from{
+
+        opacity:.45;
+
+        transform:
+            scale(1.035)
+            translateX(18px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            scale(1)
+            translateX(0);
+
+    }
+
+}
+
+
+@keyframes promoWindowInfo{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateX(22px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateX(0);
+
+    }
+
+}
+
+
+@keyframes promoWindowBadge{
+
+    from{
+
+        opacity:0;
+
+        transform:
+            translateY(-8px)
+            scale(.94);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:
+            translateY(0)
+            scale(1);
+
+    }
+
+}
+
+
+/* mobile lebih cepat */
+
+@media(max-width:600px){
+
+    .promo-canvas{
+        --transition-duration:520ms;
+    }
+
+}
+
+
+/* reduced motion */
+
+@media(prefers-reduced-motion:reduce){
+
+    .promo-canvas::after,
+    .promo-canvas.slide-out::after,
+    .promo-canvas.slide-in::after{
+
+        transition:none !important;
+
+    }
+
+    .promo-canvas.slide-content
+    .product-visual,
+    .promo-canvas.slide-content
+    .product-info,
+    .promo-canvas.slide-content
+    .promo-badge{
+
+        animation:none !important;
+
+    }
+
+}
+
+
+
+
+
+
+
+  
+
 </style>
 
 </head>
@@ -3806,7 +4056,9 @@ function applyPromo(
    PREVIEW
 ========================================================= */
 
-function renderPreview(){
+function renderPreview(
+    restartAutoplay = true
+){
 
     if(
         !promoProducts.length
@@ -3870,7 +4122,7 @@ function renderPreview(){
         normal > 0
             ? Math.round(
                 (
-                    (normal-promo)
+                    (normal - promo)
                     /
                     normal
                 ) * 100
@@ -3895,42 +4147,36 @@ function renderPreview(){
             id="promoCanvas"
         >
 
-            <div
-                class="product-visual"
-            >
+            <div class="product-visual">
 
                 ${
                     imagePath(product)
 
-                        ?
+                    ?
 
-                        `
-                        <img
-                            class="product-image"
-                            src="${escapeAttribute(
-                                imagePath(product)
-                            )}"
-                            alt="${escapeAttribute(
-                                title
-                            )}"
-                            crossorigin="anonymous"
-                        >
-                        `
+                    `
+                    <img
+                        class="product-image"
+                        src="${escapeAttribute(
+                            imagePath(product)
+                        )}"
+                        alt="${escapeAttribute(
+                            title
+                        )}"
+                        crossorigin="anonymous"
+                    >
+                    `
 
-                        :
+                    :
 
-                        `
-                        <div class="error">
-                            IMAGE NOT FOUND
-                        </div>
-                        `
-
+                    `
+                    <div class="error">
+                        IMAGE NOT FOUND
+                    </div>
+                    `
                 }
 
-
-                <div
-                    class="visual-gradient"
-                ></div>
+                <div class="visual-gradient"></div>
 
             </div>
 
@@ -3943,20 +4189,16 @@ function renderPreview(){
             <div class="product-info">
 
                 <div class="product-brand">
-
                     ${escapeHTML(
                         product.brand
                     )}
-
                 </div>
 
 
                 <h1 class="product-name">
-
                     ${escapeHTML(
                         title
                     )}
-
                 </h1>
 
 
@@ -3968,42 +4210,33 @@ function renderPreview(){
 
 
                     <div class="price-promo">
-
-                        ${rupiah(
-                            promo
-                        )}
-
+                        ${rupiah(promo)}
                     </div>
 
 
                     <div class="price-meta">
 
                         <div class="price-normal">
-
                             <s>
-                                ${rupiah(
-                                    normal
-                                )}
+                                ${rupiah(normal)}
                             </s>
-
                         </div>
 
 
                         ${
                             discount > 0
 
-                                ?
+                            ?
 
-                                `
-                                <div class="discount">
-                                    Hemat ${discount}%
-                                </div>
-                                `
+                            `
+                            <div class="discount">
+                                Hemat ${discount}%
+                            </div>
+                            `
 
-                                :
+                            :
 
-                                ""
-
+                            ""
                         }
 
                     </div>
@@ -4035,7 +4268,13 @@ function renderPreview(){
     updateSlideCount();
 
 
-    startAutoplay();
+    if(
+        restartAutoplay
+    ){
+
+        startAutoplay();
+
+    }
 
 }
 
@@ -4054,13 +4293,19 @@ function updateSlideCount(){
 }
 
 
+let transitionBusy = false;
+
+
 /* =========================================================
-   NEXT
+   CINEMATIC SLIDE
 ========================================================= */
 
-function nextSlide(){
+async function changeSlide(
+    direction
+){
 
     if(
+        transitionBusy ||
         promoProducts.length < 2
     ){
 
@@ -4069,44 +4314,148 @@ function nextSlide(){
     }
 
 
-    currentIndex =
-        (
-            currentIndex + 1
-        )
-        %
-        promoProducts.length;
+    transitionBusy = true;
+
+    stopAutoplay();
 
 
-    renderPreview();
+    const canvas =
+        document.getElementById(
+            "promoCanvas"
+        );
 
-}
 
+    /*
+     * Kalau preview belum tersedia,
+     * langsung render.
+     */
 
-/* =========================================================
-   PREVIOUS
-========================================================= */
+    if(!canvas){
 
-function previousSlide(){
+        currentIndex =
+            (
+                currentIndex +
+                direction +
+                promoProducts.length
+            )
+            %
+            promoProducts.length;
 
-    if(
-        promoProducts.length < 2
-    ){
+        renderPreview();
+
+        transitionBusy = false;
 
         return;
 
     }
 
 
+    /*
+     * STEP 1
+     * Tutup seperti jendela.
+     */
+
+    canvas.classList.remove(
+        "slide-in",
+        "slide-content"
+    );
+
+    canvas.classList.add(
+        "slide-out"
+    );
+
+
+    await wait(270);
+
+
+    /*
+     * STEP 2
+     * Ganti produk ketika layar
+     * sudah tertutup.
+     */
+
     currentIndex =
         (
-            currentIndex - 1 +
+            currentIndex +
+            direction +
             promoProducts.length
         )
         %
         promoProducts.length;
 
 
-    renderPreview();
+    renderPreview(
+        false
+    );
+
+
+    const newCanvas =
+        document.getElementById(
+            "promoCanvas"
+        );
+
+
+    if(!newCanvas){
+
+        transitionBusy = false;
+
+        return;
+
+    }
+
+
+    /*
+     * STEP 3
+     * Buka kembali dari kiri.
+     */
+
+    newCanvas.classList.add(
+        "slide-in"
+    );
+
+
+    await wait(30);
+
+
+    newCanvas.classList.add(
+        "slide-content"
+    );
+
+
+    await wait(470);
+
+
+    newCanvas.classList.remove(
+        "slide-out"
+    );
+
+
+    transitionBusy = false;
+
+
+    if(playing){
+
+        startAutoplay();
+
+    }
+
+}
+
+
+
+
+
+
+function nextSlide(){
+
+    changeSlide(1);
+
+}
+
+
+function previousSlide(){
+
+    changeSlide(-1);
 
 }
 
