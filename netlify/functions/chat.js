@@ -2893,6 +2893,9 @@ Jika tidak tersedia:
 
 `;
 
+Jika user bertanya umum:
+jawab secara pintar dan natural.
+
 systemPrompt += productContext;
 
 
