@@ -17,28 +17,13 @@
 
 <title>Promo Studio — Imam_salesfr</title>
 
-
-<!-- ======================================================
-     FONTS
-====================================================== -->
-
 <link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link
-    rel="preconnect"
-    href="https://fonts.gstatic.com"
-    crossorigin
->
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
 <link
     href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
 >
-
-
-<!-- ======================================================
-     DOWNLOAD ENGINE
-====================================================== -->
 
 <script
     src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
@@ -49,55 +34,44 @@
 
 /* =========================================================
    IMAM_SALESFR — PROMO STUDIO
-   FINAL PREMIUM BUILD
+   PREMIUM FINAL
 ========================================================= */
 
 :root{
 
     --lime:#8CC63F;
-    --lime-bright:#9BDD4A;
-    --lime-dark:#6FA52F;
+    --lime-bright:#A1DD51;
+    --lime-dark:#6EA52F;
 
     --orange:#FF7A1A;
-    --orange-light:#FF9141;
-    --orange-dark:#E9680D;
+    --orange-light:#FF9344;
+    --orange-dark:#E45F08;
 
+    --black:#030503;
     --bg:#050705;
-    --bg-soft:#080B08;
-
     --panel:#090D0A;
     --panel-2:#0D120E;
-    --panel-3:#111711;
 
-    --white:#F7F8F5;
-    --white-soft:#D9DED8;
+    --white:#F7F9F5;
+    --soft:#DCE2DA;
 
-    --muted:#858D84;
-    --muted-2:#626A62;
+    --muted:#858E84;
+    --muted-dark:#626A62;
 
-    --border:
-        rgba(255,255,255,.085);
-
-    --border-soft:
-        rgba(255,255,255,.055);
-
-    --border-lime:
-        rgba(140,198,63,.45);
+    --line:rgba(255,255,255,.085);
+    --line-soft:rgba(255,255,255,.055);
 
     --shadow:
-        0 30px 90px rgba(0,0,0,.45);
+        0 32px 90px rgba(0,0,0,.48);
 
-    --radius:
-        22px;
-
-    --font-body:
-        "Plus Jakarta Sans",
+    --display:
+        "Manrope",
         Inter,
         system-ui,
         sans-serif;
 
-    --font-display:
-        "Manrope",
+    --body:
+        "Plus Jakarta Sans",
         Inter,
         system-ui,
         sans-serif;
@@ -115,15 +89,13 @@
     box-sizing:border-box;
 }
 
-
 html{
     min-height:100%;
     background:var(--bg);
-    scroll-behavior:smooth;
 }
 
-
 body{
+
     margin:0;
     min-height:100vh;
 
@@ -131,38 +103,35 @@ body{
 
     color:var(--white);
 
-    font-family:var(--font-body);
+    font-family:var(--body);
 
     background:
         radial-gradient(
-            circle at 50% -15%,
-            rgba(140,198,63,.075),
-            transparent 35%
+            circle at 50% -20%,
+            rgba(140,198,63,.085),
+            transparent 34%
         ),
         linear-gradient(
             180deg,
             #050705 0%,
-            #060906 100%
+            #060806 100%
         );
 
     -webkit-font-smoothing:antialiased;
     -moz-osx-font-smoothing:grayscale;
-}
 
+}
 
 button,
 input{
     font:inherit;
 }
 
-
 button{
     border:0;
     cursor:pointer;
-
     -webkit-tap-highlight-color:transparent;
 }
-
 
 img{
     max-width:100%;
@@ -176,47 +145,35 @@ img{
 .topbar{
 
     position:sticky;
-
     top:0;
-
     z-index:1000;
-
-    width:100%;
 
     min-height:86px;
 
     display:flex;
-
     align-items:center;
-
     justify-content:space-between;
 
     gap:24px;
 
     padding:
-        17px
-        clamp(20px,4vw,38px);
+        16px
+        clamp(18px,4vw,40px);
 
     background:
-        rgba(5,7,5,.94);
+        rgba(4,6,4,.93);
 
     border-bottom:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid var(--line);
 
-    backdrop-filter:
-        blur(18px);
-
-    -webkit-backdrop-filter:
-        blur(18px);
+    backdrop-filter:blur(18px);
+    -webkit-backdrop-filter:blur(18px);
 
 }
-
 
 .header-brand{
     min-width:0;
 }
-
 
 .brand-name{
 
@@ -224,23 +181,21 @@ img{
 
     color:#fff;
 
-    font-family:
-        var(--font-display);
+    font-family:var(--display);
 
     font-size:
-        clamp(24px,3vw,34px);
+        clamp(23px,3vw,33px);
 
-    line-height:
-        1.02;
+    line-height:1;
 
     font-weight:800;
 
-    letter-spacing:-1.35px;
+    letter-spacing:
+        -.9px;
 
     white-space:nowrap;
 
 }
-
 
 .brand-sub{
 
@@ -249,95 +204,77 @@ img{
     color:var(--lime);
 
     font-size:
-        clamp(11px,1.25vw,14px);
+        clamp(10px,1.2vw,13px);
 
-    line-height:1.15;
+    line-height:1;
 
     font-weight:700;
 
-    letter-spacing:.45px;
+    letter-spacing:.3px;
 
 }
-
 
 .header-actions{
 
     display:flex;
-
     align-items:center;
-
-    gap:12px;
+    gap:10px;
 
     flex:0 0 auto;
 
 }
 
-
 .header-btn{
 
-    width:58px;
-    height:58px;
+    width:56px;
+    height:56px;
 
     display:grid;
-
     place-items:center;
 
     color:#fff;
 
     background:
-        rgba(9,13,10,.92);
+        rgba(10,14,10,.92);
 
     border:
-        1px solid
-        rgba(255,255,255,.11);
+        1px solid rgba(255,255,255,.11);
 
-    border-radius:18px;
+    border-radius:17px;
 
     transition:
-        transform .2s ease,
-        border-color .2s ease,
-        background .2s ease;
+        transform .18s ease,
+        border-color .18s ease,
+        background .18s ease;
 
 }
-
 
 .header-btn:hover{
 
-    transform:
-        translateY(-2px);
+    transform:translateY(-2px);
 
     border-color:
-        var(--border-lime);
+        rgba(140,198,63,.5);
 
 }
-
 
 .header-btn.primary{
 
     color:#101509;
 
-    background:
-        var(--lime);
+    background:var(--lime);
 
-    border-color:
-        var(--lime);
+    border-color:var(--lime);
 
 }
-
 
 .header-btn.primary:hover{
-
-    background:
-        var(--lime-bright);
-
+    background:var(--lime-bright);
 }
 
-
 .header-btn svg{
-
-    width:22px;
-    height:22px;
-
+    width:21px;
+    height:21px;
 }
 
 
@@ -356,112 +293,90 @@ main{
 
 }
 
-
 .container{
 
-    width:
-        min(100%,1200px);
+    width:min(100%,1180px);
 
-    margin:
-        0 auto;
+    margin:auto;
 
 }
 
 
 /* =========================================================
-   PREVIEW
+   STAGE
 ========================================================= */
-
-.preview-wrap{
-    width:100%;
-}
-
 
 .stage{
 
     width:100%;
 
     display:flex;
-
-    align-items:flex-start;
-
     justify-content:center;
 
     position:relative;
 
+    transition:
+        opacity .2s ease;
+
 }
-
-
-/* =========================================================
-   CANVAS
-========================================================= */
 
 .promo-canvas{
 
     position:relative;
 
-    width:100%;
-
     overflow:hidden;
 
     isolation:isolate;
+
+    width:100%;
 
     background:
         #070907;
 
     border:
-        1px solid
-        rgba(255,255,255,.09);
+        1px solid rgba(255,255,255,.09);
 
-    box-shadow:
-        var(--shadow);
+    box-shadow:var(--shadow);
 
     transition:
-        opacity .75s ease,
-        transform .85s cubic-bezier(.22,.61,.36,1),
-        filter .85s ease;
+        transform 1.15s cubic-bezier(.22,.61,.36,1),
+        opacity 1.05s ease,
+        filter 1.05s ease;
 
 }
 
 
 /* =========================================================
-   RATIO
+   RATIO CANVAS
 ========================================================= */
 
 .stage.ratio-916 .promo-canvas{
 
-    width:
-        min(100%,520px);
+    width:min(100%,520px);
 
-    aspect-ratio:
-        9 / 16;
+    aspect-ratio:9 / 16;
 
 }
-
 
 .stage.ratio-45 .promo-canvas{
 
-    width:
-        min(100%,760px);
+    width:min(100%,760px);
 
-    aspect-ratio:
-        4 / 5;
+    aspect-ratio:4 / 5;
 
 }
-
 
 .stage.ratio-169 .promo-canvas{
 
     width:100%;
 
-    aspect-ratio:
-        16 / 9;
+    aspect-ratio:16 / 9;
 
 }
 
 
 /* =========================================================
-   SLIDE TRANSITION
+   TRANSITION
 ========================================================= */
 
 .promo-canvas.slide-out{
@@ -469,38 +384,36 @@ main{
     opacity:0;
 
     transform:
-        scale(.985)
-        translateY(18px);
+        translateX(-4.5%)
+        scale(.985);
 
     filter:
         brightness(.55)
-        blur(1px);
+        blur(1.2px);
 
 }
-
 
 .promo-canvas.slide-in{
 
     opacity:0;
 
     transform:
-        scale(1.018)
-        translateY(-14px);
+        translateX(4.5%)
+        scale(1.012);
 
     filter:
-        brightness(.65)
-        blur(1px);
+        brightness(.58)
+        blur(1.2px);
 
 }
-
 
 .promo-canvas.slide-content{
 
     opacity:1;
 
     transform:
-        scale(1)
-        translateY(0);
+        translateX(0)
+        scale(1);
 
     filter:
         brightness(1)
@@ -510,7 +423,7 @@ main{
 
 
 /* =========================================================
-   PRODUCT VISUAL
+   VISUAL AREA
 ========================================================= */
 
 .product-visual{
@@ -524,53 +437,51 @@ main{
     display:flex;
 
     align-items:center;
-
     justify-content:center;
 
-    background:#020302;
+    background:
+        radial-gradient(
+            circle at 50% 42%,
+            rgba(255,255,255,.035),
+            transparent 55%
+        ),
+        #020302;
 
 }
 
 
 /* 9:16 */
 
-.stage.ratio-916
-.product-visual{
+.stage.ratio-916 .product-visual{
 
-    top:0;
-    left:0;
-    right:0;
+    inset:
+        0 0 auto 0;
 
-    height:57%;
+    height:55%;
 
 }
 
 
 /* 4:5 */
 
-.stage.ratio-45
-.product-visual{
+.stage.ratio-45 .product-visual{
 
-    top:0;
-    left:0;
-    right:0;
+    inset:
+        0 0 auto 0;
 
-    height:61%;
+    height:58%;
 
 }
 
 
 /* 16:9 */
 
-.stage.ratio-169
-.product-visual{
+.stage.ratio-169 .product-visual{
 
-    top:0;
-    left:0;
+    inset:
+        0 auto 0 0;
 
-    width:58%;
-
-    height:100%;
+    width:57%;
 
 }
 
@@ -581,16 +492,15 @@ main{
 
 .product-image{
 
+    display:block;
+
     width:100%;
     height:100%;
 
-    display:block;
-
     padding:
-        clamp(12px,4%,30px);
+        clamp(18px,4.5%,42px);
 
     object-fit:contain;
-
     object-position:center;
 
     opacity:1;
@@ -613,7 +523,6 @@ main{
 .visual-gradient{
 
     position:absolute;
-
     inset:0;
 
     z-index:3;
@@ -623,38 +532,129 @@ main{
     background:
         linear-gradient(
             to bottom,
-            rgba(5,7,5,0)
-            45%,
-            rgba(5,7,5,.025)
-            58%,
-            rgba(5,7,5,.12)
-            72%,
-            rgba(5,7,5,.58)
-            91%,
-            #070907
-            100%
+            transparent 48%,
+            rgba(7,9,7,.05) 60%,
+            rgba(7,9,7,.32) 78%,
+            rgba(7,9,7,.9) 96%,
+            #070907 100%
+        );
+
+}
+
+.stage.ratio-169 .visual-gradient{
+
+    background:
+        linear-gradient(
+            to right,
+            transparent 35%,
+            rgba(7,9,7,.08) 47%,
+            rgba(7,9,7,.4) 62%,
+            rgba(7,9,7,.9) 78%,
+            #070907 100%
         );
 
 }
 
 
-.stage.ratio-169
-.visual-gradient{
+/* =========================================================
+   LOWER INFORMATION AREA
+========================================================= */
 
-    background:
-        linear-gradient(
-            to right,
-            rgba(5,7,5,0)
-            35%,
-            rgba(5,7,5,.08)
-            47%,
-            rgba(5,7,5,.35)
-            59%,
-            rgba(5,7,5,.86)
-            74%,
-            #070907
-            100%
-        );
+.info-zone{
+
+    position:absolute;
+
+    z-index:15;
+
+    overflow:hidden;
+
+}
+
+
+/* 9:16 */
+
+.stage.ratio-916 .info-zone{
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:45%;
+
+    padding:
+        18px 8% 7%;
+
+}
+
+
+/* 4:5 */
+
+.stage.ratio-45 .info-zone{
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    height:42%;
+
+    padding:
+        17px 7% 6%;
+
+}
+
+
+/* 16:9 */
+
+.stage.ratio-169 .info-zone{
+
+    top:0;
+    right:0;
+    bottom:0;
+
+    width:43%;
+
+    padding:
+        8% 6% 7% 4%;
+
+}
+
+
+/* =========================================================
+   INFO CONTENT
+========================================================= */
+
+.product-info{
+
+    position:relative;
+
+    z-index:20;
+
+    width:100%;
+
+    min-width:0;
+
+}
+
+
+/* =========================================================
+   BADGE AREA
+========================================================= */
+
+.badge-stack{
+
+    position:relative;
+
+    z-index:40;
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:8px;
+
+    margin-bottom:11px;
 
 }
 
@@ -665,112 +665,29 @@ main{
 
 .promo-badge{
 
-    position:absolute;
-
-    z-index:40;
-
-    display:flex;
+    display:inline-flex;
 
     align-items:center;
-
     justify-content:center;
 
-    gap:9px;
+    height:31px;
 
-    width:max-content;
-
-    height:38px;
-
-    min-width:110px;
-
-    padding:
-        0 17px;
-
-    border-radius:999px;
-
-    background:
-        linear-gradient(
-            135deg,
-            var(--orange-light),
-            var(--orange) 58%,
-            var(--orange-dark)
-        );
-
-    color:#180A03;
-
-    font-family:
-        var(--font-body);
-
-    font-size:9px;
-
-    line-height:1;
-
-    font-weight:800;
-
-    letter-spacing:3.1px;
-
-    white-space:nowrap;
-
-    box-shadow:
-        0 12px 28px
-        rgba(255,122,26,.18);
-
-    pointer-events:none;
-
-}
-
-
-.promo-badge::before{
-
-    content:"";
-
-    width:7px;
-    height:7px;
-
-    flex:0 0 7px;
-
-    border-radius:50%;
-
-    background:#180A03;
-
-}
-
-
-/* =========================================================
-   EXTRA DISCOUNT BADGE
-========================================================= */
-
-.extra-discount-badge{
-
-    position:absolute;
-
-    z-index:39;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    width:max-content;
-
-    min-width:108px;
-
-    height:28px;
+    min-width:91px;
 
     padding:
         0 13px;
 
     border-radius:999px;
 
-    color:#FF9141;
+    color:#190A03;
 
     background:
-        rgba(255,122,26,.085);
-
-    border:
-        1px solid
-        rgba(255,122,26,.38);
+        linear-gradient(
+            135deg,
+            var(--orange-light),
+            var(--orange) 60%,
+            var(--orange-dark)
+        );
 
     font-size:8px;
 
@@ -778,130 +695,68 @@ main{
 
     font-weight:800;
 
-    letter-spacing:1.9px;
+    letter-spacing:2.6px;
 
     white-space:nowrap;
 
-}
-
-
-/* =========================================================
-   RATIO — BADGE POSITIONS
-========================================================= */
-
-.stage.ratio-916
-.promo-badge{
-
-    top:
-        calc(57% + 12px);
-
-    left:8%;
+    box-shadow:
+        0 9px 22px
+        rgba(255,122,26,.16);
 
 }
 
+.promo-badge::before{
 
-.stage.ratio-916
-.extra-discount-badge{
+    content:"";
 
-    top:
-        calc(57% + 57px);
+    width:6px;
+    height:6px;
 
-    left:8%;
+    margin-right:7px;
 
-}
+    border-radius:50%;
 
-
-.stage.ratio-45
-.promo-badge{
-
-    top:
-        calc(61% + 12px);
-
-    left:7%;
-
-}
-
-
-.stage.ratio-45
-.extra-discount-badge{
-
-    top:
-        calc(61% + 57px);
-
-    left:7%;
-
-}
-
-
-.stage.ratio-169
-.promo-badge{
-
-    top:8%;
-
-    left:61%;
-
-}
-
-
-.stage.ratio-169
-.extra-discount-badge{
-
-    top:
-        calc(8% + 48px);
-
-    left:61%;
+    background:#190A03;
 
 }
 
 
 /* =========================================================
-   PRODUCT INFO
+   EXTRA BADGE
 ========================================================= */
 
-.product-info{
+.extra-discount-badge{
 
-    position:absolute;
+    display:inline-flex;
 
-    z-index:20;
+    align-items:center;
+    justify-content:center;
 
-    min-width:0;
+    height:26px;
 
-}
+    padding:
+        0 11px;
 
+    border-radius:999px;
 
-.stage.ratio-916
-.product-info{
+    color:var(--orange-light);
 
-    top:
-        calc(57% + 72px);
+    background:
+        rgba(255,122,26,.08);
 
-    left:8%;
-    right:7%;
+    border:
+        1px solid
+        rgba(255,122,26,.35);
 
-}
+    font-size:7px;
 
+    line-height:1;
 
-.stage.ratio-45
-.product-info{
+    font-weight:800;
 
-    top:
-        calc(61% + 72px);
+    letter-spacing:1.3px;
 
-    left:7%;
-    right:7%;
-
-}
-
-
-.stage.ratio-169
-.product-info{
-
-    top:
-        calc(8% + 82px);
-
-    left:61%;
-
-    right:5%;
+    white-space:nowrap;
 
 }
 
@@ -916,18 +771,15 @@ main{
 
     color:var(--lime);
 
-    font-family:
-        var(--font-body);
-
     font-size:
-        clamp(9px,1.15vw,13px);
+        clamp(9px,1.05vw,12px);
 
     line-height:1.1;
 
     font-weight:800;
 
     letter-spacing:
-        clamp(2.4px,.45vw,4px);
+        clamp(1.8px,.32vw,3px);
 
     text-transform:uppercase;
 
@@ -947,37 +799,30 @@ main{
 .product-name{
 
     margin:
-        9px
-        0
-        0;
+        7px 0 0;
 
     color:#fff;
 
-    font-family:
-        var(--font-display);
+    font-family:var(--display);
 
     font-size:
-        clamp(29px,4.1vw,54px);
+        clamp(24px,3.2vw,43px);
 
     line-height:
-        .98;
+        1.02;
 
     font-weight:800;
 
     letter-spacing:
-        -.9px;
+        -.65px;
 
-    max-width:
-        920px;
+    max-width:100%;
 
-    display:
-        -webkit-box;
+    display:-webkit-box;
 
-    -webkit-box-orient:
-        vertical;
+    -webkit-box-orient:vertical;
 
-    -webkit-line-clamp:
-        2;
+    -webkit-line-clamp:2;
 
     overflow:hidden;
 
@@ -988,68 +833,42 @@ main{
 
 /* 9:16 */
 
-.stage.ratio-916
-.product-name{
+.stage.ratio-916 .product-name{
 
     font-size:
-        clamp(
-            29px,
-            7vw,
-            43px
-        );
+        clamp(25px,6.1vw,37px);
 
-    line-height:.99;
+    line-height:
+        1.01;
 
     letter-spacing:
-        -.75px;
-
-    max-width:94%;
+        -.55px;
 
 }
 
 
 /* 4:5 */
 
-.stage.ratio-45
-.product-name{
+.stage.ratio-45 .product-name{
 
     font-size:
-        clamp(
-            31px,
-            5.6vw,
-            48px
-        );
+        clamp(27px,5.1vw,42px);
 
     line-height:
-        1;
-
-    letter-spacing:
-        -.85px;
-
-    max-width:93%;
+        1.02;
 
 }
 
 
 /* 16:9 */
 
-.stage.ratio-169
-.product-name{
+.stage.ratio-169 .product-name{
 
     font-size:
-        clamp(
-            22px,
-            3vw,
-            39px
-        );
+        clamp(20px,2.65vw,34px);
 
     line-height:
-        1.02;
-
-    letter-spacing:
-        -.7px;
-
-    max-width:94%;
+        1.03;
 
 }
 
@@ -1060,50 +879,46 @@ main{
 
 .price-block{
 
-    margin-top:20px;
+    margin-top:
+        clamp(13px,2vw,19px);
 
 }
 
-
 .price-label{
 
-    margin-bottom:7px;
+    margin-bottom:6px;
 
-    color:
-        #7F887E;
+    color:#7D867D;
 
     font-size:
-        clamp(9px,1vw,12px);
+        clamp(8px,.85vw,10px);
 
     line-height:1;
 
     font-weight:800;
 
     letter-spacing:
-        3px;
+        2.4px;
 
     text-transform:uppercase;
 
 }
 
-
 .price-promo{
 
     color:#fff;
 
-    font-family:
-        var(--font-display);
+    font-family:var(--display);
 
     font-size:
-        clamp(37px,5vw,64px);
+        clamp(31px,4.4vw,56px);
 
-    line-height:
-        .94;
+    line-height:.95;
 
     font-weight:800;
 
     letter-spacing:
-        -1.8px;
+        -1.5px;
 
     white-space:nowrap;
 
@@ -1112,45 +927,30 @@ main{
 
 /* 9:16 */
 
-.stage.ratio-916
-.price-promo{
+.stage.ratio-916 .price-promo{
 
     font-size:
-        clamp(
-            37px,
-            8.5vw,
-            52px
-        );
+        clamp(31px,7.1vw,46px);
 
 }
 
 
 /* 4:5 */
 
-.stage.ratio-45
-.price-promo{
+.stage.ratio-45 .price-promo{
 
     font-size:
-        clamp(
-            39px,
-            7vw,
-            58px
-        );
+        clamp(33px,6.2vw,52px);
 
 }
 
 
 /* 16:9 */
 
-.stage.ratio-169
-.price-promo{
+.stage.ratio-169 .price-promo{
 
     font-size:
-        clamp(
-            28px,
-            4.8vw,
-            47px
-        );
+        clamp(24px,4vw,40px);
 
 }
 
@@ -1167,20 +967,18 @@ main{
 
     flex-wrap:wrap;
 
-    gap:10px;
+    gap:8px;
 
-    margin-top:11px;
+    margin-top:9px;
 
 }
 
-
 .price-normal{
 
-    color:
-        #727A72;
+    color:#707970;
 
     font-size:
-        clamp(10px,1.1vw,13px);
+        clamp(9px,.9vw,12px);
 
     line-height:1;
 
@@ -1188,21 +986,16 @@ main{
 
 }
 
-
 .price-normal s{
-
     text-decoration-thickness:1px;
-
 }
-
 
 .discount{
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
     font-size:
-        clamp(10px,1.1vw,14px);
+        clamp(9px,.95vw,12px);
 
     line-height:1;
 
@@ -1210,22 +1003,20 @@ main{
 
 }
 
-
 .extra-price-note{
 
-    margin-top:10px;
+    margin-top:8px;
 
-    color:
-        var(--orange-light);
+    color:var(--orange-light);
 
     font-size:
-        clamp(9px,1vw,12px);
+        clamp(8px,.85vw,10px);
 
-    line-height:1.15;
+    line-height:1;
 
     font-weight:800;
 
-    letter-spacing:1.3px;
+    letter-spacing:1px;
 
     text-transform:uppercase;
 
@@ -1241,22 +1032,16 @@ main{
     position:absolute;
 
     right:5%;
+    bottom:3.5%;
 
-    bottom:4%;
-
-    z-index:100;
+    z-index:80;
 
     color:
-        rgba(190,196,188,.62);
+        rgba(190,196,188,.55);
 
-    font-family:
-        var(--font-body);
-
-    font-size:8px;
+    font-size:7px;
 
     font-weight:500;
-
-    letter-spacing:.2px;
 
 }
 
@@ -1269,8 +1054,7 @@ main{
 
     margin-top:12px;
 
-    padding:
-        15px;
+    padding:14px;
 
     display:grid;
 
@@ -1278,26 +1062,25 @@ main{
         1.35fr
         1fr;
 
-    gap:14px;
+    gap:13px;
 
     background:
         linear-gradient(
             145deg,
-            rgba(16,22,17,.95),
-            rgba(8,11,9,.96)
+            rgba(16,22,17,.96),
+            rgba(8,11,9,.98)
         );
 
     border:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid var(--line);
 
-    border-radius:22px;
+    border-radius:21px;
 
 }
 
 
 /* =========================================================
-   RATIO GROUP
+   RATIO
 ========================================================= */
 
 .ratio-group{
@@ -1307,98 +1090,81 @@ main{
     grid-template-columns:
         repeat(3,minmax(0,1fr));
 
-    gap:10px;
+    gap:9px;
 
 }
 
-
 .ratio-caption{
 
-    grid-column:
-        1 / -1;
+    grid-column:1/-1;
 
-    color:
-        #727B72;
+    color:#737C73;
 
-    font-size:9px;
+    font-size:8px;
 
     line-height:1;
 
     font-weight:800;
 
-    letter-spacing:1.8px;
+    letter-spacing:1.7px;
 
     text-transform:uppercase;
 
 }
 
-
 .ratio-btn{
 
     min-width:0;
 
-    min-height:62px;
-
-    padding:
-        10px 12px;
+    min-height:60px;
 
     display:flex;
 
     align-items:center;
-
     justify-content:center;
 
-    gap:10px;
+    gap:9px;
 
-    color:
-        #A6ADA5;
+    padding:
+        8px 10px;
 
-    background:
-        rgba(3,6,4,.75);
+    color:#A4ACA3;
+
+    background:#080C09;
 
     border:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid rgba(255,255,255,.075);
 
-    border-radius:17px;
+    border-radius:16px;
 
     transition:
-        border-color .18s ease,
-        background .18s ease,
-        color .18s ease,
-        transform .18s ease;
+        transform .16s ease,
+        border-color .16s ease,
+        background .16s ease,
+        color .16s ease;
 
 }
-
 
 .ratio-btn:hover{
 
-    transform:
-        translateY(-1px);
+    transform:translateY(-1px);
 
     border-color:
-        rgba(140,198,63,.28);
+        rgba(140,198,63,.3);
 
 }
-
 
 .ratio-btn.active{
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
     background:
-        rgba(140,198,63,.08);
+        rgba(140,198,63,.075);
 
     border-color:
-        rgba(140,198,63,.72);
-
-    box-shadow:
-        inset 0 0 30px
-        rgba(140,198,63,.045);
+        rgba(140,198,63,.68);
 
 }
-
 
 .ratio-icon{
 
@@ -1414,43 +1180,36 @@ main{
 
 }
 
-
-.ratio-btn[data-ratio="45"]
-.ratio-icon{
+.ratio-btn[data-ratio="45"] .ratio-icon{
 
     width:17px;
     height:21px;
 
 }
 
+.ratio-btn[data-ratio="169"] .ratio-icon{
 
-.ratio-btn[data-ratio="169"]
-.ratio-icon{
-
-    width:24px;
+    width:25px;
     height:14px;
 
 }
 
-
 .ratio-text{
 
-    min-width:0;
-
     display:flex;
-
     flex-direction:column;
 
     align-items:flex-start;
 
-    gap:2px;
+    gap:3px;
+
+    min-width:0;
 
 }
 
-
 .ratio-value{
 
-    font-size:13px;
+    font-size:12px;
 
     line-height:1;
 
@@ -1458,13 +1217,11 @@ main{
 
 }
 
-
 .ratio-use{
 
-    color:
-        #687067;
+    color:#687067;
 
-    font-size:8px;
+    font-size:7px;
 
     line-height:1;
 
@@ -1472,18 +1229,13 @@ main{
 
 }
 
-
-.ratio-btn.active
-.ratio-use{
-
-    color:
-        rgba(140,198,63,.78);
-
+.ratio-btn.active .ratio-use{
+    color:rgba(140,198,63,.78);
 }
 
 
 /* =========================================================
-   NAVIGATION
+   NAV
 ========================================================= */
 
 .navigation{
@@ -1496,34 +1248,28 @@ main{
 
     align-items:center;
 
-    gap:10px;
+    gap:9px;
 
 }
 
-
 .nav-btn{
 
-    min-width:58px;
-
-    height:62px;
+    min-width:56px;
+    height:60px;
 
     display:grid;
-
     place-items:center;
 
     color:#fff;
 
-    background:
-        rgba(3,6,4,.78);
+    background:#080C09;
 
     border:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid rgba(255,255,255,.075);
 
-    border-radius:17px;
+    border-radius:16px;
 
 }
-
 
 .nav-btn:hover{
 
@@ -1532,24 +1278,22 @@ main{
 
 }
 
-
 .nav-btn svg{
 
-    width:22px;
-    height:22px;
+    width:21px;
+    height:21px;
 
 }
 
-
 .slide-count{
 
-    min-width:50px;
+    min-width:47px;
 
-    color:#8D958D;
+    color:#858D85;
 
     text-align:center;
 
-    font-size:12px;
+    font-size:11px;
 
     font-weight:800;
 
@@ -1562,18 +1306,17 @@ main{
 
 .download-btn{
 
-    min-height:62px;
+    min-height:60px;
 
     padding:
-        0 22px;
+        0 19px;
 
     display:flex;
 
     align-items:center;
-
     justify-content:center;
 
-    gap:11px;
+    gap:10px;
 
     color:#0D1409;
 
@@ -1581,58 +1324,46 @@ main{
         linear-gradient(
             135deg,
             #8CC63F,
-            #99D84A
+            #9BDD4A
         );
 
-    border-radius:17px;
+    border-radius:16px;
 
-    font-size:12px;
+    font-size:11px;
 
     font-weight:800;
 
-    letter-spacing:.35px;
+    letter-spacing:.3px;
 
     transition:
-        transform .18s ease,
-        filter .18s ease,
-        opacity .18s ease;
+        transform .16s ease,
+        filter .16s ease,
+        opacity .16s ease;
 
 }
-
 
 .download-btn:hover{
 
-    transform:
-        translateY(-1px);
+    transform:translateY(-1px);
 
-    filter:
-        brightness(1.05);
+    filter:brightness(1.05);
 
 }
 
-
 .download-btn:disabled{
 
-    opacity:.65;
+    opacity:.62;
 
     cursor:wait;
 
 }
 
-
 .download-btn svg{
 
-    width:20px;
-    height:20px;
-
-    flex:0 0 auto;
+    width:19px;
+    height:19px;
 
 }
-
-
-/* =========================================================
-   DOWNLOAD SPINNER
-========================================================= */
 
 .download-spinner{
 
@@ -1640,39 +1371,31 @@ main{
     height:18px;
 
     border:
-        2px solid
-        rgba(13,20,9,.22);
+        2px solid rgba(13,20,9,.2);
 
-    border-top-color:
-        #0D1409;
+    border-top-color:#0D1409;
 
     border-radius:50%;
 
     animation:
-        spin .75s linear infinite;
+        spin .7s linear infinite;
 
 }
 
-
 @keyframes spin{
-
-    to{
-        transform:rotate(360deg);
-    }
-
+    to{transform:rotate(360deg);}
 }
 
 
 /* =========================================================
-   PROMO MANAGER
+   MANAGER
 ========================================================= */
 
 .manager{
 
     margin-top:12px;
 
-    padding:
-        28px;
+    padding:26px;
 
     background:
         linear-gradient(
@@ -1682,47 +1405,40 @@ main{
         );
 
     border:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid var(--line);
 
-    border-radius:
-        24px;
+    border-radius:23px;
 
 }
 
-
 .section-label{
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
-    font-size:11px;
+    font-size:10px;
 
     line-height:1;
 
     font-weight:800;
 
-    letter-spacing:3.4px;
+    letter-spacing:3px;
 
     text-transform:uppercase;
 
 }
 
-
 .manager-heading{
 
-    margin-top:10px;
+    margin-top:9px;
 
     display:flex;
 
     align-items:flex-end;
-
     justify-content:space-between;
 
     gap:20px;
 
 }
-
 
 .manager-title{
 
@@ -1730,27 +1446,24 @@ main{
 
     color:#fff;
 
-    font-family:
-        var(--font-display);
+    font-family:var(--display);
 
     font-size:
-        clamp(25px,3vw,38px);
+        clamp(23px,3vw,36px);
 
     line-height:1;
 
     font-weight:800;
 
-    letter-spacing:-1px;
+    letter-spacing:-.8px;
 
 }
 
-
 .manager-summary{
 
-    color:
-        #7D857D;
+    color:#7D857D;
 
-    font-size:12px;
+    font-size:11px;
 
     font-weight:600;
 
@@ -1758,12 +1471,8 @@ main{
 
 }
 
-
 .manager-summary strong{
-
-    color:
-        var(--lime);
-
+    color:var(--lime);
 }
 
 
@@ -1773,42 +1482,38 @@ main{
 
 .manager-toolbar{
 
-    margin-top:22px;
+    margin-top:21px;
 
     display:grid;
 
     grid-template-columns:
         repeat(6,minmax(0,1fr));
 
-    gap:10px;
+    gap:9px;
 
 }
 
-
 .tool-btn{
 
-    min-height:48px;
+    min-height:47px;
 
     padding:
-        0 15px;
+        0 13px;
 
-    color:#E6EAE5;
+    color:#E4E9E3;
 
-    background:
-        #080C09;
+    background:#080C09;
 
     border:
-        1px solid
-        rgba(255,255,255,.085);
+        1px solid rgba(255,255,255,.08);
 
-    border-radius:14px;
+    border-radius:13px;
 
-    font-size:11px;
+    font-size:10px;
 
     font-weight:700;
 
 }
-
 
 .tool-btn:hover{
 
@@ -1817,25 +1522,18 @@ main{
 
 }
 
-
 .tool-btn.primary{
 
     color:#0D1409;
 
-    background:
-        var(--lime);
+    background:var(--lime);
 
-    border-color:
-        var(--lime);
+    border-color:var(--lime);
 
 }
 
-
 .tool-btn.primary:hover{
-
-    background:
-        var(--lime-bright);
-
+    background:var(--lime-bright);
 }
 
 
@@ -1844,49 +1542,35 @@ main{
 ========================================================= */
 
 .search-row{
-
-    margin-top:12px;
-
+    margin-top:11px;
 }
-
 
 .search{
 
     width:100%;
-
-    height:48px;
+    height:47px;
 
     padding:
-        0 16px;
+        0 15px;
 
     color:#fff;
 
     outline:none;
 
-    background:
-        #080C09;
+    background:#080C09;
 
     border:
-        1px solid
-        rgba(255,255,255,.085);
+        1px solid rgba(255,255,255,.08);
 
-    border-radius:14px;
+    border-radius:13px;
 
-    font-size:12px;
-
-    transition:
-        border-color .15s ease,
-        box-shadow .15s ease;
+    font-size:11px;
 
 }
-
 
 .search::placeholder{
-
     color:#5F675F;
-
 }
-
 
 .search:focus{
 
@@ -1895,7 +1579,7 @@ main{
 
     box-shadow:
         0 0 0 3px
-        rgba(140,198,63,.07);
+        rgba(140,198,63,.065);
 
 }
 
@@ -1906,20 +1590,20 @@ main{
 
 .product-grid{
 
-    margin-top:14px;
+    margin-top:13px;
 
     display:grid;
 
     grid-template-columns:
         repeat(5,minmax(0,1fr));
 
-    gap:10px;
+    gap:9px;
 
 }
 
 
 /* =========================================================
-   SELECT CARD
+   PRODUCT CARD
 ========================================================= */
 
 .select-card{
@@ -1928,7 +1612,7 @@ main{
 
     min-width:0;
 
-    min-height:275px;
+    height:274px;
 
     overflow:hidden;
 
@@ -1940,40 +1624,36 @@ main{
         );
 
     border:
-        1px solid
-        rgba(255,255,255,.075);
+        1px solid rgba(255,255,255,.075);
 
-    border-radius:16px;
+    border-radius:15px;
 
     cursor:pointer;
 
     transition:
-        border-color .18s ease,
-        transform .18s ease,
-        box-shadow .18s ease;
+        transform .16s ease,
+        border-color .16s ease,
+        box-shadow .16s ease;
 
 }
 
-
 .select-card:hover{
 
-    transform:
-        translateY(-2px);
+    transform:translateY(-2px);
 
     border-color:
         rgba(140,198,63,.3);
 
 }
 
-
 .select-card.selected{
 
     border-color:
-        rgba(140,198,63,.75);
+        rgba(140,198,63,.72);
 
     box-shadow:
         0 0 0 1px
-        rgba(140,198,63,.16);
+        rgba(140,198,63,.13);
 
 }
 
@@ -1986,24 +1666,21 @@ main{
 
     position:absolute;
 
-    top:0;
-    left:0;
-    right:0;
+    inset:
+        0 0 auto 0;
 
-    height:145px;
+    height:146px;
 
     display:flex;
 
     align-items:center;
-
     justify-content:center;
 
     overflow:hidden;
 
-    background:#060806;
+    background:#050705;
 
 }
-
 
 .select-image img{
 
@@ -2016,7 +1693,6 @@ main{
 
 }
 
-
 .select-image::after{
 
     content:"";
@@ -2028,7 +1704,7 @@ main{
     background:
         linear-gradient(
             to bottom,
-            transparent 40%,
+            transparent 42%,
             #090D0A 100%
         );
 
@@ -2043,7 +1719,7 @@ main{
 
     position:absolute;
 
-    z-index:20;
+    z-index:30;
 
     top:9px;
     left:9px;
@@ -2052,54 +1728,47 @@ main{
     height:21px;
 
     display:grid;
-
     place-items:center;
 
     color:transparent;
 
     background:
-        rgba(0,0,0,.65);
+        rgba(0,0,0,.66);
 
     border:
-        1px solid
-        rgba(255,255,255,.17);
+        1px solid rgba(255,255,255,.17);
 
     border-radius:6px;
 
 }
 
-
-.select-card.selected
-.check{
+.select-card.selected .check{
 
     color:#0D1409;
 
-    background:
-        var(--lime);
+    background:var(--lime);
 
-    border-color:
-        var(--lime);
+    border-color:var(--lime);
 
 }
 
-
 .check svg{
 
-    width:13px;
-    height:13px;
+    width:12px;
+    height:12px;
 
 }
 
 
 /* =========================================================
-   EDIT BUTTON
+   EDIT
 ========================================================= */
 
 .edit-price-btn{
 
     position:absolute;
 
-    z-index:25;
+    z-index:35;
 
     top:8px;
     right:8px;
@@ -2108,7 +1777,6 @@ main{
     height:30px;
 
     display:grid;
-
     place-items:center;
 
     color:#fff;
@@ -2117,24 +1785,19 @@ main{
         rgba(0,0,0,.68);
 
     border:
-        1px solid
-        rgba(255,255,255,.13);
+        1px solid rgba(255,255,255,.13);
 
     border-radius:9px;
 
 }
 
-
 .edit-price-btn:hover{
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
-    border-color:
-        var(--lime);
+    border-color:var(--lime);
 
 }
-
 
 .edit-price-btn svg{
 
@@ -2152,7 +1815,7 @@ main{
 
     position:absolute;
 
-    z-index:10;
+    z-index:20;
 
     left:12px;
     right:12px;
@@ -2162,11 +1825,9 @@ main{
 
 }
 
-
 .select-brand{
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
     font-size:7px;
 
@@ -2174,7 +1835,7 @@ main{
 
     font-weight:800;
 
-    letter-spacing:1.7px;
+    letter-spacing:1.6px;
 
     text-transform:uppercase;
 
@@ -2186,35 +1847,27 @@ main{
 
 }
 
-
 .select-name{
 
     margin-top:6px;
 
     color:#fff;
 
-    font-family:
-        var(--font-body);
-
-    font-size:11px;
+    font-size:10px;
 
     line-height:1.25;
 
     font-weight:700;
 
-    display:
-        -webkit-box;
+    display:-webkit-box;
 
-    -webkit-box-orient:
-        vertical;
+    -webkit-box-orient:vertical;
 
-    -webkit-line-clamp:
-        2;
+    -webkit-line-clamp:2;
 
     overflow:hidden;
 
 }
-
 
 .select-price{
 
@@ -2222,7 +1875,7 @@ main{
 
     color:#fff;
 
-    font-size:12px;
+    font-size:11px;
 
     line-height:1;
 
@@ -2236,28 +1889,25 @@ main{
 
 }
 
-
 .select-old{
 
-    margin-left:5px;
+    margin-left:4px;
 
     color:#697069;
 
-    font-size:8px;
+    font-size:7px;
 
     font-weight:500;
 
 }
 
-
 .select-discount{
 
-    margin-left:6px;
+    margin-left:5px;
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
-    font-size:8px;
+    font-size:7px;
 
     font-weight:800;
 
@@ -2274,53 +1924,43 @@ main{
 
     position:absolute;
 
-    z-index:50;
+    z-index:60;
 
-    inset:10px;
+    inset:9px;
 
-    padding:12px;
+    padding:11px;
 
     overflow:auto;
 
     background:
-        rgba(5,8,6,.98);
+        rgba(5,8,6,.985);
 
     border:
-        1px solid
-        rgba(140,198,63,.38);
+        1px solid rgba(140,198,63,.4);
 
-    border-radius:13px;
+    border-radius:12px;
 
 }
 
-
-.select-card.editing
-.price-editor{
-
+.select-card.editing .price-editor{
     display:block;
-
 }
-
 
 .price-editor-title{
 
-    margin-bottom:10px;
+    margin-bottom:9px;
 
     color:#fff;
 
-    font-size:11px;
+    font-size:10px;
 
     font-weight:800;
 
 }
 
-
 .price-field{
-
-    margin-bottom:8px;
-
+    margin-bottom:7px;
 }
-
 
 .price-field label{
 
@@ -2330,24 +1970,22 @@ main{
 
     color:#737C73;
 
-    font-size:8px;
+    font-size:7px;
 
     font-weight:700;
 
-    letter-spacing:1px;
+    letter-spacing:.9px;
 
     text-transform:uppercase;
 
 }
 
-
 .price-field input{
 
     width:100%;
+    height:31px;
 
-    height:32px;
-
-    padding:0 9px;
+    padding:0 8px;
 
     color:#fff;
 
@@ -2356,15 +1994,13 @@ main{
     background:#090D0A;
 
     border:
-        1px solid
-        rgba(255,255,255,.1);
+        1px solid rgba(255,255,255,.1);
 
     border-radius:8px;
 
-    font-size:10px;
+    font-size:9px;
 
 }
-
 
 .price-field input:focus{
 
@@ -2373,74 +2009,45 @@ main{
 
 }
 
-
 .price-check{
 
     display:flex;
 
     align-items:center;
 
-    gap:7px;
+    gap:6px;
 
     margin:
-        8px
-        0;
+        7px 0;
 
     color:#C6CCC4;
 
-    font-size:8px;
+    font-size:7px;
 
     font-weight:600;
 
 }
 
-
 .price-check input{
-
-    accent-color:
-        var(--lime);
-
+    accent-color:var(--lime);
 }
-
 
 .calculated-final{
 
     margin:
-        8px
-        0;
+        7px 0;
 
-    padding:
-        8px;
+    padding:7px;
 
-    color:
-        var(--lime);
+    color:var(--lime);
 
     background:
         rgba(140,198,63,.06);
 
     border:
-        1px solid
-        rgba(140,198,63,.14);
+        1px solid rgba(140,198,63,.14);
 
-    border-radius:8px;
-
-    font-size:9px;
-
-    font-weight:800;
-
-}
-
-
-.price-save-btn,
-.price-reset-btn{
-
-    width:100%;
-
-    height:31px;
-
-    margin-top:5px;
-
-    border-radius:8px;
+    border-radius:7px;
 
     font-size:8px;
 
@@ -2448,38 +2055,49 @@ main{
 
 }
 
+.price-save-btn,
+.price-reset-btn{
+
+    width:100%;
+    height:30px;
+
+    margin-top:4px;
+
+    border-radius:8px;
+
+    font-size:7px;
+
+    font-weight:800;
+
+}
 
 .price-save-btn{
 
     color:#0D1409;
 
-    background:
-        var(--lime);
+    background:var(--lime);
 
 }
-
 
 .price-reset-btn{
 
     color:#B5BBB4;
 
-    background:
-        #101510;
+    background:#101510;
 
     border:
-        1px solid
-        rgba(255,255,255,.08);
+        1px solid rgba(255,255,255,.08);
 
 }
 
 
 /* =========================================================
-   MANAGER FOOTER
+   FOOTER
 ========================================================= */
 
 .manager-footer{
 
-    margin-top:17px;
+    margin-top:16px;
 
     display:flex;
 
@@ -2487,18 +2105,14 @@ main{
 
     color:#747C74;
 
-    font-size:11px;
+    font-size:10px;
 
     font-weight:600;
 
 }
 
-
 .manager-footer strong{
-
-    color:
-        var(--lime);
-
+    color:var(--lime);
 }
 
 
@@ -2510,7 +2124,7 @@ main{
 
     width:100%;
 
-    padding:35px;
+    padding:30px;
 
     color:#FF9A9A;
 
@@ -2518,12 +2132,11 @@ main{
         rgba(50,8,8,.38);
 
     border:
-        1px solid
-        rgba(255,80,80,.22);
+        1px solid rgba(255,80,80,.22);
 
-    border-radius:18px;
+    border-radius:17px;
 
-    font-size:14px;
+    font-size:13px;
 
 }
 
@@ -2536,27 +2149,24 @@ main{
 
     position:fixed;
 
-    z-index:2000;
+    z-index:3000;
 
     left:50%;
-
     bottom:22px;
 
     transform:
         translate(-50%,20px);
 
     padding:
-        11px
-        17px;
+        11px 17px;
 
     color:#0D1409;
 
-    background:
-        var(--lime);
+    background:var(--lime);
 
     border-radius:999px;
 
-    font-size:11px;
+    font-size:10px;
 
     font-weight:800;
 
@@ -2570,7 +2180,6 @@ main{
 
 }
 
-
 .toast.show{
 
     opacity:1;
@@ -2582,38 +2191,36 @@ main{
 
 
 /* =========================================================
-   CAPTURE MODE
+   CAPTURE
 ========================================================= */
 
-.capture-mode{
+.capture-mode .promo-canvas{
 
-    background:#070907 !important;
+    transition:none !important;
+
+    transform:none !important;
+
+    filter:none !important;
+
+    opacity:1 !important;
 
 }
 
-
-.capture-mode
-.product-image{
+.capture-mode .product-image{
 
     opacity:1 !important;
 
     filter:none !important;
 
-    transform:none !important;
-
 }
 
-
-.capture-mode
-.visual-gradient{
-
-    opacity:1;
-
+.capture-mode .visual-gradient{
+    opacity:1 !important;
 }
 
 
 /* =========================================================
-   RESPONSIVE — TABLET
+   TABLET
 ========================================================= */
 
 @media(max-width:900px){
@@ -2623,18 +2230,15 @@ main{
         padding:
             14px
             14px
-            80px;
+            75px;
 
     }
-
 
     .control-strip{
 
-        grid-template-columns:
-            1fr;
+        grid-template-columns:1fr;
 
     }
-
 
     .product-grid{
 
@@ -2642,7 +2246,6 @@ main{
             repeat(3,minmax(0,1fr));
 
     }
-
 
     .manager-toolbar{
 
@@ -2655,466 +2258,336 @@ main{
 
 
 /* =========================================================
-   RESPONSIVE — PHONE
+   PHONE
 ========================================================= */
 
 @media(max-width:600px){
 
     .topbar{
 
-        min-height:74px;
+        min-height:73px;
 
         padding:
-            14px
-            16px;
-
-        gap:12px;
+            13px 15px;
 
     }
-
 
     .brand-name{
 
-        font-size:24px;
+        font-size:23px;
 
-        letter-spacing:-.9px;
+        letter-spacing:-.7px;
 
     }
-
 
     .brand-sub{
 
-        margin-top:6px;
+        margin-top:5px;
 
-        font-size:9px;
-
-        letter-spacing:.35px;
+        font-size:8px;
 
     }
-
 
     .header-actions{
-
-        gap:8px;
-
+        gap:7px;
     }
-
 
     .header-btn{
 
-        width:50px;
-        height:50px;
+        width:48px;
+        height:48px;
 
-        border-radius:15px;
+        border-radius:14px;
 
     }
-
 
     main{
 
         padding:
-            12px
-            12px
-            70px;
+            11px
+            11px
+            65px;
 
     }
 
 
-    /* ==============================================
-       9:16
-    ============================================== */
+    /* 9:16 */
 
-    .stage.ratio-916
-    .promo-badge{
+    .stage.ratio-916 .promo-canvas{
+        width:min(100%,430px);
+    }
 
-        top:
-            calc(57% + 9px);
+    .stage.ratio-916 .product-visual{
+        height:55%;
+    }
 
-        left:8%;
+    .stage.ratio-916 .info-zone{
 
-        height:34px;
-
-        min-width:99px;
+        height:45%;
 
         padding:
-            0 13px;
-
-        font-size:8px;
-
-        letter-spacing:2.6px;
+            15px 8% 7%;
 
     }
 
-
-    .stage.ratio-916
-    .extra-discount-badge{
-
-        top:
-            calc(57% + 50px);
-
-        left:8%;
-
-        height:25px;
-
-        min-width:95px;
-
-        font-size:7px;
-
-        letter-spacing:1.5px;
-
-    }
-
-
-    .stage.ratio-916
-    .product-info{
-
-        top:
-            calc(57% + 85px);
-
-        left:8%;
-
-        right:7%;
-
-    }
-
-
-    .stage.ratio-916
-    .product-name{
-
-        margin-top:8px;
-
-        font-size:
-            clamp(
-                27px,
-                7.4vw,
-                39px
-            );
-
-        letter-spacing:
-            -.7px;
-
-    }
-
-
-    .stage.ratio-916
-    .price-block{
-
-        margin-top:17px;
-
-    }
-
-
-    .stage.ratio-916
-    .price-promo{
-
-        font-size:
-            clamp(
-                36px,
-                9vw,
-                48px
-            );
-
-    }
-
-
-    /* ==============================================
-       4:5
-    ============================================== */
-
-    .stage.ratio-45
-    .promo-badge{
-
-        top:
-            calc(61% + 9px);
-
-        left:7%;
-
-        height:34px;
-
-        min-width:99px;
-
-        font-size:8px;
-
-        letter-spacing:2.6px;
-
-    }
-
-
-    .stage.ratio-45
-    .extra-discount-badge{
-
-        top:
-            calc(61% + 50px);
-
-        left:7%;
-
-        height:25px;
-
-        min-width:95px;
-
-        font-size:7px;
-
-    }
-
-
-    .stage.ratio-45
-    .product-info{
-
-        top:
-            calc(61% + 85px);
-
-        left:7%;
-
-        right:7%;
-
-    }
-
-
-    .stage.ratio-45
-    .product-name{
-
-        font-size:
-            clamp(
-                27px,
-                6.7vw,
-                43px
-            );
-
-    }
-
-
-    .stage.ratio-45
-    .price-promo{
-
-        font-size:
-            clamp(
-                36px,
-                8vw,
-                49px
-            );
-
-    }
-
-
-    /* ==============================================
-       16:9
-    ============================================== */
-
-    .stage.ratio-169
-    .product-visual{
-
-        width:58%;
-
-    }
-
-
-    .stage.ratio-169
-    .promo-badge{
-
-        top:8%;
-
-        left:61%;
+    .stage.ratio-916 .promo-badge{
 
         height:29px;
 
-        min-width:86px;
+        min-width:85px;
+
+        padding:0 11px;
+
+        font-size:7px;
+
+        letter-spacing:2.2px;
+
+    }
+
+    .stage.ratio-916 .extra-discount-badge{
+
+        height:24px;
+
+        font-size:6.5px;
+
+    }
+
+    .stage.ratio-916 .product-name{
+
+        font-size:
+            clamp(23px,6.4vw,34px);
+
+    }
+
+    .stage.ratio-916 .price-promo{
+
+        font-size:
+            clamp(29px,7.4vw,43px);
+
+    }
+
+
+    /* 4:5 */
+
+    .stage.ratio-45 .promo-canvas{
+        width:100%;
+    }
+
+    .stage.ratio-45 .product-visual{
+        height:58%;
+    }
+
+    .stage.ratio-45 .info-zone{
+
+        height:42%;
 
         padding:
-            0 10px;
-
-        font-size:6.3px;
-
-        letter-spacing:2px;
+            14px 7% 6%;
 
     }
 
+    .stage.ratio-45 .promo-badge{
 
-    .stage.ratio-169
-    .extra-discount-badge{
+        height:29px;
 
-        top:
-            calc(8% + 39px);
+        min-width:85px;
 
-        left:61%;
-
-        height:22px;
-
-        min-width:80px;
-
-        font-size:5.6px;
-
-        letter-spacing:1.1px;
+        font-size:7px;
 
     }
 
+    .stage.ratio-45 .extra-discount-badge{
 
-    .stage.ratio-169
-    .product-info{
+        height:24px;
 
-        top:
-            calc(8% + 69px);
-
-        left:61%;
-
-        right:4.5%;
+        font-size:6.5px;
 
     }
 
-
-    .stage.ratio-169
-    .product-name{
+    .stage.ratio-45 .product-name{
 
         font-size:
-            clamp(
-                17px,
-                4.7vw,
-                27px
-            );
-
-        letter-spacing:
-            -.45px;
+            clamp(24px,6vw,39px);
 
     }
 
-
-    .stage.ratio-169
-    .price-block{
-
-        margin-top:14px;
-
-    }
-
-
-    .stage.ratio-169
-    .price-promo{
+    .stage.ratio-45 .price-promo{
 
         font-size:
-            clamp(
-                23px,
-                6vw,
-                35px
-            );
+            clamp(30px,7vw,47px);
 
     }
 
 
-    /* ==============================================
-       CONTROLS
-    ============================================== */
+    /* 16:9 */
+
+    .stage.ratio-169 .product-visual{
+
+        width:56%;
+
+    }
+
+    .stage.ratio-169 .info-zone{
+
+        width:44%;
+
+        padding:
+            7% 5% 6% 4%;
+
+    }
+
+    .stage.ratio-169 .promo-badge{
+
+        height:25px;
+
+        min-width:72px;
+
+        padding:0 8px;
+
+        font-size:5.5px;
+
+        letter-spacing:1.6px;
+
+    }
+
+    .stage.ratio-169 .extra-discount-badge{
+
+        height:21px;
+
+        padding:0 7px;
+
+        font-size:5px;
+
+        letter-spacing:.9px;
+
+    }
+
+    .stage.ratio-169 .product-brand{
+
+        font-size:6px;
+
+        letter-spacing:1.3px;
+
+    }
+
+    .stage.ratio-169 .product-name{
+
+        margin-top:5px;
+
+        font-size:
+            clamp(16px,4.4vw,25px);
+
+    }
+
+    .stage.ratio-169 .price-block{
+
+        margin-top:10px;
+
+    }
+
+    .stage.ratio-169 .price-promo{
+
+        font-size:
+            clamp(21px,5.8vw,32px);
+
+    }
+
+    .stage.ratio-169 .price-meta{
+
+        margin-top:6px;
+
+        gap:5px;
+
+    }
+
+    .stage.ratio-169 .price-normal,
+    .stage.ratio-169 .discount{
+
+        font-size:6px;
+
+    }
+
+
+    /* controls */
 
     .control-strip{
 
-        padding:12px;
+        padding:11px;
 
-        border-radius:20px;
+        border-radius:19px;
 
     }
-
 
     .ratio-group{
-
-        gap:7px;
-
+        gap:6px;
     }
-
 
     .ratio-btn{
 
-        min-height:55px;
+        min-height:53px;
 
-        padding:
-            8px;
+        padding:7px;
 
-        gap:7px;
+        gap:6px;
 
-        border-radius:15px;
+        border-radius:14px;
 
     }
-
 
     .ratio-value{
-
-        font-size:11px;
-
+        font-size:10px;
     }
-
 
     .ratio-use{
-
         display:none;
-
     }
-
 
     .navigation{
-
-        gap:7px;
-
+        gap:6px;
     }
-
 
     .nav-btn{
 
-        height:55px;
+        height:53px;
 
         min-width:0;
 
     }
 
-
     .download-btn{
-
-        min-height:58px;
-
+        min-height:56px;
     }
 
 
-    /* ==============================================
-       MANAGER
-    ============================================== */
+    /* manager */
 
     .manager{
 
         padding:
-            21px
-            14px
-            17px;
+            20px 13px 17px;
 
-        border-radius:21px;
+        border-radius:20px;
 
     }
-
 
     .manager-heading{
-
         display:block;
-
     }
-
 
     .manager-title{
 
         font-size:
-            clamp(
-                24px,
-                7vw,
-                32px
-            );
-
-        line-height:
-            1.02;
+            clamp(23px,7vw,31px);
 
     }
 
-
     .manager-summary{
 
-        margin-top:9px;
+        margin-top:8px;
 
         white-space:normal;
 
     }
-
 
     .manager-toolbar{
 
@@ -3123,156 +2596,78 @@ main{
 
     }
 
-
     .tool-btn{
 
-        min-height:46px;
+        min-height:44px;
 
-        padding:0 9px;
+        padding:0 8px;
 
-        font-size:10px;
+        font-size:9px;
 
     }
-
 
     .product-grid{
 
         grid-template-columns:
             repeat(2,minmax(0,1fr));
 
-        gap:8px;
+        gap:7px;
 
     }
-
 
     .select-card{
-
-        min-height:260px;
-
+        height:254px;
     }
-
 
     .select-image{
-
-        height:132px;
-
+        height:129px;
     }
-
 
     .manager-footer{
-
         display:block;
-
         line-height:1.5;
-
     }
 
-
     .manager-footer > div + div{
-
-        margin-top:4px;
-
+        margin-top:3px;
     }
 
 }
 
 
 /* =========================================================
-   VERY SMALL PHONE
+   VERY SMALL
 ========================================================= */
 
 @media(max-width:380px){
 
     .brand-name{
-
-        font-size:21px;
-
+        font-size:20px;
     }
-
 
     .brand-sub{
-
-        font-size:8px;
-
+        font-size:7px;
     }
-
 
     .header-btn{
-
-        width:45px;
-        height:45px;
-
+        width:44px;
+        height:44px;
     }
 
-
-    .stage.ratio-916
-    .product-info{
-
-        top:
-            calc(57% + 82px);
-
+    .stage.ratio-916 .product-name{
+        font-size:22px;
     }
 
-
-    .stage.ratio-45
-    .product-info{
-
-        top:
-            calc(61% + 82px);
-
+    .stage.ratio-45 .product-name{
+        font-size:23px;
     }
 
-
-    .stage.ratio-916
-    .product-name{
-
-        font-size:26px;
-
+    .stage.ratio-916 .price-promo{
+        font-size:28px;
     }
 
-
-    .stage.ratio-45
-    .product-name{
-
-        font-size:26px;
-
-    }
-
-
-    .stage.ratio-916
-    .price-promo{
-
-        font-size:35px;
-
-    }
-
-
-    .stage.ratio-45
-    .price-promo{
-
-        font-size:35px;
-
-    }
-
-}
-
-
-/* =========================================================
-   LANDSCAPE PHONE
-========================================================= */
-
-@media(
-    max-width:900px
-) and (
-    orientation:landscape
-){
-
-    .stage.ratio-169
-    .promo-canvas{
-
-        max-height:
-            calc(100vh - 150px);
-
+    .stage.ratio-45 .price-promo{
+        font-size:29px;
     }
 
 }
@@ -3291,36 +2686,6 @@ main{
         animation:none !important;
 
         transition:none !important;
-
-    }
-
-}
-
-
-/* =========================================================
-   PRINT
-========================================================= */
-
-@media print{
-
-    .topbar,
-    .control-strip,
-    .manager,
-    .toast{
-
-        display:none !important;
-
-    }
-
-    main{
-
-        padding:0;
-
-    }
-
-    .promo-canvas{
-
-        box-shadow:none;
 
     }
 
@@ -3404,18 +2769,10 @@ main{
 </header>
 
 
-<!-- ======================================================
-     MAIN
-====================================================== -->
-
 <main>
 
 <div class="container">
 
-
-<!-- ======================================================
-     PREVIEW
-====================================================== -->
 
 <section class="preview-wrap">
 
@@ -3427,11 +2784,8 @@ main{
 
     <div
         class="control-strip"
-        id="controlStrip"
     >
 
-
-        <!-- RATIO -->
 
         <div class="ratio-group">
 
@@ -3511,8 +2865,6 @@ main{
         </div>
 
 
-        <!-- NAVIGATION -->
-
         <div class="navigation">
 
             <button
@@ -3528,9 +2880,7 @@ main{
                     stroke="currentColor"
                     stroke-width="2.2"
                 >
-
                     <path d="m15 18-6-6 6-6"/>
-
                 </svg>
 
             </button>
@@ -3570,9 +2920,7 @@ main{
                     stroke="currentColor"
                     stroke-width="2.2"
                 >
-
                     <path d="m9 18 6-6-6-6"/>
-
                 </svg>
 
             </button>
@@ -3587,8 +2935,6 @@ main{
 
         </div>
 
-
-        <!-- DOWNLOAD -->
 
         <button
             type="button"
@@ -3613,18 +2959,12 @@ main{
 
         </button>
 
-
     </div>
 
 </section>
 
 
-<!-- ======================================================
-     PROMO MANAGER
-====================================================== -->
-
 <section class="manager">
-
 
     <div class="section-label">
         Promo Manager
@@ -3798,7 +3138,7 @@ const CONFIG = {
         8500,
 
     TRANSITION:
-        850
+        1200
 
 };
 
@@ -3845,6 +3185,8 @@ let autoplay = null;
 let transitionBusy = false;
 
 let downloadBusy = false;
+
+let searchQuery = "";
 
 let priceOverrides =
     loadPriceOverrides();
@@ -3904,6 +3246,19 @@ const downloadBtn =
    HELPERS
 ========================================================= */
 
+function wait(ms){
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+
 function escapeHTML(value){
 
     return String(
@@ -3933,21 +3288,9 @@ function escapeHTML(value){
 }
 
 
-function escapeAttribute(value){
-
-    return escapeHTML(
-        value
-    );
-
-}
-
-
 function rupiah(value){
 
-    const number =
-        Number(value) || 0;
-
-    return number.toLocaleString(
+    return new Intl.NumberFormat(
         "id-ID",
         {
             style:"currency",
@@ -3955,19 +3298,31 @@ function rupiah(value){
             minimumFractionDigits:0,
             maximumFractionDigits:0
         }
+    ).format(
+        Number(value) || 0
     );
 
 }
 
 
-function wait(ms){
+function slug(value){
 
-    return new Promise(
-        resolve =>
-            setTimeout(
-                resolve,
-                ms
-            )
+    return String(
+        value || "produk"
+    )
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(
+        /[\u0300-\u036f]/g,
+        ""
+    )
+    .replace(
+        /[^a-z0-9]+/g,
+        "-"
+    )
+    .replace(
+        /^-+|-+$/g,
+        ""
     );
 
 }
@@ -3993,7 +3348,7 @@ function showToast(message){
                     "show"
                 );
             },
-            2300
+            2400
         );
 
 }
@@ -4007,14 +3362,11 @@ function loadPriceOverrides(){
 
     try{
 
-        const saved =
-            JSON.parse(
-                localStorage.getItem(
-                    STORAGE.PRICES
-                ) || "{}"
-            );
-
-        return saved || {};
+        return JSON.parse(
+            localStorage.getItem(
+                STORAGE.PRICES
+            ) || "{}"
+        ) || {};
 
     }catch{
 
@@ -4038,7 +3390,7 @@ function savePriceOverrides(){
 
 
 /* =========================================================
-   NORMALIZE PRODUCT
+   NORMALIZE
 ========================================================= */
 
 function normalizeProduct(
@@ -4109,11 +3461,8 @@ function normalizeProduct(
 
         harga:{
             ...harga,
-
             normal,
-
             promo
-
         }
 
     };
@@ -4122,12 +3471,10 @@ function normalizeProduct(
 
 
 /* =========================================================
-   IMAGE PATH
+   IMAGE
 ========================================================= */
 
-function imagePath(
-    product
-){
+function imagePath(product){
 
     const explicit =
         product.gambar ??
@@ -4138,37 +3485,28 @@ function imagePath(
 
     if(explicit){
 
+        const value =
+            String(
+                explicit
+            ).trim();
+
+
         if(
-            String(explicit)
-            .startsWith(
-                "http"
-            )
+            value.startsWith(
+                "http://"
+            ) ||
+            value.startsWith(
+                "https://"
+            ) ||
+            value.startsWith("/")
         ){
 
-            return String(
-                explicit
-            );
+            return value;
 
         }
 
 
-        if(
-            String(explicit)
-            .startsWith(
-                "/"
-            )
-        ){
-
-            return String(
-                explicit
-            );
-
-        }
-
-
-        return String(
-            explicit
-        );
+        return value;
 
     }
 
@@ -4184,7 +3522,7 @@ function imagePath(
 
         return (
             CONFIG.IMAGE_FOLDER +
-            filename
+            String(filename)
         );
 
     }
@@ -4207,6 +3545,8 @@ function makeDisplayTitle(
         String(
             product.nama ??
             product.name ??
+            product.judul ??
+            product.title ??
             ""
         )
         .replace(
@@ -4222,10 +3562,6 @@ function makeDisplayTitle(
         )
         .trim();
 
-
-    /*
-     * Jangan tampilkan brand dua kali.
-     */
 
     if(
         brand &&
@@ -4249,10 +3585,6 @@ function makeDisplayTitle(
 
     }
 
-
-    /*
-     * Rapikan separator aneh.
-     */
 
     title =
         title
@@ -4283,13 +3615,13 @@ function getPriceData(
 
     const baseNormal =
         Number(
-            product.harga.normal
+            product.harga?.normal
         ) || 0;
 
 
     const basePromo =
         Number(
-            product.harga.promo
+            product.harga?.promo
         ) || baseNormal;
 
 
@@ -4343,13 +3675,6 @@ function getPriceData(
         ) || 0;
 
 
-    /*
-     * EXTRA DISCOUNT
-     *
-     * Extra dihitung dari harga promo dasar,
-     * bukan dari harga normal.
-     */
-
     let calculatedFinal =
         promo;
 
@@ -4371,11 +3696,6 @@ function getPriceData(
     }
 
 
-    /*
-     * Manual final punya prioritas
-     * paling tinggi.
-     */
-
     const final =
         manualEnabled &&
         manualFinal > 0
@@ -4390,60 +3710,61 @@ function getPriceData(
 
 
     /*
-     * Diskon normal tetap dihitung
-     * dari normal → promo dasar.
-     *
-     * Jadi user tidak salah mengira
-     * "Hemat 22%" sebagai gabungan
-     * extra discount.
+     * Diskon badge utama:
+     * NORMAL → PROMO DASAR
      */
 
     const baseDiscount =
         normal > 0
-
             ?
-
-            Math.round(
-                (
-                    (normal - promo) /
-                    normal
-                ) * 100
+            Math.max(
+                0,
+                Math.round(
+                    (
+                        (normal - promo) /
+                        normal
+                    ) * 100
+                )
             )
-
             :
+            0;
 
+
+    /*
+     * Total diskon aktual:
+     * NORMAL → FINAL
+     */
+
+    const finalDiscount =
+        normal > 0
+            ?
+            Math.max(
+                0,
+                Math.round(
+                    (
+                        (normal - final) /
+                        normal
+                    ) * 100
+                )
+            )
+            :
             0;
 
 
     return {
 
         normal,
-
         promo,
-
         final,
 
         extraEnabled,
-
         extraPercent,
 
         manualEnabled,
-
         manualFinal,
 
         baseDiscount,
-
-        finalDiscount:
-            normal > 0
-                ?
-                Math.round(
-                    (
-                        (normal-final) /
-                        normal
-                    ) * 100
-                )
-                :
-                0
+        finalDiscount
 
     };
 
@@ -4472,7 +3793,7 @@ async function loadProducts(){
         ){
 
             throw new Error(
-                `HTTP ${response.status}`
+                `produk.json HTTP ${response.status}`
             );
 
         }
@@ -4484,24 +3805,22 @@ async function loadProducts(){
 
         const source =
             Array.isArray(data)
-
                 ?
-
                 data
-
                 :
-
                 Array.isArray(
                     data.products
                 )
-
                     ?
-
                     data.products
-
                     :
-
-                    [];
+                    Array.isArray(
+                        data.produk
+                    )
+                        ?
+                        data.produk
+                        :
+                        [];
 
 
         if(
@@ -4539,9 +3858,7 @@ async function loadProducts(){
                 products
                 .filter(
                     product =>
-                        isPromo(
-                            product
-                        )
+                        isPromo(product)
                 )
                 .map(
                     product =>
@@ -4555,9 +3872,9 @@ async function loadProducts(){
 
         renderManager();
 
-        applyPromo(
-            false
-        );
+        updateCounts();
+
+        applyPromo(false);
 
 
     }catch(error){
@@ -4584,9 +3901,10 @@ async function loadProducts(){
 
                 <br><br>
 
-                Pastikan file
+                Pastikan
                 <strong>produk.json</strong>
-                berada di folder promo.
+                berada di folder yang sama
+                dengan index.html promo.
 
             </div>
 
@@ -4601,9 +3919,7 @@ async function loadProducts(){
    PROMO DETECTOR
 ========================================================= */
 
-function isPromo(
-    product
-){
+function isPromo(product){
 
     const value =
         product.promo ??
@@ -4613,28 +3929,20 @@ function isPromo(
         false;
 
 
-    if(
-        value === true
-    ){
-
+    if(value === true){
         return true;
-
     }
 
 
-    if(
-        typeof value === "string"
-    ){
+    if(typeof value === "string"){
 
         return [
             "true",
             "promo",
             "yes",
             "1"
-        ]
-        .includes(
-            value
-            .toLowerCase()
+        ].includes(
+            value.toLowerCase()
         );
 
     }
@@ -4646,7 +3954,7 @@ function isPromo(
 
 
 /* =========================================================
-   RESTORE SELECTION
+   SELECTION
 ========================================================= */
 
 function restoreSelection(){
@@ -4661,17 +3969,19 @@ function restoreSelection(){
             );
 
 
-        if(
+        selectedIds =
             Array.isArray(saved)
-        ){
 
-            selectedIds =
+                ?
+
                 saved.map(
                     value =>
                         String(value)
-                );
+                )
 
-        }
+                :
+
+                [];
 
     }catch{
 
@@ -4681,10 +3991,6 @@ function restoreSelection(){
 
 }
 
-
-/* =========================================================
-   SAVE SELECTION
-========================================================= */
 
 function saveSelection(){
 
@@ -4699,7 +4005,28 @@ function saveSelection(){
 
 
 /* =========================================================
-   RENDER PREVIEW
+   COUNTS
+========================================================= */
+
+function updateCounts(){
+
+    selectedCount.textContent =
+        selectedIds.length;
+
+    footerSelected.textContent =
+        selectedIds.length;
+
+    totalCount.textContent =
+        products.length;
+
+    footerTotal.textContent =
+        products.length;
+
+}
+
+
+/* =========================================================
+   PREVIEW
 ========================================================= */
 
 function renderPreview(
@@ -4713,7 +4040,6 @@ function renderPreview(
         stage.className =
             `stage ratio-${currentRatio}`;
 
-
         stage.innerHTML = `
 
             <div class="error">
@@ -4725,7 +4051,7 @@ function renderPreview(
                 <br><br>
 
                 Pilih produk,
-                kemudian tekan
+                lalu tekan
                 <strong>
                     Terapkan Promo
                 </strong>.
@@ -4733,7 +4059,6 @@ function renderPreview(
             </div>
 
         `;
-
 
         stopAutoplay();
 
@@ -4789,11 +4114,11 @@ function renderPreview(
             ?
 
             `
-            <div
+            <span
                 class="extra-discount-badge"
             >
                 EXTRA ${price.extraPercent}% OFF
-            </div>
+            </span>
             `
 
             :
@@ -4827,6 +4152,9 @@ function renderPreview(
             id="promoCanvas"
         >
 
+
+            <!-- PRODUCT IMAGE -->
+
             <div
                 class="product-visual"
             >
@@ -4839,8 +4167,8 @@ function renderPreview(
                         `
                         <img
                             class="product-image"
-                            src="${escapeAttribute(image)}"
-                            alt="${escapeAttribute(title)}"
+                            src="${escapeHTML(image)}"
+                            alt="${escapeHTML(title)}"
                             crossorigin="anonymous"
                             decoding="async"
                         >
@@ -4855,7 +4183,6 @@ function renderPreview(
                         `
                 }
 
-
                 <div
                     class="visual-gradient"
                 ></div>
@@ -4863,95 +4190,109 @@ function renderPreview(
             </div>
 
 
-            <div
-                class="promo-badge"
-            >
-                PROMO
-            </div>
-
-
-            ${extraBadge}
-
+            <!-- INFORMATION -->
 
             <div
-                class="product-info"
+                class="info-zone"
             >
 
                 <div
-                    class="product-brand"
+                    class="product-info"
                 >
-                    ${escapeHTML(
-                        product.brand
-                    )}
-                </div>
 
-
-                <h1
-                    class="product-name"
-                >
-                    ${escapeHTML(
-                        title
-                    )}
-                </h1>
-
-
-                <div
-                    class="price-block"
-                >
 
                     <div
-                        class="price-label"
+                        class="badge-stack"
                     >
-                        Harga Promo
+
+                        <span
+                            class="promo-badge"
+                        >
+                            PROMO
+                        </span>
+
+                        ${extraBadge}
+
                     </div>
 
 
                     <div
-                        class="price-promo"
+                        class="product-brand"
                     >
-                        ${rupiah(
-                            price.final
+                        ${escapeHTML(
+                            product.brand
                         )}
                     </div>
 
 
+                    <h1
+                        class="product-name"
+                    >
+                        ${escapeHTML(
+                            title
+                        )}
+                    </h1>
+
+
                     <div
-                        class="price-meta"
+                        class="price-block"
                     >
 
                         <div
-                            class="price-normal"
+                            class="price-label"
                         >
-                            <s>
-                                ${rupiah(
-                                    price.normal
-                                )}
-                            </s>
+                            Harga Promo
                         </div>
 
 
-                        ${
-                            price.baseDiscount > 0
+                        <div
+                            class="price-promo"
+                        >
+                            ${rupiah(
+                                price.final
+                            )}
+                        </div>
 
-                                ?
 
-                                `
-                                <div
-                                    class="discount"
-                                >
-                                    Hemat ${price.baseDiscount}%
-                                </div>
-                                `
+                        <div
+                            class="price-meta"
+                        >
 
-                                :
+                            <span
+                                class="price-normal"
+                            >
+                                <s>
+                                    ${rupiah(
+                                        price.normal
+                                    )}
+                                </s>
+                            </span>
 
-                                ""
-                        }
+
+                            ${
+                                price.baseDiscount > 0
+
+                                    ?
+
+                                    `
+                                    <span
+                                        class="discount"
+                                    >
+                                        Hemat ${price.baseDiscount}%
+                                    </span>
+                                    `
+
+                                    :
+
+                                    ""
+                            }
+
+                        </div>
+
+
+                        ${extraNote}
 
                     </div>
-
-
-                    ${extraNote}
 
                 </div>
 
@@ -4964,6 +4305,7 @@ function renderPreview(
                 Imam_salesfr
             </div>
 
+
         </article>
 
     `;
@@ -4971,26 +4313,156 @@ function renderPreview(
 
     updateSlideCount();
 
+    waitForCurrentImage();
 
-    preloadCurrentImage();
 
-
-    if(
-        restart
-    ){
-
+    if(restart){
         startAutoplay();
-
     }
 
 }
 
 
 /* =========================================================
-   IMAGE PRELOAD
+   IMAGE WAIT
 ========================================================= */
 
-function preloadCurrentImage(){
+async function waitForImage(
+    img
+){
+
+    if(
+        !img
+    ){
+
+        return;
+
+    }
+
+
+    if(
+        img.complete
+    ){
+
+        if(
+            typeof img.decode ===
+            "function"
+        ){
+
+            try{
+                await img.decode();
+            }catch{}
+
+        }
+
+        return;
+
+    }
+
+
+    await new Promise(
+        resolve => {
+
+            let doneCalled =
+                false;
+
+
+            const done =
+                ()=>{
+                    if(
+                        doneCalled
+                    ){
+                        return;
+                    }
+
+                    doneCalled =
+                        true;
+
+                    img.removeEventListener(
+                        "load",
+                        done
+                    );
+
+                    img.removeEventListener(
+                        "error",
+                        done
+                    );
+
+                    resolve();
+
+                };
+
+
+            img.addEventListener(
+                "load",
+                done,
+                {
+                    once:true
+                }
+            );
+
+            img.addEventListener(
+                "error",
+                done,
+                {
+                    once:true
+                }
+            );
+
+
+            setTimeout(
+                done,
+                7000
+            );
+
+        }
+    );
+
+
+    if(
+        typeof img.decode ===
+        "function"
+    ){
+
+        try{
+
+            await Promise.race(
+                [
+                    img.decode(),
+                    wait(3000)
+                ]
+            );
+
+        }catch{}
+
+    }
+
+}
+
+
+async function waitForImages(root){
+
+    const images =
+        Array.from(
+            root.querySelectorAll(
+                "img"
+            )
+        );
+
+
+    await Promise.all(
+        images.map(
+            image =>
+                waitForImage(
+                    image
+                )
+        )
+    );
+
+}
+
+
+async function waitForCurrentImage(){
 
     const image =
         stage.querySelector(
@@ -4998,26 +4470,40 @@ function preloadCurrentImage(){
         );
 
 
-    if(!image){
+    if(image){
 
-        return;
+        await waitForImage(
+            image
+        );
 
     }
 
+}
+
+
+/* =========================================================
+   FONTS
+========================================================= */
+
+async function waitForFonts(){
 
     if(
-        image.complete
+        document.fonts &&
+        document.fonts.ready
     ){
 
-        return;
+        try{
+
+            await Promise.race(
+                [
+                    document.fonts.ready,
+                    wait(4000)
+                ]
+            );
+
+        }catch{}
 
     }
-
-
-    image.decode?.()
-    .catch(
-        ()=>{}
-    );
 
 }
 
@@ -5029,15 +4515,10 @@ function preloadCurrentImage(){
 function updateSlideCount(){
 
     slideCount.textContent =
-
         promoProducts.length
-
             ?
-
             `${currentIndex + 1} / ${promoProducts.length}`
-
             :
-
             "0 / 0";
 
 }
@@ -5075,9 +4556,7 @@ function startAutoplay(){
 
 function stopAutoplay(){
 
-    if(
-        autoplay
-    ){
+    if(autoplay){
 
         clearTimeout(
             autoplay
@@ -5091,7 +4570,7 @@ function stopAutoplay(){
 
 
 /* =========================================================
-   CHANGE SLIDE
+   SLIDE
 ========================================================= */
 
 async function changeSlide(
@@ -5119,9 +4598,7 @@ async function changeSlide(
         );
 
 
-    if(
-        oldCanvas
-    ){
+    if(oldCanvas){
 
         oldCanvas.classList.remove(
             "slide-content"
@@ -5160,9 +4637,7 @@ async function changeSlide(
         );
 
 
-    if(
-        newCanvas
-    ){
+    if(newCanvas){
 
         newCanvas.classList.remove(
             "slide-content"
@@ -5173,25 +4648,31 @@ async function changeSlide(
         );
 
 
-        requestAnimationFrame(
-            ()=>{
+        await new Promise(
+            resolve =>
                 requestAnimationFrame(
                     ()=>{
-                        newCanvas.classList.remove(
-                            "slide-in"
-                        );
+                        requestAnimationFrame(
+                            ()=>{
+                                newCanvas.classList.remove(
+                                    "slide-in"
+                                );
 
-                        newCanvas.classList.add(
-                            "slide-content"
+                                newCanvas.classList.add(
+                                    "slide-content"
+                                );
+
+                                resolve();
+
+                            }
                         );
                     }
-                );
-            }
+                )
         );
 
 
         await wait(
-            CONFIG.TRANSITION
+            580
         );
 
     }
@@ -5200,42 +4681,30 @@ async function changeSlide(
     transitionBusy = false;
 
 
-    if(
-        playing
-    ){
-
+    if(playing){
         startAutoplay();
-
     }
 
 }
 
 
 function nextSlide(){
-
-    changeSlide(
-        1
-    );
-
+    changeSlide(1);
 }
 
 
-function prevSlide(){
-
-    changeSlide(
-        -1
-    );
-
+function previousSlide(){
+    changeSlide(-1);
 }
 
 
 /* =========================================================
-   PLAY / PAUSE
+   PLAY
 ========================================================= */
 
 function updatePlayIcons(){
 
-    const path =
+    const icon =
         playing
 
             ?
@@ -5255,13 +4724,13 @@ function updatePlayIcons(){
     document.getElementById(
         "playIcon"
     ).innerHTML =
-        path;
+        icon;
 
 
     document.getElementById(
         "headerPlayIcon"
     ).innerHTML =
-        path;
+        icon;
 
 }
 
@@ -5271,13 +4740,10 @@ function togglePlay(){
     playing =
         !playing;
 
-
     updatePlayIcons();
 
 
-    if(
-        playing
-    ){
+    if(playing){
 
         startAutoplay();
 
@@ -5291,7 +4757,7 @@ function togglePlay(){
 
 
 /* =========================================================
-   APPLY PROMO
+   APPLY
 ========================================================= */
 
 function applyPromo(
@@ -5314,15 +4780,12 @@ function applyPromo(
 
     saveSelection();
 
+    updateCounts();
 
-    renderPreview(
-        true
-    );
+    renderPreview(true);
 
 
-    if(
-        notify
-    ){
+    if(notify){
 
         showToast(
             `${promoProducts.length} produk diterapkan ✓`
@@ -5337,28 +4800,18 @@ function applyPromo(
    RENDER MANAGER
 ========================================================= */
 
-function renderManager(
-    keyword=""
-){
+function renderManager(){
 
     const query =
-        String(
-            keyword
-        )
-        .trim()
-        .toLowerCase();
+        searchQuery;
 
 
     const filtered =
         products.filter(
             product => {
 
-                if(
-                    !query
-                ){
-
+                if(!query){
                     return true;
-
                 }
 
 
@@ -5366,10 +4819,18 @@ function renderManager(
                     [
                         product.brand,
                         product.nama,
-                        product.id
+                        product.name,
+                        product.id,
+                        product.sku
                     ]
+                    .filter(Boolean)
                     .join(" ")
-                    .toLowerCase();
+                    .toLowerCase()
+                    .normalize("NFD")
+                    .replace(
+                        /[\u0300-\u036f]/g,
+                        ""
+                    );
 
 
                 return haystack.includes(
@@ -5383,14 +4844,42 @@ function renderManager(
     productGrid.innerHTML = "";
 
 
+    if(!filtered.length){
+
+        productGrid.innerHTML = `
+
+            <div
+                class="error"
+                style="grid-column:1/-1"
+            >
+                Produk tidak ditemukan.
+            </div>
+
+        `;
+
+        updateCounts();
+
+        return;
+
+    }
+
+
+    const fragment =
+        document.createDocumentFragment();
+
+
     filtered.forEach(
         product => {
 
+            const id =
+                String(
+                    product.id
+                );
+
+
             const selected =
                 selectedIds.includes(
-                    String(
-                        product.id
-                    )
+                    id
                 );
 
 
@@ -5415,6 +4904,10 @@ function renderManager(
                 );
 
 
+            card.dataset.id =
+                id;
+
+
             const image =
                 imagePath(
                     product
@@ -5434,16 +4927,23 @@ function renderManager(
 
                             `
                             <img
-                                src="${escapeAttribute(image)}"
+                                src="${escapeHTML(image)}"
                                 alt=""
                                 loading="lazy"
+                                decoding="async"
                             >
                             `
 
                             :
 
                             `
-                            <div class="error">
+                            <div
+                                style="
+                                    color:#697169;
+                                    font-size:9px;
+                                    font-weight:700;
+                                "
+                            >
                                 NO IMAGE
                             </div>
                             `
@@ -5452,9 +4952,7 @@ function renderManager(
                 </div>
 
 
-                <div
-                    class="check"
-                >
+                <div class="check">
 
                     <svg
                         viewBox="0 0 24 24"
@@ -5462,11 +4960,9 @@ function renderManager(
                         stroke="currentColor"
                         stroke-width="3"
                     >
-
                         <path
                             d="m5 12 4 4L19 6"
                         />
-
                     </svg>
 
                 </div>
@@ -5498,22 +4994,16 @@ function renderManager(
                 </button>
 
 
-                <div
-                    class="select-info"
-                >
+                <div class="select-info">
 
-                    <div
-                        class="select-brand"
-                    >
+                    <div class="select-brand">
                         ${escapeHTML(
                             product.brand
                         )}
                     </div>
 
 
-                    <div
-                        class="select-name"
-                    >
+                    <div class="select-name">
                         ${escapeHTML(
                             makeDisplayTitle(
                                 product
@@ -5522,9 +5012,7 @@ function renderManager(
                     </div>
 
 
-                    <div
-                        class="select-price"
-                    >
+                    <div class="select-price">
 
                         ${rupiah(
                             price.final
@@ -5564,9 +5052,7 @@ function renderManager(
                 </div>
 
 
-                <div
-                    class="price-editor"
-                >
+                <div class="price-editor">
 
                     <div
                         class="price-editor-title"
@@ -5575,9 +5061,7 @@ function renderManager(
                     </div>
 
 
-                    <div
-                        class="price-field"
-                    >
+                    <div class="price-field">
 
                         <label>
                             Harga Normal
@@ -5587,14 +5071,13 @@ function renderManager(
                             type="number"
                             data-price="normal"
                             value="${price.normal}"
+                            min="0"
                         >
 
                     </div>
 
 
-                    <div
-                        class="price-field"
-                    >
+                    <div class="price-field">
 
                         <label>
                             Harga Promo Dasar
@@ -5604,14 +5087,13 @@ function renderManager(
                             type="number"
                             data-price="promo"
                             value="${price.promo}"
+                            min="0"
                         >
 
                     </div>
 
 
-                    <label
-                        class="price-check"
-                    >
+                    <label class="price-check">
 
                         <input
                             type="checkbox"
@@ -5628,9 +5110,7 @@ function renderManager(
                     </label>
 
 
-                    <div
-                        class="price-field"
-                    >
+                    <div class="price-field">
 
                         <label>
                             Extra Discount %
@@ -5638,18 +5118,16 @@ function renderManager(
 
                         <input
                             type="number"
-                            min="0"
-                            max="99"
                             data-extra-percent
                             value="${price.extraPercent}"
+                            min="0"
+                            max="99"
                         >
 
                     </div>
 
 
-                    <label
-                        class="price-check"
-                    >
+                    <label class="price-check">
 
                         <input
                             type="checkbox"
@@ -5661,14 +5139,12 @@ function renderManager(
                             }
                         >
 
-                        Gunakan Harga Final Manual
+                        Harga Final Manual
 
                     </label>
 
 
-                    <div
-                        class="price-field"
-                    >
+                    <div class="price-field">
 
                         <label>
                             Harga Final Manual
@@ -5676,9 +5152,9 @@ function renderManager(
 
                         <input
                             type="number"
-                            min="0"
                             data-manual-final
                             value="${price.manualFinal}"
+                            min="0"
                         >
 
                     </div>
@@ -5688,7 +5164,8 @@ function renderManager(
                         class="calculated-final"
                         data-calculated-final
                     >
-                        Harga akhir: ${rupiah(
+                        Harga akhir:
+                        ${rupiah(
                             price.final
                         )}
                     </div>
@@ -5698,7 +5175,7 @@ function renderManager(
                         type="button"
                         class="price-save-btn"
                     >
-                        TERAPKAN
+                        Terapkan
                     </button>
 
 
@@ -5706,7 +5183,7 @@ function renderManager(
                         type="button"
                         class="price-reset-btn"
                     >
-                        RESET HARGA PRODUK
+                        Reset
                     </button>
 
                 </div>
@@ -5714,124 +5191,173 @@ function renderManager(
             `;
 
 
-            /*
-             * Card click.
-             */
-
-            card.addEventListener(
-                "click",
-                event => {
-
-                    if(
-                        event.target.closest(
-                            ".price-editor"
-                        ) ||
-                        event.target.closest(
-                            ".edit-price-btn"
-                        )
-                    ){
-
-                        return;
-
-                    }
+            const editButton =
+                card.querySelector(
+                    ".edit-price-btn"
+                );
 
 
-                    toggleProduct(
-                        product.id
-                    );
-
-                }
-            );
-
-
-            /*
-             * Edit button.
-             */
-
-            card
-            .querySelector(
-                ".edit-price-btn"
-            )
-            .addEventListener(
+            editButton.addEventListener(
                 "click",
                 event => {
 
                     event.stopPropagation();
 
-
-                    document
-                    .querySelectorAll(
-                        ".select-card.editing"
-                    )
-                    .forEach(
-                        other => {
-
-                            if(
-                                other !== card
-                            ){
-
-                                other.classList.remove(
-                                    "editing"
-                                );
-
-                            }
-
-                        }
+                    closeEditorsExcept(
+                        card
                     );
-
 
                     card.classList.toggle(
                         "editing"
                     );
 
-
-                    updateEditorCalculation(
-                        card
-                    );
-
                 }
             );
 
 
-            /*
-             * Live calculation.
-             */
+            const editor =
+                card.querySelector(
+                    ".price-editor"
+                );
 
-            card
-            .querySelectorAll(
-                ".price-editor input"
-            )
+
+            const normalInput =
+                editor.querySelector(
+                    '[data-price="normal"]'
+                );
+
+
+            const promoInput =
+                editor.querySelector(
+                    '[data-price="promo"]'
+                );
+
+
+            const extraEnabledInput =
+                editor.querySelector(
+                    "[data-extra-enabled]"
+                );
+
+
+            const extraPercentInput =
+                editor.querySelector(
+                    "[data-extra-percent]"
+                );
+
+
+            const manualEnabledInput =
+                editor.querySelector(
+                    "[data-manual-enabled]"
+                );
+
+
+            const manualFinalInput =
+                editor.querySelector(
+                    "[data-manual-final]"
+                );
+
+
+            const calculated =
+                editor.querySelector(
+                    "[data-calculated-final]"
+                );
+
+
+            function updateCalculated(){
+
+                const normal =
+                    Number(
+                        normalInput.value
+                    ) || 0;
+
+
+                const promo =
+                    Number(
+                        promoInput.value
+                    ) || 0;
+
+
+                const extra =
+                    extraEnabledInput.checked
+                        ?
+                        Math.min(
+                            99,
+                            Math.max(
+                                0,
+                                Number(
+                                    extraPercentInput.value
+                                ) || 0
+                            )
+                        )
+                        :
+                        0;
+
+
+                let final =
+                    promo;
+
+
+                if(extra > 0){
+
+                    final =
+                        Math.round(
+                            promo *
+                            (
+                                1 -
+                                extra / 100
+                            )
+                        );
+
+                }
+
+
+                if(
+                    manualEnabledInput.checked &&
+                    Number(
+                        manualFinalInput.value
+                    ) > 0
+                ){
+
+                    final =
+                        Number(
+                            manualFinalInput.value
+                        );
+
+                }
+
+
+                calculated.textContent =
+                    `Harga akhir: ${rupiah(final)}`;
+
+            }
+
+
+            [
+                normalInput,
+                promoInput,
+                extraEnabledInput,
+                extraPercentInput,
+                manualEnabledInput,
+                manualFinalInput
+            ]
             .forEach(
                 input => {
 
                     input.addEventListener(
                         "input",
-                        ()=>{
-                            updateEditorCalculation(
-                                card
-                            );
-                        }
+                        updateCalculated
                     );
 
                     input.addEventListener(
                         "change",
-                        ()=>{
-                            updateEditorCalculation(
-                                card
-                            );
-                        }
+                        updateCalculated
                     );
 
                 }
             );
 
 
-            /*
-             * Save.
-             */
-
-            card
-            .querySelector(
+            editor.querySelector(
                 ".price-save-btn"
             )
             .addEventListener(
@@ -5841,21 +5367,79 @@ function renderManager(
                     event.stopPropagation();
 
 
-                    saveCardPrice(
-                        card,
-                        product
+                    priceOverrides[id] = {
+
+                        normal:
+                            Number(
+                                normalInput.value
+                            ) || 0,
+
+                        promo:
+                            Number(
+                                promoInput.value
+                            ) || 0,
+
+                        extraEnabled:
+                            extraEnabledInput.checked,
+
+                        extraPercent:
+                            Math.min(
+                                99,
+                                Math.max(
+                                    0,
+                                    Number(
+                                        extraPercentInput.value
+                                    ) || 0
+                                )
+                            ),
+
+                        manualEnabled:
+                            manualEnabledInput.checked,
+
+                        manualFinal:
+                            Number(
+                                manualFinalInput.value
+                            ) || 0
+
+                    };
+
+
+                    savePriceOverrides();
+
+
+                    card.classList.remove(
+                        "editing"
+                    );
+
+
+                    renderManager();
+
+
+                    /*
+                     * Refresh current preview
+                     * tanpa pindah produk.
+                     */
+
+                    if(
+                        promoProducts.length
+                    ){
+
+                        renderPreview(
+                            false
+                        );
+
+                    }
+
+
+                    showToast(
+                        "Harga promo berhasil diterapkan ✓"
                     );
 
                 }
             );
 
 
-            /*
-             * Reset.
-             */
-
-            card
-            .querySelector(
+            editor.querySelector(
                 ".price-reset-btn"
             )
             .addEventListener(
@@ -5865,36 +5449,75 @@ function renderManager(
                     event.stopPropagation();
 
 
-                    delete priceOverrides[
-                        String(
-                            product.id
-                        )
-                    ];
+                    delete priceOverrides[id];
 
 
                     savePriceOverrides();
 
 
-                    renderManager(
-                        document.getElementById(
-                            "search"
-                        ).value
+                    card.classList.remove(
+                        "editing"
                     );
 
 
+                    renderManager();
+
+
+                    if(
+                        promoProducts.length
+                    ){
+
+                        renderPreview(
+                            false
+                        );
+
+                    }
+
+
                     showToast(
-                        "Harga dikembalikan ke produk ✓"
+                        "Harga dikembalikan ke JSON ✓"
                     );
 
                 }
             );
 
 
-            productGrid.appendChild(
+            card.addEventListener(
+                "click",
+                event => {
+
+                    if(
+                        event.target.closest(
+                            ".edit-price-btn"
+                        ) ||
+                        event.target.closest(
+                            ".price-editor"
+                        )
+                    ){
+
+                        return;
+
+                    }
+
+
+                    toggleProduct(
+                        id
+                    );
+
+                }
+            );
+
+
+            fragment.appendChild(
                 card
             );
 
         }
+    );
+
+
+    productGrid.appendChild(
+        fragment
     );
 
 
@@ -5904,218 +5527,31 @@ function renderManager(
 
 
 /* =========================================================
-   EDITOR CALCULATION
+   CLOSE EDITORS
 ========================================================= */
 
-function updateEditorCalculation(
-    card
+function closeEditorsExcept(
+    current
 ){
 
-    const normal =
-        Number(
-            card.querySelector(
-                '[data-price="normal"]'
-            ).value
-        ) || 0;
+    document
+    .querySelectorAll(
+        ".select-card.editing"
+    )
+    .forEach(
+        card => {
 
+            if(
+                card !== current
+            ){
 
-    const promo =
-        Number(
-            card.querySelector(
-                '[data-price="promo"]'
-            ).value
-        ) || 0;
+                card.classList.remove(
+                    "editing"
+                );
 
+            }
 
-    const extraEnabled =
-        card.querySelector(
-            "[data-extra-enabled]"
-        ).checked;
-
-
-    const extraPercent =
-        Math.min(
-            99,
-            Math.max(
-                0,
-                Number(
-                    card.querySelector(
-                        "[data-extra-percent]"
-                    ).value
-                ) || 0
-            )
-        );
-
-
-    const manualEnabled =
-        card.querySelector(
-            "[data-manual-enabled]"
-        ).checked;
-
-
-    const manualFinal =
-        Number(
-            card.querySelector(
-                "[data-manual-final]"
-            ).value
-        ) || 0;
-
-
-    let final =
-        promo;
-
-
-    if(
-        extraEnabled &&
-        extraPercent > 0
-    ){
-
-        final =
-            Math.round(
-                promo *
-                (
-                    1 -
-                    extraPercent / 100
-                )
-            );
-
-    }
-
-
-    if(
-        manualEnabled &&
-        manualFinal > 0
-    ){
-
-        final =
-            manualFinal;
-
-    }
-
-
-    const output =
-        card.querySelector(
-            "[data-calculated-final]"
-        );
-
-
-    if(output){
-
-        output.textContent =
-            `Harga akhir: ${rupiah(final)}`;
-
-    }
-
-}
-
-
-/* =========================================================
-   SAVE CARD PRICE
-========================================================= */
-
-function saveCardPrice(
-    card,
-    product
-){
-
-    const normal =
-        Number(
-            card.querySelector(
-                '[data-price="normal"]'
-            ).value
-        ) || 0;
-
-
-    const promo =
-        Number(
-            card.querySelector(
-                '[data-price="promo"]'
-            ).value
-        ) || 0;
-
-
-    const extraEnabled =
-        card.querySelector(
-            "[data-extra-enabled]"
-        ).checked;
-
-
-    const extraPercent =
-        Math.min(
-            99,
-            Math.max(
-                0,
-                Number(
-                    card.querySelector(
-                        "[data-extra-percent]"
-                    ).value
-                ) || 0
-            )
-        );
-
-
-    const manualEnabled =
-        card.querySelector(
-            "[data-manual-enabled]"
-        ).checked;
-
-
-    const manualFinal =
-        Number(
-            card.querySelector(
-                "[data-manual-final]"
-            ).value
-        ) || 0;
-
-
-    priceOverrides[
-        String(
-            product.id
-        )
-    ] = {
-
-        normal,
-
-        promo,
-
-        extraEnabled,
-
-        extraPercent,
-
-        manualEnabled,
-
-        manualFinal
-
-    };
-
-
-    savePriceOverrides();
-
-
-    renderManager(
-        document.getElementById(
-            "search"
-        ).value
-    );
-
-
-    if(
-        promoProducts.some(
-            item =>
-                String(item.id) ===
-                String(product.id)
-        )
-    ){
-
-        renderPreview(
-            false
-        );
-
-    }
-
-
-    showToast(
-        "Harga promo berhasil diterapkan ✓"
+        }
     );
 
 }
@@ -6125,9 +5561,7 @@ function saveCardPrice(
    TOGGLE PRODUCT
 ========================================================= */
 
-function toggleProduct(
-    id
-){
+function toggleProduct(id){
 
     id =
         String(id);
@@ -6145,58 +5579,38 @@ function toggleProduct(
 
     }else{
 
-        selectedIds.push(
-            id
-        );
+        selectedIds.push(id);
 
     }
 
 
-    renderManager(
-        document.getElementById(
-            "search"
-        ).value
-    );
+    saveSelection();
+
+    renderManager();
 
 }
 
 
 /* =========================================================
-   COUNTS
-========================================================= */
-
-function updateCounts(){
-
-    const count =
-        selectedIds.length;
-
-
-    selectedCount.textContent =
-        count;
-
-
-    footerSelected.textContent =
-        count;
-
-
-    totalCount.textContent =
-        products.length;
-
-
-    footerTotal.textContent =
-        products.length;
-
-}
-
-
-/* =========================================================
-   DOWNLOAD BLOB
+   SAVE BLOB
 ========================================================= */
 
 async function saveBlob(
     blob,
     filename
 ){
+
+    if(
+        !blob ||
+        blob.size <= 0
+    ){
+
+        throw new Error(
+            "EMPTY_BLOB"
+        );
+
+    }
+
 
     const url =
         URL.createObjectURL(
@@ -6216,10 +5630,17 @@ async function saveBlob(
     link.download =
         filename;
 
+    link.style.position =
+        "fixed";
 
-    link.style.display =
-        "none";
+    link.style.left =
+        "-9999px";
 
+    link.style.top =
+        "-9999px";
+
+    link.style.opacity =
+        "0";
 
     document.body.appendChild(
         link
@@ -6227,6 +5648,9 @@ async function saveBlob(
 
 
     link.click();
+
+
+    await wait(500);
 
 
     link.remove();
@@ -6238,7 +5662,7 @@ async function saveBlob(
                 url
             );
         },
-        2000
+        1500
     );
 
 }
@@ -6250,12 +5674,8 @@ async function saveBlob(
 
 async function downloadStatus(){
 
-    if(
-        downloadBusy
-    ){
-
+    if(downloadBusy){
         return;
-
     }
 
 
@@ -6265,9 +5685,13 @@ async function downloadStatus(){
         );
 
 
-    if(
-        !canvas
-    ){
+    const product =
+        promoProducts[
+            currentIndex
+        ];
+
+
+    if(!canvas){
 
         showToast(
             "Preview belum siap."
@@ -6278,11 +5702,41 @@ async function downloadStatus(){
     }
 
 
-    downloadBusy = true;
+    if(!product){
+
+        showToast(
+            "Produk belum tersedia."
+        );
+
+        return;
+
+    }
+
+
+    if(
+        typeof html2canvas !==
+        "function"
+    ){
+
+        showToast(
+            "Engine download belum tersedia."
+        );
+
+        return;
+
+    }
+
+
+    downloadBusy =
+        true;
 
 
     const wasPlaying =
         playing;
+
+
+    const originalHTML =
+        downloadBtn.innerHTML;
 
 
     stopAutoplay();
@@ -6290,10 +5744,6 @@ async function downloadStatus(){
 
     downloadBtn.disabled =
         true;
-
-
-    const originalHTML =
-        downloadBtn.innerHTML;
 
 
     downloadBtn.innerHTML = `
@@ -6309,103 +5759,93 @@ async function downloadStatus(){
 
     try{
 
+        showToast(
+            "Menyiapkan status..."
+        );
+
+
+        /*
+         * Hilangkan animasi sebelum
+         * mengambil gambar.
+         */
+
         document.body.classList.add(
             "capture-mode"
         );
 
 
         /*
-         * Pastikan semua image
-         * selesai loading sebelum capture.
+         * Pastikan gambar benar-benar
+         * selesai load + decode.
          */
 
-        const images =
-            [
-                ...canvas.querySelectorAll(
-                    "img"
-                )
-            ];
+        await waitForImages(
+            canvas
+        );
 
 
-        await Promise.all(
-            images.map(
-                image => {
+        await waitForFonts();
 
-                    if(
-                        image.complete
-                    ){
 
-                        return Promise.resolve();
+        /*
+         * Tunggu dua frame browser.
+         */
 
+        await new Promise(
+            resolve =>
+                requestAnimationFrame(
+                    ()=>{
+                        requestAnimationFrame(
+                            resolve
+                        );
                     }
-
-
-                    return new Promise(
-                        resolve => {
-
-                            image.onload =
-                                resolve;
-
-                            image.onerror =
-                                resolve;
-
-                        }
-                    );
-
-                }
-            )
+                )
         );
+
+
+        await wait(120);
+
+
+        showToast(
+            "Merender status..."
+        );
+
+
+        const width =
+            canvas.offsetWidth;
+
+
+        const height =
+            canvas.offsetHeight;
 
 
         /*
-         * Decode supaya hasil
-         * tidak pudar/blur.
+         * Export lebih tinggi dari
+         * screenshot viewport.
          */
-
-        await Promise.all(
-            images.map(
-                image =>
-                    image.decode
-                        ?
-                        image.decode()
-                            .catch(
-                                ()=>{}
-                            )
-                        :
-                        Promise.resolve()
-            )
-        );
-
-
-        /*
-         * Beri browser waktu
-         * menyelesaikan paint.
-         */
-
-        await wait(
-            180
-        );
-
-
-        const ratio =
-            currentRatio;
-
 
         const scale =
-            ratio === "916"
-                ? 2.5
-                : ratio === "45"
-                    ? 2.4
-                    : 2.2;
+            currentRatio === "916"
+                ?
+                2.5
+                :
+                currentRatio === "45"
+                    ?
+                    2.35
+                    :
+                    2.15;
 
 
-        const output =
-            await html2canvas(
+        const capturePromise =
+            html2canvas(
                 canvas,
                 {
 
                     backgroundColor:
                         "#070907",
+
+                    width,
+                    height,
 
                     scale,
 
@@ -6417,86 +5857,160 @@ async function downloadStatus(){
 
                     logging:false,
 
-                    removeContainer:true,
-
                     foreignObjectRendering:false,
 
-                    width:
-                        canvas.offsetWidth,
+                    removeContainer:true,
 
-                    height:
-                        canvas.offsetHeight
+                    scrollX:0,
+
+                    scrollY:0
 
                 }
             );
 
 
-        const blob =
-            await new Promise(
-                resolve =>
-                    output.toBlob(
-                        resolve,
-                        "image/png",
-                        1
-                    )
+        const timeoutPromise =
+            new Promise(
+                (
+                    resolve,
+                    reject
+                )=>{
+
+                    setTimeout(
+                        ()=>{
+                            reject(
+                                new Error(
+                                    "EXPORT_TIMEOUT"
+                                )
+                            );
+                        },
+                        20000
+                    );
+
+                }
+            );
+
+
+        const output =
+            await Promise.race(
+                [
+                    capturePromise,
+                    timeoutPromise
+                ]
             );
 
 
         if(
-            !blob
+            !output ||
+            !output.width ||
+            !output.height
         ){
 
             throw new Error(
-                "Canvas PNG gagal dibuat."
+                "INVALID_CANVAS"
             );
 
         }
 
 
-        const product =
-            promoProducts[
-                currentIndex
-            ];
+        showToast(
+            "Menyiapkan file PNG..."
+        );
 
 
-        const safeName =
-            makeDisplayTitle(
-                product
-            )
-            .replace(
-                /[^a-z0-9]+/gi,
-                "-"
-            )
-            .replace(
-                /^-+|-+$/g,
-                ""
-            )
-            .toLowerCase();
+        const blob =
+            await new Promise(
+                (
+                    resolve,
+                    reject
+                )=>{
+
+                    output.toBlob(
+                        result => {
+
+                            if(
+                                result &&
+                                result.size > 0
+                            ){
+
+                                resolve(
+                                    result
+                                );
+
+                            }else{
+
+                                reject(
+                                    new Error(
+                                        "PNG_BLOB_FAILED"
+                                    )
+                                );
+
+                            }
+
+                        },
+                        "image/png",
+                        1
+                    );
+
+                }
+            );
+
+
+        const ratioName =
+            currentRatio === "916"
+                ?
+                "9x16"
+                :
+                currentRatio === "45"
+                    ?
+                    "4x5"
+                    :
+                    "16x9";
+
+
+        const filename =
+            `PROMO-${slug(
+                makeDisplayTitle(
+                    product
+                )
+            )}-${ratioName}.png`;
 
 
         await saveBlob(
             blob,
-            `promo-${safeName || "produk"}-${ratio}.png`
+            filename
         );
 
 
         showToast(
-            "Status berhasil di-download ✓"
+            "Status berhasil didownload ✓"
         );
 
 
     }catch(error){
 
         console.error(
-            "[DOWNLOAD]",
+            "[PROMO DOWNLOAD]",
             error
         );
 
 
-        showToast(
-            "Gagal membuat status."
-        );
+        if(
+            error?.message ===
+            "EXPORT_TIMEOUT"
+        ){
 
+            showToast(
+                "Export terlalu lama. Coba lagi."
+            );
+
+        }else{
+
+            showToast(
+                "Gagal membuat status."
+            );
+
+        }
 
     }finally{
 
@@ -6585,13 +6099,7 @@ async function downloadJSON(){
                                 price.extraEnabled,
 
                             diskonExtra:
-                                price.extraPercent,
-
-                            hargaManualAktif:
-                                price.manualEnabled,
-
-                            hargaManual:
-                                price.manualFinal
+                                price.extraPercent
 
                         }
 
@@ -6627,16 +6135,14 @@ async function downloadJSON(){
             "produk-promo-final.json berhasil dibuat ✓"
         );
 
-
     }catch(error){
 
         console.error(
             error
         );
 
-
         showToast(
-            "Gagal membuat JSON."
+            "Gagal download JSON."
         );
 
     }
@@ -6658,6 +6164,15 @@ document
         button.addEventListener(
             "click",
             ()=>{
+
+                if(
+                    transitionBusy
+                ){
+
+                    return;
+
+                }
+
 
                 currentRatio =
                     button.dataset.ratio;
@@ -6682,8 +6197,18 @@ document
                 );
 
 
+                /*
+                 * Re-render tanpa
+                 * mengubah produk aktif.
+                 */
+
                 renderPreview(
                     false
+                );
+
+
+                showToast(
+                    `Rasio ${button.textContent.trim().split(" ")[0]} aktif`
                 );
 
             }
@@ -6694,18 +6219,8 @@ document
 
 
 /* =========================================================
-   NAV
+   NAVIGATION
 ========================================================= */
-
-document
-.getElementById(
-    "prevBtn"
-)
-.addEventListener(
-    "click",
-    prevSlide
-);
-
 
 document
 .getElementById(
@@ -6714,6 +6229,16 @@ document
 .addEventListener(
     "click",
     nextSlide
+);
+
+
+document
+.getElementById(
+    "prevBtn"
+)
+.addEventListener(
+    "click",
+    previousSlide
 );
 
 
@@ -6738,63 +6263,12 @@ document
 
 
 /* =========================================================
-   FULLSCREEN
+   DOWNLOAD
 ========================================================= */
 
-document
-.getElementById(
-    "fullscreenBtn"
-)
-.addEventListener(
+downloadBtn.addEventListener(
     "click",
-    async ()=>{
-
-        try{
-
-            if(
-                !document.fullscreenElement
-            ){
-
-                await document
-                    .documentElement
-                    .requestFullscreen();
-
-            }else{
-
-                await document
-                    .exitFullscreen();
-
-            }
-
-        }catch{
-
-            showToast(
-                "Fullscreen tidak tersedia."
-            );
-
-        }
-
-    }
-);
-
-
-/* =========================================================
-   SEARCH — INSTANT
-========================================================= */
-
-document
-.getElementById(
-    "search"
-)
-.addEventListener(
-    "input",
-    event => {
-
-        renderManager(
-            event.target.value
-        );
-
-    }
+    downloadStatus
 );
 
 
@@ -6819,12 +6293,9 @@ document
             );
 
 
-        renderManager(
-            document.getElementById(
-                "search"
-            ).value
-        );
+        saveSelection();
 
+        renderManager();
 
         showToast(
             "Semua produk dipilih ✓"
@@ -6848,9 +6319,9 @@ document
 
         selectedIds = [];
 
+        saveSelection();
 
         renderManager();
-
 
         showToast(
             "Pilihan dibersihkan."
@@ -6871,15 +6342,13 @@ document
 .addEventListener(
     "click",
     ()=>{
-        applyPromo(
-            true
-        );
+        applyPromo(true);
     }
 );
 
 
 /* =========================================================
-   SAVE
+   SAVE CONFIG
 ========================================================= */
 
 document
@@ -6898,7 +6367,6 @@ document
         );
 
         savePriceOverrides();
-
 
         showToast(
             "Konfigurasi promo tersimpan ✓"
@@ -6928,10 +6396,7 @@ document
 
         renderManager();
 
-        applyPromo(
-            false
-        );
-
+        applyPromo(false);
 
         showToast(
             "Konfigurasi dipulihkan ✓"
@@ -6942,26 +6407,169 @@ document
 
 
 /* =========================================================
-   DOWNLOAD BUTTON
-========================================================= */
-
-downloadBtn.addEventListener(
-    "click",
-    downloadStatus
-);
-
-
-/* =========================================================
-   DOWNLOAD JSON BUTTON
+   SEARCH — INSTANT
 ========================================================= */
 
 document
 .getElementById(
-    "downloadJSON"
+    "search"
+)
+.addEventListener(
+    "input",
+    event => {
+
+        searchQuery =
+            event.target.value
+            .trim()
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(
+                /[\u0300-\u036f]/g,
+                ""
+            );
+
+
+        renderManager();
+
+    }
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function fullscreen(){
+
+    try{
+
+        if(
+            !document.fullscreenElement
+        ){
+
+            await document.documentElement
+                .requestFullscreen();
+
+        }else{
+
+            await document.exitFullscreen();
+
+        }
+
+    }catch(error){
+
+        console.warn(
+            "[FULLSCREEN]",
+            error
+        );
+
+    }
+
+}
+
+
+document
+.getElementById(
+    "fullscreenBtn"
 )
 .addEventListener(
     "click",
-    downloadJSON
+    fullscreen
+);
+
+
+/* =========================================================
+   SWIPE
+========================================================= */
+
+let touchStartX = 0;
+let touchStartY = 0;
+
+
+stage.addEventListener(
+    "touchstart",
+    event => {
+
+        const touch =
+            event.changedTouches[0];
+
+
+        touchStartX =
+            touch.screenX;
+
+        touchStartY =
+            touch.screenY;
+
+    },
+    {
+        passive:true
+    }
+);
+
+
+stage.addEventListener(
+    "touchend",
+    event => {
+
+        if(
+            transitionBusy
+        ){
+
+            return;
+
+        }
+
+
+        const touch =
+            event.changedTouches[0];
+
+
+        const deltaX =
+            touch.screenX -
+            touchStartX;
+
+
+        const deltaY =
+            touch.screenY -
+            touchStartY;
+
+
+        if(
+            Math.abs(deltaX) <
+            Math.abs(deltaY)
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            Math.abs(deltaX) <
+            45
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            deltaX < 0
+        ){
+
+            nextSlide();
+
+        }else{
+
+            previousSlide();
+
+        }
+
+    },
+    {
+        passive:true
+    }
 );
 
 
@@ -6973,23 +6581,20 @@ document.addEventListener(
     "keydown",
     event => {
 
+        const target =
+            event.target;
+
+
         if(
-            event.target.matches(
-                "input,textarea"
+            target &&
+            (
+                target.tagName === "INPUT" ||
+                target.tagName === "TEXTAREA" ||
+                target.isContentEditable
             )
         ){
 
             return;
-
-        }
-
-
-        if(
-            event.key ===
-            "ArrowLeft"
-        ){
-
-            prevSlide();
 
         }
 
@@ -7005,8 +6610,18 @@ document.addEventListener(
 
 
         if(
-            event.code ===
-            "Space"
+            event.key ===
+            "ArrowLeft"
+        ){
+
+            previousSlide();
+
+        }
+
+
+        if(
+            event.key ===
+            " "
         ){
 
             event.preventDefault();
@@ -7015,41 +6630,65 @@ document.addEventListener(
 
         }
 
+
+        if(
+            event.key.toLowerCase()
+            === "f"
+        ){
+
+            fullscreen();
+
+        }
+
+
+        if(
+            event.key.toLowerCase()
+            === "d"
+        ){
+
+            downloadStatus();
+
+        }
+
     }
 );
 
 
 /* =========================================================
-   INITIAL RATIO UI
-========================================================= */
-
-document
-.querySelectorAll(
-    ".ratio-btn"
-)
-.forEach(
-    button => {
-
-        button.classList.toggle(
-            "active",
-            button.dataset.ratio ===
-            currentRatio
-        );
-
-    }
-);
-
-
-/* =========================================================
-   START
+   INIT
 ========================================================= */
 
 updatePlayIcons();
 
 loadProducts();
 
+
+/* =========================================================
+   PAGE VISIBILITY
+========================================================= */
+
+document.addEventListener(
+    "visibilitychange",
+    ()=>{
+
+        if(
+            document.hidden
+        ){
+
+            stopAutoplay();
+
+        }else if(
+            playing
+        ){
+
+            startAutoplay();
+
+        }
+
+    }
+);
+
 </script>
 
 </body>
-
 </html>
