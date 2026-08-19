@@ -6882,7 +6882,531 @@ function toggleProduct(
 
 
 
+/* =========================================================
+   DOWNLOAD CSS SANITIZER
+   FIX html2canvas:
+   "Attempting to parse an unsupported color function"
+========================================================= */
 
+function sanitizeDownloadCSS(
+    cssText
+){
+
+    if(
+        typeof cssText !==
+        "string"
+    ){
+
+        return "";
+
+    }
+
+
+    let css =
+        cssText;
+
+
+    /*
+     * -------------------------------------------------------
+     * Replace color-mix(...)
+     *
+     * Kita tidak bisa memakai regex sederhana karena
+     * color-mix dapat berisi var(...) yang juga punya
+     * tanda kurung.
+     *
+     * Parser kecil di bawah mencari function dan
+     * menggantinya dengan fallback yang aman.
+     * -------------------------------------------------------
+     */
+
+    function replaceFunction(
+        source,
+        functionName,
+        fallback
+    ){
+
+        const token =
+            functionName + "(";
+
+
+        let result =
+            "";
+
+        let cursor =
+            0;
+
+
+        while(true){
+
+            const start =
+                source.indexOf(
+                    token,
+                    cursor
+                );
+
+
+            if(
+                start === -1
+            ){
+
+                result +=
+                    source.slice(
+                        cursor
+                    );
+
+                break;
+
+            }
+
+
+            result +=
+                source.slice(
+                    cursor,
+                    start
+                );
+
+
+            let depth =
+                1;
+
+
+            let index =
+                start +
+                token.length;
+
+
+            while(
+                index <
+                source.length &&
+                depth > 0
+            ){
+
+                const char =
+                    source[index];
+
+
+                if(
+                    char === "("
+                ){
+
+                    depth++;
+
+                }else if(
+                    char === ")"
+                ){
+
+                    depth--;
+
+                }
+
+
+                index++;
+
+            }
+
+
+            /*
+             * Function tidak lengkap.
+             * Jangan merusak stylesheet.
+             */
+
+            if(
+                depth !== 0
+            ){
+
+                result +=
+                    source.slice(
+                        start
+                    );
+
+                break;
+
+            }
+
+
+            result +=
+                fallback;
+
+
+            cursor =
+                index;
+
+        }
+
+
+        return result;
+
+    }
+
+
+    /*
+     * color-mix() digunakan beberapa kali
+     * di stylesheet asli.
+     *
+     * Fallback transparan menjaga layout tanpa
+     * membuat html2canvas crash.
+     */
+
+    css =
+        replaceFunction(
+            css,
+            "color-mix",
+            "rgba(255,255,255,0.10)"
+        );
+
+
+    /*
+     * color() adalah fungsi yang disebut langsung
+     * oleh error html2canvas.
+     *
+     * Fallback putih aman untuk parser.
+     */
+
+    css =
+        replaceFunction(
+            css,
+            "color",
+            "#FFFFFF"
+        );
+
+
+    return css;
+
+}
+
+
+/* =========================================================
+   PREPARE DOWNLOAD CLONE
+========================================================= */
+
+function prepareDownloadClone(
+    clonedDocument
+){
+
+    /*
+     * =======================================================
+     * 1. SANITIZE <style>
+     * =======================================================
+     *
+     * Ini bagian penting.
+     *
+     * html2canvas akan membaca stylesheet clone.
+     * Jadi kita sanitasi TEXT stylesheet sebelum
+     * html2canvas memproses rule CSS.
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            "style"
+        )
+        .forEach(
+            styleElement => {
+
+                try{
+
+                    styleElement.textContent =
+                        sanitizeDownloadCSS(
+                            styleElement.textContent
+                        );
+
+                }catch(error){
+
+                    console.warn(
+                        "[DOWNLOAD CSS] Style sanitize failed:",
+                        error
+                    );
+
+                }
+
+            }
+        );
+
+
+    /*
+     * =======================================================
+     * 2. SANITIZE LINK STYLESHEET
+     * =======================================================
+     *
+     * Google Fonts tidak berisi styling promo,
+     * jadi tidak perlu disentuh.
+     *
+     * Yang kita lakukan hanya menghindari stylesheet
+     * yang gagal dibaca html2canvas.
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            'link[rel="stylesheet"]'
+        )
+        .forEach(
+            link => {
+
+                const href =
+                    link.getAttribute(
+                        "href"
+                    ) || "";
+
+
+                /*
+                 * Font Google tetap dipertahankan.
+                 */
+
+                if(
+                    href.includes(
+                        "fonts.googleapis.com"
+                    ) ||
+                    href.includes(
+                        "fonts.gstatic.com"
+                    )
+                ){
+
+                    return;
+
+                }
+
+            }
+        );
+
+
+    /*
+     * =======================================================
+     * 3. INLINE STYLE SANITIZATION
+     * =======================================================
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            "*"
+        )
+        .forEach(
+            element => {
+
+                if(
+                    !element.style
+                ){
+
+                    return;
+
+                }
+
+
+                const cssText =
+                    element.getAttribute(
+                        "style"
+                    );
+
+
+                if(
+                    cssText &&
+                    (
+                        cssText.includes(
+                            "color("
+                        ) ||
+                        cssText.includes(
+                            "color-mix("
+                        )
+                    )
+                ){
+
+                    try{
+
+                        element.setAttribute(
+                            "style",
+                            sanitizeDownloadCSS(
+                                cssText
+                            )
+                        );
+
+                    }catch{}
+
+                }
+
+            }
+        );
+
+
+    /*
+     * =======================================================
+     * 4. REMOVE CSS VARIABLES YANG BERISI FUNCTION
+     * =======================================================
+     *
+     * Ini mencegah:
+     *
+     * color: var(--something)
+     *
+     * kemudian variable tersebut resolve menjadi
+     * color(...) dan html2canvas meledak.
+     */
+
+    const root =
+        clonedDocument.documentElement;
+
+
+    if(
+        root
+    ){
+
+        const rootStyle =
+            root.style;
+
+
+        for(
+            let i =
+                rootStyle.length - 1;
+
+            i >= 0;
+
+            i--
+        ){
+
+            const property =
+                rootStyle[i];
+
+
+            if(
+                !property.startsWith(
+                    "--"
+                )
+            ){
+
+                continue;
+
+            }
+
+
+            let value =
+                "";
+
+
+            try{
+
+                value =
+                    rootStyle.getPropertyValue(
+                        property
+                    );
+
+            }catch{
+
+                continue;
+
+            }
+
+
+            if(
+                value.includes(
+                    "color("
+                ) ||
+                value.includes(
+                    "color-mix("
+                )
+            ){
+
+                /*
+                 * Fallback warna netral.
+                 */
+
+                rootStyle.setProperty(
+                    property,
+                    "#FFFFFF"
+                );
+
+            }
+
+        }
+
+    }
+
+
+    /*
+     * =======================================================
+     * 5. SANITIZE ALL INLINE CUSTOM VARIABLES
+     * =======================================================
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            "*"
+        )
+        .forEach(
+            element => {
+
+                const style =
+                    element.style;
+
+
+                if(
+                    !style
+                ){
+
+                    return;
+
+                }
+
+
+                for(
+                    let i =
+                        style.length - 1;
+
+                    i >= 0;
+
+                    i--
+                ){
+
+                    const property =
+                        style[i];
+
+
+                    if(
+                        !property.startsWith(
+                            "--"
+                        )
+                    ){
+
+                        continue;
+
+                    }
+
+
+                    let value =
+                        "";
+
+
+                    try{
+
+                        value =
+                            style.getPropertyValue(
+                                property
+                            );
+
+                    }catch{
+
+                        continue;
+
+                    }
+
+
+                    if(
+                        value.includes(
+                            "color("
+                        ) ||
+                        value.includes(
+                            "color-mix("
+                        )
+                    ){
+
+                        style.setProperty(
+                            property,
+                            "#FFFFFF"
+                        );
+
+                    }
+
+                }
+
+            }
+        );
+
+          }
 
 /* =========================================================
    DOWNLOAD BLOB
@@ -6904,23 +7428,40 @@ async function saveBlob(
 
     }
 
+
+    const safeFilename =
+        String(
+            filename ||
+            "promo-status.png"
+        )
+        .replace(
+            /[<>:"/\\|?*\u0000-\u001F]/g,
+            "-"
+        );
+
+
     const url =
         URL.createObjectURL(
             blob
         );
 
+
     let link = null;
+
 
     try{
 
         link =
-            document.createElement("a");
+            document.createElement(
+                "a"
+            );
+
 
         link.href =
             url;
 
         link.download =
-            filename;
+            safeFilename;
 
         link.rel =
             "noopener";
@@ -6929,10 +7470,10 @@ async function saveBlob(
             "fixed";
 
         link.style.left =
-            "-9999px";
+            "-10000px";
 
         link.style.top =
-            "-9999px";
+            "-10000px";
 
         link.style.width =
             "1px";
@@ -6943,9 +7484,14 @@ async function saveBlob(
         link.style.opacity =
             "0";
 
+        link.style.pointerEvents =
+            "none";
+
+
         document.body.appendChild(
             link
         );
+
 
         await new Promise(
             resolve =>
@@ -6954,11 +7500,21 @@ async function saveBlob(
                 )
         );
 
+
         link.click();
 
-        await wait(1000);
+
+        /*
+         * Jangan revoke terlalu cepat.
+         */
+
+        await wait(
+            1200
+        );
+
 
         return true;
+
 
     }catch(error){
 
@@ -6967,66 +7523,9 @@ async function saveBlob(
             error
         );
 
-        /*
-         * Fallback mobile/browser.
-         */
-
-        try{
-
-            if(
-                navigator.share &&
-                typeof File === "function"
-            ){
-
-                const file =
-                    new File(
-                        [blob],
-                        filename,
-                        {
-                            type:
-                                blob.type ||
-                                "image/png"
-                        }
-                    );
-
-                if(
-                    !navigator.canShare ||
-                    navigator.canShare({
-                        files:[file]
-                    })
-                ){
-
-                    await navigator.share({
-                        files:[file],
-                        title:filename
-                    });
-
-                    return true;
-
-                }
-
-            }
-
-        }catch(shareError){
-
-            if(
-                shareError?.name ===
-                "AbortError"
-            ){
-
-                return true;
-
-            }
-
-            console.warn(
-                "[DOWNLOAD] Share fallback failed:",
-                shareError
-            );
-
-        }
 
         /*
-         * Last fallback.
+         * Fallback browser/mobile.
          */
 
         try{
@@ -7037,44 +7536,131 @@ async function saveBlob(
                     "_blank"
                 );
 
-            if(opened){
+
+            if(
+                opened
+            ){
 
                 showToast(
                     "Gambar dibuka. Simpan gambar dari browser."
                 );
 
+
                 return true;
 
             }
 
-        }catch(fallbackError){
+        }catch(
+            fallbackError
+        ){
 
             console.warn(
-                "[DOWNLOAD] Final fallback failed:",
+                "[DOWNLOAD] Open fallback failed:",
                 fallbackError
             );
 
         }
 
+
+        /*
+         * Fallback Web Share.
+         */
+
+        try{
+
+            if(
+                navigator.share &&
+                typeof File ===
+                "function"
+            ){
+
+                const file =
+                    new File(
+                        [blob],
+                        safeFilename,
+                        {
+                            type:
+                                blob.type ||
+                                "image/png"
+                        }
+                    );
+
+
+                if(
+                    !navigator.canShare ||
+                    navigator.canShare({
+                        files:[
+                            file
+                        ]
+                    })
+                ){
+
+                    await navigator.share({
+                        files:[
+                            file
+                        ],
+                        title:
+                            safeFilename
+                    });
+
+
+                    return true;
+
+                }
+
+            }
+
+        }catch(
+            shareError
+        ){
+
+            if(
+                shareError?.name ===
+                "AbortError"
+            ){
+
+                return true;
+
+            }
+
+
+            console.warn(
+                "[DOWNLOAD] Share failed:",
+                shareError
+            );
+
+        }
+
+
         throw new Error(
             "BROWSER_DOWNLOAD_BLOCKED"
         );
+
 
     }finally{
 
         if(link){
 
             try{
+
                 link.remove();
+
             }catch{}
 
         }
 
+
         setTimeout(
             ()=>{
+
                 try{
-                    URL.revokeObjectURL(url);
+
+                    URL.revokeObjectURL(
+                        url
+                    );
+
                 }catch{}
+
             },
             5000
         );
@@ -7084,138 +7670,32 @@ async function saveBlob(
 }
 
 
-
-
-
-
-
 /* =========================================================
-   CAPTURE COLOR COMPATIBILITY
-   html2canvas tidak support beberapa CSS color function.
-   Hanya aktif selama proses capture.
-========================================================= */
-
-function prepareCaptureStyles(root){
-
-    const restore = [];
-
-    const elements = [
-        root,
-        ...root.querySelectorAll("*")
-    ];
-
-    elements.forEach(element => {
-
-        const computed =
-            getComputedStyle(element);
-
-        const properties = [
-            "color",
-            "backgroundColor",
-            "borderTopColor",
-            "borderRightColor",
-            "borderBottomColor",
-            "borderLeftColor",
-            "outlineColor",
-            "boxShadow",
-            "textShadow"
-        ];
-
-        properties.forEach(property => {
-
-            const value =
-                computed[property];
-
-            if(
-                !value ||
-                (
-                    !value.includes("color(") &&
-                    !value.includes("color-mix(")
-                )
-            ){
-
-                return;
-
-            }
-
-            restore.push({
-                element,
-                property,
-                value:
-                    element.style[property]
-            });
-
-            if(
-                property ===
-                "backgroundColor"
-            ){
-
-                element.style[property] =
-                    "#080C09";
-
-            }else if(
-                property ===
-                "color"
-            ){
-
-                element.style[property] =
-                    "#FFFFFF";
-
-            }else if(
-                property.includes("border") ||
-                property === "outlineColor"
-            ){
-
-                element.style[property] =
-                    "rgba(255,255,255,.15)";
-
-            }else{
-
-                element.style[property] =
-                    "none";
-
-            }
-
-        });
-
-    });
-
-    return function restoreCaptureStyles(){
-
-        restore.forEach(item => {
-
-            item.element.style[
-                item.property
-            ] =
-                item.value;
-
-        });
-
-    };
-
-}
-  
-
-
-
-  
-/* =========================================================
-   DOWNLOAD STATUS
+   DOWNLOAD STATUS — HIGH RES FINAL
 ========================================================= */
 
 async function downloadStatus(){
 
-    if(downloadBusy){
+    if(
+        downloadBusy
+    ){
+
         return;
+
     }
+
 
     const canvas =
         document.getElementById(
             "promoCanvas"
         );
 
+
     const product =
-        promoProducts[currentIndex];
+        promoProducts[
+            currentIndex
+        ];
+
 
     if(
         !canvas ||
@@ -7230,6 +7710,7 @@ async function downloadStatus(){
 
     }
 
+
     if(
         typeof html2canvas !==
         "function"
@@ -7243,37 +7724,71 @@ async function downloadStatus(){
 
     }
 
+
     downloadBusy =
         true;
+
 
     const oldHTML =
         downloadBtn.innerHTML;
 
+
     const wasPlaying =
         playing;
 
+
     stopAutoplay();
+
 
     downloadBtn.disabled =
         true;
 
+
     downloadBtn.innerHTML =
         "MEMBUAT STATUS...";
+
 
     document.body.classList.add(
         "capture-mode"
     );
 
-    let restoreCaptureStyles =
-        null;
 
     try{
 
-        await waitForImages(
-            canvas
-        );
+        /*
+         * =====================================================
+         * WAIT ASSET
+         * =====================================================
+         */
 
-        await waitForFonts();
+        if(
+            typeof waitForImages ===
+            "function"
+        ){
+
+            await waitForImages(
+                canvas
+            );
+
+        }
+
+
+        if(
+            typeof waitForFonts ===
+            "function"
+        ){
+
+            await waitForFonts();
+
+        }else if(
+            document.fonts &&
+            document.fonts.ready
+        ){
+
+            await document.fonts.ready;
+
+        }
+
 
         await new Promise(
             resolve =>
@@ -7286,24 +7801,21 @@ async function downloadStatus(){
                 )
         );
 
-        await wait(150);
+
+        await wait(
+            150
+        );
+
 
         /*
-         * FIX UTAMA:
-         * color-mix()/color() hanya diganti
-         * sementara selama html2canvas bekerja.
-         *
-         * Setelah capture selesai semuanya
-         * dikembalikan.
+         * =====================================================
+         * UKURAN PREVIEW
+         * =====================================================
          */
-
-        restoreCaptureStyles =
-            prepareCaptureStyles(
-                canvas
-            );
 
         const rect =
             canvas.getBoundingClientRect();
+
 
         const width =
             Math.max(
@@ -7313,6 +7825,7 @@ async function downloadStatus(){
                 )
             );
 
+
         const height =
             Math.max(
                 1,
@@ -7321,45 +7834,110 @@ async function downloadStatus(){
                 )
             );
 
-        const MAX_PIXELS =
-            8000000;
 
-        const requestedScale =
+        /*
+         * =====================================================
+         * TARGET EXPORT
+         * =====================================================
+         */
+
+        const targetWidth =
 
             currentRatio === "916"
-                ? 2.5
-                : currentRatio === "45"
-                    ? 2.35
-                    : 2.15;
 
-        const safeScale =
-            Math.sqrt(
-                MAX_PIXELS /
-                (
-                    width *
-                    height
-                )
-            );
+                ?
 
-        const scale =
-            Math.max(
-                1,
-                Math.min(
-                    requestedScale,
-                    safeScale
-                )
-            );
+                1440
+
+                :
+
+                currentRatio === "45"
+
+                    ?
+
+                    1440
+
+                    :
+
+                    1920;
+
+
+        let scale =
+            targetWidth /
+            width;
+
+
+        /*
+         * Safety memory limit.
+         *
+         * 1440 × 2560 = 3.68 MP
+         * jadi aman untuk mayoritas HP.
+         */
+
+        const MAX_PIXELS =
+            16000000;
+
+
+        const estimatedPixels =
+            width *
+            height *
+            scale *
+            scale;
+
+
+        if(
+            estimatedPixels >
+            MAX_PIXELS
+        ){
+
+            scale =
+                Math.sqrt(
+                    MAX_PIXELS /
+                    (
+                        width *
+                        height
+                    )
+                );
+
+        }
+
 
         console.log(
-            "[DOWNLOAD] Capture:",
+            "[DOWNLOAD] High-res capture:",
             {
-                width,
-                height,
-                scale
+                sourceWidth:
+                    width,
+
+                sourceHeight:
+                    height,
+
+                targetWidth,
+
+                scale,
+
+                outputWidth:
+                    Math.round(
+                        width *
+                        scale
+                    ),
+
+                outputHeight:
+                    Math.round(
+                        height *
+                        scale
+                    )
             }
         );
 
-        let rendered;
+
+        /*
+         * =====================================================
+         * CAPTURE
+         * =====================================================
+         */
+
+        let rendered = null;
+
 
         try{
 
@@ -7367,14 +7945,18 @@ async function downloadStatus(){
                 await html2canvas(
                     canvas,
                     {
+
                         backgroundColor:
                             "#050705",
 
-                        scale,
+                        scale:
+                            scale,
 
-                        width,
+                        width:
+                            width,
 
-                        height,
+                        height:
+                            height,
 
                         useCORS:
                             true,
@@ -7398,29 +7980,67 @@ async function downloadStatus(){
                             0,
 
                         scrollY:
-                            0
+                            0,
+
+
+                        /*
+                         * INI FIX UTAMA
+                         *
+                         * CSS asli tidak disentuh.
+                         * Hanya clone html2canvas yang
+                         * dibersihkan dari color-mix/color().
+                         */
+
+                        onclone:
+                            clonedDocument => {
+
+                                prepareDownloadClone(
+                                    clonedDocument
+                                );
+
+                            }
+
                     }
                 );
 
-        }catch(firstError){
+        }catch(
+            firstCaptureError
+        ){
 
             console.warn(
-                "[DOWNLOAD] Capture pertama gagal, retry scale 1:",
-                firstError
+                "[DOWNLOAD] Capture pertama gagal:",
+                firstCaptureError
             );
+
+
+            /*
+             * Retry dengan scale lebih rendah,
+             * tapi tetap high quality.
+             */
+
+            const retryScale =
+                Math.max(
+                    1.5,
+                    scale * 0.75
+                );
+
 
             rendered =
                 await html2canvas(
                     canvas,
                     {
+
                         backgroundColor:
                             "#050705",
 
-                        scale:1,
+                        scale:
+                            retryScale,
 
-                        width,
+                        width:
+                            width,
 
-                        height,
+                        height:
+                            height,
 
                         useCORS:
                             true,
@@ -7429,7 +8049,7 @@ async function downloadStatus(){
                             false,
 
                         imageTimeout:
-                            10000,
+                            12000,
 
                         logging:
                             false,
@@ -7444,26 +8064,22 @@ async function downloadStatus(){
                             0,
 
                         scrollY:
-                            0
+                            0,
+
+                        onclone:
+                            clonedDocument => {
+
+                                prepareDownloadClone(
+                                    clonedDocument
+                                );
+
+                            }
+
                     }
                 );
 
         }
 
-        /*
-         * Restore SEGERA setelah html2canvas selesai.
-         */
-
-        if(
-            restoreCaptureStyles
-        ){
-
-            restoreCaptureStyles();
-
-            restoreCaptureStyles =
-                null;
-
-        }
 
         if(
             !rendered ||
@@ -7477,11 +8093,15 @@ async function downloadStatus(){
 
         }
 
-        let blob = null;
 
         /*
-         * PRIMARY: toBlob
+         * =====================================================
+         * CANVAS → BLOB
+         * =====================================================
          */
+
+        let blob = null;
+
 
         try{
 
@@ -7492,18 +8112,25 @@ async function downloadStatus(){
                         reject
                     )=>{
 
-                        let done =
+                        let completed =
                             false;
 
-                        const finish =
-                            result=>{
 
-                                if(done){
+                        const finish =
+                            result => {
+
+                                if(
+                                    completed
+                                ){
+
                                     return;
+
                                 }
 
-                                done =
+
+                                completed =
                                     true;
+
 
                                 if(
                                     result &&
@@ -7526,6 +8153,7 @@ async function downloadStatus(){
 
                             };
 
+
                         try{
 
                             rendered.toBlob(
@@ -7536,14 +8164,19 @@ async function downloadStatus(){
 
                         }catch(error){
 
-                            reject(error);
+                            reject(
+                                error
+                            );
 
                         }
+
 
                         setTimeout(
                             ()=>{
 
-                                if(!done){
+                                if(
+                                    !completed
+                                ){
 
                                     reject(
                                         new Error(
@@ -7560,26 +8193,90 @@ async function downloadStatus(){
                     }
                 );
 
-        }catch(blobError){
+        }catch(
+            blobError
+        ){
 
             console.warn(
-                "[DOWNLOAD] toBlob failed:",
+                "[DOWNLOAD] toBlob gagal:",
                 blobError
             );
 
+
             /*
-             * FALLBACK: toDataURL
+             * =================================================
+             * FALLBACK DATA URL
+             * =================================================
              */
 
-            const dataURL =
-                rendered.toDataURL(
-                    "image/png"
+            try{
+
+                const dataURL =
+                    rendered.toDataURL(
+                        "image/png"
+                    );
+
+
+                if(
+                    !dataURL ||
+                    !dataURL.includes(",")
+                ){
+
+                    throw new Error(
+                        "DATAURL_INVALID"
+                    );
+
+                }
+
+
+                const base64 =
+                    dataURL.split(",")[1];
+
+
+                const binary =
+                    atob(
+                        base64
+                    );
+
+
+                const bytes =
+                    new Uint8Array(
+                        binary.length
+                    );
+
+
+                for(
+                    let i = 0;
+                    i < binary.length;
+                    i++
+                ){
+
+                    bytes[i] =
+                        binary.charCodeAt(
+                            i
+                        );
+
+                }
+
+
+                blob =
+                    new Blob(
+                        [bytes],
+                        {
+                            type:
+                                "image/png"
+                        }
+                    );
+
+            }catch(
+                dataURLError
+            ){
+
+                console.error(
+                    "[DOWNLOAD] PNG generation failed:",
+                    dataURLError
                 );
 
-            if(
-                !dataURL ||
-                !dataURL.includes(",")
-            ){
 
                 throw new Error(
                     "PNG_GENERATION_FAILED"
@@ -7587,38 +8284,8 @@ async function downloadStatus(){
 
             }
 
-            const base64 =
-                dataURL.split(",")[1];
-
-            const binary =
-                atob(base64);
-
-            const bytes =
-                new Uint8Array(
-                    binary.length
-                );
-
-            for(
-                let i = 0;
-                i < binary.length;
-                i++
-            ){
-
-                bytes[i] =
-                    binary.charCodeAt(i);
-
-            }
-
-            blob =
-                new Blob(
-                    [bytes],
-                    {
-                        type:
-                            "image/png"
-                    }
-                );
-
         }
+
 
         if(
             !blob ||
@@ -7631,15 +8298,36 @@ async function downloadStatus(){
 
         }
 
+
+        /*
+         * =====================================================
+         * FILENAME
+         * =====================================================
+         */
+
         const ratioName =
 
             currentRatio === "916"
-                ? "9x16"
-                : currentRatio === "45"
-                    ? "4x5"
-                    : "16x9";
+
+                ?
+
+                "9x16"
+
+                :
+
+                currentRatio === "45"
+
+                    ?
+
+                    "4x5"
+
+                    :
+
+                    "16x9";
+
 
         const filename =
+
             `PROMO-${slug(
                 makeDisplayTitle(
                     product
@@ -7650,14 +8338,23 @@ async function downloadStatus(){
                 ].name
             )}-${ratioName}.png`;
 
+
+        /*
+         * =====================================================
+         * DOWNLOAD
+         * =====================================================
+         */
+
         await saveBlob(
             blob,
             filename
         );
 
+
         showToast(
             "Status berhasil didownload ✓"
         );
+
 
     }catch(error){
 
@@ -7666,53 +8363,88 @@ async function downloadStatus(){
             error
         );
 
-        showToast(
-            "Gagal membuat status: " +
-            (
-                error?.message ||
-                "unknown error"
-            )
-        );
 
-    }finally{
+        let message =
+            "Gagal membuat status.";
 
-        /*
-         * Safety restore kalau capture throw
-         * sebelum restore normal dipanggil.
-         */
 
         if(
-            restoreCaptureStyles
+            error?.message ===
+            "BROWSER_DOWNLOAD_BLOCKED"
         ){
 
-            try{
-                restoreCaptureStyles();
-            }catch{}
+            message =
+                "Browser memblokir download.";
 
-            restoreCaptureStyles =
-                null;
+        }else if(
+            error?.message ===
+            "PNG_GENERATION_FAILED"
+        ){
+
+            message =
+                "Gagal membuat PNG.";
+
+        }else if(
+            error?.message ===
+            "CANVAS_RENDER_FAILED"
+        ){
+
+            message =
+                "Gagal merender status.";
+
+        }else if(
+            error?.message ===
+            "EMPTY_BLOB"
+        ){
+
+            message =
+                "File hasil render kosong.";
+
+        }else if(
+            error?.message
+        ){
+
+            message =
+                "Gagal: " +
+                error.message;
 
         }
+
+
+        showToast(
+            message
+        );
+
+
+    }finally{
 
         document.body.classList.remove(
             "capture-mode"
         );
 
+
         downloadBusy =
             false;
+
 
         downloadBtn.disabled =
             false;
 
+
         downloadBtn.innerHTML =
             oldHTML;
 
-        if(wasPlaying){
+
+        if(
+            wasPlaying
+        ){
 
             playing =
                 true;
 
+
             updatePlayIcons();
+
 
             startAutoplay();
 
@@ -7720,7 +8452,7 @@ async function downloadStatus(){
 
     }
 
-    }
+}
 
 
   
