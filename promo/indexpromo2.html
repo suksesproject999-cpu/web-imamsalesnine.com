@@ -1,0 +1,7055 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta
+    name="viewport"
+    content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+
+<meta
+    name="theme-color"
+    content="#050705"
+>
+
+<title>Promo Studio — Imam_salesfr</title>
+
+
+<!-- ======================================================
+     FONTS
+====================================================== -->
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+
+<link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+>
+
+<link
+    href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+>
+
+
+<!-- ======================================================
+     DOWNLOAD ENGINE
+====================================================== -->
+
+<script
+    src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+></script>
+
+
+<style>
+
+/* =========================================================
+   IMAM_SALESFR — PROMO STUDIO
+   FINAL PREMIUM BUILD
+========================================================= */
+
+:root{
+
+    --lime:#8CC63F;
+    --lime-bright:#9BDD4A;
+    --lime-dark:#6FA52F;
+
+    --orange:#FF7A1A;
+    --orange-light:#FF9141;
+    --orange-dark:#E9680D;
+
+    --bg:#050705;
+    --bg-soft:#080B08;
+
+    --panel:#090D0A;
+    --panel-2:#0D120E;
+    --panel-3:#111711;
+
+    --white:#F7F8F5;
+    --white-soft:#D9DED8;
+
+    --muted:#858D84;
+    --muted-2:#626A62;
+
+    --border:
+        rgba(255,255,255,.085);
+
+    --border-soft:
+        rgba(255,255,255,.055);
+
+    --border-lime:
+        rgba(140,198,63,.45);
+
+    --shadow:
+        0 30px 90px rgba(0,0,0,.45);
+
+    --radius:
+        22px;
+
+    --font-body:
+        "Plus Jakarta Sans",
+        Inter,
+        system-ui,
+        sans-serif;
+
+    --font-display:
+        "Manrope",
+        Inter,
+        system-ui,
+        sans-serif;
+
+}
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+*,
+*::before,
+*::after{
+    box-sizing:border-box;
+}
+
+
+html{
+    min-height:100%;
+    background:var(--bg);
+    scroll-behavior:smooth;
+}
+
+
+body{
+    margin:0;
+    min-height:100vh;
+
+    overflow-x:hidden;
+
+    color:var(--white);
+
+    font-family:var(--font-body);
+
+    background:
+        radial-gradient(
+            circle at 50% -15%,
+            rgba(140,198,63,.075),
+            transparent 35%
+        ),
+        linear-gradient(
+            180deg,
+            #050705 0%,
+            #060906 100%
+        );
+
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+}
+
+
+button,
+input{
+    font:inherit;
+}
+
+
+button{
+    border:0;
+    cursor:pointer;
+
+    -webkit-tap-highlight-color:transparent;
+}
+
+
+img{
+    max-width:100%;
+}
+
+
+/* =========================================================
+   HEADER
+========================================================= */
+
+.topbar{
+
+    position:sticky;
+
+    top:0;
+
+    z-index:1000;
+
+    width:100%;
+
+    min-height:86px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:space-between;
+
+    gap:24px;
+
+    padding:
+        17px
+        clamp(20px,4vw,38px);
+
+    background:
+        rgba(5,7,5,.94);
+
+    border-bottom:
+        1px solid
+        rgba(255,255,255,.075);
+
+    backdrop-filter:
+        blur(18px);
+
+    -webkit-backdrop-filter:
+        blur(18px);
+
+}
+
+
+.header-brand{
+    min-width:0;
+}
+
+
+.brand-name{
+
+    margin:0;
+
+    color:#fff;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        clamp(24px,3vw,34px);
+
+    line-height:
+        1.02;
+
+    font-weight:800;
+
+    letter-spacing:-1.35px;
+
+    white-space:nowrap;
+
+}
+
+
+.brand-sub{
+
+    margin-top:7px;
+
+    color:var(--lime);
+
+    font-size:
+        clamp(11px,1.25vw,14px);
+
+    line-height:1.15;
+
+    font-weight:700;
+
+    letter-spacing:.45px;
+
+}
+
+
+.header-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+    flex:0 0 auto;
+
+}
+
+
+.header-btn{
+
+    width:58px;
+    height:58px;
+
+    display:grid;
+
+    place-items:center;
+
+    color:#fff;
+
+    background:
+        rgba(9,13,10,.92);
+
+    border:
+        1px solid
+        rgba(255,255,255,.11);
+
+    border-radius:18px;
+
+    transition:
+        transform .2s ease,
+        border-color .2s ease,
+        background .2s ease;
+
+}
+
+
+.header-btn:hover{
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        var(--border-lime);
+
+}
+
+
+.header-btn.primary{
+
+    color:#101509;
+
+    background:
+        var(--lime);
+
+    border-color:
+        var(--lime);
+
+}
+
+
+.header-btn.primary:hover{
+
+    background:
+        var(--lime-bright);
+
+}
+
+
+.header-btn svg{
+
+    width:22px;
+    height:22px;
+
+}
+
+
+/* =========================================================
+   MAIN
+========================================================= */
+
+main{
+
+    width:100%;
+
+    padding:
+        18px
+        18px
+        90px;
+
+}
+
+
+.container{
+
+    width:
+        min(100%,1200px);
+
+    margin:
+        0 auto;
+
+}
+
+
+/* =========================================================
+   PREVIEW
+========================================================= */
+
+.preview-wrap{
+    width:100%;
+}
+
+
+.stage{
+
+    width:100%;
+
+    display:flex;
+
+    align-items:flex-start;
+
+    justify-content:center;
+
+    position:relative;
+
+}
+
+
+/* =========================================================
+   CANVAS
+========================================================= */
+
+.promo-canvas{
+
+    position:relative;
+
+    width:100%;
+
+    overflow:hidden;
+
+    isolation:isolate;
+
+    background:
+        #070907;
+
+    border:
+        1px solid
+        rgba(255,255,255,.09);
+
+    box-shadow:
+        var(--shadow);
+
+    transition:
+        opacity .75s ease,
+        transform .85s cubic-bezier(.22,.61,.36,1),
+        filter .85s ease;
+
+}
+
+
+/* =========================================================
+   RATIO
+========================================================= */
+
+.stage.ratio-916 .promo-canvas{
+
+    width:
+        min(100%,520px);
+
+    aspect-ratio:
+        9 / 16;
+
+}
+
+
+.stage.ratio-45 .promo-canvas{
+
+    width:
+        min(100%,760px);
+
+    aspect-ratio:
+        4 / 5;
+
+}
+
+
+.stage.ratio-169 .promo-canvas{
+
+    width:100%;
+
+    aspect-ratio:
+        16 / 9;
+
+}
+
+
+/* =========================================================
+   SLIDE TRANSITION
+========================================================= */
+
+.promo-canvas.slide-out{
+
+    opacity:0;
+
+    transform:
+        scale(.985)
+        translateY(18px);
+
+    filter:
+        brightness(.55)
+        blur(1px);
+
+}
+
+
+.promo-canvas.slide-in{
+
+    opacity:0;
+
+    transform:
+        scale(1.018)
+        translateY(-14px);
+
+    filter:
+        brightness(.65)
+        blur(1px);
+
+}
+
+
+.promo-canvas.slide-content{
+
+    opacity:1;
+
+    transform:
+        scale(1)
+        translateY(0);
+
+    filter:
+        brightness(1)
+        blur(0);
+
+}
+
+
+/* =========================================================
+   PRODUCT VISUAL
+========================================================= */
+
+.product-visual{
+
+    position:absolute;
+
+    z-index:1;
+
+    overflow:hidden;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#020302;
+
+}
+
+
+/* 9:16 */
+
+.stage.ratio-916
+.product-visual{
+
+    top:0;
+    left:0;
+    right:0;
+
+    height:57%;
+
+}
+
+
+/* 4:5 */
+
+.stage.ratio-45
+.product-visual{
+
+    top:0;
+    left:0;
+    right:0;
+
+    height:61%;
+
+}
+
+
+/* 16:9 */
+
+.stage.ratio-169
+.product-visual{
+
+    top:0;
+    left:0;
+
+    width:58%;
+
+    height:100%;
+
+}
+
+
+/* =========================================================
+   PRODUCT IMAGE
+========================================================= */
+
+.product-image{
+
+    width:100%;
+    height:100%;
+
+    display:block;
+
+    padding:
+        clamp(12px,4%,30px);
+
+    object-fit:contain;
+
+    object-position:center;
+
+    opacity:1;
+
+    filter:none;
+
+    mix-blend-mode:normal;
+
+    user-select:none;
+
+    -webkit-user-drag:none;
+
+}
+
+
+/* =========================================================
+   VISUAL GRADIENT
+========================================================= */
+
+.visual-gradient{
+
+    position:absolute;
+
+    inset:0;
+
+    z-index:3;
+
+    pointer-events:none;
+
+    background:
+        linear-gradient(
+            to bottom,
+            rgba(5,7,5,0)
+            45%,
+            rgba(5,7,5,.025)
+            58%,
+            rgba(5,7,5,.12)
+            72%,
+            rgba(5,7,5,.58)
+            91%,
+            #070907
+            100%
+        );
+
+}
+
+
+.stage.ratio-169
+.visual-gradient{
+
+    background:
+        linear-gradient(
+            to right,
+            rgba(5,7,5,0)
+            35%,
+            rgba(5,7,5,.08)
+            47%,
+            rgba(5,7,5,.35)
+            59%,
+            rgba(5,7,5,.86)
+            74%,
+            #070907
+            100%
+        );
+
+}
+
+
+/* =========================================================
+   PROMO BADGE
+========================================================= */
+
+.promo-badge{
+
+    position:absolute;
+
+    z-index:40;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:9px;
+
+    width:max-content;
+
+    height:38px;
+
+    min-width:110px;
+
+    padding:
+        0 17px;
+
+    border-radius:999px;
+
+    background:
+        linear-gradient(
+            135deg,
+            var(--orange-light),
+            var(--orange) 58%,
+            var(--orange-dark)
+        );
+
+    color:#180A03;
+
+    font-family:
+        var(--font-body);
+
+    font-size:9px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:3.1px;
+
+    white-space:nowrap;
+
+    box-shadow:
+        0 12px 28px
+        rgba(255,122,26,.18);
+
+    pointer-events:none;
+
+}
+
+
+.promo-badge::before{
+
+    content:"";
+
+    width:7px;
+    height:7px;
+
+    flex:0 0 7px;
+
+    border-radius:50%;
+
+    background:#180A03;
+
+}
+
+
+/* =========================================================
+   EXTRA DISCOUNT BADGE
+========================================================= */
+
+.extra-discount-badge{
+
+    position:absolute;
+
+    z-index:39;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:max-content;
+
+    min-width:108px;
+
+    height:28px;
+
+    padding:
+        0 13px;
+
+    border-radius:999px;
+
+    color:#FF9141;
+
+    background:
+        rgba(255,122,26,.085);
+
+    border:
+        1px solid
+        rgba(255,122,26,.38);
+
+    font-size:8px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:1.9px;
+
+    white-space:nowrap;
+
+}
+
+
+/* =========================================================
+   RATIO — BADGE POSITIONS
+========================================================= */
+
+.stage.ratio-916
+.promo-badge{
+
+    top:
+        calc(57% + 12px);
+
+    left:8%;
+
+}
+
+
+.stage.ratio-916
+.extra-discount-badge{
+
+    top:
+        calc(57% + 57px);
+
+    left:8%;
+
+}
+
+
+.stage.ratio-45
+.promo-badge{
+
+    top:
+        calc(61% + 12px);
+
+    left:7%;
+
+}
+
+
+.stage.ratio-45
+.extra-discount-badge{
+
+    top:
+        calc(61% + 57px);
+
+    left:7%;
+
+}
+
+
+.stage.ratio-169
+.promo-badge{
+
+    top:8%;
+
+    left:61%;
+
+}
+
+
+.stage.ratio-169
+.extra-discount-badge{
+
+    top:
+        calc(8% + 48px);
+
+    left:61%;
+
+}
+
+
+/* =========================================================
+   PRODUCT INFO
+========================================================= */
+
+.product-info{
+
+    position:absolute;
+
+    z-index:20;
+
+    min-width:0;
+
+}
+
+
+.stage.ratio-916
+.product-info{
+
+    top:
+        calc(57% + 72px);
+
+    left:8%;
+    right:7%;
+
+}
+
+
+.stage.ratio-45
+.product-info{
+
+    top:
+        calc(61% + 72px);
+
+    left:7%;
+    right:7%;
+
+}
+
+
+.stage.ratio-169
+.product-info{
+
+    top:
+        calc(8% + 82px);
+
+    left:61%;
+
+    right:5%;
+
+}
+
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.product-brand{
+
+    margin:0;
+
+    color:var(--lime);
+
+    font-family:
+        var(--font-body);
+
+    font-size:
+        clamp(9px,1.15vw,13px);
+
+    line-height:1.1;
+
+    font-weight:800;
+
+    letter-spacing:
+        clamp(2.4px,.45vw,4px);
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+/* =========================================================
+   PRODUCT TITLE
+========================================================= */
+
+.product-name{
+
+    margin:
+        9px
+        0
+        0;
+
+    color:#fff;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        clamp(29px,4.1vw,54px);
+
+    line-height:
+        .98;
+
+    font-weight:800;
+
+    letter-spacing:
+        -.9px;
+
+    max-width:
+        920px;
+
+    display:
+        -webkit-box;
+
+    -webkit-box-orient:
+        vertical;
+
+    -webkit-line-clamp:
+        2;
+
+    overflow:hidden;
+
+    text-wrap:balance;
+
+}
+
+
+/* 9:16 */
+
+.stage.ratio-916
+.product-name{
+
+    font-size:
+        clamp(
+            29px,
+            7vw,
+            43px
+        );
+
+    line-height:.99;
+
+    letter-spacing:
+        -.75px;
+
+    max-width:94%;
+
+}
+
+
+/* 4:5 */
+
+.stage.ratio-45
+.product-name{
+
+    font-size:
+        clamp(
+            31px,
+            5.6vw,
+            48px
+        );
+
+    line-height:
+        1;
+
+    letter-spacing:
+        -.85px;
+
+    max-width:93%;
+
+}
+
+
+/* 16:9 */
+
+.stage.ratio-169
+.product-name{
+
+    font-size:
+        clamp(
+            22px,
+            3vw,
+            39px
+        );
+
+    line-height:
+        1.02;
+
+    letter-spacing:
+        -.7px;
+
+    max-width:94%;
+
+}
+
+
+/* =========================================================
+   PRICE
+========================================================= */
+
+.price-block{
+
+    margin-top:20px;
+
+}
+
+
+.price-label{
+
+    margin-bottom:7px;
+
+    color:
+        #7F887E;
+
+    font-size:
+        clamp(9px,1vw,12px);
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:
+        3px;
+
+    text-transform:uppercase;
+
+}
+
+
+.price-promo{
+
+    color:#fff;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        clamp(37px,5vw,64px);
+
+    line-height:
+        .94;
+
+    font-weight:800;
+
+    letter-spacing:
+        -1.8px;
+
+    white-space:nowrap;
+
+}
+
+
+/* 9:16 */
+
+.stage.ratio-916
+.price-promo{
+
+    font-size:
+        clamp(
+            37px,
+            8.5vw,
+            52px
+        );
+
+}
+
+
+/* 4:5 */
+
+.stage.ratio-45
+.price-promo{
+
+    font-size:
+        clamp(
+            39px,
+            7vw,
+            58px
+        );
+
+}
+
+
+/* 16:9 */
+
+.stage.ratio-169
+.price-promo{
+
+    font-size:
+        clamp(
+            28px,
+            4.8vw,
+            47px
+        );
+
+}
+
+
+/* =========================================================
+   PRICE META
+========================================================= */
+
+.price-meta{
+
+    display:flex;
+
+    align-items:center;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-top:11px;
+
+}
+
+
+.price-normal{
+
+    color:
+        #727A72;
+
+    font-size:
+        clamp(10px,1.1vw,13px);
+
+    line-height:1;
+
+    font-weight:500;
+
+}
+
+
+.price-normal s{
+
+    text-decoration-thickness:1px;
+
+}
+
+
+.discount{
+
+    color:
+        var(--lime);
+
+    font-size:
+        clamp(10px,1.1vw,14px);
+
+    line-height:1;
+
+    font-weight:800;
+
+}
+
+
+.extra-price-note{
+
+    margin-top:10px;
+
+    color:
+        var(--orange-light);
+
+    font-size:
+        clamp(9px,1vw,12px);
+
+    line-height:1.15;
+
+    font-weight:800;
+
+    letter-spacing:1.3px;
+
+    text-transform:uppercase;
+
+}
+
+
+/* =========================================================
+   WATERMARK
+========================================================= */
+
+.capture-hide{
+
+    position:absolute;
+
+    right:5%;
+
+    bottom:4%;
+
+    z-index:100;
+
+    color:
+        rgba(190,196,188,.62);
+
+    font-family:
+        var(--font-body);
+
+    font-size:8px;
+
+    font-weight:500;
+
+    letter-spacing:.2px;
+
+}
+
+
+/* =========================================================
+   CONTROL STRIP
+========================================================= */
+
+.control-strip{
+
+    margin-top:12px;
+
+    padding:
+        15px;
+
+    display:grid;
+
+    grid-template-columns:
+        1.35fr
+        1fr;
+
+    gap:14px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(16,22,17,.95),
+            rgba(8,11,9,.96)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:22px;
+
+}
+
+
+/* =========================================================
+   RATIO GROUP
+========================================================= */
+
+.ratio-group{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,minmax(0,1fr));
+
+    gap:10px;
+
+}
+
+
+.ratio-caption{
+
+    grid-column:
+        1 / -1;
+
+    color:
+        #727B72;
+
+    font-size:9px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:1.8px;
+
+    text-transform:uppercase;
+
+}
+
+
+.ratio-btn{
+
+    min-width:0;
+
+    min-height:62px;
+
+    padding:
+        10px 12px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    color:
+        #A6ADA5;
+
+    background:
+        rgba(3,6,4,.75);
+
+    border:
+        1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:17px;
+
+    transition:
+        border-color .18s ease,
+        background .18s ease,
+        color .18s ease,
+        transform .18s ease;
+
+}
+
+
+.ratio-btn:hover{
+
+    transform:
+        translateY(-1px);
+
+    border-color:
+        rgba(140,198,63,.28);
+
+}
+
+
+.ratio-btn.active{
+
+    color:
+        var(--lime);
+
+    background:
+        rgba(140,198,63,.08);
+
+    border-color:
+        rgba(140,198,63,.72);
+
+    box-shadow:
+        inset 0 0 30px
+        rgba(140,198,63,.045);
+
+}
+
+
+.ratio-icon{
+
+    width:13px;
+    height:21px;
+
+    border:
+        2px solid currentColor;
+
+    border-radius:3px;
+
+    flex:0 0 auto;
+
+}
+
+
+.ratio-btn[data-ratio="45"]
+.ratio-icon{
+
+    width:17px;
+    height:21px;
+
+}
+
+
+.ratio-btn[data-ratio="169"]
+.ratio-icon{
+
+    width:24px;
+    height:14px;
+
+}
+
+
+.ratio-text{
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+    gap:2px;
+
+}
+
+
+.ratio-value{
+
+    font-size:13px;
+
+    line-height:1;
+
+    font-weight:800;
+
+}
+
+
+.ratio-use{
+
+    color:
+        #687067;
+
+    font-size:8px;
+
+    line-height:1;
+
+    font-weight:600;
+
+}
+
+
+.ratio-btn.active
+.ratio-use{
+
+    color:
+        rgba(140,198,63,.78);
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+.navigation{
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(3,1fr)
+        auto;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+
+.nav-btn{
+
+    min-width:58px;
+
+    height:62px;
+
+    display:grid;
+
+    place-items:center;
+
+    color:#fff;
+
+    background:
+        rgba(3,6,4,.78);
+
+    border:
+        1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:17px;
+
+}
+
+
+.nav-btn:hover{
+
+    border-color:
+        rgba(140,198,63,.35);
+
+}
+
+
+.nav-btn svg{
+
+    width:22px;
+    height:22px;
+
+}
+
+
+.slide-count{
+
+    min-width:50px;
+
+    color:#8D958D;
+
+    text-align:center;
+
+    font-size:12px;
+
+    font-weight:800;
+
+}
+
+
+/* =========================================================
+   DOWNLOAD
+========================================================= */
+
+.download-btn{
+
+    min-height:62px;
+
+    padding:
+        0 22px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:11px;
+
+    color:#0D1409;
+
+    background:
+        linear-gradient(
+            135deg,
+            #8CC63F,
+            #99D84A
+        );
+
+    border-radius:17px;
+
+    font-size:12px;
+
+    font-weight:800;
+
+    letter-spacing:.35px;
+
+    transition:
+        transform .18s ease,
+        filter .18s ease,
+        opacity .18s ease;
+
+}
+
+
+.download-btn:hover{
+
+    transform:
+        translateY(-1px);
+
+    filter:
+        brightness(1.05);
+
+}
+
+
+.download-btn:disabled{
+
+    opacity:.65;
+
+    cursor:wait;
+
+}
+
+
+.download-btn svg{
+
+    width:20px;
+    height:20px;
+
+    flex:0 0 auto;
+
+}
+
+
+/* =========================================================
+   DOWNLOAD SPINNER
+========================================================= */
+
+.download-spinner{
+
+    width:18px;
+    height:18px;
+
+    border:
+        2px solid
+        rgba(13,20,9,.22);
+
+    border-top-color:
+        #0D1409;
+
+    border-radius:50%;
+
+    animation:
+        spin .75s linear infinite;
+
+}
+
+
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   PROMO MANAGER
+========================================================= */
+
+.manager{
+
+    margin-top:12px;
+
+    padding:
+        28px;
+
+    background:
+        linear-gradient(
+            145deg,
+            rgba(8,14,9,.98),
+            rgba(6,10,7,.98)
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:
+        24px;
+
+}
+
+
+.section-label{
+
+    color:
+        var(--lime);
+
+    font-size:11px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:3.4px;
+
+    text-transform:uppercase;
+
+}
+
+
+.manager-heading{
+
+    margin-top:10px;
+
+    display:flex;
+
+    align-items:flex-end;
+
+    justify-content:space-between;
+
+    gap:20px;
+
+}
+
+
+.manager-title{
+
+    margin:0;
+
+    color:#fff;
+
+    font-family:
+        var(--font-display);
+
+    font-size:
+        clamp(25px,3vw,38px);
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:-1px;
+
+}
+
+
+.manager-summary{
+
+    color:
+        #7D857D;
+
+    font-size:12px;
+
+    font-weight:600;
+
+    white-space:nowrap;
+
+}
+
+
+.manager-summary strong{
+
+    color:
+        var(--lime);
+
+}
+
+
+/* =========================================================
+   TOOLBAR
+========================================================= */
+
+.manager-toolbar{
+
+    margin-top:22px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(6,minmax(0,1fr));
+
+    gap:10px;
+
+}
+
+
+.tool-btn{
+
+    min-height:48px;
+
+    padding:
+        0 15px;
+
+    color:#E6EAE5;
+
+    background:
+        #080C09;
+
+    border:
+        1px solid
+        rgba(255,255,255,.085);
+
+    border-radius:14px;
+
+    font-size:11px;
+
+    font-weight:700;
+
+}
+
+
+.tool-btn:hover{
+
+    border-color:
+        rgba(140,198,63,.35);
+
+}
+
+
+.tool-btn.primary{
+
+    color:#0D1409;
+
+    background:
+        var(--lime);
+
+    border-color:
+        var(--lime);
+
+}
+
+
+.tool-btn.primary:hover{
+
+    background:
+        var(--lime-bright);
+
+}
+
+
+/* =========================================================
+   SEARCH
+========================================================= */
+
+.search-row{
+
+    margin-top:12px;
+
+}
+
+
+.search{
+
+    width:100%;
+
+    height:48px;
+
+    padding:
+        0 16px;
+
+    color:#fff;
+
+    outline:none;
+
+    background:
+        #080C09;
+
+    border:
+        1px solid
+        rgba(255,255,255,.085);
+
+    border-radius:14px;
+
+    font-size:12px;
+
+    transition:
+        border-color .15s ease,
+        box-shadow .15s ease;
+
+}
+
+
+.search::placeholder{
+
+    color:#5F675F;
+
+}
+
+
+.search:focus{
+
+    border-color:
+        rgba(140,198,63,.55);
+
+    box-shadow:
+        0 0 0 3px
+        rgba(140,198,63,.07);
+
+}
+
+
+/* =========================================================
+   PRODUCT GRID
+========================================================= */
+
+.product-grid{
+
+    margin-top:14px;
+
+    display:grid;
+
+    grid-template-columns:
+        repeat(5,minmax(0,1fr));
+
+    gap:10px;
+
+}
+
+
+/* =========================================================
+   SELECT CARD
+========================================================= */
+
+.select-card{
+
+    position:relative;
+
+    min-width:0;
+
+    min-height:275px;
+
+    overflow:hidden;
+
+    background:
+        linear-gradient(
+            145deg,
+            #0B100C,
+            #070A08
+        );
+
+    border:
+        1px solid
+        rgba(255,255,255,.075);
+
+    border-radius:16px;
+
+    cursor:pointer;
+
+    transition:
+        border-color .18s ease,
+        transform .18s ease,
+        box-shadow .18s ease;
+
+}
+
+
+.select-card:hover{
+
+    transform:
+        translateY(-2px);
+
+    border-color:
+        rgba(140,198,63,.3);
+
+}
+
+
+.select-card.selected{
+
+    border-color:
+        rgba(140,198,63,.75);
+
+    box-shadow:
+        0 0 0 1px
+        rgba(140,198,63,.16);
+
+}
+
+
+/* =========================================================
+   CARD IMAGE
+========================================================= */
+
+.select-image{
+
+    position:absolute;
+
+    top:0;
+    left:0;
+    right:0;
+
+    height:145px;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    overflow:hidden;
+
+    background:#060806;
+
+}
+
+
+.select-image img{
+
+    width:100%;
+    height:100%;
+
+    padding:9px;
+
+    object-fit:contain;
+
+}
+
+
+.select-image::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:
+        linear-gradient(
+            to bottom,
+            transparent 40%,
+            #090D0A 100%
+        );
+
+}
+
+
+/* =========================================================
+   CHECK
+========================================================= */
+
+.check{
+
+    position:absolute;
+
+    z-index:20;
+
+    top:9px;
+    left:9px;
+
+    width:21px;
+    height:21px;
+
+    display:grid;
+
+    place-items:center;
+
+    color:transparent;
+
+    background:
+        rgba(0,0,0,.65);
+
+    border:
+        1px solid
+        rgba(255,255,255,.17);
+
+    border-radius:6px;
+
+}
+
+
+.select-card.selected
+.check{
+
+    color:#0D1409;
+
+    background:
+        var(--lime);
+
+    border-color:
+        var(--lime);
+
+}
+
+
+.check svg{
+
+    width:13px;
+    height:13px;
+
+}
+
+
+/* =========================================================
+   EDIT BUTTON
+========================================================= */
+
+.edit-price-btn{
+
+    position:absolute;
+
+    z-index:25;
+
+    top:8px;
+    right:8px;
+
+    width:30px;
+    height:30px;
+
+    display:grid;
+
+    place-items:center;
+
+    color:#fff;
+
+    background:
+        rgba(0,0,0,.68);
+
+    border:
+        1px solid
+        rgba(255,255,255,.13);
+
+    border-radius:9px;
+
+}
+
+
+.edit-price-btn:hover{
+
+    color:
+        var(--lime);
+
+    border-color:
+        var(--lime);
+
+}
+
+
+.edit-price-btn svg{
+
+    width:14px;
+    height:14px;
+
+}
+
+
+/* =========================================================
+   CARD INFO
+========================================================= */
+
+.select-info{
+
+    position:absolute;
+
+    z-index:10;
+
+    left:12px;
+    right:12px;
+    bottom:12px;
+
+    min-width:0;
+
+}
+
+
+.select-brand{
+
+    color:
+        var(--lime);
+
+    font-size:7px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    letter-spacing:1.7px;
+
+    text-transform:uppercase;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+.select-name{
+
+    margin-top:6px;
+
+    color:#fff;
+
+    font-family:
+        var(--font-body);
+
+    font-size:11px;
+
+    line-height:1.25;
+
+    font-weight:700;
+
+    display:
+        -webkit-box;
+
+    -webkit-box-orient:
+        vertical;
+
+    -webkit-line-clamp:
+        2;
+
+    overflow:hidden;
+
+}
+
+
+.select-price{
+
+    margin-top:7px;
+
+    color:#fff;
+
+    font-size:12px;
+
+    line-height:1;
+
+    font-weight:800;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
+
+}
+
+
+.select-old{
+
+    margin-left:5px;
+
+    color:#697069;
+
+    font-size:8px;
+
+    font-weight:500;
+
+}
+
+
+.select-discount{
+
+    margin-left:6px;
+
+    color:
+        var(--lime);
+
+    font-size:8px;
+
+    font-weight:800;
+
+}
+
+
+/* =========================================================
+   PRICE EDITOR
+========================================================= */
+
+.price-editor{
+
+    display:none;
+
+    position:absolute;
+
+    z-index:50;
+
+    inset:10px;
+
+    padding:12px;
+
+    overflow:auto;
+
+    background:
+        rgba(5,8,6,.98);
+
+    border:
+        1px solid
+        rgba(140,198,63,.38);
+
+    border-radius:13px;
+
+}
+
+
+.select-card.editing
+.price-editor{
+
+    display:block;
+
+}
+
+
+.price-editor-title{
+
+    margin-bottom:10px;
+
+    color:#fff;
+
+    font-size:11px;
+
+    font-weight:800;
+
+}
+
+
+.price-field{
+
+    margin-bottom:8px;
+
+}
+
+
+.price-field label{
+
+    display:block;
+
+    margin-bottom:4px;
+
+    color:#737C73;
+
+    font-size:8px;
+
+    font-weight:700;
+
+    letter-spacing:1px;
+
+    text-transform:uppercase;
+
+}
+
+
+.price-field input{
+
+    width:100%;
+
+    height:32px;
+
+    padding:0 9px;
+
+    color:#fff;
+
+    outline:none;
+
+    background:#090D0A;
+
+    border:
+        1px solid
+        rgba(255,255,255,.1);
+
+    border-radius:8px;
+
+    font-size:10px;
+
+}
+
+
+.price-field input:focus{
+
+    border-color:
+        rgba(140,198,63,.55);
+
+}
+
+
+.price-check{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:7px;
+
+    margin:
+        8px
+        0;
+
+    color:#C6CCC4;
+
+    font-size:8px;
+
+    font-weight:600;
+
+}
+
+
+.price-check input{
+
+    accent-color:
+        var(--lime);
+
+}
+
+
+.calculated-final{
+
+    margin:
+        8px
+        0;
+
+    padding:
+        8px;
+
+    color:
+        var(--lime);
+
+    background:
+        rgba(140,198,63,.06);
+
+    border:
+        1px solid
+        rgba(140,198,63,.14);
+
+    border-radius:8px;
+
+    font-size:9px;
+
+    font-weight:800;
+
+}
+
+
+.price-save-btn,
+.price-reset-btn{
+
+    width:100%;
+
+    height:31px;
+
+    margin-top:5px;
+
+    border-radius:8px;
+
+    font-size:8px;
+
+    font-weight:800;
+
+}
+
+
+.price-save-btn{
+
+    color:#0D1409;
+
+    background:
+        var(--lime);
+
+}
+
+
+.price-reset-btn{
+
+    color:#B5BBB4;
+
+    background:
+        #101510;
+
+    border:
+        1px solid
+        rgba(255,255,255,.08);
+
+}
+
+
+/* =========================================================
+   MANAGER FOOTER
+========================================================= */
+
+.manager-footer{
+
+    margin-top:17px;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    color:#747C74;
+
+    font-size:11px;
+
+    font-weight:600;
+
+}
+
+
+.manager-footer strong{
+
+    color:
+        var(--lime);
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
+.error{
+
+    width:100%;
+
+    padding:35px;
+
+    color:#FF9A9A;
+
+    background:
+        rgba(50,8,8,.38);
+
+    border:
+        1px solid
+        rgba(255,80,80,.22);
+
+    border-radius:18px;
+
+    font-size:14px;
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+.toast{
+
+    position:fixed;
+
+    z-index:2000;
+
+    left:50%;
+
+    bottom:22px;
+
+    transform:
+        translate(-50%,20px);
+
+    padding:
+        11px
+        17px;
+
+    color:#0D1409;
+
+    background:
+        var(--lime);
+
+    border-radius:999px;
+
+    font-size:11px;
+
+    font-weight:800;
+
+    opacity:0;
+
+    pointer-events:none;
+
+    transition:
+        opacity .2s ease,
+        transform .2s ease;
+
+}
+
+
+.toast.show{
+
+    opacity:1;
+
+    transform:
+        translate(-50%,0);
+
+}
+
+
+/* =========================================================
+   CAPTURE MODE
+========================================================= */
+
+.capture-mode{
+
+    background:#070907 !important;
+
+}
+
+
+.capture-mode
+.product-image{
+
+    opacity:1 !important;
+
+    filter:none !important;
+
+    transform:none !important;
+
+}
+
+
+.capture-mode
+.visual-gradient{
+
+    opacity:1;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — TABLET
+========================================================= */
+
+@media(max-width:900px){
+
+    main{
+
+        padding:
+            14px
+            14px
+            80px;
+
+    }
+
+
+    .control-strip{
+
+        grid-template-columns:
+            1fr;
+
+    }
+
+
+    .product-grid{
+
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+
+    }
+
+
+    .manager-toolbar{
+
+        grid-template-columns:
+            repeat(3,minmax(0,1fr));
+
+    }
+
+}
+
+
+/* =========================================================
+   RESPONSIVE — PHONE
+========================================================= */
+
+@media(max-width:600px){
+
+    .topbar{
+
+        min-height:74px;
+
+        padding:
+            14px
+            16px;
+
+        gap:12px;
+
+    }
+
+
+    .brand-name{
+
+        font-size:24px;
+
+        letter-spacing:-.9px;
+
+    }
+
+
+    .brand-sub{
+
+        margin-top:6px;
+
+        font-size:9px;
+
+        letter-spacing:.35px;
+
+    }
+
+
+    .header-actions{
+
+        gap:8px;
+
+    }
+
+
+    .header-btn{
+
+        width:50px;
+        height:50px;
+
+        border-radius:15px;
+
+    }
+
+
+    main{
+
+        padding:
+            12px
+            12px
+            70px;
+
+    }
+
+
+    /* ==============================================
+       9:16
+    ============================================== */
+
+    .stage.ratio-916
+    .promo-badge{
+
+        top:
+            calc(57% + 9px);
+
+        left:8%;
+
+        height:34px;
+
+        min-width:99px;
+
+        padding:
+            0 13px;
+
+        font-size:8px;
+
+        letter-spacing:2.6px;
+
+    }
+
+
+    .stage.ratio-916
+    .extra-discount-badge{
+
+        top:
+            calc(57% + 50px);
+
+        left:8%;
+
+        height:25px;
+
+        min-width:95px;
+
+        font-size:7px;
+
+        letter-spacing:1.5px;
+
+    }
+
+
+    .stage.ratio-916
+    .product-info{
+
+        top:
+            calc(57% + 85px);
+
+        left:8%;
+
+        right:7%;
+
+    }
+
+
+    .stage.ratio-916
+    .product-name{
+
+        margin-top:8px;
+
+        font-size:
+            clamp(
+                27px,
+                7.4vw,
+                39px
+            );
+
+        letter-spacing:
+            -.7px;
+
+    }
+
+
+    .stage.ratio-916
+    .price-block{
+
+        margin-top:17px;
+
+    }
+
+
+    .stage.ratio-916
+    .price-promo{
+
+        font-size:
+            clamp(
+                36px,
+                9vw,
+                48px
+            );
+
+    }
+
+
+    /* ==============================================
+       4:5
+    ============================================== */
+
+    .stage.ratio-45
+    .promo-badge{
+
+        top:
+            calc(61% + 9px);
+
+        left:7%;
+
+        height:34px;
+
+        min-width:99px;
+
+        font-size:8px;
+
+        letter-spacing:2.6px;
+
+    }
+
+
+    .stage.ratio-45
+    .extra-discount-badge{
+
+        top:
+            calc(61% + 50px);
+
+        left:7%;
+
+        height:25px;
+
+        min-width:95px;
+
+        font-size:7px;
+
+    }
+
+
+    .stage.ratio-45
+    .product-info{
+
+        top:
+            calc(61% + 85px);
+
+        left:7%;
+
+        right:7%;
+
+    }
+
+
+    .stage.ratio-45
+    .product-name{
+
+        font-size:
+            clamp(
+                27px,
+                6.7vw,
+                43px
+            );
+
+    }
+
+
+    .stage.ratio-45
+    .price-promo{
+
+        font-size:
+            clamp(
+                36px,
+                8vw,
+                49px
+            );
+
+    }
+
+
+    /* ==============================================
+       16:9
+    ============================================== */
+
+    .stage.ratio-169
+    .product-visual{
+
+        width:58%;
+
+    }
+
+
+    .stage.ratio-169
+    .promo-badge{
+
+        top:8%;
+
+        left:61%;
+
+        height:29px;
+
+        min-width:86px;
+
+        padding:
+            0 10px;
+
+        font-size:6.3px;
+
+        letter-spacing:2px;
+
+    }
+
+
+    .stage.ratio-169
+    .extra-discount-badge{
+
+        top:
+            calc(8% + 39px);
+
+        left:61%;
+
+        height:22px;
+
+        min-width:80px;
+
+        font-size:5.6px;
+
+        letter-spacing:1.1px;
+
+    }
+
+
+    .stage.ratio-169
+    .product-info{
+
+        top:
+            calc(8% + 69px);
+
+        left:61%;
+
+        right:4.5%;
+
+    }
+
+
+    .stage.ratio-169
+    .product-name{
+
+        font-size:
+            clamp(
+                17px,
+                4.7vw,
+                27px
+            );
+
+        letter-spacing:
+            -.45px;
+
+    }
+
+
+    .stage.ratio-169
+    .price-block{
+
+        margin-top:14px;
+
+    }
+
+
+    .stage.ratio-169
+    .price-promo{
+
+        font-size:
+            clamp(
+                23px,
+                6vw,
+                35px
+            );
+
+    }
+
+
+    /* ==============================================
+       CONTROLS
+    ============================================== */
+
+    .control-strip{
+
+        padding:12px;
+
+        border-radius:20px;
+
+    }
+
+
+    .ratio-group{
+
+        gap:7px;
+
+    }
+
+
+    .ratio-btn{
+
+        min-height:55px;
+
+        padding:
+            8px;
+
+        gap:7px;
+
+        border-radius:15px;
+
+    }
+
+
+    .ratio-value{
+
+        font-size:11px;
+
+    }
+
+
+    .ratio-use{
+
+        display:none;
+
+    }
+
+
+    .navigation{
+
+        gap:7px;
+
+    }
+
+
+    .nav-btn{
+
+        height:55px;
+
+        min-width:0;
+
+    }
+
+
+    .download-btn{
+
+        min-height:58px;
+
+    }
+
+
+    /* ==============================================
+       MANAGER
+    ============================================== */
+
+    .manager{
+
+        padding:
+            21px
+            14px
+            17px;
+
+        border-radius:21px;
+
+    }
+
+
+    .manager-heading{
+
+        display:block;
+
+    }
+
+
+    .manager-title{
+
+        font-size:
+            clamp(
+                24px,
+                7vw,
+                32px
+            );
+
+        line-height:
+            1.02;
+
+    }
+
+
+    .manager-summary{
+
+        margin-top:9px;
+
+        white-space:normal;
+
+    }
+
+
+    .manager-toolbar{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+    }
+
+
+    .tool-btn{
+
+        min-height:46px;
+
+        padding:0 9px;
+
+        font-size:10px;
+
+    }
+
+
+    .product-grid{
+
+        grid-template-columns:
+            repeat(2,minmax(0,1fr));
+
+        gap:8px;
+
+    }
+
+
+    .select-card{
+
+        min-height:260px;
+
+    }
+
+
+    .select-image{
+
+        height:132px;
+
+    }
+
+
+    .manager-footer{
+
+        display:block;
+
+        line-height:1.5;
+
+    }
+
+
+    .manager-footer > div + div{
+
+        margin-top:4px;
+
+    }
+
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+========================================================= */
+
+@media(max-width:380px){
+
+    .brand-name{
+
+        font-size:21px;
+
+    }
+
+
+    .brand-sub{
+
+        font-size:8px;
+
+    }
+
+
+    .header-btn{
+
+        width:45px;
+        height:45px;
+
+    }
+
+
+    .stage.ratio-916
+    .product-info{
+
+        top:
+            calc(57% + 82px);
+
+    }
+
+
+    .stage.ratio-45
+    .product-info{
+
+        top:
+            calc(61% + 82px);
+
+    }
+
+
+    .stage.ratio-916
+    .product-name{
+
+        font-size:26px;
+
+    }
+
+
+    .stage.ratio-45
+    .product-name{
+
+        font-size:26px;
+
+    }
+
+
+    .stage.ratio-916
+    .price-promo{
+
+        font-size:35px;
+
+    }
+
+
+    .stage.ratio-45
+    .price-promo{
+
+        font-size:35px;
+
+    }
+
+}
+
+
+/* =========================================================
+   LANDSCAPE PHONE
+========================================================= */
+
+@media(
+    max-width:900px
+) and (
+    orientation:landscape
+){
+
+    .stage.ratio-169
+    .promo-canvas{
+
+        max-height:
+            calc(100vh - 150px);
+
+    }
+
+}
+
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+    *,
+    *::before,
+    *::after{
+
+        animation:none !important;
+
+        transition:none !important;
+
+    }
+
+}
+
+
+/* =========================================================
+   PRINT
+========================================================= */
+
+@media print{
+
+    .topbar,
+    .control-strip,
+    .manager,
+    .toast{
+
+        display:none !important;
+
+    }
+
+    main{
+
+        padding:0;
+
+    }
+
+    .promo-canvas{
+
+        box-shadow:none;
+
+    }
+
+}
+
+</style>
+
+</head>
+
+
+<body>
+
+
+<!-- ======================================================
+     HEADER
+====================================================== -->
+
+<header class="topbar">
+
+    <div class="header-brand">
+
+        <div class="brand-name">
+            Imam_salesfr
+        </div>
+
+        <div class="brand-sub">
+            Sales Representative • nine autoseries
+        </div>
+
+    </div>
+
+
+    <div class="header-actions">
+
+        <button
+            type="button"
+            class="header-btn"
+            id="headerPlay"
+            title="Play / Pause"
+        >
+
+            <svg
+                id="headerPlayIcon"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+            >
+
+                <path d="M7 5h4v14H7z"/>
+                <path d="M13 5h4v14h-4z"/>
+
+            </svg>
+
+        </button>
+
+
+        <button
+            type="button"
+            class="header-btn primary"
+            id="fullscreenBtn"
+            title="Fullscreen"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+
+                <path d="M8 3H3v5"/>
+                <path d="M16 3h5v5"/>
+                <path d="M21 16v5h-5"/>
+                <path d="M3 16v5h5"/>
+
+            </svg>
+
+        </button>
+
+    </div>
+
+</header>
+
+
+<!-- ======================================================
+     MAIN
+====================================================== -->
+
+<main>
+
+<div class="container">
+
+
+<!-- ======================================================
+     PREVIEW
+====================================================== -->
+
+<section class="preview-wrap">
+
+    <div
+        class="stage ratio-916"
+        id="stage"
+    ></div>
+
+
+    <div
+        class="control-strip"
+        id="controlStrip"
+    >
+
+
+        <!-- RATIO -->
+
+        <div class="ratio-group">
+
+            <div class="ratio-caption">
+                Pilih Rasio
+            </div>
+
+
+            <button
+                type="button"
+                class="ratio-btn active"
+                data-ratio="916"
+            >
+
+                <span class="ratio-icon"></span>
+
+                <span class="ratio-text">
+
+                    <span class="ratio-value">
+                        9:16
+                    </span>
+
+                    <span class="ratio-use">
+                        Story
+                    </span>
+
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="ratio-btn"
+                data-ratio="45"
+            >
+
+                <span class="ratio-icon"></span>
+
+                <span class="ratio-text">
+
+                    <span class="ratio-value">
+                        4:5
+                    </span>
+
+                    <span class="ratio-use">
+                        Feed
+                    </span>
+
+                </span>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="ratio-btn"
+                data-ratio="169"
+            >
+
+                <span class="ratio-icon"></span>
+
+                <span class="ratio-text">
+
+                    <span class="ratio-value">
+                        16:9
+                    </span>
+
+                    <span class="ratio-use">
+                        Landscape
+                    </span>
+
+                </span>
+
+            </button>
+
+        </div>
+
+
+        <!-- NAVIGATION -->
+
+        <div class="navigation">
+
+            <button
+                type="button"
+                class="nav-btn"
+                id="prevBtn"
+                title="Sebelumnya"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                >
+
+                    <path d="m15 18-6-6 6-6"/>
+
+                </svg>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-btn"
+                id="playBtn"
+                title="Play / Pause"
+            >
+
+                <svg
+                    id="playIcon"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                >
+
+                    <path d="M7 5h4v14H7z"/>
+                    <path d="M13 5h4v14h-4z"/>
+
+                </svg>
+
+            </button>
+
+
+            <button
+                type="button"
+                class="nav-btn"
+                id="nextBtn"
+                title="Berikutnya"
+            >
+
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.2"
+                >
+
+                    <path d="m9 18 6-6-6-6"/>
+
+                </svg>
+
+            </button>
+
+
+            <div
+                class="slide-count"
+                id="slideCount"
+            >
+                0 / 0
+            </div>
+
+        </div>
+
+
+        <!-- DOWNLOAD -->
+
+        <button
+            type="button"
+            class="download-btn"
+            id="downloadBtn"
+        >
+
+            <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+            >
+
+                <path d="M12 3v12"/>
+                <path d="m7 10 5 5 5-5"/>
+                <path d="M5 21h14"/>
+
+            </svg>
+
+            DOWNLOAD STATUS
+
+        </button>
+
+
+    </div>
+
+</section>
+
+
+<!-- ======================================================
+     PROMO MANAGER
+====================================================== -->
+
+<section class="manager">
+
+
+    <div class="section-label">
+        Promo Manager
+    </div>
+
+
+    <div class="manager-heading">
+
+        <h1 class="manager-title">
+            Pilih produk yang masuk promo
+        </h1>
+
+
+        <div class="manager-summary">
+
+            <strong id="selectedCount">
+                0
+            </strong>
+
+            produk dipilih
+
+            &nbsp; • &nbsp;
+
+            Total:
+
+            <span id="totalCount">
+                0
+            </span>
+
+            produk
+
+        </div>
+
+    </div>
+
+
+    <div class="manager-toolbar">
+
+        <button
+            type="button"
+            class="tool-btn primary"
+            id="selectAll"
+        >
+            Pilih Semua
+        </button>
+
+
+        <button
+            type="button"
+            class="tool-btn"
+            id="clearAll"
+        >
+            Bersihkan
+        </button>
+
+
+        <button
+            type="button"
+            class="tool-btn primary"
+            id="applyPromo"
+        >
+            Terapkan Promo
+        </button>
+
+
+        <button
+            type="button"
+            class="tool-btn"
+            id="saveConfig"
+        >
+            Simpan
+        </button>
+
+
+        <button
+            type="button"
+            class="tool-btn"
+            id="restoreConfig"
+        >
+            Pulihkan
+        </button>
+
+
+        <button
+            type="button"
+            class="tool-btn"
+            id="downloadJSON"
+        >
+            Download JSON
+        </button>
+
+    </div>
+
+
+    <div class="search-row">
+
+        <input
+            id="search"
+            class="search"
+            type="search"
+            placeholder="Cari produk..."
+            autocomplete="off"
+            spellcheck="false"
+        >
+
+    </div>
+
+
+    <div
+        class="product-grid"
+        id="productGrid"
+    ></div>
+
+
+    <div class="manager-footer">
+
+        <div>
+
+            <strong id="footerSelected">
+                0
+            </strong>
+
+            produk dipilih
+
+        </div>
+
+
+        <div>
+
+            Total:
+
+            <strong id="footerTotal">
+                0
+            </strong>
+
+            produk
+
+        </div>
+
+    </div>
+
+</section>
+
+
+</div>
+
+</main>
+
+
+<div
+    class="toast"
+    id="toast"
+></div>
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+========================================================= */
+
+const CONFIG = {
+
+    JSON:
+        "produk.json",
+
+    IMAGE_FOLDER:
+        "images/produk/",
+
+    DURATION:
+        8500,
+
+    TRANSITION:
+        850
+
+};
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+const STORAGE = {
+
+    SELECTION:
+        "promoSelection",
+
+    RATIO:
+        "promoRatio",
+
+    PRICES:
+        "promoPriceOverrides"
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+let products = [];
+
+let selectedIds = [];
+
+let promoProducts = [];
+
+let currentIndex = 0;
+
+let currentRatio =
+    localStorage.getItem(
+        STORAGE.RATIO
+    ) || "916";
+
+let playing = true;
+
+let autoplay = null;
+
+let transitionBusy = false;
+
+let downloadBusy = false;
+
+let priceOverrides =
+    loadPriceOverrides();
+
+
+/* =========================================================
+   DOM
+========================================================= */
+
+const stage =
+    document.getElementById(
+        "stage"
+    );
+
+const productGrid =
+    document.getElementById(
+        "productGrid"
+    );
+
+const slideCount =
+    document.getElementById(
+        "slideCount"
+    );
+
+const selectedCount =
+    document.getElementById(
+        "selectedCount"
+    );
+
+const totalCount =
+    document.getElementById(
+        "totalCount"
+    );
+
+const footerSelected =
+    document.getElementById(
+        "footerSelected"
+    );
+
+const footerTotal =
+    document.getElementById(
+        "footerTotal"
+    );
+
+const toast =
+    document.getElementById(
+        "toast"
+    );
+
+const downloadBtn =
+    document.getElementById(
+        "downloadBtn"
+    );
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function escapeHTML(value){
+
+    return String(
+        value ?? ""
+    )
+    .replace(
+        /&/g,
+        "&amp;"
+    )
+    .replace(
+        /</g,
+        "&lt;"
+    )
+    .replace(
+        />/g,
+        "&gt;"
+    )
+    .replace(
+        /"/g,
+        "&quot;"
+    )
+    .replace(
+        /'/g,
+        "&#039;"
+    );
+
+}
+
+
+function escapeAttribute(value){
+
+    return escapeHTML(
+        value
+    );
+
+}
+
+
+function rupiah(value){
+
+    const number =
+        Number(value) || 0;
+
+    return number.toLocaleString(
+        "id-ID",
+        {
+            style:"currency",
+            currency:"IDR",
+            minimumFractionDigits:0,
+            maximumFractionDigits:0
+        }
+    );
+
+}
+
+
+function wait(ms){
+
+    return new Promise(
+        resolve =>
+            setTimeout(
+                resolve,
+                ms
+            )
+    );
+
+}
+
+
+function showToast(message){
+
+    toast.textContent =
+        message;
+
+    toast.classList.add(
+        "show"
+    );
+
+    clearTimeout(
+        showToast.timer
+    );
+
+    showToast.timer =
+        setTimeout(
+            ()=>{
+                toast.classList.remove(
+                    "show"
+                );
+            },
+            2300
+        );
+
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function loadPriceOverrides(){
+
+    try{
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    STORAGE.PRICES
+                ) || "{}"
+            );
+
+        return saved || {};
+
+    }catch{
+
+        return {};
+
+    }
+
+}
+
+
+function savePriceOverrides(){
+
+    localStorage.setItem(
+        STORAGE.PRICES,
+        JSON.stringify(
+            priceOverrides
+        )
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZE PRODUCT
+========================================================= */
+
+function normalizeProduct(
+    raw,
+    index
+){
+
+    const id =
+        String(
+            raw.id ??
+            raw.kode ??
+            raw.sku ??
+            `product-${index}`
+        );
+
+
+    const brand =
+        String(
+            raw.brand ??
+            raw.merek ??
+            "Nine Luximos"
+        )
+        .trim();
+
+
+    const name =
+        String(
+            raw.nama ??
+            raw.name ??
+            raw.judul ??
+            raw.title ??
+            "Produk"
+        )
+        .trim();
+
+
+    const harga =
+        raw.harga || {};
+
+
+    const normal =
+        Number(
+            harga.normal ??
+            raw.hargaNormal ??
+            raw.normal ??
+            0
+        ) || 0;
+
+
+    const promo =
+        Number(
+            harga.promo ??
+            raw.hargaPromo ??
+            raw.promo ??
+            normal
+        ) || normal;
+
+
+    return {
+
+        ...raw,
+
+        id,
+
+        brand,
+
+        nama:name,
+
+        harga:{
+            ...harga,
+
+            normal,
+
+            promo
+
+        }
+
+    };
+
+}
+
+
+/* =========================================================
+   IMAGE PATH
+========================================================= */
+
+function imagePath(
+    product
+){
+
+    const explicit =
+        product.gambar ??
+        product.image ??
+        product.foto ??
+        product.imagePath;
+
+
+    if(explicit){
+
+        if(
+            String(explicit)
+            .startsWith(
+                "http"
+            )
+        ){
+
+            return String(
+                explicit
+            );
+
+        }
+
+
+        if(
+            String(explicit)
+            .startsWith(
+                "/"
+            )
+        ){
+
+            return String(
+                explicit
+            );
+
+        }
+
+
+        return String(
+            explicit
+        );
+
+    }
+
+
+    const filename =
+        product.file ??
+        product.filename ??
+        product.imageName ??
+        product.namaFile;
+
+
+    if(filename){
+
+        return (
+            CONFIG.IMAGE_FOLDER +
+            filename
+        );
+
+    }
+
+
+    return "";
+
+}
+
+
+/* =========================================================
+   DISPLAY TITLE
+========================================================= */
+
+function makeDisplayTitle(
+    product
+){
+
+    let title =
+        String(
+            product.nama ??
+            product.name ??
+            ""
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
+
+
+    const brand =
+        String(
+            product.brand || ""
+        )
+        .trim();
+
+
+    /*
+     * Jangan tampilkan brand dua kali.
+     */
+
+    if(
+        brand &&
+        title
+            .toLowerCase()
+            .startsWith(
+                brand.toLowerCase()
+            )
+    ){
+
+        title =
+            title
+            .slice(
+                brand.length
+            )
+            .replace(
+                /^[-–—:|•\s]+/,
+                ""
+            )
+            .trim();
+
+    }
+
+
+    /*
+     * Rapikan separator aneh.
+     */
+
+    title =
+        title
+        .replace(
+            /\s*[-–—|]+\s*/g,
+            " "
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim();
+
+
+    return title ||
+        "Produk Promo";
+
+}
+
+
+/* =========================================================
+   PRICE DATA
+========================================================= */
+
+function getPriceData(
+    product
+){
+
+    const baseNormal =
+        Number(
+            product.harga.normal
+        ) || 0;
+
+
+    const basePromo =
+        Number(
+            product.harga.promo
+        ) || baseNormal;
+
+
+    const override =
+        priceOverrides[
+            String(product.id)
+        ] || {};
+
+
+    const normal =
+        Number(
+            override.normal ??
+            baseNormal
+        ) || 0;
+
+
+    const promo =
+        Number(
+            override.promo ??
+            basePromo
+        ) || 0;
+
+
+    const extraEnabled =
+        Boolean(
+            override.extraEnabled
+        );
+
+
+    const extraPercent =
+        Math.min(
+            99,
+            Math.max(
+                0,
+                Number(
+                    override.extraPercent
+                ) || 0
+            )
+        );
+
+
+    const manualEnabled =
+        Boolean(
+            override.manualEnabled
+        );
+
+
+    const manualFinal =
+        Number(
+            override.manualFinal
+        ) || 0;
+
+
+    /*
+     * EXTRA DISCOUNT
+     *
+     * Extra dihitung dari harga promo dasar,
+     * bukan dari harga normal.
+     */
+
+    let calculatedFinal =
+        promo;
+
+
+    if(
+        extraEnabled &&
+        extraPercent > 0
+    ){
+
+        calculatedFinal =
+            Math.round(
+                promo *
+                (
+                    1 -
+                    extraPercent / 100
+                )
+            );
+
+    }
+
+
+    /*
+     * Manual final punya prioritas
+     * paling tinggi.
+     */
+
+    const final =
+        manualEnabled &&
+        manualFinal > 0
+
+            ?
+
+            manualFinal
+
+            :
+
+            calculatedFinal;
+
+
+    /*
+     * Diskon normal tetap dihitung
+     * dari normal → promo dasar.
+     *
+     * Jadi user tidak salah mengira
+     * "Hemat 22%" sebagai gabungan
+     * extra discount.
+     */
+
+    const baseDiscount =
+        normal > 0
+
+            ?
+
+            Math.round(
+                (
+                    (normal - promo) /
+                    normal
+                ) * 100
+            )
+
+            :
+
+            0;
+
+
+    return {
+
+        normal,
+
+        promo,
+
+        final,
+
+        extraEnabled,
+
+        extraPercent,
+
+        manualEnabled,
+
+        manualFinal,
+
+        baseDiscount,
+
+        finalDiscount:
+            normal > 0
+                ?
+                Math.round(
+                    (
+                        (normal-final) /
+                        normal
+                    ) * 100
+                )
+                :
+                0
+
+    };
+
+}
+
+
+/* =========================================================
+   LOAD PRODUCTS
+========================================================= */
+
+async function loadProducts(){
+
+    try{
+
+        const response =
+            await fetch(
+                CONFIG.JSON,
+                {
+                    cache:"no-store"
+                }
+            );
+
+
+        if(
+            !response.ok
+        ){
+
+            throw new Error(
+                `HTTP ${response.status}`
+            );
+
+        }
+
+
+        const data =
+            await response.json();
+
+
+        const source =
+            Array.isArray(data)
+
+                ?
+
+                data
+
+                :
+
+                Array.isArray(
+                    data.products
+                )
+
+                    ?
+
+                    data.products
+
+                    :
+
+                    [];
+
+
+        if(
+            !source.length
+        ){
+
+            throw new Error(
+                "produk.json kosong atau format tidak dikenali."
+            );
+
+        }
+
+
+        products =
+            source.map(
+                normalizeProduct
+            );
+
+
+        totalCount.textContent =
+            products.length;
+
+        footerTotal.textContent =
+            products.length;
+
+
+        restoreSelection();
+
+
+        if(
+            !selectedIds.length
+        ){
+
+            selectedIds =
+                products
+                .filter(
+                    product =>
+                        isPromo(
+                            product
+                        )
+                )
+                .map(
+                    product =>
+                        String(
+                            product.id
+                        )
+                );
+
+        }
+
+
+        renderManager();
+
+        applyPromo(
+            false
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "[PROMO]",
+            error
+        );
+
+
+        stage.innerHTML = `
+
+            <div class="error">
+
+                <strong>
+                    Gagal memuat produk.
+                </strong>
+
+                <br><br>
+
+                ${escapeHTML(
+                    error.message
+                )}
+
+                <br><br>
+
+                Pastikan file
+                <strong>produk.json</strong>
+                berada di folder promo.
+
+            </div>
+
+        `;
+
+    }
+
+}
+
+
+/* =========================================================
+   PROMO DETECTOR
+========================================================= */
+
+function isPromo(
+    product
+){
+
+    const value =
+        product.promo ??
+        product.isPromo ??
+        product.promosi ??
+        product.statusPromo ??
+        false;
+
+
+    if(
+        value === true
+    ){
+
+        return true;
+
+    }
+
+
+    if(
+        typeof value === "string"
+    ){
+
+        return [
+            "true",
+            "promo",
+            "yes",
+            "1"
+        ]
+        .includes(
+            value
+            .toLowerCase()
+        );
+
+    }
+
+
+    return false;
+
+}
+
+
+/* =========================================================
+   RESTORE SELECTION
+========================================================= */
+
+function restoreSelection(){
+
+    try{
+
+        const saved =
+            JSON.parse(
+                localStorage.getItem(
+                    STORAGE.SELECTION
+                ) || "[]"
+            );
+
+
+        if(
+            Array.isArray(saved)
+        ){
+
+            selectedIds =
+                saved.map(
+                    value =>
+                        String(value)
+                );
+
+        }
+
+    }catch{
+
+        selectedIds = [];
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE SELECTION
+========================================================= */
+
+function saveSelection(){
+
+    localStorage.setItem(
+        STORAGE.SELECTION,
+        JSON.stringify(
+            selectedIds
+        )
+    );
+
+}
+
+
+/* =========================================================
+   RENDER PREVIEW
+========================================================= */
+
+function renderPreview(
+    restart=true
+){
+
+    if(
+        !promoProducts.length
+    ){
+
+        stage.className =
+            `stage ratio-${currentRatio}`;
+
+
+        stage.innerHTML = `
+
+            <div class="error">
+
+                <strong>
+                    Belum ada produk promo.
+                </strong>
+
+                <br><br>
+
+                Pilih produk,
+                kemudian tekan
+                <strong>
+                    Terapkan Promo
+                </strong>.
+
+            </div>
+
+        `;
+
+
+        stopAutoplay();
+
+        updateSlideCount();
+
+        return;
+
+    }
+
+
+    if(
+        currentIndex >=
+        promoProducts.length
+    ){
+
+        currentIndex = 0;
+
+    }
+
+
+    const product =
+        promoProducts[
+            currentIndex
+        ];
+
+
+    const price =
+        getPriceData(
+            product
+        );
+
+
+    const title =
+        makeDisplayTitle(
+            product
+        );
+
+
+    const image =
+        imagePath(
+            product
+        );
+
+
+    stage.className =
+        `stage ratio-${currentRatio}`;
+
+
+    const extraBadge =
+        price.extraEnabled &&
+        price.extraPercent > 0
+
+            ?
+
+            `
+            <div
+                class="extra-discount-badge"
+            >
+                EXTRA ${price.extraPercent}% OFF
+            </div>
+            `
+
+            :
+
+            "";
+
+
+    const extraNote =
+        price.extraEnabled &&
+        price.extraPercent > 0
+
+            ?
+
+            `
+            <div
+                class="extra-price-note"
+            >
+                Extra Discount ${price.extraPercent}%
+            </div>
+            `
+
+            :
+
+            "";
+
+
+    stage.innerHTML = `
+
+        <article
+            class="promo-canvas slide-content"
+            id="promoCanvas"
+        >
+
+            <div
+                class="product-visual"
+            >
+
+                ${
+                    image
+
+                        ?
+
+                        `
+                        <img
+                            class="product-image"
+                            src="${escapeAttribute(image)}"
+                            alt="${escapeAttribute(title)}"
+                            crossorigin="anonymous"
+                            decoding="async"
+                        >
+                        `
+
+                        :
+
+                        `
+                        <div class="error">
+                            IMAGE NOT FOUND
+                        </div>
+                        `
+                }
+
+
+                <div
+                    class="visual-gradient"
+                ></div>
+
+            </div>
+
+
+            <div
+                class="promo-badge"
+            >
+                PROMO
+            </div>
+
+
+            ${extraBadge}
+
+
+            <div
+                class="product-info"
+            >
+
+                <div
+                    class="product-brand"
+                >
+                    ${escapeHTML(
+                        product.brand
+                    )}
+                </div>
+
+
+                <h1
+                    class="product-name"
+                >
+                    ${escapeHTML(
+                        title
+                    )}
+                </h1>
+
+
+                <div
+                    class="price-block"
+                >
+
+                    <div
+                        class="price-label"
+                    >
+                        Harga Promo
+                    </div>
+
+
+                    <div
+                        class="price-promo"
+                    >
+                        ${rupiah(
+                            price.final
+                        )}
+                    </div>
+
+
+                    <div
+                        class="price-meta"
+                    >
+
+                        <div
+                            class="price-normal"
+                        >
+                            <s>
+                                ${rupiah(
+                                    price.normal
+                                )}
+                            </s>
+                        </div>
+
+
+                        ${
+                            price.baseDiscount > 0
+
+                                ?
+
+                                `
+                                <div
+                                    class="discount"
+                                >
+                                    Hemat ${price.baseDiscount}%
+                                </div>
+                                `
+
+                                :
+
+                                ""
+                        }
+
+                    </div>
+
+
+                    ${extraNote}
+
+                </div>
+
+            </div>
+
+
+            <div
+                class="capture-hide"
+            >
+                Imam_salesfr
+            </div>
+
+        </article>
+
+    `;
+
+
+    updateSlideCount();
+
+
+    preloadCurrentImage();
+
+
+    if(
+        restart
+    ){
+
+        startAutoplay();
+
+    }
+
+}
+
+
+/* =========================================================
+   IMAGE PRELOAD
+========================================================= */
+
+function preloadCurrentImage(){
+
+    const image =
+        stage.querySelector(
+            ".product-image"
+        );
+
+
+    if(!image){
+
+        return;
+
+    }
+
+
+    if(
+        image.complete
+    ){
+
+        return;
+
+    }
+
+
+    image.decode?.()
+    .catch(
+        ()=>{}
+    );
+
+}
+
+
+/* =========================================================
+   SLIDE COUNT
+========================================================= */
+
+function updateSlideCount(){
+
+    slideCount.textContent =
+
+        promoProducts.length
+
+            ?
+
+            `${currentIndex + 1} / ${promoProducts.length}`
+
+            :
+
+            "0 / 0";
+
+}
+
+
+/* =========================================================
+   AUTOPLAY
+========================================================= */
+
+function startAutoplay(){
+
+    stopAutoplay();
+
+
+    if(
+        !playing ||
+        promoProducts.length < 2
+    ){
+
+        return;
+
+    }
+
+
+    autoplay =
+        setTimeout(
+            ()=>{
+                nextSlide();
+            },
+            CONFIG.DURATION
+        );
+
+}
+
+
+function stopAutoplay(){
+
+    if(
+        autoplay
+    ){
+
+        clearTimeout(
+            autoplay
+        );
+
+        autoplay = null;
+
+    }
+
+}
+
+
+/* =========================================================
+   CHANGE SLIDE
+========================================================= */
+
+async function changeSlide(
+    direction
+){
+
+    if(
+        transitionBusy ||
+        promoProducts.length < 2
+    ){
+
+        return;
+
+    }
+
+
+    transitionBusy = true;
+
+    stopAutoplay();
+
+
+    const oldCanvas =
+        document.getElementById(
+            "promoCanvas"
+        );
+
+
+    if(
+        oldCanvas
+    ){
+
+        oldCanvas.classList.remove(
+            "slide-content"
+        );
+
+        oldCanvas.classList.add(
+            "slide-out"
+        );
+
+
+        await wait(
+            620
+        );
+
+    }
+
+
+    currentIndex =
+        (
+            currentIndex +
+            direction +
+            promoProducts.length
+        )
+        %
+        promoProducts.length;
+
+
+    renderPreview(
+        false
+    );
+
+
+    const newCanvas =
+        document.getElementById(
+            "promoCanvas"
+        );
+
+
+    if(
+        newCanvas
+    ){
+
+        newCanvas.classList.remove(
+            "slide-content"
+        );
+
+        newCanvas.classList.add(
+            "slide-in"
+        );
+
+
+        requestAnimationFrame(
+            ()=>{
+                requestAnimationFrame(
+                    ()=>{
+                        newCanvas.classList.remove(
+                            "slide-in"
+                        );
+
+                        newCanvas.classList.add(
+                            "slide-content"
+                        );
+                    }
+                );
+            }
+        );
+
+
+        await wait(
+            CONFIG.TRANSITION
+        );
+
+    }
+
+
+    transitionBusy = false;
+
+
+    if(
+        playing
+    ){
+
+        startAutoplay();
+
+    }
+
+}
+
+
+function nextSlide(){
+
+    changeSlide(
+        1
+    );
+
+}
+
+
+function prevSlide(){
+
+    changeSlide(
+        -1
+    );
+
+}
+
+
+/* =========================================================
+   PLAY / PAUSE
+========================================================= */
+
+function updatePlayIcons(){
+
+    const path =
+        playing
+
+            ?
+
+            `
+            <path d="M7 5h4v14H7z"/>
+            <path d="M13 5h4v14h-4z"/>
+            `
+
+            :
+
+            `
+            <path d="m8 5 11 7-11 7z"/>
+            `;
+
+
+    document.getElementById(
+        "playIcon"
+    ).innerHTML =
+        path;
+
+
+    document.getElementById(
+        "headerPlayIcon"
+    ).innerHTML =
+        path;
+
+}
+
+
+function togglePlay(){
+
+    playing =
+        !playing;
+
+
+    updatePlayIcons();
+
+
+    if(
+        playing
+    ){
+
+        startAutoplay();
+
+    }else{
+
+        stopAutoplay();
+
+    }
+
+}
+
+
+/* =========================================================
+   APPLY PROMO
+========================================================= */
+
+function applyPromo(
+    notify=true
+){
+
+    promoProducts =
+        products.filter(
+            product =>
+                selectedIds.includes(
+                    String(
+                        product.id
+                    )
+                )
+        );
+
+
+    currentIndex = 0;
+
+
+    saveSelection();
+
+
+    renderPreview(
+        true
+    );
+
+
+    if(
+        notify
+    ){
+
+        showToast(
+            `${promoProducts.length} produk diterapkan ✓`
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RENDER MANAGER
+========================================================= */
+
+function renderManager(
+    keyword=""
+){
+
+    const query =
+        String(
+            keyword
+        )
+        .trim()
+        .toLowerCase();
+
+
+    const filtered =
+        products.filter(
+            product => {
+
+                if(
+                    !query
+                ){
+
+                    return true;
+
+                }
+
+
+                const haystack =
+                    [
+                        product.brand,
+                        product.nama,
+                        product.id
+                    ]
+                    .join(" ")
+                    .toLowerCase();
+
+
+                return haystack.includes(
+                    query
+                );
+
+            }
+        );
+
+
+    productGrid.innerHTML = "";
+
+
+    filtered.forEach(
+        product => {
+
+            const selected =
+                selectedIds.includes(
+                    String(
+                        product.id
+                    )
+                );
+
+
+            const price =
+                getPriceData(
+                    product
+                );
+
+
+            const card =
+                document.createElement(
+                    "article"
+                );
+
+
+            card.className =
+                "select-card" +
+                (
+                    selected
+                        ? " selected"
+                        : ""
+                );
+
+
+            const image =
+                imagePath(
+                    product
+                );
+
+
+            card.innerHTML = `
+
+                <div
+                    class="select-image"
+                >
+
+                    ${
+                        image
+
+                            ?
+
+                            `
+                            <img
+                                src="${escapeAttribute(image)}"
+                                alt=""
+                                loading="lazy"
+                            >
+                            `
+
+                            :
+
+                            `
+                            <div class="error">
+                                NO IMAGE
+                            </div>
+                            `
+                    }
+
+                </div>
+
+
+                <div
+                    class="check"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                    >
+
+                        <path
+                            d="m5 12 4 4L19 6"
+                        />
+
+                    </svg>
+
+                </div>
+
+
+                <button
+                    type="button"
+                    class="edit-price-btn"
+                    title="Edit harga"
+                >
+
+                    <svg
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                    >
+
+                        <path
+                            d="M12 20h9"
+                        />
+
+                        <path
+                            d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"
+                        />
+
+                    </svg>
+
+                </button>
+
+
+                <div
+                    class="select-info"
+                >
+
+                    <div
+                        class="select-brand"
+                    >
+                        ${escapeHTML(
+                            product.brand
+                        )}
+                    </div>
+
+
+                    <div
+                        class="select-name"
+                    >
+                        ${escapeHTML(
+                            makeDisplayTitle(
+                                product
+                            )
+                        )}
+                    </div>
+
+
+                    <div
+                        class="select-price"
+                    >
+
+                        ${rupiah(
+                            price.final
+                        )}
+
+                        <span
+                            class="select-old"
+                        >
+                            <s>
+                                ${rupiah(
+                                    price.normal
+                                )}
+                            </s>
+                        </span>
+
+
+                        ${
+                            price.baseDiscount > 0
+
+                                ?
+
+                                `
+                                <span
+                                    class="select-discount"
+                                >
+                                    ${price.baseDiscount}%
+                                </span>
+                                `
+
+                                :
+
+                                ""
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div
+                    class="price-editor"
+                >
+
+                    <div
+                        class="price-editor-title"
+                    >
+                        Pengaturan Harga
+                    </div>
+
+
+                    <div
+                        class="price-field"
+                    >
+
+                        <label>
+                            Harga Normal
+                        </label>
+
+                        <input
+                            type="number"
+                            data-price="normal"
+                            value="${price.normal}"
+                        >
+
+                    </div>
+
+
+                    <div
+                        class="price-field"
+                    >
+
+                        <label>
+                            Harga Promo Dasar
+                        </label>
+
+                        <input
+                            type="number"
+                            data-price="promo"
+                            value="${price.promo}"
+                        >
+
+                    </div>
+
+
+                    <label
+                        class="price-check"
+                    >
+
+                        <input
+                            type="checkbox"
+                            data-extra-enabled
+                            ${
+                                price.extraEnabled
+                                    ? "checked"
+                                    : ""
+                            }
+                        >
+
+                        Aktifkan Extra Discount
+
+                    </label>
+
+
+                    <div
+                        class="price-field"
+                    >
+
+                        <label>
+                            Extra Discount %
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            max="99"
+                            data-extra-percent
+                            value="${price.extraPercent}"
+                        >
+
+                    </div>
+
+
+                    <label
+                        class="price-check"
+                    >
+
+                        <input
+                            type="checkbox"
+                            data-manual-enabled
+                            ${
+                                price.manualEnabled
+                                    ? "checked"
+                                    : ""
+                            }
+                        >
+
+                        Gunakan Harga Final Manual
+
+                    </label>
+
+
+                    <div
+                        class="price-field"
+                    >
+
+                        <label>
+                            Harga Final Manual
+                        </label>
+
+                        <input
+                            type="number"
+                            min="0"
+                            data-manual-final
+                            value="${price.manualFinal}"
+                        >
+
+                    </div>
+
+
+                    <div
+                        class="calculated-final"
+                        data-calculated-final
+                    >
+                        Harga akhir: ${rupiah(
+                            price.final
+                        )}
+                    </div>
+
+
+                    <button
+                        type="button"
+                        class="price-save-btn"
+                    >
+                        TERAPKAN
+                    </button>
+
+
+                    <button
+                        type="button"
+                        class="price-reset-btn"
+                    >
+                        RESET HARGA PRODUK
+                    </button>
+
+                </div>
+
+            `;
+
+
+            /*
+             * Card click.
+             */
+
+            card.addEventListener(
+                "click",
+                event => {
+
+                    if(
+                        event.target.closest(
+                            ".price-editor"
+                        ) ||
+                        event.target.closest(
+                            ".edit-price-btn"
+                        )
+                    ){
+
+                        return;
+
+                    }
+
+
+                    toggleProduct(
+                        product.id
+                    );
+
+                }
+            );
+
+
+            /*
+             * Edit button.
+             */
+
+            card
+            .querySelector(
+                ".edit-price-btn"
+            )
+            .addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    document
+                    .querySelectorAll(
+                        ".select-card.editing"
+                    )
+                    .forEach(
+                        other => {
+
+                            if(
+                                other !== card
+                            ){
+
+                                other.classList.remove(
+                                    "editing"
+                                );
+
+                            }
+
+                        }
+                    );
+
+
+                    card.classList.toggle(
+                        "editing"
+                    );
+
+
+                    updateEditorCalculation(
+                        card
+                    );
+
+                }
+            );
+
+
+            /*
+             * Live calculation.
+             */
+
+            card
+            .querySelectorAll(
+                ".price-editor input"
+            )
+            .forEach(
+                input => {
+
+                    input.addEventListener(
+                        "input",
+                        ()=>{
+                            updateEditorCalculation(
+                                card
+                            );
+                        }
+                    );
+
+                    input.addEventListener(
+                        "change",
+                        ()=>{
+                            updateEditorCalculation(
+                                card
+                            );
+                        }
+                    );
+
+                }
+            );
+
+
+            /*
+             * Save.
+             */
+
+            card
+            .querySelector(
+                ".price-save-btn"
+            )
+            .addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    saveCardPrice(
+                        card,
+                        product
+                    );
+
+                }
+            );
+
+
+            /*
+             * Reset.
+             */
+
+            card
+            .querySelector(
+                ".price-reset-btn"
+            )
+            .addEventListener(
+                "click",
+                event => {
+
+                    event.stopPropagation();
+
+
+                    delete priceOverrides[
+                        String(
+                            product.id
+                        )
+                    ];
+
+
+                    savePriceOverrides();
+
+
+                    renderManager(
+                        document.getElementById(
+                            "search"
+                        ).value
+                    );
+
+
+                    showToast(
+                        "Harga dikembalikan ke produk ✓"
+                    );
+
+                }
+            );
+
+
+            productGrid.appendChild(
+                card
+            );
+
+        }
+    );
+
+
+    updateCounts();
+
+}
+
+
+/* =========================================================
+   EDITOR CALCULATION
+========================================================= */
+
+function updateEditorCalculation(
+    card
+){
+
+    const normal =
+        Number(
+            card.querySelector(
+                '[data-price="normal"]'
+            ).value
+        ) || 0;
+
+
+    const promo =
+        Number(
+            card.querySelector(
+                '[data-price="promo"]'
+            ).value
+        ) || 0;
+
+
+    const extraEnabled =
+        card.querySelector(
+            "[data-extra-enabled]"
+        ).checked;
+
+
+    const extraPercent =
+        Math.min(
+            99,
+            Math.max(
+                0,
+                Number(
+                    card.querySelector(
+                        "[data-extra-percent]"
+                    ).value
+                ) || 0
+            )
+        );
+
+
+    const manualEnabled =
+        card.querySelector(
+            "[data-manual-enabled]"
+        ).checked;
+
+
+    const manualFinal =
+        Number(
+            card.querySelector(
+                "[data-manual-final]"
+            ).value
+        ) || 0;
+
+
+    let final =
+        promo;
+
+
+    if(
+        extraEnabled &&
+        extraPercent > 0
+    ){
+
+        final =
+            Math.round(
+                promo *
+                (
+                    1 -
+                    extraPercent / 100
+                )
+            );
+
+    }
+
+
+    if(
+        manualEnabled &&
+        manualFinal > 0
+    ){
+
+        final =
+            manualFinal;
+
+    }
+
+
+    const output =
+        card.querySelector(
+            "[data-calculated-final]"
+        );
+
+
+    if(output){
+
+        output.textContent =
+            `Harga akhir: ${rupiah(final)}`;
+
+    }
+
+}
+
+
+/* =========================================================
+   SAVE CARD PRICE
+========================================================= */
+
+function saveCardPrice(
+    card,
+    product
+){
+
+    const normal =
+        Number(
+            card.querySelector(
+                '[data-price="normal"]'
+            ).value
+        ) || 0;
+
+
+    const promo =
+        Number(
+            card.querySelector(
+                '[data-price="promo"]'
+            ).value
+        ) || 0;
+
+
+    const extraEnabled =
+        card.querySelector(
+            "[data-extra-enabled]"
+        ).checked;
+
+
+    const extraPercent =
+        Math.min(
+            99,
+            Math.max(
+                0,
+                Number(
+                    card.querySelector(
+                        "[data-extra-percent]"
+                    ).value
+                ) || 0
+            )
+        );
+
+
+    const manualEnabled =
+        card.querySelector(
+            "[data-manual-enabled]"
+        ).checked;
+
+
+    const manualFinal =
+        Number(
+            card.querySelector(
+                "[data-manual-final]"
+            ).value
+        ) || 0;
+
+
+    priceOverrides[
+        String(
+            product.id
+        )
+    ] = {
+
+        normal,
+
+        promo,
+
+        extraEnabled,
+
+        extraPercent,
+
+        manualEnabled,
+
+        manualFinal
+
+    };
+
+
+    savePriceOverrides();
+
+
+    renderManager(
+        document.getElementById(
+            "search"
+        ).value
+    );
+
+
+    if(
+        promoProducts.some(
+            item =>
+                String(item.id) ===
+                String(product.id)
+        )
+    ){
+
+        renderPreview(
+            false
+        );
+
+    }
+
+
+    showToast(
+        "Harga promo berhasil diterapkan ✓"
+    );
+
+}
+
+
+/* =========================================================
+   TOGGLE PRODUCT
+========================================================= */
+
+function toggleProduct(
+    id
+){
+
+    id =
+        String(id);
+
+
+    if(
+        selectedIds.includes(id)
+    ){
+
+        selectedIds =
+            selectedIds.filter(
+                value =>
+                    value !== id
+            );
+
+    }else{
+
+        selectedIds.push(
+            id
+        );
+
+    }
+
+
+    renderManager(
+        document.getElementById(
+            "search"
+        ).value
+    );
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+function updateCounts(){
+
+    const count =
+        selectedIds.length;
+
+
+    selectedCount.textContent =
+        count;
+
+
+    footerSelected.textContent =
+        count;
+
+
+    totalCount.textContent =
+        products.length;
+
+
+    footerTotal.textContent =
+        products.length;
+
+}
+
+
+/* =========================================================
+   DOWNLOAD BLOB
+========================================================= */
+
+async function saveBlob(
+    blob,
+    filename
+){
+
+    const url =
+        URL.createObjectURL(
+            blob
+        );
+
+
+    const link =
+        document.createElement(
+            "a"
+        );
+
+
+    link.href =
+        url;
+
+    link.download =
+        filename;
+
+
+    link.style.display =
+        "none";
+
+
+    document.body.appendChild(
+        link
+    );
+
+
+    link.click();
+
+
+    link.remove();
+
+
+    setTimeout(
+        ()=>{
+            URL.revokeObjectURL(
+                url
+            );
+        },
+        2000
+    );
+
+}
+
+
+/* =========================================================
+   DOWNLOAD STATUS
+========================================================= */
+
+async function downloadStatus(){
+
+    if(
+        downloadBusy
+    ){
+
+        return;
+
+    }
+
+
+    const canvas =
+        document.getElementById(
+            "promoCanvas"
+        );
+
+
+    if(
+        !canvas
+    ){
+
+        showToast(
+            "Preview belum siap."
+        );
+
+        return;
+
+    }
+
+
+    downloadBusy = true;
+
+
+    const wasPlaying =
+        playing;
+
+
+    stopAutoplay();
+
+
+    downloadBtn.disabled =
+        true;
+
+
+    const originalHTML =
+        downloadBtn.innerHTML;
+
+
+    downloadBtn.innerHTML = `
+
+        <span
+            class="download-spinner"
+        ></span>
+
+        MEMBUAT STATUS...
+
+    `;
+
+
+    try{
+
+        document.body.classList.add(
+            "capture-mode"
+        );
+
+
+        /*
+         * Pastikan semua image
+         * selesai loading sebelum capture.
+         */
+
+        const images =
+            [
+                ...canvas.querySelectorAll(
+                    "img"
+                )
+            ];
+
+
+        await Promise.all(
+            images.map(
+                image => {
+
+                    if(
+                        image.complete
+                    ){
+
+                        return Promise.resolve();
+
+                    }
+
+
+                    return new Promise(
+                        resolve => {
+
+                            image.onload =
+                                resolve;
+
+                            image.onerror =
+                                resolve;
+
+                        }
+                    );
+
+                }
+            )
+        );
+
+
+        /*
+         * Decode supaya hasil
+         * tidak pudar/blur.
+         */
+
+        await Promise.all(
+            images.map(
+                image =>
+                    image.decode
+                        ?
+                        image.decode()
+                            .catch(
+                                ()=>{}
+                            )
+                        :
+                        Promise.resolve()
+            )
+        );
+
+
+        /*
+         * Beri browser waktu
+         * menyelesaikan paint.
+         */
+
+        await wait(
+            180
+        );
+
+
+        const ratio =
+            currentRatio;
+
+
+        const scale =
+            ratio === "916"
+                ? 2.5
+                : ratio === "45"
+                    ? 2.4
+                    : 2.2;
+
+
+        const output =
+            await html2canvas(
+                canvas,
+                {
+
+                    backgroundColor:
+                        "#070907",
+
+                    scale,
+
+                    useCORS:true,
+
+                    allowTaint:false,
+
+                    imageTimeout:15000,
+
+                    logging:false,
+
+                    removeContainer:true,
+
+                    foreignObjectRendering:false,
+
+                    width:
+                        canvas.offsetWidth,
+
+                    height:
+                        canvas.offsetHeight
+
+                }
+            );
+
+
+        const blob =
+            await new Promise(
+                resolve =>
+                    output.toBlob(
+                        resolve,
+                        "image/png",
+                        1
+                    )
+            );
+
+
+        if(
+            !blob
+        ){
+
+            throw new Error(
+                "Canvas PNG gagal dibuat."
+            );
+
+        }
+
+
+        const product =
+            promoProducts[
+                currentIndex
+            ];
+
+
+        const safeName =
+            makeDisplayTitle(
+                product
+            )
+            .replace(
+                /[^a-z0-9]+/gi,
+                "-"
+            )
+            .replace(
+                /^-+|-+$/g,
+                ""
+            )
+            .toLowerCase();
+
+
+        await saveBlob(
+            blob,
+            `promo-${safeName || "produk"}-${ratio}.png`
+        );
+
+
+        showToast(
+            "Status berhasil di-download ✓"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            "[DOWNLOAD]",
+            error
+        );
+
+
+        showToast(
+            "Gagal membuat status."
+        );
+
+
+    }finally{
+
+        document.body.classList.remove(
+            "capture-mode"
+        );
+
+
+        downloadBusy =
+            false;
+
+
+        downloadBtn.disabled =
+            false;
+
+
+        downloadBtn.innerHTML =
+            originalHTML;
+
+
+        if(
+            wasPlaying
+        ){
+
+            playing =
+                true;
+
+            updatePlayIcons();
+
+            startAutoplay();
+
+        }
+
+    }
+
+}
+
+
+/* =========================================================
+   DOWNLOAD JSON
+========================================================= */
+
+async function downloadJSON(){
+
+    try{
+
+        const selected =
+            products.filter(
+                product =>
+                    selectedIds.includes(
+                        String(
+                            product.id
+                        )
+                    )
+            );
+
+
+        const output =
+            selected.map(
+                product => {
+
+                    const price =
+                        getPriceData(
+                            product
+                        );
+
+
+                    return {
+
+                        ...product,
+
+                        harga:{
+
+                            ...product.harga,
+
+                            normal:
+                                price.normal,
+
+                            promo:
+                                price.final,
+
+                            hargaDasarPromo:
+                                price.promo,
+
+                            diskonExtraAktif:
+                                price.extraEnabled,
+
+                            diskonExtra:
+                                price.extraPercent,
+
+                            hargaManualAktif:
+                                price.manualEnabled,
+
+                            hargaManual:
+                                price.manualFinal
+
+                        }
+
+                    };
+
+                }
+            );
+
+
+        const blob =
+            new Blob(
+                [
+                    JSON.stringify(
+                        output,
+                        null,
+                        4
+                    )
+                ],
+                {
+                    type:
+                        "application/json"
+                }
+            );
+
+
+        await saveBlob(
+            blob,
+            "produk-promo-final.json"
+        );
+
+
+        showToast(
+            "produk-promo-final.json berhasil dibuat ✓"
+        );
+
+
+    }catch(error){
+
+        console.error(
+            error
+        );
+
+
+        showToast(
+            "Gagal membuat JSON."
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   RATIO
+========================================================= */
+
+document
+.querySelectorAll(
+    ".ratio-btn"
+)
+.forEach(
+    button => {
+
+        button.addEventListener(
+            "click",
+            ()=>{
+
+                currentRatio =
+                    button.dataset.ratio;
+
+
+                localStorage.setItem(
+                    STORAGE.RATIO,
+                    currentRatio
+                );
+
+
+                document
+                .querySelectorAll(
+                    ".ratio-btn"
+                )
+                .forEach(
+                    item =>
+                        item.classList.toggle(
+                            "active",
+                            item === button
+                        )
+                );
+
+
+                renderPreview(
+                    false
+                );
+
+            }
+        );
+
+    }
+);
+
+
+/* =========================================================
+   NAV
+========================================================= */
+
+document
+.getElementById(
+    "prevBtn"
+)
+.addEventListener(
+    "click",
+    prevSlide
+);
+
+
+document
+.getElementById(
+    "nextBtn"
+)
+.addEventListener(
+    "click",
+    nextSlide
+);
+
+
+document
+.getElementById(
+    "playBtn"
+)
+.addEventListener(
+    "click",
+    togglePlay
+);
+
+
+document
+.getElementById(
+    "headerPlay"
+)
+.addEventListener(
+    "click",
+    togglePlay
+);
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+document
+.getElementById(
+    "fullscreenBtn"
+)
+.addEventListener(
+    "click",
+    async ()=>{
+
+        try{
+
+            if(
+                !document.fullscreenElement
+            ){
+
+                await document
+                    .documentElement
+                    .requestFullscreen();
+
+            }else{
+
+                await document
+                    .exitFullscreen();
+
+            }
+
+        }catch{
+
+            showToast(
+                "Fullscreen tidak tersedia."
+            );
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   SEARCH — INSTANT
+========================================================= */
+
+document
+.getElementById(
+    "search"
+)
+.addEventListener(
+    "input",
+    event => {
+
+        renderManager(
+            event.target.value
+        );
+
+    }
+);
+
+
+/* =========================================================
+   SELECT ALL
+========================================================= */
+
+document
+.getElementById(
+    "selectAll"
+)
+.addEventListener(
+    "click",
+    ()=>{
+
+        selectedIds =
+            products.map(
+                product =>
+                    String(
+                        product.id
+                    )
+            );
+
+
+        renderManager(
+            document.getElementById(
+                "search"
+            ).value
+        );
+
+
+        showToast(
+            "Semua produk dipilih ✓"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   CLEAR
+========================================================= */
+
+document
+.getElementById(
+    "clearAll"
+)
+.addEventListener(
+    "click",
+    ()=>{
+
+        selectedIds = [];
+
+
+        renderManager();
+
+
+        showToast(
+            "Pilihan dibersihkan."
+        );
+
+    }
+);
+
+
+/* =========================================================
+   APPLY
+========================================================= */
+
+document
+.getElementById(
+    "applyPromo"
+)
+.addEventListener(
+    "click",
+    ()=>{
+        applyPromo(
+            true
+        );
+    }
+);
+
+
+/* =========================================================
+   SAVE
+========================================================= */
+
+document
+.getElementById(
+    "saveConfig"
+)
+.addEventListener(
+    "click",
+    ()=>{
+
+        saveSelection();
+
+        localStorage.setItem(
+            STORAGE.RATIO,
+            currentRatio
+        );
+
+        savePriceOverrides();
+
+
+        showToast(
+            "Konfigurasi promo tersimpan ✓"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   RESTORE
+========================================================= */
+
+document
+.getElementById(
+    "restoreConfig"
+)
+.addEventListener(
+    "click",
+    ()=>{
+
+        restoreSelection();
+
+        priceOverrides =
+            loadPriceOverrides();
+
+
+        renderManager();
+
+        applyPromo(
+            false
+        );
+
+
+        showToast(
+            "Konfigurasi dipulihkan ✓"
+        );
+
+    }
+);
+
+
+/* =========================================================
+   DOWNLOAD BUTTON
+========================================================= */
+
+downloadBtn.addEventListener(
+    "click",
+    downloadStatus
+);
+
+
+/* =========================================================
+   DOWNLOAD JSON BUTTON
+========================================================= */
+
+document
+.getElementById(
+    "downloadJSON"
+)
+.addEventListener(
+    "click",
+    downloadJSON
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+document.addEventListener(
+    "keydown",
+    event => {
+
+        if(
+            event.target.matches(
+                "input,textarea"
+            )
+        ){
+
+            return;
+
+        }
+
+
+        if(
+            event.key ===
+            "ArrowLeft"
+        ){
+
+            prevSlide();
+
+        }
+
+
+        if(
+            event.key ===
+            "ArrowRight"
+        ){
+
+            nextSlide();
+
+        }
+
+
+        if(
+            event.code ===
+            "Space"
+        ){
+
+            event.preventDefault();
+
+            togglePlay();
+
+        }
+
+    }
+);
+
+
+/* =========================================================
+   INITIAL RATIO UI
+========================================================= */
+
+document
+.querySelectorAll(
+    ".ratio-btn"
+)
+.forEach(
+    button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.ratio ===
+            currentRatio
+        );
+
+    }
+);
+
+
+/* =========================================================
+   START
+========================================================= */
+
+updatePlayIcons();
+
+loadProducts();
+
+</script>
+
+</body>
+
+</html>
