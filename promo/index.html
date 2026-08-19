@@ -6879,6 +6879,11 @@ function toggleProduct(
 }
 
 
+
+
+
+
+
 /* =========================================================
    DOWNLOAD BLOB
 ========================================================= */
@@ -6899,60 +6904,301 @@ async function saveBlob(
 
     }
 
-
     const url =
         URL.createObjectURL(
             blob
         );
 
+    let link = null;
 
-    const link =
-        document.createElement(
-            "a"
+    try{
+
+        link =
+            document.createElement("a");
+
+        link.href =
+            url;
+
+        link.download =
+            filename;
+
+        link.rel =
+            "noopener";
+
+        link.style.position =
+            "fixed";
+
+        link.style.left =
+            "-9999px";
+
+        link.style.top =
+            "-9999px";
+
+        link.style.width =
+            "1px";
+
+        link.style.height =
+            "1px";
+
+        link.style.opacity =
+            "0";
+
+        document.body.appendChild(
+            link
         );
 
+        await new Promise(
+            resolve =>
+                requestAnimationFrame(
+                    resolve
+                )
+        );
 
-    link.href =
-        url;
+        link.click();
 
-    link.download =
-        filename;
+        await wait(1000);
 
-    link.style.position =
-        "fixed";
+        return true;
 
-    link.style.left =
-        "-9999px";
+    }catch(error){
 
-    link.style.top =
-        "-9999px";
+        console.warn(
+            "[DOWNLOAD] Direct download failed:",
+            error
+        );
 
-    document.body.appendChild(
-        link
-    );
+        /*
+         * Fallback mobile/browser.
+         */
 
+        try{
 
-    link.click();
+            if(
+                navigator.share &&
+                typeof File === "function"
+            ){
 
+                const file =
+                    new File(
+                        [blob],
+                        filename,
+                        {
+                            type:
+                                blob.type ||
+                                "image/png"
+                        }
+                    );
 
-    await wait(400);
+                if(
+                    !navigator.canShare ||
+                    navigator.canShare({
+                        files:[file]
+                    })
+                ){
 
+                    await navigator.share({
+                        files:[file],
+                        title:filename
+                    });
 
-    link.remove();
+                    return true;
 
+                }
 
-    setTimeout(
-        ()=>{
-            URL.revokeObjectURL(
-                url
+            }
+
+        }catch(shareError){
+
+            if(
+                shareError?.name ===
+                "AbortError"
+            ){
+
+                return true;
+
+            }
+
+            console.warn(
+                "[DOWNLOAD] Share fallback failed:",
+                shareError
             );
-        },
-        1200
-    );
+
+        }
+
+        /*
+         * Last fallback.
+         */
+
+        try{
+
+            const opened =
+                window.open(
+                    url,
+                    "_blank"
+                );
+
+            if(opened){
+
+                showToast(
+                    "Gambar dibuka. Simpan gambar dari browser."
+                );
+
+                return true;
+
+            }
+
+        }catch(fallbackError){
+
+            console.warn(
+                "[DOWNLOAD] Final fallback failed:",
+                fallbackError
+            );
+
+        }
+
+        throw new Error(
+            "BROWSER_DOWNLOAD_BLOCKED"
+        );
+
+    }finally{
+
+        if(link){
+
+            try{
+                link.remove();
+            }catch{}
+
+        }
+
+        setTimeout(
+            ()=>{
+                try{
+                    URL.revokeObjectURL(url);
+                }catch{}
+            },
+            5000
+        );
+
+    }
 
 }
 
 
+
+
+
+
+
+/* =========================================================
+   CAPTURE COLOR COMPATIBILITY
+   html2canvas tidak support beberapa CSS color function.
+   Hanya aktif selama proses capture.
+========================================================= */
+
+function prepareCaptureStyles(root){
+
+    const restore = [];
+
+    const elements = [
+        root,
+        ...root.querySelectorAll("*")
+    ];
+
+    elements.forEach(element => {
+
+        const computed =
+            getComputedStyle(element);
+
+        const properties = [
+            "color",
+            "backgroundColor",
+            "borderTopColor",
+            "borderRightColor",
+            "borderBottomColor",
+            "borderLeftColor",
+            "outlineColor",
+            "boxShadow",
+            "textShadow"
+        ];
+
+        properties.forEach(property => {
+
+            const value =
+                computed[property];
+
+            if(
+                !value ||
+                (
+                    !value.includes("color(") &&
+                    !value.includes("color-mix(")
+                )
+            ){
+
+                return;
+
+            }
+
+            restore.push({
+                element,
+                property,
+                value:
+                    element.style[property]
+            });
+
+            if(
+                property ===
+                "backgroundColor"
+            ){
+
+                element.style[property] =
+                    "#080C09";
+
+            }else if(
+                property ===
+                "color"
+            ){
+
+                element.style[property] =
+                    "#FFFFFF";
+
+            }else if(
+                property.includes("border") ||
+                property === "outlineColor"
+            ){
+
+                element.style[property] =
+                    "rgba(255,255,255,.15)";
+
+            }else{
+
+                element.style[property] =
+                    "none";
+
+            }
+
+        });
+
+    });
+
+    return function restoreCaptureStyles(){
+
+        restore.forEach(item => {
+
+            item.element.style[
+                item.property
+            ] =
+                item.value;
+
+        });
+
+    };
+
+}
+  
+
+
+
+  
 /* =========================================================
    DOWNLOAD STATUS
 ========================================================= */
@@ -6960,23 +7206,16 @@ async function saveBlob(
 async function downloadStatus(){
 
     if(downloadBusy){
-
         return;
-
     }
-
 
     const canvas =
         document.getElementById(
             "promoCanvas"
         );
 
-
     const product =
-        promoProducts[
-            currentIndex
-        ];
-
+        promoProducts[currentIndex];
 
     if(
         !canvas ||
@@ -6991,7 +7230,6 @@ async function downloadStatus(){
 
     }
 
-
     if(
         typeof html2canvas !==
         "function"
@@ -7005,34 +7243,29 @@ async function downloadStatus(){
 
     }
 
-
     downloadBusy =
         true;
-
 
     const oldHTML =
         downloadBtn.innerHTML;
 
-
     const wasPlaying =
         playing;
 
-
     stopAutoplay();
-
 
     downloadBtn.disabled =
         true;
 
-
     downloadBtn.innerHTML =
         "MEMBUAT STATUS...";
-
 
     document.body.classList.add(
         "capture-mode"
     );
 
+    let restoreCaptureStyles =
+        null;
 
     try{
 
@@ -7040,101 +7273,373 @@ async function downloadStatus(){
             canvas
         );
 
-
         await waitForFonts();
 
+        await new Promise(
+            resolve =>
+                requestAnimationFrame(
+                    ()=>{
+                        requestAnimationFrame(
+                            resolve
+                        );
+                    }
+                )
+        );
 
-        await wait(120);
+        await wait(150);
 
+        /*
+         * FIX UTAMA:
+         * color-mix()/color() hanya diganti
+         * sementara selama html2canvas bekerja.
+         *
+         * Setelah capture selesai semuanya
+         * dikembalikan.
+         */
 
-        const scale =
+        restoreCaptureStyles =
+            prepareCaptureStyles(
+                canvas
+            );
+
+        const rect =
+            canvas.getBoundingClientRect();
+
+        const width =
+            Math.max(
+                1,
+                Math.round(
+                    rect.width
+                )
+            );
+
+        const height =
+            Math.max(
+                1,
+                Math.round(
+                    rect.height
+                )
+            );
+
+        const MAX_PIXELS =
+            8000000;
+
+        const requestedScale =
 
             currentRatio === "916"
+                ? 2.5
+                : currentRatio === "45"
+                    ? 2.35
+                    : 2.15;
 
-                ?
-                2.5
-
-                :
-
-                currentRatio === "45"
-
-                    ?
-                    2.35
-
-                    :
-                    2.15;
-
-
-        const rendered =
-            await html2canvas(
-                canvas,
-                {
-
-                    backgroundColor:
-                        "#050705",
-
-                    scale,
-
-                    useCORS:true,
-
-                    allowTaint:false,
-
-                    imageTimeout:
-                        15000,
-
-                    logging:false,
-
-                    foreignObjectRendering:
-                        false,
-
-                    scrollX:0,
-
-                    scrollY:0
-
-                }
+        const safeScale =
+            Math.sqrt(
+                MAX_PIXELS /
+                (
+                    width *
+                    height
+                )
             );
 
-
-        const blob =
-            await new Promise(
-                resolve =>
-                    rendered.toBlob(
-                        resolve,
-                        "image/png",
-                        1
-                    )
+        const scale =
+            Math.max(
+                1,
+                Math.min(
+                    requestedScale,
+                    safeScale
+                )
             );
 
+        console.log(
+            "[DOWNLOAD] Capture:",
+            {
+                width,
+                height,
+                scale
+            }
+        );
 
-        if(!blob){
+        let rendered;
+
+        try{
+
+            rendered =
+                await html2canvas(
+                    canvas,
+                    {
+                        backgroundColor:
+                            "#050705",
+
+                        scale,
+
+                        width,
+
+                        height,
+
+                        useCORS:
+                            true,
+
+                        allowTaint:
+                            false,
+
+                        imageTimeout:
+                            15000,
+
+                        logging:
+                            false,
+
+                        foreignObjectRendering:
+                            false,
+
+                        removeContainer:
+                            true,
+
+                        scrollX:
+                            0,
+
+                        scrollY:
+                            0
+                    }
+                );
+
+        }catch(firstError){
+
+            console.warn(
+                "[DOWNLOAD] Capture pertama gagal, retry scale 1:",
+                firstError
+            );
+
+            rendered =
+                await html2canvas(
+                    canvas,
+                    {
+                        backgroundColor:
+                            "#050705",
+
+                        scale:1,
+
+                        width,
+
+                        height,
+
+                        useCORS:
+                            true,
+
+                        allowTaint:
+                            false,
+
+                        imageTimeout:
+                            10000,
+
+                        logging:
+                            false,
+
+                        foreignObjectRendering:
+                            false,
+
+                        removeContainer:
+                            true,
+
+                        scrollX:
+                            0,
+
+                        scrollY:
+                            0
+                    }
+                );
+
+        }
+
+        /*
+         * Restore SEGERA setelah html2canvas selesai.
+         */
+
+        if(
+            restoreCaptureStyles
+        ){
+
+            restoreCaptureStyles();
+
+            restoreCaptureStyles =
+                null;
+
+        }
+
+        if(
+            !rendered ||
+            !rendered.width ||
+            !rendered.height
+        ){
 
             throw new Error(
-                "PNG_FAILED"
+                "CANVAS_RENDER_FAILED"
             );
 
         }
 
+        let blob = null;
+
+        /*
+         * PRIMARY: toBlob
+         */
+
+        try{
+
+            blob =
+                await new Promise(
+                    (
+                        resolve,
+                        reject
+                    )=>{
+
+                        let done =
+                            false;
+
+                        const finish =
+                            result=>{
+
+                                if(done){
+                                    return;
+                                }
+
+                                done =
+                                    true;
+
+                                if(
+                                    result &&
+                                    result.size > 0
+                                ){
+
+                                    resolve(
+                                        result
+                                    );
+
+                                }else{
+
+                                    reject(
+                                        new Error(
+                                            "TOBLOB_EMPTY"
+                                        )
+                                    );
+
+                                }
+
+                            };
+
+                        try{
+
+                            rendered.toBlob(
+                                finish,
+                                "image/png",
+                                1
+                            );
+
+                        }catch(error){
+
+                            reject(error);
+
+                        }
+
+                        setTimeout(
+                            ()=>{
+
+                                if(!done){
+
+                                    reject(
+                                        new Error(
+                                            "TOBLOB_TIMEOUT"
+                                        )
+                                    );
+
+                                }
+
+                            },
+                            8000
+                        );
+
+                    }
+                );
+
+        }catch(blobError){
+
+            console.warn(
+                "[DOWNLOAD] toBlob failed:",
+                blobError
+            );
+
+            /*
+             * FALLBACK: toDataURL
+             */
+
+            const dataURL =
+                rendered.toDataURL(
+                    "image/png"
+                );
+
+            if(
+                !dataURL ||
+                !dataURL.includes(",")
+            ){
+
+                throw new Error(
+                    "PNG_GENERATION_FAILED"
+                );
+
+            }
+
+            const base64 =
+                dataURL.split(",")[1];
+
+            const binary =
+                atob(base64);
+
+            const bytes =
+                new Uint8Array(
+                    binary.length
+                );
+
+            for(
+                let i = 0;
+                i < binary.length;
+                i++
+            ){
+
+                bytes[i] =
+                    binary.charCodeAt(i);
+
+            }
+
+            blob =
+                new Blob(
+                    [bytes],
+                    {
+                        type:
+                            "image/png"
+                    }
+                );
+
+        }
+
+        if(
+            !blob ||
+            blob.size <= 0
+        ){
+
+            throw new Error(
+                "PNG_EMPTY"
+            );
+
+        }
 
         const ratioName =
 
             currentRatio === "916"
-
-                ?
-                "9x16"
-
-                :
-
-                currentRatio === "45"
-
-                    ?
-                    "4x5"
-
-                    :
-                    "16x9";
-
+                ? "9x16"
+                : currentRatio === "45"
+                    ? "4x5"
+                    : "16x9";
 
         const filename =
-
             `PROMO-${slug(
                 makeDisplayTitle(
                     product
@@ -7145,48 +7650,62 @@ async function downloadStatus(){
                 ].name
             )}-${ratioName}.png`;
 
-
         await saveBlob(
             blob,
             filename
         );
 
-
         showToast(
             "Status berhasil didownload ✓"
         );
 
-
     }catch(error){
 
         console.error(
-            "[DOWNLOAD]",
+            "[DOWNLOAD STATUS ERROR]",
             error
         );
 
-
         showToast(
-            "Gagal membuat status."
+            "Gagal membuat status: " +
+            (
+                error?.message ||
+                "unknown error"
+            )
         );
 
     }finally{
+
+        /*
+         * Safety restore kalau capture throw
+         * sebelum restore normal dipanggil.
+         */
+
+        if(
+            restoreCaptureStyles
+        ){
+
+            try{
+                restoreCaptureStyles();
+            }catch{}
+
+            restoreCaptureStyles =
+                null;
+
+        }
 
         document.body.classList.remove(
             "capture-mode"
         );
 
-
         downloadBusy =
             false;
-
 
         downloadBtn.disabled =
             false;
 
-
         downloadBtn.innerHTML =
             oldHTML;
-
 
         if(wasPlaying){
 
@@ -7201,9 +7720,10 @@ async function downloadStatus(){
 
     }
 
-}
+    }
 
 
+  
 /* =========================================================
    DOWNLOAD JSON
 ========================================================= */
