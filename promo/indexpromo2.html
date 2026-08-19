@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
 
 <meta charset="UTF-8">
@@ -46,18 +45,18 @@
 
 /* =========================================================
    IMAM_SALESFR — PROMO STUDIO
-   PREMIUM FINAL
+   FULL PREMIUM VERSION
 ========================================================= */
 
 :root{
 
     --lime:#8CC63F;
-    --lime-bright:#9ADA4B;
-    --lime-dark:#70A92F;
+    --lime-bright:#98D848;
+    --lime-dark:#72A82F;
 
     --orange:#FF7A1A;
     --orange-light:#FF9141;
-    --orange-dark:#E8620B;
+    --orange-dark:#E9630C;
 
     --bg:#050705;
     --bg-2:#070907;
@@ -83,7 +82,7 @@
 
     --shadow:
         0 30px 90px
-        rgba(0,0,0,.44);
+        rgba(0,0,0,.42);
 
     --font:
         Poppins,
@@ -143,8 +142,8 @@ body{
 
         linear-gradient(
             180deg,
-            #050705,
-            #060906
+            #050705 0%,
+            #060906 100%
         );
 
     color:
@@ -180,9 +179,23 @@ button{
 }
 
 
+button:disabled{
+
+    cursor:wait;
+
+}
+
+
 img{
 
     max-width:100%;
+
+}
+
+
+input{
+
+    outline:none;
 
 }
 
@@ -198,6 +211,8 @@ img{
     top:0;
 
     z-index:1000;
+
+    width:100%;
 
     min-height:78px;
 
@@ -279,6 +294,8 @@ img{
 
     gap:9px;
 
+    flex-shrink:0;
+
 }
 
 
@@ -329,12 +346,19 @@ img{
     border-color:
         var(--lime);
 
+    box-shadow:
+        0 8px 25px
+        rgba(140,198,63,.13);
+
 }
 
 
 .header-btn.primary:hover{
 
     background:
+        var(--lime-bright);
+
+    border-color:
         var(--lime-bright);
 
 }
@@ -380,15 +404,22 @@ main{
    STAGE
 ========================================================= */
 
+.preview-wrap{
+
+    width:100%;
+
+}
+
+
 .stage{
 
     width:100%;
 
     display:flex;
 
-    justify-content:center;
-
     align-items:flex-start;
+
+    justify-content:center;
 
     position:relative;
 
@@ -396,7 +427,7 @@ main{
 
 
 /* =========================================================
-   CANVAS
+   PROMO CANVAS
 ========================================================= */
 
 .promo-canvas{
@@ -410,6 +441,13 @@ main{
     isolation:isolate;
 
     background:
+
+        radial-gradient(
+            circle at 50% 10%,
+            rgba(140,198,63,.055),
+            transparent 34%
+        ),
+
         #070907;
 
     border:
@@ -423,7 +461,7 @@ main{
 
 
 /* =========================================================
-   RATIOS
+   RATIO
 ========================================================= */
 
 .stage.ratio-916
@@ -462,7 +500,7 @@ main{
 
 
 /* =========================================================
-   VISUAL
+   PRODUCT VISUAL
 ========================================================= */
 
 .product-visual{
@@ -471,13 +509,13 @@ main{
 
     z-index:1;
 
-    overflow:hidden;
-
     display:flex;
 
     align-items:center;
 
     justify-content:center;
+
+    overflow:hidden;
 
 }
 
@@ -486,7 +524,9 @@ main{
 .product-visual{
 
     top:0;
+
     left:0;
+
     right:0;
 
     height:57%;
@@ -498,7 +538,9 @@ main{
 .product-visual{
 
     top:0;
+
     left:0;
+
     right:0;
 
     height:61%;
@@ -510,6 +552,7 @@ main{
 .product-visual{
 
     top:0;
+
     left:0;
 
     width:58%;
@@ -520,21 +563,26 @@ main{
 
 
 /* =========================================================
-   IMAGE
+   PRODUCT IMAGE
 ========================================================= */
 
 .product-image{
 
     width:100%;
+
     height:100%;
 
     padding:5%;
+
+    display:block;
 
     object-fit:contain;
 
     object-position:center;
 
-    display:block;
+    user-select:none;
+
+    -webkit-user-drag:none;
 
     opacity:1 !important;
 
@@ -542,15 +590,12 @@ main{
 
     mix-blend-mode:normal !important;
 
-    user-select:none;
-
-    -webkit-user-drag:none;
-
 }
 
 
 /* =========================================================
-   SUBTLE GRADIENT
+   VISUAL GRADIENT
+   SUBTLE — TIDAK MEMUDARKAN FOTO
 ========================================================= */
 
 .visual-gradient{
@@ -602,7 +647,18 @@ main{
 
     position:absolute;
 
-    z-index:50;
+    z-index:40;
+
+    width:max-content;
+
+    max-width:30%;
+
+    min-width:96px;
+
+    height:34px;
+
+    padding:
+        0 14px;
 
     display:flex;
 
@@ -610,41 +666,36 @@ main{
 
     justify-content:center;
 
-    gap:7px;
-
-    height:34px;
-
-    min-width:96px;
-
-    max-width:30%;
-
-    padding:
-        0 14px;
+    gap:8px;
 
     border-radius:999px;
 
     background:
+
         linear-gradient(
             135deg,
             var(--orange-light),
             var(--orange)
         );
 
-    color:#1A0801;
+    color:#1B0A02;
 
     font-size:8px;
 
-    line-height:1;
-
     font-weight:950;
 
-    letter-spacing:2.8px;
+    letter-spacing:3px;
+
+    line-height:1;
 
     white-space:nowrap;
 
     box-shadow:
+
         0 10px 30px
         rgba(255,122,26,.18);
+
+    pointer-events:none;
 
 }
 
@@ -654,118 +705,27 @@ main{
     content:"";
 
     width:7px;
+
     height:7px;
 
     flex:0 0 7px;
 
     border-radius:50%;
 
-    background:#1A0801;
+    background:#1B0A02;
 
 }
 
 
 /* =========================================================
-   EXTRA DISCOUNT BADGE
+   BADGE PER RATIO
 ========================================================= */
 
-.extra-discount-badge{
-
-    position:absolute;
-
-    z-index:51;
-
-    display:flex;
-
-    align-items:center;
-
-    justify-content:center;
-
-    gap:6px;
-
-    min-width:94px;
-
-    height:27px;
-
-    padding:
-        0 10px;
-
-    border:
-        1px solid
-        rgba(255,145,65,.32);
-
-    border-radius:999px;
-
-    background:
-        rgba(255,122,26,.12);
-
-    color:
-        var(--orange-light);
-
-    font-size:7px;
-
-    line-height:1;
-
-    font-weight:950;
-
-    letter-spacing:1.4px;
-
-    white-space:nowrap;
-
-    backdrop-filter:
-        blur(8px);
-
-}
-
-
-.extra-discount-badge::before{
-
-    content:"";
-
-    width:5px;
-    height:5px;
-
-    flex:0 0 5px;
-
-    border-radius:50%;
-
-    background:
-        var(--orange);
-
-}
-
-
-/* 9:16 */
-
 .stage.ratio-916
 .promo-badge{
 
     top:
-        calc(57% + 11px);
-
-    left:7%;
-
-}
-
-
-.stage.ratio-916
-.extra-discount-badge{
-
-    top:
-        calc(57% + 50px);
-
-    left:7%;
-
-}
-
-
-/* 4:5 */
-
-.stage.ratio-45
-.promo-badge{
-
-    top:
-        calc(61% + 11px);
+        calc(57% + 12px);
 
     left:7%;
 
@@ -773,17 +733,15 @@ main{
 
 
 .stage.ratio-45
-.extra-discount-badge{
+.promo-badge{
 
     top:
-        calc(61% + 50px);
+        calc(61% + 12px);
 
     left:7%;
 
 }
 
-
-/* 16:9 */
 
 .stage.ratio-169
 .promo-badge{
@@ -792,16 +750,11 @@ main{
 
     left:60%;
 
-}
+    height:32px;
 
+    min-width:94px;
 
-.stage.ratio-169
-.extra-discount-badge{
-
-    top:
-        calc(7% + 42px);
-
-    left:60%;
+    max-width:28%;
 
 }
 
@@ -818,14 +771,18 @@ main{
 
     min-width:0;
 
+    overflow:visible;
+
 }
 
+
+/* 9:16 */
 
 .stage.ratio-916
 .product-info{
 
     top:
-        calc(57% + 96px);
+        calc(57% + 60px);
 
     left:7%;
 
@@ -834,11 +791,13 @@ main{
 }
 
 
+/* 4:5 */
+
 .stage.ratio-45
 .product-info{
 
     top:
-        calc(61% + 96px);
+        calc(61% + 60px);
 
     left:7%;
 
@@ -847,11 +806,13 @@ main{
 }
 
 
+/* 16:9 */
+
 .stage.ratio-169
 .product-info{
 
     top:
-        calc(7% + 88px);
+        calc(7% + 51px);
 
     left:60%;
 
@@ -899,8 +860,6 @@ main{
     margin:
         9px 0 0;
 
-    max-width:96%;
-
     color:#fff;
 
     font-weight:950;
@@ -910,14 +869,18 @@ main{
     letter-spacing:
         clamp(-1.8px,-.12vw,-.7px);
 
+    max-width:96%;
+
+    overflow:hidden;
+
     display:-webkit-box;
 
     -webkit-box-orient:vertical;
 
-    overflow:hidden;
-
 }
 
+
+/* 9:16 */
 
 .stage.ratio-916
 .product-name{
@@ -930,6 +893,8 @@ main{
 }
 
 
+/* 4:5 */
+
 .stage.ratio-45
 .product-name{
 
@@ -940,6 +905,8 @@ main{
 
 }
 
+
+/* 16:9 */
 
 .stage.ratio-169
 .product-name{
@@ -959,6 +926,8 @@ main{
 .price-block{
 
     margin-top:17px;
+
+    min-width:0;
 
 }
 
@@ -1038,7 +1007,9 @@ main{
 
     flex-wrap:wrap;
 
-    gap:11px;
+    gap:12px;
+
+    min-height:18px;
 
 }
 
@@ -1051,66 +1022,29 @@ main{
 
     line-height:1;
 
+    white-space:nowrap;
+
 }
 
 
 .discount{
 
     color:
-        var(--lime);
+        var(--orange);
 
     font-size:11px;
 
-    line-height:1;
-
     font-weight:950;
-
-}
-
-
-.extra-price-note{
-
-    margin-top:9px;
-
-    display:inline-flex;
-
-    align-items:center;
-
-    gap:6px;
-
-    color:
-        var(--orange-light);
-
-    font-size:9px;
 
     line-height:1;
 
-    font-weight:950;
-
-    letter-spacing:1.2px;
-
-    text-transform:uppercase;
-
-}
-
-
-.extra-price-note::before{
-
-    content:"";
-
-    width:6px;
-    height:6px;
-
-    border-radius:50%;
-
-    background:
-        var(--orange);
+    white-space:nowrap;
 
 }
 
 
 /* =========================================================
-   CINEMATIC TRANSITION
+   CINEMATIC WINDOW TRANSITION
 ========================================================= */
 
 .promo-canvas::after{
@@ -1129,9 +1063,9 @@ main{
 
         linear-gradient(
             90deg,
-            #050705,
+            #050705 0%,
             #080C08 50%,
-            #050705
+            #050705 100%
         );
 
     transform:
@@ -1158,7 +1092,7 @@ main{
     transition:
 
         transform
-        650ms
+        620ms
         cubic-bezier(.76,0,.24,1),
 
         opacity
@@ -1181,7 +1115,7 @@ main{
     transition:
 
         transform
-        760ms
+        730ms
         cubic-bezier(.16,1,.3,1),
 
         opacity
@@ -1197,7 +1131,7 @@ main{
     animation:
 
         promoVisualReveal
-        1100ms
+        1050ms
         cubic-bezier(.16,1,.3,1)
         both;
 
@@ -1210,25 +1144,23 @@ main{
     animation:
 
         promoInfoReveal
-        900ms
+        850ms
         cubic-bezier(.16,1,.3,1)
-        170ms
+        180ms
         both;
 
 }
 
 
 .promo-canvas.slide-content
-.promo-badge,
-.promo-canvas.slide-content
-.extra-discount-badge{
+.promo-badge{
 
     animation:
 
         promoBadgeReveal
-        720ms
+        700ms
         cubic-bezier(.16,1,.3,1)
-        210ms
+        220ms
         both;
 
 }
@@ -1236,17 +1168,23 @@ main{
 
 @keyframes promoVisualReveal{
 
-    from{
+    0%{
 
-        opacity:.1;
+        opacity:.15;
 
         transform:
             scale(1.045)
-            translateX(34px);
+            translateX(35px);
 
     }
 
-    to{
+    55%{
+
+        opacity:.82;
+
+    }
+
+    100%{
 
         opacity:1;
 
@@ -1261,7 +1199,7 @@ main{
 
 @keyframes promoInfoReveal{
 
-    from{
+    0%{
 
         opacity:0;
 
@@ -1270,7 +1208,7 @@ main{
 
     }
 
-    to{
+    100%{
 
         opacity:1;
 
@@ -1284,17 +1222,17 @@ main{
 
 @keyframes promoBadgeReveal{
 
-    from{
+    0%{
 
         opacity:0;
 
         transform:
-            translateY(-10px)
-            scale(.94);
+            translateY(-12px)
+            scale(.92);
 
     }
 
-    to{
+    100%{
 
         opacity:1;
 
@@ -1308,7 +1246,7 @@ main{
 
 
 /* =========================================================
-   CAPTURE MODE
+   CAPTURE
 ========================================================= */
 
 .capture-mode
@@ -1327,10 +1265,7 @@ main{
 .product-info,
 .capture-mode
 .promo-canvas
-.promo-badge,
-.capture-mode
-.promo-canvas
-.extra-discount-badge{
+.promo-badge{
 
     animation:none !important;
 
@@ -1342,7 +1277,7 @@ main{
 
 
 /* =========================================================
-   CONTROLS
+   CONTROL STRIP
 ========================================================= */
 
 .control-strip{
@@ -1354,13 +1289,14 @@ main{
     display:grid;
 
     grid-template-columns:
+
         minmax(260px,1.05fr)
         minmax(250px,1fr)
         minmax(190px,.7fr);
 
-    gap:12px;
-
     align-items:center;
+
+    gap:12px;
 
     border:
         1px solid
@@ -1369,6 +1305,7 @@ main{
     border-radius:20px;
 
     background:
+
         linear-gradient(
             145deg,
             #0B100C,
@@ -1379,7 +1316,7 @@ main{
 
 
 /* =========================================================
-   RATIO
+   RATIO GROUP
 ========================================================= */
 
 .ratio-group{
@@ -1389,12 +1326,13 @@ main{
     display:grid;
 
     grid-template-columns:
+
         auto
         repeat(3,minmax(0,1fr));
 
-    gap:7px;
-
     align-items:center;
+
+    gap:7px;
 
 }
 
@@ -1408,6 +1346,8 @@ main{
     font-weight:950;
 
     letter-spacing:2px;
+
+    line-height:1;
 
     text-transform:uppercase;
 
@@ -1476,7 +1416,10 @@ main{
 .ratio-icon{
 
     width:13px;
+
     height:18px;
+
+    flex:0 0 auto;
 
     border:
         1.5px solid
@@ -1491,6 +1434,7 @@ main{
 .ratio-icon{
 
     width:15px;
+
     height:18px;
 
 }
@@ -1500,6 +1444,7 @@ main{
 .ratio-icon{
 
     width:21px;
+
     height:12px;
 
 }
@@ -1512,6 +1457,8 @@ main{
     display:flex;
 
     flex-direction:column;
+
+    align-items:flex-start;
 
 }
 
@@ -1535,13 +1482,15 @@ main{
 
     font-size:7px;
 
+    font-weight:600;
+
     white-space:nowrap;
 
 }
 
 
 /* =========================================================
-   NAV
+   NAVIGATION
 ========================================================= */
 
 .navigation{
@@ -1560,6 +1509,7 @@ main{
 .nav-btn{
 
     width:48px;
+
     height:48px;
 
     flex:0 0 48px;
@@ -1597,6 +1547,7 @@ main{
 .nav-btn svg{
 
     width:19px;
+
     height:19px;
 
 }
@@ -1613,6 +1564,8 @@ main{
     font-size:10px;
 
     font-weight:800;
+
+    white-space:nowrap;
 
 }
 
@@ -1643,6 +1596,7 @@ main{
     border-radius:12px;
 
     background:
+
         linear-gradient(
             135deg,
             var(--lime-bright),
@@ -1657,7 +1611,16 @@ main{
 
     letter-spacing:.35px;
 
+    box-shadow:
+
+        0 10px 25px
+        rgba(140,198,63,.1);
+
     transition:.18s ease;
+
+    touch-action:manipulation;
+
+    user-select:none;
 
 }
 
@@ -1669,6 +1632,14 @@ main{
 
     transform:
         translateY(-1px);
+
+}
+
+
+.download-btn:active{
+
+    transform:
+        translateY(0);
 
 }
 
@@ -1685,20 +1656,17 @@ main{
 .download-btn svg{
 
     width:18px;
+
     height:18px;
 
 }
 
 
-.download-spinner{
+@keyframes promoDownloadSpin{
 
-    animation:
-        spin .7s linear infinite;
-
-}
-
-
-@keyframes spin{
+    from{
+        transform:rotate(0deg);
+    }
 
     to{
         transform:rotate(360deg);
@@ -1751,6 +1719,8 @@ main{
 
     letter-spacing:3.5px;
 
+    line-height:1;
+
     text-transform:uppercase;
 
 }
@@ -1790,6 +1760,8 @@ main{
 
 
 .manager-summary{
+
+    flex-shrink:0;
 
     color:#707870;
 
@@ -1875,6 +1847,17 @@ main{
 }
 
 
+.tool-btn.primary:hover{
+
+    background:
+        var(--lime-bright);
+
+    border-color:
+        var(--lime-bright);
+
+}
+
+
 /* =========================================================
    SEARCH
 ========================================================= */
@@ -1893,7 +1876,7 @@ main{
 .search{
 
     width:
-        min(100%,300px);
+        min(100%,280px);
 
     height:42px;
 
@@ -1912,6 +1895,10 @@ main{
 
     font-size:10px;
 
+    transition:
+        border-color .12s ease,
+        box-shadow .12s ease;
+
 }
 
 
@@ -1928,6 +1915,7 @@ main{
         rgba(140,198,63,.5);
 
     box-shadow:
+
         0 0 0 3px
         rgba(140,198,63,.06);
 
@@ -1947,7 +1935,7 @@ main{
     grid-template-columns:
         repeat(
             auto-fill,
-            minmax(180px,1fr)
+            minmax(170px,1fr)
         );
 
     gap:11px;
@@ -1956,7 +1944,7 @@ main{
 
 
 /* =========================================================
-   CARD
+   SELECT CARD
 ========================================================= */
 
 .select-card{
@@ -1965,7 +1953,7 @@ main{
 
     min-width:0;
 
-    min-height:280px;
+    min-height:250px;
 
     overflow:hidden;
 
@@ -1976,6 +1964,7 @@ main{
     border-radius:14px;
 
     background:
+
         linear-gradient(
             145deg,
             #090E0A,
@@ -2006,8 +1995,9 @@ main{
         var(--lime);
 
     box-shadow:
+
         0 0 0 1px
-        rgba(140,198,63,.2);
+        rgba(140,198,63,.22);
 
 }
 
@@ -2021,10 +2011,12 @@ main{
     position:absolute;
 
     top:0;
+
     left:0;
+
     right:0;
 
-    height:132px;
+    height:125px;
 
     display:flex;
 
@@ -2042,6 +2034,7 @@ main{
 .select-image img{
 
     width:100%;
+
     height:100%;
 
     padding:10px;
@@ -2059,7 +2052,10 @@ main{
 
     inset:0;
 
+    pointer-events:none;
+
     background:
+
         linear-gradient(
             to bottom,
             transparent 35%,
@@ -2077,12 +2073,14 @@ main{
 
     position:absolute;
 
-    z-index:10;
+    z-index:5;
 
     top:10px;
+
     left:10px;
 
     width:20px;
+
     height:20px;
 
     display:grid;
@@ -2120,60 +2118,8 @@ main{
 .check svg{
 
     width:12px;
+
     height:12px;
-
-}
-
-
-/* =========================================================
-   EDIT BUTTON
-========================================================= */
-
-.edit-price-btn{
-
-    position:absolute;
-
-    z-index:15;
-
-    top:9px;
-    right:9px;
-
-    width:27px;
-    height:27px;
-
-    display:grid;
-
-    place-items:center;
-
-    border:
-        1px solid
-        rgba(255,255,255,.14);
-
-    border-radius:8px;
-
-    background:
-        rgba(0,0,0,.68);
-
-    color:#fff;
-
-}
-
-
-.edit-price-btn:hover{
-
-    color:
-        var(--lime);
-
-    border-color:
-        var(--lime);
-
-}
-
-
-.edit-price-btn svg{
-
-    width:13px;
-    height:13px;
 
 }
 
@@ -2186,11 +2132,13 @@ main{
 
     position:absolute;
 
-    z-index:5;
-
     left:11px;
+
     right:11px;
+
     bottom:11px;
+
+    z-index:4;
 
     min-width:0;
 
@@ -2207,6 +2155,8 @@ main{
     font-weight:950;
 
     letter-spacing:1.8px;
+
+    line-height:1.1;
 
     text-transform:uppercase;
 
@@ -2271,6 +2221,8 @@ main{
 
     font-size:8px;
 
+    font-weight:500;
+
     text-decoration:line-through;
 
 }
@@ -2281,29 +2233,11 @@ main{
     margin-left:5px;
 
     color:
-        var(--lime);
+        var(--orange);
 
     font-size:8px;
 
     font-weight:950;
-
-}
-
-
-.select-extra{
-
-    display:block;
-
-    margin-top:5px;
-
-    color:
-        var(--orange);
-
-    font-size:7px;
-
-    font-weight:950;
-
-    letter-spacing:.8px;
 
 }
 
@@ -2319,29 +2253,26 @@ main{
     z-index:30;
 
     left:8px;
+
     right:8px;
+
     bottom:8px;
 
-    max-height:
-        calc(100% - 16px);
-
-    overflow:auto;
-
-    padding:11px;
+    padding:9px;
 
     border:
         1px solid
-        rgba(140,198,63,.2);
+        rgba(140,198,63,.18);
 
-    border-radius:11px;
+    border-radius:10px;
 
     background:
-        rgba(5,8,6,.98);
+        rgba(5,8,6,.96);
 
     opacity:0;
 
     transform:
-        translateY(7px);
+        translateY(5px);
 
     pointer-events:none;
 
@@ -2365,33 +2296,17 @@ main{
 }
 
 
-.editor-title{
-
-    margin-bottom:9px;
-
-    color:#fff;
-
-    font-size:9px;
-
-    font-weight:950;
-
-}
-
-
-.editor-label{
+.price-editor label{
 
     display:block;
 
-    margin:
-        7px 0 4px;
+    margin-bottom:3px;
 
     color:#747C74;
 
     font-size:7px;
 
-    font-weight:800;
-
-    letter-spacing:.5px;
+    font-weight:700;
 
 }
 
@@ -2400,7 +2315,9 @@ main{
 
     width:100%;
 
-    height:31px;
+    height:30px;
+
+    margin-bottom:6px;
 
     padding:
         0 8px;
@@ -2428,214 +2345,15 @@ main{
 }
 
 
-/* =========================================================
-   EXTRA TOGGLE
-========================================================= */
-
-.extra-row{
-
-    margin-top:9px;
-
-    padding:9px;
-
-    border:
-        1px solid
-        rgba(255,255,255,.07);
-
-    border-radius:9px;
-
-    background:
-        rgba(255,255,255,.025);
-
-}
-
-
-.extra-toggle{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    color:#DDE3DC;
-
-    font-size:8px;
-
-    font-weight:850;
-
-    cursor:pointer;
-
-}
-
-
-.extra-toggle input{
-
-    width:15px;
-    height:15px;
-
-    accent-color:
-        var(--orange);
-
-}
-
-
-.extra-percent-wrap{
-
-    margin-top:8px;
-
-    display:grid;
-
-    grid-template-columns:
-        1fr
-        58px;
-
-    gap:7px;
-
-    align-items:center;
-
-}
-
-
-.extra-percent-input{
-
-    width:100%;
-
-    height:31px;
-
-    padding:
-        0 8px;
-
-    border:
-        1px solid
-        rgba(255,122,26,.2);
-
-    border-radius:7px;
-
-    background:#080604;
-
-    color:#fff;
-
-    font-size:9px;
-
-}
-
-
-.extra-percent-symbol{
-
-    height:31px;
-
-    display:grid;
-
-    place-items:center;
-
-    border-radius:7px;
-
-    background:
-        rgba(255,122,26,.1);
-
-    color:
-        var(--orange-light);
-
-    font-size:9px;
-
-    font-weight:950;
-
-}
-
-
-/* =========================================================
-   MANUAL FINAL PRICE
-========================================================= */
-
-.manual-row{
-
-    margin-top:9px;
-
-}
-
-
-.manual-toggle{
-
-    display:flex;
-
-    align-items:center;
-
-    gap:8px;
-
-    color:#AEB6AE;
-
-    font-size:8px;
-
-    font-weight:750;
-
-    cursor:pointer;
-
-}
-
-
-.manual-toggle input{
-
-    width:15px;
-    height:15px;
-
-    accent-color:
-        var(--lime);
-
-}
-
-
-.manual-final-input{
-
-    margin-top:7px;
-
-}
-
-
-.calculated-final{
-
-    margin-top:8px;
-
-    padding:8px;
-
-    border-radius:8px;
-
-    background:
-        rgba(140,198,63,.06);
-
-    color:#A9C783;
-
-    font-size:8px;
-
-    line-height:1.4;
-
-}
-
-
-.calculated-final strong{
-
-    color:#fff;
-
-    font-size:10px;
-
-}
-
-
-/* =========================================================
-   SAVE PRICE
-========================================================= */
-
 .price-save-btn{
 
     width:100%;
 
-    height:34px;
-
-    margin-top:9px;
+    height:31px;
 
     border:0;
 
-    border-radius:8px;
+    border-radius:7px;
 
     background:
         var(--lime);
@@ -2649,27 +2367,58 @@ main{
 }
 
 
-.price-reset-btn{
+/* =========================================================
+   EDIT BUTTON
+========================================================= */
 
-    width:100%;
+.edit-price-btn{
 
-    height:30px;
+    position:absolute;
 
-    margin-top:6px;
+    z-index:15;
+
+    top:9px;
+
+    right:9px;
+
+    width:25px;
+
+    height:25px;
+
+    display:grid;
+
+    place-items:center;
 
     border:
         1px solid
-        rgba(255,255,255,.09);
+        rgba(255,255,255,.13);
 
-    border-radius:8px;
+    border-radius:7px;
 
-    background:#070A08;
+    background:
+        rgba(0,0,0,.65);
 
-    color:#8B948B;
+    color:#fff;
 
-    font-size:7px;
+}
 
-    font-weight:800;
+
+.edit-price-btn:hover{
+
+    color:
+        var(--lime);
+
+    border-color:
+        var(--lime);
+
+}
+
+
+.edit-price-btn svg{
+
+    width:12px;
+
+    height:12px;
 
 }
 
@@ -2689,6 +2438,8 @@ main{
         var(--border);
 
     display:flex;
+
+    align-items:center;
 
     justify-content:space-between;
 
@@ -2710,7 +2461,7 @@ main{
 
 
 /* =========================================================
-   ERROR / LOADING
+   LOADING
 ========================================================= */
 
 .loading{
@@ -2735,6 +2486,7 @@ main{
 .spinner{
 
     width:34px;
+
     height:34px;
 
     margin:auto;
@@ -2754,6 +2506,19 @@ main{
 }
 
 
+@keyframes spin{
+
+    to{
+        transform:rotate(360deg);
+    }
+
+}
+
+
+/* =========================================================
+   ERROR
+========================================================= */
+
 .error{
 
     width:100%;
@@ -2771,6 +2536,15 @@ main{
     background:
         rgba(50,5,5,.25);
 
+    line-height:1.55;
+
+}
+
+
+.error strong{
+
+    font-size:18px;
+
 }
 
 
@@ -2778,9 +2552,9 @@ main{
 
     margin-top:14px;
 
-    padding:14px;
-
     overflow:auto;
+
+    padding:14px;
 
     border-radius:10px;
 
@@ -2802,6 +2576,7 @@ main{
     position:fixed;
 
     left:50%;
+
     bottom:24px;
 
     z-index:5000;
@@ -2835,6 +2610,7 @@ main{
     pointer-events:none;
 
     transition:
+
         opacity .2s ease,
         transform .2s ease;
 
@@ -2843,23 +2619,60 @@ main{
 
 .toast.show{
 
-    opacity:1;
-
     transform:
         translate(-50%,0);
+
+    opacity:1;
 
 }
 
 
 /* =========================================================
-   MOBILE
+   FULLSCREEN
+========================================================= */
+
+:fullscreen
+.promo-canvas{
+
+    width:100vw !important;
+
+    height:100vh !important;
+
+    aspect-ratio:auto !important;
+
+    border:0;
+
+}
+
+
+/* =========================================================
+   RESPONSIVE TABLET
 ========================================================= */
 
 @media(max-width:900px){
 
+    main{
+
+        padding:
+            14px
+            14px
+            70px;
+
+    }
+
+
     .control-strip{
 
         grid-template-columns:1fr;
+
+        gap:11px;
+
+    }
+
+
+    .ratio-group{
+
+        width:100%;
 
     }
 
@@ -2870,8 +2683,19 @@ main{
 
     }
 
+
+    .manager-heading{
+
+        align-items:flex-start;
+
+    }
+
 }
 
+
+/* =========================================================
+   MOBILE
+========================================================= */
 
 @media(max-width:600px){
 
@@ -2889,12 +2713,18 @@ main{
 
         font-size:20px;
 
+        letter-spacing:-1px;
+
     }
 
 
     .brand-sub{
 
+        margin-top:6px;
+
         font-size:8px;
+
+        letter-spacing:.7px;
 
     }
 
@@ -2902,7 +2732,10 @@ main{
     .header-btn{
 
         width:43px;
+
         height:43px;
+
+        border-radius:13px;
 
     }
 
@@ -2925,26 +2758,18 @@ main{
         top:
             calc(57% + 9px);
 
+        left:7%;
+
         height:31px;
 
         min-width:92px;
 
-        font-size:6.5px;
-
-    }
-
-
-    .stage.ratio-916
-    .extra-discount-badge{
-
-        top:
-            calc(57% + 47px);
-
-        height:25px;
-
-        min-width:90px;
+        padding:
+            0 11px;
 
         font-size:6.5px;
+
+        letter-spacing:2.3px;
 
     }
 
@@ -2953,7 +2778,11 @@ main{
     .product-info{
 
         top:
-            calc(57% + 84px);
+            calc(57% + 50px);
+
+        left:7%;
+
+        right:6%;
 
     }
 
@@ -2961,8 +2790,20 @@ main{
     .stage.ratio-916
     .product-name{
 
+        margin-top:7px;
+
         font-size:
             clamp(24px,7vw,39px);
+
+        letter-spacing:-1.1px;
+
+    }
+
+
+    .stage.ratio-916
+    .price-block{
+
+        margin-top:14px;
 
     }
 
@@ -2984,14 +2825,18 @@ main{
         top:
             calc(61% + 9px);
 
-    }
+        left:7%;
 
+        height:31px;
 
-    .stage.ratio-45
-    .extra-discount-badge{
+        min-width:94px;
 
-        top:
-            calc(61% + 47px);
+        padding:
+            0 11px;
+
+        font-size:6.5px;
+
+        letter-spacing:2.3px;
 
     }
 
@@ -3000,7 +2845,11 @@ main{
     .product-info{
 
         top:
-            calc(61% + 84px);
+            calc(61% + 50px);
+
+        left:7%;
+
+        right:7%;
 
     }
 
@@ -3008,8 +2857,20 @@ main{
     .stage.ratio-45
     .product-name{
 
+        margin-top:7px;
+
         font-size:
             clamp(26px,6.2vw,43px);
+
+        letter-spacing:-1.2px;
+
+    }
+
+
+    .stage.ratio-45
+    .price-block{
+
+        margin-top:14px;
 
     }
 
@@ -3036,24 +2897,12 @@ main{
 
         min-width:88px;
 
+        padding:
+            0 9px;
+
         font-size:6px;
 
-    }
-
-
-    .stage.ratio-169
-    .extra-discount-badge{
-
-        top:
-            calc(6.5% + 38px);
-
-        left:60%;
-
-        min-width:84px;
-
-        height:24px;
-
-        font-size:5.7px;
+        letter-spacing:1.9px;
 
     }
 
@@ -3062,7 +2911,11 @@ main{
     .product-info{
 
         top:
-            calc(6.5% + 76px);
+            calc(6.5% + 45px);
+
+        left:60%;
+
+        right:4%;
 
     }
 
@@ -3070,8 +2923,20 @@ main{
     .stage.ratio-169
     .product-name{
 
+        margin-top:6px;
+
         font-size:
             clamp(19px,4.8vw,30px);
+
+        letter-spacing:-.7px;
+
+    }
+
+
+    .stage.ratio-169
+    .price-block{
+
+        margin-top:11px;
 
     }
 
@@ -3087,10 +2952,23 @@ main{
 
     /* controls */
 
+    .control-strip{
+
+        padding:12px;
+
+        border-radius:17px;
+
+    }
+
+
     .ratio-group{
+
+        display:grid;
 
         grid-template-columns:
             repeat(3,minmax(0,1fr));
+
+        gap:7px;
 
     }
 
@@ -3100,12 +2978,21 @@ main{
         grid-column:
             1 / -1;
 
+        margin-bottom:1px;
+
     }
 
 
     .ratio-btn{
 
+        width:100%;
+
         height:53px;
+
+        padding:
+            0 6px;
+
+        border-radius:13px;
 
     }
 
@@ -3113,6 +3000,13 @@ main{
     .ratio-use{
 
         display:none;
+
+    }
+
+
+    .ratio-value{
+
+        font-size:10px;
 
     }
 
@@ -3129,12 +3023,29 @@ main{
             1fr
             auto;
 
+        gap:7px;
+
     }
 
 
     .nav-btn{
 
         width:100%;
+
+        min-width:0;
+
+    }
+
+
+    .slide-count{
+
+        min-width:42px;
+
+        display:flex;
+
+        align-items:center;
+
+        justify-content:center;
 
     }
 
@@ -3158,6 +3069,15 @@ main{
     }
 
 
+    .manager-title{
+
+        font-size:25px;
+
+        line-height:1.02;
+
+    }
+
+
     .manager-summary{
 
         margin-top:8px;
@@ -3174,12 +3094,19 @@ main{
         grid-template-columns:
             repeat(2,minmax(0,1fr));
 
+        gap:7px;
+
     }
 
 
     .tool-btn{
 
         width:100%;
+
+        min-height:44px;
+
+        padding:
+            0 8px;
 
     }
 
@@ -3210,7 +3137,27 @@ main{
 
     .select-card{
 
-        min-height:285px;
+        min-height:250px;
+
+        border-radius:12px;
+
+    }
+
+
+    .select-image{
+
+        height:112px;
+
+    }
+
+
+    .select-info{
+
+        left:9px;
+
+        right:9px;
+
+        bottom:9px;
 
     }
 
@@ -3219,29 +3166,89 @@ main{
 
         display:block;
 
-        line-height:1.5;
+        line-height:1.4;
+
+    }
+
+
+    .manager-footer > * + *{
+
+        margin-top:7px;
 
     }
 
 }
 
 
+/* =========================================================
+   SMALL PHONE
+========================================================= */
+
 @media(max-width:380px){
 
-    .stage.ratio-916
-    .product-info{
+    .brand-name{
 
-        top:
-            calc(57% + 80px);
+        font-size:18px;
+
+    }
+
+
+    .brand-sub{
+
+        font-size:7px;
+
+    }
+
+
+    .header-btn{
+
+        width:40px;
+
+        height:40px;
+
+    }
+
+
+    .stage.ratio-916
+    .product-name{
+
+        font-size:23px;
+
+    }
+
+
+    .stage.ratio-916
+    .price-promo{
+
+        font-size:30px;
 
     }
 
 
     .stage.ratio-45
-    .product-info{
+    .product-name{
 
-        top:
-            calc(61% + 80px);
+        font-size:23px;
+
+    }
+
+
+    .stage.ratio-45
+    .price-promo{
+
+        font-size:31px;
+
+    }
+
+
+    .stage.ratio-169
+    .promo-badge{
+
+        left:59%;
+
+        min-width:84px;
+
+        height:27px;
 
     }
 
@@ -3249,13 +3256,55 @@ main{
     .stage.ratio-169
     .product-info{
 
-        top:
-            calc(6.5% + 70px);
+        left:59%;
+
+    }
+
+
+    .stage.ratio-169
+    .product-name{
+
+        font-size:18px;
+
+    }
+
+
+    .stage.ratio-169
+    .price-promo{
+
+        font-size:23px;
+
+    }
+
+
+    .ratio-btn{
+
+        height:48px;
+
+    }
+
+
+    .nav-btn{
+
+        height:46px;
+
+    }
+
+
+    .download-btn{
+
+        height:50px;
+
+        font-size:9px;
 
     }
 
 }
 
+
+/* =========================================================
+   REDUCED MOTION
+========================================================= */
 
 @media(prefers-reduced-motion:reduce){
 
@@ -3314,6 +3363,7 @@ main{
             >
 
                 <path d="M7 5h4v14H7z"/>
+
                 <path d="M13 5h4v14h-4z"/>
 
             </svg>
@@ -3336,8 +3386,11 @@ main{
             >
 
                 <path d="M8 3H3v5"/>
+
                 <path d="M16 3h5v5"/>
+
                 <path d="M8 21H3v-5"/>
+
                 <path d="M21 16v5h-5"/>
 
             </svg>
@@ -3359,7 +3412,8 @@ main{
      PREVIEW
 ====================================================== -->
 
-<section>
+<section class="preview-wrap">
+
 
     <div
         class="stage ratio-916"
@@ -3390,11 +3444,14 @@ main{
     </div>
 
 
-    <!-- ==================================================
+    <!-- =================================================
          CONTROL STRIP
-    =================================================== -->
+    ================================================== -->
 
-    <div class="control-strip">
+    <div
+        class="control-strip"
+        id="controlStrip"
+    >
 
 
         <div class="ratio-group">
@@ -3512,6 +3569,7 @@ main{
                 >
 
                     <path d="M7 5h4v14H7z"/>
+
                     <path d="M13 5h4v14h-4z"/>
 
                 </svg>
@@ -3564,7 +3622,9 @@ main{
             >
 
                 <path d="M12 3v12"/>
+
                 <path d="m7 10 5 5 5-5"/>
+
                 <path d="M5 21h14"/>
 
             </svg>
@@ -3754,8 +3814,8 @@ const CONFIG = {
         "images/produk/",
 
     /*
-     * Durasi diam sebelum pindah.
-     * Transition sendiri ±1.4 detik.
+     * Waktu tunggu sebelum produk berikutnya.
+     * Ditambah dengan durasi cinematic transition.
      */
 
     DURATION:
@@ -3780,7 +3840,7 @@ const STORAGE = {
         "promoRatio",
 
     PRICES:
-        "promoPriceOverrides_v3"
+        "promoPriceOverrides_v2"
 
 };
 
@@ -3923,7 +3983,7 @@ function wait(
 
 
 /* =========================================================
-   LOAD
+   LOAD PRODUCTS
 ========================================================= */
 
 async function loadProducts(){
@@ -3998,6 +4058,13 @@ async function loadProducts(){
 
         restoreSelection();
 
+
+        /*
+         * Kalau belum pernah ada
+         * selection tersimpan,
+         * otomatis ambil produk
+         * yang memang punya promo.
+         */
 
         if(!selectedIds.length){
 
@@ -4212,7 +4279,7 @@ function loadPriceOverrides(){
 
     try{
 
-        const data =
+        const saved =
             JSON.parse(
                 localStorage.getItem(
                     STORAGE.PRICES
@@ -4221,19 +4288,19 @@ function loadPriceOverrides(){
 
 
         if(
-            data &&
-            typeof data ===
+            saved &&
+            typeof saved ===
             "object"
         ){
 
-            return data;
+            return saved;
 
         }
 
     }catch(error){
 
         console.warn(
-            "[PRICE OVERRIDE]",
+            "[PROMO PRICE]",
             error
         );
 
@@ -4257,10 +4324,6 @@ function savePriceOverrides(){
 }
 
 
-/* =========================================================
-   PRICE KEY
-========================================================= */
-
 function getPriceKey(
     product
 ){
@@ -4275,53 +4338,9 @@ function getPriceKey(
 }
 
 
-/* =========================================================
-   RAW PRICE
-========================================================= */
-
-function getRawPrice(
-    product
-){
-
-    return {
-
-        normal:
-            Number(
-                product.harga?.normal
-            ) || 0,
-
-        promo:
-            Number(
-                product.harga?.promo
-            ) || 0
-
-    };
-
-}
-
-
-/* =========================================================
-   EFFECTIVE PRICE
-=========================================================
-
-   PRIORITY:
-
-   1. Manual final override
-   2. Extra discount calculation
-   3. Custom promo price
-   4. JSON promo price
-
-========================================================= */
-
 function getPriceData(
     product
 ){
-
-    const original =
-        getRawPrice(
-            product
-        );
-
 
     const key =
         getPriceKey(
@@ -4332,225 +4351,73 @@ function getPriceData(
     const override =
         priceOverrides[
             key
-        ] || {};
+        ];
 
 
-    const normal =
-        override.normal != null
-
-            ?
-
-            Number(
-                override.normal
-            ) || 0
-
-            :
-
-            original.normal;
+    const originalNormal =
+        Number(
+            product.harga?.normal
+        ) || 0;
 
 
-    const promoBase =
-        override.promo != null
-
-            ?
-
-            Number(
-                override.promo
-            ) || 0
-
-            :
-
-            original.promo;
+    const originalPromo =
+        Number(
+            product.harga?.promo
+        ) || 0;
 
 
-    const extraEnabled =
-        override.extraEnabled === true;
+    if(!override){
 
+        return {
 
-    const extraPercent =
-        extraEnabled
+            normal:
+                originalNormal,
 
-            ?
+            promo:
+                originalPromo
 
-            clamp(
-                Number(
-                    override.extraPercent
-                ) || 0,
-                0,
-                99
-            )
-
-            :
-
-            0;
-
-
-    const manualFinalEnabled =
-        override.manualFinalEnabled === true;
-
-
-    const manualFinal =
-        override.manualFinal != null
-
-            ?
-
-            Number(
-                override.manualFinal
-            ) || 0
-
-            :
-
-            0;
-
-
-    let finalPrice =
-        promoBase;
-
-
-    let calculationMode =
-        "base";
-
-
-    /*
-     * Manual final selalu paling tinggi
-     * prioritasnya.
-     */
-
-    if(
-        manualFinalEnabled &&
-        manualFinal > 0
-    ){
-
-        finalPrice =
-            manualFinal;
-
-        calculationMode =
-            "manual";
-
-    }else if(
-        extraEnabled &&
-        extraPercent > 0
-    ){
-
-        finalPrice =
-            promoBase *
-            (
-                1 -
-                (
-                    extraPercent /
-                    100
-                )
-            );
-
-        calculationMode =
-            "extra";
+        };
 
     }
 
 
-    /*
-     * Pembulatan ke rupiah penuh.
-     */
-
-    finalPrice =
-        Math.round(
-            finalPrice
-        );
-
-
-    /*
-     * Diskon dasar terhadap harga normal.
-     */
-
-    const baseDiscount =
-        normal > 0
-
-            ?
-
-            Math.max(
-                0,
-                Math.round(
-                    (
-                        (
-                            normal -
-                            promoBase
-                        )
-                        /
-                        normal
-                    ) * 100
-                )
-            )
-
-            :
-
-            0;
-
-
-    /*
-     * Diskon total aktual terhadap
-     * harga normal.
-     */
-
-    const totalDiscount =
-        normal > 0
-
-            ?
-
-            Math.max(
-                0,
-                Math.round(
-                    (
-                        (
-                            normal -
-                            finalPrice
-                        )
-                        /
-                        normal
-                    ) * 100
-                )
-            )
-
-            :
-
-            0;
-
-
     return {
 
-        normal,
+        normal:
+            override.normal == null
+
+                ?
+
+                originalNormal
+
+                :
+
+                Number(
+                    override.normal
+                ) || 0,
 
         promo:
-            promoBase,
+            override.promo == null
 
-        final:
-            finalPrice,
+                ?
 
-        extraEnabled,
+                originalPromo
 
-        extraPercent,
+                :
 
-        manualFinalEnabled,
-
-        manualFinal,
-
-        calculationMode,
-
-        baseDiscount,
-
-        totalDiscount
+                Number(
+                    override.promo
+                ) || 0
 
     };
 
 }
 
 
-/* =========================================================
-   SAVE PRICE CONFIG
-========================================================= */
-
-function saveProductPricing(
+function saveCustomPrice(
     productId,
-    data
+    normal,
+    promo
 ){
 
     const key =
@@ -4559,127 +4426,27 @@ function saveProductPricing(
         );
 
 
-    const normal =
-        data.normal === ""
-
-            ?
-
-            null
-
-            :
-
-            Math.max(
+    const cleanNormal =
+        normal === ""
+            ? null
+            : Math.max(
                 0,
-                Number(
-                    data.normal
-                ) || 0
+                Number(normal) || 0
             );
 
 
-    const promo =
-        data.promo === ""
-
-            ?
-
-            null
-
-            :
-
-            Math.max(
+    const cleanPromo =
+        promo === ""
+            ? null
+            : Math.max(
                 0,
-                Number(
-                    data.promo
-                ) || 0
+                Number(promo) || 0
             );
-
-
-    const extraEnabled =
-        Boolean(
-            data.extraEnabled
-        );
-
-
-    const extraPercent =
-        extraEnabled
-
-            ?
-
-            clamp(
-                Number(
-                    data.extraPercent
-                ) || 0,
-                0,
-                99
-            )
-
-            :
-
-            0;
-
-
-    const manualFinalEnabled =
-        Boolean(
-            data.manualFinalEnabled
-        );
-
-
-    const manualFinal =
-        manualFinalEnabled
-
-            ?
-
-            Math.max(
-                0,
-                Number(
-                    data.manualFinal
-                ) || 0
-            )
-
-            :
-
-            null;
-
-
-    /*
-     * Kalau semuanya balik ke default,
-     * hapus override.
-     */
-
-    const original =
-        products.find(
-            p =>
-                getPriceKey(p) ===
-                key
-        );
-
-
-    const raw =
-        original
-            ? getRawPrice(original)
-            : {
-                normal:0,
-                promo:0
-            };
-
-
-    const noMeaningfulOverride =
-        (
-            normal === null ||
-            normal === raw.normal
-        )
-        &&
-        (
-            promo === null ||
-            promo === raw.promo
-        )
-        &&
-        !extraEnabled
-        &&
-        !manualFinalEnabled;
 
 
     if(
-        noMeaningfulOverride
+        cleanNormal === null &&
+        cleanPromo === null
     ){
 
         delete priceOverrides[
@@ -4692,17 +4459,11 @@ function saveProductPricing(
             key
         ] = {
 
-            normal,
+            normal:
+                cleanNormal,
 
-            promo,
-
-            extraEnabled,
-
-            extraPercent,
-
-            manualFinalEnabled,
-
-            manualFinal
+            promo:
+                cleanPromo
 
         };
 
@@ -4712,12 +4473,11 @@ function saveProductPricing(
     savePriceOverrides();
 
 
-    renderManager();
-
-
     /*
-     * Jangan menggeser produk.
+     * Refresh manager + preview.
      */
+
+    renderManager();
 
     renderPreview(
         false
@@ -4725,14 +4485,14 @@ function saveProductPricing(
 
 
     showToast(
-        "Harga & promo diterapkan ✓"
+        "Harga custom diterapkan ✓"
     );
 
 }
 
 
 /* =========================================================
-   PROMO
+   PROMO CHECK
 ========================================================= */
 
 function isPromo(
@@ -4749,9 +4509,9 @@ function isPromo(
 
         price.normal > 0 &&
 
-        price.final > 0 &&
+        price.promo > 0 &&
 
-        price.final <
+        price.promo <
         price.normal
 
     );
@@ -4783,7 +4543,7 @@ function makeDisplayTitle(
 
     if(brand){
 
-        const brandWords =
+        const words =
             brand
             .split(/\s+/)
             .filter(Boolean)
@@ -4793,12 +4553,12 @@ function makeDisplayTitle(
             .join("\\s+");
 
 
-        if(brandWords){
+        if(words){
 
             title =
                 title.replace(
                     new RegExp(
-                        brandWords,
+                        words,
                         "ig"
                     ),
                     ""
@@ -4831,11 +4591,20 @@ function makeDisplayTitle(
 
 
     title =
-        title.replace(
+        title
+
+        .replace(
             /\b(dengan|with|seri|series|variant|varian)\b.*$/i,
             ""
-        ).trim();
+        )
 
+        .trim();
+
+
+    /*
+     * Jangan biarkan headline
+     * terlalu panjang.
+     */
 
     if(
         title.length > 58
@@ -4851,11 +4620,13 @@ function makeDisplayTitle(
 
 
         for(
-            const word of words
+            const word
+            of words
         ){
 
             const candidate =
                 compact
+
                     ?
 
                     `${compact} ${word}`
@@ -4892,10 +4663,12 @@ function makeDisplayTitle(
 
 
     return title
+
         .replace(
             /\s+/g,
             " "
         )
+
         .trim();
 
 }
@@ -4967,7 +4740,7 @@ function buildSearchIndex(){
 
 
 /* =========================================================
-   FILTER SEARCH
+   SEARCH
 ========================================================= */
 
 function getFilteredProducts(){
@@ -4988,12 +4761,17 @@ function getFilteredProducts(){
     return searchIndex
 
         .filter(
-            item =>
-                terms.every(
+            item => {
+
+                return terms.every(
                     term =>
                         item.searchable
-                        .includes(term)
-                )
+                        .includes(
+                            term
+                        )
+                );
+
+            }
         )
 
         .map(
@@ -5061,10 +4839,43 @@ function createProductCard(
         );
 
 
-    const override =
-        priceOverrides[
+    const normal =
+        price.normal;
+
+
+    const promo =
+        price.promo;
+
+
+    const discount =
+        normal > 0
+
+            ?
+
+            Math.round(
+                (
+                    (
+                        normal -
+                        promo
+                    )
+                    /
+                    normal
+                )
+                * 100
+            )
+
+            :
+
+            0;
+
+
+    const hasCustomPrice =
+        Object.prototype
+        .hasOwnProperty
+        .call(
+            priceOverrides,
             getPriceKey(product)
-        ] || {};
+        );
 
 
     const card =
@@ -5080,6 +4891,14 @@ function createProductCard(
                 ? " selected"
                 : ""
         );
+
+
+    if(hasCustomPrice){
+
+        card.dataset.customPrice =
+            "1";
+
+    }
 
 
     card.innerHTML = `
@@ -5113,7 +4932,8 @@ function createProductCard(
         <button
             type="button"
             class="edit-price-btn"
-            title="Atur harga & diskon"
+            title="Edit harga"
+            data-edit-price
         >
 
             <svg
@@ -5123,7 +4943,9 @@ function createProductCard(
                 stroke-width="2"
             >
 
-                <path d="M12 20h9"/>
+                <path
+                    d="M12 20h9"
+                />
 
                 <path
                     d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"
@@ -5143,7 +4965,9 @@ function createProductCard(
                 stroke-width="3"
             >
 
-                <path d="m5 12 4 4L19 6"/>
+                <path
+                    d="m5 12 4 4L19 6"
+                />
 
             </svg>
 
@@ -5153,41 +4977,43 @@ function createProductCard(
         <div class="select-info">
 
             <div class="select-brand">
+
                 ${escapeHTML(
                     product.brand
                 )}
+
             </div>
 
 
             <div class="select-name">
+
                 ${escapeHTML(
                     makeDisplayTitle(
                         product
                     )
                 )}
+
             </div>
 
 
             <div class="select-price">
 
-                ${rupiah(
-                    price.final
-                )}
+                ${rupiah(promo)}
 
                 <span class="select-old">
-                    ${rupiah(
-                        price.normal
-                    )}
+
+                    ${rupiah(normal)}
+
                 </span>
 
                 ${
-                    price.totalDiscount > 0
+                    discount > 0
 
                         ?
 
                         `
                         <span class="select-discount">
-                            ${price.totalDiscount}%
+                            ${discount}%
                         </span>
                         `
 
@@ -5199,183 +5025,75 @@ function createProductCard(
 
             </div>
 
-
-            ${
-                price.extraEnabled &&
-                price.extraPercent > 0
-
-                    ?
-
-                    `
-                    <span class="select-extra">
-                        EXTRA ${price.extraPercent}% • OTOMATIS
-                    </span>
-                    `
-
-                    :
-
-                    ""
-
-            }
-
         </div>
 
 
         <div class="price-editor">
 
-            <div class="editor-title">
-                Harga & Extra Discount
-            </div>
-
-
-            <label class="editor-label">
+            <label>
                 Harga normal
             </label>
 
             <input
                 class="price-input"
-                data-price="normal"
+                data-price-type="normal"
                 type="number"
                 min="0"
                 inputmode="numeric"
-                value="${escapeAttribute(
-                    String(
-                        override.normal ??
-                        price.normal
-                    )
-                )}"
+                value="${
+                    hasCustomPrice &&
+                    priceOverrides[
+                        getPriceKey(product)
+                    ]?.normal != null
+
+                        ?
+
+                        priceOverrides[
+                            getPriceKey(product)
+                        ].normal
+
+                        :
+
+                        normal
+                }"
             >
 
 
-            <label class="editor-label">
-                Harga promo / harga dasar
+            <label>
+                Harga promo
             </label>
 
             <input
                 class="price-input"
-                data-price="promo"
+                data-price-type="promo"
                 type="number"
                 min="0"
                 inputmode="numeric"
-                value="${escapeAttribute(
-                    String(
-                        override.promo ??
-                        price.promo
-                    )
-                )}"
+                value="${
+                    hasCustomPrice &&
+                    priceOverrides[
+                        getPriceKey(product)
+                    ]?.promo != null
+
+                        ?
+
+                        priceOverrides[
+                            getPriceKey(product)
+                        ].promo
+
+                        :
+
+                        promo
+                }"
             >
-
-
-            <div class="extra-row">
-
-                <label class="extra-toggle">
-
-                    <input
-                        type="checkbox"
-                        data-extra-enabled
-                        ${
-                            price.extraEnabled
-                                ? "checked"
-                                : ""
-                        }
-                    >
-
-                    <span>
-                        Aktifkan Diskon Extra
-                    </span>
-
-                </label>
-
-
-                <div class="extra-percent-wrap">
-
-                    <input
-                        class="extra-percent-input"
-                        data-extra-percent
-                        type="number"
-                        min="0"
-                        max="99"
-                        step="1"
-                        inputmode="numeric"
-                        placeholder="Contoh 10"
-                        value="${
-                            price.extraPercent > 0
-                                ? price.extraPercent
-                                : ""
-                        }"
-                    >
-
-
-                    <div
-                        class="extra-percent-symbol"
-                    >
-                        %
-                    </div>
-
-                </div>
-
-            </div>
-
-
-            <div class="manual-row">
-
-                <label class="manual-toggle">
-
-                    <input
-                        type="checkbox"
-                        data-manual-enabled
-                        ${
-                            price.manualFinalEnabled
-                                ? "checked"
-                                : ""
-                        }
-                    >
-
-                    <span>
-                        Harga akhir manual
-                    </span>
-
-                </label>
-
-
-                <input
-                    class="price-input manual-final-input"
-                    data-manual-final
-                    type="number"
-                    min="0"
-                    inputmode="numeric"
-                    placeholder="Harga akhir khusus"
-                    value="${
-                        price.manualFinalEnabled
-                            ? price.manualFinal
-                            : ""
-                    }"
-                >
-
-            </div>
-
-
-            <div
-                class="calculated-final"
-                data-calculated-final
-            >
-                Menghitung...
-            </div>
 
 
             <button
                 type="button"
                 class="price-save-btn"
+                data-save-price
             >
-                TERAPKAN
-            </button>
-
-
-            <button
-                type="button"
-                class="price-reset-btn"
-            >
-                RESET HARGA PRODUK
+                TERAPKAN HARGA
             </button>
 
         </div>
@@ -5384,7 +5102,7 @@ function createProductCard(
 
 
     /*
-     * Card select.
+     * Card click = select.
      */
 
     card.addEventListener(
@@ -5393,10 +5111,10 @@ function createProductCard(
 
             if(
                 event.target.closest(
-                    ".price-editor"
+                    "[data-edit-price]"
                 ) ||
                 event.target.closest(
-                    ".edit-price-btn"
+                    ".price-editor"
                 )
             ){
 
@@ -5414,32 +5132,36 @@ function createProductCard(
 
 
     /*
-     * Edit.
+     * Edit harga.
      */
 
-    card
-    .querySelector(
-        ".edit-price-btn"
-    )
-    .addEventListener(
+    const editButton =
+        card.querySelector(
+            "[data-edit-price]"
+        );
+
+
+    editButton.addEventListener(
         "click",
         event => {
 
             event.stopPropagation();
 
 
+            /*
+             * Tutup card lain.
+             */
+
             document
             .querySelectorAll(
                 ".select-card.editing"
             )
             .forEach(
-                other => {
+                item => {
 
-                    if(
-                        other !== card
-                    ){
+                    if(item !== card){
 
-                        other.classList.remove(
+                        item.classList.remove(
                             "editing"
                         );
 
@@ -5453,108 +5175,37 @@ function createProductCard(
                 "editing"
             );
 
-
-            updateEditorCalculation(
-                card,
-                price
-            );
-
         }
     );
 
 
     /*
-     * Live calculation.
+     * Save harga.
      */
 
-    const normalInput =
+    const saveButton =
         card.querySelector(
-            '[data-price="normal"]'
+            "[data-save-price]"
         );
 
 
-    const promoInput =
-        card.querySelector(
-            '[data-price="promo"]'
-        );
-
-
-    const extraEnabledInput =
-        card.querySelector(
-            "[data-extra-enabled]"
-        );
-
-
-    const extraPercentInput =
-        card.querySelector(
-            "[data-extra-percent]"
-        );
-
-
-    const manualEnabledInput =
-        card.querySelector(
-            "[data-manual-enabled]"
-        );
-
-
-    const manualFinalInput =
-        card.querySelector(
-            "[data-manual-final]"
-        );
-
-
-    [
-        normalInput,
-        promoInput,
-        extraEnabledInput,
-        extraPercentInput,
-        manualEnabledInput,
-        manualFinalInput
-    ]
-    .forEach(
-        input => {
-
-            if(!input){
-                return;
-            }
-
-
-            input.addEventListener(
-                "input",
-                ()=>{
-                    updateEditorCalculation(
-                        card
-                    );
-                }
-            );
-
-
-            input.addEventListener(
-                "change",
-                ()=>{
-                    updateEditorCalculation(
-                        card
-                    );
-                }
-            );
-
-        }
-    );
-
-
-    /*
-     * Save.
-     */
-
-    card
-    .querySelector(
-        ".price-save-btn"
-    )
-    .addEventListener(
+    saveButton.addEventListener(
         "click",
         event => {
 
             event.stopPropagation();
+
+
+            const normalInput =
+                card.querySelector(
+                    '[data-price-type="normal"]'
+                );
+
+
+            const promoInput =
+                card.querySelector(
+                    '[data-price-type="promo"]'
+                );
 
 
             const normal =
@@ -5563,22 +5214,6 @@ function createProductCard(
 
             const promo =
                 promoInput.value;
-
-
-            const extraEnabled =
-                extraEnabledInput.checked;
-
-
-            const extraPercent =
-                extraPercentInput.value;
-
-
-            const manualFinalEnabled =
-                manualEnabledInput.checked;
-
-
-            const manualFinal =
-                manualFinalInput.value;
 
 
             if(
@@ -5595,316 +5230,17 @@ function createProductCard(
             }
 
 
-            if(
-                extraEnabled &&
-                (
-                    Number(extraPercent) <= 0 ||
-                    Number(extraPercent) >= 100
-                )
-            ){
-
-                showToast(
-                    "Isi Diskon Extra antara 1–99%."
-                );
-
-                return;
-
-            }
-
-
-            if(
-                manualFinalEnabled &&
-                Number(manualFinal) <= 0
-            ){
-
-                showToast(
-                    "Isi harga akhir manual."
-                );
-
-                return;
-
-            }
-
-
-            saveProductPricing(
+            saveCustomPrice(
                 product.id,
-                {
-
-                    normal,
-
-                    promo,
-
-                    extraEnabled,
-
-                    extraPercent,
-
-                    manualFinalEnabled,
-
-                    manualFinal
-
-                }
+                normal,
+                promo
             );
 
-        }
-    );
-
-
-    /*
-     * Reset.
-     */
-
-    card
-    .querySelector(
-        ".price-reset-btn"
-    )
-    .addEventListener(
-        "click",
-        event => {
-
-            event.stopPropagation();
-
-
-            delete priceOverrides[
-                getPriceKey(product)
-            ];
-
-
-            savePriceOverrides();
-
-
-            renderManager();
-
-
-            renderPreview(
-                false
-            );
-
-
-            showToast(
-                "Harga produk dikembalikan ke JSON ✓"
-            );
-
-        }
-    );
-
-
-    /*
-     * Initial calculation.
-     */
-
-    requestAnimationFrame(
-        ()=>{
-            updateEditorCalculation(
-                card,
-                price
-            );
         }
     );
 
 
     return card;
-
-}
-
-
-/* =========================================================
-   LIVE EDITOR CALCULATION
-========================================================= */
-
-function updateEditorCalculation(
-    card
-){
-
-    if(!card){
-        return;
-    }
-
-
-    const normal =
-        Number(
-            card
-            .querySelector(
-                '[data-price="normal"]'
-            )
-            ?.value
-        ) || 0;
-
-
-    const promo =
-        Number(
-            card
-            .querySelector(
-                '[data-price="promo"]'
-            )
-            ?.value
-        ) || 0;
-
-
-    const extraEnabled =
-        Boolean(
-            card
-            .querySelector(
-                "[data-extra-enabled]"
-            )
-            ?.checked
-        );
-
-
-    const extraPercent =
-        clamp(
-            Number(
-                card
-                .querySelector(
-                    "[data-extra-percent]"
-                )
-                ?.value
-            ) || 0,
-            0,
-            99
-        );
-
-
-    const manualEnabled =
-        Boolean(
-            card
-            .querySelector(
-                "[data-manual-enabled]"
-            )
-            ?.checked
-        );
-
-
-    const manualFinal =
-        Number(
-            card
-            .querySelector(
-                "[data-manual-final]"
-            )
-            ?.value
-        ) || 0;
-
-
-    let final =
-        promo;
-
-
-    if(
-        manualEnabled &&
-        manualFinal > 0
-    ){
-
-        final =
-            manualFinal;
-
-    }else if(
-        extraEnabled &&
-        extraPercent > 0
-    ){
-
-        final =
-            Math.round(
-                promo *
-                (
-                    1 -
-                    extraPercent /
-                    100
-                )
-            );
-
-    }
-
-
-    const discount =
-        normal > 0
-
-            ?
-
-            Math.max(
-                0,
-                Math.round(
-                    (
-                        (
-                            normal -
-                            final
-                        )
-                        /
-                        normal
-                    ) * 100
-                )
-            )
-
-            :
-
-            0;
-
-
-    const box =
-        card.querySelector(
-            "[data-calculated-final]"
-        );
-
-
-    if(!box){
-        return;
-    }
-
-
-    if(
-        manualEnabled &&
-        manualFinal > 0
-    ){
-
-        box.innerHTML = `
-
-            Harga akhir manual:
-
-            <strong>
-                ${rupiah(final)}
-            </strong>
-
-        `;
-
-    }else if(
-        extraEnabled &&
-        extraPercent > 0
-    ){
-
-        box.innerHTML = `
-
-            ${rupiah(promo)}
-
-            ×
-
-            ${100 - extraPercent}%
-
-            =
-
-            <strong>
-                ${rupiah(final)}
-            </strong>
-
-            <br>
-
-            Total hemat:
-            <strong>
-                ${discount}%
-            </strong>
-
-        `;
-
-    }else{
-
-        box.innerHTML = `
-
-            Harga akhir:
-
-            <strong>
-                ${rupiah(final)}
-            </strong>
-
-        `;
-
-    }
 
 }
 
@@ -5983,7 +5319,7 @@ function applyPromo(
     if(notify){
 
         showToast(
-            `${promoProducts.length} produk diterapkan ✓`
+            `${promoProducts.length} produk diterapkan.`
         );
 
     }
@@ -5992,7 +5328,7 @@ function applyPromo(
 
 
 /* =========================================================
-   RENDER PREVIEW
+   PREVIEW
 ========================================================= */
 
 function renderPreview(
@@ -6056,6 +5392,39 @@ function renderPreview(
         );
 
 
+    const normal =
+        price.normal;
+
+
+    const promo =
+        price.promo;
+
+
+    const discount =
+        normal > 0
+
+            ?
+
+            Math.max(
+                0,
+                Math.round(
+                    (
+                        (
+                            normal -
+                            promo
+                        )
+                        /
+                        normal
+                    )
+                    * 100
+                )
+            )
+
+            :
+
+            0;
+
+
     const title =
         makeDisplayTitle(
             product
@@ -6064,53 +5433,6 @@ function renderPreview(
 
     stage.className =
         `stage ratio-${currentRatio}`;
-
-
-    /*
-     * Extra badge hanya muncul
-     * ketika benar-benar aktif.
-     */
-
-    const extraBadge =
-        price.extraEnabled &&
-        price.extraPercent > 0
-
-            ?
-
-            `
-            <div
-                class="extra-discount-badge"
-            >
-                EXTRA ${price.extraPercent}% OFF
-            </div>
-            `
-
-            :
-
-            "";
-
-
-    /*
-     * Extra note.
-     */
-
-    const extraNote =
-        price.extraEnabled &&
-        price.extraPercent > 0
-
-            ?
-
-            `
-            <div
-                class="extra-price-note"
-            >
-                Extra discount ${price.extraPercent}%
-            </div>
-            `
-
-            :
-
-            "";
 
 
     stage.innerHTML = `
@@ -6169,9 +5491,6 @@ function renderPreview(
             </div>
 
 
-            ${extraBadge}
-
-
             <div
                 class="product-info"
             >
@@ -6214,7 +5533,7 @@ function renderPreview(
                     >
 
                         ${rupiah(
-                            price.final
+                            promo
                         )}
 
                     </div>
@@ -6230,7 +5549,7 @@ function renderPreview(
 
                             <s>
                                 ${rupiah(
-                                    price.normal
+                                    normal
                                 )}
                             </s>
 
@@ -6238,15 +5557,13 @@ function renderPreview(
 
 
                         ${
-                            price.totalDiscount > 0
+                            discount > 0
 
                                 ?
 
                                 `
-                                <div
-                                    class="discount"
-                                >
-                                    Hemat ${price.totalDiscount}%
+                                <div class="discount">
+                                    Hemat ${discount}%
                                 </div>
                                 `
 
@@ -6257,9 +5574,6 @@ function renderPreview(
                         }
 
                     </div>
-
-
-                    ${extraNote}
 
                 </div>
 
@@ -6390,12 +5704,12 @@ async function changeSlide(
 
 
     await wait(
-        650
+        620
     );
 
 
     /*
-     * CHANGE
+     * CHANGE PRODUCT
      */
 
     currentIndex =
@@ -6438,7 +5752,7 @@ async function changeSlide(
 
 
     await wait(
-        45
+        40
     );
 
 
@@ -6448,7 +5762,7 @@ async function changeSlide(
 
 
     await wait(
-        780
+        760
     );
 
 
@@ -6524,12 +5838,12 @@ function togglePlay(){
 
 
 /* =========================================================
-   PLAY ICON
+   PLAY ICONS
 ========================================================= */
 
 function updatePlayIcons(){
 
-    const icon =
+    const path =
         playing
 
             ?
@@ -6549,13 +5863,13 @@ function updatePlayIcons(){
     document.getElementById(
         "playIcon"
     ).innerHTML =
-        icon;
+        path;
 
 
     document.getElementById(
         "headerPlayIcon"
     ).innerHTML =
-        icon;
+        path;
 
 }
 
@@ -6667,6 +5981,27 @@ document
 );
 
 
+/*
+ * Restore ratio button.
+ */
+
+document
+.querySelectorAll(
+    ".ratio-btn"
+)
+.forEach(
+    button => {
+
+        button.classList.toggle(
+            "active",
+            button.dataset.ratio ===
+            currentRatio
+        );
+
+    }
+);
+
+
 /* =========================================================
    PREV / NEXT / PLAY
 ========================================================= */
@@ -6755,7 +6090,6 @@ async function fullscreen(){
             error
         );
 
-
         showToast(
             "Fullscreen tidak tersedia."
         );
@@ -6798,22 +6132,20 @@ function waitForImage(
             }
 
 
-            let doneCalled =
+            let finished =
                 false;
 
 
             const done =
                 ()=>{
-                    if(
-                        doneCalled
-                    ){
+                    if(finished){
 
                         return;
 
                     }
 
 
-                    doneCalled =
+                    finished =
                         true;
 
 
@@ -6864,7 +6196,7 @@ function waitForImage(
 
 
 /* =========================================================
-   IMAGE WAIT ALL
+   WAIT IMAGES
 ========================================================= */
 
 async function waitForImages(
@@ -6913,7 +6245,7 @@ async function waitForImages(
 
 
 /* =========================================================
-   FONTS
+   WAIT FONTS
 ========================================================= */
 
 async function waitForFonts(){
@@ -7019,7 +6351,7 @@ async function saveBlob(
 
 
 /* =========================================================
-   DOWNLOAD STATUS
+   DOWNLOAD STATUS — FINAL
 ========================================================= */
 
 async function downloadStatus(){
@@ -7083,8 +6415,14 @@ async function downloadStatus(){
         true;
 
 
+    const button =
+        downloadBtn;
+
+
     const originalHTML =
-        downloadBtn.innerHTML;
+        button
+            ? button.innerHTML
+            : "";
 
 
     const wasPlaying =
@@ -7096,36 +6434,45 @@ async function downloadStatus(){
         stopAutoplay();
 
 
-        downloadBtn.disabled =
-            true;
+        if(button){
 
+            button.disabled =
+                true;
 
-        downloadBtn.innerHTML = `
+            button.innerHTML = `
 
-            <svg
-                class="download-spinner"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-            >
+                <svg
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    style="
+                        width:18px;
+                        height:18px;
+                        animation:
+                            promoDownloadSpin
+                            .7s linear infinite;
+                    "
+                >
 
-                <circle
-                    cx="12"
-                    cy="12"
-                    r="9"
-                    stroke-opacity=".25"
-                ></circle>
+                    <circle
+                        cx="12"
+                        cy="12"
+                        r="9"
+                        stroke-opacity=".25"
+                    ></circle>
 
-                <path
-                    d="M21 12a9 9 0 0 0-9-9"
-                ></path>
+                    <path
+                        d="M21 12a9 9 0 0 0-9-9"
+                    ></path>
 
-            </svg>
+                </svg>
 
-            MEMBUAT...
+                MEMBUAT...
 
-        `;
+            `;
+
+        }
 
 
         showToast(
@@ -7152,6 +6499,10 @@ async function downloadStatus(){
                 )
         );
 
+
+        /*
+         * Disable active transition.
+         */
 
         document.body.classList.add(
             "capture-mode"
@@ -7185,9 +6536,13 @@ async function downloadStatus(){
             );
 
 
-        const pixelRatio =
+        /*
+         * Safe adaptive scale.
+         */
+
+        const scale =
             Math.min(
-                1.75,
+                2,
                 Math.max(
                     1,
                     window.devicePixelRatio || 1
@@ -7200,69 +6555,123 @@ async function downloadStatus(){
         );
 
 
-        const capture =
-            html2canvas(
-                source,
-                {
-
-                    backgroundColor:
-                        "#070907",
-
-                    width,
-
-                    height,
-
-                    scale:
-                        pixelRatio,
-
-                    useCORS:true,
-
-                    allowTaint:false,
-
-                    imageTimeout:8000,
-
-                    logging:false,
-
-                    foreignObjectRendering:false,
-
-                    removeContainer:true,
-
-                    scrollX:0,
-
-                    scrollY:0
-
-                }
-            );
-
-
-        const timeout =
-            new Promise(
+        const canvas =
+            await new Promise(
                 (
                     resolve,
                     reject
                 )=>{
 
-                    setTimeout(
-                        ()=>{
-                            reject(
-                                new Error(
-                                    "EXPORT_TIMEOUT"
-                                )
+                    let settled =
+                        false;
+
+
+                    const finish =
+                        (
+                            fn,
+                            value
+                        )=>{
+
+                            if(settled){
+
+                                return;
+
+                            }
+
+
+                            settled =
+                                true;
+
+
+                            fn(
+                                value
                             );
-                        },
-                        15000
+
+                        };
+
+
+                    const timeout =
+                        setTimeout(
+                            ()=>{
+
+                                finish(
+                                    reject,
+                                    new Error(
+                                        "EXPORT_TIMEOUT"
+                                    )
+                                );
+
+                            },
+                            15000
+                        );
+
+
+                    html2canvas(
+                        source,
+                        {
+
+                            backgroundColor:
+                                "#070907",
+
+                            width,
+
+                            height,
+
+                            scale,
+
+                            useCORS:true,
+
+                            allowTaint:false,
+
+                            imageTimeout:8000,
+
+                            logging:false,
+
+                            foreignObjectRendering:false,
+
+                            removeContainer:true,
+
+                            scrollX:0,
+
+                            scrollY:0
+
+                        }
+
+                    )
+
+                    .then(
+                        result=>{
+
+                            clearTimeout(
+                                timeout
+                            );
+
+
+                            finish(
+                                resolve,
+                                result
+                            );
+
+                        }
+                    )
+
+                    .catch(
+                        error=>{
+
+                            clearTimeout(
+                                timeout
+                            );
+
+
+                            finish(
+                                reject,
+                                error
+                            );
+
+                        }
                     );
 
                 }
-            );
-
-
-        const result =
-            await Promise.race(
-                [
-                    capture,
-                    timeout
-                ]
             );
 
 
@@ -7272,9 +6681,9 @@ async function downloadStatus(){
 
 
         if(
-            !result ||
-            !result.width ||
-            !result.height
+            !canvas ||
+            !canvas.width ||
+            !canvas.height
         ){
 
             throw new Error(
@@ -7296,16 +6705,16 @@ async function downloadStatus(){
                     reject
                 )=>{
 
-                    result.toBlob(
-                        value => {
+                    canvas.toBlob(
+                        result=>{
 
                             if(
-                                value &&
-                                value.size > 0
+                                result &&
+                                result.size > 0
                             ){
 
                                 resolve(
-                                    value
+                                    result
                                 );
 
                             }else{
@@ -7388,6 +6797,15 @@ async function downloadStatus(){
                 "Export terlalu lama. Coba lagi."
             );
 
+        }else if(
+            error?.message ===
+            "PNG_BLOB_FAILED"
+        ){
+
+            showToast(
+                "Browser gagal membuat PNG."
+            );
+
         }else{
 
             showToast(
@@ -7403,16 +6821,19 @@ async function downloadStatus(){
         );
 
 
+        if(button){
+
+            button.disabled =
+                false;
+
+            button.innerHTML =
+                originalHTML;
+
+        }
+
+
         downloadBusy =
             false;
-
-
-        downloadBtn.disabled =
-            false;
-
-
-        downloadBtn.innerHTML =
-            originalHTML;
 
 
         if(wasPlaying){
@@ -7500,7 +6921,7 @@ document
 
 
 /* =========================================================
-   SAVE
+   SAVE CONFIG
 ========================================================= */
 
 document
@@ -7537,7 +6958,7 @@ document
 
 
 /* =========================================================
-   RESTORE
+   RESTORE CONFIG
 ========================================================= */
 
 document
@@ -7653,16 +7074,7 @@ document
                                     price.normal,
 
                                 promo:
-                                    price.final,
-
-                                hargaDasarPromo:
-                                    price.promo,
-
-                                diskonExtraAktif:
-                                    price.extraEnabled,
-
-                                diskonExtra:
-                                    price.extraPercent
+                                    price.promo
 
                             }
 
@@ -7690,12 +7102,12 @@ document
 
             await saveBlob(
                 blob,
-                "produk-promo-final.json"
+                "produk-promo.json"
             );
 
 
             showToast(
-                "produk-promo-final.json berhasil dibuat ✓"
+                "produk-promo.json berhasil didownload ✓"
             );
 
         }catch(error){
@@ -7717,14 +7129,16 @@ document
 
 
 /* =========================================================
-   SEARCH — INSTANT
+   SEARCH — SUPER RESPONSIVE
 ========================================================= */
 
-document
-.getElementById(
-    "search"
-)
-.addEventListener(
+const searchInput =
+    document.getElementById(
+        "search"
+    );
+
+
+searchInput.addEventListener(
     "input",
     event => {
 
@@ -7742,6 +7156,11 @@ document
                 ""
             );
 
+
+        /*
+         * Tidak ada debounce.
+         * Input langsung diproses.
+         */
 
         renderManager();
 
@@ -7797,15 +7216,27 @@ stage.addEventListener(
             event.changedTouches[0];
 
 
+        const endX =
+            touch.screenX;
+
+
+        const endY =
+            touch.screenY;
+
+
         const deltaX =
-            touch.screenX -
+            endX -
             touchStartX;
 
 
         const deltaY =
-            touch.screenY -
+            endY -
             touchStartY;
 
+
+        /*
+         * Abaikan swipe vertikal.
+         */
 
         if(
             Math.abs(deltaX) <
@@ -7853,6 +7284,11 @@ stage.addEventListener(
 document.addEventListener(
     "keydown",
     event => {
+
+        /*
+         * Jangan ambil shortcut
+         * ketika user sedang mengetik.
+         */
 
         if(
             event.target &&
@@ -8003,28 +7439,7 @@ function slug(
 
 
 /* =========================================================
-   CLAMP
-========================================================= */
-
-function clamp(
-    value,
-    min,
-    max
-){
-
-    return Math.min(
-        max,
-        Math.max(
-            min,
-            value
-        )
-    );
-
-}
-
-
-/* =========================================================
-   ESCAPE
+   ESCAPE REGEXP
 ========================================================= */
 
 function escapeRegExp(
@@ -8034,6 +7449,7 @@ function escapeRegExp(
     return String(
         value
     )
+
     .replace(
         /[.*+?^${}()|[\]\\]/g,
         "\\$&"
@@ -8041,6 +7457,10 @@ function escapeRegExp(
 
 }
 
+
+/* =========================================================
+   ESCAPE HTML
+========================================================= */
 
 function escapeHTML(
     value
@@ -8090,31 +7510,10 @@ function escapeAttribute(
 
 
 /* =========================================================
-   INITIAL PLAY ICON
+   INIT PLAY ICON
 ========================================================= */
 
 updatePlayIcons();
-
-
-/* =========================================================
-   RESTORE RATIO BUTTON
-========================================================= */
-
-document
-.querySelectorAll(
-    ".ratio-btn"
-)
-.forEach(
-    button => {
-
-        button.classList.toggle(
-            "active",
-            button.dataset.ratio ===
-            currentRatio
-        );
-
-    }
-);
 
 
 /* =========================================================
@@ -8126,5 +7525,4 @@ loadProducts();
 </script>
 
 </body>
-
 </html>
