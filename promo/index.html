@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
+
 <meta charset="UTF-8">
 
 <meta
@@ -8,8 +9,10 @@
   content="width=device-width,initial-scale=1,viewport-fit=cover"
 >
 
-<meta name="theme-color" content="#020402">
-<meta name="color-scheme" content="dark">
+<meta
+  name="theme-color"
+  content="#020402"
+>
 
 <title>Imam_salesfr — nine autoseries</title>
 
@@ -35,26 +38,28 @@
 :root{
 
   --lime:#8CC63F;
-  --lime2:#B9F26C;
+  --lime-2:#B9F26C;
 
   --orange:#FF7612;
-  --orange2:#FFAA67;
+  --orange-2:#FFAA67;
 
   --blue:#2998E8;
-  --blue2:#6DD5FF;
+  --blue-2:#6DD5FF;
 
   --bg:#020402;
-  --bg2:#050805;
+  --bg-2:#050805;
+
   --panel:#080D09;
-  --panel2:#0C130E;
+  --panel-2:#0B120D;
 
   --white:#F7FAF6;
   --soft:#DDE6DE;
-  --muted:#748076;
-  --muted2:#59645B;
+
+  --muted:#788378;
+  --muted-2:#59645B;
 
   --line:rgba(255,255,255,.075);
-  --line2:rgba(255,255,255,.14);
+  --line-strong:rgba(255,255,255,.16);
 
   --display:
     "Manrope",
@@ -82,6 +87,7 @@
 html{
   min-height:100%;
   background:var(--bg);
+  scroll-behavior:smooth;
 }
 
 body{
@@ -89,18 +95,19 @@ body{
   margin:0;
 
   color:var(--white);
+
   font-family:var(--body);
 
   background:
     radial-gradient(
-      900px 500px at 50% -180px,
+      900px 500px at 50% -200px,
       rgba(140,198,63,.09),
       transparent 70%
     ),
     linear-gradient(
       180deg,
       #020402,
-      #050805 48%,
+      #050805 50%,
       #020402
     );
 
@@ -136,7 +143,7 @@ img{
 
 
 /* =========================================================
-   LOADER
+   LOADING
 ========================================================= */
 
 .loading-screen{
@@ -161,13 +168,14 @@ img{
 }
 
 .loader-box{
-  width:min(90vw,320px);
+  width:min(90vw,340px);
   text-align:center;
 }
 
 .loader-mark{
-  width:60px;
-  height:60px;
+  width:62px;
+  height:62px;
+
   margin:auto;
 
   display:grid;
@@ -179,64 +187,71 @@ img{
     linear-gradient(
       135deg,
       var(--lime),
-      var(--lime2)
+      var(--lime-2)
     );
 
   border-radius:18px;
 
   box-shadow:
-    0 18px 55px rgba(140,198,63,.18);
+    0 20px 60px rgba(140,198,63,.2);
 }
 
 .loader-mark svg{
-  width:28px;
-  height:28px;
+  width:30px;
+  height:30px;
 }
 
 .loader-name{
-  margin-top:17px;
+  margin-top:18px;
 
   color:#fff;
 
   font-family:var(--display);
-  font-size:19px;
+
+  font-size:21px;
+  line-height:1;
+
   font-weight:900;
-  letter-spacing:-.6px;
+  letter-spacing:-.8px;
 }
 
 .loader-sub{
-  margin-top:6px;
+  margin-top:7px;
 
   color:var(--lime);
 
-  font-size:7px;
+  font-size:9px;
   font-weight:900;
-  letter-spacing:1.3px;
+
+  letter-spacing:1.4px;
 }
 
 .loader-status{
-  margin-top:15px;
+  margin-top:16px;
 
-  color:#89958B;
+  color:#7D887F;
 
-  font-size:6.5px;
+  font-size:7px;
   font-weight:800;
-  letter-spacing:1.2px;
+
+  letter-spacing:1.3px;
+
   text-transform:uppercase;
 }
 
 .loader-progress{
   position:relative;
 
-  width:155px;
+  width:170px;
   height:2px;
 
-  margin:12px auto 0;
+  margin:13px auto 0;
 
   overflow:hidden;
 
   background:#101610;
-  border-radius:99px;
+
+  border-radius:999px;
 }
 
 .loader-progress::after{
@@ -256,7 +271,7 @@ img{
 @keyframes loaderMove{
 
   from{
-    transform:translateX(-130%);
+    transform:translateX(-140%);
   }
 
   to{
@@ -275,56 +290,69 @@ img{
   z-index:1000;
   top:0;
 
-  min-height:74px;
+  min-height:76px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
 
-  gap:18px;
+  gap:20px;
 
   padding:
-    10px
-    clamp(13px,4vw,42px);
+    11px
+    clamp(14px,4vw,42px);
 
   background:
-    rgba(2,4,2,.93);
+    rgba(2,4,2,.94);
 
   border-bottom:
     1px solid var(--line);
 
-  backdrop-filter:blur(18px);
+  backdrop-filter:blur(20px);
+}
+
+.header-brand{
+  min-width:0;
 }
 
 .brand-name{
   color:#fff;
 
   font-family:var(--display);
-  font-size:25px;
-  font-weight:900;
+
+  font-size:27px;
   line-height:1;
 
-  letter-spacing:-1.2px;
+  font-weight:900;
+
+  letter-spacing:-1.35px;
 }
 
 .brand-sub{
-  margin-top:5px;
+  margin-top:7px;
 
   color:var(--lime);
 
-  font-size:7px;
+  /*
+   * DIPERBESAR sesuai request.
+   */
+  font-size:10px;
+
+  line-height:1.2;
+
   font-weight:900;
-  letter-spacing:1.5px;
+
+  letter-spacing:1.45px;
 }
 
 .header-actions{
   display:flex;
-  gap:7px;
+  gap:8px;
 }
 
 .header-btn{
-  width:43px;
-  height:43px;
+  width:45px;
+  height:45px;
 
   display:grid;
   place-items:center;
@@ -336,12 +364,12 @@ img{
   border:
     1px solid var(--line);
 
-  border-radius:12px;
+  border-radius:13px;
 }
 
 .header-btn:hover{
   background:#101710;
-  border-color:var(--line2);
+  border-color:var(--line-strong);
 }
 
 .header-btn.primary{
@@ -351,7 +379,7 @@ img{
     linear-gradient(
       135deg,
       var(--lime),
-      var(--lime2)
+      var(--lime-2)
     );
 
   border-color:var(--lime);
@@ -393,9 +421,13 @@ main{
 .section-label{
   color:var(--lime);
 
-  font-size:8px;
+  font-size:9px;
+  line-height:1;
+
   font-weight:900;
-  letter-spacing:2.3px;
+
+  letter-spacing:2.4px;
+
   text-transform:uppercase;
 }
 
@@ -405,8 +437,12 @@ main{
   color:#fff;
 
   font-family:var(--display);
-  font-size:clamp(30px,4vw,46px);
+
+  font-size:
+    clamp(30px,4vw,46px);
+
   line-height:.96;
+
   font-weight:900;
 
   letter-spacing:-1.8px;
@@ -419,34 +455,40 @@ main{
 
   color:var(--muted);
 
-  font-size:9px;
+  font-size:10px;
+
   line-height:1.65;
 }
 
 .live-summary{
   display:flex;
   flex-wrap:wrap;
+
   justify-content:flex-end;
+
   gap:7px;
 }
 
 .summary-chip{
-  min-height:30px;
+  min-height:31px;
 
   display:inline-flex;
   align-items:center;
+
   gap:6px;
 
-  padding:0 10px;
+  padding:0 11px;
 
   color:#8E998F;
 
   background:#080D09;
 
-  border:1px solid var(--line);
+  border:
+    1px solid var(--line);
+
   border-radius:999px;
 
-  font-size:7px;
+  font-size:8px;
   font-weight:800;
 }
 
@@ -460,8 +502,49 @@ main{
 
 
 /* =========================================================
-   PREVIEW
+   PREVIEW AREA
 ========================================================= */
+
+.preview-wrap{
+  position:relative;
+
+  width:100%;
+}
+
+.stage-shell{
+  position:relative;
+
+  width:100%;
+
+  /*
+   * Zoom TIDAK mengubah ukuran shell.
+   * Jadi layout page tetap stabil.
+   */
+  overflow:auto;
+
+  padding:
+    10px;
+
+  border-radius:22px;
+
+  scrollbar-width:thin;
+
+  scrollbar-color:
+    rgba(140,198,63,.35)
+    transparent;
+}
+
+.stage-shell::-webkit-scrollbar{
+  height:7px;
+  width:7px;
+}
+
+.stage-shell::-webkit-scrollbar-thumb{
+  background:
+    rgba(140,198,63,.35);
+
+  border-radius:999px;
+}
 
 .stage{
   position:relative;
@@ -470,14 +553,19 @@ main{
 
   display:flex;
   justify-content:center;
+  align-items:flex-start;
 
-  transform-origin:top center;
+  /*
+   * Tidak ada transform zoom di sini.
+   */
+  transform:none !important;
 }
 
 .promo-canvas{
   position:relative;
 
   overflow:hidden;
+
   isolation:isolate;
 
   width:100%;
@@ -510,34 +598,161 @@ main{
 
 
 /* =========================================================
+   ZOOM LAYER
+========================================================= */
+
+/*
+ * Semua visual artwork berada di dalam layer ini.
+ *
+ * Zoom hanya mengubah layer.
+ * Canvas / output dimensions TIDAK berubah.
+ */
+.artwork-layer{
+  position:absolute;
+
+  inset:0;
+
+  z-index:1;
+
+  transform-origin:
+    center center;
+
+  transform:
+    scale(var(--artwork-zoom,1));
+
+  /*
+   * Sangat penting:
+   * overflow bukan di sini.
+   * Parent promo-canvas yang melakukan clipping.
+   */
+  will-change:transform;
+}
+
+
+/* =========================================================
+   ZOOM CONTROLS
+========================================================= */
+
+.preview-meta{
+  margin-top:9px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:12px;
+
+  padding:
+    10px
+    12px;
+
+  background:#080D09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:14px;
+}
+
+.preview-caption{
+  color:#788378;
+
+  font-size:7px;
+  font-weight:800;
+}
+
+.preview-caption strong{
+  color:#fff;
+}
+
+.zoom-controls{
+  display:flex;
+  align-items:center;
+
+  gap:5px;
+}
+
+.zoom-readout{
+  min-width:52px;
+
+  display:grid;
+  place-items:center;
+
+  color:var(--lime);
+
+  font-size:8px;
+  font-weight:900;
+
+  letter-spacing:.4px;
+}
+
+.zoom-btn{
+  min-width:34px;
+  height:34px;
+
+  display:grid;
+  place-items:center;
+
+  color:#D5DDD6;
+
+  background:#101610;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+}
+
+.zoom-btn:hover{
+  color:#fff;
+
+  border-color:
+    var(--line-strong);
+}
+
+.zoom-btn.reset{
+  color:#071006;
+
+  background:var(--lime);
+
+  border-color:var(--lime);
+}
+
+.zoom-btn svg{
+  width:15px;
+  height:15px;
+}
+
+
+/* =========================================================
    TEMPLATE COLORS
 ========================================================= */
 
 .template-modern{
   --accent:var(--lime);
-  --accent2:var(--lime2);
+  --accent-light:var(--lime-2);
   --glow:rgba(140,198,63,.17);
   --base:#050705;
 }
 
 .template-orange{
   --accent:var(--orange);
-  --accent2:var(--orange2);
-  --glow:rgba(255,118,18,.18);
+  --accent-light:var(--orange-2);
+  --glow:rgba(255,118,18,.19);
   --base:#080604;
 }
 
 .template-neon{
   --accent:#A6E84D;
-  --accent2:#D4FF96;
+  --accent-light:#D4FF96;
   --glow:rgba(166,232,77,.20);
   --base:#020502;
 }
 
 .template-blue{
   --accent:var(--blue);
-  --accent2:var(--blue2);
-  --glow:rgba(41,152,232,.18);
+  --accent-light:var(--blue-2);
+  --glow:rgba(41,152,232,.19);
   --base:#03080B;
 }
 
@@ -548,7 +763,9 @@ main{
 
 .template-bg{
   position:absolute;
+
   z-index:0;
+
   inset:0;
 
   background:
@@ -562,9 +779,10 @@ main{
 
 .template-bg-grid{
   position:absolute;
+
   inset:0;
 
-  opacity:.22;
+  opacity:.23;
 
   background:
     repeating-linear-gradient(
@@ -573,10 +791,6 @@ main{
       rgba(255,255,255,.018) 34px 35px,
       transparent 35px 76px
     );
-}
-
-.template-modern .template-bg-sweep{
-  display:none;
 }
 
 .template-bg-sweep{
@@ -588,12 +802,16 @@ main{
   width:47%;
   height:150%;
 
+  opacity:.78;
+
   transform:skewX(-13deg);
 
-  opacity:.78;
+  display:none;
 }
 
 .template-orange .template-bg-sweep{
+  display:block;
+
   background:
     linear-gradient(
       135deg,
@@ -605,6 +823,8 @@ main{
 }
 
 .template-neon .template-bg-sweep{
+  display:block;
+
   background:
     linear-gradient(
       135deg,
@@ -616,12 +836,14 @@ main{
 }
 
 .template-blue .template-bg-sweep{
+  display:block;
+
   background:
     linear-gradient(
       135deg,
       transparent 9%,
-      rgba(41,152,232,.72) 9%,
-      rgba(109,213,255,.32) 74%,
+      rgba(41,152,232,.78) 9%,
+      rgba(109,213,255,.34) 74%,
       transparent 74%
     );
 }
@@ -629,13 +851,13 @@ main{
 
 /* =========================================================
    REAL WATERMARK
-   NO MIX-BLEND
-   NO PSEUDO ELEMENT
 ========================================================= */
 
 .brand-watermark{
   position:absolute;
+
   z-index:4;
+
   inset:0;
 
   overflow:hidden;
@@ -692,28 +914,6 @@ main{
   text-align:center;
 }
 
-.watermark-micro{
-  position:absolute;
-  z-index:5;
-
-  color:rgba(190,220,170,.042);
-
-  font-family:var(--display);
-
-  font-size:
-    clamp(6px,.7vw,9px);
-
-  font-weight:800;
-
-  letter-spacing:1.8px;
-
-  white-space:nowrap;
-
-  transform:rotate(-25deg);
-
-  pointer-events:none;
-}
-
 
 /* =========================================================
    PRODUCT VISUAL
@@ -721,6 +921,7 @@ main{
 
 .product-visual{
   position:absolute;
+
   z-index:10;
 
   overflow:hidden;
@@ -738,19 +939,31 @@ main{
     #020302;
 }
 
-.stage.ratio-916 .product-visual{
+.stage.ratio-916
+.product-visual{
+
   inset:0 0 auto;
+
   height:55%;
+
 }
 
-.stage.ratio-45 .product-visual{
+.stage.ratio-45
+.product-visual{
+
   inset:0 0 auto;
+
   height:56%;
+
 }
 
-.stage.ratio-169 .product-visual{
+.stage.ratio-169
+.product-visual{
+
   inset:0 auto 0 0;
+
   width:58%;
+
 }
 
 .product-image{
@@ -767,17 +980,22 @@ main{
   filter:none;
 
   user-select:none;
+
   -webkit-user-drag:none;
 }
 
 .image-fallback{
+  width:100%;
+  height:100%;
+
   display:grid;
   place-items:center;
 
-  color:#657066;
+  color:#667168;
 
   font-size:8px;
   font-weight:900;
+
   letter-spacing:1px;
 }
 
@@ -788,6 +1006,7 @@ main{
 
 .visual-gradient{
   position:absolute;
+
   z-index:11;
 
   inset:0;
@@ -797,40 +1016,59 @@ main{
   background:
     linear-gradient(
       to bottom,
-      transparent 42%,
+      transparent 41%,
       rgba(5,8,5,.04) 57%,
-      rgba(5,8,5,.24) 73%,
-      rgba(5,8,5,.72) 91%,
+      rgba(5,8,5,.23) 73%,
+      rgba(5,8,5,.68) 90%,
       #050805 100%
     );
 }
 
-.stage.ratio-169 .visual-gradient{
+.stage.ratio-169
+.visual-gradient{
+
   background:
     linear-gradient(
       to right,
-      transparent 34%,
-      rgba(5,8,5,.03) 47%,
-      rgba(5,8,5,.22) 63%,
-      rgba(5,8,5,.76) 84%,
+      transparent 33%,
+      rgba(5,8,5,.04) 47%,
+      rgba(5,8,5,.24) 63%,
+      rgba(5,8,5,.78) 84%,
       #050805 100%
     );
+
 }
 
 
 /* =========================================================
-   COMMERCIAL ZONE
+   COMMERCIAL INFO ZONE
 ========================================================= */
+
+/*
+ * PERBAIKAN BESAR:
+ *
+ * info-zone TIDAK overflow:hidden.
+ * Parent canvas tetap overflow:hidden.
+ *
+ * Ini mencegah badge / text kehilangan bagian
+ * ketika renderer melakukan capture.
+ */
 
 .info-zone{
   position:absolute;
-  z-index:20;
 
-  overflow:hidden;
+  z-index:30;
+
+  overflow:visible;
+
+  pointer-events:none;
 }
 
-.stage.ratio-916 .info-zone,
-.stage.ratio-45 .info-zone{
+.stage.ratio-916
+.info-zone,
+.stage.ratio-45
+.info-zone{
+
   left:0;
   right:0;
   bottom:0;
@@ -841,9 +1079,12 @@ main{
     19px
     8%
     7%;
+
 }
 
-.stage.ratio-169 .info-zone{
+.stage.ratio-169
+.info-zone{
+
   top:0;
   right:0;
   bottom:0;
@@ -851,19 +1092,30 @@ main{
   width:42%;
 
   padding:
-    7%
+    6.8%
     5%
-    6%
-    4.5%;
+    5.7%
+    4.4%;
+
 }
 
 .product-info{
   position:relative;
+
+  z-index:50;
+
   width:100%;
+
+  min-width:0;
+
+  /*
+   * Tidak clipping.
+   */
+  overflow:visible;
 }
 
 .info-line{
-  width:55px;
+  width:56px;
   height:2px;
 
   margin-bottom:12px;
@@ -876,121 +1128,186 @@ main{
     );
 }
 
+
+/* =========================================================
+   BADGES
+========================================================= */
+
 .badge-stack{
+  position:relative;
+
+  z-index:60;
+
   display:flex;
-  flex-wrap:wrap;
+
   align-items:center;
 
-  gap:6px;
+  flex-wrap:wrap;
 
-  margin-bottom:9px;
+  gap:7px;
+
+  /*
+   * Beri ruang supaya badge tidak ketiban
+   * warranty badge.
+   */
+  padding-right:46px;
+
+  margin-bottom:10px;
 }
 
 .promo-badge{
-  min-height:28px;
+  min-height:31px;
 
   display:inline-flex;
+
   align-items:center;
   justify-content:center;
 
-  padding:0 11px;
+  padding:
+    0 13px;
 
-  color:#180A03;
+  color:#190A03;
 
   background:
     linear-gradient(
       135deg,
-      var(--orange2),
+      var(--orange-2),
       var(--orange)
     );
 
   border-radius:999px;
 
-  font-size:6.5px;
+  font-size:7px;
+
+  line-height:1;
+
   font-weight:900;
-  letter-spacing:1.5px;
+
+  letter-spacing:2px;
+
+  white-space:nowrap;
+
+  box-shadow:
+    0 9px 22px
+    rgba(255,122,26,.13);
 }
 
 .promo-dot{
-  width:5px;
-  height:5px;
+  width:6px;
+  height:6px;
 
-  margin-right:6px;
+  flex:0 0 auto;
+
+  margin-right:7px;
 
   border-radius:50%;
 
-  background:#180A03;
+  background:#190A03;
 }
 
 .extra-discount-badge{
-  min-height:25px;
+  min-height:27px;
 
   display:inline-flex;
+
   align-items:center;
 
-  padding:0 9px;
+  justify-content:center;
 
-  color:var(--orange2);
+  padding:
+    0 11px;
 
-  background:rgba(255,118,18,.055);
+  color:var(--orange-2);
+
+  background:
+    rgba(255,118,18,.055);
 
   border:
-    1px solid rgba(255,118,18,.48);
+    1px solid
+    rgba(255,118,18,.52);
 
   border-radius:999px;
 
-  font-size:6px;
+  font-size:6.5px;
+
+  line-height:1;
+
   font-weight:900;
-  letter-spacing:.8px;
+
+  letter-spacing:1px;
+
+  white-space:nowrap;
 }
 
 .warranty-badge{
   position:absolute;
 
+  z-index:70;
+
   top:0;
   right:0;
 
-  max-width:45%;
+  min-height:27px;
 
-  min-height:25px;
+  max-width:43%;
 
   display:flex;
-  align-items:center;
 
-  padding:0 9px;
+  align-items:center;
+  justify-content:center;
+
+  padding:
+    0 10px;
 
   color:var(--accent);
 
-  background:rgba(0,0,0,.36);
+  background:
+    rgba(0,0,0,.72);
 
   border:
     1px solid var(--accent);
 
   border-radius:999px;
 
-  font-size:5.5px;
+  font-size:5.8px;
+
+  line-height:1;
+
   font-weight:900;
+
+  letter-spacing:.35px;
 
   white-space:nowrap;
 
   overflow:hidden;
+
   text-overflow:ellipsis;
 }
+
+
+/* =========================================================
+   PRODUCT COPY
+========================================================= */
 
 .product-brand{
   margin-top:7px;
 
   color:var(--accent);
 
-  font-size:7px;
+  font-size:8px;
+
+  line-height:1.15;
+
   font-weight:900;
 
-  letter-spacing:1.7px;
+  letter-spacing:1.75px;
 
   text-transform:uppercase;
 
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
 }
 
@@ -1008,26 +1325,31 @@ main{
 
   font-weight:900;
 
-  letter-spacing:-1.15px;
+  letter-spacing:-1.2px;
 
   display:-webkit-box;
+
   -webkit-box-orient:vertical;
+
   -webkit-line-clamp:2;
 
   overflow:hidden;
 }
 
 .price-block{
-  margin-top:13px;
+  margin-top:14px;
 }
 
 .price-label{
-  color:#768078;
+  color:#788278;
 
-  font-size:6.5px;
+  font-size:7px;
+
+  line-height:1;
+
   font-weight:900;
 
-  letter-spacing:1.8px;
+  letter-spacing:2px;
 
   text-transform:uppercase;
 }
@@ -1046,40 +1368,46 @@ main{
 
   font-weight:900;
 
-  letter-spacing:-1.6px;
+  letter-spacing:-1.7px;
 
   white-space:nowrap;
 }
 
 .price-meta{
   display:flex;
+
   flex-wrap:wrap;
+
   align-items:center;
 
   gap:7px;
 
-  margin-top:7px;
+  margin-top:8px;
 }
 
 .price-normal{
   color:#687168;
 
-  font-size:7px;
+  font-size:8px;
 }
 
 .discount{
   color:var(--lime);
 
-  font-size:8px;
+  font-size:9px;
+
   font-weight:900;
 }
 
 .extra-price-note{
   margin-top:7px;
 
-  color:var(--orange2);
+  color:var(--orange-2);
 
-  font-size:6px;
+  font-size:7px;
+
+  line-height:1;
+
   font-weight:900;
 
   letter-spacing:.8px;
@@ -1087,38 +1415,54 @@ main{
   text-transform:uppercase;
 }
 
+
+/* =========================================================
+   RATIO + SIGNATURE
+========================================================= */
+
 .ratio-mark{
   position:absolute;
-  z-index:80;
+
+  z-index:90;
 
   top:3%;
   right:3%;
 
-  padding:5px 7px;
+  padding:
+    5px 8px;
 
   color:#fff;
 
-  background:rgba(0,0,0,.72);
+  background:
+    rgba(0,0,0,.72);
 
   border:
-    1px solid rgba(255,255,255,.12);
+    1px solid
+    rgba(255,255,255,.13);
 
   border-radius:6px;
 
-  font-size:5.5px;
+  font-size:6px;
+
+  line-height:1;
+
   font-weight:900;
 }
 
 .signature{
   position:absolute;
-  z-index:80;
+
+  z-index:90;
 
   right:3.5%;
   bottom:2.3%;
 
   color:rgba(220,225,218,.45);
 
-  font-size:5.5px;
+  font-size:6px;
+
+  line-height:1;
+
   font-weight:800;
 
   letter-spacing:.8px;
@@ -1126,36 +1470,65 @@ main{
 
 
 /* =========================================================
-   16:9
+   16:9 TUNING
 ========================================================= */
 
-.stage.ratio-169 .product-brand{
-  font-size:5.8px;
+.stage.ratio-169
+.product-brand{
+
+  font-size:6.8px;
+
+  letter-spacing:1.45px;
+
 }
 
-.stage.ratio-169 .product-name{
+.stage.ratio-169
+.product-name{
+
   font-size:
-    clamp(16px,4.3vw,25px);
+    clamp(17px,3vw,30px);
+
 }
 
-.stage.ratio-169 .price-promo{
+.stage.ratio-169
+.price-promo{
+
   font-size:
-    clamp(21px,5.7vw,32px);
+    clamp(22px,4vw,39px);
+
 }
 
-.stage.ratio-169 .promo-badge{
-  min-height:24px;
+.stage.ratio-169
+.promo-badge{
+
+  min-height:25px;
+
+  padding:
+    0 10px;
+
+  font-size:5.7px;
+
+}
+
+.stage.ratio-169
+.extra-discount-badge{
+
+  min-height:22px;
+
+  padding:
+    0 8px;
+
   font-size:5px;
+
 }
 
-.stage.ratio-169 .extra-discount-badge{
-  min-height:20px;
+.stage.ratio-169
+.warranty-badge{
+
+  min-height:22px;
+
   font-size:4.8px;
-}
 
-.stage.ratio-169 .warranty-badge{
-  min-height:21px;
-  font-size:4.5px;
 }
 
 
@@ -1192,7 +1565,9 @@ main{
 
 .ratio-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+
+  grid-template-columns:
+    repeat(3,1fr);
 
   gap:7px;
 
@@ -1203,6 +1578,7 @@ main{
   min-height:58px;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
 
@@ -1212,7 +1588,9 @@ main{
 
   background:#080D09;
 
-  border:1px solid var(--line);
+  border:
+    1px solid var(--line);
+
   border-radius:12px;
 }
 
@@ -1223,7 +1601,8 @@ main{
 .ratio-btn.active{
   color:var(--lime);
 
-  background:rgba(140,198,63,.055);
+  background:
+    rgba(140,198,63,.055);
 
   border-color:
     rgba(140,198,63,.65);
@@ -1238,17 +1617,20 @@ main{
   border-radius:4px;
 }
 
-.ratio-btn[data-ratio="916"] .ratio-icon{
+.ratio-btn[data-ratio="916"]
+.ratio-icon{
   width:13px;
   height:22px;
 }
 
-.ratio-btn[data-ratio="45"] .ratio-icon{
+.ratio-btn[data-ratio="45"]
+.ratio-icon{
   width:17px;
   height:22px;
 }
 
-.ratio-btn[data-ratio="169"] .ratio-icon{
+.ratio-btn[data-ratio="169"]
+.ratio-icon{
   width:27px;
   height:15px;
 }
@@ -1274,7 +1656,10 @@ main{
   display:grid;
 
   grid-template-columns:
-    1fr 1fr 1fr 58px;
+    1fr
+    1fr
+    1fr
+    58px;
 
   gap:7px;
 
@@ -1298,7 +1683,7 @@ main{
 }
 
 .nav-btn:hover{
-  border-color:var(--line2);
+  border-color:var(--line-strong);
 }
 
 .nav-btn svg{
@@ -1319,7 +1704,9 @@ main{
 .download-row{
   display:grid;
 
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:
+    1fr
+    1fr;
 
   gap:7px;
 
@@ -1330,6 +1717,7 @@ main{
   min-height:51px;
 
   display:flex;
+
   align-items:center;
   justify-content:center;
 
@@ -1341,12 +1729,12 @@ main{
     linear-gradient(
       135deg,
       var(--lime),
-      var(--lime2)
+      var(--lime-2)
     );
 
   border-radius:12px;
 
-  font-size:6.5px;
+  font-size:7px;
   font-weight:900;
 }
 
@@ -1392,6 +1780,7 @@ main{
 
 .panel-header{
   display:flex;
+
   align-items:flex-end;
   justify-content:space-between;
 
@@ -1421,7 +1810,12 @@ main{
   color:#69736A;
 
   font-size:8px;
+
   line-height:1.55;
+}
+
+.panel-description strong{
+  color:#B6C0B7;
 }
 
 .panel-side{
@@ -1476,7 +1870,8 @@ main{
 }
 
 .template-card.active{
-  border-color:var(--template-accent);
+  border-color:
+    var(--template-accent);
 }
 
 .template-card[data-template="modern"]{
@@ -1497,8 +1892,10 @@ main{
 
 .template-head{
   display:flex;
+
   align-items:center;
   justify-content:space-between;
+
   gap:9px;
 }
 
@@ -1506,10 +1903,13 @@ main{
   min-width:0;
 
   font-size:8px;
+
   font-weight:900;
 
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
 }
 
@@ -1531,9 +1931,12 @@ main{
   font-size:9px;
 }
 
-.template-card.active .template-check{
+.template-card.active
+.template-check{
   color:#071006;
-  background:var(--template-accent);
+
+  background:
+    var(--template-accent);
 }
 
 .template-caption{
@@ -1544,13 +1947,14 @@ main{
   color:#657066;
 
   font-size:6px;
+
   line-height:1.4;
 }
 
 .template-thumb{
   position:relative;
 
-  aspect-ratio:16 / 9;
+  aspect-ratio:16/9;
 
   margin-top:9px;
 
@@ -1564,6 +1968,7 @@ main{
 
 .thumb{
   position:absolute;
+
   inset:0;
 
   overflow:hidden;
@@ -1643,6 +2048,7 @@ main{
 
 .thumb-copy{
   position:absolute;
+
   z-index:5;
 
   left:5%;
@@ -1655,6 +2061,7 @@ main{
   color:#8CC63F;
 
   font-size:4px;
+
   font-weight:900;
 
   letter-spacing:.8px;
@@ -1684,6 +2091,7 @@ main{
 
 .thumb-product{
   position:absolute;
+
   z-index:6;
 
   right:7%;
@@ -1707,6 +2115,7 @@ main{
 
 .thumb-commercial{
   position:absolute;
+
   z-index:12;
 
   left:4%;
@@ -1782,6 +2191,7 @@ main{
 
 .thumb-watermark{
   position:absolute;
+
   z-index:30;
 
   left:5%;
@@ -1790,6 +2200,7 @@ main{
   color:rgba(255,255,255,.18);
 
   font-size:3.5px;
+
   font-weight:900;
 
   letter-spacing:.7px;
@@ -1797,6 +2208,7 @@ main{
 
 .thumb-ratio{
   position:absolute;
+
   z-index:30;
 
   right:4%;
@@ -1805,6 +2217,7 @@ main{
   color:rgba(255,255,255,.35);
 
   font-size:3.5px;
+
   font-weight:900;
 }
 
@@ -1827,7 +2240,8 @@ main{
 .tool-btn{
   min-height:39px;
 
-  padding:0 12px;
+  padding:
+    0 12px;
 
   color:#CBD4CC;
 
@@ -1839,11 +2253,12 @@ main{
   border-radius:9px;
 
   font-size:6px;
+
   font-weight:900;
 }
 
 .tool-btn:hover{
-  border-color:var(--line2);
+  border-color:var(--line-strong);
 }
 
 .tool-btn.primary{
@@ -1861,7 +2276,8 @@ main{
 
   margin-top:8px;
 
-  padding:0 13px;
+  padding:
+    0 13px;
 
   color:#fff;
 
@@ -1874,7 +2290,7 @@ main{
 
   outline:none;
 
-  font-size:7px;
+  font-size:8px;
 }
 
 .search::placeholder{
@@ -1895,13 +2311,24 @@ main{
   gap:9px;
 
   margin-top:11px;
+
+  /*
+   * Jangan clip price editor.
+   */
+  overflow:visible;
 }
 
 .select-card{
   position:relative;
 
+  min-width:0;
+
   height:287px;
 
+  /*
+   * NORMAL CARD tetap hidden.
+   * Saat editing diubah menjadi visible.
+   */
   overflow:hidden;
 
   background:
@@ -1917,10 +2344,16 @@ main{
   border-radius:15px;
 
   cursor:pointer;
+
+  transition:
+    transform .17s ease,
+    border-color .17s ease;
 }
 
 .select-card:hover{
-  border-color:var(--line2);
+  transform:translateY(-2px);
+
+  border-color:var(--line-strong);
 }
 
 .select-card.selected{
@@ -1931,6 +2364,23 @@ main{
     0 0 0 1px
     rgba(140,198,63,.08);
 }
+
+/*
+ * FIX PRICE EDITOR:
+ * card editing boleh overflow keluar.
+ */
+.select-card.editing{
+
+  z-index:500;
+
+  overflow:visible;
+
+}
+
+
+/* =========================================================
+   PRODUCT CARD IMAGE
+========================================================= */
 
 .select-image{
   position:absolute;
@@ -1964,12 +2414,14 @@ main{
 
 .card-gradient{
   position:absolute;
+
   z-index:3;
 
   left:0;
   right:0;
 
   top:92px;
+
   height:82px;
 
   background:
@@ -1982,6 +2434,7 @@ main{
 
 .card-check{
   position:absolute;
+
   z-index:30;
 
   top:8px;
@@ -1995,7 +2448,8 @@ main{
 
   color:transparent;
 
-  background:rgba(0,0,0,.72);
+  background:
+    rgba(0,0,0,.72);
 
   border:
     1px solid rgba(255,255,255,.14);
@@ -2003,47 +2457,63 @@ main{
   border-radius:6px;
 
   font-size:9px;
+
   font-weight:900;
 }
 
-.select-card.selected .card-check{
+.select-card.selected
+.card-check{
+
   color:#071006;
 
   background:var(--lime);
 
   border-color:var(--lime);
+
 }
 
 .edit-price-btn{
   position:absolute;
+
   z-index:30;
 
   top:8px;
   right:8px;
 
-  width:29px;
-  height:29px;
+  width:31px;
+  height:31px;
 
   display:grid;
   place-items:center;
 
   color:#fff;
 
-  background:rgba(0,0,0,.72);
+  background:
+    rgba(0,0,0,.72);
 
   border:
     1px solid rgba(255,255,255,.12);
 
-  border-radius:7px;
+  border-radius:8px;
+}
+
+.edit-price-btn:hover{
+  background:#000;
 }
 
 .edit-price-btn svg{
-  width:13px;
-  height:13px;
+  width:14px;
+  height:14px;
 }
+
+
+/* =========================================================
+   CARD INFO
+========================================================= */
 
 .select-info{
   position:absolute;
+
   z-index:10;
 
   left:10px;
@@ -2055,6 +2525,7 @@ main{
   color:var(--lime);
 
   font-size:6px;
+
   font-weight:900;
 
   letter-spacing:1.2px;
@@ -2062,7 +2533,9 @@ main{
   text-transform:uppercase;
 
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
 }
 
@@ -2072,11 +2545,15 @@ main{
   color:#fff;
 
   font-size:8px;
+
   line-height:1.25;
+
   font-weight:800;
 
   display:-webkit-box;
+
   -webkit-box-orient:vertical;
+
   -webkit-line-clamp:2;
 
   overflow:hidden;
@@ -2088,6 +2565,7 @@ main{
   color:#fff;
 
   font-size:8px;
+
   font-weight:900;
 
   white-space:nowrap;
@@ -2107,6 +2585,7 @@ main{
   color:var(--lime);
 
   font-size:5.5px;
+
   font-weight:900;
 }
 
@@ -2117,42 +2596,87 @@ main{
 
 .price-editor{
   position:absolute;
-  z-index:100;
+
+  z-index:1000;
 
   left:7px;
   right:7px;
   bottom:7px;
 
-  padding:9px;
+  padding:11px;
 
-  background:#050906;
+  background:
+    rgba(5,9,6,.985);
 
   border:
-    1px solid rgba(255,255,255,.12);
+    1px solid
+    rgba(140,198,63,.28);
 
-  border-radius:11px;
+  border-radius:12px;
 
   box-shadow:
-    0 20px 50px rgba(0,0,0,.55);
+    0 25px 70px
+    rgba(0,0,0,.72);
 
   display:none;
+
+  /*
+   * FIX SCROLL:
+   */
+  max-height:
+    min(68vh,390px);
+
+  overflow-y:auto;
+
+  overscroll-behavior:contain;
+
+  scrollbar-width:thin;
+
+  scrollbar-color:
+    rgba(140,198,63,.45)
+    transparent;
 }
 
-.select-card.editing .price-editor{
+.price-editor::-webkit-scrollbar{
+  width:6px;
+}
+
+.price-editor::-webkit-scrollbar-thumb{
+  background:
+    rgba(140,198,63,.45);
+
+  border-radius:999px;
+}
+
+.select-card.editing
+.price-editor{
   display:block;
 }
 
 .price-editor-title{
+  position:sticky;
+
+  top:-11px;
+
+  z-index:5;
+
+  padding:
+    11px
+    0
+    8px;
+
   color:#fff;
 
-  font-size:6px;
-  font-weight:900;
+  background:
+    rgba(5,9,6,.985);
 
-  margin-bottom:7px;
+  font-size:7px;
+
+  font-weight:900;
 }
 
 .price-field{
-  margin-top:5px;
+  margin-top:6px;
 }
 
 .price-field label{
@@ -2162,16 +2686,18 @@ main{
 
   color:#737D74;
 
-  font-size:5px;
+  font-size:5.5px;
+
   font-weight:900;
 }
 
 .price-field input{
   width:100%;
 
-  min-height:28px;
+  min-height:31px;
 
-  padding:0 7px;
+  padding:
+    0 8px;
 
   color:#fff;
 
@@ -2184,20 +2710,28 @@ main{
 
   outline:none;
 
-  font-size:6px;
+  font-size:7px;
+}
+
+.price-field input:focus{
+  border-color:
+    rgba(140,198,63,.55);
 }
 
 .price-check{
   display:flex;
+
   align-items:center;
 
-  gap:5px;
+  gap:6px;
 
-  margin-top:6px;
+  margin-top:7px;
 
   color:#89938A;
 
-  font-size:5.5px;
+  font-size:6px;
+
+  line-height:1.3;
 }
 
 .price-check input{
@@ -2205,18 +2739,33 @@ main{
 }
 
 .price-actions{
+  position:sticky;
+
+  bottom:-11px;
+
   display:grid;
 
-  grid-template-columns:1fr 1fr;
+  grid-template-columns:
+    1fr
+    1fr;
 
-  gap:5px;
+  gap:6px;
 
-  margin-top:7px;
+  margin-top:9px;
+
+  padding:
+    8px
+    0
+    11px;
+
+  background:
+    rgba(5,9,6,.985);
 }
 
 .price-save-btn,
 .price-reset-btn{
-  min-height:27px;
+
+  min-height:31px;
 
   color:#CBD4CC;
 
@@ -2225,18 +2774,22 @@ main{
   border:
     1px solid var(--line);
 
-  border-radius:7px;
+  border-radius:8px;
 
-  font-size:5.5px;
+  font-size:6px;
+
   font-weight:900;
+
 }
 
 .price-save-btn{
+
   color:#071006;
 
   background:var(--lime);
 
   border-color:var(--lime);
+
 }
 
 
@@ -2246,11 +2799,13 @@ main{
 
 .empty,
 .error{
+
   grid-column:1 / -1;
 
   min-height:220px;
 
   display:grid;
+
   place-items:center;
 
   padding:30px;
@@ -2262,11 +2817,13 @@ main{
   background:#060A07;
 
   border:
-    1px dashed rgba(255,255,255,.12);
+    1px dashed
+    rgba(255,255,255,.12);
 
   border-radius:14px;
 
-  font-size:7px;
+  font-size:8px;
+
   line-height:1.6;
 }
 
@@ -2285,15 +2842,20 @@ main{
 ========================================================= */
 
 .toast{
+
   position:fixed;
+
   z-index:9000;
 
   left:50%;
+
   bottom:22px;
 
-  max-width:min(92vw,520px);
+  max-width:
+    min(92vw,520px);
 
-  padding:11px 17px;
+  padding:
+    12px 18px;
 
   color:#071006;
 
@@ -2301,7 +2863,8 @@ main{
 
   border-radius:999px;
 
-  font-size:6.5px;
+  font-size:7px;
+
   font-weight:900;
 
   text-align:center;
@@ -2314,18 +2877,24 @@ main{
   pointer-events:none;
 
   transition:.2s ease;
+
 }
 
 .toast.show{
+
   opacity:1;
 
   transform:
     translate(-50%,0);
+
 }
 
 .toast.error{
+
   color:#fff;
+
   background:#9D3038;
+
 }
 
 
@@ -2334,11 +2903,13 @@ main{
 ========================================================= */
 
 .download-spinner{
+
   width:15px;
   height:15px;
 
   border:
-    2px solid rgba(7,16,6,.20);
+    2px solid
+    rgba(7,16,6,.2);
 
   border-top-color:#071006;
 
@@ -2349,9 +2920,11 @@ main{
 }
 
 @keyframes spin{
+
   to{
     transform:rotate(360deg);
   }
+
 }
 
 
@@ -2377,6 +2950,7 @@ main{
 
   .page-intro{
     align-items:flex-start;
+
     flex-direction:column;
   }
 
@@ -2398,21 +2972,24 @@ main{
 @media(max-width:650px){
 
   .topbar{
-    min-height:68px;
-    padding:10px 12px;
+    min-height:72px;
+
+    padding:
+      11px 12px;
   }
 
   .brand-name{
-    font-size:21px;
+    font-size:23px;
   }
 
   .brand-sub{
-    font-size:6px;
+    font-size:9px;
+    letter-spacing:1.15px;
   }
 
   .header-btn{
-    width:40px;
-    height:40px;
+    width:42px;
+    height:42px;
   }
 
   main{
@@ -2427,12 +3004,15 @@ main{
   }
 
   .panel{
-    padding:18px 12px;
+    padding:
+      18px 12px;
   }
 
   .panel-header{
     align-items:flex-start;
+
     flex-direction:column;
+
     gap:7px;
   }
 
@@ -2460,22 +3040,26 @@ main{
     height:132px;
   }
 
-  .stage.ratio-916 .product-name{
+  .stage.ratio-916
+  .product-name{
     font-size:
       clamp(22px,6.4vw,34px);
   }
 
-  .stage.ratio-916 .price-promo{
+  .stage.ratio-916
+  .price-promo{
     font-size:
       clamp(28px,7.4vw,43px);
   }
 
-  .stage.ratio-45 .product-name{
+  .stage.ratio-45
+  .product-name{
     font-size:
       clamp(23px,6vw,35px);
   }
 
-  .stage.ratio-45 .price-promo{
+  .stage.ratio-45
+  .price-promo{
     font-size:
       clamp(29px,6.8vw,45px);
   }
@@ -2484,31 +3068,57 @@ main{
     grid-template-columns:1fr;
   }
 
+  .preview-meta{
+    align-items:flex-start;
+
+    flex-direction:column;
+  }
+
+  .zoom-controls{
+    width:100%;
+
+    justify-content:flex-end;
+  }
+
 }
 
 @media(max-width:380px){
 
   .brand-name{
-    font-size:19px;
+    font-size:20px;
+  }
+
+  .brand-sub{
+    font-size:8px;
+  }
+
+  .header-btn{
+    width:40px;
+    height:40px;
   }
 
   .product-grid{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
   }
 
-  .stage.ratio-916 .product-name{
+  .stage.ratio-916
+  .product-name{
     font-size:22px;
   }
 
-  .stage.ratio-45 .product-name{
+  .stage.ratio-45
+  .product-name{
     font-size:23px;
   }
 
-  .stage.ratio-916 .price-promo{
+  .stage.ratio-916
+  .price-promo{
     font-size:28px;
   }
 
-  .stage.ratio-45 .price-promo{
+  .stage.ratio-45
+  .price-promo{
     font-size:29px;
   }
 
@@ -2519,8 +3129,11 @@ main{
   *,
   *::before,
   *::after{
+
     animation:none !important;
+
     transition:none !important;
+
   }
 
 }
@@ -2551,20 +3164,25 @@ main{
         stroke="currentColor"
         stroke-width="2.1"
       >
+
         <path d="M12 3v18"/>
         <path d="M5 8.5 12 5l7 3.5L12 12 5 8.5Z"/>
         <path d="M5 15.5 12 19l7-3.5"/>
+
       </svg>
 
     </div>
+
 
     <div class="loader-name">
       Imam_salesfr
     </div>
 
+
     <div class="loader-sub">
       Sales Representative • nine autoseries
     </div>
+
 
     <div
       class="loader-status"
@@ -2572,6 +3190,7 @@ main{
     >
       Preparing creative workspace
     </div>
+
 
     <div class="loader-progress"></div>
 
@@ -2586,7 +3205,7 @@ main{
 
 <header class="topbar">
 
-  <div>
+  <div class="header-brand">
 
     <div class="brand-name">
       Imam_salesfr
@@ -2613,8 +3232,10 @@ main{
         viewBox="0 0 24 24"
         fill="currentColor"
       >
+
         <path d="M7 5h4v14H7z"/>
         <path d="M13 5h4v14h-4z"/>
+
       </svg>
 
     </button>
@@ -2633,10 +3254,12 @@ main{
         stroke="currentColor"
         stroke-width="2"
       >
+
         <path d="M8 3H3v5"/>
         <path d="M16 3h5v5"/>
         <path d="M21 16v5h-5"/>
         <path d="M3 16v5h5"/>
+
       </svg>
 
     </button>
@@ -2671,7 +3294,7 @@ main{
     <p class="page-description">
       Product campaign workspace untuk nine autoseries:
       pilih produk, atur harga promo, pilih creative direction,
-      preview semua format, lalu export artwork resolusi tinggi.
+      preview semua format, atur zoom, lalu export artwork.
     </p>
 
   </div>
@@ -2681,22 +3304,30 @@ main{
 
     <div class="summary-chip accent">
       Selected
-      <strong id="topSelectedCount">0</strong>
+      <strong id="topSelectedCount">
+        0
+      </strong>
     </div>
 
     <div class="summary-chip">
       Products
-      <strong id="topTotalCount">0</strong>
+      <strong id="topTotalCount">
+        0
+      </strong>
     </div>
 
     <div class="summary-chip">
       Ratio
-      <strong id="topRatio">16:9</strong>
+      <strong id="topRatio">
+        16:9
+      </strong>
     </div>
 
     <div class="summary-chip">
-      Template
-      <strong id="topTemplate">Modern Dark</strong>
+      Zoom
+      <strong id="topZoom">
+        100%
+      </strong>
     </div>
 
   </div>
@@ -2708,12 +3339,116 @@ main{
      PREVIEW
 ====================================================== -->
 
-<section>
+<section class="preview-wrap">
 
-  <div
-    class="stage ratio-169"
-    id="stage"
-  ></div>
+  <div class="stage-shell">
+
+    <div
+      class="stage ratio-169"
+      id="stage"
+    ></div>
+
+  </div>
+
+
+  <div class="preview-meta">
+
+    <div
+      class="preview-caption"
+      id="previewCaption"
+    >
+      Preview
+      <strong>—</strong>
+    </div>
+
+
+    <div class="zoom-controls">
+
+      <button
+        type="button"
+        class="zoom-btn"
+        id="zoomOutBtn"
+        title="Zoom Out"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+
+          <path d="M5 12h14"/>
+
+        </svg>
+
+      </button>
+
+
+      <button
+        type="button"
+        class="zoom-btn reset"
+        id="zoomResetBtn"
+        title="Reset Zoom"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+
+          <path d="M4 4h6"/>
+          <path d="M4 4v6"/>
+          <path d="M20 20h-6"/>
+          <path d="M20 20v-6"/>
+
+        </svg>
+
+      </button>
+
+
+      <div
+        class="zoom-readout"
+        id="zoomReadout"
+      >
+        100%
+      </div>
+
+
+      <button
+        type="button"
+        class="zoom-btn"
+        id="zoomInBtn"
+        title="Zoom In"
+      >
+
+        <svg
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
+
+          <circle
+            cx="11"
+            cy="11"
+            r="6"
+          />
+
+          <path d="M16 16l5 5"/>
+
+          <path d="M11 8v6"/>
+          <path d="M8 11h6"/>
+
+        </svg>
+
+      </button>
+
+    </div>
+
+  </div>
 
 
   <div class="control-strip">
@@ -2721,8 +3456,9 @@ main{
     <div>
 
       <div class="section-label">
-        Pilih Rasio
+        Canvas Ratio
       </div>
+
 
       <div class="ratio-grid">
 
@@ -2731,9 +3467,11 @@ main{
           class="ratio-btn"
           data-ratio="916"
         >
+
           <span class="ratio-icon"></span>
 
           <span>
+
             <span class="ratio-value">
               9:16
             </span>
@@ -2741,7 +3479,9 @@ main{
             <span class="ratio-use">
               Story
             </span>
+
           </span>
+
         </button>
 
 
@@ -2750,9 +3490,11 @@ main{
           class="ratio-btn"
           data-ratio="45"
         >
+
           <span class="ratio-icon"></span>
 
           <span>
+
             <span class="ratio-value">
               4:5
             </span>
@@ -2760,7 +3502,9 @@ main{
             <span class="ratio-use">
               Feed
             </span>
+
           </span>
+
         </button>
 
 
@@ -2769,9 +3513,11 @@ main{
           class="ratio-btn active"
           data-ratio="169"
         >
+
           <span class="ratio-icon"></span>
 
           <span>
+
             <span class="ratio-value">
               16:9
             </span>
@@ -2779,7 +3525,9 @@ main{
             <span class="ratio-use">
               Landscape
             </span>
+
           </span>
+
         </button>
 
       </div>
@@ -2793,6 +3541,7 @@ main{
         Preview & Export
       </div>
 
+
       <div class="navigation">
 
         <button
@@ -2800,14 +3549,18 @@ main{
           class="nav-btn"
           id="prevBtn"
         >
+
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2.2"
           >
+
             <path d="m15 18-6-6 6-6"/>
+
           </svg>
+
         </button>
 
 
@@ -2816,14 +3569,18 @@ main{
           class="nav-btn"
           id="playBtn"
         >
+
           <svg
             id="playIcon"
             viewBox="0 0 24 24"
             fill="currentColor"
           >
+
             <path d="M7 5h4v14H7z"/>
             <path d="M13 5h4v14h-4z"/>
+
           </svg>
+
         </button>
 
 
@@ -2832,14 +3589,18 @@ main{
           class="nav-btn"
           id="nextBtn"
         >
+
           <svg
             viewBox="0 0 24 24"
             fill="none"
             stroke="currentColor"
             stroke-width="2.2"
           >
+
             <path d="m9 18 6-6-6-6"/>
+
           </svg>
+
         </button>
 
 
@@ -2867,9 +3628,11 @@ main{
             stroke="currentColor"
             stroke-width="2.2"
           >
+
             <path d="M12 3v12"/>
             <path d="m7 10 5 5 5-5"/>
             <path d="M4 21h16"/>
+
           </svg>
 
           DOWNLOAD PNG
@@ -2889,6 +3652,7 @@ main{
             stroke="currentColor"
             stroke-width="2"
           >
+
             <rect
               x="4"
               y="4"
@@ -2896,7 +3660,9 @@ main{
               height="12"
               rx="2"
             />
+
             <path d="M8 20h12a2 2 0 0 0 2-2V8"/>
+
           </svg>
 
           EXPORT ALL
@@ -2913,7 +3679,7 @@ main{
 
 
 <!-- ======================================================
-     TEMPLATE
+     CREATIVE SYSTEM
 ====================================================== -->
 
 <section class="panel">
@@ -2931,24 +3697,27 @@ main{
       </h2>
 
       <div class="panel-description">
-        Four premium visual systems yang tetap membawa
-        identity Imam_salesfr.
+        Four premium visual systems dengan identity
+        Imam_salesfr • nine autoseries.
       </div>
 
     </div>
 
 
     <div class="panel-side">
+
       Active:
       <strong id="activeTemplate">
         Modern Dark
       </strong>
+
     </div>
 
   </div>
 
 
   <div class="template-grid">
+
 
     <button
       type="button"
@@ -2968,9 +3737,11 @@ main{
 
       </div>
 
+
       <div class="template-caption">
-        Clean, premium, balanced commercial direction.
+        Clean, premium and balanced commercial direction.
       </div>
+
 
       <div class="template-thumb">
 
@@ -2979,26 +3750,35 @@ main{
           <div class="thumb-sweep"></div>
 
           <div class="thumb-copy">
+
             <div class="thumb-brand">
               NINE AUTOSERIES
             </div>
 
             <div class="thumb-title"></div>
+
             <div class="thumb-sub"></div>
+
           </div>
+
 
           <div class="thumb-product"></div>
 
+
           <div class="thumb-commercial">
+
             <span class="thumb-promo"></span>
             <span class="thumb-extra"></span>
             <span class="thumb-badge"></span>
             <span class="thumb-price"></span>
+
           </div>
+
 
           <span class="thumb-watermark">
             IMAMSALESNINE.COM
           </span>
+
 
           <span class="thumb-ratio">
             16:9
@@ -3029,9 +3809,11 @@ main{
 
       </div>
 
+
       <div class="template-caption">
-        High-energy sales treatment untuk promo agresif.
+        High-energy sales treatment dengan accent orange.
       </div>
+
 
       <div class="template-thumb">
 
@@ -3040,26 +3822,35 @@ main{
           <div class="thumb-sweep"></div>
 
           <div class="thumb-copy">
+
             <div class="thumb-brand">
               NINE AUTOSERIES
             </div>
 
             <div class="thumb-title"></div>
+
             <div class="thumb-sub"></div>
+
           </div>
+
 
           <div class="thumb-product"></div>
 
+
           <div class="thumb-commercial">
+
             <span class="thumb-promo"></span>
             <span class="thumb-extra"></span>
             <span class="thumb-badge"></span>
             <span class="thumb-price"></span>
+
           </div>
+
 
           <span class="thumb-watermark">
             IMAMSALESNINE.COM
           </span>
+
 
           <span class="thumb-ratio">
             16:9
@@ -3090,9 +3881,11 @@ main{
 
       </div>
 
+
       <div class="template-caption">
-        Futuristic, sharp and high-contrast product direction.
+        Futuristic, sharp and high-contrast direction.
       </div>
+
 
       <div class="template-thumb">
 
@@ -3101,26 +3894,35 @@ main{
           <div class="thumb-sweep"></div>
 
           <div class="thumb-copy">
+
             <div class="thumb-brand">
               NINE AUTOSERIES
             </div>
 
             <div class="thumb-title"></div>
+
             <div class="thumb-sub"></div>
+
           </div>
+
 
           <div class="thumb-product"></div>
 
+
           <div class="thumb-commercial">
+
             <span class="thumb-promo"></span>
             <span class="thumb-extra"></span>
             <span class="thumb-badge"></span>
             <span class="thumb-price"></span>
+
           </div>
+
 
           <span class="thumb-watermark">
             IMAMSALESNINE.COM
           </span>
+
 
           <span class="thumb-ratio">
             16:9
@@ -3151,9 +3953,11 @@ main{
 
       </div>
 
+
       <div class="template-caption">
-        Corporate, technical and automotive-friendly direction.
+        Corporate, technical and automotive-friendly look.
       </div>
+
 
       <div class="template-thumb">
 
@@ -3162,26 +3966,35 @@ main{
           <div class="thumb-sweep"></div>
 
           <div class="thumb-copy">
+
             <div class="thumb-brand">
               NINE AUTOSERIES
             </div>
 
             <div class="thumb-title"></div>
+
             <div class="thumb-sub"></div>
+
           </div>
+
 
           <div class="thumb-product"></div>
 
+
           <div class="thumb-commercial">
+
             <span class="thumb-promo"></span>
             <span class="thumb-extra"></span>
             <span class="thumb-badge"></span>
             <span class="thumb-price"></span>
+
           </div>
+
 
           <span class="thumb-watermark">
             IMAMSALESNINE.COM
           </span>
+
 
           <span class="thumb-ratio">
             16:9
@@ -3192,6 +4005,7 @@ main{
       </div>
 
     </button>
+
 
   </div>
 
@@ -3255,6 +4069,7 @@ main{
       PILIH SEMUA
     </button>
 
+
     <button
       type="button"
       class="tool-btn"
@@ -3262,6 +4077,7 @@ main{
     >
       BALIK SELEKSI
     </button>
+
 
     <button
       type="button"
@@ -3271,6 +4087,7 @@ main{
       BERSIHKAN
     </button>
 
+
     <button
       type="button"
       class="tool-btn primary"
@@ -3278,6 +4095,7 @@ main{
     >
       TERAPKAN PROMO
     </button>
+
 
     <button
       type="button"
@@ -3315,6 +4133,8 @@ main{
 <div
   class="toast"
   id="toast"
+  role="status"
+  aria-live="polite"
 ></div>
 
 
@@ -3323,6 +4143,9 @@ main{
 /* =========================================================
    CONFIG
 ========================================================= */
+
+"use strict";
+
 
 const CONFIG = {
 
@@ -3335,9 +4158,9 @@ const CONFIG = {
   DURATION:
     8500,
 
-  MAX_EXTRA:
-    99,
-
+  /*
+   * FINAL OUTPUT
+   */
   EXPORT_WIDTH:{
     "916":1080,
     "45":1080,
@@ -3345,38 +4168,45 @@ const CONFIG = {
   },
 
   MAX_EXPORT_PIXELS:
-    12000000
+    12000000,
+
+  /*
+   * Zoom.
+   */
+  MIN_ZOOM:
+    .75,
+
+  MAX_ZOOM:
+    1.25,
+
+  ZOOM_STEP:
+    .05
 
 };
 
-
-/* =========================================================
-   STORAGE
-========================================================= */
 
 const STORAGE = {
 
   RATIO:
-    "imamPromo.ratio",
+    "imamPremium.ratio",
 
   TEMPLATE:
-    "imamPromo.template",
+    "imamPremium.template",
 
   SELECTION:
-    "imamPromo.selection",
+    "imamPremium.selection",
 
   PRICES:
-    "imamPromo.priceOverrides",
+    "imamPremium.prices",
+
+  ZOOM:
+    "imamPremium.zoom",
 
   PLAYING:
-    "imamPromo.playing"
+    "imamPremium.playing"
 
 };
 
-
-/* =========================================================
-   TEMPLATES
-========================================================= */
 
 const TEMPLATES = {
 
@@ -3431,6 +4261,13 @@ const state = {
 
   searchQuery:"",
 
+  zoom:
+    Number(
+      localStorage.getItem(
+        STORAGE.ZOOM
+      )
+    ) || 1,
+
   playing:
     localStorage.getItem(
       STORAGE.PLAYING
@@ -3477,14 +4314,20 @@ const DOM = {
   topRatio:
     $("topRatio"),
 
-  topTemplate:
-    $("topTemplate"),
+  topZoom:
+    $("topZoom"),
 
   activeTemplate:
     $("activeTemplate"),
 
   slideCount:
     $("slideCount"),
+
+  previewCaption:
+    $("previewCaption"),
+
+  zoomReadout:
+    $("zoomReadout"),
 
   downloadBtn:
     $("downloadBtn"),
@@ -3517,7 +4360,7 @@ const DOM = {
 
 
 /* =========================================================
-   SAFE EVENT BINDING
+   SAFE EVENT BINDER
 ========================================================= */
 
 function on(
@@ -3545,10 +4388,12 @@ function on(
 
 
 /* =========================================================
-   BASIC
+   HELPERS
 ========================================================= */
 
-function wait(ms){
+function wait(
+  ms
+){
 
   return new Promise(
     resolve =>
@@ -3556,6 +4401,23 @@ function wait(ms){
         resolve,
         ms
       )
+  );
+
+}
+
+
+function clamp(
+  value,
+  min,
+  max
+){
+
+  return Math.min(
+    max,
+    Math.max(
+      min,
+      value
+    )
   );
 
 }
@@ -3575,20 +4437,25 @@ function text(
 
   }
 
+
   if(
     typeof value === "string" ||
     typeof value === "number"
   ){
 
-    return String(value);
+    return String(
+      value
+    );
 
   }
+
 
   if(
     typeof value === "object"
   ){
 
     return String(
+
       value.text ??
       value.label ??
       value.title ??
@@ -3596,9 +4463,11 @@ function text(
       value.nama ??
       value.value ??
       fallback
+
     );
 
   }
+
 
   return fallback;
 
@@ -3665,38 +4534,21 @@ function normalizeSearch(
 }
 
 
-function clamp(
-  value,
-  min,
-  max
-){
-
-  return Math.min(
-    max,
-    Math.max(
-      min,
-      value
-    )
-  );
-
-}
-
-
 function rupiah(
   value
 ){
-
-  const number =
-    Number(value) || 0;
 
   return new Intl.NumberFormat(
     "id-ID",
     {
       style:"currency",
       currency:"IDR",
+      minimumFractionDigits:0,
       maximumFractionDigits:0
     }
-  ).format(number);
+  ).format(
+    Number(value) || 0
+  );
 
 }
 
@@ -3706,7 +4558,7 @@ function slug(
 ){
 
   return String(
-    value ?? ""
+    value ?? "produk"
   )
 
     .toLowerCase()
@@ -3750,7 +4602,9 @@ function storageGet(
   try{
 
     const value =
-      localStorage.getItem(key);
+      localStorage.getItem(
+        key
+      );
 
     return value === null
       ? fallback
@@ -3812,6 +4666,10 @@ function savePrices(){
 }
 
 
+/* =========================================================
+   RESTORE
+========================================================= */
+
 function restoreWorkspace(){
 
   try{
@@ -3824,13 +4682,18 @@ function restoreWorkspace(){
         )
       );
 
-    state.selectedIds =
+
+    if(
       Array.isArray(selection)
-        ? selection.map(
-            value =>
-              String(value)
-          )
-        : [];
+    ){
+
+      state.selectedIds =
+        selection.map(
+          id =>
+            String(id)
+        );
+
+    }
 
   }catch{
 
@@ -3841,19 +4704,41 @@ function restoreWorkspace(){
 
   try{
 
-    state.priceOverrides =
+    const prices =
       JSON.parse(
         storageGet(
           STORAGE.PRICES,
           "{}"
         )
-      ) || {};
+      );
+
+
+    if(
+      prices &&
+      typeof prices ===
+        "object"
+    ){
+
+      state.priceOverrides =
+        prices;
+
+    }
 
   }catch{
 
     state.priceOverrides = {};
 
   }
+
+
+  state.zoom =
+    clamp(
+      Number(
+        state.zoom
+      ) || 1,
+      CONFIG.MIN_ZOOM,
+      CONFIG.MAX_ZOOM
+    );
 
 }
 
@@ -3879,13 +4764,17 @@ function normalizeProduct(
 
   const harga =
     raw.harga &&
-    typeof raw.harga === "object"
+    typeof raw.harga ===
+      "object"
+
       ? raw.harga
+
       : {};
 
 
   const normal =
     Number(
+
       harga.normal ??
       harga.reguler ??
       harga.original ??
@@ -3893,60 +4782,74 @@ function normalizeProduct(
       raw.normalPrice ??
       raw.price ??
       0
+
     ) || 0;
 
 
   const promo =
     Number(
+
       harga.promo ??
       harga.discount ??
       harga.sale ??
       raw.hargaPromo ??
       raw.promoPrice ??
-      0
-    ) || 0;
+      normal
+
+    ) || normal;
 
 
   const id =
     text(
+
       raw.id ??
       raw.sku ??
       raw.kode ??
       raw.code ??
       index + 1
+
     );
 
 
   const sku =
     text(
+
       raw.sku ??
       raw.kode ??
       raw.code ??
       id
+
     );
 
 
   const brand =
     text(
+
       raw.brand ??
       raw.merek ??
-      raw.brandName ??
+      raw.brandName,
+
       "NINE AUTOSERIES"
+
     );
 
 
   const nama =
     text(
+
       raw.nama ??
       raw.name ??
       raw.title ??
-      raw.productName ??
-      "Produk"
+      raw.productName,
+
+      "Produk Promo"
+
     );
 
 
   const gambar =
     text(
+
       raw.gambar ??
       raw.image ??
       raw.foto ??
@@ -3954,15 +4857,18 @@ function normalizeProduct(
       raw.imageUrl ??
       raw.thumbnail ??
       ""
+
     );
 
 
   const garansi =
     text(
+
       raw.garansi ??
       raw.warranty ??
       raw.guarantee ??
       "GARANSI RESMI"
+
     );
 
 
@@ -4003,19 +4909,21 @@ function imagePath(
   product
 ){
 
-  const explicit =
+  const direct =
     product.gambar ??
     product.image ??
     product.foto ??
     product.imagePath ??
-    product.image_url ??
-    product.imageUrl;
+    product.imageUrl ??
+    product.image_url;
 
 
-  if(explicit){
+  if(
+    direct
+  ){
 
     return text(
-      explicit
+      direct
     ).trim();
 
   }
@@ -4028,11 +4936,15 @@ function imagePath(
     product.namaFile;
 
 
-  if(filename){
+  if(
+    filename
+  ){
 
     return (
       CONFIG.IMAGE_FOLDER +
-      text(filename).trim()
+      text(
+        filename
+      ).trim()
     );
 
   }
@@ -4044,7 +4956,7 @@ function imagePath(
 
 
 /* =========================================================
-   DISPLAY DATA
+   PRODUCT TEXT
 ========================================================= */
 
 function makeDisplayTitle(
@@ -4053,19 +4965,22 @@ function makeDisplayTitle(
 
   let title =
     text(
+
       product.nama ??
       product.name ??
       product.judul ??
       product.title,
+
       "Produk Promo"
+
     )
 
-    .replace(
-      /\s+/g,
-      " "
-    )
+      .replace(
+        /\s+/g,
+        " "
+      )
 
-    .trim();
+      .trim();
 
 
   const brand =
@@ -4108,12 +5023,16 @@ function warrantyText(
 ){
 
   return text(
+
     product.garansi ??
     product.warranty ??
+    product.guarantee ??
     product.badgeWarranty ??
     product.warrantyBadge ??
-    product.badge ??
+    product.badge,
+
     "GARANSI RESMI"
+
   ).trim();
 
 }
@@ -4124,10 +5043,12 @@ function categoryText(
 ){
 
   return text(
+
     product.kategori ??
     product.category ??
     product.jenis ??
     ""
+
   ).trim();
 
 }
@@ -4141,41 +5062,49 @@ function getPriceData(
   product
 ){
 
-  const baseNormal =
+  const normal =
     Number(
       product.harga?.normal
     ) || 0;
 
 
-  const basePromo =
+  const promo =
     Number(
       product.harga?.promo
-    ) || baseNormal;
+    ) || normal;
 
 
   const override =
     state.priceOverrides[
-      String(product.id)
+      String(
+        product.id
+      )
     ] || {};
 
 
-  const normal =
+  const finalNormal =
     Math.max(
+
       0,
+
       Number(
         override.normal ??
-        baseNormal
+        normal
       ) || 0
+
     );
 
 
-  const promo =
+  const basePromo =
     Math.max(
+
       0,
+
       Number(
         override.promo ??
-        basePromo
+        promo
       ) || 0
+
     );
 
 
@@ -4187,11 +5116,14 @@ function getPriceData(
 
   const extraPercent =
     clamp(
+
       Number(
         override.extraPercent
       ) || 0,
+
       0,
-      CONFIG.MAX_EXTRA
+      99
+
     );
 
 
@@ -4203,30 +5135,34 @@ function getPriceData(
 
   const manualFinal =
     Math.max(
+
       0,
+
       Number(
         override.manualFinal
       ) || 0
+
     );
 
 
   let final =
-    promo;
+    basePromo;
 
 
   if(
     extraEnabled &&
-    extraPercent > 0 &&
-    promo > 0
+    extraPercent > 0
   ){
 
     final =
       Math.round(
-        promo *
+
+        basePromo *
         (
           1 -
           extraPercent / 100
         )
+
       );
 
   }
@@ -4243,18 +5179,20 @@ function getPriceData(
   }
 
 
-  const finalDiscount =
-    normal > 0 &&
-    final < normal
+  const discount =
+    finalNormal > 0 &&
+    final < finalNormal
 
       ? Math.round(
+
           (
             (
-              normal -
+              finalNormal -
               final
             ) /
-            normal
+            finalNormal
           ) * 100
+
         )
 
       : 0;
@@ -4262,17 +5200,24 @@ function getPriceData(
 
   return {
 
-    normal,
-    promo,
+    normal:
+      finalNormal,
+
+    promo:
+      basePromo,
+
     final,
 
     extraEnabled,
+
     extraPercent,
 
     manualEnabled,
+
     manualFinal,
 
-    finalDiscount
+    finalDiscount:
+      discount
 
   };
 
@@ -4280,19 +5225,39 @@ function getPriceData(
 
 
 /* =========================================================
-   TEMPLATE / RATIO
+   RATIO
 ========================================================= */
 
 function ratioLabel(){
 
-  return state.currentRatio === "916"
-    ? "9:16"
-    : state.currentRatio === "45"
-      ? "4:5"
-      : "16:9";
+  if(
+    state.currentRatio ===
+      "916"
+  ){
+
+    return "9:16";
+
+  }
+
+
+  if(
+    state.currentRatio ===
+      "45"
+  ){
+
+    return "4:5";
+
+  }
+
+
+  return "16:9";
 
 }
 
+
+/* =========================================================
+   TEMPLATE
+========================================================= */
 
 function templateClass(){
 
@@ -4305,64 +5270,152 @@ function templateClass(){
 
 
 /* =========================================================
-   TOAST
+   ZOOM
 ========================================================= */
 
-let toastTimer = null;
+function updateZoomUI(){
 
-function showToast(
-  message,
-  type="success"
-){
+  const percent =
+    Math.round(
+      state.zoom * 100
+    );
 
-  if(!DOM.toast){
-    return;
+
+  if(
+    DOM.zoomReadout
+  ){
+
+    DOM.zoomReadout.textContent =
+      `${percent}%`;
+
   }
 
-  DOM.toast.textContent =
-    message;
 
-  DOM.toast.className =
-    "toast " +
+  if(
+    DOM.topZoom
+  ){
+
+    DOM.topZoom.textContent =
+      `${percent}%`;
+
+  }
+
+
+  if(
+    DOM.previewCaption
+  ){
+
+    DOM.previewCaption.innerHTML =
+      `Preview <strong>${ratioLabel()} • ${percent}%</strong>`;
+
+  }
+
+}
+
+
+function applyZoomToArtwork(){
+
+  const artwork =
+    DOM.stage.querySelector(
+      ".artwork-layer"
+    );
+
+
+  if(
+    artwork
+  ){
+
+    artwork.style.setProperty(
+      "--artwork-zoom",
+      String(
+        state.zoom
+      )
+    );
+
+  }
+
+
+  updateZoomUI();
+
+}
+
+
+function setZoom(
+  value
+){
+
+  state.zoom =
+    clamp(
+
+      Number(
+        value
+      ) || 1,
+
+      CONFIG.MIN_ZOOM,
+      CONFIG.MAX_ZOOM
+
+    );
+
+
+  storageSet(
+    STORAGE.ZOOM,
+    String(
+      state.zoom
+    )
+  );
+
+
+  applyZoomToArtwork();
+
+}
+
+
+function zoomIn(){
+
+  setZoom(
+
     (
-      type === "error"
-        ? "error"
-        : ""
-    );
+      state.zoom +
+      CONFIG.ZOOM_STEP
+    ).toFixed(2)
 
-  requestAnimationFrame(
-    ()=>{
-      DOM.toast.classList.add(
-        "show"
-      );
-    }
   );
 
-  clearTimeout(
-    toastTimer
+}
+
+
+function zoomOut(){
+
+  setZoom(
+
+    (
+      state.zoom -
+      CONFIG.ZOOM_STEP
+    ).toFixed(2)
+
   );
 
-  toastTimer =
-    setTimeout(
-      ()=>{
-        DOM.toast.classList.remove(
-          "show"
-        );
-      },
-      2800
-    );
+}
+
+
+function zoomReset(){
+
+  setZoom(
+    1
+  );
 
 }
 
 
 /* =========================================================
-   COUNTS / UI
+   COUNTS
 ========================================================= */
 
 function updateCounts(){
 
   const selected =
     state.selectedIds.length;
+
 
   const total =
     state.products.length;
@@ -4383,15 +5436,12 @@ function updateCounts(){
   DOM.topRatio.textContent =
     ratioLabel();
 
-  DOM.topTemplate.textContent =
-    TEMPLATES[
-      state.currentTemplate
-    ].name;
-
   DOM.activeTemplate.textContent =
     TEMPLATES[
       state.currentTemplate
     ].name;
+
+  updateZoomUI();
 
 }
 
@@ -4399,12 +5449,19 @@ function updateCounts(){
 function updateSlideCount(){
 
   DOM.slideCount.textContent =
+
     state.promoProducts.length
+
       ? `${state.currentIndex + 1} / ${state.promoProducts.length}`
+
       : "0 / 0";
 
 }
 
+
+/* =========================================================
+   SYNC UI
+========================================================= */
 
 function syncUI(){
 
@@ -4416,9 +5473,12 @@ function syncUI(){
       button =>{
 
         button.classList.toggle(
+
           "active",
+
           button.dataset.ratio ===
             state.currentRatio
+
         );
 
       }
@@ -4433,9 +5493,12 @@ function syncUI(){
       card =>{
 
         card.classList.toggle(
+
           "active",
+
           card.dataset.template ===
             state.currentTemplate
+
         );
 
       }
@@ -4448,24 +5511,99 @@ function syncUI(){
 
 
 /* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer =
+  null;
+
+
+function showToast(
+  message,
+  type="success"
+){
+
+  if(
+    !DOM.toast
+  ){
+
+    return;
+
+  }
+
+
+  DOM.toast.textContent =
+    message;
+
+
+  DOM.toast.className =
+    "toast" +
+    (
+      type ===
+        "error"
+        ? " error"
+        : ""
+    );
+
+
+  requestAnimationFrame(
+    ()=>{
+      DOM.toast.classList.add(
+        "show"
+      );
+    }
+  );
+
+
+  clearTimeout(
+    toastTimer
+  );
+
+
+  toastTimer =
+    setTimeout(
+      ()=>{
+        DOM.toast.classList.remove(
+          "show"
+        );
+      },
+      2800
+    );
+
+}
+
+
+/* =========================================================
    PLAY
 ========================================================= */
 
 function updatePlayIcons(){
 
   const icon = `
+
     <path d="M7 5h4v14H7z"/>
     <path d="M13 5h4v14h-4z"/>
+
   `;
 
-  if(DOM.playIcon){
+
+  if(
+    DOM.playIcon
+  ){
+
     DOM.playIcon.innerHTML =
       icon;
+
   }
 
-  if(DOM.headerPlayIcon){
+
+  if(
+    DOM.headerPlayIcon
+  ){
+
     DOM.headerPlayIcon.innerHTML =
       icon;
+
   }
 
 }
@@ -4493,6 +5631,7 @@ function startAutoplay(){
 
   stopAutoplay();
 
+
   if(
     !state.playing ||
     document.hidden ||
@@ -4508,9 +5647,12 @@ function startAutoplay(){
     setInterval(
       ()=>{
         if(
-          !document.hidden
+          !document.hidden &&
+          !state.downloadBusy
         ){
+
           nextSlide();
+
         }
       },
       CONFIG.DURATION
@@ -4524,6 +5666,7 @@ function togglePlay(){
   state.playing =
     !state.playing;
 
+
   storageSet(
     STORAGE.PLAYING,
     String(
@@ -4531,7 +5674,9 @@ function togglePlay(){
     )
   );
 
+
   updatePlayIcons();
+
 
   if(
     state.playing
@@ -4549,15 +5694,17 @@ function togglePlay(){
 
 
 /* =========================================================
-   RENDER PREVIEW
+   PREVIEW RENDER
 ========================================================= */
 
 function imageFallbackHTML(){
 
   return `
+
     <div class="image-fallback">
       IMAGE NOT FOUND
     </div>
+
   `;
 
 }
@@ -4601,9 +5748,12 @@ function renderPreview(){
 
     `;
 
+
     updateSlideCount();
 
     stopAutoplay();
+
+    updateZoomUI();
 
     return;
 
@@ -4612,10 +5762,11 @@ function renderPreview(){
 
   if(
     state.currentIndex >=
-    state.promoProducts.length
+      state.promoProducts.length
   ){
 
-    state.currentIndex = 0;
+    state.currentIndex =
+      0;
 
   }
 
@@ -4656,7 +5807,7 @@ function renderPreview(){
     );
 
 
-  const extra =
+  const extraVisible =
     price.extraEnabled &&
     price.extraPercent > 0;
 
@@ -4673,247 +5824,309 @@ function renderPreview(){
       "
     >
 
-      <div class="template-bg">
-
-        <div
-          class="template-bg-grid"
-        ></div>
-
-        <div
-          class="template-bg-sweep"
-        ></div>
-
-      </div>
-
+      <!--
+        FIXED CANVAS.
+        Semua zoom terjadi di artwork-layer.
+      -->
 
       <div
-        class="brand-watermark"
-        aria-hidden="true"
+        class="artwork-layer"
+        style="
+          --artwork-zoom:${state.zoom};
+        "
       >
 
-        <div class="watermark-large">
-          imamsalesnine.com
-          •
-          imamsalesnine.com
-          •
-          imamsalesnine.com
+
+        <!-- BACKGROUND -->
+
+        <div class="template-bg">
+
+          <div class="template-bg-grid"></div>
+
+          <div class="template-bg-sweep"></div>
+
         </div>
 
-        <div class="watermark-bottom">
-          Imam_salesfr
-          •
-          nine autoseries
-          •
-          imamsalesnine.com
+
+        <!-- WATERMARK -->
+
+        <div
+          class="brand-watermark"
+          aria-hidden="true"
+        >
+
+          <div class="watermark-large">
+
+            imamsalesnine.com
+            •
+            imamsalesnine.com
+            •
+            imamsalesnine.com
+
+          </div>
+
+
+          <div class="watermark-bottom">
+
+            Imam_salesfr
+            •
+            nine autoseries
+            •
+            imamsalesnine.com
+
+          </div>
+
         </div>
 
-      </div>
-
-
-      ${
-        category
-          ? `
-            <span
-              class="watermark-micro"
-              style="
-                left:9%;
-                top:23%;
-              "
-            >
-              ${escapeHTML(category)}
-            </span>
-          `
-          : ""
-      }
-
-
-      <div class="product-visual">
 
         ${
-          image
-
+          category
             ? `
-
-              <img
-                class="product-image"
-                src="${escapeHTML(image)}"
-                alt="${escapeHTML(title)}"
-                crossorigin="anonymous"
-                decoding="async"
-                draggable="false"
+              <span
+                style="
+                  position:absolute;
+                  z-index:5;
+                  left:9%;
+                  top:23%;
+                  color:rgba(190,220,170,.042);
+                  font-family:Manrope,Arial,sans-serif;
+                  font-size:8px;
+                  font-weight:900;
+                  letter-spacing:1.5px;
+                "
               >
-
+                ${escapeHTML(
+                  category
+                )}
+              </span>
             `
-
-            : imageFallbackHTML()
-
+            : ""
         }
 
-      </div>
+
+        <!-- PRODUCT -->
+
+        <div class="product-visual">
+
+          ${
+            image
+
+              ? `
+
+                <img
+                  class="product-image"
+                  src="${escapeHTML(image)}"
+                  alt="${escapeHTML(title)}"
+                  crossorigin="anonymous"
+                  decoding="async"
+                  draggable="false"
+                >
+
+              `
+
+              : imageFallbackHTML()
+
+          }
+
+        </div>
 
 
-      <div class="visual-gradient"></div>
+        <div class="visual-gradient"></div>
 
 
-      <div class="info-zone">
+        <!-- COMMERCIAL -->
 
-        <div class="product-info">
+        <div class="info-zone">
 
-          <div class="info-line"></div>
+          <div class="product-info">
 
-
-          <div class="badge-stack">
-
-            <span class="promo-badge">
-
-              <span class="promo-dot"></span>
-
-              PROMO
-
-            </span>
+            <div class="info-line"></div>
 
 
-            ${
-              extra
-                ? `
-                  <span
-                    class="extra-discount-badge"
-                  >
-                    EXTRA
-                    ${price.extraPercent}%
-                  </span>
-                `
-                : ""
-            }
+            <div class="badge-stack">
+
+              <span
+                class="promo-badge"
+              >
+
+                <span
+                  class="promo-dot"
+                ></span>
+
+                PROMO
+
+              </span>
 
 
-            <span class="warranty-badge">
+              ${
+                extraVisible
 
-              ${escapeHTML(
-                warranty
-              )}
+                  ? `
 
-            </span>
+                    <span
+                      class="extra-discount-badge"
+                    >
+                      EXTRA
+                      ${price.extraPercent}%
+                    </span>
 
-          </div>
+                  `
 
-
-          <div class="product-brand">
-
-            ${escapeHTML(
-              product.brand
-            )}
-
-          </div>
+                  : ""
+              }
 
 
-          <div class="product-name">
+              <span
+                class="warranty-badge"
+              >
 
-            ${escapeHTML(
-              title
-            )}
+                ${escapeHTML(
+                  warranty
+                )}
 
-          </div>
+              </span>
 
-
-          <div class="price-block">
-
-            <div class="price-label">
-              SPECIAL PRICE
             </div>
 
 
-            <div class="price-promo">
+            <div
+              class="product-brand"
+            >
 
               ${escapeHTML(
-                rupiah(
-                  price.final
-                )
+                product.brand
               )}
 
             </div>
 
 
-            ${
-              price.normal > 0 &&
-              (
-                price.normal !==
-                price.final
-              )
+            <div
+              class="product-name"
+            >
 
-              ||
+              ${escapeHTML(
+                title
+              )}
 
-              price.finalDiscount > 0
-
-                ? `
-
-                  <div class="price-meta">
-
-                    ${
-                      price.normal > 0 &&
-                      price.normal !==
-                      price.final
-
-                        ? `
-                          <span class="price-normal">
-                            Normal
-                            ${escapeHTML(
-                              rupiah(
-                                price.normal
-                              )
-                            )}
-                          </span>
-                        `
-                        : ""
-                    }
+            </div>
 
 
-                    ${
-                      price.finalDiscount > 0
+            <div class="price-block">
 
-                        ? `
-                          <span class="discount">
-                            -${price.finalDiscount}%
-                          </span>
-                        `
-                        : ""
-                    }
-
-                  </div>
-
-                `
-
-                : ""
-            }
+              <div
+                class="price-label"
+              >
+                SPECIAL PRICE
+              </div>
 
 
-            ${
-              extra
+              <div
+                class="price-promo"
+              >
 
-                ? `
-                  <div class="extra-price-note">
-                    EXTRA DISCOUNT
-                    ${price.extraPercent}%
-                  </div>
-                `
+                ${escapeHTML(
+                  rupiah(
+                    price.final
+                  )
+                )}
 
-                : ""
-            }
+              </div>
+
+
+              ${
+                price.normal > 0
+
+                  ? `
+
+                    <div
+                      class="price-meta"
+                    >
+
+                      ${
+                        price.normal !==
+                        price.final
+
+                          ? `
+
+                            <span
+                              class="price-normal"
+                            >
+                              Normal
+                              ${escapeHTML(
+                                rupiah(
+                                  price.normal
+                                )
+                              )}
+                            </span>
+
+                          `
+
+                          : ""
+                      }
+
+
+                      ${
+                        price.finalDiscount > 0
+
+                          ? `
+
+                            <span
+                              class="discount"
+                            >
+                              -${price.finalDiscount}%
+                            </span>
+
+                          `
+
+                          : ""
+                      }
+
+                    </div>
+
+                  `
+
+                  : ""
+              }
+
+
+              ${
+                extraVisible
+
+                  ? `
+
+                    <div
+                      class="extra-price-note"
+                    >
+                      EXTRA DISCOUNT
+                      ${price.extraPercent}%
+                    </div>
+
+                  `
+
+                  : ""
+              }
+
+            </div>
 
           </div>
 
         </div>
 
-      </div>
+
+        <!-- RATIO -->
+
+        <div class="ratio-mark">
+          ${ratioLabel()}
+        </div>
 
 
-      <div class="ratio-mark">
-        ${ratioLabel()}
-      </div>
+        <!-- SIGNATURE -->
+
+        <div class="signature">
+          IMAM_SALESFR • NINE AUTOSERIES
+        </div>
 
 
-      <div class="signature">
-        IMAM_SALESFR • NINE AUTOSERIES
       </div>
 
     </article>
@@ -4923,6 +6136,8 @@ function renderPreview(){
 
   updateSlideCount();
 
+  applyZoomToArtwork();
+
 
   const imageElement =
     DOM.stage.querySelector(
@@ -4930,24 +6145,32 @@ function renderPreview(){
     );
 
 
-  if(imageElement){
+  if(
+    imageElement
+  ){
 
     on(
       imageElement,
       "error",
       ()=>{
         imageElement.replaceWith(
+
           Object.assign(
+
             document.createElement(
               "div"
             ),
+
             {
               className:
                 "image-fallback",
+
               textContent:
                 "IMAGE NOT FOUND"
             }
+
           )
+
         );
       },
       {
@@ -5044,7 +6267,9 @@ function toggleProduct(
 ){
 
   id =
-    String(id);
+    String(
+      id
+    );
 
 
   if(
@@ -5101,32 +6326,9 @@ function selectAll(){
 }
 
 
-function clearAll(){
-
-  state.selectedIds =
-    [];
-
-  state.promoProducts =
-    [];
-
-  saveSelection();
-
-  renderManager();
-
-  renderPreview();
-
-  updateCounts();
-
-  showToast(
-    "Selection dibersihkan."
-  );
-
-}
-
-
 function invertSelection(){
 
-  const selected =
+  const current =
     new Set(
       state.selectedIds
     );
@@ -5137,7 +6339,7 @@ function invertSelection(){
 
       .filter(
         product =>
-          !selected.has(
+          !current.has(
             String(
               product.id
             )
@@ -5160,6 +6362,29 @@ function invertSelection(){
 
   showToast(
     "Selection dibalik ✓"
+  );
+
+}
+
+
+function clearAll(){
+
+  state.selectedIds =
+    [];
+
+  state.promoProducts =
+    [];
+
+  saveSelection();
+
+  renderManager();
+
+  renderPreview();
+
+  updateCounts();
+
+  showToast(
+    "Selection dibersihkan."
   );
 
 }
@@ -5195,13 +6420,112 @@ function applyPromo(
   updateCounts();
 
 
-  if(notify){
+  if(
+    notify
+  ){
 
     showToast(
+
       `${state.promoProducts.length} produk masuk creative queue ✓`
+
     );
 
   }
+
+}
+
+
+/* =========================================================
+   PRODUCT FILTER
+========================================================= */
+
+function filteredProducts(){
+
+  const query =
+    normalizeSearch(
+      state.searchQuery
+    );
+
+
+  return state.products.filter(
+    product =>{
+
+      if(
+        !query
+      ){
+
+        return true;
+
+      }
+
+
+      const haystack =
+        [
+
+          product.brand,
+
+          product.nama,
+
+          product.name,
+
+          product.id,
+
+          product.sku,
+
+          product.kode,
+
+          categoryText(
+            product
+          )
+
+        ]
+
+          .filter(Boolean)
+
+          .join(
+            " "
+          );
+
+
+      return normalizeSearch(
+        haystack
+      ).includes(
+        query
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   CLOSE EDITORS
+========================================================= */
+
+function closeEditorsExcept(
+  current
+){
+
+  document
+    .querySelectorAll(
+      ".select-card.editing"
+    )
+    .forEach(
+      card =>{
+
+        if(
+          card !== current
+        ){
+
+          card.classList.remove(
+            "editing"
+          );
+
+        }
+
+      }
+    );
 
 }
 
@@ -5265,16 +6589,19 @@ function createProductCard(
         image
 
           ? `
+
             <img
               src="${escapeHTML(image)}"
               alt=""
               loading="lazy"
               decoding="async"
-              crossorigin="anonymous"
+              draggable="false"
             >
+
           `
 
           : imageFallbackHTML()
+
       }
 
     </div>
@@ -5315,18 +6642,24 @@ function createProductCard(
     <div class="select-info">
 
       <div class="select-brand">
+
         ${escapeHTML(
           product.brand
         )}
+
       </div>
 
+
       <div class="select-name">
+
         ${escapeHTML(
           makeDisplayTitle(
             product
           )
         )}
+
       </div>
+
 
       <div class="select-price">
 
@@ -5336,11 +6669,15 @@ function createProductCard(
           )
         )}
 
+
         ${
           price.normal > 0
 
             ? `
-              <span class="select-old">
+
+              <span
+                class="select-old"
+              >
                 <s>
                   ${escapeHTML(
                     rupiah(
@@ -5349,18 +6686,26 @@ function createProductCard(
                   )}
                 </s>
               </span>
+
             `
+
             : ""
         }
+
 
         ${
           price.finalDiscount > 0
 
             ? `
-              <span class="select-discount">
+
+              <span
+                class="select-discount"
+              >
                 -${price.finalDiscount}%
               </span>
+
             `
+
             : ""
         }
 
@@ -5372,14 +6717,20 @@ function createProductCard(
     <div class="price-editor">
 
       <div class="price-editor-title">
-        EDIT HARGA CUSTOM
+
+        CUSTOM PRICE
+        —
+        ${escapeHTML(
+          product.sku
+        )}
+
       </div>
 
 
       <div class="price-field">
 
         <label>
-          Harga Normal
+          HARGA NORMAL
         </label>
 
         <input
@@ -5395,7 +6746,7 @@ function createProductCard(
       <div class="price-field">
 
         <label>
-          Harga Promo Dasar
+          HARGA PROMO DASAR
         </label>
 
         <input
@@ -5420,7 +6771,7 @@ function createProductCard(
           }
         >
 
-        Aktifkan Extra Discount
+        AKTIFKAN EXTRA DISCOUNT
 
       </label>
 
@@ -5428,7 +6779,7 @@ function createProductCard(
       <div class="price-field">
 
         <label>
-          Extra Discount %
+          EXTRA DISCOUNT %
         </label>
 
         <input
@@ -5454,7 +6805,7 @@ function createProductCard(
           }
         >
 
-        Gunakan Harga Final Manual
+        GUNAKAN HARGA FINAL MANUAL
 
       </label>
 
@@ -5462,7 +6813,7 @@ function createProductCard(
       <div class="price-field">
 
         <label>
-          Harga Final Manual
+          HARGA FINAL MANUAL
         </label>
 
         <input
@@ -5484,11 +6835,12 @@ function createProductCard(
           RESET
         </button>
 
+
         <button
           type="button"
           class="price-save-btn"
         >
-          SIMPAN
+          TERAPKAN
         </button>
 
       </div>
@@ -5498,7 +6850,7 @@ function createProductCard(
   `;
 
 
-  const editBtn =
+  const editButton =
     card.querySelector(
       ".edit-price-btn"
     );
@@ -5510,56 +6862,73 @@ function createProductCard(
     );
 
 
-  const resetBtn =
-    card.querySelector(
-      ".price-reset-btn"
-    );
-
-
-  const saveBtn =
+  const saveButton =
     card.querySelector(
       ".price-save-btn"
     );
 
 
+  const resetButton =
+    card.querySelector(
+      ".price-reset-btn"
+    );
+
+
+  /*
+   * OPEN EDITOR
+   */
+
   on(
-    editBtn,
+    editButton,
     "click",
     event =>{
 
       event.stopPropagation();
 
-      document
-        .querySelectorAll(
-          ".select-card.editing"
-        )
-        .forEach(
-          other =>{
 
-            if(
-              other !== card
-            ){
-
-              other.classList.remove(
-                "editing"
-              );
-
-            }
-
-          }
-        );
+      closeEditorsExcept(
+        card
+      );
 
 
       card.classList.toggle(
         "editing"
       );
 
+
+      /*
+       * Pastikan editor terlihat.
+       */
+
+      if(
+        card.classList.contains(
+          "editing"
+        )
+      ){
+
+        setTimeout(
+          ()=>{
+            editor
+              ?.querySelector(
+                "input"
+              )
+              ?.focus();
+          },
+          40
+        );
+
+      }
+
     }
   );
 
 
+  /*
+   * SAVE
+   */
+
   on(
-    saveBtn,
+    saveButton,
     "click",
     event =>{
 
@@ -5568,7 +6937,7 @@ function createProductCard(
 
       const normal =
         Number(
-          card.querySelector(
+          editor.querySelector(
             "[data-price-normal]"
           ).value
         ) || 0;
@@ -5576,39 +6945,42 @@ function createProductCard(
 
       const promo =
         Number(
-          card.querySelector(
+          editor.querySelector(
             "[data-price-promo]"
           ).value
         ) || 0;
 
 
       const extraEnabled =
-        card.querySelector(
+        editor.querySelector(
           "[data-extra-enabled]"
         ).checked;
 
 
       const extraPercent =
         clamp(
+
           Number(
-            card.querySelector(
+            editor.querySelector(
               "[data-extra-percent]"
             ).value
           ) || 0,
+
           0,
           99
+
         );
 
 
       const manualEnabled =
-        card.querySelector(
+        editor.querySelector(
           "[data-manual-enabled]"
         ).checked;
 
 
       const manualFinal =
         Number(
-          card.querySelector(
+          editor.querySelector(
             "[data-manual-final]"
           ).value
         ) || 0;
@@ -5647,12 +7019,15 @@ function createProductCard(
       state.priceOverrides[id] = {
 
         normal,
+
         promo,
 
         extraEnabled,
+
         extraPercent,
 
         manualEnabled,
+
         manualFinal
 
       };
@@ -5660,6 +7035,7 @@ function createProductCard(
 
       savePrices();
 
+
       card.classList.remove(
         "editing"
       );
@@ -5667,27 +7043,38 @@ function createProductCard(
 
       renderManager();
 
-      renderPreview();
+      applyPromo(
+        false
+      );
+
 
       showToast(
-        "Harga promo berhasil diperbarui ✓"
+        "Harga promo berhasil diterapkan ✓"
       );
 
     }
   );
 
 
+  /*
+   * RESET
+   */
+
   on(
-    resetBtn,
+    resetButton,
     "click",
     event =>{
 
       event.stopPropagation();
 
 
-      delete state.priceOverrides[id];
+      delete state.priceOverrides[
+        id
+      ];
+
 
       savePrices();
+
 
       card.classList.remove(
         "editing"
@@ -5696,7 +7083,10 @@ function createProductCard(
 
       renderManager();
 
-      renderPreview();
+      applyPromo(
+        false
+      );
+
 
       showToast(
         "Harga dikembalikan ke JSON ✓"
@@ -5705,6 +7095,10 @@ function createProductCard(
     }
   );
 
+
+  /*
+   * CARD SELECT
+   */
 
   on(
     card,
@@ -5715,6 +7109,7 @@ function createProductCard(
         event.target.closest(
           ".edit-price-btn"
         ) ||
+
         event.target.closest(
           ".price-editor"
         )
@@ -5739,7 +7134,7 @@ function createProductCard(
 
 
 /* =========================================================
-   PRODUCT MANAGER
+   RENDER MANAGER
 ========================================================= */
 
 function renderManager(){
@@ -5753,47 +7148,8 @@ function renderManager(){
   }
 
 
-  const query =
-    normalizeSearch(
-      state.searchQuery
-    );
-
-
   const filtered =
-    state.products.filter(
-      product =>{
-
-        if(!query){
-          return true;
-        }
-
-
-        const haystack =
-          [
-
-            product.brand,
-            product.nama,
-            product.name,
-            product.id,
-            product.sku,
-            product.kode,
-            categoryText(product)
-
-          ]
-
-            .filter(Boolean)
-
-            .join(" ");
-
-
-        return normalizeSearch(
-          haystack
-        ).includes(
-          query
-        );
-
-      }
-    );
+    filteredProducts();
 
 
   DOM.productGrid.innerHTML =
@@ -5816,13 +7172,14 @@ function renderManager(){
 
           <br><br>
 
-          Coba ubah kata pencarian.
+          Coba kata pencarian lain.
 
         </div>
 
       </div>
 
     `;
+
 
     updateCounts();
 
@@ -5854,40 +7211,6 @@ function renderManager(){
 
 
   updateCounts();
-
-}
-
-
-/* =========================================================
-   SAVE STATE
-========================================================= */
-
-function saveWorkspace(){
-
-  storageSet(
-    STORAGE.RATIO,
-    state.currentRatio
-  );
-
-  storageSet(
-    STORAGE.TEMPLATE,
-    state.currentTemplate
-  );
-
-  storageSet(
-    STORAGE.PLAYING,
-    String(
-      state.playing
-    )
-  );
-
-  saveSelection();
-
-  savePrices();
-
-  showToast(
-    "Workspace berhasil disimpan ✓"
-  );
 
 }
 
@@ -5965,7 +7288,7 @@ function setTemplate(
 
 
 /* =========================================================
-   WAIT FONT
+   FONT WAIT
 ========================================================= */
 
 async function waitForFonts(){
@@ -5983,7 +7306,7 @@ async function waitForFonts(){
 
   }catch{
 
-    /* fallback font tetap jalan */
+    /* fallback font */
 
   }
 
@@ -5991,7 +7314,7 @@ async function waitForFonts(){
 
 
 /* =========================================================
-   WAIT IMAGE
+   IMAGE WAIT
 ========================================================= */
 
 function waitForImage(
@@ -5999,8 +7322,12 @@ function waitForImage(
   timeout=15000
 ){
 
-  if(!image){
+  if(
+    !image
+  ){
+
     return Promise.resolve();
+
   }
 
 
@@ -6026,21 +7353,15 @@ function waitForImage(
           if(
             finished
           ){
+
             return;
+
           }
+
 
           finished =
             true;
 
-          image.removeEventListener(
-            "load",
-            done
-          );
-
-          image.removeEventListener(
-            "error",
-            done
-          );
 
           resolve();
 
@@ -6082,8 +7403,12 @@ async function waitForImages(
   root
 ){
 
-  if(!root){
+  if(
+    !root
+  ){
+
     return;
+
   }
 
 
@@ -6096,12 +7421,14 @@ async function waitForImages(
 
 
   await Promise.all(
+
     images.map(
       image =>
         waitForImage(
           image
         )
     )
+
   );
 
 
@@ -6121,7 +7448,7 @@ async function waitForImages(
 
     }catch{
 
-      /* browser may reject decode for cached image */
+      /* cached image */
 
     }
 
@@ -6134,17 +7461,23 @@ async function waitForImages(
    EXPORT CLONE
 ========================================================= */
 
+/*
+ * INI KUNCI PERBAIKAN BADGE.
+ *
+ * Kita tidak mengganti struktur artwork.
+ * Clone export memakai artwork layer yang SAMA.
+ *
+ * Kita hanya:
+ * - matikan transition
+ * - pertahankan zoom
+ * - pastikan info visible
+ * - pastikan badge visible
+ * - pastikan text opaque
+ */
+
 function prepareExportClone(
   clonedDocument
 ){
-
-  /*
-   * IMPORTANT:
-   * Tidak lagi melakukan replace color-mix.
-   * Artwork CSS versi baru memang sudah tidak
-   * menggunakan fungsi CSS unsupported tersebut.
-   */
-
 
   const root =
     clonedDocument.querySelector(
@@ -6152,27 +7485,21 @@ function prepareExportClone(
     );
 
 
-  if(!root){
+  if(
+    !root
+  ){
+
     return;
+
   }
 
 
-  /*
-   * Matikan semua efek compositor yang
-   * tidak dibutuhkan pada PNG.
-   */
-
   root.style.setProperty(
-    "mix-blend-mode",
-    "normal",
+    "overflow",
+    "hidden",
     "important"
   );
 
-  root.style.setProperty(
-    "filter",
-    "none",
-    "important"
-  );
 
   root.style.setProperty(
     "opacity",
@@ -6180,32 +7507,52 @@ function prepareExportClone(
     "important"
   );
 
+
   root.style.setProperty(
-    "transform",
+    "filter",
+    "none",
+    "important"
+  );
+
+
+  root.style.setProperty(
+    "transition",
     "none",
     "important"
   );
 
 
   /*
-   * Paksa watermark nyata.
+   * ARTWORK ZOOM:
+   * Jangan reset.
+   *
+   * Ini sengaja.
+   * Kalau preview 115%, PNG juga 115%.
    */
 
-  const watermark =
+  const artwork =
     root.querySelector(
-      ".brand-watermark"
+      ".artwork-layer"
     );
 
 
-  if(watermark){
+  if(
+    artwork
+  ){
 
-    watermark.style.setProperty(
-      "mix-blend-mode",
-      "normal",
+    artwork.style.setProperty(
+      "transform",
+      `scale(${state.zoom})`,
       "important"
     );
 
-    watermark.style.setProperty(
+    artwork.style.setProperty(
+      "transform-origin",
+      "center center",
+      "important"
+    );
+
+    artwork.style.setProperty(
       "opacity",
       "1",
       "important"
@@ -6215,36 +7562,53 @@ function prepareExportClone(
 
 
   /*
-   * Semua image wajib opaque.
+   * Commercial zone.
    */
 
   root
     .querySelectorAll(
-      "img"
+      ".info-zone," +
+      ".product-info," +
+      ".badge-stack," +
+      ".promo-badge," +
+      ".extra-discount-badge," +
+      ".warranty-badge," +
+      ".product-brand," +
+      ".product-name," +
+      ".price-block," +
+      ".price-promo," +
+      ".price-meta," +
+      ".price-normal," +
+      ".discount," +
+      ".extra-price-note"
     )
     .forEach(
-      img =>{
+      element =>{
 
-        img.setAttribute(
-          "crossorigin",
-          "anonymous"
-        );
-
-        img.style.setProperty(
+        element.style.setProperty(
           "opacity",
           "1",
           "important"
         );
 
-        img.style.setProperty(
-          "filter",
-          "none",
+
+        element.style.setProperty(
+          "visibility",
+          "visible",
           "important"
         );
 
-        img.style.setProperty(
-          "mix-blend-mode",
-          "normal",
+
+        element.style.setProperty(
+          "overflow",
+          "visible",
+          "important"
+        );
+
+
+        element.style.setProperty(
+          "filter",
+          "none",
           "important"
         );
 
@@ -6253,7 +7617,47 @@ function prepareExportClone(
 
 
   /*
-   * Teks komersial.
+   * Badges mendapat z-index eksplisit.
+   */
+
+  root
+    .querySelectorAll(
+      ".badge-stack"
+    )
+    .forEach(
+      element =>{
+
+        element.style.setProperty(
+          "z-index",
+          "200",
+          "important"
+        );
+
+      }
+    );
+
+
+  root
+    .querySelectorAll(
+      ".promo-badge," +
+      ".extra-discount-badge," +
+      ".warranty-badge"
+    )
+    .forEach(
+      element =>{
+
+        element.style.setProperty(
+          "z-index",
+          "300",
+          "important"
+        );
+
+      }
+    );
+
+
+  /*
+   * Text jangan kena compositing.
    */
 
   root
@@ -6264,9 +7668,6 @@ function prepareExportClone(
       ".price-promo," +
       ".price-normal," +
       ".discount," +
-      ".promo-badge," +
-      ".extra-discount-badge," +
-      ".warranty-badge," +
       ".extra-price-note," +
       ".ratio-mark," +
       ".signature"
@@ -6281,10 +7682,64 @@ function prepareExportClone(
         );
 
         element.style.setProperty(
-          "mix-blend-mode",
-          "normal",
+          "filter",
+          "none",
           "important"
         );
+
+      }
+    );
+
+
+  /*
+   * Product image.
+   */
+
+  root
+    .querySelectorAll(
+      ".product-image"
+    )
+    .forEach(
+      image =>{
+
+        image.style.setProperty(
+          "opacity",
+          "1",
+          "important"
+        );
+
+        image.style.setProperty(
+          "filter",
+          "none",
+          "important"
+        );
+
+      }
+    );
+
+
+  /*
+   * Tidak ada blend mode.
+   */
+
+  root
+    .querySelectorAll(
+      "*"
+    )
+    .forEach(
+      element =>{
+
+        if(
+          element.style
+        ){
+
+          element.style.setProperty(
+            "mix-blend-mode",
+            "normal",
+            "important"
+          );
+
+        }
 
       }
     );
@@ -6300,7 +7755,7 @@ async function renderExportCanvas(){
 
   if(
     typeof html2canvas !==
-    "function"
+      "function"
   ){
 
     throw new Error(
@@ -6316,7 +7771,9 @@ async function renderExportCanvas(){
     );
 
 
-  if(!source){
+  if(
+    !source
+  ){
 
     throw new Error(
       "CANVAS_RENDER_FAILED"
@@ -6333,8 +7790,7 @@ async function renderExportCanvas(){
 
 
   /*
-   * Browser harus paint artwork terbaru
-   * sebelum capture.
+   * Force paint.
    */
 
   await new Promise(
@@ -6378,6 +7834,13 @@ async function renderExportCanvas(){
     1920;
 
 
+  /*
+   * FIXED OUTPUT DIMENSIONS.
+   *
+   * Zoom TIDAK mengubah target.
+   * Zoom hanya mengubah isi artwork.
+   */
+
   let scale =
     targetWidth /
     sourceWidth;
@@ -6397,19 +7860,17 @@ async function renderExportCanvas(){
 
     scale =
       Math.sqrt(
+
         CONFIG.MAX_EXPORT_PIXELS /
         (
           sourceWidth *
           sourceHeight
         )
+
       );
 
   }
 
-
-  /*
-   * Clone khusus capture.
-   */
 
   let canvas;
 
@@ -6448,6 +7909,9 @@ async function renderExportCanvas(){
 
           scrollY:0,
 
+          /*
+           * Clone memakai zoom yang sedang aktif.
+           */
           onclone:
             prepareExportClone
 
@@ -6459,19 +7923,15 @@ async function renderExportCanvas(){
   ){
 
     console.warn(
-      "[EXPORT] First render failed:",
+      "[EXPORT RETRY]",
       firstError
     );
 
 
-    /*
-     * Retry aman.
-     */
-
     const retryScale =
       Math.max(
         1,
-        scale * .72
+        scale * .75
       );
 
 
@@ -6536,7 +7996,7 @@ async function renderExportCanvas(){
 
 
 /* =========================================================
-   CANVAS BLOB
+   BLOB
 ========================================================= */
 
 function canvasToBlob(
@@ -6560,23 +8020,24 @@ function canvasToBlob(
                 blob
               );
 
-              return;
+            }else{
+
+              reject(
+                new Error(
+                  "PNG_GENERATION_FAILED"
+                )
+              );
 
             }
-
-
-            reject(
-              new Error(
-                "PNG_GENERATION_FAILED"
-              )
-            );
 
           },
           "image/png",
           1
         );
 
-      }catch(error){
+      }catch(
+        error
+      ){
 
         reject(
           error
@@ -6626,8 +8087,10 @@ async function saveBlob(
   anchor.href =
     url;
 
+
   anchor.download =
     filename;
+
 
   anchor.style.display =
     "none";
@@ -6641,7 +8104,9 @@ async function saveBlob(
   anchor.click();
 
 
-  await wait(120);
+  await wait(
+    120
+  );
 
 
   anchor.remove();
@@ -6708,8 +8173,13 @@ async function downloadCurrent(){
 
 
   DOM.downloadBtn.innerHTML = `
-    <span class="download-spinner"></span>
+
+    <span
+      class="download-spinner"
+    ></span>
+
     RENDERING...
+
   `;
 
 
@@ -6720,6 +8190,14 @@ async function downloadCurrent(){
         state.currentIndex
       ];
 
+
+    /*
+     * PENTING:
+     *
+     * Tidak ada state.zoom = 1.
+     *
+     * Zoom yang dipilih user dipakai.
+     */
 
     const canvas =
       await renderExportCanvas();
@@ -6733,6 +8211,7 @@ async function downloadCurrent(){
 
     const filename =
       [
+
         "PROMO",
 
         slug(
@@ -6751,7 +8230,11 @@ async function downloadCurrent(){
           .replace(
             ":",
             "x"
-          )
+          ),
+
+        `zoom-${Math.round(
+          state.zoom * 100
+        )}`
 
       ].join(
         "-"
@@ -6770,7 +8253,9 @@ async function downloadCurrent(){
     );
 
 
-  }catch(error){
+  }catch(
+    error
+  ){
 
     console.error(
       "[DOWNLOAD]",
@@ -6779,16 +8264,9 @@ async function downloadCurrent(){
 
 
     showToast(
-      error.message ===
-        "HTML2CANVAS_UNAVAILABLE"
-
-        ? "Library export tidak tersedia."
-
-        : "Export PNG gagal. Coba lagi.",
-
+      "Export PNG gagal. Coba lagi.",
       "error"
     );
-
 
   }finally{
 
@@ -6806,6 +8284,9 @@ async function downloadCurrent(){
 
     state.playing =
       wasPlaying;
+
+
+    updatePlayIcons();
 
 
     if(
@@ -6866,6 +8347,16 @@ async function exportAll(){
     state.playing;
 
 
+  /*
+   * Simpan zoom user.
+   *
+   * Export ALL juga memakai zoom yang sama.
+   */
+
+  const originalZoom =
+    state.zoom;
+
+
   stopAutoplay();
 
 
@@ -6874,8 +8365,13 @@ async function exportAll(){
 
 
   DOM.downloadAllBtn.innerHTML = `
-    <span class="download-spinner"></span>
+
+    <span
+      class="download-spinner"
+    ></span>
+
     EXPORTING...
+
   `;
 
 
@@ -6883,8 +8379,10 @@ async function exportAll(){
 
     for(
       let index = 0;
+
       index <
       state.promoProducts.length;
+
       index++
     ){
 
@@ -6896,7 +8394,7 @@ async function exportAll(){
 
 
       await wait(
-        220
+        260
       );
 
 
@@ -6918,6 +8416,7 @@ async function exportAll(){
 
       const filename =
         [
+
           "PROMO",
 
           String(
@@ -6943,7 +8442,11 @@ async function exportAll(){
             .replace(
               ":",
               "x"
-            )
+            ),
+
+          `zoom-${Math.round(
+            originalZoom * 100
+          )}`
 
         ].join(
           "-"
@@ -6964,7 +8467,9 @@ async function exportAll(){
     );
 
 
-  }catch(error){
+  }catch(
+    error
+  ){
 
     console.error(
       "[EXPORT ALL]",
@@ -6977,11 +8482,14 @@ async function exportAll(){
       "error"
     );
 
-
   }finally{
 
     state.currentIndex =
       originalIndex;
+
+
+    state.zoom =
+      originalZoom;
 
 
     renderPreview();
@@ -7101,6 +8609,9 @@ async function downloadJSON(){
               ratio:
                 ratioLabel(),
 
+              zoom:
+                state.zoom,
+
               generatedAt:
                 new Date().toISOString()
 
@@ -7139,7 +8650,9 @@ async function downloadJSON(){
     );
 
 
-  }catch(error){
+  }catch(
+    error
+  ){
 
     console.error(
       "[JSON]",
@@ -7153,6 +8666,52 @@ async function downloadJSON(){
     );
 
   }
+
+}
+
+
+/* =========================================================
+   SAVE WORKSPACE
+========================================================= */
+
+function saveWorkspace(){
+
+  storageSet(
+    STORAGE.RATIO,
+    state.currentRatio
+  );
+
+
+  storageSet(
+    STORAGE.TEMPLATE,
+    state.currentTemplate
+  );
+
+
+  storageSet(
+    STORAGE.ZOOM,
+    String(
+      state.zoom
+    )
+  );
+
+
+  storageSet(
+    STORAGE.PLAYING,
+    String(
+      state.playing
+    )
+  );
+
+
+  saveSelection();
+
+  savePrices();
+
+
+  showToast(
+    "Workspace berhasil disimpan ✓"
+  );
 
 }
 
@@ -7249,7 +8808,13 @@ async function loadProducts(){
 
             ? data.produk
 
-            : [];
+            : Array.isArray(
+                data.items
+              )
+
+              ? data.items
+
+              : [];
 
 
     if(
@@ -7271,9 +8836,16 @@ async function loadProducts(){
         .filter(Boolean);
 
 
-    /*
-     * Restore valid selection.
-     */
+    if(
+      !state.products.length
+    ){
+
+      throw new Error(
+        "Tidak ada produk valid."
+      );
+
+    }
+
 
     const validIds =
       new Set(
@@ -7289,13 +8861,17 @@ async function loadProducts(){
     state.selectedIds =
       state.selectedIds.filter(
         id =>
-          validIds.has(id)
+          validIds.has(
+            String(
+              id
+            )
+          )
       );
 
 
     /*
-     * Jika belum pernah memilih,
-     * otomatis pilih produk promo.
+     * Kalau belum ada saved selection,
+     * cari produk yang status promo.
      */
 
     if(
@@ -7317,7 +8893,9 @@ async function loadProducts(){
 
 
               return (
+
                 value === true ||
+
                 [
                   "true",
                   "promo",
@@ -7329,6 +8907,7 @@ async function loadProducts(){
                     value
                   ).toLowerCase()
                 )
+
               );
 
             }
@@ -7346,7 +8925,9 @@ async function loadProducts(){
 
     renderManager();
 
-    applyPromo(false);
+    applyPromo(
+      false
+    );
 
     syncUI();
 
@@ -7356,7 +8937,7 @@ async function loadProducts(){
 
 
     await wait(
-      350
+      300
     );
 
 
@@ -7373,17 +8954,23 @@ async function loadProducts(){
 
     }
 
-
-  }catch(error){
+  }catch(
+    error
+  ){
 
     console.error(
-      "[LOAD PRODUCTS]",
+      "[LOAD]",
       error
     );
 
 
     DOM.loaderStatus.textContent =
       "Product library error";
+
+
+    DOM.loadingScreen.classList.add(
+      "hidden"
+    );
 
 
     DOM.stage.className =
@@ -7412,6 +8999,7 @@ async function loadProducts(){
           <strong>
             produk.json
           </strong>
+
           berada di folder yang sama
           dengan
           <strong>
@@ -7425,9 +9013,27 @@ async function loadProducts(){
     `;
 
 
-    DOM.loadingScreen.classList.add(
-      "hidden"
-    );
+    DOM.productGrid.innerHTML = `
+
+      <div class="error">
+
+        <div>
+
+          Product manager tidak dapat
+          diinisialisasi.
+
+          <br><br>
+
+          Periksa
+          <strong>
+            produk.json
+          </strong>.
+
+        </div>
+
+      </div>
+
+    `;
 
   }
 
@@ -7435,50 +9041,8 @@ async function loadProducts(){
 
 
 /* =========================================================
-   EVENTS
+   EVENTS — RATIO
 ========================================================= */
-
-
-/* Header */
-
-on(
-  $("headerPlay"),
-  "click",
-  togglePlay
-);
-
-
-on(
-  $("fullscreenBtn"),
-  "click",
-  toggleFullscreen
-);
-
-
-/* Navigation */
-
-on(
-  $("prevBtn"),
-  "click",
-  previousSlide
-);
-
-
-on(
-  $("nextBtn"),
-  "click",
-  nextSlide
-);
-
-
-on(
-  DOM.playBtn,
-  "click",
-  togglePlay
-);
-
-
-/* Ratio */
 
 document
   .querySelectorAll(
@@ -7501,7 +9065,9 @@ document
   );
 
 
-/* Template */
+/* =========================================================
+   EVENTS — TEMPLATE
+========================================================= */
 
 document
   .querySelectorAll(
@@ -7524,23 +9090,73 @@ document
   );
 
 
-/* Search */
+/* =========================================================
+   EVENTS — ZOOM
+========================================================= */
 
 on(
-  DOM.search,
-  "input",
-  event =>{
-
-    state.searchQuery =
-      event.target.value;
-
-    renderManager();
-
-  }
+  $("zoomInBtn"),
+  "click",
+  zoomIn
 );
 
 
-/* Selection */
+on(
+  $("zoomOutBtn"),
+  "click",
+  zoomOut
+);
+
+
+on(
+  $("zoomResetBtn"),
+  "click",
+  zoomReset
+);
+
+
+/* =========================================================
+   EVENTS — NAV
+========================================================= */
+
+on(
+  $("prevBtn"),
+  "click",
+  previousSlide
+);
+
+
+on(
+  $("nextBtn"),
+  "click",
+  nextSlide
+);
+
+
+on(
+  DOM.playBtn,
+  "click",
+  togglePlay
+);
+
+
+on(
+  $("headerPlay"),
+  "click",
+  togglePlay
+);
+
+
+on(
+  $("fullscreenBtn"),
+  "click",
+  toggleFullscreen
+);
+
+
+/* =========================================================
+   EVENTS — MANAGER
+========================================================= */
 
 on(
   $("selectAll"),
@@ -7581,7 +9197,34 @@ on(
 );
 
 
-/* Downloads */
+on(
+  $("downloadJSON"),
+  "click",
+  downloadJSON
+);
+
+
+/* =========================================================
+   EVENTS — SEARCH
+========================================================= */
+
+on(
+  DOM.search,
+  "input",
+  event =>{
+
+    state.searchQuery =
+      event.target.value;
+
+    renderManager();
+
+  }
+);
+
+
+/* =========================================================
+   EVENTS — DOWNLOAD
+========================================================= */
 
 on(
   DOM.downloadBtn,
@@ -7597,7 +9240,44 @@ on(
 );
 
 
-/* Keyboard */
+/* =========================================================
+   CLOSE EDITOR WHEN CLICK OUTSIDE
+========================================================= */
+
+on(
+  document,
+  "click",
+  event =>{
+
+    if(
+      event.target.closest(
+        ".select-card"
+      )
+    ){
+
+      return;
+
+    }
+
+
+    document
+      .querySelectorAll(
+        ".select-card.editing"
+      )
+      .forEach(
+        card =>
+          card.classList.remove(
+            "editing"
+          )
+      );
+
+  }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
 
 on(
   document,
@@ -7628,7 +9308,7 @@ on(
 
     if(
       event.key ===
-      "ArrowRight"
+        "ArrowRight"
     ){
 
       nextSlide();
@@ -7638,7 +9318,7 @@ on(
 
     if(
       event.key ===
-      "ArrowLeft"
+        "ArrowLeft"
     ){
 
       previousSlide();
@@ -7648,7 +9328,7 @@ on(
 
     if(
       event.key ===
-      " "
+        " "
     ){
 
       event.preventDefault();
@@ -7660,7 +9340,7 @@ on(
 
     if(
       event.key.toLowerCase() ===
-      "f"
+        "f"
     ){
 
       toggleFullscreen();
@@ -7670,10 +9350,40 @@ on(
 
     if(
       event.key.toLowerCase() ===
-      "d"
+        "d"
     ){
 
       downloadCurrent();
+
+    }
+
+
+    if(
+      event.key ===
+        "+"
+    ){
+
+      zoomIn();
+
+    }
+
+
+    if(
+      event.key ===
+        "-"
+    ){
+
+      zoomOut();
+
+    }
+
+
+    if(
+      event.key ===
+        "0"
+    ){
+
+      zoomReset();
 
     }
 
@@ -7681,7 +9391,9 @@ on(
 );
 
 
-/* Visibility */
+/* =========================================================
+   VISIBILITY
+========================================================= */
 
 on(
   document,
@@ -7702,6 +9414,95 @@ on(
 
     }
 
+  }
+);
+
+
+/* =========================================================
+   TOUCH SWIPE
+========================================================= */
+
+let touchStartX =
+  null;
+
+
+on(
+  DOM.stage,
+  "touchstart",
+  event =>{
+
+    if(
+      event.touches &&
+      event.touches[0]
+    ){
+
+      touchStartX =
+        event.touches[0].clientX;
+
+    }
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+on(
+  DOM.stage,
+  "touchend",
+  event =>{
+
+    if(
+      touchStartX === null ||
+      !event.changedTouches ||
+      !event.changedTouches[0]
+    ){
+
+      return;
+
+    }
+
+
+    const endX =
+      event.changedTouches[0]
+        .clientX;
+
+
+    const delta =
+      endX -
+      touchStartX;
+
+
+    touchStartX =
+      null;
+
+
+    if(
+      Math.abs(delta) <
+        45
+    ){
+
+      return;
+
+    }
+
+
+    if(
+      delta < 0
+    ){
+
+      nextSlide();
+
+    }else{
+
+      previousSlide();
+
+    }
+
+  },
+  {
+    passive:true
   }
 );
 
@@ -7750,6 +9551,8 @@ on(
   syncUI();
 
   updatePlayIcons();
+
+  updateZoomUI();
 
   loadProducts();
 
