@@ -220,12 +220,12 @@ svg{
 .loader-sub{
   margin-top:7px;
 
-  color:#69746A;
+  color:#8CC63F;
 
   font-size:7px;
   font-weight:900;
   letter-spacing:1.25px;
-  text-transform:uppercase;
+  
 }
 
 .loader-status{
@@ -6770,67 +6770,489 @@ async function waitForCurrentImage(){
 
 async function renderCanvas(){
 
-  if(
-    !window.html2canvas
-  ){
-
+  if(!window.html2canvas){
     throw new Error(
       "HTML2CANVAS_UNAVAILABLE"
     );
+  }
+
+  const source =
+    DOM.stage.querySelector("#promoCanvas");
+
+  if(!source){
+    throw new Error(
+      "PROMO_CANVAS_NOT_FOUND"
+    );
+  }
+
+  /*
+   * Pastikan font selesai loading.
+   */
+  if(document.fonts && document.fonts.ready){
+    await document.fonts.ready;
+  }
+
+  /*
+   * Pastikan gambar selesai.
+   */
+  const sourceImages =
+    source.querySelectorAll("img");
+
+  await Promise.all(
+    [...sourceImages].map(img =>
+      waitForImage(img)
+    )
+  );
+
+  /*
+   * Clone artwork khusus untuk export.
+   */
+  const exportRoot =
+    source.cloneNode(true);
+
+  /*
+   * Jangan bawa ID yang sama ke DOM.
+   */
+  exportRoot.removeAttribute("id");
+
+  /*
+   * Export harus bebas dari effect CSS
+   * yang sering bermasalah di html2canvas.
+   */
+  exportRoot.style.cssText = `
+    position:relative !important;
+    width:${source.getBoundingClientRect().width}px !important;
+    height:${source.getBoundingClientRect().height}px !important;
+    aspect-ratio:auto !important;
+
+    overflow:hidden !important;
+    isolation:isolate !important;
+
+    background:#050805 !important;
+
+    opacity:1 !important;
+    filter:none !important;
+    transform:none !important;
+
+    mix-blend-mode:normal !important;
+
+    box-shadow:none !important;
+
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+  `;
+
+  /*
+   * Semua child export dibuat lebih deterministic.
+   */
+  exportRoot
+    .querySelectorAll("*")
+    .forEach(el => {
+
+      el.style.mixBlendMode =
+        "normal";
+
+      el.style.backdropFilter =
+        "none";
+
+      el.style.webkitBackdropFilter =
+        "none";
+
+      el.style.filter =
+        "none";
+
+      el.style.opacity =
+        "1";
+
+    });
+
+
+  /*
+   * Background template dibuat solid + gradient
+   * tanpa pseudo-element.
+   */
+  const templateBg =
+    exportRoot.querySelector(
+      ".template-bg"
+    );
+
+  if(templateBg){
+
+    const template =
+      state.currentTemplate;
+
+    const backgrounds = {
+
+      modern: `
+        radial-gradient(
+          circle at 78% 20%,
+          rgba(140,198,63,.18),
+          transparent 43%
+        ),
+        #050705
+      `,
+
+      orange: `
+        radial-gradient(
+          circle at 78% 20%,
+          rgba(255,118,18,.20),
+          transparent 43%
+        ),
+        #080604
+      `,
+
+      neon: `
+        radial-gradient(
+          circle at 50% 22%,
+          rgba(166,232,77,.20),
+          transparent 45%
+        ),
+        #020502
+      `,
+
+      blue: `
+        radial-gradient(
+          circle at 78% 20%,
+          rgba(41,152,232,.20),
+          transparent 43%
+        ),
+        #03080B
+      `
+
+    };
+
+    templateBg.style.cssText = `
+      position:absolute !important;
+      inset:0 !important;
+
+      opacity:1 !important;
+
+      background:
+        ${backgrounds[template] ||
+          backgrounds.modern}
+        !important;
+
+      z-index:0 !important;
+    `;
 
   }
 
 
-  await waitForCurrentImage();
+  /*
+   * Hilangkan watermark pseudo-element.
+   * Kita buat watermark nyata di DOM supaya
+   * html2canvas pasti menangkapnya.
+   */
+  const watermark =
+    exportRoot.querySelector(
+      ".brand-watermark"
+    );
+
+  if(watermark){
+
+    watermark.style.cssText = `
+      position:absolute !important;
+      inset:0 !important;
+
+      z-index:4 !important;
+
+      pointer-events:none !important;
+
+      opacity:1 !important;
+
+      mix-blend-mode:normal !important;
+    `;
+
+    watermark.innerHTML = `
+
+      <div
+        style="
+          position:absolute;
+          width:170%;
+          left:-35%;
+          top:41%;
+
+          transform:rotate(-25deg);
+
+          color:rgba(190,220,170,.035);
+
+          font-family:Manrope,Arial,sans-serif;
+
+          font-size:42px;
+          line-height:1.9;
+
+          font-weight:900;
+
+          letter-spacing:4px;
+
+          white-space:nowrap;
+        "
+      >
+        imamsalesnine.com
+        •
+        imamsalesnine.com
+        •
+        imamsalesnine.com
+      </div>
+
+      <div
+        style="
+          position:absolute;
+          left:7%;
+          right:7%;
+          bottom:3.5%;
+
+          color:rgba(190,220,170,.075);
+
+          font-family:Manrope,Arial,sans-serif;
+
+          font-size:8px;
+          line-height:1;
+
+          font-weight:800;
+
+          letter-spacing:2.1px;
+
+          text-align:center;
+        "
+      >
+        IMAM_SALESFR
+        •
+        NINE AUTOSERIES
+        •
+        imamsalesnine.com
+      </div>
+
+    `;
+
+  }
+
+
+  /*
+   * Pastikan image tidak mengalami opacity/filter.
+   */
+  exportRoot
+    .querySelectorAll(
+      ".product-image"
+    )
+    .forEach(img => {
+
+      img.style.cssText = `
+        display:block !important;
+
+        width:100% !important;
+        height:100% !important;
+
+        object-fit:contain !important;
+
+        opacity:1 !important;
+
+        filter:none !important;
+
+        mix-blend-mode:normal !important;
+
+        transform:none !important;
+
+        image-rendering:auto !important;
+      `;
+
+    });
+
+
+  /*
+   * Hilangkan effect visual yang tidak perlu
+   * pada export.
+   */
+  const gradient =
+    exportRoot.querySelector(
+      ".visual-gradient"
+    );
+
+  if(gradient){
+
+    gradient.style.cssText = `
+      position:absolute !important;
+      inset:0 !important;
+
+      z-index:11 !important;
+
+      pointer-events:none !important;
+
+      opacity:1 !important;
+
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 40%,
+          rgba(5,8,5,.08) 56%,
+          rgba(5,8,5,.30) 74%,
+          rgba(5,8,5,.80) 92%,
+          #050805 100%
+        ) !important;
+
+      mix-blend-mode:normal !important;
+    `;
+
+  }
+
+
+  /*
+   * Semua teks dipaksa opaque.
+   */
+  exportRoot
+    .querySelectorAll(
+      ".product-brand," +
+      ".product-name," +
+      ".price-promo," +
+      ".price-label," +
+      ".price-normal," +
+      ".discount," +
+      ".extra-price-note," +
+      ".warranty-badge," +
+      ".promo-badge," +
+      ".extra-discount-badge," +
+      ".signature," +
+      ".ratio-mark"
+    )
+    .forEach(el => {
+
+      el.style.opacity =
+        "1";
+
+      el.style.mixBlendMode =
+        "normal";
+
+    });
+
+
+  /*
+   * Masukkan clone ke viewport khusus.
+   */
+  const exportHolder =
+    document.createElement("div");
+
+  exportHolder.style.cssText = `
+    position:fixed;
+
+    left:-100000px;
+    top:0;
+
+    width:${source.getBoundingClientRect().width}px;
+    height:${source.getBoundingClientRect().height}px;
+
+    overflow:hidden;
+
+    background:#050805;
+
+    opacity:1;
+
+    pointer-events:none;
+
+    z-index:-999999;
+  `;
+
+  exportHolder.appendChild(
+    exportRoot
+  );
+
+  document.body.appendChild(
+    exportHolder
+  );
+
+
+  /*
+   * Tunggu browser benar-benar paint.
+   */
+  await new Promise(
+    resolve =>
+      requestAnimationFrame(
+        () =>
+          requestAnimationFrame(
+            resolve
+          )
+      )
+  );
+
+
+  /*
+   * Render resolusi tinggi.
+   */
+  const rect =
+    source.getBoundingClientRect();
+
+
+  const exportScale =
+    3;
 
 
   const canvas =
-    DOM.stage.querySelector(
-      "#promoCanvas"
+    await html2canvas(
+      exportRoot,
+      {
+
+        backgroundColor:
+          "#050805",
+
+        scale:
+          exportScale,
+
+        width:
+          Math.round(
+            rect.width
+          ),
+
+        height:
+          Math.round(
+            rect.height
+          ),
+
+        useCORS:
+          true,
+
+        allowTaint:
+          false,
+
+        foreignObjectRendering:
+          false,
+
+        logging:
+          false,
+
+        imageTimeout:
+          20000,
+
+        removeContainer:
+          true
+
+      }
     );
 
 
+  /*
+   * Bersihkan DOM.
+   */
+  exportHolder.remove();
+
+
+  /*
+   * Pastikan hasil punya ukuran nyata.
+   */
   if(
-    !canvas
+    !canvas ||
+    canvas.width < 100 ||
+    canvas.height < 100
   ){
 
     throw new Error(
-      "CANVAS_RENDER_FAILED"
+      "EXPORT_CANVAS_TOO_SMALL"
     );
 
   }
 
 
-  return html2canvas(
-    canvas,
-    {
+  return canvas;
 
-      backgroundColor:
-        "#050805",
-
-      scale:
-        Math.min(
-          2,
-          window.devicePixelRatio ||
-          1
-        ),
-
-      useCORS:
-        true,
-
-      allowTaint:
-        false,
-
-      logging:
-        false,
-
-      imageTimeout:
-        12000
-
-    }
-  );
-
-}
+      }
 
 
 /* =========================================================
