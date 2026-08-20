@@ -6883,9 +6883,33 @@ function toggleProduct(
 
 
 /* =========================================================
+   DOWNLOAD SYSTEM — PROFESSIONAL EXPORT FINAL
+   =========================================================
+   Scope:
+   - CSS sanitizer khusus html2canvas clone
+   - Clone preparation
+   - Asset validation / decode
+   - High resolution PNG capture
+   - PNG blob generation
+   - Browser / Android download fallback
+   - JSON download
+
+   OUTPUT:
+   9:16  = 1440 x 2560
+   4:5   = 1440 x 1800
+   16:9  = 1920 x 1080
+
+   IMPORTANT:
+   - Tidak mengubah preview asli
+   - Tidak mengubah harga
+   - Tidak mengubah template
+   - Tidak mengubah renderPreview()
+   - Sanitizer hanya bekerja pada clone
+========================================================= */
+
+
+/* =========================================================
    DOWNLOAD CSS SANITIZER
-   FIX html2canvas:
-   "Attempting to parse an unsupported color function"
 ========================================================= */
 
 function sanitizeDownloadCSS(
@@ -6908,16 +6932,113 @@ function sanitizeDownloadCSS(
 
     /*
      * -------------------------------------------------------
-     * Replace color-mix(...)
-     *
-     * Kita tidak bisa memakai regex sederhana karena
-     * color-mix dapat berisi var(...) yang juga punya
-     * tanda kurung.
-     *
-     * Parser kecil di bawah mencari function dan
-     * menggantinya dengan fallback yang aman.
+     * PARSER FUNCTION CSS
      * -------------------------------------------------------
+     *
+     * html2canvas 1.4.1 dapat error pada:
+     *
+     *     color(...)
+     *     color-mix(...)
+     *
+     * Jangan pakai regex biasa karena:
+     *
+     * color-mix(
+     *     in srgb,
+     *     var(--accent) 5%,
+     *     transparent
+     * )
+     *
+     * punya nested parentheses.
      */
+
+    function findFunctionEnd(
+        source,
+        start
+    ){
+
+        let depth =
+            1;
+
+        let index =
+            start;
+
+
+        let quote =
+            null;
+
+
+        while(
+            index <
+            source.length
+        ){
+
+            const char =
+                source[index];
+
+
+            if(
+                quote
+            ){
+
+                if(
+                    char ===
+                    quote &&
+                    source[index - 1] !==
+                    "\\"
+                ){
+
+                    quote =
+                        null;
+
+                }
+
+                index++;
+
+                continue;
+
+            }
+
+
+            if(
+                char === '"' ||
+                char === "'"
+            ){
+
+                quote =
+                    char;
+
+            }else if(
+                char === "("
+            ){
+
+                depth++;
+
+            }else if(
+                char === ")"
+            ){
+
+                depth--;
+
+                if(
+                    depth === 0
+                ){
+
+                    return index;
+
+                }
+
+            }
+
+
+            index++;
+
+        }
+
+
+        return -1;
+
+    }
+
 
     function replaceFunction(
         source,
@@ -6926,7 +7047,8 @@ function sanitizeDownloadCSS(
     ){
 
         const token =
-            functionName + "(";
+            functionName +
+            "(";
 
 
         let result =
@@ -6966,52 +7088,21 @@ function sanitizeDownloadCSS(
                 );
 
 
-            let depth =
-                1;
-
-
-            let index =
-                start +
-                token.length;
-
-
-            while(
-                index <
-                source.length &&
-                depth > 0
-            ){
-
-                const char =
-                    source[index];
-
-
-                if(
-                    char === "("
-                ){
-
-                    depth++;
-
-                }else if(
-                    char === ")"
-                ){
-
-                    depth--;
-
-                }
-
-
-                index++;
-
-            }
+            const end =
+                findFunctionEnd(
+                    source,
+                    start +
+                    token.length
+                );
 
 
             /*
-             * Function tidak lengkap.
-             * Jangan merusak stylesheet.
+             * CSS function tidak lengkap.
+             * Jangan hancurkan stylesheet.
              */
 
             if(
-                depth !== 0
+                end === -1
             ){
 
                 result +=
@@ -7029,7 +7120,7 @@ function sanitizeDownloadCSS(
 
 
             cursor =
-                index;
+                end + 1;
 
         }
 
@@ -7040,37 +7131,157 @@ function sanitizeDownloadCSS(
 
 
     /*
-     * color-mix() digunakan beberapa kali
-     * di stylesheet asli.
+     * -------------------------------------------------------
+     * SPECIAL FALLBACKS
+     * -------------------------------------------------------
      *
-     * Fallback transparan menjaga layout tanpa
-     * membuat html2canvas crash.
+     * Kita pertahankan warna semirip mungkin.
+     *
+     * color-mix() di source digunakan terutama untuk:
+     * - pattern
+     * - glow
+     * - border
+     * - box-shadow
+     *
+     * Untuk decorative function, fallback netral lebih
+     * aman daripada membuat html2canvas crash.
      */
+
 
     css =
         replaceFunction(
             css,
             "color-mix",
-            "rgba(255,255,255,0.10)"
+            "rgba(255,255,255,.08)"
         );
 
 
     /*
-     * color() adalah fungsi yang disebut langsung
-     * oleh error html2canvas.
+     * `color()` HARUS diproses setelah color-mix().
      *
-     * Fallback putih aman untuk parser.
+     * Kalau dibalik, parser "color(" bisa membaca bagian
+     * dari color-mix().
      */
 
     css =
         replaceFunction(
             css,
             "color",
-            "#FFFFFF"
+            "rgba(255,255,255,.08)"
         );
 
 
     return css;
+
+}
+
+
+/* =========================================================
+   REMOVE UNSUPPORTED CSS DECLARATION
+========================================================= */
+
+function removeUnsupportedInlineCSS(
+    element
+){
+
+    if(
+        !element ||
+        !element.getAttribute
+    ){
+
+        return;
+
+    }
+
+
+    const inline =
+        element.getAttribute(
+            "style"
+        );
+
+
+    if(
+        !inline
+    ){
+
+        return;
+
+    }
+
+
+    /*
+     * Inline CSS biasanya sangat pendek.
+     * Kita rebuild declaration satu per satu.
+     */
+
+    const declarations =
+        inline
+        .split(";");
+
+
+    const safe = [];
+
+
+    declarations.forEach(
+        declaration => {
+
+            const value =
+                declaration.trim();
+
+
+            if(
+                !value
+            ){
+
+                return;
+
+            }
+
+
+            /*
+             * Kalau declaration mengandung function
+             * unsupported, jangan ikut dikirim ke
+             * html2canvas.
+             */
+
+            if(
+                value.includes(
+                    "color-mix("
+                ) ||
+                value.includes(
+                    "color("
+                )
+            ){
+
+                return;
+
+            }
+
+
+            safe.push(
+                value
+            );
+
+        }
+    );
+
+
+    if(
+        safe.length
+    ){
+
+        element.setAttribute(
+            "style",
+            safe.join(";")
+        );
+
+    }else{
+
+        element.removeAttribute(
+            "style"
+        );
+
+    }
 
 }
 
@@ -7083,16 +7294,19 @@ function prepareDownloadClone(
     clonedDocument
 ){
 
+    if(
+        !clonedDocument
+    ){
+
+        return;
+
+    }
+
+
     /*
-     * =======================================================
-     * 1. SANITIZE <style>
-     * =======================================================
-     *
-     * Ini bagian penting.
-     *
-     * html2canvas akan membaca stylesheet clone.
-     * Jadi kita sanitasi TEXT stylesheet sebelum
-     * html2canvas memproses rule CSS.
+     * =====================================================
+     * 1. SANITIZE INTERNAL STYLE
+     * =====================================================
      */
 
     clonedDocument
@@ -7104,15 +7318,20 @@ function prepareDownloadClone(
 
                 try{
 
+                    const css =
+                        styleElement.textContent ||
+                        "";
+
+
                     styleElement.textContent =
                         sanitizeDownloadCSS(
-                            styleElement.textContent
+                            css
                         );
 
                 }catch(error){
 
                     console.warn(
-                        "[DOWNLOAD CSS] Style sanitize failed:",
+                        "[DOWNLOAD CSS] sanitize failed:",
                         error
                     );
 
@@ -7123,101 +7342,30 @@ function prepareDownloadClone(
 
 
     /*
-     * =======================================================
-     * 2. SANITIZE LINK STYLESHEET
-     * =======================================================
-     *
-     * Google Fonts tidak berisi styling promo,
-     * jadi tidak perlu disentuh.
-     *
-     * Yang kita lakukan hanya menghindari stylesheet
-     * yang gagal dibaca html2canvas.
+     * =====================================================
+     * 2. INLINE STYLE
+     * =====================================================
      */
 
     clonedDocument
         .querySelectorAll(
-            'link[rel="stylesheet"]'
-        )
-        .forEach(
-            link => {
-
-                const href =
-                    link.getAttribute(
-                        "href"
-                    ) || "";
-
-
-                /*
-                 * Font Google tetap dipertahankan.
-                 */
-
-                if(
-                    href.includes(
-                        "fonts.googleapis.com"
-                    ) ||
-                    href.includes(
-                        "fonts.gstatic.com"
-                    )
-                ){
-
-                    return;
-
-                }
-
-            }
-        );
-
-
-    /*
-     * =======================================================
-     * 3. INLINE STYLE SANITIZATION
-     * =======================================================
-     */
-
-    clonedDocument
-        .querySelectorAll(
-            "*"
+            "[style]"
         )
         .forEach(
             element => {
 
-                if(
-                    !element.style
-                ){
+                try{
 
-                    return;
-
-                }
-
-
-                const cssText =
-                    element.getAttribute(
-                        "style"
+                    removeUnsupportedInlineCSS(
+                        element
                     );
 
+                }catch(error){
 
-                if(
-                    cssText &&
-                    (
-                        cssText.includes(
-                            "color("
-                        ) ||
-                        cssText.includes(
-                            "color-mix("
-                        )
-                    )
-                ){
-
-                    try{
-
-                        element.setAttribute(
-                            "style",
-                            sanitizeDownloadCSS(
-                                cssText
-                            )
-                        );
-
-                    }catch{}
+                    console.warn(
+                        "[DOWNLOAD CSS] inline sanitize failed:",
+                        error
+                    );
 
                 }
 
@@ -7226,187 +7374,434 @@ function prepareDownloadClone(
 
 
     /*
-     * =======================================================
-     * 4. REMOVE CSS VARIABLES YANG BERISI FUNCTION
-     * =======================================================
+     * =====================================================
+     * 3. REMOVE ANIMATION / TRANSITION
+     * =====================================================
      *
-     * Ini mencegah:
-     *
-     * color: var(--something)
-     *
-     * kemudian variable tersebut resolve menjadi
-     * color(...) dan html2canvas meledak.
+     * Export harus berupa frame final.
+     * Animation bisa membuat hasil capture random.
      */
 
-    const root =
-        clonedDocument.documentElement;
+    const captureStyle =
+        clonedDocument.createElement(
+            "style"
+        );
+
+
+    captureStyle.textContent = `
+
+        *,
+        *::before,
+        *::after{
+
+            animation:none !important;
+
+            transition:none !important;
+
+            caret-color:transparent !important;
+
+        }
+
+
+        html,
+        body{
+
+            margin:0 !important;
+
+            padding:0 !important;
+
+            overflow:visible !important;
+
+            background:#050705 !important;
+
+        }
+
+
+        #promoCanvas{
+
+            transform:none !important;
+
+            filter:none !important;
+
+            opacity:1 !important;
+
+            visibility:visible !important;
+
+        }
+
+
+        #promoCanvas,
+        #promoCanvas *{
+
+            animation:none !important;
+
+            transition:none !important;
+
+        }
+
+
+        .product-image{
+
+            opacity:1 !important;
+
+            visibility:visible !important;
+
+            filter:none !important;
+
+            transform:none !important;
+
+        }
+
+    `;
+
+
+    clonedDocument.head.appendChild(
+        captureStyle
+    );
+
+
+    /*
+     * =====================================================
+     * 4. FREEZE PRODUCT IMAGE
+     * =====================================================
+     *
+     * Hindari image sedang transition / lazy state.
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            ".product-image"
+        )
+        .forEach(
+            image => {
+
+                image.style.opacity =
+                    "1";
+
+                image.style.visibility =
+                    "visible";
+
+                image.style.filter =
+                    "none";
+
+            }
+        );
+
+
+    /*
+     * =====================================================
+     * 5. FREEZE WATERMARK
+     * =====================================================
+     */
+
+    clonedDocument
+        .querySelectorAll(
+            ".brand-watermark, .watermark-micro"
+        )
+        .forEach(
+            element => {
+
+                element.style.animation =
+                    "none";
+
+                element.style.transition =
+                    "none";
+
+                element.style.opacity =
+                    element.style.opacity ||
+                    "1";
+
+            }
+        );
+
+
+    /*
+     * =====================================================
+     * 6. FORCE CANVAS BACKGROUND
+     * =====================================================
+     */
+
+    const promoCanvas =
+        clonedDocument.getElementById(
+            "promoCanvas"
+        );
 
 
     if(
-        root
+        promoCanvas
     ){
 
-        const rootStyle =
-            root.style;
+        promoCanvas.style.backgroundColor =
+            "#070907";
 
-
-        for(
-            let i =
-                rootStyle.length - 1;
-
-            i >= 0;
-
-            i--
-        ){
-
-            const property =
-                rootStyle[i];
-
-
-            if(
-                !property.startsWith(
-                    "--"
-                )
-            ){
-
-                continue;
-
-            }
-
-
-            let value =
-                "";
-
-
-            try{
-
-                value =
-                    rootStyle.getPropertyValue(
-                        property
-                    );
-
-            }catch{
-
-                continue;
-
-            }
-
-
-            if(
-                value.includes(
-                    "color("
-                ) ||
-                value.includes(
-                    "color-mix("
-                )
-            ){
-
-                /*
-                 * Fallback warna netral.
-                 */
-
-                rootStyle.setProperty(
-                    property,
-                    "#FFFFFF"
-                );
-
-            }
-
-        }
+        promoCanvas.style.backgroundImage =
+            "none";
 
     }
 
 
     /*
-     * =======================================================
-     * 5. SANITIZE ALL INLINE CUSTOM VARIABLES
-     * =======================================================
+     * Jangan ubah ukuran clone.
+     *
+     * Ukuran asli harus dipertahankan supaya:
+     * - clamp()
+     * - percentage
+     * - aspect-ratio
+     * - responsive layout
+     *
+     * tetap identik dengan preview.
      */
 
-    clonedDocument
-        .querySelectorAll(
-            "*"
+}
+
+
+/* =========================================================
+   WAIT FOR SINGLE IMAGE
+========================================================= */
+
+async function waitForDownloadImage(
+    image
+){
+
+    if(
+        !image
+    ){
+
+        return;
+
+    }
+
+
+    /*
+     * Browser sudah selesai load.
+     */
+
+    if(
+        image.complete &&
+        image.naturalWidth > 0
+    ){
+
+        if(
+            typeof image.decode ===
+            "function"
+        ){
+
+            try{
+
+                await image.decode();
+
+            }catch{}
+
+        }
+
+
+        return;
+
+    }
+
+
+    /*
+     * Tunggu event load/error.
+     */
+
+    await new Promise(
+        resolve => {
+
+            let finished =
+                false;
+
+
+            const done =
+                ()=>{
+                    
+                    if(
+                        finished
+                    ){
+
+                        return;
+
+                    }
+
+
+                    finished =
+                        true;
+
+
+                    resolve();
+
+                };
+
+
+            image.addEventListener(
+                "load",
+                done,
+                {
+                    once:true
+                }
+            );
+
+
+            image.addEventListener(
+                "error",
+                done,
+                {
+                    once:true
+                }
+            );
+
+
+            setTimeout(
+                done,
+                15000
+            );
+
+        }
+    );
+
+
+    /*
+     * Decode setelah load.
+     */
+
+    if(
+        image.complete &&
+        image.naturalWidth > 0 &&
+        typeof image.decode ===
+        "function"
+    ){
+
+        try{
+
+            await image.decode();
+
+        }catch{}
+
+    }
+
+}
+
+
+/* =========================================================
+   WAIT FOR DOWNLOAD IMAGES
+========================================================= */
+
+async function waitForDownloadImages(
+    root
+){
+
+    if(
+        !root
+    ){
+
+        return;
+
+    }
+
+
+    const images =
+        [
+            ...root.querySelectorAll(
+                "img"
+            )
+        ];
+
+
+    await Promise.all(
+        images.map(
+            image =>
+                waitForDownloadImage(
+                    image
+                )
         )
-        .forEach(
-            element => {
-
-                const style =
-                    element.style;
+    );
 
 
-                if(
-                    !style
-                ){
+    /*
+     * Beri browser satu kesempatan untuk
+     * menyelesaikan compositing.
+     */
 
-                    return;
-
+    await new Promise(
+        resolve =>
+            requestAnimationFrame(
+                ()=>{
+                    requestAnimationFrame(
+                        resolve
+                    );
                 }
+            )
+    );
+
+}
 
 
-                for(
-                    let i =
-                        style.length - 1;
+/* =========================================================
+   WAIT FOR DOWNLOAD FONTS
+========================================================= */
 
-                    i >= 0;
+async function waitForDownloadFonts(){
 
-                    i--
-                ){
+    if(
+        !document.fonts
+    ){
 
-                    const property =
-                        style[i];
+        return;
 
-
-                    if(
-                        !property.startsWith(
-                            "--"
-                        )
-                    ){
-
-                        continue;
-
-                    }
+    }
 
 
-                    let value =
-                        "";
+    try{
 
+        await Promise.race(
+            [
 
-                    try{
+                document.fonts.ready,
 
-                        value =
-                            style.getPropertyValue(
-                                property
-                            );
+                wait(
+                    6000
+                )
 
-                    }catch{
-
-                        continue;
-
-                    }
-
-
-                    if(
-                        value.includes(
-                            "color("
-                        ) ||
-                        value.includes(
-                            "color-mix("
-                        )
-                    ){
-
-                        style.setProperty(
-                            property,
-                            "#FFFFFF"
-                        );
-
-                    }
-
-                }
-
-            }
+            ]
         );
 
-          }
+
+        /*
+         * Force font faces yang digunakan.
+         */
+
+        await Promise.all(
+            [
+
+                document.fonts.load(
+                    '900 32px "Manrope"'
+                ),
+
+                document.fonts.load(
+                    '800 20px "Manrope"'
+                ),
+
+                document.fonts.load(
+                    '700 16px "Plus Jakarta Sans"'
+                ),
+
+                document.fonts.load(
+                    '400 16px "Plus Jakarta Sans"'
+                )
+
+            ]
+        );
+
+    }catch(error){
+
+        console.warn(
+            "[DOWNLOAD FONT] Font wait failed:",
+            error
+        );
+
+    }
+
+}
+
 
 /* =========================================================
    DOWNLOAD BLOB
@@ -7432,7 +7827,7 @@ async function saveBlob(
     const safeFilename =
         String(
             filename ||
-            "promo-status.png"
+            "promo.png"
         )
         .replace(
             /[<>:"/\\|?*\u0000-\u001F]/g,
@@ -7446,10 +7841,17 @@ async function saveBlob(
         );
 
 
-    let link = null;
+    let link =
+        null;
 
 
     try{
+
+        /*
+         * =====================================================
+         * PRIMARY DOWNLOAD
+         * =====================================================
+         */
 
         link =
             document.createElement(
@@ -7493,6 +7895,11 @@ async function saveBlob(
         );
 
 
+        /*
+         * Android WebView / Chrome lebih stabil
+         * kalau click terjadi setelah frame.
+         */
+
         await new Promise(
             resolve =>
                 requestAnimationFrame(
@@ -7505,11 +7912,11 @@ async function saveBlob(
 
 
         /*
-         * Jangan revoke terlalu cepat.
+         * Jangan langsung revoke.
          */
 
         await wait(
-            1200
+            1500
         );
 
 
@@ -7525,7 +7932,9 @@ async function saveBlob(
 
 
         /*
-         * Fallback browser/mobile.
+         * =====================================================
+         * FALLBACK 1 — OPEN IMAGE
+         * =====================================================
          */
 
         try{
@@ -7563,7 +7972,9 @@ async function saveBlob(
 
 
         /*
-         * Fallback Web Share.
+         * =====================================================
+         * FALLBACK 2 — WEB SHARE
+         * =====================================================
          */
 
         try{
@@ -7586,19 +7997,24 @@ async function saveBlob(
                     );
 
 
-                if(
+                const supported =
                     !navigator.canShare ||
                     navigator.canShare({
                         files:[
                             file
                         ]
-                    })
+                    });
+
+
+                if(
+                    supported
                 ){
 
                     await navigator.share({
                         files:[
                             file
                         ],
+
                         title:
                             safeFilename
                     });
@@ -7613,6 +8029,10 @@ async function saveBlob(
         }catch(
             shareError
         ){
+
+            /*
+             * User menutup share sheet.
+             */
 
             if(
                 shareError?.name ===
@@ -7639,7 +8059,9 @@ async function saveBlob(
 
     }finally{
 
-        if(link){
+        if(
+            link
+        ){
 
             try{
 
@@ -7649,6 +8071,11 @@ async function saveBlob(
 
         }
 
+
+        /*
+         * Revoke cukup lambat supaya Android tidak
+         * kehilangan Blob sebelum download selesai.
+         */
 
         setTimeout(
             ()=>{
@@ -7662,7 +8089,7 @@ async function saveBlob(
                 }catch{}
 
             },
-            5000
+            8000
         );
 
     }
@@ -7671,7 +8098,237 @@ async function saveBlob(
 
 
 /* =========================================================
-   DOWNLOAD STATUS — HIGH RES FINAL
+   CANVAS → PNG BLOB
+========================================================= */
+
+async function canvasToPNGBlob(
+    canvas
+){
+
+    if(
+        !canvas
+    ){
+
+        throw new Error(
+            "CANVAS_RENDER_FAILED"
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * PRIMARY: toBlob()
+     * =====================================================
+     */
+
+    try{
+
+        const blob =
+            await new Promise(
+                (
+                    resolve,
+                    reject
+                )=>{
+
+                    let completed =
+                        false;
+
+
+                    const finish =
+                        result => {
+
+                            if(
+                                completed
+                            ){
+
+                                return;
+
+                            }
+
+
+                            completed =
+                                true;
+
+
+                            if(
+                                result &&
+                                result.size > 0
+                            ){
+
+                                resolve(
+                                    result
+                                );
+
+                            }else{
+
+                                reject(
+                                    new Error(
+                                        "TOBLOB_EMPTY"
+                                    )
+                                );
+
+                            }
+
+                        };
+
+
+                    try{
+
+                        canvas.toBlob(
+                            finish,
+                            "image/png",
+                            1
+                        );
+
+                    }catch(error){
+
+                        reject(
+                            error
+                        );
+
+                    }
+
+
+                    setTimeout(
+                        ()=>{
+
+                            if(
+                                !completed
+                            ){
+
+                                reject(
+                                    new Error(
+                                        "TOBLOB_TIMEOUT"
+                                    )
+                                );
+
+                            }
+
+                        },
+                        10000
+                    );
+
+                }
+            );
+
+
+        return blob;
+
+    }catch(
+        blobError
+    ){
+
+        console.warn(
+            "[DOWNLOAD] toBlob failed:",
+            blobError
+        );
+
+    }
+
+
+    /*
+     * =====================================================
+     * FALLBACK: toDataURL()
+     * =====================================================
+     */
+
+    try{
+
+        const dataURL =
+            canvas.toDataURL(
+                "image/png"
+            );
+
+
+        if(
+            !dataURL ||
+            !dataURL.includes(",")
+        ){
+
+            throw new Error(
+                "DATAURL_INVALID"
+            );
+
+        }
+
+
+        const base64 =
+            dataURL.split(
+                ","
+            )[1];
+
+
+        const binary =
+            atob(
+                base64
+            );
+
+
+        const bytes =
+            new Uint8Array(
+                binary.length
+            );
+
+
+        for(
+            let i = 0;
+            i < binary.length;
+            i++
+        ){
+
+            bytes[i] =
+                binary.charCodeAt(
+                    i
+                );
+
+        }
+
+
+        const blob =
+            new Blob(
+                [bytes],
+                {
+                    type:
+                        "image/png"
+                }
+            );
+
+
+        if(
+            blob.size <= 0
+        ){
+
+            throw new Error(
+                "PNG_EMPTY"
+            );
+
+        }
+
+
+        return blob;
+
+    }catch(
+        dataURLError
+    ){
+
+        console.error(
+            "[DOWNLOAD] PNG generation failed:",
+            dataURLError
+        );
+
+
+        throw new Error(
+            "PNG_GENERATION_FAILED"
+        );
+
+    }
+
+}
+
+
+/* =========================================================
+   DOWNLOAD STATUS — PROFESSIONAL HIGH RES
 ========================================================= */
 
 async function downloadStatus(){
@@ -7737,6 +8394,11 @@ async function downloadStatus(){
         playing;
 
 
+    /*
+     * Stop autoplay supaya frame yang diambil
+     * benar-benar frame produk saat ini.
+     */
+
     stopAutoplay();
 
 
@@ -7744,8 +8406,13 @@ async function downloadStatus(){
         true;
 
 
-    downloadBtn.innerHTML =
-        "MEMBUAT STATUS...";
+    downloadBtn.innerHTML = `
+
+        <span class="download-spinner"></span>
+
+        MEMBUAT STATUS...
+
+    `;
 
 
     document.body.classList.add(
@@ -7757,38 +8424,29 @@ async function downloadStatus(){
 
         /*
          * =====================================================
-         * WAIT ASSET
+         * STEP 1 — WAIT IMAGES
          * =====================================================
          */
 
-        if(
-            typeof waitForImages ===
-            "function"
-        ){
-
-            await waitForImages(
-                canvas
-            );
-
-        }
+        await waitForDownloadImages(
+            canvas
+        );
 
 
-        if(
-            typeof waitForFonts ===
-            "function"
-        ){
+        /*
+         * =====================================================
+         * STEP 2 — WAIT FONTS
+         * =====================================================
+         */
 
-            await waitForFonts();
+        await waitForDownloadFonts();
 
-        }else if(
-            document.fonts &&
-            document.fonts.ready
-        ){
 
-            await document.fonts.ready;
-
-        }
-
+        /*
+         * =====================================================
+         * STEP 3 — FORCE FINAL LAYOUT
+         * =====================================================
+         */
 
         await new Promise(
             resolve =>
@@ -7803,13 +8461,13 @@ async function downloadStatus(){
 
 
         await wait(
-            150
+            180
         );
 
 
         /*
          * =====================================================
-         * UKURAN PREVIEW
+         * STEP 4 — MEASURE SOURCE
          * =====================================================
          */
 
@@ -7817,7 +8475,7 @@ async function downloadStatus(){
             canvas.getBoundingClientRect();
 
 
-        const width =
+        const sourceWidth =
             Math.max(
                 1,
                 Math.round(
@@ -7826,7 +8484,7 @@ async function downloadStatus(){
             );
 
 
-        const height =
+        const sourceHeight =
             Math.max(
                 1,
                 Math.round(
@@ -7837,56 +8495,147 @@ async function downloadStatus(){
 
         /*
          * =====================================================
-         * TARGET EXPORT
+         * STEP 5 — PROFESSIONAL OUTPUT SIZE
          * =====================================================
          */
 
-        const targetWidth =
+        let targetWidth;
 
-            currentRatio === "916"
-
-                ?
-
-                1440
-
-                :
-
-                currentRatio === "45"
-
-                    ?
-
-                    1440
-
-                    :
-
-                    1920;
+        let targetHeight;
 
 
-        let scale =
-            targetWidth /
-            width;
+        if(
+            currentRatio ===
+            "916"
+        ){
+
+            targetWidth =
+                1440;
+
+            targetHeight =
+                2560;
+
+        }else if(
+            currentRatio ===
+            "45"
+        ){
+
+            targetWidth =
+                1440;
+
+            targetHeight =
+                1800;
+
+        }else{
+
+            targetWidth =
+                1920;
+
+            targetHeight =
+                1080;
+
+        }
 
 
         /*
-         * Safety memory limit.
+         * =====================================================
+         * STEP 6 — CALCULATE SCALE FROM REAL RATIO
+         * =====================================================
          *
-         * 1440 × 2560 = 3.68 MP
-         * jadi aman untuk mayoritas HP.
+         * Jangan asal scale.
+         *
+         * Gunakan rasio target terhadap source.
+         */
+
+        const widthScale =
+            targetWidth /
+            sourceWidth;
+
+
+        const heightScale =
+            targetHeight /
+            sourceHeight;
+
+
+        /*
+         * Source stage seharusnya punya aspect ratio
+         * yang sama.
+         *
+         * Ambil nilai konservatif agar tidak memotong.
+         */
+
+        let scale =
+            Math.min(
+                widthScale,
+                heightScale
+            );
+
+
+        /*
+         * Untuk source yang aspect ratio-nya identik,
+         * hasil akan tepat 1440x2560 / 1440x1800 / 1920x1080.
+         *
+         * Kalau ada selisih kecil karena border/subpixel,
+         * gunakan width sebagai master.
+         */
+
+        if(
+            currentRatio === "916"
+        ){
+
+            scale =
+                widthScale;
+
+        }else if(
+            currentRatio === "45"
+        ){
+
+            scale =
+                widthScale;
+
+        }else{
+
+            scale =
+                widthScale;
+
+        }
+
+
+        /*
+         * =====================================================
+         * MEMORY GUARD
+         * =====================================================
+         *
+         * Jangan memaksa ukuran yang bisa bikin HP crash.
+         *
+         * 16 MP adalah batas aman praktis.
          */
 
         const MAX_PIXELS =
             16000000;
 
 
-        const estimatedPixels =
-            width *
-            height *
-            scale *
-            scale;
+        const expectedWidth =
+            Math.round(
+                sourceWidth *
+                scale
+            );
+
+
+        const expectedHeight =
+            Math.round(
+                sourceHeight *
+                scale
+            );
+
+
+        const expectedPixels =
+            expectedWidth *
+            expectedHeight;
 
 
         if(
-            estimatedPixels >
+            expectedPixels >
             MAX_PIXELS
         ){
 
@@ -7894,49 +8643,139 @@ async function downloadStatus(){
                 Math.sqrt(
                     MAX_PIXELS /
                     (
-                        width *
-                        height
+                        sourceWidth *
+                        sourceHeight
                     )
                 );
 
         }
 
 
+        const outputWidth =
+            Math.round(
+                sourceWidth *
+                scale
+            );
+
+
+        const outputHeight =
+            Math.round(
+                sourceHeight *
+                scale
+            );
+
+
         console.log(
-            "[DOWNLOAD] High-res capture:",
+            "[DOWNLOAD] PROFESSIONAL EXPORT",
             {
+
+                ratio:
+                    currentRatio,
+
                 sourceWidth:
-                    width,
+                    sourceWidth,
 
                 sourceHeight:
-                    height,
+                    sourceHeight,
 
-                targetWidth,
+                targetWidth:
+                    targetWidth,
 
-                scale,
+                targetHeight:
+                    targetHeight,
 
                 outputWidth:
-                    Math.round(
-                        width *
-                        scale
-                    ),
+                    outputWidth,
 
                 outputHeight:
-                    Math.round(
-                        height *
-                        scale
-                    )
+                    outputHeight,
+
+                scale:
+                    scale,
+
+                pixels:
+                    outputWidth *
+                    outputHeight
+
             }
         );
 
 
         /*
          * =====================================================
-         * CAPTURE
+         * STEP 7 — CAPTURE OPTIONS
          * =====================================================
          */
 
-        let rendered = null;
+        const captureOptions = {
+
+            backgroundColor:
+                "#050705",
+
+            scale:
+                scale,
+
+            width:
+                sourceWidth,
+
+            height:
+                sourceHeight,
+
+            useCORS:
+                true,
+
+            allowTaint:
+                false,
+
+            imageTimeout:
+                20000,
+
+            logging:
+                false,
+
+            foreignObjectRendering:
+                false,
+
+            removeContainer:
+                true,
+
+            scrollX:
+                0,
+
+            scrollY:
+                0,
+
+            windowWidth:
+                Math.max(
+                    document.documentElement.clientWidth,
+                    sourceWidth
+                ),
+
+            windowHeight:
+                Math.max(
+                    document.documentElement.clientHeight,
+                    sourceHeight
+                ),
+
+            onclone:
+                clonedDocument => {
+
+                    prepareDownloadClone(
+                        clonedDocument
+                    );
+
+                }
+
+        };
+
+
+        /*
+         * =====================================================
+         * STEP 8 — FIRST CAPTURE
+         * =====================================================
+         */
+
+        let rendered;
 
 
         try{
@@ -7944,147 +8783,120 @@ async function downloadStatus(){
             rendered =
                 await html2canvas(
                     canvas,
-                    {
-
-                        backgroundColor:
-                            "#050705",
-
-                        scale:
-                            scale,
-
-                        width:
-                            width,
-
-                        height:
-                            height,
-
-                        useCORS:
-                            true,
-
-                        allowTaint:
-                            false,
-
-                        imageTimeout:
-                            15000,
-
-                        logging:
-                            false,
-
-                        foreignObjectRendering:
-                            false,
-
-                        removeContainer:
-                            true,
-
-                        scrollX:
-                            0,
-
-                        scrollY:
-                            0,
-
-
-                        /*
-                         * INI FIX UTAMA
-                         *
-                         * CSS asli tidak disentuh.
-                         * Hanya clone html2canvas yang
-                         * dibersihkan dari color-mix/color().
-                         */
-
-                        onclone:
-                            clonedDocument => {
-
-                                prepareDownloadClone(
-                                    clonedDocument
-                                );
-
-                            }
-
-                    }
+                    captureOptions
                 );
 
+
         }catch(
-            firstCaptureError
+            firstError
         ){
 
             console.warn(
                 "[DOWNLOAD] Capture pertama gagal:",
-                firstCaptureError
+                firstError
             );
 
 
             /*
-             * Retry dengan scale lebih rendah,
-             * tapi tetap high quality.
+             * =================================================
+             * RETRY #1
+             * =================================================
+             *
+             * Jangan langsung turun ke scale 1.
+             *
+             * Retry tetap high-res tapi memory sedikit
+             * lebih rendah.
              */
 
-            const retryScale =
-                Math.max(
-                    1.5,
-                    scale * 0.75
+            const retryOptions = {
+
+                ...captureOptions,
+
+                scale:
+                    Math.max(
+                        1.75,
+                        scale *
+                        0.88
+                    ),
+
+                imageTimeout:
+                    25000
+
+            };
+
+
+            try{
+
+                rendered =
+                    await html2canvas(
+                        canvas,
+                        retryOptions
+                    );
+
+
+            }catch(
+                secondError
+            ){
+
+                console.warn(
+                    "[DOWNLOAD] Capture retry #1 gagal:",
+                    secondError
                 );
 
 
-            rendered =
-                await html2canvas(
-                    canvas,
-                    {
+                /*
+                 * =================================================
+                 * RETRY #2 — COMPATIBILITY MODE
+                 * =================================================
+                 *
+                 * Tetap gunakan CSS sanitizer.
+                 * Tidak menggunakan foreignObject.
+                 */
 
-                        backgroundColor:
-                            "#050705",
+                const fallbackOptions = {
 
-                        scale:
-                            retryScale,
+                    ...captureOptions,
 
-                        width:
-                            width,
+                    scale:
+                        Math.max(
+                            1.5,
+                            scale *
+                            0.72
+                        ),
 
-                        height:
-                            height,
+                    imageTimeout:
+                        30000,
 
-                        useCORS:
-                            true,
+                    logging:
+                        false,
 
-                        allowTaint:
-                            false,
+                    foreignObjectRendering:
+                        false
 
-                        imageTimeout:
-                            12000,
+                };
 
-                        logging:
-                            false,
 
-                        foreignObjectRendering:
-                            false,
+                rendered =
+                    await html2canvas(
+                        canvas,
+                        fallbackOptions
+                    );
 
-                        removeContainer:
-                            true,
-
-                        scrollX:
-                            0,
-
-                        scrollY:
-                            0,
-
-                        onclone:
-                            clonedDocument => {
-
-                                prepareDownloadClone(
-                                    clonedDocument
-                                );
-
-                            }
-
-                    }
-                );
+            }
 
         }
 
 
+        /*
+         * =====================================================
+         * STEP 9 — VALIDATE RENDER
+         * =====================================================
+         */
+
         if(
             !rendered ||
-            !rendered.width ||
-            !rendered.height
+            rendered.width <= 0 ||
+            rendered.height <= 0
         ){
 
             throw new Error(
@@ -8096,195 +8908,14 @@ async function downloadStatus(){
 
         /*
          * =====================================================
-         * CANVAS → BLOB
+         * STEP 10 — PNG
          * =====================================================
          */
 
-        let blob = null;
-
-
-        try{
-
-            blob =
-                await new Promise(
-                    (
-                        resolve,
-                        reject
-                    )=>{
-
-                        let completed =
-                            false;
-
-
-                        const finish =
-                            result => {
-
-                                if(
-                                    completed
-                                ){
-
-                                    return;
-
-                                }
-
-
-                                completed =
-                                    true;
-
-
-                                if(
-                                    result &&
-                                    result.size > 0
-                                ){
-
-                                    resolve(
-                                        result
-                                    );
-
-                                }else{
-
-                                    reject(
-                                        new Error(
-                                            "TOBLOB_EMPTY"
-                                        )
-                                    );
-
-                                }
-
-                            };
-
-
-                        try{
-
-                            rendered.toBlob(
-                                finish,
-                                "image/png",
-                                1
-                            );
-
-                        }catch(error){
-
-                            reject(
-                                error
-                            );
-
-                        }
-
-
-                        setTimeout(
-                            ()=>{
-
-                                if(
-                                    !completed
-                                ){
-
-                                    reject(
-                                        new Error(
-                                            "TOBLOB_TIMEOUT"
-                                        )
-                                    );
-
-                                }
-
-                            },
-                            8000
-                        );
-
-                    }
-                );
-
-        }catch(
-            blobError
-        ){
-
-            console.warn(
-                "[DOWNLOAD] toBlob gagal:",
-                blobError
+        const blob =
+            await canvasToPNGBlob(
+                rendered
             );
-
-
-            /*
-             * =================================================
-             * FALLBACK DATA URL
-             * =================================================
-             */
-
-            try{
-
-                const dataURL =
-                    rendered.toDataURL(
-                        "image/png"
-                    );
-
-
-                if(
-                    !dataURL ||
-                    !dataURL.includes(",")
-                ){
-
-                    throw new Error(
-                        "DATAURL_INVALID"
-                    );
-
-                }
-
-
-                const base64 =
-                    dataURL.split(",")[1];
-
-
-                const binary =
-                    atob(
-                        base64
-                    );
-
-
-                const bytes =
-                    new Uint8Array(
-                        binary.length
-                    );
-
-
-                for(
-                    let i = 0;
-                    i < binary.length;
-                    i++
-                ){
-
-                    bytes[i] =
-                        binary.charCodeAt(
-                            i
-                        );
-
-                }
-
-
-                blob =
-                    new Blob(
-                        [bytes],
-                        {
-                            type:
-                                "image/png"
-                        }
-                    );
-
-            }catch(
-                dataURLError
-            ){
-
-                console.error(
-                    "[DOWNLOAD] PNG generation failed:",
-                    dataURLError
-                );
-
-
-                throw new Error(
-                    "PNG_GENERATION_FAILED"
-                );
-
-            }
-
-        }
 
 
         if(
@@ -8301,13 +8932,44 @@ async function downloadStatus(){
 
         /*
          * =====================================================
-         * FILENAME
+         * STEP 11 — QUALITY LOG
+         * =====================================================
+         */
+
+        console.log(
+            "[DOWNLOAD] PNG READY",
+            {
+
+                width:
+                    rendered.width,
+
+                height:
+                    rendered.height,
+
+                bytes:
+                    blob.size,
+
+                megabytes:
+                    (
+                        blob.size /
+                        1024 /
+                        1024
+                    ).toFixed(2)
+
+            }
+        );
+
+
+        /*
+         * =====================================================
+         * STEP 12 — FILENAME
          * =====================================================
          */
 
         const ratioName =
 
-            currentRatio === "916"
+            currentRatio ===
+            "916"
 
                 ?
 
@@ -8315,7 +8977,8 @@ async function downloadStatus(){
 
                 :
 
-                currentRatio === "45"
+                currentRatio ===
+                "45"
 
                     ?
 
@@ -8341,7 +9004,7 @@ async function downloadStatus(){
 
         /*
          * =====================================================
-         * DOWNLOAD
+         * STEP 13 — SAVE
          * =====================================================
          */
 
@@ -8352,7 +9015,7 @@ async function downloadStatus(){
 
 
         showToast(
-            "Status berhasil didownload ✓"
+            `Status ${ratioName} berhasil didownload ✓`
         );
 
 
@@ -8378,6 +9041,14 @@ async function downloadStatus(){
 
         }else if(
             error?.message ===
+            "CANVAS_RENDER_FAILED"
+        ){
+
+            message =
+                "Gagal merender status.";
+
+        }else if(
+            error?.message ===
             "PNG_GENERATION_FAILED"
         ){
 
@@ -8386,11 +9057,11 @@ async function downloadStatus(){
 
         }else if(
             error?.message ===
-            "CANVAS_RENDER_FAILED"
+            "PNG_EMPTY"
         ){
 
             message =
-                "Gagal merender status.";
+                "PNG hasil render kosong.";
 
         }else if(
             error?.message ===
@@ -8418,6 +9089,12 @@ async function downloadStatus(){
 
     }finally{
 
+        /*
+         * =====================================================
+         * RESTORE UI
+         * =====================================================
+         */
+
         document.body.classList.remove(
             "capture-mode"
         );
@@ -8434,6 +9111,10 @@ async function downloadStatus(){
         downloadBtn.innerHTML =
             oldHTML;
 
+
+        /*
+         * Restore autoplay.
+         */
 
         if(
             wasPlaying
@@ -8455,7 +9136,6 @@ async function downloadStatus(){
 }
 
 
-  
 /* =========================================================
    DOWNLOAD JSON
 ========================================================= */
@@ -8463,6 +9143,12 @@ async function downloadStatus(){
 async function downloadJSON(){
 
     try{
+
+        /*
+         * =====================================================
+         * SELECTED PRODUCTS
+         * =====================================================
+         */
 
         const selected =
             products.filter(
@@ -8474,6 +9160,12 @@ async function downloadJSON(){
                     )
             );
 
+
+        /*
+         * =====================================================
+         * BUILD EXPORT
+         * =====================================================
+         */
 
         const output =
             selected.map(
@@ -8525,6 +9217,12 @@ async function downloadJSON(){
             );
 
 
+        /*
+         * =====================================================
+         * JSON BLOB
+         * =====================================================
+         */
+
         const blob =
             new Blob(
                 [
@@ -8536,10 +9234,16 @@ async function downloadJSON(){
                 ],
                 {
                     type:
-                        "application/json"
+                        "application/json;charset=utf-8"
                 }
             );
 
+
+        /*
+         * =====================================================
+         * SAVE
+         * =====================================================
+         */
 
         await saveBlob(
             blob,
@@ -8551,11 +9255,14 @@ async function downloadJSON(){
             "produk-promo-final.json berhasil dibuat ✓"
         );
 
+
     }catch(error){
 
         console.error(
+            "[DOWNLOAD JSON ERROR]",
             error
         );
+
 
         showToast(
             "Gagal download JSON."
