@@ -1,66 +1,92 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#050705">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
+<meta name="theme-color" content="#020402">
 <meta name="color-scheme" content="dark">
-<meta name="description" content="LARAS Promo Creative Studio — Premium product campaign workspace.">
-<title>LARAS — Premium Promo Studio</title>
+
+<title>Imam_salesfr — nine autoseries</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800;900&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+  rel="stylesheet"
+>
 
-<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"
+></script>
 
 <style>
+/* =========================================================
+   ROOT
+========================================================= */
+
 :root{
   --lime:#8CC63F;
-  --lime2:#B4EF63;
+  --lime-light:#B9F26C;
+
   --orange:#FF7612;
-  --orange2:#FFAA67;
+  --orange-light:#FFAA67;
+
   --blue:#2998E8;
-  --cyan:#69D4FF;
+  --blue-light:#6DD5FF;
 
   --bg:#020402;
-  --bg2:#050805;
+  --bg-2:#050805;
   --panel:#080D09;
-  --panel2:#0B120D;
-  --panel3:#101810;
+  --panel-2:#0B120D;
+  --panel-3:#101710;
 
-  --text:#F7FAF5;
-  --soft:#DCE5DC;
-  --muted:#788278;
-  --muted2:#59635A;
+  --text:#F6FAF4;
+  --text-soft:#DDE6DE;
+  --muted:#748076;
+  --muted-2:#59645B;
 
   --line:rgba(255,255,255,.075);
-  --line2:rgba(255,255,255,.13);
+  --line-strong:rgba(255,255,255,.14);
 
-  --danger:#FF5E63;
-  --warning:#FFBF55;
-  --success:#8CC63F;
+  --danger:#FF5F65;
 
-  --accent:var(--lime);
-  --accent2:var(--lime2);
-  --glow:rgba(140,198,63,.17);
+  --radius-xl:25px;
+  --radius-lg:19px;
+  --radius-md:13px;
+  --radius-sm:9px;
 
-  --display:"Manrope",Inter,system-ui,sans-serif;
-  --body:"Plus Jakarta Sans",Inter,system-ui,sans-serif;
+  --shadow:
+    0 30px 90px rgba(0,0,0,.48);
 
-  --r-xl:28px;
-  --r-lg:20px;
-  --r-md:15px;
-  --r-sm:10px;
+  --shadow-soft:
+    0 15px 45px rgba(0,0,0,.28);
 
-  --shadow:0 30px 100px rgba(0,0,0,.52);
-  --shadow2:0 14px 42px rgba(0,0,0,.30);
+  --display:
+    "Manrope",
+    Inter,
+    system-ui,
+    sans-serif;
+
+  --body:
+    "Plus Jakarta Sans",
+    Inter,
+    system-ui,
+    sans-serif;
 }
+
+
+/* =========================================================
+   RESET
+========================================================= */
 
 *,
 *::before,
-*::after{box-sizing:border-box}
+*::after{
+  box-sizing:border-box;
+}
 
 html{
   min-height:100%;
@@ -69,90 +95,230 @@ html{
 }
 
 body{
-  margin:0;
   min-height:100vh;
+  margin:0;
   color:var(--text);
   font-family:var(--body);
+
   background:
-    radial-gradient(900px 500px at 50% -160px,rgba(140,198,63,.09),transparent 68%),
-    linear-gradient(180deg,#020402,#050805 45%,#020402);
+    radial-gradient(
+      900px 500px at 50% -180px,
+      rgba(140,198,63,.09),
+      transparent 70%
+    ),
+    linear-gradient(
+      180deg,
+      #020402 0%,
+      #050805 45%,
+      #020402 100%
+    );
+
   -webkit-font-smoothing:antialiased;
 }
 
-button,input,select,textarea{font:inherit}
-button{cursor:pointer;border:0}
-button:disabled{cursor:not-allowed;opacity:.45}
-button:focus-visible,
-input:focus-visible,
-select:focus-visible,
-textarea:focus-visible{
-  outline:2px solid var(--accent);
-  outline-offset:2px;
+button,
+input,
+select{
+  font:inherit;
 }
 
-img{display:block;max-width:100%}
-svg{display:block}
-.hidden{display:none!important}
-.no-scroll{overflow:hidden}
+button{
+  border:0;
+  cursor:pointer;
+}
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+img{
+  display:block;
+  max-width:100%;
+}
+
+svg{
+  display:block;
+}
 
 ::selection{
   color:#071006;
-  background:var(--accent);
+  background:var(--lime);
 }
 
-/* =========================
-   APP SHELL
-========================= */
 
-.app{
-  min-height:100vh;
+/* =========================================================
+   LOADING
+========================================================= */
+
+.loading-screen{
+  position:fixed;
+  z-index:9999;
+  inset:0;
+
+  display:grid;
+  place-items:center;
+
+  background:#020402;
+
+  transition:
+    opacity .35s ease,
+    visibility .35s ease;
 }
+
+.loading-screen.hidden{
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+}
+
+.loader-box{
+  width:min(90vw,310px);
+  text-align:center;
+}
+
+.loader-mark{
+  width:58px;
+  height:58px;
+  margin:auto;
+
+  display:grid;
+  place-items:center;
+
+  color:#071006;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--lime),
+      var(--lime-light)
+    );
+
+  border-radius:17px;
+
+  box-shadow:
+    0 18px 50px rgba(140,198,63,.18);
+}
+
+.loader-mark svg{
+  width:27px;
+  height:27px;
+}
+
+.loader-name{
+  margin-top:16px;
+
+  color:#fff;
+
+  font-family:var(--display);
+  font-size:18px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.5px;
+}
+
+.loader-sub{
+  margin-top:7px;
+
+  color:#69746A;
+
+  font-size:7px;
+  font-weight:900;
+  letter-spacing:1.25px;
+  text-transform:uppercase;
+}
+
+.loader-status{
+  margin-top:15px;
+
+  color:var(--lime);
+
+  font-size:6.5px;
+  font-weight:900;
+  letter-spacing:1.4px;
+  text-transform:uppercase;
+}
+
+.loader-progress{
+  position:relative;
+
+  width:150px;
+  height:2px;
+
+  margin:12px auto 0;
+
+  overflow:hidden;
+
+  background:#101610;
+  border-radius:99px;
+}
+
+.loader-progress::after{
+  content:"";
+
+  position:absolute;
+  top:0;
+  left:0;
+
+  width:45%;
+  height:100%;
+
+  background:var(--lime);
+
+  animation:
+    loaderMove 1s ease-in-out infinite;
+}
+
+@keyframes loaderMove{
+  from{
+    transform:translateX(-120%);
+  }
+
+  to{
+    transform:translateX(340%);
+  }
+}
+
+
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 .topbar{
   position:sticky;
-  top:0;
   z-index:1000;
-  min-height:76px;
+  top:0;
+
+  min-height:75px;
+
   display:flex;
   align-items:center;
   justify-content:space-between;
-  gap:20px;
-  padding:12px clamp(14px,4vw,44px);
-  background:rgba(2,4,2,.82);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(24px) saturate(1.3);
+
+  gap:18px;
+
+  padding:
+    11px
+    clamp(13px,4vw,42px);
+
+  background:
+    rgba(2,4,2,.84);
+
+  border-bottom:
+    1px solid var(--line);
+
+  backdrop-filter:
+    blur(22px)
+    saturate(1.25);
 }
 
-.brand{
-  display:flex;
-  align-items:center;
-  gap:11px;
-  min-width:0;
-}
-
-.brand-mark{
-  width:37px;
-  height:37px;
-  flex:0 0 auto;
-  display:grid;
-  place-items:center;
-  color:#071006;
-  background:linear-gradient(135deg,var(--lime),var(--lime2));
-  border-radius:12px;
-  box-shadow:0 10px 28px rgba(140,198,63,.20);
-}
-
-.brand-mark svg{
-  width:20px;
-  height:20px;
-}
-
-.brand-copy{
+.header-brand{
   min-width:0;
 }
 
 .brand-name{
   color:#fff;
+
   font-family:var(--display);
   font-size:25px;
   line-height:1;
@@ -162,30 +328,14 @@ svg{display:block}
 
 .brand-sub{
   margin-top:5px;
-  color:var(--muted);
+
+  color:#6E796F;
+
   font-size:7px;
+  line-height:1;
   font-weight:900;
-  letter-spacing:1.7px;
+  letter-spacing:1.65px;
   text-transform:uppercase;
-}
-
-.workspace-state{
-  display:flex;
-  align-items:center;
-  gap:7px;
-  margin-left:10px;
-  color:#8D978E;
-  font-size:7px;
-  font-weight:900;
-  letter-spacing:.7px;
-}
-
-.state-dot{
-  width:7px;
-  height:7px;
-  border-radius:50%;
-  background:var(--lime);
-  box-shadow:0 0 14px rgba(140,198,63,.75);
 }
 
 .header-actions{
@@ -194,308 +344,462 @@ svg{display:block}
   gap:7px;
 }
 
-.icon-btn{
+.header-btn{
   width:43px;
   height:43px;
+
   display:grid;
   place-items:center;
-  color:#DCE5DC;
+
+  color:#D9E1DA;
+
   background:#080D09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:12px;
-  transition:.18s ease;
+
+  transition:
+    transform .16s ease,
+    background .16s ease,
+    border-color .16s ease;
 }
 
-.icon-btn:hover{
+.header-btn:hover{
   transform:translateY(-1px);
-  border-color:var(--line2);
+
   background:#0D140E;
+
+  border-color:
+    var(--line-strong);
 }
 
-.icon-btn.primary{
+.header-btn.primary{
   color:#071006;
-  background:linear-gradient(135deg,var(--lime),var(--lime2));
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--lime),
+      var(--lime-light)
+    );
+
   border-color:var(--lime);
 }
 
-.icon-btn svg{
+.header-btn svg{
   width:18px;
   height:18px;
 }
 
-/* =========================
+
+/* =========================================================
    MAIN
-========================= */
+========================================================= */
 
 main{
-  width:100%;
-  padding:24px 18px 90px;
+  padding:
+    24px
+    17px
+    90px;
 }
 
 .container{
-  width:min(100%,1220px);
+  width:min(100%,1180px);
   margin:auto;
 }
 
-.hero{
+.page-intro{
   display:flex;
-  justify-content:space-between;
   align-items:flex-end;
-  gap:24px;
+  justify-content:space-between;
+
+  gap:22px;
+
   margin-bottom:16px;
 }
 
 .eyebrow{
-  color:var(--accent);
+  color:var(--lime);
+
   font-size:8px;
+  line-height:1;
   font-weight:900;
-  letter-spacing:2.7px;
+  letter-spacing:2.6px;
   text-transform:uppercase;
 }
 
-.hero h1{
+.page-title{
   margin:9px 0 0;
+
+  color:#fff;
+
   font-family:var(--display);
-  font-size:clamp(31px,4.5vw,50px);
-  line-height:.95;
-  letter-spacing:-2px;
+  font-size:
+    clamp(29px,4vw,46px);
+
+  line-height:.96;
   font-weight:900;
+  letter-spacing:-1.8px;
 }
 
-.hero p{
-  max-width:600px;
-  margin:10px 0 0;
+.page-description{
+  max-width:550px;
+
+  margin-top:10px;
+
   color:var(--muted);
-  font-size:10px;
+
+  font-size:9px;
   line-height:1.65;
 }
 
-.hero-stats{
+.live-summary{
   display:flex;
   flex-wrap:wrap;
   justify-content:flex-end;
   gap:7px;
 }
 
-.stat{
-  min-height:32px;
-  display:flex;
+.summary-chip{
+  min-height:30px;
+
+  display:inline-flex;
   align-items:center;
-  gap:7px;
-  padding:0 11px;
-  color:#8C968D;
+  gap:6px;
+
+  padding:0 10px;
+
+  color:#8E998F;
+
   background:#080D09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:999px;
+
   font-size:7px;
-  font-weight:900;
+  font-weight:800;
 }
 
-.stat strong{color:#fff}
-.stat.accent strong{color:var(--accent)}
-
-/* =========================
-   PANELS
-========================= */
-
-.panel{
-  margin-top:14px;
-  padding:22px;
-  background:
-    linear-gradient(145deg,rgba(10,17,11,.98),rgba(5,9,6,.99));
-  border:1px solid var(--line);
-  border-radius:var(--r-xl);
-  box-shadow:var(--shadow2);
+.summary-chip strong{
+  color:#fff;
 }
 
-.panel-head{
-  display:flex;
-  align-items:flex-end;
-  justify-content:space-between;
-  gap:20px;
+.summary-chip.accent strong{
+  color:var(--lime);
 }
 
-.label{
-  color:#6D786E;
-  font-size:7px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:2.5px;
-  text-transform:uppercase;
-}
 
-.panel-title{
-  margin:8px 0 0;
-  font-family:var(--display);
-  font-size:clamp(22px,3vw,34px);
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-1px;
-}
-
-.panel-desc{
-  margin-top:7px;
-  color:#667167;
-  font-size:8px;
-  line-height:1.55;
-}
-
-.panel-side{
-  color:#737E75;
-  font-size:8px;
-}
-
-.panel-side strong{color:var(--accent)}
-
-/* =========================
+/* =========================================================
    PREVIEW
-========================= */
+========================================================= */
 
-.preview-stage{
+.preview-wrap{
   position:relative;
+}
+
+.stage{
+  position:relative;
+
   width:100%;
+
   display:flex;
   justify-content:center;
 }
 
-.canvas-wrap{
+.promo-canvas{
   position:relative;
-  width:100%;
-  display:flex;
-  justify-content:center;
-}
 
-.canvas{
-  position:relative;
   overflow:hidden;
   isolation:isolate;
+
   width:100%;
-  background:#060806;
-  border:1px solid rgba(255,255,255,.11);
-  border-radius:20px;
+
+  background:#070907;
+
+  border:
+    1px solid rgba(255,255,255,.11);
+
+  border-radius:19px;
+
   box-shadow:var(--shadow);
-  transition:width .22s ease;
+
+  transition:
+    width .22s ease,
+    aspect-ratio .22s ease;
 }
 
-.canvas.r916{
-  width:min(100%,500px);
-  aspect-ratio:9/16;
+.stage.ratio-916 .promo-canvas{
+  width:min(100%,520px);
+  aspect-ratio:9 / 16;
 }
 
-.canvas.r45{
+.stage.ratio-45 .promo-canvas{
   width:min(100%,760px);
-  aspect-ratio:4/5;
+  aspect-ratio:4 / 5;
 }
 
-.canvas.r169{
+.stage.ratio-169 .promo-canvas{
   width:100%;
-  aspect-ratio:16/9;
+  aspect-ratio:16 / 9;
 }
 
-/* Theme variables */
 
-.theme-modern{
+/* =========================================================
+   TEMPLATE VARIABLES
+========================================================= */
+
+.template-modern{
   --accent:var(--lime);
-  --accent2:var(--lime2);
-  --glow:rgba(140,198,63,.17);
-  --canvas-bg:#050705;
+  --accent-light:var(--lime-light);
+  --template-glow:rgba(140,198,63,.17);
+  --template-bg:#050705;
 }
 
-.theme-orange{
+.template-orange{
   --accent:var(--orange);
-  --accent2:var(--orange2);
-  --glow:rgba(255,118,18,.18);
-  --canvas-bg:#080604;
+  --accent-light:var(--orange-light);
+  --template-glow:rgba(255,118,18,.18);
+  --template-bg:#080604;
 }
 
-.theme-neon{
+.template-neon{
   --accent:#A6E84D;
-  --accent2:#D7FF99;
-  --glow:rgba(166,232,77,.21);
-  --canvas-bg:#020502;
+  --accent-light:#D4FF96;
+  --template-glow:rgba(166,232,77,.20);
+  --template-bg:#020502;
 }
 
-.theme-blue{
+.template-blue{
   --accent:var(--blue);
-  --accent2:var(--cyan);
-  --glow:rgba(41,152,232,.19);
-  --canvas-bg:#03080B;
+  --accent-light:var(--blue-light);
+  --template-glow:rgba(41,152,232,.18);
+  --template-bg:#03080B;
 }
 
-.canvas-bg{
+
+/* =========================================================
+   TEMPLATE BACKGROUND
+========================================================= */
+
+.template-bg{
   position:absolute;
   inset:0;
+
   z-index:0;
+
+  pointer-events:none;
+
   background:
-    radial-gradient(circle at 78% 18%,var(--glow),transparent 43%),
-    var(--canvas-bg);
+    radial-gradient(
+      circle at 78% 20%,
+      var(--template-glow),
+      transparent 43%
+    ),
+    var(--template-bg);
 }
 
-.canvas-bg::before{
+.template-bg::before{
   content:"";
+
   position:absolute;
   inset:-20%;
-  opacity:.35;
+
+  opacity:.42;
+
   background:
     repeating-linear-gradient(
       125deg,
-      transparent 0 38px,
-      rgba(255,255,255,.017) 38px 39px,
-      transparent 39px 78px
+      transparent 0 34px,
+      rgba(255,255,255,.018) 34px 35px,
+      transparent 35px 76px
     );
 }
 
-.theme-orange .canvas-bg::after{
+.template-orange .template-bg::after{
   content:"";
+
   position:absolute;
-  top:-20%;
+
+  top:-25%;
   right:-12%;
+
   width:47%;
-  height:145%;
-  background:linear-gradient(
-    135deg,
-    transparent 8%,
-    rgba(255,92,0,.92) 8%,
-    rgba(255,118,18,.73) 74%,
-    transparent 74%
-  );
+  height:150%;
+
+  background:
+    linear-gradient(
+      135deg,
+      transparent 9%,
+      rgba(255,91,0,.94) 9%,
+      rgba(255,118,18,.74) 74%,
+      transparent 74%
+    );
+
   transform:skewX(-13deg);
+
+  opacity:.82;
 }
 
-.theme-blue .canvas-bg::after{
+.template-blue .template-bg::after{
   content:"";
+
   position:absolute;
-  top:14%;
+
+  top:10%;
   right:-5%;
+
   width:54%;
   height:1px;
-  background:linear-gradient(90deg,transparent,var(--accent));
+
+  background:
+    linear-gradient(
+      90deg,
+      transparent,
+      var(--accent)
+    );
+
   box-shadow:
-    0 90px 0 rgba(41,152,232,.27),
-    0 180px 0 rgba(41,152,232,.14);
+    0 90px 0 rgba(41,152,232,.28),
+    0 180px 0 rgba(41,152,232,.15);
 }
 
-/* Product image */
+
+/* =========================================================
+   IDENTITY WATERMARK
+========================================================= */
+
+.brand-watermark{
+  position:absolute;
+  inset:0;
+
+  z-index:4;
+
+  overflow:hidden;
+
+  pointer-events:none;
+
+  user-select:none;
+
+  mix-blend-mode:screen;
+}
+
+.brand-watermark::before{
+  content:
+    "imamsalesnine.com   •   imamsalesnine.com   •   imamsalesnine.com";
+
+  position:absolute;
+
+  width:170%;
+  left:-35%;
+  top:41%;
+
+  transform:rotate(-25deg);
+
+  color:rgba(190,220,170,.035);
+
+  font-family:var(--display);
+
+  font-size:
+    clamp(18px,4.5vw,58px);
+
+  line-height:1.9;
+
+  font-weight:900;
+
+  letter-spacing:4px;
+
+  white-space:nowrap;
+}
+
+.brand-watermark::after{
+  content:
+    "Imam_salesfr  /  nine autoseries  /  imamsalesnine.com";
+
+  position:absolute;
+
+  left:7%;
+  right:7%;
+  bottom:3.5%;
+
+  color:rgba(190,220,170,.075);
+
+  font-family:var(--display);
+
+  font-size:
+    clamp(5px,.72vw,9px);
+
+  line-height:1;
+
+  font-weight:800;
+
+  letter-spacing:2.1px;
+
+  text-align:center;
+}
+
+.watermark-micro{
+  position:absolute;
+
+  z-index:5;
+
+  pointer-events:none;
+
+  color:rgba(190,220,170,.042);
+
+  font-family:var(--display);
+
+  font-size:
+    clamp(6px,.7vw,9px);
+
+  font-weight:800;
+
+  letter-spacing:1.8px;
+
+  white-space:nowrap;
+
+  transform:rotate(-25deg);
+}
+
+
+/* =========================================================
+   PRODUCT VISUAL
+========================================================= */
 
 .product-visual{
   position:absolute;
-  z-index:8;
+
+  z-index:10;
+
   overflow:hidden;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:
-    radial-gradient(circle at 50% 42%,rgba(255,255,255,.045),transparent 57%),
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(255,255,255,.035),
+      transparent 55%
+    ),
     #020302;
 }
 
-.r916 .product-visual,
-.r45 .product-visual{
-  inset:0 0 auto;
+.stage.ratio-916 .product-visual{
+  inset:0 0 auto 0;
+  height:55%;
+}
+
+.stage.ratio-45 .product-visual{
+  inset:0 0 auto 0;
   height:56%;
 }
 
-.r169 .product-visual{
+.stage.ratio-169 .product-visual{
   inset:0 auto 0 0;
   width:58%;
 }
@@ -503,59 +807,56 @@ main{
 .product-image{
   width:100%;
   height:100%;
-  padding:clamp(16px,4%,44px);
+
+  padding:
+    clamp(16px,4%,44px);
+
   object-fit:contain;
+
   user-select:none;
   -webkit-user-drag:none;
 }
 
-.image-empty{
-  width:100%;
-  height:100%;
-  display:grid;
-  place-items:center;
-  color:#536056;
-  text-align:center;
-  padding:30px;
-}
+.image-missing{
+  color:#667067;
 
-.image-empty svg{
-  width:40px;
-  height:40px;
-  margin:auto auto 9px;
-  opacity:.6;
-}
-
-.image-empty span{
-  display:block;
   font-size:8px;
   font-weight:900;
+
+  text-align:center;
+
   letter-spacing:1px;
 }
 
-/* Gradient */
+
+/* =========================================================
+   GRADIENT
+========================================================= */
 
 .visual-gradient{
   position:absolute;
-  z-index:10;
   inset:0;
+
+  z-index:11;
+
   pointer-events:none;
+
   background:
     linear-gradient(
       to bottom,
-      transparent 43%,
-      rgba(5,8,5,.08) 57%,
+      transparent 42%,
+      rgba(5,8,5,.06) 57%,
       rgba(5,8,5,.28) 73%,
       rgba(5,8,5,.78) 91%,
       #050805 100%
     );
 }
 
-.r169 .visual-gradient{
+.stage.ratio-169 .visual-gradient{
   background:
     linear-gradient(
       to right,
-      transparent 33%,
+      transparent 34%,
       rgba(5,8,5,.04) 47%,
       rgba(5,8,5,.25) 63%,
       rgba(5,8,5,.80) 84%,
@@ -563,160 +864,251 @@ main{
     );
 }
 
-/* Copy zone */
+
+/* =========================================================
+   COMMERCIAL
+========================================================= */
 
 .info-zone{
   position:absolute;
+
   z-index:20;
+
   overflow:hidden;
 }
 
-.r916 .info-zone,
-.r45 .info-zone{
+.stage.ratio-916 .info-zone,
+.stage.ratio-45 .info-zone{
   left:0;
   right:0;
   bottom:0;
+
   height:45%;
-  padding:19px 8% 7%;
+
+  padding:
+    19px
+    8%
+    7%;
 }
 
-.r169 .info-zone{
+.stage.ratio-169 .info-zone{
   top:0;
   right:0;
   bottom:0;
+
   width:42%;
-  padding:7% 5% 6% 4.5%;
+
+  padding:
+    7%
+    5%
+    6%
+    4.5%;
 }
 
-.info{
+.product-info{
   position:relative;
   width:100%;
 }
 
-.info::before{
+.product-info::before{
   content:"";
+
   position:absolute;
+
   top:-12px;
   left:0;
-  width:52px;
+
+  width:55px;
   height:2px;
-  background:linear-gradient(90deg,var(--accent),transparent);
+
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      transparent
+    );
 }
 
-.badges{
+.badge-stack{
   display:flex;
   flex-wrap:wrap;
+
   align-items:center;
-  gap:7px;
+
+  gap:6px;
+
   margin-bottom:10px;
 }
 
-.badge{
-  min-height:29px;
+.promo-badge{
+  min-height:28px;
+
   display:inline-flex;
   align-items:center;
   justify-content:center;
-  padding:0 12px;
+
+  padding:0 11px;
+
   color:#180A03;
-  background:linear-gradient(135deg,var(--orange2),var(--orange));
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--orange-light),
+      var(--orange)
+    );
+
   border-radius:999px;
-  font-size:7px;
+
+  font-size:6.5px;
   font-weight:900;
-  letter-spacing:1.8px;
-  white-space:nowrap;
+  letter-spacing:1.5px;
 }
 
-.badge::before{
+.promo-badge::before{
   content:"";
+
   width:5px;
   height:5px;
+
   margin-right:6px;
+
   border-radius:50%;
+
   background:#180A03;
 }
 
-.extra-badge{
+.extra-discount-badge{
   min-height:25px;
+
   display:inline-flex;
   align-items:center;
-  padding:0 10px;
-  color:var(--orange2);
-  background:rgba(255,118,18,.055);
-  border:1px solid rgba(255,118,18,.48);
-  border-radius:999px;
-  font-size:6.5px;
-  font-weight:900;
-  letter-spacing:.9px;
-  white-space:nowrap;
-}
 
-.warranty{
-  position:absolute;
-  z-index:40;
-  top:0;
-  right:0;
-  max-width:46%;
-  min-height:25px;
-  display:flex;
-  align-items:center;
   padding:0 9px;
-  color:var(--accent);
-  background:rgba(0,0,0,.35);
-  border:1px solid var(--accent);
+
+  color:var(--orange-light);
+
+  background:
+    rgba(255,118,18,.055);
+
+  border:
+    1px solid rgba(255,118,18,.48);
+
   border-radius:999px;
+
   font-size:6px;
   font-weight:900;
+  letter-spacing:.8px;
+}
+
+.warranty-badge{
+  position:absolute;
+
+  top:0;
+  right:0;
+
+  max-width:45%;
+
+  min-height:25px;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 9px;
+
+  color:var(--accent);
+
+  background:
+    rgba(0,0,0,.32);
+
+  border:
+    1px solid var(--accent);
+
+  border-radius:999px;
+
+  font-size:5.5px;
+  font-weight:900;
+
   white-space:nowrap;
+
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
 .product-brand{
-  margin-top:9px;
+  margin-top:8px;
+
   color:var(--accent);
-  font-size:8px;
+
+  font-size:7px;
+
   font-weight:900;
-  letter-spacing:1.8px;
+
+  letter-spacing:1.7px;
+
   text-transform:uppercase;
+
   white-space:nowrap;
+
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
 .product-name{
   margin-top:6px;
+
   color:#fff;
+
   font-family:var(--display);
-  font-size:clamp(25px,3.5vw,43px);
+
+  font-size:
+    clamp(25px,3.5vw,42px);
+
   line-height:1;
+
   font-weight:900;
-  letter-spacing:-1.2px;
+
+  letter-spacing:-1.15px;
+
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
+
   overflow:hidden;
 }
 
 .price-block{
-  margin-top:14px;
+  margin-top:13px;
 }
 
 .price-label{
-  color:#788278;
-  font-size:7px;
+  color:#768078;
+
+  font-size:6.5px;
+
   font-weight:900;
-  letter-spacing:2px;
+
+  letter-spacing:1.8px;
+
   text-transform:uppercase;
 }
 
-.price{
+.price-promo{
   margin-top:5px;
+
   color:#fff;
+
   font-family:var(--display);
-  font-size:clamp(31px,4.4vw,57px);
+
+  font-size:
+    clamp(31px,4.4vw,56px);
+
   line-height:.95;
+
   font-weight:900;
-  letter-spacing:-1.7px;
+
+  letter-spacing:-1.6px;
+
   white-space:nowrap;
 }
 
@@ -724,3554 +1116,7169 @@ main{
   display:flex;
   flex-wrap:wrap;
   align-items:center;
+
   gap:7px;
-  margin-top:8px;
+
+  margin-top:7px;
 }
 
-.old-price{
+.price-normal{
   color:#687168;
-  font-size:8px;
-  text-decoration:line-through;
+
+  font-size:7px;
 }
 
 .discount{
   color:var(--lime);
-  font-size:9px;
+
+  font-size:8px;
+
   font-weight:900;
 }
 
-.extra-note{
+.extra-price-note{
   margin-top:7px;
-  color:var(--orange2);
-  font-size:7px;
+
+  color:var(--orange-light);
+
+  font-size:6px;
+
   font-weight:900;
+
   letter-spacing:.8px;
+
   text-transform:uppercase;
 }
 
-.watermark{
+.ratio-mark{
   position:absolute;
-  z-index:50;
-  inset:0;
-  pointer-events:none;
-  overflow:hidden;
-  mix-blend-mode:screen;
-}
 
-.watermark::before{
-  content:"LARAS CREATIVE STUDIO  •  LARAS CREATIVE STUDIO";
-  position:absolute;
-  width:170%;
-  left:-35%;
-  top:42%;
-  transform:rotate(-25deg);
-  color:rgba(200,220,190,.032);
-  font-family:var(--display);
-  font-size:clamp(18px,4.5vw,58px);
-  font-weight:900;
-  letter-spacing:4px;
-  white-space:nowrap;
-}
-
-.watermark::after{
-  content:"LARAS  /  PROMO CREATIVE SYSTEM";
-  position:absolute;
-  left:7%;
-  right:7%;
-  bottom:3.5%;
-  color:rgba(200,220,190,.065);
-  font-size:clamp(5px,.7vw,9px);
-  font-weight:900;
-  letter-spacing:2px;
-  text-align:center;
-}
-
-.ratio-tag{
-  position:absolute;
   z-index:80;
+
   top:3%;
   right:3%;
+
   padding:5px 7px;
+
   color:#fff;
-  background:rgba(0,0,0,.68);
-  border:1px solid rgba(255,255,255,.12);
+
+  background:
+    rgba(0,0,0,.68);
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
   border-radius:6px;
-  font-size:6px;
+
+  font-size:5.5px;
+
   font-weight:900;
 }
 
 .signature{
   position:absolute;
+
   z-index:80;
+
   right:3.5%;
   bottom:2.3%;
+
   color:rgba(220,225,218,.42);
-  font-size:6px;
-}
 
-/* Landscape tuning */
-
-.r169 .product-name{
-  font-size:clamp(17px,3vw,30px);
-}
-
-.r169 .product-brand{
-  font-size:6px;
-  letter-spacing:1.3px;
-}
-
-.r169 .price{
-  font-size:clamp(22px,4vw,39px);
-}
-
-.r169 .price-meta{
-  gap:5px;
-}
-
-.r169 .old-price,
-.r169 .discount{
-  font-size:6px;
-}
-
-.r169 .badge{
-  min-height:24px;
-  padding:0 8px;
   font-size:5.5px;
+
+  font-weight:800;
+
+  letter-spacing:.8px;
 }
 
-.r169 .extra-badge,
-.r169 .warranty{
-  min-height:21px;
+
+/* =========================================================
+   16:9 TUNING
+========================================================= */
+
+.stage.ratio-169 .product-brand{
+  font-size:5.8px;
+}
+
+.stage.ratio-169 .product-name{
+  font-size:
+    clamp(16px,4.3vw,25px);
+}
+
+.stage.ratio-169 .price-promo{
+  font-size:
+    clamp(21px,5.7vw,32px);
+}
+
+.stage.ratio-169 .promo-badge{
+  min-height:24px;
   font-size:5px;
 }
 
-/* Preview toolbar */
+.stage.ratio-169 .extra-discount-badge{
+  min-height:20px;
+  font-size:4.8px;
+}
 
-.preview-toolbar{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:10px;
+.stage.ratio-169 .warranty-badge{
+  min-height:21px;
+  font-size:4.5px;
+}
+
+
+/* =========================================================
+   PREVIEW CONTROLS
+========================================================= */
+
+.control-strip{
   margin-top:9px;
-}
 
-.preview-caption{
-  color:#6D786E;
-  font-size:7px;
-  font-weight:800;
-}
+  padding:12px;
 
-.preview-caption strong{color:#DCE5DC}
-
-.toolbar-actions{
-  display:flex;
-  gap:6px;
-}
-
-.small-btn{
-  height:32px;
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:0 10px;
-  color:#B7C0B8;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:9px;
-  font-size:6.5px;
-  font-weight:900;
-}
-
-.small-btn:hover{
-  color:#fff;
-  border-color:var(--line2);
-}
-
-.small-btn svg{
-  width:13px;
-  height:13px;
-}
-
-/* =========================
-   CONTROLS
-========================= */
-
-.control-grid{
-  margin-top:12px;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:12px;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:10px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #080D09,
+      #050905
+    );
+
+  border:
+    1px solid var(--line);
+
+  border-radius:18px;
+
+  box-shadow:var(--shadow-soft);
 }
 
-.control-card{
-  padding:14px;
-  background:#070C08;
-  border:1px solid var(--line);
-  border-radius:17px;
+.section-label{
+  color:#6D786E;
+
+  font-size:6.5px;
+
+  line-height:1;
+
+  font-weight:900;
+
+  letter-spacing:2.2px;
+
+  text-transform:uppercase;
 }
 
 .ratio-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+
+  grid-template-columns:
+    repeat(3,1fr);
+
   gap:7px;
-  margin-top:10px;
+
+  margin-top:9px;
 }
 
 .ratio-btn{
-  min-height:61px;
+  min-height:58px;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   gap:8px;
-  color:#8A948B;
+
+  color:#89938A;
+
   background:#080D09;
-  border:1px solid var(--line);
-  border-radius:13px;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:12px;
+
+  transition:.16s ease;
 }
 
 .ratio-btn:hover{
   color:#fff;
-  border-color:var(--line2);
+
+  border-color:
+    var(--line-strong);
 }
 
 .ratio-btn.active{
   color:var(--lime);
-  background:rgba(140,198,63,.055);
-  border-color:rgba(140,198,63,.66);
+
+  background:
+    rgba(140,198,63,.055);
+
+  border-color:
+    rgba(140,198,63,.65);
 }
 
 .ratio-icon{
-  border:2px solid currentColor;
+  display:block;
+
+  border:
+    2px solid currentColor;
+
   border-radius:4px;
 }
 
-[data-ratio="916"] .ratio-icon{
+.ratio-btn[data-ratio="916"] .ratio-icon{
   width:13px;
   height:22px;
 }
 
-[data-ratio="45"] .ratio-icon{
+.ratio-btn[data-ratio="45"] .ratio-icon{
   width:17px;
   height:22px;
 }
 
-[data-ratio="169"] .ratio-icon{
+.ratio-btn[data-ratio="169"] .ratio-icon{
   width:27px;
   height:15px;
 }
 
 .ratio-value{
   display:block;
-  font-size:10px;
+
+  font-size:9px;
+
   font-weight:900;
 }
 
 .ratio-use{
   display:block;
-  margin-top:4px;
-  color:#59635A;
-  font-size:6px;
+
+  margin-top:3px;
+
+  color:#586259;
+
+  font-size:5.5px;
 }
 
-.nav-grid{
+.navigation{
   display:grid;
-  grid-template-columns:repeat(3,1fr) 58px;
+
+  grid-template-columns:
+    1fr
+    1fr
+    1fr
+    58px;
+
   gap:7px;
-  margin-top:10px;
+
+  margin-top:9px;
 }
 
 .nav-btn{
   min-height:50px;
+
   display:grid;
   place-items:center;
+
   color:#fff;
+
   background:#080D09;
-  border:1px solid var(--line);
-  border-radius:13px;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:12px;
 }
 
 .nav-btn:hover{
-  border-color:var(--line2);
+  border-color:
+    var(--line-strong);
 }
 
 .nav-btn svg{
-  width:18px;
-  height:18px;
+  width:17px;
+  height:17px;
 }
 
 .slide-count{
   display:grid;
   place-items:center;
-  color:#8B958C;
-  font-size:8px;
+
+  color:#7B857C;
+
+  font-size:7px;
+
   font-weight:900;
 }
 
-.export-row{
+.download-row{
   display:grid;
-  grid-template-columns:1fr 1fr;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
   gap:7px;
-  margin-top:8px;
+
+  margin-top:7px;
 }
 
-.action-btn{
+.download-btn{
   min-height:51px;
+
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:8px;
+
+  gap:7px;
+
   color:#071006;
-  background:linear-gradient(135deg,var(--lime),var(--lime2));
-  border-radius:13px;
-  font-size:7px;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--lime),
+      var(--lime-light)
+    );
+
+  border-radius:12px;
+
+  font-size:6.5px;
+
   font-weight:900;
 }
 
-.action-btn.secondary{
-  color:#DCE5DC;
+.download-btn.secondary{
+  color:#DCE4DC;
+
   background:#101610;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
 }
 
-.action-btn svg{
-  width:16px;
-  height:16px;
+.download-btn svg{
+  width:15px;
+  height:15px;
 }
 
-/* =========================
-   TEMPLATES
-========================= */
+
+/* =========================================================
+   PANELS
+========================================================= */
+
+.panel{
+  margin-top:14px;
+
+  padding:23px;
+
+  background:
+    linear-gradient(
+      145deg,
+      rgba(8,14,9,.98),
+      rgba(5,9,6,.99)
+    );
+
+  border:
+    1px solid var(--line);
+
+  border-radius:var(--radius-xl);
+
+  box-shadow:var(--shadow-soft);
+}
+
+.panel-header{
+  display:flex;
+
+  align-items:flex-end;
+  justify-content:space-between;
+
+  gap:20px;
+}
+
+.panel-title{
+  margin:8px 0 0;
+
+  color:#fff;
+
+  font-family:var(--display);
+
+  font-size:
+    clamp(23px,3vw,35px);
+
+  line-height:1;
+
+  font-weight:900;
+
+  letter-spacing:-1px;
+}
+
+.panel-description{
+  margin-top:7px;
+
+  color:#69736A;
+
+  font-size:8px;
+
+  line-height:1.55;
+}
+
+.panel-side{
+  color:#747D74;
+
+  font-size:7px;
+}
+
+.panel-side strong{
+  color:var(--lime);
+}
+
+
+/* =========================================================
+   TEMPLATE ENGINE
+========================================================= */
 
 .template-grid{
-  display:grid;
-  grid-template-columns:repeat(4,1fr);
-  gap:10px;
   margin-top:17px;
+
+  display:grid;
+
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+
+  gap:10px;
 }
 
-.template{
+.template-card{
+  min-width:0;
+
   padding:11px;
+
   color:#fff;
+
   text-align:left;
+
   background:#060A07;
-  border:1px solid var(--line);
+
+  border:
+    1px solid rgba(255,255,255,.09);
+
   border-radius:16px;
-  transition:.18s ease;
+
+  transition:
+    transform .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
 }
 
-.template:hover{
+.template-card:hover{
   transform:translateY(-2px);
-  border-color:var(--line2);
+
+  border-color:
+    rgba(255,255,255,.16);
 }
 
-.template.active{
-  border-color:var(--template-color);
-  box-shadow:0 0 0 1px color-mix(in srgb,var(--template-color) 12%,transparent);
+.template-card.active{
+  border-color:var(--template-accent);
+
+  box-shadow:
+    0 0 0 1px
+    rgba(255,255,255,.025);
 }
 
-.template[data-theme="modern"]{--template-color:#8CC63F}
-.template[data-theme="orange"]{--template-color:#FF7612}
-.template[data-theme="neon"]{--template-color:#A6E84D}
-.template[data-theme="blue"]{--template-color:#2998E8}
+.template-card[data-template="modern"]{
+  --template-accent:#8CC63F;
+}
 
-.template-top{
+.template-card[data-template="orange"]{
+  --template-accent:#FF7612;
+}
+
+.template-card[data-template="neon"]{
+  --template-accent:#A6E84D;
+}
+
+.template-card[data-template="blue"]{
+  --template-accent:#2998E8;
+}
+
+.template-head{
   display:flex;
+
+  align-items:center;
   justify-content:space-between;
-  gap:8px;
+
+  gap:9px;
 }
 
 .template-name{
-  font-size:9px;
+  min-width:0;
+
+  font-size:8px;
+
+  line-height:1;
+
   font-weight:900;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
 
 .template-check{
-  width:22px;
-  height:22px;
+  width:21px;
+  height:21px;
+
+  flex:0 0 auto;
+
   display:grid;
   place-items:center;
+
   color:transparent;
+
   background:#101510;
+
   border-radius:50%;
-  font-size:10px;
+
+  font-size:9px;
 }
 
-.template.active .template-check{
+.template-card.active
+.template-check{
   color:#071006;
-  background:var(--template-color);
+
+  background:
+    var(--template-accent);
 }
 
-.template-desc{
+.template-caption{
+  min-height:28px;
+
   margin-top:6px;
+
   color:#657066;
-  font-size:6.5px;
+
+  font-size:6px;
+
   line-height:1.4;
 }
 
 .template-thumb{
   position:relative;
-  aspect-ratio:16/9;
-  margin-top:10px;
+
+  aspect-ratio:16 / 9;
+
+  margin-top:9px;
+
   overflow:hidden;
-  border:1px solid rgba(255,255,255,.08);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
   border-radius:9px;
 }
 
 .thumb{
   position:absolute;
   inset:0;
+
+  overflow:hidden;
+
   background:#030503;
 }
 
-.thumb.modern{
-  background:radial-gradient(circle at 78% 25%,rgba(140,198,63,.28),transparent 46%),#030503;
+.thumb-modern{
+  background:
+    radial-gradient(
+      circle at 78% 25%,
+      rgba(140,198,63,.28),
+      transparent 46%
+    ),
+    #030503;
 }
 
-.thumb.orange{
-  background:radial-gradient(circle at 78% 25%,rgba(255,118,18,.28),transparent 46%),#060504;
+.thumb-orange{
+  background:
+    radial-gradient(
+      circle at 78% 25%,
+      rgba(255,118,18,.28),
+      transparent 46%
+    ),
+    #060504;
 }
 
-.thumb.neon{
-  background:radial-gradient(circle at 50% 22%,rgba(166,232,77,.3),transparent 48%),#020402;
+.thumb-neon{
+  background:
+    radial-gradient(
+      circle at 50% 22%,
+      rgba(166,232,77,.30),
+      transparent 48%
+    ),
+    #020402;
 }
 
-.thumb.blue{
-  background:radial-gradient(circle at 78% 25%,rgba(41,152,232,.30),transparent 48%),#020609;
+.thumb-blue{
+  background:
+    radial-gradient(
+      circle at 78% 25%,
+      rgba(41,152,232,.30),
+      transparent 48%
+    ),
+    #020609;
 }
 
 .thumb-sweep{
   position:absolute;
+
   top:-15%;
   right:-8%;
+
   width:42%;
   height:140%;
-  background:var(--tc);
+
   opacity:.78;
+
   transform:skewX(-13deg);
+}
+
+.thumb-modern .thumb-sweep{
+  background:#8CC63F;
+}
+
+.thumb-orange .thumb-sweep{
+  background:#FF7612;
+}
+
+.thumb-neon .thumb-sweep{
+  background:#A6E84D;
+}
+
+.thumb-blue .thumb-sweep{
+  background:#2998E8;
 }
 
 .thumb-copy{
   position:absolute;
+
   z-index:5;
+
   left:5%;
   top:9%;
+
   width:43%;
 }
 
-.thumb-line{
+.thumb-brand{
+  color:#8CC63F;
+
+  font-size:4px;
+
+  font-weight:900;
+
+  letter-spacing:.8px;
+}
+
+.thumb-title{
+  width:80%;
   height:5px;
-  margin-top:4px;
+
+  margin-top:5px;
+
   background:#fff;
+
   border-radius:2px;
-  opacity:.9;
 }
 
-.thumb-line.accent{
-  width:75%;
-  background:var(--tc);
-}
-
-.thumb-line.small{
-  width:50%;
+.thumb-sub{
+  width:48%;
   height:3px;
+
+  margin-top:4px;
+
+  background:#778178;
+
+  border-radius:2px;
 }
 
 .thumb-product{
   position:absolute;
+
   z-index:6;
+
   right:7%;
-  top:18%;
-  width:43%;
-  height:50%;
+  top:17%;
+
+  width:42%;
+  height:52%;
+
   border-radius:6px;
+
   transform:rotate(-5deg);
-  background:linear-gradient(145deg,#D9DED9,#737C73 48%,#232823);
-  box-shadow:-15px 19px 0 -7px #4E574F;
+
+  background:
+    linear-gradient(
+      145deg,
+      #E1E5E1,
+      #747D74 48%,
+      #232823
+    );
+
+  box-shadow:
+    -14px 17px 0 -7px #4D564E;
 }
 
-.thumb-bottom{
+.thumb-commercial{
   position:absolute;
+
   z-index:12;
+
   left:4%;
   right:4%;
   bottom:4%;
-  height:22%;
-  background:rgba(0,0,0,.82);
-  border:1px solid rgba(255,255,255,.08);
+
+  height:23%;
+
+  background:
+    rgba(0,0,0,.84);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
   border-radius:5px;
 }
 
-.thumb-pill{
+.thumb-promo{
   position:absolute;
+
   left:4%;
   top:18%;
-  width:23%;
-  height:18%;
+
+  width:24%;
+  height:17%;
+
   background:#FF7612;
+
+  border-radius:99px;
+}
+
+.thumb-extra{
+  position:absolute;
+
+  left:31%;
+  top:18%;
+
+  width:19%;
+  height:17%;
+
+  background:#8CC63F;
+
+  border-radius:99px;
+}
+
+.thumb-badge{
+  position:absolute;
+
+  right:4%;
+  top:18%;
+
+  width:20%;
+  height:17%;
+
+  border:
+    1px solid #8CC63F;
+
   border-radius:99px;
 }
 
 .thumb-price{
   position:absolute;
+
   left:4%;
   bottom:15%;
-  width:32%;
+
+  width:34%;
   height:11%;
+
   background:#fff;
+
   border-radius:2px;
 }
 
-.thumb-warranty{
+.thumb-watermark{
   position:absolute;
+
+  z-index:30;
+
+  left:5%;
+  bottom:3%;
+
+  color:rgba(255,255,255,.18);
+
+  font-size:3.5px;
+
+  font-weight:900;
+
+  letter-spacing:.7px;
+}
+
+.thumb-ratio{
+  position:absolute;
+
+  z-index:30;
+
   right:4%;
-  top:18%;
-  width:20%;
-  height:18%;
-  border:1px solid var(--tc);
-  border-radius:99px;
-}
+  bottom:4%;
 
-/* =========================
-   PRODUCT MANAGER
-========================= */
+  color:rgba(255,255,255,.35);
 
-.manager-tools{
-  margin-top:17px;
-  display:grid;
-  grid-template-columns:auto auto 1fr auto auto;
-  gap:7px;
-}
+  font-size:3.5px;
 
-.tool{
-  min-height:40px;
-  padding:0 12px;
-  color:#DCE5DC;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:10px;
-  font-size:6.5px;
   font-weight:900;
 }
 
-.tool:hover{
-  border-color:var(--line2);
-}
 
-.tool.primary{
-  color:#071006;
-  background:var(--lime);
-  border-color:var(--lime);
-}
+/* =========================================================
+   PRODUCT MANAGER
+========================================================= */
 
-.tool.danger{
-  color:#FF9A9E;
-  border-color:rgba(255,94,99,.2);
-}
-
-.search-box{
-  min-width:0;
-  position:relative;
-}
-
-.search-box svg{
-  position:absolute;
-  left:12px;
-  top:50%;
-  width:14px;
-  height:14px;
-  transform:translateY(-50%);
-  color:#59635A;
-}
-
-.search-box input{
-  width:100%;
-  height:40px;
-  padding:0 12px 0 36px;
-  color:#fff;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:10px;
-  font-size:7px;
-}
-
-.search-box input::placeholder{color:#59635A}
-
-.filter-select{
-  min-width:105px;
-  height:40px;
-  padding:0 10px;
-  color:#B8C1B9;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:10px;
-  font-size:7px;
-}
-
-.selection-bar{
+.manager-heading{
   display:flex;
-  align-items:center;
+
+  align-items:flex-end;
   justify-content:space-between;
-  gap:10px;
-  margin-top:10px;
-  padding:9px 11px;
-  color:#7D877E;
-  background:rgba(140,198,63,.035);
-  border:1px solid rgba(140,198,63,.09);
-  border-radius:10px;
-  font-size:7px;
-  font-weight:800;
+
+  gap:15px;
+
+  margin-top:0;
 }
 
-.selection-bar strong{color:var(--lime)}
+.manager-summary{
+  color:#68736A;
+
+  font-size:7px;
+}
+
+.manager-summary strong{
+  color:var(--lime);
+}
+
+.manager-toolbar{
+  display:grid;
+
+  grid-template-columns:
+    auto
+    auto
+    auto
+    auto
+    auto;
+
+  gap:7px;
+
+  margin-top:16px;
+}
+
+.tool-btn{
+  min-height:39px;
+
+  padding:
+    0
+    12px;
+
+  color:#CBD4CC;
+
+  background:#080D09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:6px;
+
+  font-weight:900;
+
+  white-space:nowrap;
+}
+
+.tool-btn:hover{
+  border-color:
+    var(--line-strong);
+}
+
+.tool-btn.primary{
+  color:#071006;
+
+  background:
+    var(--lime);
+
+  border-color:
+    var(--lime);
+}
+
+.search{
+  width:100%;
+
+  min-height:42px;
+
+  margin-top:8px;
+
+  padding:
+    0
+    13px;
+
+  color:#fff;
+
+  background:#070C08;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:10px;
+
+  outline:none;
+
+  font-size:7px;
+}
+
+.search::placeholder{
+  color:#59645B;
+}
+
+.search:focus{
+  border-color:
+    rgba(140,198,63,.48);
+}
 
 .product-grid{
   display:grid;
-  grid-template-columns:repeat(5,1fr);
+
+  grid-template-columns:
+    repeat(5,minmax(0,1fr));
+
   gap:9px;
+
   margin-top:11px;
 }
 
-.product-card{
+.select-card{
   position:relative;
-  min-width:0;
-  height:290px;
+
+  height:287px;
+
   overflow:hidden;
-  background:linear-gradient(180deg,#080D09,#060A07);
-  border:1px solid var(--line);
+
+  background:
+    linear-gradient(
+      180deg,
+      #080D09,
+      #060A07
+    );
+
+  border:
+    1px solid var(--line);
+
   border-radius:15px;
-  transition:.18s ease;
+
+  cursor:pointer;
+
+  transition:
+    transform .17s ease,
+    border-color .17s ease;
 }
 
-.product-card:hover{
+.select-card:hover{
   transform:translateY(-2px);
-  border-color:var(--line2);
+
+  border-color:
+    var(--line-strong);
 }
 
-.product-card.selected{
-  border-color:rgba(140,198,63,.7);
-  box-shadow:0 0 0 1px rgba(140,198,63,.08);
+.select-card.selected{
+  border-color:
+    rgba(140,198,63,.70);
+
+  box-shadow:
+    0 0 0 1px
+    rgba(140,198,63,.08);
 }
 
-.card-image{
+.select-image{
   position:absolute;
-  inset:0 0 auto;
-  height:148px;
+
+  inset:0 0 auto 0;
+
+  height:147px;
+
   display:grid;
   place-items:center;
+
   overflow:hidden;
+
   background:
-    radial-gradient(circle at 50% 50%,rgba(255,255,255,.04),transparent 60%),
+    radial-gradient(
+      circle at 50% 50%,
+      rgba(255,255,255,.04),
+      transparent 60%
+    ),
     #050705;
 }
 
-.card-image img{
+.select-image img{
   width:100%;
   height:100%;
-  object-fit:contain;
+
   padding:8px;
+
+  object-fit:contain;
 }
 
 .card-gradient{
   position:absolute;
-  z-index:2;
+
+  z-index:3;
+
   left:0;
   right:0;
+
   top:92px;
-  height:78px;
-  background:linear-gradient(to bottom,transparent,#080D09);
+
+  height:82px;
+
+  background:
+    linear-gradient(
+      to bottom,
+      transparent,
+      #080D09
+    );
 }
 
 .card-check{
   position:absolute;
-  z-index:20;
+
+  z-index:30;
+
   top:8px;
   left:8px;
+
   width:22px;
   height:22px;
+
   display:grid;
   place-items:center;
+
   color:transparent;
-  background:rgba(0,0,0,.72);
-  border:1px solid rgba(255,255,255,.14);
+
+  background:
+    rgba(0,0,0,.72);
+
+  border:
+    1px solid rgba(255,255,255,.14);
+
   border-radius:6px;
-  font-size:10px;
+
+  font-size:9px;
+
   font-weight:900;
 }
 
-.product-card.selected .card-check{
+.select-card.selected
+.card-check{
   color:#071006;
+
   background:var(--lime);
+
   border-color:var(--lime);
 }
 
-.card-actions{
+.edit-price-btn{
   position:absolute;
-  z-index:20;
+
+  z-index:30;
+
   top:8px;
   right:8px;
-  display:flex;
-  gap:4px;
-}
 
-.card-icon{
   width:29px;
   height:29px;
+
   display:grid;
   place-items:center;
+
   color:#fff;
-  background:rgba(0,0,0,.72);
-  border:1px solid rgba(255,255,255,.12);
+
+  background:
+    rgba(0,0,0,.72);
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
   border-radius:7px;
 }
 
-.card-icon:hover{
+.edit-price-btn:hover{
   background:#000;
 }
 
-.card-icon svg{
+.edit-price-btn svg{
   width:13px;
   height:13px;
 }
 
-.card-status{
+.select-status{
   position:absolute;
-  z-index:15;
-  left:10px;
+
+  z-index:20;
+
+  left:9px;
   top:115px;
+
   padding:5px 7px;
-  color:#9EA89F;
-  background:rgba(0,0,0,.6);
-  border:1px solid rgba(255,255,255,.08);
-  border-radius:999px;
-  font-size:5.5px;
+
+  color:#8E998F;
+
+  background:
+    rgba(0,0,0,.62);
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius:99px;
+
+  font-size:4.8px;
+
   font-weight:900;
-  letter-spacing:.7px;
+
+  letter-spacing:.65px;
+
   text-transform:uppercase;
 }
 
-.card-status.active{
+.select-card.selected
+.select-status{
   color:#071006;
+
   background:var(--lime);
+
   border-color:var(--lime);
 }
 
-.card-info{
+.select-info{
   position:absolute;
+
   z-index:10;
-  left:11px;
-  right:11px;
-  bottom:11px;
+
+  left:10px;
+  right:10px;
+  bottom:10px;
 }
 
-.card-brand{
+.select-brand{
   color:var(--lime);
-  font-size:6.5px;
+
+  font-size:6px;
+
   font-weight:900;
-  letter-spacing:1.4px;
+
+  letter-spacing:1.2px;
+
   text-transform:uppercase;
+
   white-space:nowrap;
+
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.card-name{
+.select-name{
   margin-top:5px;
+
   color:#fff;
-  font-size:9px;
+
+  font-size:8px;
+
   line-height:1.25;
+
   font-weight:800;
+
   display:-webkit-box;
   -webkit-box-orient:vertical;
   -webkit-line-clamp:2;
+
   overflow:hidden;
 }
 
-.card-price{
+.select-price{
   margin-top:7px;
+
   color:#fff;
-  font-size:9px;
+
+  font-size:8px;
+
   font-weight:900;
+
   white-space:nowrap;
 }
 
-.card-old{
+.select-normal{
   margin-left:4px;
+
   color:#687168;
-  font-size:6.5px;
+
+  font-size:5.5px;
+
   text-decoration:line-through;
 }
 
-.card-discount{
+.select-discount{
   margin-left:4px;
+
   color:var(--lime);
-  font-size:6.5px;
+
+  font-size:5.5px;
+
   font-weight:900;
 }
 
-.card-extra{
+.select-extra{
   margin-top:5px;
-  color:var(--orange2);
-  font-size:5.8px;
+
+  color:var(--orange-light);
+
+  font-size:5px;
+
   font-weight:900;
+
   letter-spacing:.4px;
-}
 
-/* =========================
-   MODALS
-========================= */
-
-.backdrop{
-  position:fixed;
-  z-index:4000;
-  inset:0;
-  display:none;
-  place-items:center;
-  padding:18px;
-  background:rgba(0,0,0,.72);
-  backdrop-filter:blur(13px);
-}
-
-.backdrop.open{display:grid}
-
-.modal{
-  width:min(100%,560px);
-  max-height:min(90vh,760px);
-  overflow:auto;
-  padding:23px;
-  background:linear-gradient(145deg,#0C130E,#060A07);
-  border:1px solid var(--line2);
-  border-radius:23px;
-  box-shadow:0 35px 100px rgba(0,0,0,.62);
-}
-
-.modal.large{width:min(100%,760px)}
-
-.modal-head{
-  display:flex;
-  align-items:flex-start;
-  justify-content:space-between;
-  gap:15px;
-}
-
-.modal-title{
-  margin:0;
-  font-family:var(--display);
-  font-size:22px;
-  line-height:1;
-  font-weight:900;
-  letter-spacing:-.8px;
-}
-
-.modal-copy{
-  margin-top:8px;
-  color:#6C776E;
-  font-size:8px;
-  line-height:1.6;
-}
-
-.close-btn{
-  width:34px;
-  height:34px;
-  display:grid;
-  place-items:center;
-  color:#B0BAB1;
-  background:#101610;
-  border:1px solid var(--line);
-  border-radius:9px;
-}
-
-.form-grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:10px;
-  margin-top:18px;
-}
-
-.form-group.full{grid-column:1/-1}
-
-.form-group label{
-  display:block;
-  margin-bottom:5px;
-  color:#737D74;
-  font-size:6.5px;
-  font-weight:900;
-  letter-spacing:1px;
   text-transform:uppercase;
 }
 
-.form-group input,
-.form-group select,
-.form-group textarea{
-  width:100%;
-  min-height:39px;
-  padding:0 10px;
+
+/* =========================================================
+   PRICE EDITOR
+========================================================= */
+
+.price-editor{
+  position:absolute;
+
+  z-index:100;
+
+  left:7px;
+  right:7px;
+  bottom:7px;
+
+  padding:9px;
+
+  background:
+    rgba(5,9,6,.97);
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
+  border-radius:11px;
+
+  box-shadow:
+    0 20px 50px rgba(0,0,0,.55);
+
+  display:none;
+}
+
+.select-card.editing
+.price-editor{
+  display:block;
+}
+
+.editor-title{
   color:#fff;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:9px;
-  outline:none;
-  font-size:8px;
+
+  font-size:6px;
+
+  font-weight:900;
+
+  margin-bottom:7px;
 }
 
-.form-group textarea{
-  min-height:78px;
-  padding:10px;
-  resize:vertical;
-}
-
-.form-group input:focus,
-.form-group select:focus,
-.form-group textarea:focus{
-  border-color:rgba(140,198,63,.5);
-}
-
-.image-upload{
+.editor-grid{
   display:grid;
-  grid-template-columns:110px 1fr;
-  gap:10px;
-  align-items:stretch;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:5px;
 }
 
-.upload-preview{
-  min-height:100px;
-  display:grid;
-  place-items:center;
-  overflow:hidden;
-  background:#050805;
-  border:1px dashed rgba(255,255,255,.12);
-  border-radius:10px;
-}
-
-.upload-preview img{
+.editor-field{
   width:100%;
-  height:100%;
-  object-fit:contain;
-  padding:7px;
-}
 
-.upload-actions{
-  display:flex;
-  flex-direction:column;
-  gap:7px;
-}
+  min-height:30px;
 
-.upload-btn{
-  flex:1;
-  display:grid;
-  place-items:center;
-  color:#B8C1B9;
+  padding:
+    0
+    7px;
+
+  color:#fff;
+
   background:#080D09;
-  border:1px solid var(--line);
-  border-radius:9px;
-  font-size:7px;
-  font-weight:900;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:7px;
+
+  outline:none;
+
+  font-size:6px;
 }
 
-.upload-btn:hover{
-  border-color:var(--line2);
+.editor-field:focus{
+  border-color:
+    rgba(140,198,63,.48);
 }
 
-.modal-footer{
+.editor-wide{
+  grid-column:1 / -1;
+}
+
+.editor-check{
   display:flex;
-  justify-content:flex-end;
-  gap:7px;
-  margin-top:18px;
+
+  align-items:center;
+
+  gap:5px;
+
+  margin-top:6px;
+
+  color:#89938A;
+
+  font-size:5.5px;
 }
 
-.modal-btn{
-  min-height:40px;
-  padding:0 14px;
-  color:#DCE5DC;
+.editor-check input{
+  accent-color:var(--lime);
+}
+
+.editor-actions{
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:5px;
+
+  margin-top:7px;
+}
+
+.editor-btn{
+  min-height:28px;
+
+  color:#BFC8C0;
+
   background:#101610;
-  border:1px solid var(--line);
-  border-radius:10px;
-  font-size:7px;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:7px;
+
+  font-size:5.5px;
+
   font-weight:900;
 }
 
-.modal-btn.primary{
+.editor-btn.save{
   color:#071006;
+
   background:var(--lime);
+
   border-color:var(--lime);
 }
 
-.project-actions{
+
+/* =========================================================
+   EMPTY / ERROR
+========================================================= */
+
+.empty{
+  grid-column:1 / -1;
+
+  min-height:210px;
+
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-  margin-top:18px;
+  place-items:center;
+
+  padding:30px;
+
+  text-align:center;
+
+  color:#69746A;
+
+  background:#060A07;
+
+  border:
+    1px dashed rgba(255,255,255,.12);
+
+  border-radius:14px;
 }
 
-.project-action{
-  min-height:75px;
-  padding:12px;
-  text-align:left;
-  color:#DCE5DC;
-  background:#080D09;
-  border:1px solid var(--line);
-  border-radius:12px;
-}
-
-.project-action:hover{border-color:var(--line2)}
-
-.project-action strong{
+.empty strong{
   display:block;
+
   color:#fff;
-  font-size:9px;
+
+  font-size:10px;
 }
 
-.project-action span{
+.empty span{
   display:block;
-  margin-top:5px;
-  color:#657066;
+
+  margin-top:6px;
+
   font-size:6.5px;
-  line-height:1.4;
+
+  line-height:1.5;
 }
 
-/* =========================
+.error{
+  width:100%;
+
+  min-height:230px;
+
+  display:grid;
+  place-items:center;
+
+  padding:30px;
+
+  color:#8B958C;
+
+  background:#070B08;
+
+  border:
+    1px dashed rgba(255,94,99,.25);
+
+  border-radius:14px;
+
+  font-size:7px;
+
+  line-height:1.6;
+
+  text-align:center;
+}
+
+.error strong{
+  color:#FF8C90;
+}
+
+
+/* =========================================================
    TOAST
-========================= */
+========================================================= */
 
 .toast{
   position:fixed;
-  z-index:7000;
+
+  z-index:8000;
+
   left:50%;
   bottom:22px;
+
   max-width:min(92vw,520px);
-  padding:11px 17px;
-  transform:translate(-50%,20px);
-  opacity:0;
-  pointer-events:none;
+
+  padding:
+    11px
+    17px;
+
   color:#071006;
+
   background:var(--lime);
+
   border-radius:999px;
-  font-size:7px;
+
+  font-size:6.5px;
+
   font-weight:900;
+
   text-align:center;
-  box-shadow:0 15px 40px rgba(0,0,0,.35);
+
+  box-shadow:
+    0 15px 40px rgba(0,0,0,.35);
+
+  opacity:0;
+
+  transform:
+    translate(-50%,20px);
+
+  pointer-events:none;
+
   transition:.2s ease;
 }
 
 .toast.show{
   opacity:1;
-  transform:translate(-50%,0);
+
+  transform:
+    translate(-50%,0);
 }
 
 .toast.error{
   color:#fff;
-  background:#A83238;
+
+  background:#9D3038;
 }
 
-/* =========================
-   LOADER
-========================= */
 
-.loader{
+/* =========================================================
+   MODAL
+========================================================= */
+
+.modal-backdrop{
   position:fixed;
-  z-index:9000;
+
+  z-index:5000;
+
   inset:0;
-  display:grid;
+
+  display:none;
+
   place-items:center;
-  background:#020402;
-  transition:.3s ease;
+
+  padding:17px;
+
+  background:
+    rgba(0,0,0,.73);
+
+  backdrop-filter:
+    blur(13px);
 }
 
-.loader.hide{
-  opacity:0;
-  visibility:hidden;
-}
-
-.loader-inner{text-align:center}
-
-.loader-logo{
-  width:54px;
-  height:54px;
-  margin:auto;
+.modal-backdrop.open{
   display:grid;
-  place-items:center;
-  color:#071006;
-  background:linear-gradient(135deg,var(--lime),var(--lime2));
-  border-radius:16px;
-  box-shadow:0 15px 40px rgba(140,198,63,.2);
 }
 
-.loader-logo svg{
-  width:25px;
-  height:25px;
+.modal{
+  width:min(100%,560px);
+
+  max-height:90vh;
+
+  overflow:auto;
+
+  padding:21px;
+
+  background:
+    linear-gradient(
+      145deg,
+      #0C130E,
+      #060A07
+    );
+
+  border:
+    1px solid var(--line-strong);
+
+  border-radius:21px;
+
+  box-shadow:
+    0 35px 100px rgba(0,0,0,.62);
 }
 
-.loader-title{
-  margin-top:14px;
+.modal-head{
+  display:flex;
+
+  align-items:flex-start;
+  justify-content:space-between;
+
+  gap:15px;
+}
+
+.modal-title{
+  margin:0;
+
   color:#fff;
+
   font-family:var(--display);
-  font-size:16px;
+
+  font-size:21px;
+
+  line-height:1;
+
   font-weight:900;
+
+  letter-spacing:-.8px;
 }
 
-.loader-copy{
-  margin-top:6px;
-  color:#647066;
-  font-size:6.5px;
+.modal-description{
+  margin-top:7px;
+
+  color:#6C776E;
+
+  font-size:7px;
+
+  line-height:1.5;
+}
+
+.modal-close{
+  width:33px;
+  height:33px;
+
+  display:grid;
+  place-items:center;
+
+  color:#B0BAB1;
+
+  background:#101610;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:17px;
+}
+
+.modal-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr
+    1fr;
+
+  gap:9px;
+
+  margin-top:17px;
+}
+
+.modal-field.full{
+  grid-column:1 / -1;
+}
+
+.modal-field label{
+  display:block;
+
+  margin-bottom:5px;
+
+  color:#737D74;
+
+  font-size:6px;
+
   font-weight:900;
-  letter-spacing:1.2px;
+
+  letter-spacing:1px;
+
   text-transform:uppercase;
 }
 
-.loader-line{
-  width:135px;
-  height:2px;
-  margin:14px auto 0;
-  overflow:hidden;
-  background:#101610;
-  border-radius:99px;
-}
+.modal-field input,
+.modal-field select{
+  width:100%;
 
-.loader-line::after{
-  content:"";
-  display:block;
-  width:42%;
-  height:100%;
-  background:var(--lime);
-  animation:load 1s ease-in-out infinite;
-}
+  min-height:38px;
 
-@keyframes load{
-  from{transform:translateX(-120%)}
-  to{transform:translateX(330%)}
-}
+  padding:
+    0
+    9px;
 
-/* =========================
-   EMPTY
-========================= */
-
-.empty{
-  grid-column:1/-1;
-  min-height:220px;
-  display:grid;
-  place-items:center;
-  padding:30px;
-  color:#758076;
-  text-align:center;
-  background:#060A07;
-  border:1px dashed rgba(255,255,255,.12);
-  border-radius:15px;
-}
-
-.empty strong{
-  display:block;
   color:#fff;
-  font-size:11px;
-}
 
-.empty span{
-  display:block;
-  margin-top:6px;
+  background:#080D09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  outline:none;
+
   font-size:7px;
 }
 
-/* =========================
-   RESPONSIVE
-========================= */
+.modal-field input:focus,
+.modal-field select:focus{
+  border-color:
+    rgba(140,198,63,.48);
+}
 
-@media(max-width:1050px){
-  .product-grid{grid-template-columns:repeat(4,1fr)}
-  .template-grid{grid-template-columns:repeat(2,1fr)}
-  .manager-tools{
-    grid-template-columns:auto auto 1fr;
+.modal-footer{
+  display:flex;
+
+  justify-content:flex-end;
+
+  gap:7px;
+
+  margin-top:17px;
+}
+
+.modal-btn{
+  min-height:39px;
+
+  padding:
+    0
+    14px;
+
+  color:#DCE5DC;
+
+  background:#101610;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:6.5px;
+
+  font-weight:900;
+}
+
+.modal-btn.primary{
+  color:#071006;
+
+  background:var(--lime);
+
+  border-color:var(--lime);
+}
+
+
+/* =========================================================
+   SPINNER
+========================================================= */
+
+.download-spinner{
+  width:15px;
+  height:15px;
+
+  border:
+    2px solid rgba(7,16,6,.18);
+
+  border-top-color:#071006;
+
+  border-radius:50%;
+
+  animation:
+    spin .7s linear infinite;
+}
+
+@keyframes spin{
+  to{
+    transform:rotate(360deg);
   }
 }
 
-@media(max-width:850px){
-  .hero{
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px){
+
+  .product-grid{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+  }
+
+  .template-grid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .manager-toolbar{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
+  }
+}
+
+@media(max-width:820px){
+
+  .page-intro{
     align-items:flex-start;
     flex-direction:column;
   }
 
-  .hero-stats{
+  .live-summary{
     justify-content:flex-start;
   }
 
-  .control-grid{
+  .control-strip{
     grid-template-columns:1fr;
   }
 
-  .product-grid{grid-template-columns:repeat(3,1fr)}
-
-  .manager-tools{
-    grid-template-columns:1fr 1fr;
-  }
-
-  .search-box{
-    grid-column:1/-1;
+  .product-grid{
+    grid-template-columns:
+      repeat(3,minmax(0,1fr));
   }
 }
 
 @media(max-width:650px){
+
   .topbar{
     min-height:68px;
-    padding:10px 12px;
+
+    padding:
+      10px
+      12px;
   }
 
-  .brand-mark{
-    width:31px;
-    height:31px;
-    border-radius:9px;
+  .brand-name{
+    font-size:21px;
   }
 
-  .brand-mark svg{
-    width:17px;
-    height:17px;
+  .brand-sub{
+    font-size:6px;
+    letter-spacing:1.25px;
   }
 
-  .brand-name{font-size:21px}
-  .brand-sub{font-size:6px}
-  .workspace-state{display:none}
-
-  .header-actions{gap:5px}
-  .icon-btn{
+  .header-btn{
     width:40px;
     height:40px;
   }
 
   main{
-    padding:17px 11px 70px;
+    padding:
+      17px
+      11px
+      70px;
   }
 
-  .hero h1{font-size:31px}
+  .page-title{
+    font-size:31px;
+  }
 
   .panel{
-    padding:17px 12px;
-    border-radius:20px;
+    padding:
+      18px
+      12px;
   }
 
-  .panel-head{
+  .panel-header{
     align-items:flex-start;
     flex-direction:column;
     gap:7px;
   }
 
-  .template-grid{grid-template-columns:1fr}
+  .template-grid{
+    grid-template-columns:1fr;
+  }
+
+  .manager-toolbar{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
   .product-grid{
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+
     gap:7px;
   }
 
-  .product-card{height:260px}
-  .card-image{height:132px}
-  .card-status{top:101px}
-
-  .manager-tools{
-    grid-template-columns:1fr 1fr;
+  .select-card{
+    height:258px;
   }
 
-  .manager-tools .tool{
-    width:100%;
+  .select-image{
+    height:132px;
   }
 
-  .search-box{
-    grid-column:1/-1;
+  .select-status{
+    top:102px;
   }
 
-  .filter-select{
-    width:100%;
+  .ratio-use{
+    display:none;
   }
 
-  .preview-toolbar{
-    align-items:flex-start;
-    flex-direction:column;
+  .navigation{
+    grid-template-columns:
+      1fr
+      1fr
+      1fr
+      52px;
   }
 
-  .toolbar-actions{
-    width:100%;
-  }
-
-  .small-btn{
-    flex:1;
-    justify-content:center;
-  }
-
-  .export-row{
+  .download-row{
     grid-template-columns:1fr;
   }
 
-  .form-grid{
+  .modal-grid{
     grid-template-columns:1fr;
   }
 
-  .form-group.full{
+  .modal-field.full{
     grid-column:auto;
   }
 
-  .image-upload{
-    grid-template-columns:1fr;
+  .stage.ratio-916 .product-name{
+    font-size:
+      clamp(22px,6.4vw,34px);
   }
 
-  .project-actions{
-    grid-template-columns:1fr;
+  .stage.ratio-916 .price-promo{
+    font-size:
+      clamp(28px,7.4vw,43px);
   }
 
-  .r916 .info-zone{
-    padding:15px 8% 7%;
+  .stage.ratio-45 .product-name{
+    font-size:
+      clamp(23px,6vw,35px);
   }
 
-  .r916 .product-name{
-    font-size:clamp(22px,6.4vw,35px);
+  .stage.ratio-45 .price-promo{
+    font-size:
+      clamp(29px,6.8vw,45px);
   }
 
-  .r916 .price{
-    font-size:clamp(28px,7.4vw,43px);
+  .stage.ratio-169 .product-name{
+    font-size:
+      clamp(16px,4.3vw,25px);
   }
 
-  .r45 .info-zone{
-    padding:14px 7% 6%;
-  }
-
-  .r45 .product-name{
-    font-size:clamp(22px,6vw,35px);
-  }
-
-  .r45 .price{
-    font-size:clamp(28px,6.8vw,45px);
-  }
-
-  .r169 .product-name{
-    font-size:clamp(15px,4.3vw,25px);
-  }
-
-  .r169 .price{
-    font-size:clamp(20px,5.7vw,32px);
-  }
-
-  .modal{
-    padding:18px;
+  .stage.ratio-169 .price-promo{
+    font-size:
+      clamp(21px,5.7vw,32px);
   }
 }
 
 @media(max-width:380px){
-  .product-card{height:245px}
-  .card-image{height:125px}
-}
 
-/* capture */
-.capture .canvas{
-  border-radius:0!important;
-  box-shadow:none!important;
-}
-
-/* reduced motion */
-@media(prefers-reduced-motion:reduce){
-  *,*::before,*::after{
-    animation:none!important;
-    transition:none!important;
+  .brand-name{
+    font-size:19px;
   }
 
-  html{scroll-behavior:auto}
+  .header-btn{
+    width:39px;
+    height:39px;
+  }
+
+  .product-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .stage.ratio-916 .product-name{
+    font-size:22px;
+  }
+
+  .stage.ratio-45 .product-name{
+    font-size:23px;
+  }
+
+  .stage.ratio-916 .price-promo{
+    font-size:28px;
+  }
+
+  .stage.ratio-45 .price-promo{
+    font-size:29px;
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    animation:none !important;
+    transition:none !important;
+  }
+
+  html{
+    scroll-behavior:auto;
+  }
 }
 </style>
 </head>
 
 <body>
 
-<div class="loader" id="loader">
-  <div class="loader-inner">
-    <div class="loader-logo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+<!-- ======================================================
+     LOADING SCREEN
+====================================================== -->
+
+<div
+  class="loading-screen"
+  id="loadingScreen"
+>
+  <div class="loader-box">
+
+    <div class="loader-mark">
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.1"
+      >
         <path d="M12 3v18"/>
         <path d="M5 8.5 12 5l7 3.5L12 12 5 8.5Z"/>
         <path d="M5 15.5 12 19l7-3.5"/>
       </svg>
+
     </div>
-    <div class="loader-title">LARAS Promo Studio</div>
-    <div class="loader-copy">Initializing premium workspace</div>
-    <div class="loader-line"></div>
+
+    <div class="loader-name">
+      Imam_salesfr
+    </div>
+
+    <div class="loader-sub">
+      Sales Representative • nine autoseries
+    </div>
+
+    <div
+      class="loader-status"
+      id="loaderStatus"
+    >
+      Preparing creative workspace
+    </div>
+
+    <div class="loader-progress"></div>
+
   </div>
 </div>
 
-<div class="app">
+
+<!-- ======================================================
+     HEADER
+====================================================== -->
 
 <header class="topbar">
-  <div class="brand">
-    <div class="brand-mark">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
-        <path d="M12 3v18"/>
-        <path d="M5 8.5 12 5l7 3.5L12 12 5 8.5Z"/>
-        <path d="M5 15.5 12 19l7-3.5"/>
-      </svg>
+
+  <div class="header-brand">
+
+    <div class="brand-name">
+      Imam_salesfr
     </div>
 
-    <div class="brand-copy">
-      <div class="brand-name">LARAS</div>
-      <div class="brand-sub">Premium Promo Creative Studio</div>
+    <div class="brand-sub">
+      Sales Representative • nine autoseries
     </div>
 
-    <div class="workspace-state">
-      <span class="state-dot"></span>
-      Autosave enabled
-    </div>
   </div>
 
+
   <div class="header-actions">
-    <button class="icon-btn" id="undoBtn" title="Undo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M9 14 4 9l5-5"/>
-        <path d="M4 9h10a6 6 0 0 1 0 12h-2"/>
+
+    <button
+      type="button"
+      class="header-btn"
+      id="headerPlay"
+      title="Play / Pause"
+    >
+
+      <svg
+        id="headerPlayIcon"
+        viewBox="0 0 24 24"
+        fill="currentColor"
+      >
+        <path d="M7 5h4v14H7z"/>
+        <path d="M13 5h4v14h-4z"/>
       </svg>
+
     </button>
 
-    <button class="icon-btn" id="redoBtn" title="Redo">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="m15 14 5-5-5-5"/>
-        <path d="M20 9H10a6 6 0 0 0 0 12h2"/>
-      </svg>
-    </button>
 
-    <button class="icon-btn" id="projectBtn" title="Project">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M4 7h6l2 2h8v10H4z"/>
-        <path d="M4 7V5h6l2 2"/>
-      </svg>
-    </button>
+    <button
+      type="button"
+      class="header-btn primary"
+      id="fullscreenBtn"
+      title="Fullscreen"
+    >
 
-    <button class="icon-btn primary" id="fullscreenBtn" title="Fullscreen">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
         <path d="M8 3H3v5"/>
         <path d="M16 3h5v5"/>
         <path d="M21 16v5h-5"/>
         <path d="M3 16v5h5"/>
       </svg>
+
     </button>
+
   </div>
+
 </header>
 
+
 <main>
+
 <div class="container">
 
-<section class="hero">
+
+<!-- ======================================================
+     INTRO
+====================================================== -->
+
+<section class="page-intro">
+
   <div>
-    <div class="eyebrow">Professional Creative Workspace</div>
-    <h1>Build promo.<br>Make it premium.</h1>
-    <p>
-      Manage products, tune pricing, choose a creative direction,
-      preview every format, and export production-ready campaign assets.
+
+    <div class="eyebrow">
+      Premium Promo Creative Studio
+    </div>
+
+    <h1 class="page-title">
+      Build promo.<br>
+      Make it premium.
+    </h1>
+
+    <p class="page-description">
+      Product campaign workspace untuk nine autoseries:
+      pilih produk, atur harga promo, pilih creative direction,
+      preview semua format, lalu export artwork.
     </p>
+
   </div>
 
-  <div class="hero-stats">
-    <div class="stat accent">
-      Selected <strong id="statSelected">0</strong>
+
+  <div class="live-summary">
+
+    <div class="summary-chip accent">
+      Selected
+      <strong id="topSelectedCount">0</strong>
     </div>
-    <div class="stat">
-      Products <strong id="statProducts">0</strong>
+
+    <div class="summary-chip">
+      Products
+      <strong id="topTotalCount">0</strong>
     </div>
-    <div class="stat">
-      Ratio <strong id="statRatio">16:9</strong>
+
+    <div class="summary-chip">
+      Ratio
+      <strong id="topRatio">16:9</strong>
     </div>
-    <div class="stat">
-      Theme <strong id="statTheme">Modern</strong>
+
+    <div class="summary-chip">
+      Template
+      <strong id="topTemplate">Modern Dark</strong>
     </div>
+
   </div>
+
 </section>
 
-<section class="panel">
 
-  <div class="preview-stage">
-    <div class="canvas-wrap" id="canvasWrap">
-      <div class="canvas r169 theme-modern" id="promoCanvas">
-        <div class="canvas-bg"></div>
+<!-- ======================================================
+     PREVIEW
+====================================================== -->
 
-        <div class="product-visual">
-          <div class="image-empty" id="previewEmpty">
-            <div>
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6">
-                <rect x="3" y="4" width="18" height="16" rx="2"/>
-                <circle cx="8.5" cy="9" r="1.5"/>
-                <path d="m21 15-4-4-5 6-3-3-6 4"/>
-              </svg>
-              <span>Select a product</span>
-            </div>
-          </div>
-          <img class="product-image hidden" id="previewImage" alt="">
-        </div>
+<section class="preview-wrap">
 
-        <div class="visual-gradient"></div>
+  <div
+    class="stage ratio-169"
+    id="stage"
+  ></div>
 
-        <div class="info-zone">
-          <div class="info">
 
-            <div class="badges">
-              <div class="badge" id="previewBadge">LIMITED OFFER</div>
-              <div class="extra-badge hidden" id="previewExtraBadge">EXTRA DISCOUNT</div>
-            </div>
+  <div class="control-strip">
 
-            <div class="warranty hidden" id="previewWarranty"></div>
+    <div>
 
-            <div class="product-brand" id="previewBrand">LARAS</div>
-            <div class="product-name" id="previewName">Select a product</div>
-
-            <div class="price-block">
-              <div class="price-label">Special Price</div>
-              <div class="price" id="previewPrice">—</div>
-
-              <div class="price-meta">
-                <span class="old-price" id="previewOldPrice"></span>
-                <span class="discount" id="previewDiscount"></span>
-              </div>
-
-              <div class="extra-note hidden" id="previewExtraNote"></div>
-            </div>
-
-          </div>
-        </div>
-
-        <div class="watermark"></div>
-        <div class="ratio-tag" id="previewRatioTag">16:9</div>
-        <div class="signature">LARAS / PREMIUM PROMO SYSTEM</div>
+      <div class="section-label">
+        Pilih Rasio
       </div>
-    </div>
-  </div>
-
-  <div class="preview-toolbar">
-    <div class="preview-caption">
-      Previewing <strong id="previewCaption">No product selected</strong>
-    </div>
-
-    <div class="toolbar-actions">
-      <button class="small-btn" id="zoomOutBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M5 12h14"/>
-        </svg>
-        ZOOM OUT
-      </button>
-
-      <button class="small-btn" id="zoomResetBtn">
-        RESET
-      </button>
-
-      <button class="small-btn" id="zoomInBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="11" cy="11" r="6"/>
-          <path d="M16 16l5 5"/>
-          <path d="M11 8v6"/>
-          <path d="M8 11h6"/>
-        </svg>
-        ZOOM IN
-      </button>
-    </div>
-  </div>
-
-  <div class="control-grid">
-
-    <div class="control-card">
-      <div class="label">Canvas Ratio</div>
 
       <div class="ratio-grid">
-        <button class="ratio-btn" data-ratio="916">
+
+        <button
+          type="button"
+          class="ratio-btn"
+          data-ratio="916"
+        >
+
           <span class="ratio-icon"></span>
+
           <span>
             <span class="ratio-value">9:16</span>
             <span class="ratio-use">Story</span>
           </span>
+
         </button>
 
-        <button class="ratio-btn" data-ratio="45">
+
+        <button
+          type="button"
+          class="ratio-btn"
+          data-ratio="45"
+        >
+
           <span class="ratio-icon"></span>
+
           <span>
             <span class="ratio-value">4:5</span>
             <span class="ratio-use">Feed</span>
           </span>
+
         </button>
 
-        <button class="ratio-btn active" data-ratio="169">
+
+        <button
+          type="button"
+          class="ratio-btn active"
+          data-ratio="169"
+        >
+
           <span class="ratio-icon"></span>
+
           <span>
             <span class="ratio-value">16:9</span>
             <span class="ratio-use">Landscape</span>
           </span>
+
         </button>
+
       </div>
+
     </div>
 
-    <div class="control-card">
-      <div class="label">Preview & Export</div>
 
-      <div class="nav-grid">
-        <button class="nav-btn" id="prevBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+    <div>
+
+      <div class="section-label">
+        Preview & Export
+      </div>
+
+      <div class="navigation">
+
+        <button
+          type="button"
+          class="nav-btn"
+          id="prevBtn"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+          >
             <path d="m15 18-6-6 6-6"/>
           </svg>
         </button>
 
-        <button class="nav-btn" id="playBtn">
-          <svg id="playIcon" viewBox="0 0 24 24" fill="currentColor">
+
+        <button
+          type="button"
+          class="nav-btn"
+          id="playBtn"
+        >
+          <svg
+            id="playIcon"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
             <path d="M7 5h4v14H7z"/>
             <path d="M13 5h4v14h-4z"/>
           </svg>
         </button>
 
-        <button class="nav-btn" id="nextBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3">
+
+        <button
+          type="button"
+          class="nav-btn"
+          id="nextBtn"
+        >
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+          >
             <path d="m9 18 6-6-6-6"/>
           </svg>
         </button>
 
-        <div class="slide-count" id="slideCount">0 / 0</div>
+
+        <div
+          class="slide-count"
+          id="slideCount"
+        >
+          0 / 0
+        </div>
+
       </div>
 
-      <div class="export-row">
-        <button class="action-btn" id="exportCurrentBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+
+      <div class="download-row">
+
+        <button
+          type="button"
+          class="download-btn"
+          id="downloadBtn"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+          >
             <path d="M12 3v12"/>
             <path d="m7 10 5 5 5-5"/>
             <path d="M4 21h16"/>
           </svg>
-          EXPORT PNG
+
+          DOWNLOAD PNG
+
         </button>
 
-        <button class="action-btn secondary" id="exportAllBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <rect x="4" y="4" width="12" height="12" rx="2"/>
+
+        <button
+          type="button"
+          class="download-btn secondary"
+          id="downloadAllBtn"
+        >
+
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <rect
+              x="4"
+              y="4"
+              width="12"
+              height="12"
+              rx="2"
+            />
             <path d="M8 20h12a2 2 0 0 0 2-2V8"/>
           </svg>
-          EXPORT ZIP
+
+          EXPORT ALL
+
         </button>
+
       </div>
+
     </div>
 
   </div>
+
 </section>
+
+
+<!-- ======================================================
+     TEMPLATE ENGINE
+====================================================== -->
 
 <section class="panel">
 
-  <div class="panel-head">
+  <div class="panel-header">
+
     <div>
-      <div class="label">Creative System</div>
-      <div class="panel-title">Choose your direction.</div>
-      <div class="panel-desc">
-        Premium visual systems with persistent workspace state.
+
+      <div class="section-label">
+        Creative System
       </div>
+
+      <h2 class="panel-title">
+        Choose your direction.
+      </h2>
+
+      <div class="panel-description">
+        Four premium visual systems yang tetap membawa
+        identity Imam_salesfr.
+      </div>
+
     </div>
+
 
     <div class="panel-side">
       Active:
-      <strong id="activeTheme">Modern Dark</strong>
+      <strong id="activeTemplate">
+        Modern Dark
+      </strong>
     </div>
+
   </div>
+
 
   <div class="template-grid">
 
-    <button class="template active" data-theme="modern">
-      <div class="template-top">
-        <span class="template-name">01 — Modern Dark</span>
-        <span class="template-check">✓</span>
-      </div>
-      <div class="template-desc">Clean, premium, balanced commercial layout.</div>
-      <div class="template-thumb">
-        <div class="thumb modern" style="--tc:#8CC63F">
-          <div class="thumb-sweep"></div>
-          <div class="thumb-copy">
-            <div class="thumb-line accent"></div>
-            <div class="thumb-line"></div>
-            <div class="thumb-line small"></div>
-          </div>
-          <div class="thumb-product"></div>
-          <div class="thumb-bottom">
-            <div class="thumb-pill"></div>
-            <div class="thumb-price"></div>
-            <div class="thumb-warranty"></div>
-          </div>
+    <!-- MODERN -->
+
+    <button
+      type="button"
+      class="template-card active"
+      data-template="modern"
+    >
+
+      <div class="template-head">
+
+        <div class="template-name">
+          01 — Modern Dark
         </div>
+
+        <span class="template-check">
+          ✓
+        </span>
+
       </div>
+
+      <div class="template-caption">
+        Clean, premium, balanced commercial direction.
+      </div>
+
+      <div class="template-thumb">
+
+        <div class="thumb thumb-modern">
+
+          <div class="thumb-sweep"></div>
+
+          <div class="thumb-copy">
+            <div class="thumb-brand">
+              NINE AUTOSERIES
+            </div>
+            <div class="thumb-title"></div>
+            <div class="thumb-sub"></div>
+          </div>
+
+          <div class="thumb-product"></div>
+
+          <div class="thumb-commercial">
+            <span class="thumb-promo"></span>
+            <span class="thumb-extra"></span>
+            <span class="thumb-badge"></span>
+            <span class="thumb-price"></span>
+          </div>
+
+          <span class="thumb-watermark">
+            IMAMSALESNINE.COM
+          </span>
+
+          <span class="thumb-ratio">
+            16:9
+          </span>
+
+        </div>
+
+      </div>
+
     </button>
 
-    <button class="template" data-theme="orange">
-      <div class="template-top">
-        <span class="template-name">02 — Orange Rush</span>
-        <span class="template-check">✓</span>
-      </div>
-      <div class="template-desc">High-energy promotional treatment for sales campaigns.</div>
-      <div class="template-thumb">
-        <div class="thumb orange" style="--tc:#FF7612">
-          <div class="thumb-sweep"></div>
-          <div class="thumb-copy">
-            <div class="thumb-line accent"></div>
-            <div class="thumb-line"></div>
-            <div class="thumb-line small"></div>
-          </div>
-          <div class="thumb-product"></div>
-          <div class="thumb-bottom">
-            <div class="thumb-pill"></div>
-            <div class="thumb-price"></div>
-            <div class="thumb-warranty"></div>
-          </div>
+
+    <!-- ORANGE -->
+
+    <button
+      type="button"
+      class="template-card"
+      data-template="orange"
+    >
+
+      <div class="template-head">
+
+        <div class="template-name">
+          02 — Dynamic Orange
         </div>
+
+        <span class="template-check">
+          ✓
+        </span>
+
       </div>
+
+      <div class="template-caption">
+        High-energy sales treatment untuk promo agresif.
+      </div>
+
+      <div class="template-thumb">
+
+        <div class="thumb thumb-orange">
+
+          <div class="thumb-sweep"></div>
+
+          <div class="thumb-copy">
+            <div class="thumb-brand">
+              NINE AUTOSERIES
+            </div>
+            <div class="thumb-title"></div>
+            <div class="thumb-sub"></div>
+          </div>
+
+          <div class="thumb-product"></div>
+
+          <div class="thumb-commercial">
+            <span class="thumb-promo"></span>
+            <span class="thumb-extra"></span>
+            <span class="thumb-badge"></span>
+            <span class="thumb-price"></span>
+          </div>
+
+          <span class="thumb-watermark">
+            IMAMSALESNINE.COM
+          </span>
+
+          <span class="thumb-ratio">
+            16:9
+          </span>
+
+        </div>
+
+      </div>
+
     </button>
 
-    <button class="template" data-theme="neon">
-      <div class="template-top">
-        <span class="template-name">03 — Neon Edge</span>
-        <span class="template-check">✓</span>
-      </div>
-      <div class="template-desc">Sharper contrast and futuristic campaign atmosphere.</div>
-      <div class="template-thumb">
-        <div class="thumb neon" style="--tc:#A6E84D">
-          <div class="thumb-sweep"></div>
-          <div class="thumb-copy">
-            <div class="thumb-line accent"></div>
-            <div class="thumb-line"></div>
-            <div class="thumb-line small"></div>
-          </div>
-          <div class="thumb-product"></div>
-          <div class="thumb-bottom">
-            <div class="thumb-pill"></div>
-            <div class="thumb-price"></div>
-            <div class="thumb-warranty"></div>
-          </div>
+
+    <!-- NEON -->
+
+    <button
+      type="button"
+      class="template-card"
+      data-template="neon"
+    >
+
+      <div class="template-head">
+
+        <div class="template-name">
+          03 — Neon Green
         </div>
+
+        <span class="template-check">
+          ✓
+        </span>
+
       </div>
+
+      <div class="template-caption">
+        Futuristic, sharp and high-contrast product direction.
+      </div>
+
+      <div class="template-thumb">
+
+        <div class="thumb thumb-neon">
+
+          <div class="thumb-sweep"></div>
+
+          <div class="thumb-copy">
+            <div class="thumb-brand">
+              NINE AUTOSERIES
+            </div>
+            <div class="thumb-title"></div>
+            <div class="thumb-sub"></div>
+          </div>
+
+          <div class="thumb-product"></div>
+
+          <div class="thumb-commercial">
+            <span class="thumb-promo"></span>
+            <span class="thumb-extra"></span>
+            <span class="thumb-badge"></span>
+            <span class="thumb-price"></span>
+          </div>
+
+          <span class="thumb-watermark">
+            IMAMSALESNINE.COM
+          </span>
+
+          <span class="thumb-ratio">
+            16:9
+          </span>
+
+        </div>
+
+      </div>
+
     </button>
 
-    <button class="template" data-theme="blue">
-      <div class="template-top">
-        <span class="template-name">04 — Blue Signal</span>
-        <span class="template-check">✓</span>
-      </div>
-      <div class="template-desc">Cool technical look for modern product launches.</div>
-      <div class="template-thumb">
-        <div class="thumb blue" style="--tc:#2998E8">
-          <div class="thumb-sweep"></div>
-          <div class="thumb-copy">
-            <div class="thumb-line accent"></div>
-            <div class="thumb-line"></div>
-            <div class="thumb-line small"></div>
-          </div>
-          <div class="thumb-product"></div>
-          <div class="thumb-bottom">
-            <div class="thumb-pill"></div>
-            <div class="thumb-price"></div>
-            <div class="thumb-warranty"></div>
-          </div>
+
+    <!-- BLUE -->
+
+    <button
+      type="button"
+      class="template-card"
+      data-template="blue"
+    >
+
+      <div class="template-head">
+
+        <div class="template-name">
+          04 — Carbon Blue
         </div>
+
+        <span class="template-check">
+          ✓
+        </span>
+
       </div>
+
+      <div class="template-caption">
+        Corporate, technical and automotive-friendly direction.
+      </div>
+
+      <div class="template-thumb">
+
+        <div class="thumb thumb-blue">
+
+          <div class="thumb-sweep"></div>
+
+          <div class="thumb-copy">
+            <div class="thumb-brand">
+              NINE AUTOSERIES
+            </div>
+            <div class="thumb-title"></div>
+            <div class="thumb-sub"></div>
+          </div>
+
+          <div class="thumb-product"></div>
+
+          <div class="thumb-commercial">
+            <span class="thumb-promo"></span>
+            <span class="thumb-extra"></span>
+            <span class="thumb-badge"></span>
+            <span class="thumb-price"></span>
+          </div>
+
+          <span class="thumb-watermark">
+            IMAMSALESNINE.COM
+          </span>
+
+          <span class="thumb-ratio">
+            16:9
+          </span>
+
+        </div>
+
+      </div>
+
     </button>
 
   </div>
+
 </section>
+
+
+<!-- ======================================================
+     PRODUCT MANAGER
+====================================================== -->
 
 <section class="panel">
 
-  <div class="panel-head">
+  <div class="panel-header">
+
     <div>
-      <div class="label">Product Manager</div>
-      <div class="panel-title">Campaign inventory.</div>
-      <div class="panel-desc">
-        Manage products, images, pricing and campaign selection.
+
+      <div class="section-label">
+        Promo Manager
       </div>
+
+      <h2 class="panel-title">
+        Product library.
+      </h2>
+
+      <div class="panel-description">
+        Data produk dibaca langsung dari
+        <strong>produk.json</strong>.
+      </div>
+
     </div>
+
 
     <div class="panel-side">
-      <strong id="managerSelected">0 selected</strong>
-    </div>
-  </div>
 
-  <div class="manager-tools">
+      <strong id="selectedCount">
+        0
+      </strong>
 
-    <button class="tool primary" id="addProductBtn">
-      + ADD PRODUCT
-    </button>
+      dipilih
 
-    <button class="tool" id="demoBtn">
-      LOAD DEMO
-    </button>
+      &nbsp;•&nbsp;
 
-    <div class="search-box">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <circle cx="11" cy="11" r="6"/>
-        <path d="m16 16 5 5"/>
-      </svg>
-      <input
-        id="searchInput"
-        type="search"
-        placeholder="Search brand, product, campaign..."
-      >
+      <strong id="totalCount">
+        0
+      </strong>
+
+      total
+
     </div>
 
-    <select class="filter-select" id="filterSelect">
-      <option value="all">All products</option>
-      <option value="selected">Selected</option>
-      <option value="discount">Discounted</option>
-      <option value="warranty">With warranty</option>
-    </select>
+  </div>
 
-    <button class="tool danger" id="deleteSelectedBtn">
-      DELETE SELECTED
+
+  <div class="manager-toolbar">
+
+    <button
+      type="button"
+      class="tool-btn primary"
+      id="selectAll"
+    >
+      PILIH SEMUA
+    </button>
+
+
+    <button
+      type="button"
+      class="tool-btn"
+      id="clearAll"
+    >
+      BERSIHKAN
+    </button>
+
+
+    <button
+      type="button"
+      class="tool-btn primary"
+      id="applyPromo"
+    >
+      TERAPKAN PROMO
+    </button>
+
+
+    <button
+      type="button"
+      class="tool-btn"
+      id="saveConfig"
+    >
+      SIMPAN
+    </button>
+
+
+    <button
+      type="button"
+      class="tool-btn"
+      id="downloadJSON"
+    >
+      DOWNLOAD JSON
     </button>
 
   </div>
 
-  <div class="selection-bar">
-    <span>
-      <strong id="selectionCount">0</strong> products selected for export
-    </span>
 
-    <span>
-      Tip: press <strong>Space</strong> to play preview
-    </span>
-  </div>
+  <input
+    type="search"
+    class="search"
+    id="search"
+    placeholder="Cari produk / SKU / nama..."
+    autocomplete="off"
+  >
 
-  <div class="product-grid" id="productGrid"></div>
+
+  <div
+    class="product-grid"
+    id="productGrid"
+  ></div>
+
 </section>
 
-<section class="panel">
-
-  <div class="panel-head">
-    <div>
-      <div class="label">Workspace</div>
-      <div class="panel-title">Project controls.</div>
-      <div class="panel-desc">
-        Backup your workspace or move it to another device.
-      </div>
-    </div>
-  </div>
-
-  <div class="project-actions">
-
-    <button class="project-action" id="exportProjectBtn">
-      <strong>Export Project JSON</strong>
-      <span>Save products, pricing, theme, ratio and workspace state.</span>
-    </button>
-
-    <button class="project-action" id="importProjectBtn">
-      <strong>Import Project JSON</strong>
-      <span>Restore a previously exported LARAS workspace.</span>
-    </button>
-
-    <button class="project-action" id="resetProjectBtn">
-      <strong>Reset Workspace</strong>
-      <span>Clear local data and restore a clean demo workspace.</span>
-    </button>
-
-    <button class="project-action" id="clearAllBtn">
-      <strong>Clear Product Inventory</strong>
-      <span>Remove all products and start with an empty workspace.</span>
-    </button>
-
-  </div>
-</section>
 
 </div>
+
 </main>
-</div>
 
-<!-- PRODUCT MODAL -->
 
-<div class="backdrop" id="productModal">
+<!-- ======================================================
+     TOAST
+====================================================== -->
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<!-- ======================================================
+     MODAL
+====================================================== -->
+
+<div
+  class="modal-backdrop"
+  id="exportModal"
+>
+
   <div class="modal">
 
     <div class="modal-head">
+
       <div>
-        <h2 class="modal-title" id="productModalTitle">Add Product</h2>
-        <div class="modal-copy">
-          Create a campaign-ready product with image and pricing.
-        </div>
-      </div>
 
-      <button class="close-btn" data-close="productModal">×</button>
-    </div>
+        <h2 class="modal-title">
+          Export Campaign
+        </h2>
 
-    <form id="productForm">
-
-      <input type="hidden" id="editProductId">
-
-      <div class="form-grid">
-
-        <div class="form-group">
-          <label>Brand</label>
-          <input id="fieldBrand" required placeholder="Example Brand">
-        </div>
-
-        <div class="form-group">
-          <label>Product Name</label>
-          <input id="fieldName" required placeholder="Product name">
-        </div>
-
-        <div class="form-group">
-          <label>Normal Price</label>
-          <input id="fieldNormalPrice" type="number" min="0" step="1" required placeholder="1000000">
-        </div>
-
-        <div class="form-group">
-          <label>Promo Price</label>
-          <input id="fieldPromoPrice" type="number" min="0" step="1" required placeholder="799000">
-        </div>
-
-        <div class="form-group">
-          <label>Promo Label</label>
-          <input id="fieldBadge" value="LIMITED OFFER" placeholder="LIMITED OFFER">
-        </div>
-
-        <div class="form-group">
-          <label>Warranty</label>
-          <input id="fieldWarranty" placeholder="1 YEAR WARRANTY">
-        </div>
-
-        <div class="form-group">
-          <label>Extra Note</label>
-          <input id="fieldExtra" placeholder="FREE DELIVERY">
-        </div>
-
-        <div class="form-group">
-          <label>SKU / Campaign Code</label>
-          <input id="fieldSku" placeholder="LRS-001">
-        </div>
-
-        <div class="form-group full">
-          <label>Product Image</label>
-
-          <div class="image-upload">
-
-            <div class="upload-preview" id="uploadPreview">
-              <span style="font-size:7px;color:#59635A">No image</span>
-            </div>
-
-            <div class="upload-actions">
-              <label class="upload-btn">
-                UPLOAD IMAGE
-                <input
-                  id="fieldImageFile"
-                  type="file"
-                  accept="image/*"
-                  hidden
-                >
-              </label>
-
-              <button
-                type="button"
-                class="upload-btn"
-                id="removeImageBtn"
-              >
-                REMOVE IMAGE
-              </button>
-
-              <button
-                type="button"
-                class="upload-btn"
-                id="useUrlBtn"
-              >
-                USE IMAGE URL
-              </button>
-            </div>
-
-          </div>
+        <div class="modal-description">
+          Pilih output yang mau lo generate dari promo queue.
         </div>
 
       </div>
 
-      <div class="modal-footer">
-        <button type="button" class="modal-btn" data-close="productModal">
-          CANCEL
-        </button>
 
-        <button type="submit" class="modal-btn primary">
-          SAVE PRODUCT
-        </button>
-      </div>
-
-    </form>
-  </div>
-</div>
-
-<!-- PROJECT MODAL -->
-
-<div class="backdrop" id="projectModal">
-  <div class="modal">
-
-    <div class="modal-head">
-      <div>
-        <h2 class="modal-title">Project Workspace</h2>
-        <div class="modal-copy">
-          Your workspace is automatically saved locally in this browser.
-        </div>
-      </div>
-
-      <button class="close-btn" data-close="projectModal">×</button>
-    </div>
-
-    <div class="project-actions">
-
-      <button class="project-action" id="modalExportProject">
-        <strong>Export JSON</strong>
-        <span>Download complete workspace.</span>
-      </button>
-
-      <button class="project-action" id="modalImportProject">
-        <strong>Import JSON</strong>
-        <span>Restore workspace data.</span>
-      </button>
-
-      <button class="project-action" id="modalResetProject">
-        <strong>Reset</strong>
-        <span>Restore demo configuration.</span>
-      </button>
-
-      <button class="project-action" id="modalClear">
-        <strong>Clear Inventory</strong>
-        <span>Remove every product.</span>
+      <button
+        type="button"
+        class="modal-close"
+        id="modalClose"
+      >
+        ×
       </button>
 
     </div>
+
+
+    <div class="modal-grid">
+
+      <div class="modal-field full">
+
+        <label>
+          Current Template
+        </label>
+
+        <select id="modalTemplate">
+          <option value="modern">
+            Modern Dark
+          </option>
+
+          <option value="orange">
+            Dynamic Orange
+          </option>
+
+          <option value="neon">
+            Neon Green
+          </option>
+
+          <option value="blue">
+            Carbon Blue
+          </option>
+        </select>
+
+      </div>
+
+
+      <div class="modal-field">
+
+        <label>
+          Current Ratio
+        </label>
+
+        <select id="modalRatio">
+
+          <option value="916">
+            9:16
+          </option>
+
+          <option value="45">
+            4:5
+          </option>
+
+          <option value="169">
+            16:9
+          </option>
+
+        </select>
+
+      </div>
+
+
+      <div class="modal-field">
+
+        <label>
+          Queue
+        </label>
+
+        <input
+          id="modalQueue"
+          readonly
+          value="0 produk"
+        >
+
+      </div>
+
+    </div>
+
 
     <div class="modal-footer">
-      <button class="modal-btn" data-close="projectModal">CLOSE</button>
+
+      <button
+        type="button"
+        class="modal-btn"
+        id="modalSaveState"
+      >
+        SIMPAN STATE
+      </button>
+
+      <button
+        type="button"
+        class="modal-btn"
+        id="modalDownloadJSON"
+      >
+        DOWNLOAD JSON
+      </button>
+
+      <button
+        type="button"
+        class="modal-btn primary"
+        id="modalExportAll"
+      >
+        EXPORT SEMUA
+      </button>
+
     </div>
 
   </div>
+
 </div>
 
-<input
-  type="file"
-  id="projectFileInput"
-  accept="application/json,.json"
-  hidden
->
-
-<input
-  type="file"
-  id="urlImageInput"
-  accept="image/*"
-  hidden
->
-
-<div class="toast" id="toast"></div>
 
 <script>
 /* =========================================================
-   LARAS PREMIUM ENGINE
+   CONFIG
 ========================================================= */
 
-(() => {
-  "use strict";
+const CONFIG = {
 
-  const STORAGE_KEY = "laras-premium-workspace-v3";
+  JSON:
+    "produk.json",
 
-  const DEMO_PRODUCTS = [
-    {
-      id:"p1",
-      brand:"LARAS TECH",
-      name:"Aero X1 Pro",
-      normalPrice:1299000,
-      promoPrice:899000,
-      badge:"LIMITED OFFER",
-      warranty:"1 YEAR WARRANTY",
-      extra:"FREE DELIVERY",
-      sku:"LRS-AERO-X1",
-      image:"https://images.unsplash.com/photo-1546435770-a3e426bf472b?w=1000&q=90"
-    },
-    {
-      id:"p2",
-      brand:"NOVA",
-      name:"Studio Headphones X",
-      normalPrice:1599000,
-      promoPrice:1099000,
-      badge:"HOT DEAL",
-      warranty:"2 YEAR WARRANTY",
-      extra:"FREE CASE",
-      sku:"NVA-STUDIO-X",
-      image:"https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=1000&q=90"
-    },
-    {
-      id:"p3",
-      brand:"ORBIT",
-      name:"Smart Watch Ultra",
-      normalPrice:2499000,
-      promoPrice:1799000,
-      badge:"NEW ARRIVAL",
-      warranty:"1 YEAR WARRANTY",
-      extra:"FREE STRAP",
-      sku:"ORB-WATCH-U",
-      image:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=1000&q=90"
-    },
-    {
-      id:"p4",
-      brand:"LUMEN",
-      name:"Portable Speaker S9",
-      normalPrice:1199000,
-      promoPrice:749000,
-      badge:"FLASH SALE",
-      warranty:"1 YEAR WARRANTY",
-      extra:"FREE SHIPPING",
-      sku:"LUM-S9",
-      image:"https://images.unsplash.com/photo-1608043152269-423dbba4e7e1?w=1000&q=90"
-    },
-    {
-      id:"p5",
-      brand:"NOVA HOME",
-      name:"Air Purifier Prime",
-      normalPrice:3299000,
-      promoPrice:2399000,
-      badge:"PREMIUM DEAL",
-      warranty:"3 YEAR WARRANTY",
-      extra:"FREE FILTER",
-      sku:"NHP-PRIME",
-      image:"https://images.unsplash.com/photo-1585771724684-38269d6639fd?w=1000&q=90"
+  IMAGE_FOLDER:
+    "images/produk/",
+
+  DURATION:
+    8500
+
+};
+
+
+const STORAGE = {
+
+  RATIO:
+    "imamPromo.ratio",
+
+  TEMPLATE:
+    "imamPromo.template",
+
+  SELECTION:
+    "imamPromo.selection",
+
+  PRICES:
+    "imamPromo.priceOverrides",
+
+  PLAYING:
+    "imamPromo.playing"
+
+};
+
+
+const TEMPLATES = {
+
+  modern:{
+    name:"Modern Dark",
+    className:"template-modern"
+  },
+
+  orange:{
+    name:"Dynamic Orange",
+    className:"template-orange"
+  },
+
+  neon:{
+    name:"Neon Green",
+    className:"template-neon"
+  },
+
+  blue:{
+    name:"Carbon Blue",
+    className:"template-blue"
+  }
+
+};
+
+
+/* =========================================================
+   STATE
+========================================================= */
+
+const state = {
+
+  products:[],
+
+  selectedIds:[],
+
+  promoProducts:[],
+
+  priceOverrides:{},
+
+  currentIndex:0,
+
+  currentRatio:
+    localStorage.getItem(
+      STORAGE.RATIO
+    ) || "169",
+
+  currentTemplate:
+    localStorage.getItem(
+      STORAGE.TEMPLATE
+    ) || "modern",
+
+  searchQuery:"",
+
+  playing:
+    localStorage.getItem(
+      STORAGE.PLAYING
+    ) !== "false",
+
+  autoplay:null,
+
+  transitionBusy:false,
+
+  downloadBusy:false,
+
+  initialized:false
+
+};
+
+
+/* =========================================================
+   DOM HELPER
+========================================================= */
+
+function $(id){
+
+  return document.getElementById(id);
+
+}
+
+
+const DOM = {
+
+  body:
+    document.body,
+
+  stage:
+    $("stage"),
+
+  productGrid:
+    $("productGrid"),
+
+  selectedCount:
+    $("selectedCount"),
+
+  totalCount:
+    $("totalCount"),
+
+  topSelectedCount:
+    $("topSelectedCount"),
+
+  topTotalCount:
+    $("topTotalCount"),
+
+  topRatio:
+    $("topRatio"),
+
+  topTemplate:
+    $("topTemplate"),
+
+  slideCount:
+    $("slideCount"),
+
+  activeTemplate:
+    $("activeTemplate"),
+
+  downloadBtn:
+    $("downloadBtn"),
+
+  downloadAllBtn:
+    $("downloadAllBtn"),
+
+  search:
+    $("search"),
+
+  toast:
+    $("toast"),
+
+  loadingScreen:
+    $("loadingScreen"),
+
+  loaderStatus:
+    $("loaderStatus"),
+
+  exportModal:
+    $("exportModal"),
+
+  modalTemplate:
+    $("modalTemplate"),
+
+  modalRatio:
+    $("modalRatio"),
+
+  modalQueue:
+    $("modalQueue"),
+
+  headerPlay:
+    $("headerPlay"),
+
+  headerPlayIcon:
+    $("headerPlayIcon"),
+
+  playBtn:
+    $("playBtn"),
+
+  playIcon:
+    $("playIcon")
+
+};
+
+
+/* =========================================================
+   SAFE EVENT BINDING
+========================================================= */
+
+function on(
+  element,
+  event,
+  handler
+){
+
+  if(
+    element &&
+    typeof element.addEventListener ===
+      "function"
+  ){
+
+    element.addEventListener(
+      event,
+      handler
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   STORAGE
+========================================================= */
+
+function storageGet(
+  key,
+  fallback=null
+){
+
+  try{
+
+    const value =
+      localStorage.getItem(key);
+
+    return value === null
+      ? fallback
+      : value;
+
+  }catch(error){
+
+    console.warn(
+      "[STORAGE GET]",
+      error
+    );
+
+    return fallback;
+
+  }
+
+}
+
+
+function storageSet(
+  key,
+  value
+){
+
+  try{
+
+    localStorage.setItem(
+      key,
+      value
+    );
+
+    return true;
+
+  }catch(error){
+
+    console.warn(
+      "[STORAGE SET]",
+      error
+    );
+
+    return false;
+
+  }
+
+}
+
+
+function storageJSON(
+  key,
+  fallback
+){
+
+  try{
+
+    const raw =
+      localStorage.getItem(key);
+
+    if(!raw){
+      return fallback;
     }
-  ];
 
-  const defaultState = {
-    products:structuredClone(DEMO_PRODUCTS),
-    selectedIds:["p1","p2","p3"],
-    activeIndex:0,
-    ratio:"169",
-    theme:"modern",
-    zoom:1,
-    playing:false
-  };
+    return JSON.parse(raw);
 
-  let state = loadState();
-  let undoStack = [];
-  let redoStack = [];
-  let toastTimer = null;
-  let playTimer = null;
-  let pendingImage = "";
+  }catch(error){
 
-  const $ = (s,root=document) => root.querySelector(s);
-  const $$ = (s,root=document) => [...root.querySelectorAll(s)];
+    console.warn(
+      "[STORAGE JSON]",
+      error
+    );
 
-  const els = {
-    loader:$("#loader"),
+    return fallback;
 
-    canvas:$("#promoCanvas"),
-    previewImage:$("#previewImage"),
-    previewEmpty:$("#previewEmpty"),
-    previewBrand:$("#previewBrand"),
-    previewName:$("#previewName"),
-    previewPrice:$("#previewPrice"),
-    previewOldPrice:$("#previewOldPrice"),
-    previewDiscount:$("#previewDiscount"),
-    previewBadge:$("#previewBadge"),
-    previewExtraBadge:$("#previewExtraBadge"),
-    previewWarranty:$("#previewWarranty"),
-    previewExtraNote:$("#previewExtraNote"),
-    previewCaption:$("#previewCaption"),
-    previewRatioTag:$("#previewRatioTag"),
-
-    productGrid:$("#productGrid"),
-
-    statSelected:$("#statSelected"),
-    statProducts:$("#statProducts"),
-    statRatio:$("#statRatio"),
-    statTheme:$("#statTheme"),
-    managerSelected:$("#managerSelected"),
-    selectionCount:$("#selectionCount"),
-    slideCount:$("#slideCount"),
-    activeTheme:$("#activeTheme"),
-
-    productModal:$("#productModal"),
-    productModalTitle:$("#productModalTitle"),
-    productForm:$("#productForm"),
-    editProductId:$("#editProductId"),
-
-    fieldBrand:$("#fieldBrand"),
-    fieldName:$("#fieldName"),
-    fieldNormalPrice:$("#fieldNormalPrice"),
-    fieldPromoPrice:$("#fieldPromoPrice"),
-    fieldBadge:$("#fieldBadge"),
-    fieldWarranty:$("#fieldWarranty"),
-    fieldExtra:$("#fieldExtra"),
-    fieldSku:$("#fieldSku"),
-    fieldImageFile:$("#fieldImageFile"),
-    uploadPreview:$("#uploadPreview"),
-
-    searchInput:$("#searchInput"),
-    filterSelect:$("#filterSelect"),
-
-    projectModal:$("#projectModal"),
-    projectFileInput:$("#projectFileInput")
-  };
-
-  /* =======================================================
-     UTILITIES
-  ======================================================= */
-
-  function uid(){
-    return "p_" + Date.now().toString(36) + "_" +
-      Math.random().toString(36).slice(2,8);
   }
 
-  function clone(value){
-    return JSON.parse(JSON.stringify(value));
+}
+
+
+function saveSelection(){
+
+  storageSet(
+    STORAGE.SELECTION,
+    JSON.stringify(
+      state.selectedIds
+    )
+  );
+
+}
+
+
+function savePriceOverrides(){
+
+  storageSet(
+    STORAGE.PRICES,
+    JSON.stringify(
+      state.priceOverrides
+    )
+  );
+
+}
+
+
+function saveWorkspace(){
+
+  storageSet(
+    STORAGE.RATIO,
+    state.currentRatio
+  );
+
+  storageSet(
+    STORAGE.TEMPLATE,
+    state.currentTemplate
+  );
+
+  storageSet(
+    STORAGE.PLAYING,
+    String(state.playing)
+  );
+
+  saveSelection();
+  savePriceOverrides();
+
+  showToast(
+    "Workspace berhasil disimpan ✓"
+  );
+
+}
+
+
+function restoreWorkspace(){
+
+  const selection =
+    storageJSON(
+      STORAGE.SELECTION,
+      []
+    );
+
+  const prices =
+    storageJSON(
+      STORAGE.PRICES,
+      {}
+    );
+
+  state.selectedIds =
+    Array.isArray(selection)
+      ? selection.map(String)
+      : [];
+
+  state.priceOverrides =
+    prices &&
+    typeof prices === "object"
+      ? prices
+      : {};
+
+}
+
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+function text(
+  value,
+  fallback=""
+){
+
+  if(
+    value === null ||
+    value === undefined
+  ){
+
+    return fallback;
+
   }
 
-  function escapeHtml(value=""){
-    return String(value)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+  if(
+    typeof value === "string" ||
+    typeof value === "number"
+  ){
+
+    return String(value);
+
   }
 
-  function formatMoney(value){
-    const n = Number(value || 0);
-    return new Intl.NumberFormat("id-ID",{
+  if(
+    typeof value === "object"
+  ){
+
+    return String(
+
+      value.text ??
+      value.label ??
+      value.title ??
+      value.name ??
+      value.nama ??
+      value.value ??
+      fallback
+
+    );
+
+  }
+
+  return fallback;
+
+}
+
+
+function escapeHTML(
+  value
+){
+
+  return String(
+    value ?? ""
+  )
+
+    .replace(
+      /&/g,
+      "&amp;"
+    )
+
+    .replace(
+      /</g,
+      "&lt;"
+    )
+
+    .replace(
+      />/g,
+      "&gt;"
+    )
+
+    .replace(
+      /"/g,
+      "&quot;"
+    )
+
+    .replace(
+      /'/g,
+      "&#039;"
+    );
+
+}
+
+
+function normalizeSearch(
+  value
+){
+
+  return String(
+    value ?? ""
+  )
+
+    .toLowerCase()
+
+    .normalize("NFD")
+
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+
+    .trim();
+
+}
+
+
+function clamp(
+  value,
+  min,
+  max
+){
+
+  return Math.min(
+    max,
+    Math.max(
+      min,
+      value
+    )
+  );
+
+}
+
+
+function rupiah(
+  value
+){
+
+  return new Intl.NumberFormat(
+    "id-ID",
+    {
       style:"currency",
       currency:"IDR",
+      minimumFractionDigits:0,
       maximumFractionDigits:0
-    }).format(n);
-  }
-
-  function discountPercent(product){
-    const normal = Number(product.normalPrice || 0);
-    const promo = Number(product.promoPrice || 0);
-
-    if(!normal || promo >= normal) return 0;
-
-    return Math.round(((normal-promo)/normal)*100);
-  }
-
-  function themeLabel(theme){
-    return {
-      modern:"Modern Dark",
-      orange:"Orange Rush",
-      neon:"Neon Edge",
-      blue:"Blue Signal"
-    }[theme] || "Modern Dark";
-  }
-
-  function ratioLabel(ratio){
-    return {
-      "916":"9:16",
-      "45":"4:5",
-      "169":"16:9"
-    }[ratio] || "16:9";
-  }
-
-  function saveState(){
-    try{
-      localStorage.setItem(
-        STORAGE_KEY,
-        JSON.stringify({
-          products:state.products,
-          selectedIds:state.selectedIds,
-          activeIndex:state.activeIndex,
-          ratio:state.ratio,
-          theme:state.theme,
-          zoom:state.zoom
-        })
-      );
-    }catch(err){
-      console.warn("LARAS localStorage:",err);
     }
-  }
-
-  function loadState(){
-    try{
-      const raw = localStorage.getItem(STORAGE_KEY);
-
-      if(!raw) return clone(defaultState);
-
-      const saved = JSON.parse(raw);
-
-      return {
-        ...clone(defaultState),
-        ...saved,
-        products:Array.isArray(saved.products)
-          ? saved.products
-          : clone(DEMO_PRODUCTS),
-        selectedIds:Array.isArray(saved.selectedIds)
-          ? saved.selectedIds
-          : []
-      };
-    }catch{
-      return clone(defaultState);
-    }
-  }
-
-  function pushHistory(){
-    undoStack.push(clone(state));
-
-    if(undoStack.length > 30){
-      undoStack.shift();
-    }
-
-    redoStack = [];
-  }
-
-  function mutate(callback){
-    pushHistory();
-    callback();
-    normalizeState();
-    saveState();
-    renderAll();
-  }
-
-  function normalizeState(){
-    const ids = new Set(state.products.map(p => p.id));
-
-    state.selectedIds = state.selectedIds.filter(id => ids.has(id));
-
-    if(!state.products.length){
-      state.activeIndex = 0;
-    }else{
-      state.activeIndex = Math.max(
-        0,
-        Math.min(state.activeIndex,state.products.length-1)
-      );
-    }
-
-    state.ratio = ["916","45","169"].includes(state.ratio)
-      ? state.ratio
-      : "169";
-
-    state.theme = ["modern","orange","neon","blue"].includes(state.theme)
-      ? state.theme
-      : "modern";
-  }
-
-  function getActiveProduct(){
-    if(!state.products.length) return null;
-
-    return state.products[state.activeIndex] || state.products[0];
-  }
-
-  function getVisibleProducts(){
-    const query = els.searchInput.value.trim().toLowerCase();
-    const filter = els.filterSelect.value;
-
-    return state.products.filter(product => {
-      const haystack = [
-        product.brand,
-        product.name,
-        product.sku,
-        product.badge,
-        product.extra
-      ].join(" ").toLowerCase();
-
-      if(query && !haystack.includes(query)){
-        return false;
-      }
-
-      if(filter === "selected"){
-        return state.selectedIds.includes(product.id);
-      }
-
-      if(filter === "discount"){
-        return discountPercent(product) > 0;
-      }
-
-      if(filter === "warranty"){
-        return Boolean(product.warranty);
-      }
-
-      return true;
-    });
-  }
-
-  /* =======================================================
-     TOAST
-  ======================================================= */
-
-  function toast(message,type="success"){
-    const el = $("#toast");
-
-    el.textContent = message;
-    el.className = "toast " + (type === "error" ? "error " : "");
-
-    requestAnimationFrame(() => el.classList.add("show"));
-
-    clearTimeout(toastTimer);
-
-    toastTimer = setTimeout(() => {
-      el.classList.remove("show");
-    },2600);
-  }
-
-  /* =======================================================
-     RENDER
-  ======================================================= */
-
-  function renderAll(){
-    normalizeState();
-    renderPreview();
-    renderProducts();
-    renderStats();
-    renderControls();
-  }
-
-  function renderStats(){
-    els.statSelected.textContent = state.selectedIds.length;
-    els.statProducts.textContent = state.products.length;
-    els.statRatio.textContent = ratioLabel(state.ratio);
-    els.statTheme.textContent = themeLabel(state.theme).replace(" Dark","");
-    els.managerSelected.textContent =
-      `${state.selectedIds.length} selected`;
-    els.selectionCount.textContent = state.selectedIds.length;
-    els.activeTheme.textContent = themeLabel(state.theme);
-  }
-
-  function renderControls(){
-  $$(".ratio-btn").forEach(btn => {
-    btn.classList.toggle(
-      "active",
-      btn.dataset.ratio === state.ratio
-    );
-  });
-
-  $$(".template").forEach(btn => {
-    btn.classList.toggle(
-      "active",
-      btn.dataset.theme === state.theme
-    );
-  });
-
-  els.slideCount.textContent =
-    state.products.length
-      ? `${state.activeIndex + 1} / ${state.products.length}`
-      : "0 / 0";
-
-  const icon = $("#playIcon");
-
-  if(icon){
-    if(state.playing){
-      icon.innerHTML = `
-        <path d="M7 5h4v14H7z"/>
-        <path d="M13 5h4v14h-4z"/>
-      `;
-    }else{
-      icon.innerHTML =
-        `<path d="m8 5 11 7-11 7V5z"/>`;
-    }
-  }
-  }
-
-  function renderPreview(){
-    const product = getActiveProduct();
-
-    els.canvas.className =
-      `canvas r${state.ratio} theme-${state.theme}`;
-
-    els.canvas.style.transform =
-      `scale(${state.zoom})`;
-
-    els.previewRatioTag.textContent =
-      ratioLabel(state.ratio);
-
-    if(!product){
-      els.previewEmpty.classList.remove("hidden");
-      els.previewImage.classList.add("hidden");
-
-      els.previewBrand.textContent = "LARAS";
-      els.previewName.textContent = "Select a product";
-      els.previewPrice.textContent = "—";
-      els.previewOldPrice.textContent = "";
-      els.previewDiscount.textContent = "";
-      els.previewCaption.textContent = "No product selected";
-
-      els.previewWarranty.classList.add("hidden");
-      els.previewExtraBadge.classList.add("hidden");
-      els.previewExtraNote.classList.add("hidden");
-
-      return;
-    }
-
-    els.previewCaption.textContent =
-      `${product.brand} / ${product.name}`;
-
-    if(product.image){
-      els.previewImage.src = product.image;
-      els.previewImage.alt = product.name;
-      els.previewImage.classList.remove("hidden");
-      els.previewEmpty.classList.add("hidden");
-    }else{
-      els.previewImage.classList.add("hidden");
-      els.previewEmpty.classList.remove("hidden");
-    }
-
-    els.previewBrand.textContent =
-      product.brand || "LARAS";
-
-    els.previewName.textContent =
-      product.name || "Untitled Product";
-
-    els.previewPrice.textContent =
-      formatMoney(product.promoPrice);
-
-    if(Number(product.normalPrice) > Number(product.promoPrice)){
-      els.previewOldPrice.textContent =
-        formatMoney(product.normalPrice);
-
-      els.previewDiscount.textContent =
-        `-${discountPercent(product)}%`;
-    }else{
-      els.previewOldPrice.textContent = "";
-      els.previewDiscount.textContent = "";
-    }
-
-    els.previewBadge.textContent =
-      product.badge || "LIMITED OFFER";
-
-    if(product.extra){
-      els.previewExtraBadge.textContent = product.extra;
-      els.previewExtraBadge.classList.remove("hidden");
-      els.previewExtraNote.textContent = product.extra;
-      els.previewExtraNote.classList.remove("hidden");
-    }else{
-      els.previewExtraBadge.classList.add("hidden");
-      els.previewExtraNote.classList.add("hidden");
-    }
-
-    if(product.warranty){
-      els.previewWarranty.textContent = product.warranty;
-      els.previewWarranty.classList.remove("hidden");
-    }else{
-      els.previewWarranty.classList.add("hidden");
-    }
-  }
-
-  function renderProducts(){
-    const products = getVisibleProducts();
-
-    if(!products.length){
-      els.productGrid.innerHTML = `
-        <div class="empty">
-          <div>
-            <strong>No products found</strong>
-            <span>Try another search or add a new product.</span>
-          </div>
-        </div>
-      `;
-      return;
-    }
-
-    els.productGrid.innerHTML = products.map(product => {
-      const selected =
-        state.selectedIds.includes(product.id);
-
-      const discount =
-        discountPercent(product);
-
-      return `
-        <article
-          class="product-card ${selected ? "selected" : ""}"
-          data-id="${escapeHtml(product.id)}"
-        >
-
-          <div class="card-image">
-            ${
-              product.image
-              ? `<img
-                  src="${escapeHtml(product.image)}"
-                  alt="${escapeHtml(product.name)}"
-                  loading="lazy"
-                  onerror="this.style.opacity='.2'"
-                >`
-              : `<div style="color:#59635A;font-size:7px;font-weight:900">
-                  NO IMAGE
-                </div>`
-            }
-          </div>
-
-          <div class="card-gradient"></div>
-
-          <button
-            class="card-check"
-            data-action="select"
-            aria-label="Select product"
-          >
-            ✓
-          </button>
-
-          <div class="card-actions">
-            <button
-              class="card-icon"
-              data-action="edit"
-              title="Edit"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="m4 16 10-10 4 4L8 20H4z"/>
-                <path d="m13 7 4 4"/>
-              </svg>
-            </button>
-
-            <button
-              class="card-icon"
-              data-action="duplicate"
-              title="Duplicate"
-            >
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="8" y="8" width="12" height="12" rx="2"/>
-                <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/>
-              </svg>
-            </button>
-          </div>
-
-          <div class="card-status ${selected ? "active" : ""}">
-            ${selected ? "SELECTED" : "AVAILABLE"}
-          </div>
-
-          <div
-            class="card-info"
-            data-action="preview"
-          >
-            <div class="card-brand">
-              ${escapeHtml(product.brand)}
-            </div>
-
-            <div class="card-name">
-              ${escapeHtml(product.name)}
-            </div>
-
-            <div class="card-price">
-              ${formatMoney(product.promoPrice)}
-              ${
-                product.normalPrice > product.promoPrice
-                ? `
-                  <span class="card-old">
-                    ${formatMoney(product.normalPrice)}
-                  </span>
-                  <span class="card-discount">
-                    -${discount}%
-                  </span>
-                `
-                : ""
-              }
-            </div>
-
-            ${
-              product.extra
-              ? `<div class="card-extra">${escapeHtml(product.extra)}</div>`
-              : ""
-            }
-          </div>
-
-        </article>
-      `;
-    }).join("");
-  }
-
-  /* =======================================================
-     PRODUCT ACTIONS
-  ======================================================= */
-
-  function selectProduct(id){
-    const index = state.products.findIndex(p => p.id === id);
-
-    if(index < 0) return;
-
-    pushHistory();
-
-    if(state.selectedIds.includes(id)){
-      state.selectedIds =
-        state.selectedIds.filter(x => x !== id);
-    }else{
-      state.selectedIds.push(id);
-    }
-
-    state.activeIndex = index;
-
-    saveState();
-    renderAll();
-  }
-
-  function previewProduct(id){
-    const index =
-      state.products.findIndex(p => p.id === id);
-
-    if(index < 0) return;
-
-    state.activeIndex = index;
-    saveState();
-    renderAll();
-
-    document
-      .getElementById("promoCanvas")
-      .scrollIntoView({
-        behavior:"smooth",
-        block:"center"
-      });
-  }
-
-  function editProduct(id){
-    const product =
-      state.products.find(p => p.id === id);
-
-    if(!product) return;
-
-    els.productModalTitle.textContent = "Edit Product";
-
-    els.editProductId.value = product.id;
-    els.fieldBrand.value = product.brand || "";
-    els.fieldName.value = product.name || "";
-    els.fieldNormalPrice.value = product.normalPrice || "";
-    els.fieldPromoPrice.value = product.promoPrice || "";
-    els.fieldBadge.value = product.badge || "";
-    els.fieldWarranty.value = product.warranty || "";
-    els.fieldExtra.value = product.extra || "";
-    els.fieldSku.value = product.sku || "";
-
-    pendingImage = product.image || "";
-
-    updateUploadPreview();
-
-    openModal("productModal");
-  }
-
-  function resetProductForm(){
-    els.productForm.reset();
-    els.editProductId.value = "";
-    els.fieldBadge.value = "LIMITED OFFER";
-    pendingImage = "";
-    updateUploadPreview();
-    els.productModalTitle.textContent = "Add Product";
-  }
-
-  function duplicateProduct(id){
-    const product =
-      state.products.find(p => p.id === id);
-
-    if(!product) return;
-
-    mutate(() => {
-      const copy = {
-        ...clone(product),
-        id:uid(),
-        name:`${product.name} Copy`,
-        sku:`${product.sku || "LRS"}-COPY`
-      };
-
-      state.products.push(copy);
-      state.activeIndex = state.products.length - 1;
-      state.selectedIds.push(copy.id);
-    });
-
-    toast("Product duplicated.");
-  }
-
-  function deleteSelected(){
-    if(!state.selectedIds.length){
-      toast("No products selected.","error");
-      return;
-    }
-
-    const count = state.selectedIds.length;
-
-    mutate(() => {
-      const selected = new Set(state.selectedIds);
-
-      state.products =
-        state.products.filter(p => !selected.has(p.id));
-
-      state.selectedIds = [];
-      state.activeIndex = 0;
-    });
-
-    toast(`${count} product${count > 1 ? "s" : ""} deleted.`);
-  }
-
-  /* =======================================================
-     MODAL
-  ======================================================= */
-
-  function openModal(id){
-    const modal = document.getElementById(id);
-
-    if(!modal) return;
-
-    modal.classList.add("open");
-    document.body.classList.add("no-scroll");
-  }
-
-  function closeModal(id){
-    const modal = document.getElementById(id);
-
-    if(!modal) return;
-
-    modal.classList.remove("open");
-    document.body.classList.remove("no-scroll");
-  }
-
-  function updateUploadPreview(){
-    if(pendingImage){
-      els.uploadPreview.innerHTML = `
-        <img src="${escapeHtml(pendingImage)}" alt="Preview">
-      `;
-    }else{
-      els.uploadPreview.innerHTML =
-        `<span style="font-size:7px;color:#59635A">No image</span>`;
-    }
-  }
-
-  /* =======================================================
-     IMAGE HANDLING
-  ======================================================= */
-
-  els.fieldImageFile.addEventListener("change",event => {
-    const file = event.target.files?.[0];
-
-    if(!file) return;
-
-    if(!file.type.startsWith("image/")){
-      toast("Please select an image file.","error");
-      return;
-    }
-
-    if(file.size > 8 * 1024 * 1024){
-      toast("Image is larger than 8MB.","error");
-      return;
-    }
-
-    const reader = new FileReader();
-
-    reader.onload = () => {
-      pendingImage = reader.result;
-      updateUploadPreview();
-    };
-
-    reader.readAsDataURL(file);
-  });
-
-  $("#removeImageBtn").addEventListener("click",() => {
-    pendingImage = "";
-    els.fieldImageFile.value = "";
-    updateUploadPreview();
-  });
-
-  $("#useUrlBtn").addEventListener("click",() => {
-    const url = prompt("Paste image URL:");
-
-    if(!url) return;
-
-    pendingImage = url.trim();
-    updateUploadPreview();
-  });
-
-  /* =======================================================
-     FORM
-  ======================================================= */
-
-  els.productForm.addEventListener("submit",event => {
-    event.preventDefault();
-
-    const brand = els.fieldBrand.value.trim();
-    const name = els.fieldName.value.trim();
-    const normalPrice = Number(els.fieldNormalPrice.value);
-    const promoPrice = Number(els.fieldPromoPrice.value);
-
-    if(!brand || !name){
-      toast("Brand and product name are required.","error");
-      return;
-    }
-
-    if(normalPrice < 0 || promoPrice < 0){
-      toast("Price cannot be negative.","error");
-      return;
-    }
-
-    if(promoPrice > normalPrice && normalPrice > 0){
-      toast("Promo price should not exceed normal price.","error");
-      return;
-    }
-
-    const existingId = els.editProductId.value;
-
-    mutate(() => {
-      const data = {
-        brand,
-        name,
-        normalPrice,
-        promoPrice,
-        badge:els.fieldBadge.value.trim(),
-        warranty:els.fieldWarranty.value.trim(),
-        extra:els.fieldExtra.value.trim(),
-        sku:els.fieldSku.value.trim(),
-        image:pendingImage
-      };
-
-      if(existingId){
-        const index =
-          state.products.findIndex(p => p.id === existingId);
-
-        if(index >= 0){
-          state.products[index] = {
-            ...state.products[index],
-            ...data
-          };
-
-          state.activeIndex = index;
-        }
-      }else{
-        const product = {
-          id:uid(),
-          ...data
-        };
-
-        state.products.push(product);
-        state.activeIndex = state.products.length - 1;
-      }
-    });
-
-    closeModal("productModal");
-    resetProductForm();
-
-    toast(existingId ? "Product updated." : "Product created.");
-  });
-
-  /* =======================================================
-     PRODUCT GRID EVENTS
-  ======================================================= */
-
-  els.productGrid.addEventListener("click",event => {
-    const card = event.target.closest(".product-card");
-
-    if(!card) return;
-
-    const id = card.dataset.id;
-    const actionEl = event.target.closest("[data-action]");
-    const action = actionEl?.dataset.action;
-
-    if(action === "select"){
-      selectProduct(id);
-      return;
-    }
-
-    if(action === "edit"){
-      editProduct(id);
-      return;
-    }
-
-    if(action === "duplicate"){
-      duplicateProduct(id);
-      return;
-    }
-
-    previewProduct(id);
-  });
-
-  /* =======================================================
-     RATIO
-  ======================================================= */
-
-  $$(".ratio-btn").forEach(btn => {
-    btn.addEventListener("click",() => {
-      mutate(() => {
-        state.ratio = btn.dataset.ratio;
-      });
-
-      toast(`Canvas changed to ${ratioLabel(state.ratio)}.`);
-    });
-  });
-
-  /* =======================================================
-     THEMES
-  ======================================================= */
-
-  $$(".template").forEach(btn => {
-    btn.addEventListener("click",() => {
-      mutate(() => {
-        state.theme = btn.dataset.theme;
-      });
-
-      toast(`${themeLabel(state.theme)} activated.`);
-    });
-  });
-
-  /* =======================================================
-     NAVIGATION
-  ======================================================= */
-
-  function nextProduct(){
-    if(!state.products.length) return;
-
-    state.activeIndex =
-      (state.activeIndex + 1) % state.products.length;
-
-    saveState();
-    renderAll();
-  }
-
-  function previousProduct(){
-    if(!state.products.length) return;
-
-    state.activeIndex =
-      (state.activeIndex - 1 + state.products.length)
-      % state.products.length;
-
-    saveState();
-    renderAll();
-  }
-
-  function togglePlay(){
-    if(!state.products.length){
-      toast("Add products before playing.","error");
-      return;
-    }
-
-    state.playing = !state.playing;
-
-    clearInterval(playTimer);
-
-    if(state.playing){
-      playTimer = setInterval(() => {
-        nextProduct();
-      },2200);
-    }
-
-    renderControls();
-  }
-
-  $("#nextBtn").addEventListener("click",nextProduct);
-  $("#prevBtn").addEventListener("click",previousProduct);
-  $("#playBtn").addEventListener("click",togglePlay);
-  
-
-  /* =======================================================
-     ZOOM
-  ======================================================= */
-
-  $("#zoomInBtn").addEventListener("click",() => {
-    state.zoom = Math.min(1.25,+(state.zoom + .05).toFixed(2));
-    saveState();
-    renderPreview();
-  });
-
-  $("#zoomOutBtn").addEventListener("click",() => {
-    state.zoom = Math.max(.75,+(state.zoom - .05).toFixed(2));
-    saveState();
-    renderPreview();
-  });
-
-  $("#zoomResetBtn").addEventListener("click",() => {
-    state.zoom = 1;
-    saveState();
-    renderPreview();
-  });
-
-  /* =======================================================
-     SEARCH
-  ======================================================= */
-
-  els.searchInput.addEventListener("input",renderProducts);
-  els.filterSelect.addEventListener("change",renderProducts);
-
-  /* =======================================================
-     ADD PRODUCT
-  ======================================================= */
-
-  $("#addProductBtn").addEventListener("click",() => {
-    resetProductForm();
-    openModal("productModal");
-  });
-
-  $("#demoBtn").addEventListener("click",() => {
-    mutate(() => {
-      state.products = clone(DEMO_PRODUCTS);
-      state.selectedIds = ["p1","p2","p3"];
-      state.activeIndex = 0;
-    });
-
-    toast("Demo inventory loaded.");
-  });
-
-  $("#deleteSelectedBtn").addEventListener(
-    "click",
-    deleteSelected
+  ).format(
+    Number(value) || 0
   );
 
-  /* =======================================================
-     UNDO / REDO
-  ======================================================= */
+}
 
-  function undo(){
-    if(!undoStack.length){
-      toast("Nothing to undo.","error");
-      return;
-    }
 
-    redoStack.push(clone(state));
-    state = undoStack.pop();
+function slug(
+  value
+){
 
-    saveState();
-    renderAll();
+  return String(
+    value || "produk"
+  )
 
-    toast("Undo complete.");
-  }
+    .toLowerCase()
 
-  function redo(){
-    if(!redoStack.length){
-      toast("Nothing to redo.","error");
-      return;
-    }
+    .normalize("NFD")
 
-    undoStack.push(clone(state));
-    state = redoStack.pop();
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
 
-    saveState();
-    renderAll();
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
 
-    toast("Redo complete.");
-  }
+    .replace(
+      /^-+|-+$/g,
+      ""
+    )
 
-  $("#undoBtn").addEventListener("click",undo);
-  $("#redoBtn").addEventListener("click",redo);
+    .slice(
+      0,
+      80
+    ) || "produk";
 
-  /* =======================================================
-     EXPORT CURRENT
-  ======================================================= */
+}
 
-  async function captureCanvas(product){
-    if(!window.html2canvas){
-      throw new Error("html2canvas is unavailable.");
-    }
 
-    const originalZoom = state.zoom;
+function wait(
+  ms
+){
 
-    state.zoom = 1;
-    renderPreview();
-
-    await new Promise(resolve =>
-      requestAnimationFrame(() =>
-        requestAnimationFrame(resolve)
+  return new Promise(
+    resolve =>
+      setTimeout(
+        resolve,
+        ms
       )
+  );
+
+}
+
+
+function ratioLabel(){
+
+  return state.currentRatio === "916"
+    ? "9:16"
+    : state.currentRatio === "45"
+      ? "4:5"
+      : "16:9";
+
+}
+
+
+/* =========================================================
+   TOAST
+========================================================= */
+
+let toastTimer = null;
+
+function showToast(
+  message,
+  type="success"
+){
+
+  if(!DOM.toast){
+    return;
+  }
+
+  DOM.toast.textContent =
+    message;
+
+  DOM.toast.className =
+    "toast " +
+    (
+      type === "error"
+        ? "error"
+        : ""
     );
 
-    const canvas = await html2canvas(els.canvas,{
-      backgroundColor:null,
-      scale:2,
-      useCORS:true,
-      allowTaint:false,
-      logging:false,
-      imageTimeout:10000
-    });
+  requestAnimationFrame(
+    ()=>{
+      DOM.toast.classList.add(
+        "show"
+      );
+    }
+  );
 
-    state.zoom = originalZoom;
-    renderPreview();
+  clearTimeout(
+    toastTimer
+  );
 
-    return canvas;
+  toastTimer =
+    setTimeout(
+      ()=>{
+        DOM.toast.classList.remove(
+          "show"
+        );
+      },
+      2600
+    );
+
+}
+
+
+/* =========================================================
+   NORMALIZE PRODUCT
+========================================================= */
+
+function normalizeProduct(
+  raw,
+  index
+){
+
+  if(
+    !raw ||
+    typeof raw !== "object"
+  ){
+
+    return null;
+
   }
 
-  function downloadBlob(blob,filename){
-    const url = URL.createObjectURL(blob);
 
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
+  const harga =
+    raw.harga &&
+    typeof raw.harga === "object"
+      ? raw.harga
+      : {};
 
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
 
-    setTimeout(() => URL.revokeObjectURL(url),1000);
-  }
+  const priceNormal =
+    Number(
+      harga.normal ??
+      harga.reguler ??
+      harga.original ??
+      raw.hargaNormal ??
+      raw.normalPrice ??
+      raw.price ??
+      0
+    ) || 0;
 
-  function safeFilename(value){
-    return String(value || "laras")
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g,"-")
-      .replace(/^-|-$/g,"")
-      .slice(0,70);
-  }
 
-  async function exportCurrent(){
-    const product = getActiveProduct();
+  const pricePromo =
+    Number(
+      harga.promo ??
+      harga.discount ??
+      harga.sale ??
+      raw.hargaPromo ??
+      raw.promoPrice ??
+      0
+    ) || 0;
 
-    if(!product){
-      toast("Select a product first.","error");
-      return;
+
+  const id =
+    text(
+      raw.id ??
+      raw.sku ??
+      raw.kode ??
+      raw.code ??
+      index + 1
+    );
+
+
+  const sku =
+    text(
+      raw.sku ??
+      raw.kode ??
+      raw.code ??
+      id
+    );
+
+
+  const brand =
+    text(
+      raw.brand ??
+      raw.merek ??
+      raw.brandName ??
+      "NINE AUTOSERIES"
+    );
+
+
+  const nama =
+    text(
+      raw.nama ??
+      raw.name ??
+      raw.title ??
+      raw.productName ??
+      "Produk"
+    );
+
+
+  const gambar =
+    text(
+      raw.gambar ??
+      raw.image ??
+      raw.foto ??
+      raw.imagePath ??
+      raw.imageUrl ??
+      raw.thumbnail ??
+      ""
+    );
+
+
+  const garansi =
+    text(
+      raw.garansi ??
+      raw.warranty ??
+      raw.guarantee ??
+      "GARANSI RESMI"
+    );
+
+
+  const promo =
+    Boolean(
+      raw.promo ??
+      raw.isPromo ??
+      raw.promoAktif ??
+      raw.featured ??
+      false
+    );
+
+
+  return {
+
+    ...raw,
+
+    id,
+
+    sku,
+
+    brand,
+
+    nama,
+
+    name:nama,
+
+    gambar,
+
+    garansi,
+
+    promo,
+
+    harga:{
+
+      ...harga,
+
+      normal:
+        priceNormal,
+
+      promo:
+        pricePromo
+
     }
 
-    try{
-      toast("Rendering premium PNG...");
+  };
 
-      document.body.classList.add("capture");
+}
 
-      const canvas =
-        await captureCanvas(product);
 
-      const blob =
-        await new Promise(resolve =>
-          canvas.toBlob(resolve,"image/png",1)
+/* =========================================================
+   IMAGE PATH
+========================================================= */
+
+function imagePath(
+  product
+){
+
+  const source =
+    text(
+      product.gambar ??
+      product.image ??
+      product.foto ??
+      product.imagePath ??
+      product.imageUrl ??
+      ""
+    );
+
+
+  if(!source){
+    return "";
+  }
+
+
+  if(
+    /^https?:\/\//i.test(
+      source
+    ) ||
+    /^data:/i.test(
+      source
+    ) ||
+    source.startsWith("/")
+  ){
+
+    return source;
+
+  }
+
+
+  if(
+    source.startsWith(
+      CONFIG.IMAGE_FOLDER
+    )
+  ){
+
+    return source;
+
+  }
+
+
+  return (
+    CONFIG.IMAGE_FOLDER +
+    source.replace(
+      /^\.?\//,
+      ""
+    )
+  );
+
+}
+
+
+/* =========================================================
+   PROMO
+========================================================= */
+
+function isPromo(
+  product
+){
+
+  return Boolean(
+    product.promo
+  );
+
+}
+
+
+function getPriceData(
+  product
+){
+
+  const baseNormal =
+    Number(
+      product.harga?.normal
+    ) || 0;
+
+
+  const basePromo =
+    Number(
+      product.harga?.promo
+    ) || 0;
+
+
+  const override =
+    state.priceOverrides[
+      String(product.id)
+    ];
+
+
+  let normal =
+    baseNormal;
+
+  let promo =
+    basePromo;
+
+
+  let extraEnabled =
+    false;
+
+  let extraPercent =
+    0;
+
+  let manualEnabled =
+    false;
+
+  let manualFinal =
+    0;
+
+
+  if(
+    override &&
+    typeof override === "object"
+  ){
+
+    if(
+      Number.isFinite(
+        Number(
+          override.normal
+        )
+      )
+    ){
+
+      normal =
+        Number(
+          override.normal
         );
 
-      document.body.classList.remove("capture");
+    }
 
-      downloadBlob(
-        blob,
-        `laras-${safeFilename(product.name)}-${state.ratio}.png`
+
+    if(
+      Number.isFinite(
+        Number(
+          override.promo
+        )
+      )
+    ){
+
+      promo =
+        Number(
+          override.promo
+        );
+
+    }
+
+
+    extraEnabled =
+      Boolean(
+        override.extraEnabled
       );
 
-      toast("PNG exported successfully.");
-    }catch(error){
-      document.body.classList.remove("capture");
-      console.error(error);
-      toast("Export failed. Check image CORS or browser permissions.","error");
-    }
+
+    extraPercent =
+      clamp(
+        Number(
+          override.extraPercent
+        ) || 0,
+        0,
+        99
+      );
+
+
+    manualEnabled =
+      Boolean(
+        override.manualEnabled
+      );
+
+
+    manualFinal =
+      Number(
+        override.manualFinal
+      ) || 0;
+
   }
 
-  $("#exportCurrentBtn").addEventListener(
-    "click",
-    exportCurrent
+
+  let final =
+    promo;
+
+
+  if(
+    extraEnabled &&
+    extraPercent > 0 &&
+    promo > 0
+  ){
+
+    final =
+      Math.round(
+        promo *
+        (
+          1 -
+          extraPercent / 100
+        )
+      );
+
+  }
+
+
+  if(
+    manualEnabled &&
+    manualFinal > 0
+  ){
+
+    final =
+      manualFinal;
+
+  }
+
+
+  let finalDiscount =
+    0;
+
+
+  if(
+    normal > 0 &&
+    final < normal
+  ){
+
+    finalDiscount =
+      Math.round(
+        (
+          (
+            normal -
+            final
+          ) /
+          normal
+        ) *
+        100
+      );
+
+  }
+
+
+  return {
+
+    normal,
+
+    promo,
+
+    final,
+
+    finalDiscount,
+
+    extraEnabled,
+
+    extraPercent,
+
+    manualEnabled,
+
+    manualFinal
+
+  };
+
+}
+
+
+/* =========================================================
+   DISPLAY TITLE
+========================================================= */
+
+function makeDisplayTitle(
+  product
+){
+
+  return text(
+    product.nama ??
+    product.name ??
+    product.title,
+    "Produk"
   );
 
-  /* =======================================================
-     EXPORT ZIP
-  ======================================================= */
+}
 
-  async function exportAll(){
-    const products =
-      state.selectedIds.length
-      ? state.products.filter(p =>
-          state.selectedIds.includes(p.id)
+
+function warrantyText(
+  product
+){
+
+  return text(
+    product.garansi ??
+    product.warranty ??
+    product.guarantee,
+    "GARANSI RESMI"
+  );
+
+}
+
+
+/* =========================================================
+   RENDER PREVIEW
+========================================================= */
+
+function renderPreview(){
+
+  if(
+    !DOM.stage
+  ){
+
+    return;
+
+  }
+
+
+  DOM.stage.className =
+    `stage ratio-${state.currentRatio}`;
+
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    DOM.stage.innerHTML = `
+
+      <div
+        class="error"
+        style="
+          min-height:300px;
+        "
+      >
+
+        <div>
+
+          <strong>
+            Belum ada produk promo.
+          </strong>
+
+          <br><br>
+
+          Pilih produk dari
+          <strong>
+            Promo Manager
+          </strong>
+
+          lalu tekan
+          <strong>
+            TERAPKAN PROMO
+          </strong>.
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    updateSlideCount();
+
+    stopAutoplay();
+
+    return;
+
+  }
+
+
+  if(
+    state.currentIndex >=
+    state.promoProducts.length
+  ){
+
+    state.currentIndex = 0;
+
+  }
+
+
+  const product =
+    state.promoProducts[
+      state.currentIndex
+    ];
+
+
+  const price =
+    getPriceData(
+      product
+    );
+
+
+  const title =
+    makeDisplayTitle(
+      product
+    );
+
+
+  const image =
+    imagePath(
+      product
+    );
+
+
+  const warranty =
+    warrantyText(
+      product
+    );
+
+
+  const template =
+    TEMPLATES[
+      state.currentTemplate
+    ];
+
+
+  const extraVisible =
+    price.extraEnabled &&
+    price.extraPercent > 0;
+
+
+  const extraText =
+    extraVisible
+      ? `EXTRA ${price.extraPercent}% OFF`
+      : "";
+
+
+  const normalVisible =
+    price.normal > 0 &&
+    price.normal !== price.final;
+
+
+  const discountVisible =
+    price.finalDiscount > 0;
+
+
+  DOM.stage.innerHTML = `
+
+    <article
+      class="
+        promo-canvas
+        ${template.className}
+      "
+      id="promoCanvas"
+    >
+
+      <div
+        class="template-bg"
+      ></div>
+
+
+      <div
+        class="brand-watermark"
+        aria-hidden="true"
+      ></div>
+
+
+      <span
+        class="watermark-micro"
+        style="
+          left:9%;
+          top:23%;
+        "
+      >
+        imamsalesnine.com
+      </span>
+
+
+      <span
+        class="watermark-micro"
+        style="
+          right:9%;
+          top:61%;
+        "
+      >
+        imamsalesnine.com
+      </span>
+
+
+      <div
+        class="product-visual"
+      >
+
+        ${
+          image
+            ?
+
+            `
+              <img
+                class="product-image"
+                src="${escapeHTML(image)}"
+                alt="${escapeHTML(title)}"
+                crossorigin="anonymous"
+                decoding="async"
+                draggable="false"
+              >
+            `
+
+            :
+
+            `
+              <div class="image-missing">
+                IMAGE NOT FOUND
+              </div>
+            `
+        }
+
+      </div>
+
+
+      <div
+        class="visual-gradient"
+      ></div>
+
+
+      <div
+        class="info-zone"
+      >
+
+        <div
+          class="product-info"
+        >
+
+          <div
+            class="badge-stack"
+          >
+
+            <span
+              class="promo-badge"
+            >
+              PROMO
+            </span>
+
+
+            ${
+              extraVisible
+
+                ?
+
+                `
+                  <span
+                    class="extra-discount-badge"
+                  >
+                    ${escapeHTML(extraText)}
+                  </span>
+                `
+
+                :
+
+                ""
+            }
+
+          </div>
+
+
+          <span
+            class="warranty-badge"
+          >
+            ◇
+            ${escapeHTML(warranty)}
+          </span>
+
+
+          <div
+            class="product-brand"
+          >
+            ${escapeHTML(product.brand)}
+          </div>
+
+
+          <div
+            class="product-name"
+          >
+            ${escapeHTML(title)}
+          </div>
+
+
+          <div
+            class="price-block"
+          >
+
+            <div
+              class="price-label"
+            >
+              SPECIAL PRICE
+            </div>
+
+
+            <div
+              class="price-promo"
+            >
+              ${escapeHTML(
+                rupiah(price.final)
+              )}
+            </div>
+
+
+            ${
+              normalVisible ||
+              discountVisible
+
+                ?
+
+                `
+                  <div
+                    class="price-meta"
+                  >
+
+                    ${
+                      normalVisible
+
+                        ?
+
+                        `
+                          <span
+                            class="price-normal"
+                          >
+                            Normal
+                            ${escapeHTML(
+                              rupiah(price.normal)
+                            )}
+                          </span>
+                        `
+
+                        :
+
+                        ""
+                    }
+
+
+                    ${
+                      discountVisible
+
+                        ?
+
+                        `
+                          <span
+                            class="discount"
+                          >
+                            -${price.finalDiscount}%
+                          </span>
+                        `
+
+                        :
+
+                        ""
+                    }
+
+                  </div>
+                `
+
+                :
+
+                ""
+            }
+
+
+            ${
+              extraVisible
+
+                ?
+
+                `
+                  <div
+                    class="extra-price-note"
+                  >
+                    EXTRA DISCOUNT
+                    ${price.extraPercent}%
+                  </div>
+                `
+
+                :
+
+                ""
+            }
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <div
+        class="ratio-mark"
+      >
+        ${ratioLabel()}
+      </div>
+
+
+      <div
+        class="signature"
+      >
+        Imam_salesfr • nine autoseries
+      </div>
+
+    </article>
+
+  `;
+
+
+  updateSlideCount();
+
+
+  const imageElement =
+    DOM.stage.querySelector(
+      ".product-image"
+    );
+
+
+  if(imageElement){
+
+    imageElement.addEventListener(
+      "error",
+      ()=>{
+        imageElement.style.display =
+          "none";
+      }
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   COUNTS
+========================================================= */
+
+function updateCounts(){
+
+  const selected =
+    state.selectedIds.length;
+
+
+  const total =
+    state.products.length;
+
+
+  DOM.selectedCount.textContent =
+    selected;
+
+  DOM.totalCount.textContent =
+    total;
+
+  DOM.topSelectedCount.textContent =
+    selected;
+
+  DOM.topTotalCount.textContent =
+    total;
+
+  DOM.topRatio.textContent =
+    ratioLabel();
+
+  DOM.topTemplate.textContent =
+    TEMPLATES[
+      state.currentTemplate
+    ].name;
+
+  DOM.activeTemplate.textContent =
+    TEMPLATES[
+      state.currentTemplate
+    ].name;
+
+  DOM.modalQueue.value =
+    `${state.promoProducts.length} produk`;
+
+}
+
+
+function updateSlideCount(){
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    DOM.slideCount.textContent =
+      "0 / 0";
+
+    return;
+
+  }
+
+
+  DOM.slideCount.textContent =
+    `${state.currentIndex + 1} / ${state.promoProducts.length}`;
+
+}
+
+
+/* =========================================================
+   PRODUCT CARD
+========================================================= */
+
+function createProductCard(
+  product
+){
+
+  const id =
+    String(
+      product.id
+    );
+
+
+  const selected =
+    state.selectedIds.includes(
+      id
+    );
+
+
+  const price =
+    getPriceData(
+      product
+    );
+
+
+  const image =
+    imagePath(
+      product
+    );
+
+
+  const card =
+    document.createElement(
+      "article"
+    );
+
+
+  card.className =
+    "select-card" +
+    (
+      selected
+        ? " selected"
+        : ""
+    );
+
+
+  card.dataset.id =
+    id;
+
+
+  card.innerHTML = `
+
+    <div
+      class="select-image"
+    >
+
+      ${
+        image
+
+          ?
+
+          `
+            <img
+              src="${escapeHTML(image)}"
+              alt=""
+              loading="lazy"
+              decoding="async"
+            >
+          `
+
+          :
+
+          `
+            <span
+              style="
+                color:#697169;
+                font-size:7px;
+                font-weight:800;
+              "
+            >
+              NO IMAGE
+            </span>
+          `
+      }
+
+    </div>
+
+
+    <div
+      class="card-gradient"
+    ></div>
+
+
+    <div
+      class="card-check"
+    >
+      ✓
+    </div>
+
+
+    <button
+      type="button"
+      class="edit-price-btn"
+      title="Edit harga"
+    >
+
+      <svg
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+      >
+        <path d="M12 20h9"/>
+
+        <path
+          d="M16.5 3.5a2.12 2.12 0 0 1 3 3L8 18l-4 1 1-4Z"
+        />
+      </svg>
+
+    </button>
+
+
+    <div
+      class="select-status"
+    >
+      ${selected ? "SELECTED" : "AVAILABLE"}
+    </div>
+
+
+    <div
+      class="select-info"
+    >
+
+      <div
+        class="select-brand"
+      >
+        ${escapeHTML(
+          product.brand
+        )}
+      </div>
+
+
+      <div
+        class="select-name"
+      >
+        ${escapeHTML(
+          makeDisplayTitle(product)
+        )}
+      </div>
+
+
+      <div
+        class="select-price"
+      >
+
+        ${escapeHTML(
+          rupiah(price.final)
+        )}
+
+        ${
+          price.normal > price.final
+
+            ?
+
+            `
+              <span
+                class="select-normal"
+              >
+                ${escapeHTML(
+                  rupiah(price.normal)
+                )}
+              </span>
+
+              <span
+                class="select-discount"
+              >
+                -${price.finalDiscount}%
+              </span>
+            `
+
+            :
+
+            ""
+        }
+
+      </div>
+
+
+      ${
+        price.extraEnabled &&
+        price.extraPercent > 0
+
+          ?
+
+          `
+            <div
+              class="select-extra"
+            >
+              EXTRA
+              ${price.extraPercent}%
+            </div>
+          `
+
+          :
+
+          ""
+      }
+
+    </div>
+
+
+    <div
+      class="price-editor"
+    >
+
+      <div
+        class="editor-title"
+      >
+        EDIT HARGA — ${escapeHTML(
+          makeDisplayTitle(product)
+        )}
+      </div>
+
+
+      <div class="editor-grid">
+
+        <input
+          class="editor-field"
+          data-field="normal"
+          type="number"
+          min="0"
+          placeholder="Harga normal"
+          value="${price.normal}"
+        >
+
+
+        <input
+          class="editor-field"
+          data-field="promo"
+          type="number"
+          min="0"
+          placeholder="Harga promo"
+          value="${price.promo}"
+        >
+
+
+        <label
+          class="editor-check editor-wide"
+        >
+
+          <input
+            data-field="extraEnabled"
+            type="checkbox"
+            ${price.extraEnabled ? "checked" : ""}
+          >
+
+          Extra discount
+
+        </label>
+
+
+        <input
+          class="editor-field editor-wide"
+          data-field="extraPercent"
+          type="number"
+          min="0"
+          max="99"
+          placeholder="Extra %"
+          value="${price.extraPercent}"
+        >
+
+
+        <label
+          class="editor-check editor-wide"
+        >
+
+          <input
+            data-field="manualEnabled"
+            type="checkbox"
+            ${price.manualEnabled ? "checked" : ""}
+          >
+
+          Manual final price
+
+        </label>
+
+
+        <input
+          class="editor-field editor-wide"
+          data-field="manualFinal"
+          type="number"
+          min="0"
+          placeholder="Harga final manual"
+          value="${price.manualFinal}"
+        >
+
+      </div>
+
+
+      <div
+        class="editor-actions"
+      >
+
+        <button
+          type="button"
+          class="editor-btn price-reset-btn"
+        >
+          RESET
+        </button>
+
+
+        <button
+          type="button"
+          class="editor-btn save price-save-btn"
+        >
+          TERAPKAN
+        </button>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  const editBtn =
+    card.querySelector(
+      ".edit-price-btn"
+    );
+
+
+  on(
+    editBtn,
+    "click",
+    event =>{
+
+      event.stopPropagation();
+
+      closeEditorsExcept(
+        card
+      );
+
+      card.classList.toggle(
+        "editing"
+      );
+
+    }
+  );
+
+
+  const editor =
+    card.querySelector(
+      ".price-editor"
+    );
+
+
+  const saveBtn =
+    card.querySelector(
+      ".price-save-btn"
+    );
+
+
+  const resetBtn =
+    card.querySelector(
+      ".price-reset-btn"
+    );
+
+
+  on(
+    saveBtn,
+    "click",
+    event =>{
+
+      event.stopPropagation();
+
+
+      const normal =
+        Number(
+          editor.querySelector(
+            '[data-field="normal"]'
+          ).value
+        ) || 0;
+
+
+      const promo =
+        Number(
+          editor.querySelector(
+            '[data-field="promo"]'
+          ).value
+        ) || 0;
+
+
+      const extraEnabled =
+        editor.querySelector(
+          '[data-field="extraEnabled"]'
+        ).checked;
+
+
+      const extraPercent =
+        clamp(
+          Number(
+            editor.querySelector(
+              '[data-field="extraPercent"]'
+            ).value
+          ) || 0,
+          0,
+          99
+        );
+
+
+      const manualEnabled =
+        editor.querySelector(
+          '[data-field="manualEnabled"]'
+        ).checked;
+
+
+      const manualFinal =
+        Number(
+          editor.querySelector(
+            '[data-field="manualFinal"]'
+          ).value
+        ) || 0;
+
+
+      state.priceOverrides[id] = {
+
+        normal,
+
+        promo,
+
+        extraEnabled,
+
+        extraPercent,
+
+        manualEnabled,
+
+        manualFinal
+
+      };
+
+
+      savePriceOverrides();
+
+
+      card.classList.remove(
+        "editing"
+      );
+
+
+      renderManager();
+      applyPromo(false);
+
+
+      showToast(
+        "Harga promo berhasil diterapkan ✓"
+      );
+
+    }
+  );
+
+
+  on(
+    resetBtn,
+    "click",
+    event =>{
+
+      event.stopPropagation();
+
+
+      delete state.priceOverrides[id];
+
+
+      savePriceOverrides();
+
+
+      card.classList.remove(
+        "editing"
+      );
+
+
+      renderManager();
+      applyPromo(false);
+
+
+      showToast(
+        "Harga dikembalikan ke JSON ✓"
+      );
+
+    }
+  );
+
+
+  on(
+    card,
+    "click",
+    event =>{
+
+      if(
+        event.target.closest(
+          ".edit-price-btn"
+        ) ||
+        event.target.closest(
+          ".price-editor"
         )
-      : state.products;
+      ){
 
-    if(!products.length){
-      toast("No products available for export.","error");
-      return;
+        return;
+
+      }
+
+
+      toggleProduct(
+        id
+      );
+
     }
+  );
 
-    if(!window.JSZip){
-      toast("ZIP engine unavailable.","error");
-      return;
-    }
 
-    try{
-      toast(`Rendering ${products.length} assets...`);
+  return card;
 
-      const zip = new JSZip();
+}
 
-      const originalIndex = state.activeIndex;
-      const originalZoom = state.zoom;
 
-      for(let i=0;i<products.length;i++){
+/* =========================================================
+   CLOSE EDITORS
+========================================================= */
 
-        const product = products[i];
+function closeEditorsExcept(
+  current
+){
 
-        state.activeIndex =
-          state.products.findIndex(p => p.id === product.id);
+  document
+    .querySelectorAll(
+      ".select-card.editing"
+    )
+    .forEach(
+      card =>{
 
-        state.zoom = 1;
+        if(
+          card !== current
+        ){
 
-        renderPreview();
+          card.classList.remove(
+            "editing"
+          );
 
-        await new Promise(resolve =>
-          requestAnimationFrame(() =>
-            requestAnimationFrame(resolve)
+        }
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   TOGGLE PRODUCT
+========================================================= */
+
+function toggleProduct(
+  id
+){
+
+  id =
+    String(id);
+
+
+  if(
+    state.selectedIds.includes(
+      id
+    )
+  ){
+
+    state.selectedIds =
+      state.selectedIds.filter(
+        value =>
+          value !== id
+      );
+
+  }else{
+
+    state.selectedIds.push(
+      id
+    );
+
+  }
+
+
+  saveSelection();
+
+  renderManager();
+
+}
+
+
+/* =========================================================
+   RENDER MANAGER
+========================================================= */
+
+function renderManager(){
+
+  if(
+    !DOM.productGrid
+  ){
+
+    return;
+
+  }
+
+
+  const filtered =
+    state.products.filter(
+      product =>{
+
+        if(
+          !state.searchQuery
+        ){
+
+          return true;
+
+        }
+
+
+        const haystack =
+          [
+
+            product.brand,
+
+            product.nama,
+
+            product.name,
+
+            product.id,
+
+            product.sku
+
+          ]
+
+            .filter(Boolean)
+
+            .join(" ");
+
+
+        return normalizeSearch(
+          haystack
+        ).includes(
+          normalizeSearch(
+            state.searchQuery
           )
         );
 
-        const captured =
-          await html2canvas(els.canvas,{
-            backgroundColor:null,
-            scale:2,
-            useCORS:true,
-            allowTaint:false,
-            logging:false,
-            imageTimeout:10000
-          });
-
-        const dataUrl =
-          captured.toDataURL("image/png",1);
-
-        const base64 =
-          dataUrl.split(",")[1];
-
-        zip.file(
-          `${String(i+1).padStart(2,"0")}-${safeFilename(product.name)}-${state.ratio}.png`,
-          base64,
-          {base64:true}
-        );
       }
+    );
 
-      state.activeIndex = originalIndex;
-      state.zoom = originalZoom;
 
-      renderAll();
+  DOM.productGrid.innerHTML =
+    "";
+
+
+  if(
+    !filtered.length
+  ){
+
+    DOM.productGrid.innerHTML = `
+
+      <div
+        class="empty"
+      >
+
+        <div>
+
+          <strong>
+            Produk tidak ditemukan.
+          </strong>
+
+          <span>
+            Coba ubah kata pencarian atau refresh
+            product.json.
+          </span>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    updateCounts();
+
+    return;
+
+  }
+
+
+  const fragment =
+    document.createDocumentFragment();
+
+
+  filtered.forEach(
+    product =>{
+
+      fragment.appendChild(
+        createProductCard(
+          product
+        )
+      );
+
+    }
+  );
+
+
+  DOM.productGrid.appendChild(
+    fragment
+  );
+
+
+  updateCounts();
+
+}
+
+
+/* =========================================================
+   APPLY PROMO
+========================================================= */
+
+function applyPromo(
+  notify=true
+){
+
+  state.promoProducts =
+    state.products.filter(
+      product =>
+        state.selectedIds.includes(
+          String(product.id)
+        )
+    );
+
+
+  state.currentIndex =
+    0;
+
+
+  saveSelection();
+
+  updateCounts();
+
+  renderPreview();
+
+
+  if(
+    notify
+  ){
+
+    showToast(
+      `${state.promoProducts.length} produk diterapkan ✓`
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   NAVIGATION
+========================================================= */
+
+function nextSlide(){
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    return;
+
+  }
+
+
+  state.currentIndex =
+    (
+      state.currentIndex + 1
+    ) %
+    state.promoProducts.length;
+
+
+  renderPreview();
+
+}
+
+
+function previousSlide(){
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    return;
+
+  }
+
+
+  state.currentIndex =
+    (
+      state.currentIndex -
+      1 +
+      state.promoProducts.length
+    ) %
+    state.promoProducts.length;
+
+
+  renderPreview();
+
+}
+
+
+/* =========================================================
+   PLAY
+========================================================= */
+
+function updatePlayIcons(){
+
+  const path =
+    state.playing
+
+      ?
+
+      `
+        <path d="M7 5h4v14H7z"/>
+        <path d="M13 5h4v14h-4z"/>
+      `
+
+      :
+
+      `
+        <path d="m8 5 11 7-11 7V5z"/>
+      `;
+
+
+  if(
+    DOM.playIcon
+  ){
+
+    DOM.playIcon.innerHTML =
+      path;
+
+  }
+
+
+  if(
+    DOM.headerPlayIcon
+  ){
+
+    DOM.headerPlayIcon.innerHTML =
+      path;
+
+  }
+
+}
+
+
+function stopAutoplay(){
+
+  if(
+    state.autoplay
+  ){
+
+    clearInterval(
+      state.autoplay
+    );
+
+    state.autoplay =
+      null;
+
+  }
+
+}
+
+
+function startAutoplay(){
+
+  stopAutoplay();
+
+
+  if(
+    !state.playing ||
+    !state.promoProducts.length
+  ){
+
+    return;
+
+  }
+
+
+  state.autoplay =
+    setInterval(
+      ()=>{
+        nextSlide();
+      },
+      CONFIG.DURATION
+    );
+
+}
+
+
+function togglePlay(){
+
+  state.playing =
+    !state.playing;
+
+
+  storageSet(
+    STORAGE.PLAYING,
+    String(
+      state.playing
+    )
+  );
+
+
+  updatePlayIcons();
+
+
+  if(
+    state.playing
+  ){
+
+    startAutoplay();
+
+  }else{
+
+    stopAutoplay();
+
+  }
+
+}
+
+
+/* =========================================================
+   RATIO
+========================================================= */
+
+function setRatio(
+  ratio
+){
+
+  if(
+    !["916","45","169"]
+      .includes(ratio)
+  ){
+
+    return;
+
+  }
+
+
+  state.currentRatio =
+    ratio;
+
+
+  storageSet(
+    STORAGE.RATIO,
+    ratio
+  );
+
+
+  document
+    .querySelectorAll(
+      ".ratio-btn"
+    )
+    .forEach(
+      button =>{
+
+        button.classList.toggle(
+          "active",
+          button.dataset.ratio ===
+            ratio
+        );
+
+      }
+    );
+
+
+  DOM.modalRatio.value =
+    ratio;
+
+
+  updateCounts();
+
+  renderPreview();
+
+}
+
+
+/* =========================================================
+   TEMPLATE
+========================================================= */
+
+function setTemplate(
+  template
+){
+
+  if(
+    !TEMPLATES[template]
+  ){
+
+    return;
+
+  }
+
+
+  state.currentTemplate =
+    template;
+
+
+  storageSet(
+    STORAGE.TEMPLATE,
+    template
+  );
+
+
+  document
+    .querySelectorAll(
+      ".template-card"
+    )
+    .forEach(
+      card =>{
+
+        card.classList.toggle(
+          "active",
+          card.dataset.template ===
+            template
+        );
+
+      }
+    );
+
+
+  DOM.modalTemplate.value =
+    template;
+
+
+  updateCounts();
+
+  renderPreview();
+
+}
+
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+
+async function toggleFullscreen(){
+
+  try{
+
+    if(
+      !document.fullscreenElement
+    ){
+
+      await DOM.stage.requestFullscreen();
+
+    }else{
+
+      await document.exitFullscreen();
+
+    }
+
+  }catch(error){
+
+    showToast(
+      "Fullscreen tidak tersedia di browser ini.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   WAIT IMAGE
+========================================================= */
+
+function waitForImage(
+  image
+){
+
+  if(
+    !image
+  ){
+
+    return Promise.resolve();
+
+  }
+
+
+  if(
+    image.complete
+  ){
+
+    if(
+      typeof image.decode ===
+      "function"
+    ){
+
+      return image.decode()
+        .catch(
+          ()=>{}
+        );
+
+    }
+
+    return Promise.resolve();
+
+  }
+
+
+  return new Promise(
+    resolve =>{
+
+      image.addEventListener(
+        "load",
+        resolve,
+        {
+          once:true
+        }
+      );
+
+      image.addEventListener(
+        "error",
+        resolve,
+        {
+          once:true
+        }
+      );
+
+    }
+  );
+
+}
+
+
+async function waitForCurrentImage(){
+
+  const image =
+    DOM.stage.querySelector(
+      ".product-image"
+    );
+
+
+  await waitForImage(
+    image
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT CANVAS
+========================================================= */
+
+async function renderCanvas(){
+
+  if(
+    !window.html2canvas
+  ){
+
+    throw new Error(
+      "HTML2CANVAS_UNAVAILABLE"
+    );
+
+  }
+
+
+  await waitForCurrentImage();
+
+
+  const canvas =
+    DOM.stage.querySelector(
+      "#promoCanvas"
+    );
+
+
+  if(
+    !canvas
+  ){
+
+    throw new Error(
+      "CANVAS_RENDER_FAILED"
+    );
+
+  }
+
+
+  return html2canvas(
+    canvas,
+    {
+
+      backgroundColor:
+        "#050805",
+
+      scale:
+        Math.min(
+          2,
+          window.devicePixelRatio ||
+          1
+        ),
+
+      useCORS:
+        true,
+
+      allowTaint:
+        false,
+
+      logging:
+        false,
+
+      imageTimeout:
+        12000
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   BLOB
+========================================================= */
+
+function canvasToBlob(
+  canvas
+){
+
+  return new Promise(
+    (
+      resolve,
+      reject
+    )=>{
+
+      canvas.toBlob(
+        blob =>{
+
+          if(
+            !blob
+          ){
+
+            reject(
+              new Error(
+                "EMPTY_BLOB"
+              )
+            );
+
+            return;
+
+          }
+
+          resolve(
+            blob
+          );
+
+        },
+        "image/png",
+        1
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
+   SAVE BLOB
+========================================================= */
+
+async function saveBlob(
+  blob,
+  filename
+){
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const link =
+    document.createElement(
+      "a"
+    );
+
+
+  link.href =
+    url;
+
+  link.download =
+    filename;
+
+
+  document.body.appendChild(
+    link
+  );
+
+
+  link.click();
+
+
+  link.remove();
+
+
+  setTimeout(
+    ()=>{
+      URL.revokeObjectURL(
+        url
+      );
+    },
+    1000
+  );
+
+}
+
+
+/* =========================================================
+   DOWNLOAD CURRENT
+========================================================= */
+
+async function downloadCurrent(){
+
+  if(
+    state.downloadBusy
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    showToast(
+      "Creative queue masih kosong.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  state.downloadBusy =
+    true;
+
+
+  const wasPlaying =
+    state.playing;
+
+
+  stopAutoplay();
+
+
+  const oldHTML =
+    DOM.downloadBtn.innerHTML;
+
+
+  DOM.downloadBtn.disabled =
+    true;
+
+
+  DOM.downloadBtn.innerHTML = `
+
+    <span
+      class="download-spinner"
+    ></span>
+
+    RENDERING...
+
+  `;
+
+
+  try{
+
+    const canvas =
+      await renderCanvas();
+
+
+    const blob =
+      await canvasToBlob(
+        canvas
+      );
+
+
+    const product =
+      state.promoProducts[
+        state.currentIndex
+      ];
+
+
+    const filename =
+
+      [
+        "PROMO",
+
+        String(
+          state.currentIndex + 1
+        ).padStart(
+          2,
+          "0"
+        ),
+
+        slug(
+          makeDisplayTitle(
+            product
+          )
+        ),
+
+        slug(
+          TEMPLATES[
+            state.currentTemplate
+          ].name
+        ),
+
+        ratioLabel()
+          .replace(
+            ":",
+            "x"
+          )
+
+      ].join(
+        "-"
+      ) +
+      ".png";
+
+
+    await saveBlob(
+      blob,
+      filename
+    );
+
+
+    showToast(
+      "PNG berhasil dibuat ✓"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "[EXPORT CURRENT]",
+      error
+    );
+
+
+    showToast(
+      "Gagal membuat PNG.",
+      "error"
+    );
+
+  }finally{
+
+    state.downloadBusy =
+      false;
+
+
+    DOM.downloadBtn.disabled =
+      false;
+
+
+    DOM.downloadBtn.innerHTML =
+      oldHTML;
+
+
+    state.playing =
+      wasPlaying;
+
+
+    updatePlayIcons();
+
+
+    if(
+      wasPlaying
+    ){
+
+      startAutoplay();
+
+    }
+
+  }
+
+}
+
+
+/* =========================================================
+   EXPORT ALL
+========================================================= */
+
+async function exportAll(){
+
+  if(
+    state.downloadBusy
+  ){
+
+    return;
+
+  }
+
+
+  if(
+    !state.promoProducts.length
+  ){
+
+    showToast(
+      "Creative queue masih kosong.",
+      "error"
+    );
+
+    return;
+
+  }
+
+
+  state.downloadBusy =
+    true;
+
+
+  const wasPlaying =
+    state.playing;
+
+
+  stopAutoplay();
+
+
+  const oldHTML =
+    DOM.downloadAllBtn.innerHTML;
+
+
+  DOM.downloadAllBtn.disabled =
+    true;
+
+
+  DOM.downloadAllBtn.innerHTML = `
+
+    <span
+      class="download-spinner"
+    ></span>
+
+    EXPORTING...
+
+  `;
+
+
+  const originalIndex =
+    state.currentIndex;
+
+
+  try{
+
+    for(
+      let index = 0;
+      index <
+      state.promoProducts.length;
+      index++
+    ){
+
+      state.currentIndex =
+        index;
+
+
+      renderPreview();
+
+
+      await wait(300);
+
+
+      const canvas =
+        await renderCanvas();
+
 
       const blob =
-        await zip.generateAsync({
-          type:"blob",
-          compression:"DEFLATE",
-          compressionOptions:{level:6}
-        });
+        await canvasToBlob(
+          canvas
+        );
 
-      downloadBlob(
+
+      const product =
+        state.promoProducts[
+          index
+        ];
+
+
+      const filename =
+
+        [
+          "PROMO",
+
+          String(
+            index + 1
+          ).padStart(
+            2,
+            "0"
+          ),
+
+          slug(
+            makeDisplayTitle(
+              product
+            )
+          ),
+
+          slug(
+            TEMPLATES[
+              state.currentTemplate
+            ].name
+          ),
+
+          ratioLabel()
+            .replace(
+              ":",
+              "x"
+            )
+
+        ].join(
+          "-"
+        ) +
+        ".png";
+
+
+      await saveBlob(
         blob,
-        `laras-campaign-${new Date().toISOString().slice(0,10)}.zip`
+        filename
       );
 
-      toast("Campaign ZIP exported.");
-    }catch(error){
-      console.error(error);
-      toast("ZIP export failed.","error");
-      renderAll();
     }
-  }
 
-  $("#exportAllBtn").addEventListener(
-    "click",
-    exportAll
-  );
 
-  /* =======================================================
-     PROJECT EXPORT
-  ======================================================= */
-
-  function exportProject(){
-    const payload = {
-      app:"LARAS Premium Promo Studio",
-      version:3,
-      exportedAt:new Date().toISOString(),
-      state:{
-        products:state.products,
-        selectedIds:state.selectedIds,
-        activeIndex:state.activeIndex,
-        ratio:state.ratio,
-        theme:state.theme,
-        zoom:state.zoom
-      }
-    };
-
-    const blob = new Blob(
-      [JSON.stringify(payload,null,2)],
-      {type:"application/json"}
+    showToast(
+      `${state.promoProducts.length} PNG berhasil diexport ✓`
     );
 
-    downloadBlob(
-      blob,
-      `laras-project-${new Date().toISOString().slice(0,10)}.json`
+
+  }catch(error){
+
+    console.error(
+      "[EXPORT ALL]",
+      error
     );
 
-    toast("Project JSON exported.");
+
+    showToast(
+      "Export semua produk berhenti karena error.",
+      "error"
+    );
+
+  }finally{
+
+    state.currentIndex =
+      originalIndex;
+
+
+    renderPreview();
+
+
+    state.downloadBusy =
+      false;
+
+
+    DOM.downloadAllBtn.disabled =
+      false;
+
+
+    DOM.downloadAllBtn.innerHTML =
+      oldHTML;
+
+
+    state.playing =
+      wasPlaying;
+
+
+    updatePlayIcons();
+
+
+    if(
+      wasPlaying
+    ){
+
+      startAutoplay();
+
+    }
+
   }
 
-  function importProject(){
-    els.projectFileInput.click();
-  }
+}
 
-  els.projectFileInput.addEventListener(
-    "change",
-    async event => {
-      const file = event.target.files?.[0];
 
-      if(!file) return;
+/* =========================================================
+   DOWNLOAD JSON
+========================================================= */
 
-      try{
-        const text = await file.text();
-        const payload = JSON.parse(text);
+async function downloadJSON(){
 
-        const imported = payload.state || payload;
+  try{
 
-        if(!Array.isArray(imported.products)){
-          throw new Error("Invalid project.");
+    const selected =
+      state.products.filter(
+        product =>
+          state.selectedIds.includes(
+            String(product.id)
+          )
+      );
+
+
+    if(
+      !selected.length
+    ){
+
+      showToast(
+        "Pilih minimal satu produk.",
+        "error"
+      );
+
+      return;
+
+    }
+
+
+    const output =
+      selected.map(
+        product =>{
+
+          const price =
+            getPriceData(
+              product
+            );
+
+
+          return {
+
+            ...product,
+
+            harga:{
+
+              ...(product.harga || {}),
+
+              normal:
+                price.normal,
+
+              promo:
+                price.final,
+
+              hargaDasarPromo:
+                price.promo,
+
+              diskon:
+                price.finalDiscount,
+
+              diskonExtraAktif:
+                price.extraEnabled,
+
+              diskonExtra:
+                price.extraPercent,
+
+              hargaFinalCustomAktif:
+                price.manualEnabled,
+
+              hargaFinalCustom:
+                price.manualFinal
+
+            },
+
+            _imamSalesfr:{
+
+              template:
+                state.currentTemplate,
+
+              ratio:
+                ratioLabel(),
+
+              generatedAt:
+                new Date().toISOString()
+
+            }
+
+          };
+
         }
+      );
 
-        pushHistory();
 
-        state = {
-          ...clone(defaultState),
-          ...imported,
-          products:imported.products,
-          selectedIds:Array.isArray(imported.selectedIds)
-            ? imported.selectedIds
-            : []
-        };
+    const blob =
+      new Blob(
+        [
+          JSON.stringify(
+            output,
+            null,
+            4
+          )
+        ],
+        {
+          type:
+            "application/json"
+        }
+      );
 
-        normalizeState();
-        saveState();
-        renderAll();
 
-        toast("Project imported.");
-      }catch(error){
-        console.error(error);
-        toast("Invalid project JSON.","error");
-      }finally{
-        event.target.value = "";
-      }
+    await saveBlob(
+      blob,
+      "produk-promo-final.json"
+    );
+
+
+    showToast(
+      "produk-promo-final.json berhasil dibuat ✓"
+    );
+
+
+  }catch(error){
+
+    console.error(
+      "[JSON EXPORT]",
+      error
+    );
+
+
+    showToast(
+      "Gagal membuat JSON.",
+      "error"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   MODAL
+========================================================= */
+
+function openExportModal(){
+
+  if(
+    !DOM.exportModal
+  ){
+
+    return;
+
+  }
+
+
+  DOM.modalTemplate.value =
+    state.currentTemplate;
+
+
+  DOM.modalRatio.value =
+    state.currentRatio;
+
+
+  DOM.modalQueue.value =
+    `${state.promoProducts.length} produk`;
+
+
+  DOM.exportModal.classList.add(
+    "open"
+  );
+
+}
+
+
+function closeExportModal(){
+
+  DOM.exportModal
+    ?.classList
+    .remove(
+      "open"
+    );
+
+}
+
+
+/* =========================================================
+   EVENT BINDING
+========================================================= */
+
+/* Header */
+
+on(
+  DOM.headerPlay,
+  "click",
+  togglePlay
+);
+
+
+on(
+  $("fullscreenBtn"),
+  "click",
+  toggleFullscreen
+);
+
+
+/* Preview navigation */
+
+on(
+  $("prevBtn"),
+  "click",
+  previousSlide
+);
+
+
+on(
+  $("nextBtn"),
+  "click",
+  nextSlide
+);
+
+
+on(
+  DOM.playBtn,
+  "click",
+  togglePlay
+);
+
+
+/* Ratio */
+
+document
+  .querySelectorAll(
+    ".ratio-btn"
+  )
+  .forEach(
+    button =>{
+
+      on(
+        button,
+        "click",
+        ()=>{
+          setRatio(
+            button.dataset.ratio
+          );
+        }
+      );
+
     }
   );
 
-  $("#exportProjectBtn").addEventListener(
-    "click",
-    exportProject
-  );
 
-  $("#importProjectBtn").addEventListener(
-    "click",
-    importProject
-  );
+/* Template */
 
-  /* =======================================================
-     PROJECT MODAL
-  ======================================================= */
+document
+  .querySelectorAll(
+    ".template-card"
+  )
+  .forEach(
+    card =>{
 
-  $("#projectBtn").addEventListener(
-    "click",
-    () => openModal("projectModal")
-  );
+      on(
+        card,
+        "click",
+        ()=>{
+          setTemplate(
+            card.dataset.template
+          );
+        }
+      );
 
-  $("#modalExportProject").addEventListener(
-    "click",
-    exportProject
-  );
-
-  $("#modalImportProject").addEventListener(
-    "click",
-    importProject
-  );
-
-  $("#modalResetProject").addEventListener(
-    "click",
-    resetWorkspace
-  );
-
-  $("#modalClear").addEventListener(
-    "click",
-    clearInventory
-  );
-
-  $("#resetProjectBtn").addEventListener(
-    "click",
-    resetWorkspace
-  );
-
-  $("#clearAllBtn").addEventListener(
-    "click",
-    clearInventory
-  );
-
-  function resetWorkspace(){
-    if(!confirm("Reset workspace to demo data?")) return;
-
-    pushHistory();
-
-    state = clone(defaultState);
-
-    saveState();
-    renderAll();
-
-    closeModal("projectModal");
-
-    toast("Workspace reset.");
-  }
-
-  function clearInventory(){
-    if(!confirm("Delete every product from this workspace?")) return;
-
-    mutate(() => {
-      state.products = [];
-      state.selectedIds = [];
-      state.activeIndex = 0;
-    });
-
-    closeModal("projectModal");
-
-    toast("Inventory cleared.");
-  }
-
-  /* =======================================================
-     MODAL CLOSE
-  ======================================================= */
-
-  $$("[data-close]").forEach(btn => {
-    btn.addEventListener("click",() => {
-      closeModal(btn.dataset.close);
-    });
-  });
-
-  $$(".backdrop").forEach(backdrop => {
-    backdrop.addEventListener("click",event => {
-      if(event.target === backdrop){
-        backdrop.classList.remove("open");
-        document.body.classList.remove("no-scroll");
-      }
-    });
-  });
-
-  /* =======================================================
-     FULLSCREEN
-  ======================================================= */
-
-  $("#fullscreenBtn").addEventListener("click",async() => {
-    const target = els.canvas;
-
-    try{
-      if(document.fullscreenElement){
-        await document.exitFullscreen();
-      }else{
-        await target.requestFullscreen();
-      }
-    }catch{
-      toast("Fullscreen is not supported here.","error");
     }
-  });
+  );
 
-  /* =======================================================
-     KEYBOARD SHORTCUTS
-  ======================================================= */
 
-  document.addEventListener("keydown",event => {
+/* Product Manager */
+
+on(
+  DOM.search,
+  "input",
+  event =>{
+
+    state.searchQuery =
+      event.target.value;
+
+    renderManager();
+
+  }
+);
+
+
+on(
+  $("selectAll"),
+  "click",
+  ()=>{
+
+    state.selectedIds =
+      state.products.map(
+        product =>
+          String(product.id)
+      );
+
+
+    saveSelection();
+
+    renderManager();
+
+    showToast(
+      "Semua produk dipilih ✓"
+    );
+
+  }
+);
+
+
+on(
+  $("clearAll"),
+  "click",
+  ()=>{
+
+    state.selectedIds =
+      [];
+
+    state.promoProducts =
+      [];
+
+    saveSelection();
+
+    renderManager();
+    renderPreview();
+
+    showToast(
+      "Selection dibersihkan."
+    );
+
+  }
+);
+
+
+on(
+  $("applyPromo"),
+  "click",
+  ()=>{
+    applyPromo(
+      true
+    );
+  }
+);
+
+
+on(
+  $("saveConfig"),
+  "click",
+  saveWorkspace
+);
+
+
+on(
+  $("downloadJSON"),
+  "click",
+  downloadJSON
+);
+
+
+/* Download */
+
+on(
+  DOM.downloadBtn,
+  "click",
+  downloadCurrent
+);
+
+
+on(
+  DOM.downloadAllBtn,
+  "click",
+  exportAll
+);
+
+
+/* Modal */
+
+on(
+  $("modalClose"),
+  "click",
+  closeExportModal
+);
+
+
+on(
+  DOM.exportModal,
+  "click",
+  event =>{
+
+    if(
+      event.target ===
+      DOM.exportModal
+    ){
+
+      closeExportModal();
+
+    }
+
+  }
+);
+
+
+on(
+  $("modalExportAll"),
+  "click",
+  async ()=>{
+
+    closeExportModal();
+
+    await exportAll();
+
+  }
+);
+
+
+on(
+  $("modalDownloadJSON"),
+  "click",
+  async ()=>{
+
+    closeExportModal();
+
+    await downloadJSON();
+
+  }
+);
+
+
+on(
+  $("modalSaveState"),
+  "click",
+  ()=>{
+
+    closeExportModal();
+
+    saveWorkspace();
+
+  }
+);
+
+
+on(
+  DOM.modalTemplate,
+  "change",
+  event =>{
+
+    setTemplate(
+      event.target.value
+    );
+
+  }
+);
+
+
+on(
+  DOM.modalRatio,
+  "change",
+  event =>{
+
+    setRatio(
+      event.target.value
+    );
+
+  }
+);
+
+
+/* =========================================================
+   KEYBOARD
+========================================================= */
+
+on(
+  document,
+  "keydown",
+  event =>{
+
     const tag =
-      document.activeElement?.tagName?.toLowerCase();
+      event.target?.tagName;
+
 
     const typing =
-      tag === "input" ||
-      tag === "textarea" ||
-      tag === "select";
+      tag === "INPUT" ||
+      tag === "TEXTAREA" ||
+      tag === "SELECT";
 
-    if(event.key === "Escape"){
-      $$(".backdrop.open").forEach(modal =>
-        closeModal(modal.id)
+
+    if(
+      event.key === "Escape"
+    ){
+
+      closeExportModal();
+
+      closeEditorsExcept(
+        null
       );
+
+      document
+        .querySelectorAll(
+          ".select-card.editing"
+        )
+        .forEach(
+          card =>
+            card.classList.remove(
+              "editing"
+            )
+        );
+
       return;
+
     }
 
-    if(typing) return;
 
-    if(event.code === "Space"){
+    if(
+      typing
+    ){
+
+      return;
+
+    }
+
+
+    if(
+      event.key === "ArrowRight"
+    ){
+
+      nextSlide();
+
+    }
+
+
+    if(
+      event.key === "ArrowLeft"
+    ){
+
+      previousSlide();
+
+    }
+
+
+    if(
+      event.code === "Space"
+    ){
+
       event.preventDefault();
+
       togglePlay();
+
+    }
+
+
+    if(
+      event.key.toLowerCase() === "f"
+    ){
+
+      toggleFullscreen();
+
+    }
+
+
+    if(
+      event.key.toLowerCase() === "e"
+    ){
+
+      openExportModal();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   VISIBILITY
+========================================================= */
+
+on(
+  document,
+  "visibilitychange",
+  ()=>{
+
+    if(
+      document.hidden
+    ){
+
+      stopAutoplay();
+
+    }else if(
+      state.playing
+    ){
+
+      startAutoplay();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   CLICK OUTSIDE EDITOR
+========================================================= */
+
+on(
+  document,
+  "click",
+  event =>{
+
+    if(
+      event.target.closest(
+        ".select-card"
+      )
+    ){
+
       return;
+
     }
 
-    if(event.key === "ArrowRight"){
-      nextProduct();
-      return;
+
+    document
+      .querySelectorAll(
+        ".select-card.editing"
+      )
+      .forEach(
+        card =>
+          card.classList.remove(
+            "editing"
+          )
+      );
+
+  }
+);
+
+
+/* =========================================================
+   LOAD PRODUCTS
+========================================================= */
+
+async function loadProducts(){
+
+  try{
+
+    DOM.loaderStatus.textContent =
+      "Loading product library";
+
+
+    const response =
+      await fetch(
+        CONFIG.JSON,
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(
+      !response.ok
+    ){
+
+      throw new Error(
+        `HTTP ${response.status} — ${CONFIG.JSON} tidak ditemukan.`
+      );
+
     }
 
-    if(event.key === "ArrowLeft"){
-      previousProduct();
-      return;
+
+    DOM.loaderStatus.textContent =
+      "Normalizing product data";
+
+
+    const data =
+      await response.json();
+
+
+    const source =
+
+      Array.isArray(data)
+
+        ?
+
+        data
+
+        :
+
+        Array.isArray(
+          data.products
+        )
+
+          ?
+
+          data.products
+
+          :
+
+          Array.isArray(
+            data.produk
+          )
+
+            ?
+
+            data.produk
+
+            :
+
+            Array.isArray(
+              data.items
+            )
+
+              ?
+
+              data.items
+
+              :
+
+              [];
+
+
+    if(
+      !source.length
+    ){
+
+      throw new Error(
+        "produk.json kosong atau format tidak dikenali."
+      );
+
     }
 
-    if((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "z"){
-      event.preventDefault();
 
-      if(event.shiftKey){
-        redo();
-      }else{
-        undo();
-      }
+    state.products =
+      source
 
-      return;
+        .map(
+          normalizeProduct
+        )
+
+        .filter(
+          Boolean
+        );
+
+
+    if(
+      !state.products.length
+    ){
+
+      throw new Error(
+        "Tidak ada produk valid setelah normalisasi."
+      );
+
     }
 
-    if((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "y"){
-      event.preventDefault();
-      redo();
+
+    const validIds =
+      new Set(
+        state.products.map(
+          product =>
+            String(product.id)
+        )
+      );
+
+
+    state.selectedIds =
+      state.selectedIds.filter(
+        id =>
+          validIds.has(
+            String(id)
+          )
+      );
+
+
+    /*
+     * Kalau belum ada selection tersimpan,
+     * otomatis gunakan produk yang memiliki
+     * promo:true dari JSON.
+     */
+
+    if(
+      !state.selectedIds.length
+    ){
+
+      state.selectedIds =
+        state.products
+
+          .filter(
+            isPromo
+          )
+
+          .map(
+            product =>
+              String(product.id)
+          );
+
     }
-  });
 
-  /* =======================================================
-     STARTUP
-  ======================================================= */
 
-  renderAll();
+    DOM.loaderStatus.textContent =
+      "Building creative workspace";
 
-  setTimeout(() => {
-    els.loader.classList.add("hide");
-  },650);
+
+    renderManager();
+
+    applyPromo(
+      false
+    );
+
+
+    state.initialized =
+      true;
+
+
+    DOM.loadingScreen
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    if(
+      state.playing
+    ){
+
+      startAutoplay();
+
+    }
+
+
+  }catch(error){
+
+    console.error(
+      "[LOAD PRODUCTS]",
+      error
+    );
+
+
+    DOM.loadingScreen
+      .classList
+      .add(
+        "hidden"
+      );
+
+
+    DOM.stage.className =
+      `stage ratio-${state.currentRatio}`;
+
+
+    DOM.stage.innerHTML = `
+
+      <div class="error">
+
+        <div>
+
+          <strong>
+            Gagal memuat product library.
+          </strong>
+
+          <br><br>
+
+          ${escapeHTML(
+            error.message
+          )}
+
+          <br><br>
+
+          Pastikan
+          <strong>
+            produk.json
+          </strong>
+          berada satu folder dengan
+          <strong>
+            index.html
+          </strong>.
+
+          <br><br>
+
+          Struktur gambar:
+          <strong>
+            images/produk/
+          </strong>
+
+        </div>
+
+      </div>
+
+    `;
+
+
+    DOM.productGrid.innerHTML = `
+
+      <div class="error">
+
+        <div>
+
+          Product Manager tidak dapat
+          diinisialisasi.
+
+          <br><br>
+
+          Periksa file
+          <strong>
+            produk.json
+          </strong>
+          lalu refresh halaman.
+
+        </div>
+
+      </div>
+
+    `;
+
+  }
+
+}
+
+
+/* =========================================================
+   GLOBAL ERRORS
+========================================================= */
+
+on(
+  window,
+  "error",
+  event =>{
+
+    console.error(
+      "[WINDOW ERROR]",
+      event.error ||
+      event.message
+    );
+
+  }
+);
+
+
+on(
+  window,
+  "unhandledrejection",
+  event =>{
+
+    console.error(
+      "[PROMISE ERROR]",
+      event.reason
+    );
+
+  }
+);
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+(function init(){
+
+  restoreWorkspace();
+
+
+  setRatio(
+    state.currentRatio
+  );
+
+
+  setTemplate(
+    state.currentTemplate
+  );
+
+
+  updatePlayIcons();
+
+
+  updateCounts();
+
+
+  loadProducts();
 
 })();
+
 </script>
 
 </body>
