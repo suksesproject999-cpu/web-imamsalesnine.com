@@ -6486,64 +6486,63 @@ function lockExportClone(
   snapshot
 ){
 
+  const html=
+    doc.documentElement;
+
+  const body=
+    doc.body;
+
+  /*
+    Keep browser viewport identical
+    to the live preview.
+  */
+
+  html.style.width=
+    window.innerWidth+"px";
+
+  html.style.minWidth=
+    window.innerWidth+"px";
+
+  body.style.width=
+    window.innerWidth+"px";
+
+  body.style.minWidth=
+    window.innerWidth+"px";
+
+  /*
+    Find the cloned stage AND artwork.
+  */
+
+  const stage=
+    doc.getElementById(
+      "stage"
+    );
+
   const clone=
     doc.getElementById(
       "promoCanvas"
     );
 
-  if(!clone)
+  if(
+    !stage||
+    !clone
+  ){
     return;
+  }
 
   /*
-    LOCK EXPORT STATE
+    ==========================================================
+    CRITICAL FIX
+    Keep ratio class on STAGE.
+    Never move r916/r45/r169 to promoCanvas.
+    ==========================================================
   */
 
-  clone.classList.add(
-    "export-static"
+  stage.classList.remove(
+    "r916",
+    "r45",
+    "r169"
   );
-
-  clone.style.animation=
-    "none";
-
-  clone.style.transition=
-    "none";
-
-  clone.style.opacity=
-    "1";
-
-  /*
-    LOCK EXACT CANVAS SIZE
-  */
-
-  clone.style.width=
-    snapshot.width+
-    "px";
-
-  clone.style.height=
-    snapshot.height+
-    "px";
-
-  clone.style.maxWidth=
-    "none";
-
-  clone.style.maxHeight=
-    "none";
-
-  clone.style.aspectRatio=
-    snapshot.width+
-    "/" +
-    snapshot.height;
-
-  /*
-    IMPORTANT:
-    The responsive ratio rules are normally
-    attached to .stage, while html2canvas
-    captures .promo-canvas.
-    
-    Put the ratio class directly on the
-    cloned promo canvas so its internal
-    layout survives export.
-  */
 
   const ratioClass=
     currentRatio==="916"
@@ -6554,19 +6553,76 @@ function lockExportClone(
       :
       "r169";
 
-  clone.classList.remove(
-    "r916",
-    "r45",
-    "r169"
-  );
-
-  clone.classList.add(
+  stage.classList.add(
     ratioClass
   );
 
   /*
-    Freeze animation only.
-    DO NOT change typography geometry.
+    Force the cloned stage to have
+    EXACTLY the same dimensions as
+    the real preview.
+  */
+
+  stage.style.width=
+    snapshot.width+"px";
+
+  stage.style.height=
+    snapshot.height+"px";
+
+  stage.style.minWidth=
+    snapshot.width+"px";
+
+  stage.style.minHeight=
+    snapshot.height+"px";
+
+  stage.style.maxWidth=
+    snapshot.width+"px";
+
+  stage.style.maxHeight=
+    snapshot.height+"px";
+
+  stage.style.display=
+    "flex";
+
+  stage.style.justifyContent=
+    "center";
+
+  /*
+    ==========================================================
+    LOCK ARTWORK TO STAGE
+    ==========================================================
+  */
+
+  clone.classList.add(
+    "export-static"
+  );
+
+  clone.style.width=
+    "100%";
+
+  clone.style.height=
+    "100%";
+
+  clone.style.maxWidth=
+    "none";
+
+  clone.style.maxHeight=
+    "none";
+
+  clone.style.aspectRatio=
+    "auto";
+
+  clone.style.opacity=
+    "1";
+
+  clone.style.animation=
+    "none";
+
+  clone.style.transition=
+    "none";
+
+  /*
+    Freeze descendants.
   */
 
   clone
@@ -6610,8 +6666,9 @@ function lockExportClone(
   }
 
   /*
-    Badge centering only.
-    No forced width/height.
+    ==========================================================
+    BADGE CENTER LOCK
+    ==========================================================
   */
 
   clone
@@ -6638,6 +6695,7 @@ function lockExportClone(
 
         badge.style.transform=
           "none";
+
       }
     );
 }
