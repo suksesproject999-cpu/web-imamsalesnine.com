@@ -6594,265 +6594,12 @@ function capturePreviewGeometry(
    CLONE LOCK
 ============================================================ */
 
-function lockExportClone(
-  doc,
-  snapshot,
-  geometry
-){
 
-  const clone=
-    doc.getElementById(
-      "promoCanvas"
-    );
-
-  if(!clone)
-    return;
-
-  /*
-    ROOT = EXACT PREVIEW SIZE
-  */
-
-  clone.style.width=
-    snapshot.width+
-    "px";
-
-  clone.style.height=
-    snapshot.height+
-    "px";
-
-  clone.style.maxWidth=
-    "none";
-
-  clone.style.maxHeight=
-    "none";
-
-  clone.style.minWidth=
-    "0";
-
-  clone.style.minHeight=
-    "0";
-
-  clone.style.aspectRatio=
-    "auto";
-
-  clone.style.animation=
-    "none";
-
-  clone.style.transition=
-    "none";
-
-  clone.style.opacity=
-    "1";
-
-  /*
-    Freeze every visual element
-    to the geometry calculated by
-    the real browser preview.
-  */
-
-  const nodes=[
-    clone,
-    ...clone.querySelectorAll("*")
-  ];
-
-  nodes.forEach(
-    (node,index)=>{
-
-      const g=
-        geometry[index];
-
-      if(!g)
-        return;
-
-      node.style.animation=
-        "none";
-
-      node.style.transition=
-        "none";
-
-      /*
-        Typography
-      */
-
-      node.style.fontFamily=
-        g.fontFamily;
-
-      node.style.fontSize=
-        g.fontSize;
-
-      node.style.fontWeight=
-        g.fontWeight;
-
-      node.style.fontStyle=
-        g.fontStyle;
-
-      node.style.lineHeight=
-        g.lineHeight;
-
-      node.style.letterSpacing=
-        g.letterSpacing;
-
-      node.style.wordSpacing=
-        g.wordSpacing;
-
-      node.style.whiteSpace=
-        g.whiteSpace;
-
-      node.style.wordBreak=
-        g.wordBreak;
-
-      node.style.overflowWrap=
-        g.overflowWrap;
-
-      node.style.textAlign=
-        g.textAlign;
-
-      node.style.textTransform=
-        g.textTransform;
-
-      /*
-        Box geometry
-      */
-
-      node.style.boxSizing=
-        g.boxSizing;
-
-      node.style.width=
-        g.width+
-        "px";
-
-      node.style.height=
-        g.height+
-        "px";
-
-      node.style.minWidth=
-        g.minWidth;
-
-      node.style.maxWidth=
-        g.maxWidth;
-
-      node.style.minHeight=
-        g.minHeight;
-
-      node.style.maxHeight=
-        g.maxHeight;
-
-      /*
-        Spacing
-      */
-
-      node.style.padding=
-        g.padding;
-
-      node.style.margin=
-        g.margin;
-
-      node.style.gap=
-        g.gap;
-
-      node.style.rowGap=
-        g.rowGap;
-
-      node.style.columnGap=
-        g.columnGap;
-
-      /*
-        Flex geometry
-      */
-
-      node.style.flexDirection=
-        g.flexDirection;
-
-      node.style.alignItems=
-        g.alignItems;
-
-      node.style.justifyContent=
-        g.justifyContent;
-
-      node.style.alignSelf=
-        g.alignSelf;
-
-      node.style.flex=
-        g.flex;
-
-      node.style.flexGrow=
-        g.flexGrow;
-
-      node.style.flexShrink=
-        g.flexShrink;
-
-      node.style.flexBasis=
-        g.flexBasis;
-
-      /*
-        Visual geometry
-      */
-
-      node.style.border=
-        g.border;
-
-      node.style.borderRadius=
-        g.borderRadius;
-
-      node.style.background=
-        g.background;
-
-      node.style.backgroundColor=
-        g.backgroundColor;
-
-      node.style.backgroundImage=
-        g.backgroundImage;
-
-      node.style.boxShadow=
-        g.boxShadow;
-
-      node.style.opacity=
-        g.opacity;
-
-      node.style.transform=
-        g.transform;
-
-      node.style.transformOrigin=
-        g.transformOrigin;
-
-      node.style.filter=
-        g.filter;
-
-      node.style.color=
-        g.color;
-
-      node.style.zIndex=
-        g.zIndex;
-
-      /*
-        Do NOT change position/inset.
-        The original preview layout
-        must remain responsible for
-        positioning.
-      */
-    }
-  );
-
-  /*
-    Hide editor-only elements only.
-  */
-
-  clone
-    .querySelectorAll(
-      ".safe-zone,.ratio-mark"
-    )
-    .forEach(
-      node=>{
-        node.style.display=
-          "none";
-      }
-    );
-    }
+  
 
 /* ============================================================
    EXACT PNG RENDER
 ============================================================ */
-
 async function renderPNG(){
 
   const source=
@@ -6877,7 +6624,16 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    WAIT UNTIL THE CURRENT PREVIEW IS COMPLETELY READY
+    FREEZE ONLY THE STATE.
+    
+    DO NOT MODIFY:
+    - typography
+    - badges
+    - price
+    - layout
+    - width
+    - height
+    - ratio
     ==========================================================
   */
 
@@ -6886,6 +6642,10 @@ async function renderPNG(){
   );
 
   await waitForFonts();
+
+  /*
+    Let browser finish its final paint.
+  */
 
   await new Promise(
     resolve=>
@@ -6907,46 +6667,56 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    DO NOT RECALCULATE THE DESIGN.
-    
-    Read the preview exactly as it currently appears.
+    READ THE ACTUAL VISIBLE PREVIEW
     ==========================================================
   */
 
-  const snapshot=
-    previewSnapshot();
+  const rect=
+    source.getBoundingClientRect();
 
-  /*
-    Capture every computed visual geometry
-    from the REAL preview before html2canvas
-    creates its clone.
-  */
+  if(
+    rect.width<=0||
+    rect.height<=0
+  ){
 
-  const geometry=
-    capturePreviewGeometry(
-      source
+    throw new Error(
+      "PREVIEW_HAS_NO_SIZE"
     );
+  }
+
+  const snapshot={
+    width:
+      rect.width,
+
+    height:
+      rect.height,
+
+    ratio:
+      rect.width/
+      rect.height,
+
+    index:
+      currentIndex,
+
+    productId:
+      promoProducts[
+        currentIndex
+      ]?.id||
+      null
+  };
 
   /*
     ==========================================================
-    EXPORT SIZE
-    Only determines final pixel resolution.
-    It does NOT determine layout.
+    FINAL PNG RESOLUTION
     ==========================================================
   */
 
   const target=
     exportDimensions();
 
-  /*
-    ==========================================================
-    VERIFY CURRENT PRODUCT
-    ==========================================================
-  */
-
   const product=
     promoProducts[
-      snapshot.index
+      currentIndex
     ];
 
   if(!product){
@@ -6958,8 +6728,10 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    SCALE ONLY
-    Preview geometry remains the master.
+    SCALE ONLY.
+    
+    The design itself is NEVER resized by CSS.
+    We only scale the finished screenshot.
     ==========================================================
   */
 
@@ -6990,7 +6762,14 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    EXACT PREVIEW CAPTURE
+    CAPTURE THE REAL PREVIEW
+    
+    IMPORTANT:
+    NO onclone.
+    NO CSS injection.
+    NO geometry override.
+    NO badge adjustment.
+    NO typography adjustment.
     ==========================================================
   */
 
@@ -7002,11 +6781,6 @@ async function renderPNG(){
         backgroundColor:
           "#050705",
 
-        /*
-          Keep the same browser environment
-          used by the visible preview.
-        */
-
         windowWidth:
           window.innerWidth,
 
@@ -7014,7 +6788,7 @@ async function renderPNG(){
           window.innerHeight,
 
         /*
-          Capture the exact preview box.
+          Use the actual preview size.
         */
 
         width:
@@ -7032,8 +6806,7 @@ async function renderPNG(){
         y:0,
 
         /*
-          Resolution scaling ONLY.
-          No layout scaling.
+          Resolution scaling only.
         */
 
         scale,
@@ -7047,6 +6820,12 @@ async function renderPNG(){
 
         logging:false,
 
+        /*
+          Keep normal html2canvas DOM
+          rendering. Do not replace it
+          with foreignObject rendering.
+        */
+
         foreignObjectRendering:
           false,
 
@@ -7054,33 +6833,9 @@ async function renderPNG(){
 
         scrollX:0,
 
-        scrollY:0,
-
-        /*
-          ====================================================
-          CRITICAL:
-          Freeze clone using the geometry already
-          calculated by the real browser preview.
-          ====================================================
-        */
-
-        onclone:
-          clonedDocument=>{
-
-            lockExportClone(
-              clonedDocument,
-              snapshot,
-              geometry
-            );
-          }
+        scrollY:0
       }
     );
-
-  /*
-    ==========================================================
-    VALIDATE CAPTURE
-    ==========================================================
-  */
 
   if(
     !captured||
@@ -7114,8 +6869,7 @@ async function renderPNG(){
     finalCanvas.getContext(
       "2d",
       {
-        alpha:false,
-        desynchronized:false
+        alpha:false
       }
     );
 
@@ -7126,12 +6880,6 @@ async function renderPNG(){
     );
   }
 
-  /*
-    Highest available interpolation
-    when converting preview pixels
-    to final PNG resolution.
-  */
-
   ctx.imageSmoothingEnabled=
     true;
 
@@ -7139,7 +6887,7 @@ async function renderPNG(){
     "high";
 
   /*
-    Background matches preview.
+    Same background as preview.
   */
 
   ctx.fillStyle=
@@ -7154,14 +6902,16 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    IMPORTANT:
-    The captured preview is simply scaled
-    into the requested PNG resolution.
-
-    No element is repositioned.
-    No text is recalculated.
-    No badge is rebuilt.
-    No price is redrawn.
+    THE ONLY TRANSFORMATION:
+    
+    Preview screenshot
+             ↓
+       pixel scaling
+             ↓
+        final PNG
+    
+    Nothing inside the design is
+    repositioned or recalculated.
     ==========================================================
   */
 
@@ -7181,7 +6931,7 @@ async function renderPNG(){
 
   /*
     ==========================================================
-    FINAL RATIO VALIDATION
+    VALIDATE FINAL RATIO
     ==========================================================
   */
 
@@ -7206,12 +6956,6 @@ async function renderPNG(){
     );
   }
 
-  /*
-    ==========================================================
-    RETURN FINAL RESULT
-    ==========================================================
-  */
-
   return{
 
     canvas:
@@ -7228,7 +6972,7 @@ async function renderPNG(){
 
     product
   };
-            }
+  }
 
 /* ============================================================
    CANVAS -> BLOB
