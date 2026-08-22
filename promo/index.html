@@ -6486,56 +6486,18 @@ function lockExportClone(
   snapshot
 ){
 
-  const html=
-    doc.documentElement;
-
-  const body=
-    doc.body;
-
-  /*
-    Keep browser viewport identical
-    to the live preview.
-  */
-
-  html.style.width=
-    window.innerWidth+"px";
-
-  html.style.minWidth=
-    window.innerWidth+"px";
-
-  body.style.width=
-    window.innerWidth+"px";
-
-  body.style.minWidth=
-    window.innerWidth+"px";
-
-  /*
-    Find the cloned stage AND artwork.
-  */
-
   const stage=
     doc.getElementById(
       "stage"
     );
 
-  const clone=
-    doc.getElementById(
-      "promoCanvas"
-    );
-
-  if(
-    !stage||
-    !clone
-  ){
+  if(!stage)
     return;
-  }
 
   /*
-    ==========================================================
-    CRITICAL FIX
-    Keep ratio class on STAGE.
-    Never move r916/r45/r169 to promoCanvas.
-    ==========================================================
+    KEEP THE ACTIVE RATIO ON STAGE.
+    This is where r916/r45/r169
+    actually controls the layout.
   */
 
   stage.classList.remove(
@@ -6544,23 +6506,12 @@ function lockExportClone(
     "r169"
   );
 
-  const ratioClass=
-    currentRatio==="916"
-      ?"r916"
-      :
-    currentRatio==="45"
-      ?"r45"
-      :
-      "r169";
-
   stage.classList.add(
-    ratioClass
+    "r"+currentRatio
   );
 
   /*
-    Force the cloned stage to have
-    EXACTLY the same dimensions as
-    the real preview.
+    Freeze the exact preview dimensions.
   */
 
   stage.style.width=
@@ -6587,45 +6538,14 @@ function lockExportClone(
   stage.style.justifyContent=
     "center";
 
-  /*
-    ==========================================================
-    LOCK ARTWORK TO STAGE
-    ==========================================================
-  */
-
-  clone.classList.add(
-    "export-static"
-  );
-
-  clone.style.width=
-    "100%";
-
-  clone.style.height=
-    "100%";
-
-  clone.style.maxWidth=
-    "none";
-
-  clone.style.maxHeight=
-    "none";
-
-  clone.style.aspectRatio=
-    "auto";
-
-  clone.style.opacity=
-    "1";
-
-  clone.style.animation=
-    "none";
-
-  clone.style.transition=
-    "none";
+  stage.style.alignItems=
+    "flex-start";
 
   /*
-    Freeze descendants.
+    Freeze animations only.
   */
 
-  clone
+  stage
     .querySelectorAll("*")
     .forEach(
       node=>{
@@ -6635,43 +6555,67 @@ function lockExportClone(
 
         node.style.transition=
           "none";
-
       }
     );
+
+  /*
+    Keep promo canvas as a normal child.
+    DO NOT force its width/height to
+    export dimensions.
+  */
+
+  const canvas=
+    stage.querySelector(
+      ".promo-canvas"
+    );
+
+  if(canvas){
+
+    canvas.classList.add(
+      "export-static"
+    );
+
+    canvas.style.width=
+      "100%";
+
+    canvas.style.height=
+      "100%";
+
+    canvas.style.maxWidth=
+      "none";
+
+    canvas.style.maxHeight=
+      "none";
+
+    canvas.style.aspectRatio=
+      "auto";
+
+    canvas.style.opacity=
+      "1";
+  }
 
   /*
     Hide editor overlays.
   */
 
-  const safeZone=
-    clone.querySelector(
-      ".safe-zone"
+  stage
+    .querySelectorAll(
+      ".safe-zone,.ratio-mark"
+    )
+    .forEach(
+      node=>{
+        node.style.display=
+          "none";
+      }
     );
-
-  if(safeZone){
-
-    safeZone.style.display=
-      "none";
-  }
-
-  const ratioMark=
-    clone.querySelector(
-      ".ratio-mark"
-    );
-
-  if(ratioMark){
-
-    ratioMark.style.display=
-      "none";
-  }
 
   /*
-    ==========================================================
-    BADGE CENTER LOCK
-    ==========================================================
+    Badge alignment only.
+    No forced width, height,
+    font-size or position.
   */
 
-  clone
+  stage
     .querySelectorAll(
       ".badge"
     )
@@ -6695,7 +6639,6 @@ function lockExportClone(
 
         badge.style.transform=
           "none";
-
       }
     );
 }
@@ -6707,7 +6650,7 @@ function lockExportClone(
 async function renderPNG(){
 
   const source=
-    $("promoCanvas");
+    $("stage");
 
   if(!source){
 
@@ -6727,8 +6670,7 @@ async function renderPNG(){
   }
 
   /*
-    Freeze current visual state
-    before reading geometry.
+    Freeze current preview.
   */
 
   fitBadges();
@@ -6747,32 +6689,56 @@ async function renderPNG(){
   );
 
   await wait(
-  EXPORT_CONFIG.settleDelay
-);
+    EXPORT_CONFIG.settleDelay
+  );
 
-/*
-  IMPORTANT:
-  Do not recalculate badge geometry here.
-  The preview has already been settled.
-*/
+  fitBadges();
 
-/*
-  Read the actual preview.
-*/
-const snapshot =
-  previewSnapshot();
+  /*
+    Snapshot THE STAGE, not promoCanvas.
+    Stage owns the active ratio layout.
+  */
+
+  const rect=
+    source.getBoundingClientRect();
+
+  if(
+    rect.width<=0||
+    rect.height<=0
+  ){
+
+    throw new Error(
+      "PREVIEW_HAS_NO_SIZE"
+    );
+  }
+
+  const snapshot={
+    width:
+      rect.width,
+
+    height:
+      rect.height,
+
+    ratio:
+      rect.width/
+      rect.height,
+
+    index:
+      currentIndex,
+
+    productId:
+      promoProducts[
+        currentIndex
+      ]?.id||
+      null
+  };
 
   const target=
     exportDimensions();
 
-  /*
-    The export must correspond to
-    exactly the current product.
-  */
-
   const product=
     promoProducts[
-      snapshot.index
+      currentIndex
     ];
 
   if(!product){
@@ -6783,8 +6749,7 @@ const snapshot =
   }
 
   /*
-    Render scale derives ONLY from
-    the visible preview dimensions.
+    Scale from preview to final PNG.
   */
 
   let scale=
@@ -6813,10 +6778,7 @@ const snapshot =
   }
 
   /*
-    Capture.
-    NO sanitizeClone.
-    NO color rewriting.
-    NO alternate layout.
+    Capture the complete stage.
   */
 
   const captured=
@@ -6867,6 +6829,7 @@ const snapshot =
 
         onclone:
           clonedDocument=>{
+
             lockExportClone(
               clonedDocument,
               snapshot
@@ -6887,7 +6850,7 @@ const snapshot =
   }
 
   /*
-    Normalize to exact requested dimensions.
+    Final PNG canvas.
   */
 
   const finalCanvas=
@@ -6905,8 +6868,7 @@ const snapshot =
     finalCanvas.getContext(
       "2d",
       {
-        alpha:false,
-        desynchronized:false
+        alpha:false
       }
     );
 
@@ -6945,32 +6907,8 @@ const snapshot =
     target.height
   );
 
-  /*
-    Final ratio validation.
-  */
-
-  const expectedRatio=
-    target.width/
-    target.height;
-
-  const actualRatio=
-    finalCanvas.width/
-    finalCanvas.height;
-
-  if(
-    Math.abs(
-      expectedRatio-
-      actualRatio
-    )>
-    .0001
-  ){
-
-    throw new Error(
-      "FINAL_RATIO_INVALID"
-    );
-  }
-
   return{
+
     canvas:
       finalCanvas,
 
@@ -6985,7 +6923,7 @@ const snapshot =
 
     product
   };
-}
+    }
 
 /* ============================================================
    CANVAS -> BLOB
