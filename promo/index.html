@@ -2,7 +2,10 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1,viewport-fit=cover"
+>
 <meta name="theme-color" content="#050705">
 <title>Imam_salesfr — Creative Promo Studio</title>
 
@@ -29,642 +32,638 @@
 }
 
 *{box-sizing:border-box}
-html,body{margin:0;min-height:100%;background:var(--bg)}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--bg);
+}
+
 body{
   color:var(--text);
   font-family:var(--body);
   background:
-    radial-gradient(circle at 50% -20%,rgba(140,198,63,.1),transparent 35%),
+    radial-gradient(
+      circle at 50% -20%,
+      rgba(140,198,63,.1),
+      transparent 35%
+    ),
     var(--bg);
   -webkit-font-smoothing:antialiased;
 }
+
 button,input,select{font:inherit}
 button{cursor:pointer;border:0}
 img{display:block;max-width:100%}
 
+/* ============================================================
+   TOPBAR
+============================================================ */
+
 .topbar{
-  position:sticky;top:0;z-index:1000;
-  display:flex;align-items:center;justify-content:space-between;
-  gap:18px;padding:14px clamp(14px,4vw,40px);
+  position:sticky;
+  top:0;
+  z-index:1000;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:18px;
+  padding:14px clamp(14px,4vw,40px);
   min-height:78px;
   background:rgba(4,6,4,.94);
   border-bottom:1px solid var(--line);
   backdrop-filter:blur(20px);
 }
+
 .brand{min-width:0}
+
 .brand h1{
-  margin:0;font-size:clamp(22px,3vw,34px);
-  font-weight:950;letter-spacing:-1.4px;
+  margin:0;
+  font-size:clamp(22px,3vw,34px);
+  font-weight:950;
+  letter-spacing:-1.4px;
 }
+
 .brand p{
-  margin:5px 0 0;color:var(--lime);
-  font-size:9px;font-weight:900;letter-spacing:1.5px;
+  margin:5px 0 0;
+  color:var(--lime);
+  font-size:9px;
+  font-weight:900;
+  letter-spacing:1.5px;
   text-transform:uppercase;
 }
-.header-actions{display:flex;gap:8px}
-.icon-btn,.primary-btn{
-  min-width:48px;height:48px;border-radius:14px;
-  color:white;background:#080c09;
+
+.header-actions{
+  display:flex;
+  gap:8px;
+}
+
+.icon-btn,
+.primary-btn{
+  min-width:48px;
+  height:48px;
+  border-radius:14px;
+  color:white;
+  background:#080c09;
   border:1px solid var(--line);
 }
+
 .primary-btn{
-  color:#081006;background:linear-gradient(135deg,var(--lime),var(--lime2));
+  color:#081006;
+  background:linear-gradient(
+    135deg,
+    var(--lime),
+    var(--lime2)
+  );
   border-color:var(--lime);
   font-weight:950;
   padding:0 17px;
 }
 
-main{padding:16px 16px 90px}
-.container{width:min(1240px,100%);margin:auto}
+/* ============================================================
+   LAYOUT
+============================================================ */
+
+main{
+  padding:16px 16px 90px;
+}
+
+.container{
+  width:min(1240px,100%);
+  margin:auto;
+}
 
 .grid-main{
   display:grid;
-  grid-template-columns:minmax(0,1.6fr) minmax(330px,.9fr);
+  grid-template-columns:
+    minmax(0,1.6fr)
+    minmax(330px,.9fr);
   gap:14px;
   align-items:start;
 }
 
 .panel{
-  background:linear-gradient(145deg,rgba(12,18,13,.98),rgba(6,10,7,.98));
+  background:
+    linear-gradient(
+      145deg,
+      rgba(12,18,13,.98),
+      rgba(6,10,7,.98)
+    );
   border:1px solid var(--line);
   border-radius:22px;
   padding:18px;
   box-shadow:0 18px 60px rgba(0,0,0,.16);
 }
-.panel + .panel{margin-top:12px}
+
+.panel + .panel{
+  margin-top:12px;
+}
+
 .eyebrow{
-  color:#748075;font-size:8px;font-weight:950;
-  letter-spacing:2.5px;text-transform:uppercase;
+  color:#748075;
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
 }
+
 .panel-title{
-  margin:7px 0 0;font-size:24px;
-  font-weight:950;letter-spacing:-.8px;
+  margin:7px 0 0;
+  font-size:24px;
+  font-weight:950;
+  letter-spacing:-.8px;
 }
+
 .panel-sub{
-  margin:7px 0 0;color:#778178;font-size:10px;line-height:1.5;
+  margin:7px 0 0;
+  color:#778178;
+  font-size:10px;
+  line-height:1.5;
 }
+
+/* ============================================================
+   STAGE
+============================================================ */
 
 .stage-wrap{
   position:relative;
-  display:flex;justify-content:center;
+  display:flex;
+  justify-content:center;
 }
+
 .stage{
-  width:100%;display:flex;justify-content:center;
+  width:100%;
+  display:flex;
+  justify-content:center;
 }
+
 .promo-canvas{
-  position:relative;overflow:hidden;isolation:isolate;
-  width:100%;background:#050705;
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  width:100%;
+  background:#050705;
   border:1px solid rgba(255,255,255,.11);
   box-shadow:var(--shadow);
-  transition:opacity .2s ease,transform .3s ease;
+  transition:
+    opacity .2s ease,
+    transform .3s ease;
 }
-.stage.r916 .promo-canvas{max-width:520px;aspect-ratio:9/16}
-.stage.r45 .promo-canvas{max-width:760px;aspect-ratio:4/5}
-.stage.r169 .promo-canvas{max-width:none;aspect-ratio:16/9}
+
+.stage.r916 .promo-canvas{
+  max-width:520px;
+  aspect-ratio:9/16;
+}
+
+.stage.r45 .promo-canvas{
+  max-width:760px;
+  aspect-ratio:4/5;
+}
+
+.stage.r169 .promo-canvas{
+  max-width:none;
+  aspect-ratio:16/9;
+}
 
 .canvas-bg{
-  position:absolute;inset:0;z-index:0;
+  position:absolute;
+  inset:0;
+  z-index:0;
   background:
-    radial-gradient(circle at 78% 20%,var(--glow),transparent 42%),
+    radial-gradient(
+      circle at 78% 20%,
+      var(--glow),
+      transparent 42%
+    ),
     var(--base);
 }
+
 .canvas-bg:before{
-  content:"";position:absolute;inset:-20%;
-  background:repeating-linear-gradient(
-    125deg,transparent 0 34px,
-    color-mix(in srgb,var(--accent) 5%,transparent) 34px 36px,
-    transparent 36px 78px
-  );
+  content:"";
+  position:absolute;
+  inset:-20%;
+  background:
+    repeating-linear-gradient(
+      125deg,
+      transparent 0 34px,
+      color-mix(
+        in srgb,
+        var(--accent) 5%,
+        transparent
+      ) 34px 36px,
+      transparent 36px 78px
+    );
   opacity:.55;
 }
+
 .canvas-bg:after{
-  content:"";position:absolute;
-  right:-12%;top:-25%;width:42%;height:150%;
-  background:linear-gradient(135deg,transparent 8%,var(--accent) 9%,transparent 70%);
-  opacity:.22;transform:skewX(-13deg);
-}
-.product-visual{
-  position:absolute;z-index:5;overflow:hidden;
-  display:flex;align-items:center;justify-content:center;
+  content:"";
+  position:absolute;
+  right:-12%;
+  top:-25%;
+  width:42%;
+  height:150%;
   background:
-    radial-gradient(circle at 50% 45%,rgba(255,255,255,.055),transparent 58%),
+    linear-gradient(
+      135deg,
+      transparent 8%,
+      var(--accent) 9%,
+      transparent 70%
+    );
+  opacity:.22;
+  transform:skewX(-13deg);
+}
+
+.product-visual{
+  position:absolute;
+  z-index:5;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:
+    radial-gradient(
+      circle at 50% 45%,
+      rgba(255,255,255,.055),
+      transparent 58%
+    ),
     #020302;
   transition:all .35s ease;
 }
-.r916 .product-visual,.r45 .product-visual{
-  left:0;right:0;top:0;height:56%;
+
+.r916 .product-visual,
+.r45 .product-visual{
+  left:0;
+  right:0;
+  top:0;
+  height:56%;
 }
+
 .r169 .product-visual{
-  left:0;top:0;bottom:0;width:58%;
+  left:0;
+  top:0;
+  bottom:0;
+  width:58%;
 }
+
 .product-image{
-  width:100%;height:100%;padding:7%;
-  object-fit:contain;object-position:center;
-  transition:transform .35s ease,filter .35s ease;
+  width:100%;
+  height:100%;
+  padding:7%;
+  object-fit:contain;
+  object-position:center;
+  transition:
+    transform .35s ease,
+    filter .35s ease;
   user-select:none;
 }
-.product-image.portrait{padding-left:13%;padding-right:13%}
-.product-image.landscape{padding-top:13%;padding-bottom:13%}
-.product-image.square{padding:9%}
+
+.product-image.portrait{
+  padding-left:13%;
+  padding-right:13%;
+}
+
+.product-image.landscape{
+  padding-top:13%;
+  padding-bottom:13%;
+}
+
+.product-image.square{
+  padding:9%;
+}
+
 .contact-shadow{
-  position:absolute;z-index:2;
-  width:42%;height:8%;
-  left:29%;bottom:12%;
+  position:absolute;
+  z-index:2;
+  width:42%;
+  height:8%;
+  left:29%;
+  bottom:12%;
   border-radius:50%;
   background:rgba(0,0,0,.62);
   filter:blur(14px);
   transform:scaleY(.45);
 }
-.r169 .contact-shadow{left:20%;width:55%;bottom:18%}
+
+.r169 .contact-shadow{
+  left:20%;
+  width:55%;
+  bottom:18%;
+}
+
 .visual-gradient{
-  position:absolute;inset:0;z-index:3;pointer-events:none;
-  background:linear-gradient(to bottom,
-    transparent 42%,
-    rgba(5,7,5,.08) 58%,
-    rgba(5,7,5,.72) 91%,
-    #050705 100%);
+  position:absolute;
+  inset:0;
+  z-index:3;
+  pointer-events:none;
+  background:
+    linear-gradient(
+      to bottom,
+      transparent 42%,
+      rgba(5,7,5,.08) 58%,
+      rgba(5,7,5,.72) 91%,
+      #050705 100%
+    );
 }
+
 .r169 .visual-gradient{
-  background:linear-gradient(to right,
-    transparent 35%,
-    rgba(5,7,5,.08) 55%,
-    rgba(5,7,5,.84) 100%);
+  background:
+    linear-gradient(
+      to right,
+      transparent 35%,
+      rgba(5,7,5,.08) 55%,
+      rgba(5,7,5,.84) 100%
+    );
 }
+
+/* ============================================================
+   INFO ZONE
+============================================================ */
+
 .info-zone{
-  position:absolute;z-index:20;overflow:hidden;
+  position:absolute;
+  z-index:20;
+  overflow:hidden;
 }
-.r916 .info-zone,.r45 .info-zone{
-  left:0;right:0;bottom:0;height:44%;
+
+.r916 .info-zone,
+.r45 .info-zone{
+  left:0;
+  right:0;
+  bottom:0;
+  height:44%;
   padding:5% 8% 7%;
 }
+
 .r169 .info-zone{
-  right:0;top:0;bottom:0;width:42%;
+  right:0;
+  top:0;
+  bottom:0;
+  width:42%;
   padding:7% 6% 6% 5%;
 }
-.product-info{position:relative;z-index:30}
+
+.product-info{
+  position:relative;
+  z-index:30;
+}
+
 .rule{
-  width:48px;height:2px;
-  background:linear-gradient(90deg,var(--accent),transparent);
+  width:48px;
+  height:2px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--accent),
+      transparent
+    );
   margin-bottom:11px;
 }
-.badges{display:flex;gap:7px;flex-wrap:wrap}
+
+.badges{
+  display:flex;
+  gap:7px;
+  flex-wrap:wrap;
+}
+
 .badge{
-  min-height:27px;padding:0 10px;border-radius:999px;
-  display:inline-flex;align-items:center;
-  font-size:6.5px;font-weight:950;letter-spacing:1.5px;
+  min-height:27px;
+  padding:0 10px;
+  border-radius:999px;
+  display:inline-flex;
+  align-items:center;
+  font-size:6.5px;
+  font-weight:950;
+  letter-spacing:1.5px;
   white-space:nowrap;
 }
-.badge.promo{background:var(--orange);color:#190a03}
+
+.badge.promo{
+  background:var(--orange);
+  color:#190a03;
+}
+
 .badge.extra{
   color:#ff974a;
   border:1px solid rgba(255,118,18,.55);
-  background:rgba(255,118,18,.06)
+  background:rgba(255,118,18,.06);
 }
+
 .badge.warranty{
   color:var(--accent);
   border:1px solid var(--accent);
-  background:rgba(0,0,0,.28)
+  background:rgba(0,0,0,.28);
 }
+
 .brand-line{
-  margin-top:9px;color:var(--accent);
-  font-size:8px;font-weight:950;letter-spacing:2px;
+  margin-top:9px;
+  color:var(--accent);
+  font-size:8px;
+  font-weight:950;
+  letter-spacing:2px;
   text-transform:uppercase;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
 }
+
 .product-name{
-  margin:6px 0 0;color:#fff;
+  margin:6px 0 0;
+  color:#fff;
   font-size:clamp(22px,3.7vw,43px);
-  line-height:1.02;font-weight:950;letter-spacing:-1.1px;
-  display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  line-height:1.02;
+  font-weight:950;
+  letter-spacing:-1.1px;
+  display:-webkit-box;
+  -webkit-line-clamp:2;
+  -webkit-box-orient:vertical;
+  overflow:hidden;
 }
+
 .price-label{
-  margin-top:13px;color:#6f786f;font-size:7px;font-weight:950;letter-spacing:2px;
+  margin-top:13px;
+  color:#6f786f;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:2px;
 }
+
 .price{
-  margin-top:4px;color:white;
+  margin-top:4px;
+  color:white;
   font-size:clamp(28px,4.5vw,55px);
-  line-height:.95;font-weight:950;letter-spacing:-1.7px;
+  line-height:.95;
+  font-weight:950;
+  letter-spacing:-1.7px;
   white-space:nowrap;
 }
+
 .price-meta{
-  display:flex;gap:8px;align-items:center;
-  margin-top:8px;flex-wrap:wrap
+  display:flex;
+  gap:8px;
+  align-items:center;
+  margin-top:8px;
+  flex-wrap:wrap;
 }
-.old{color:#6d756d;font-size:8px}
-.discount{color:var(--lime);font-size:8px;font-weight:950}
+
+.old{
+  color:#6d756d;
+  font-size:8px;
+}
+
+.discount{
+  color:var(--lime);
+  font-size:8px;
+  font-weight:950;
+}
+
 .extra-note{
-  margin-top:7px;color:#ff974a;font-size:7px;
-  font-weight:950;letter-spacing:1px
+  margin-top:7px;
+  color:#ff974a;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:1px;
 }
+
 .cta{
-  display:inline-flex;margin-top:10px;
-  min-height:25px;padding:0 11px;align-items:center;
-  color:#071006;background:var(--accent);border-radius:999px;
-  font-size:6px;font-weight:950;letter-spacing:1.2px;
+  display:inline-flex;
+  margin-top:10px;
+  min-height:25px;
+  padding:0 11px;
+  align-items:center;
+  color:#071006;
+  background:var(--accent);
+  border-radius:999px;
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:1.2px;
 }
+
 .watermark{
-  position:absolute;inset:0;z-index:70;pointer-events:none;
+  position:absolute;
+  inset:0;
+  z-index:70;
+  pointer-events:none;
   color:rgba(190,220,170,.035);
-  font-size:clamp(14px,4vw,52px);font-weight:950;
-  letter-spacing:3px;display:grid;place-items:center;
+  font-size:clamp(14px,4vw,52px);
+  font-weight:950;
+  letter-spacing:3px;
+  display:grid;
+  place-items:center;
   transform:rotate(-25deg);
 }
+
 .signature{
-  position:absolute;right:3%;bottom:2.5%;z-index:90;
-  color:rgba(210,216,208,.45);font-size:6px;
+  position:absolute;
+  right:3%;
+  bottom:2.5%;
+  z-index:90;
+  color:rgba(210,216,208,.45);
+  font-size:6px;
 }
+
 .ratio-mark{
-  position:absolute;z-index:90;top:2.5%;right:2.5%;
-  padding:4px 6px;background:rgba(0,0,0,.7);
-  border:1px solid rgba(255,255,255,.12);border-radius:5px;
-  color:#fff;font-size:6px;font-weight:950;
+  position:absolute;
+  z-index:90;
+  top:2.5%;
+  right:2.5%;
+  padding:4px 6px;
+  background:rgba(0,0,0,.7);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:5px;
+  color:#fff;
+  font-size:6px;
+  font-weight:950;
 }
 
 .safe-zone{
-  position:absolute;inset:5%;z-index:95;
+  position:absolute;
+  inset:5%;
+  z-index:95;
   border:1px dashed rgba(255,255,255,.34);
-  pointer-events:none;display:none;
+  pointer-events:none;
+  display:none;
 }
+
 .safe-zone:after{
-  content:"SAFE ZONE";position:absolute;left:6px;top:6px;
-  color:rgba(255,255,255,.45);font-size:6px;font-weight:950;
+  content:"SAFE ZONE";
+  position:absolute;
+  left:6px;
+  top:6px;
+  color:rgba(255,255,255,.45);
+  font-size:6px;
+  font-weight:950;
   letter-spacing:1px;
 }
-.show-safe .safe-zone{display:block}
+
+.show-safe .safe-zone{
+  display:block;
+}
+
+/* ============================================================
+   MOTION
+============================================================ */
 
 .motion-active .product-image{
-  animation:heroIn 8s ease-in-out infinite alternate
+  animation:
+    heroIn 8s ease-in-out infinite alternate;
 }
+
 .motion-active .price{
-  animation:pricePulse 8s ease-in-out infinite
+  animation:
+    pricePulse 8s ease-in-out infinite;
 }
+
 .motion-active .badge.promo{
-  animation:badgePop 8s ease-in-out infinite
+  animation:
+    badgePop 8s ease-in-out infinite;
 }
 
 @keyframes heroIn{
-  from{transform:scale(1)}
-  to{transform:scale(1.055) translateY(-1%)}
+  from{
+    transform:scale(1);
+  }
+  to{
+    transform:
+      scale(1.055)
+      translateY(-1%);
+  }
 }
+
 @keyframes pricePulse{
-  0%,65%{transform:scale(1)}
-  72%{transform:scale(1.045)}
-  80%,100%{transform:scale(1)}
+  0%,65%{
+    transform:scale(1);
+  }
+  72%{
+    transform:scale(1.045);
+  }
+  80%,100%{
+    transform:scale(1);
+  }
 }
+
 @keyframes badgePop{
-  0%,60%{transform:scale(1)}
-  68%{transform:scale(1.07)}
-  76%,100%{transform:scale(1)}
+  0%,60%{
+    transform:scale(1);
+  }
+  68%{
+    transform:scale(1.07);
+  }
+  76%,100%{
+    transform:scale(1);
+  }
 }
-
-/* EXPORT LOCK
-   Clone export only. Preview tetap normal.
-*/
-.export-lock,
-.export-lock *{
-  animation:none!important;
-  transition:none!important;
-  caret-color:transparent!important;
-}
-.export-lock .safe-zone{
-  display:none!important;
-}
-.export-lock .ratio-mark{
-  display:none!important;
-}
-.export-lock .signature{
-  display:block!important;
-}
-
-/* Download status */
-.download-status{
-  display:none;
-  margin-top:10px;
-  padding:11px 13px;
-  border-radius:11px;
-  background:#080c09;
-  border:1px solid var(--line);
-  color:#aeb9ae;
-  font-size:8px;
-  font-weight:900;
-  line-height:1.4;
-}
-.download-status.show{display:block}
-.download-status.running{
-  color:#d8efbd;
-  border-color:rgba(140,198,63,.25);
-  background:rgba(140,198,63,.06);
-}
-.download-status.success{
-  color:#bdf18c;
-  border-color:rgba(140,198,63,.35);
-  background:rgba(140,198,63,.08);
-}
-.download-status.warn{
-  color:#ffe49a;
-  border-color:rgba(255,212,90,.25);
-  background:rgba(255,212,90,.06);
-}
-.download-status.error{
-  color:#ffaaaa;
-  border-color:rgba(255,98,98,.25);
-  background:rgba(255,98,98,.06);
-}
-.download-progress{
-  height:4px;
-  margin-top:8px;
-  overflow:hidden;
-  border-radius:99px;
-  background:#151a16;
-}
-.download-progress-fill{
-  width:0%;
-  height:100%;
-  border-radius:99px;
-  background:linear-gradient(90deg,var(--lime),var(--lime2));
-  transition:width .25s ease;
-}
-
-.toolbar{
-  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:7px;margin-top:12px;
-}
-.tool{
-  min-height:43px;padding:0 9px;border-radius:11px;
-  color:#dce4dc;background:#080c09;border:1px solid var(--line);
-  font-size:8px;font-weight:950;
-}
-.tool.active{
-  color:#081006;background:var(--lime);
-  border-color:var(--lime)
-}
-.tool.danger{color:#ff9b9b}
-
-select,input[type=text],input[type=number],input[type=search]{
-  width:100%;height:40px;padding:0 11px;
-  color:#fff;background:#080c09;border:1px solid var(--line);
-  border-radius:10px;outline:none;font-size:9px;
-}
-select:focus,input:focus{border-color:rgba(140,198,63,.65)}
-.field{margin-top:10px}
-.field label{
-  display:block;margin-bottom:5px;color:#747e75;
-  font-size:7px;font-weight:950;
-  letter-spacing:1.5px;text-transform:uppercase;
-}
-
-.choice-grid{
-  display:grid;grid-template-columns:repeat(2,1fr);
-  gap:7px;margin-top:10px;
-}
-.choice{
-  padding:11px;text-align:left;border-radius:12px;
-  color:#b8c0b8;background:#080c09;border:1px solid var(--line);
-}
-.choice strong{display:block;font-size:10px;color:#fff}
-.choice span{
-  display:block;margin-top:4px;color:#707970;
-  font-size:7px;line-height:1.4
-}
-.choice.active{
-  border-color:var(--lime);
-  box-shadow:0 0 0 1px rgba(140,198,63,.13)
-}
-.choice.active strong{color:var(--lime)}
-
-.score{
-  margin-top:12px;padding:14px;border-radius:16px;
-  background:#070b08;border:1px solid var(--line);
-}
-.score-head{
-  display:flex;justify-content:space-between;align-items:center
-}
-.score-number{
-  font-size:28px;font-weight:950;color:var(--lime)
-}
-.score-bar{
-  height:7px;margin-top:9px;
-  background:#151a16;border-radius:99px;overflow:hidden
-}
-.score-fill{
-  height:100%;width:0;
-  background:linear-gradient(90deg,var(--orange),var(--yellow),var(--lime));
-  border-radius:99px
-}
-.score-list{
-  display:grid;grid-template-columns:1fr 1fr;
-  gap:6px;margin-top:10px
-}
-.score-item{
-  display:flex;justify-content:space-between;
-  padding:6px 7px;border-radius:7px;background:#0b100c;
-  font-size:7px;color:#788178;
-}
-.score-item b{color:#dfe6df}
-
-.control-grid{
-  display:grid;grid-template-columns:repeat(3,1fr);
-  gap:8px;margin-top:10px;
-}
-.control{
-  padding:10px;border:1px solid var(--line);
-  background:#080c09;border-radius:11px;
-}
-.control label{
-  display:flex;justify-content:space-between;
-  color:#7e887f;font-size:7px;font-weight:900
-}
-.control output{color:var(--lime);font-size:7px}
-input[type=range]{width:100%;accent-color:var(--lime)}
-
-.section{margin-top:14px}
-.section-head{
-  display:flex;justify-content:space-between;
-  gap:10px;align-items:end
-}
-.section-title{font-size:18px;font-weight:950}
-.section-note{color:#727b73;font-size:8px}
-
-.product-grid{
-  display:grid;grid-template-columns:repeat(4,minmax(0,1fr));
-  gap:8px;margin-top:10px;
-}
-.card{
-  position:relative;overflow:hidden;min-width:0;
-  min-height:230px;background:#080d09;
-  border:1px solid var(--line);
-  border-radius:14px;cursor:pointer;
-}
-.card.selected{border-color:rgba(140,198,63,.75)}
-.card-image{
-  height:125px;background:#050705;
-  display:flex;align-items:center;justify-content:center
-}
-.card-image img{
-  width:100%;height:100%;padding:8px;object-fit:contain
-}
-.card-check{
-  position:absolute;top:7px;left:7px;
-  width:21px;height:21px;
-  display:grid;place-items:center;border-radius:6px;
-  color:transparent;background:rgba(0,0,0,.75);
-  border:1px solid rgba(255,255,255,.13);
-  font-size:11px;font-weight:950;
-}
-.card.selected .card-check{
-  color:#071006;background:var(--lime)
-}
-.card-info{padding:10px}
-.card-brand{
-  color:var(--lime);font-size:6px;font-weight:950;
-  letter-spacing:1.2px
-}
-.card-name{
-  margin-top:5px;font-size:9px;font-weight:850;line-height:1.3
-}
-.card-price{margin-top:7px;font-size:9px;font-weight:950}
-.card-meta{margin-top:4px;color:#6f786f;font-size:6px}
-.card-edit{
-  position:absolute;right:7px;top:7px;
-  width:27px;height:27px;border-radius:7px;color:white;
-  background:rgba(0,0,0,.75);border:1px solid var(--line);
-}
-
-.tabs{
-  display:flex;gap:5px;overflow:auto;
-  padding-bottom:2px;margin-top:12px;
-}
-.tab{
-  flex:0 0 auto;padding:8px 11px;border-radius:999px;
-  color:#7e887f;background:#080c09;border:1px solid var(--line);
-  font-size:7px;font-weight:950;
-}
-.tab.active{
-  color:#071006;background:var(--lime);
-  border-color:var(--lime)
-}
-
-.status{
-  margin-top:10px;padding:10px 12px;border-radius:11px;
-  font-size:8px;font-weight:800;
-  background:rgba(140,198,63,.06);
-  border:1px solid rgba(140,198,63,.13);
-  color:#a9c992;
-}
-.status.warn{
-  background:rgba(255,212,90,.06);
-  border-color:rgba(255,212,90,.18);
-  color:#ffe49a
-}
-.status.bad{
-  background:rgba(255,98,98,.06);
-  border-color:rgba(255,98,98,.18);
-  color:#ffaaaa
-}
-
-.modal{
-  position:fixed;inset:0;z-index:3000;
-  display:none;align-items:center;justify-content:center;
-  padding:18px;background:rgba(0,0,0,.72);
-  backdrop-filter:blur(12px);
-}
-.modal.open{display:flex}
-.modal-box{
-  width:min(760px,100%);max-height:90vh;overflow:auto;
-  padding:20px;border-radius:22px;
-  background:#090e0a;border:1px solid var(--line);
-  box-shadow:var(--shadow);
-}
-.modal-head{
-  display:flex;justify-content:space-between;align-items:center
-}
-.close{
-  width:36px;height:36px;border-radius:10px;
-  color:white;background:#111711
-}
-.modal-content{margin-top:14px}
-pre{
-  white-space:pre-wrap;word-break:break-word;
-  color:#b8c5b8;background:#050805;
-  border:1px solid var(--line);
-  border-radius:12px;padding:12px;font-size:8px;line-height:1.5;
-}
-
-.toast{
-  position:fixed;z-index:5000;left:50%;bottom:20px;
-  transform:translate(-50%,20px);
-  padding:10px 16px;border-radius:999px;
-  color:#071006;background:var(--lime);
-  font-size:8px;font-weight:950;
-  opacity:0;pointer-events:none;transition:.2s;
-}
-.toast.show{opacity:1;transform:translate(-50%,0)}
-
-.error{
-  min-height:260px;display:grid;place-items:center;
-  padding:30px;text-align:center;color:#ffaaaa;
-  background:rgba(50,8,8,.3);
-  border:1px solid rgba(255,80,80,.2);
-  border-radius:18px;font-size:10px;line-height:1.7;
-}
-
-@media(max-width:1050px){
-  .grid-main{grid-template-columns:1fr}
-  .product-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
-}
-@media(max-width:720px){
-  .product-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
-  .control-grid{grid-template-columns:1fr 1fr}
-  .toolbar{grid-template-columns:repeat(2,1fr)}
-}
-@media(max-width:520px){
-  main{padding:10px 10px 70px}
-  .panel{padding:13px;border-radius:18px}
-  .topbar{padding:11px 13px}
-  .brand h1{font-size:21px}
-  .brand p{font-size:7px}
-  .primary-btn{padding:0 11px}
-  .stage.r916 .promo-canvas{max-width:430px}
-  .product-name{font-size:23px}
-  .price{font-size:31px}
-  .r169 .product-name{font-size:17px}
-  .r169 .price{font-size:23px}
-  .score-list{grid-template-columns:1fr}
-}
-
-
-
-
-
 
 /* ============================================================
-   FINAL 9:16 TYPOGRAPHY / INFO-ZONE FIX
-   Prevent product title clipping in preview + PNG export
+   FINAL 9:16 TYPOGRAPHY FIX
 ============================================================ */
 
 .r916 .info-zone{
   left:0;
   right:0;
   bottom:0;
-
-  /*
-    Give typography more vertical room.
-    Old value: 44%
-  */
   height:47%;
-
-  /*
-    Reduce excessive vertical padding.
-  */
-  padding:
-    4.2%
-    8%
-    5.2%;
-
-  /*
-    IMPORTANT:
-    Do not clip typography at the container edge.
-  */
+  padding:4.2% 8% 5.2%;
   overflow:visible;
 }
 
@@ -695,44 +694,17 @@ pre{
 }
 
 .r916 .product-name{
-  /*
-    Smaller and safer typography.
-    This prevents the descender/bottom
-    of the glyphs from being clipped.
-  */
   margin-top:6px;
-
-  font-size:
-    clamp(
-      20px,
-      3.15vw,
-      38px
-    );
-
+  font-size:clamp(20px,3.15vw,38px);
   line-height:1.08;
-
-  /*
-    Remove WebKit line box clipping.
-  */
   display:block;
   overflow:visible;
-
-  /*
-    Allow long product names to wrap naturally.
-  */
   white-space:normal;
-
   word-break:normal;
   overflow-wrap:anywhere;
-
-  /*
-    Maximum 2 lines without clipping
-    the actual glyph box.
-  */
-  max-height:
-    calc(
-      2 * 1.08em
-    );
+  max-height:calc(2 * 1.08em);
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
 }
 
 .r916 .price-label{
@@ -743,14 +715,7 @@ pre{
 
 .r916 .price{
   margin-top:4px;
-
-  font-size:
-    clamp(
-      27px,
-      4.15vw,
-      48px
-    );
-
+  font-size:clamp(27px,4.15vw,48px);
   line-height:1;
 }
 
@@ -779,43 +744,668 @@ pre{
   line-height:1;
 }
 
-/*
-  Export clone must obey the same geometry.
-*/
-.export-static .r916 .info-zone,
-.export-lock .r916 .info-zone{
+/* ============================================================
+   EXPORT STATIC LOCK
+============================================================ */
+
+.export-static,
+.export-static *{
+  animation:none!important;
+  transition:none!important;
+  caret-color:transparent!important;
+}
+
+.export-static .safe-zone,
+.export-static .ratio-mark{
+  display:none!important;
+}
+
+.export-static .r916 .info-zone{
   overflow:visible!important;
 }
 
-.export-static .r916 .product-name,
-.export-lock .r916 .product-name{
+.export-static .r916 .product-name{
   display:block!important;
   overflow:visible!important;
   white-space:normal!important;
   max-height:none!important;
-}
-
-/*
-  Never let the title itself get clipped by
-  an inherited line-clamp.
-*/
-.r916 .product-name{
   -webkit-line-clamp:unset!important;
-  -webkit-box-orient:initial!important;
 }
 
+/* ============================================================
+   DOWNLOAD STATUS
+============================================================ */
 
+.download-status{
+  display:none;
+  margin-top:10px;
+  padding:11px 13px;
+  border-radius:11px;
+  background:#080c09;
+  border:1px solid var(--line);
+  color:#aeb9ae;
+  font-size:8px;
+  font-weight:900;
+  line-height:1.4;
+}
 
+.download-status.show{
+  display:block;
+}
 
+.download-status.running{
+  color:#d8efbd;
+  border-color:rgba(140,198,63,.25);
+  background:rgba(140,198,63,.06);
+}
 
+.download-status.success{
+  color:#bdf18c;
+  border-color:rgba(140,198,63,.35);
+  background:rgba(140,198,63,.08);
+}
 
+.download-status.warn{
+  color:#ffe49a;
+  border-color:rgba(255,212,90,.25);
+  background:rgba(255,212,90,.06);
+}
 
+.download-status.error{
+  color:#ffaaaa;
+  border-color:rgba(255,98,98,.25);
+  background:rgba(255,98,98,.06);
+}
 
+.download-progress{
+  height:4px;
+  margin-top:8px;
+  overflow:hidden;
+  border-radius:99px;
+  background:#151a16;
+}
 
+.download-progress-fill{
+  width:0%;
+  height:100%;
+  border-radius:99px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--lime),
+      var(--lime2)
+    );
+  transition:width .25s ease;
+}
 
-  
+/* ============================================================
+   CONTROLS
+============================================================ */
+
+.toolbar{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:12px;
+}
+
+.tool{
+  min-height:43px;
+  padding:0 9px;
+  border-radius:11px;
+  color:#dce4dc;
+  background:#080c09;
+  border:1px solid var(--line);
+  font-size:8px;
+  font-weight:950;
+}
+
+.tool.active{
+  color:#081006;
+  background:var(--lime);
+  border-color:var(--lime);
+}
+
+.tool.danger{
+  color:#ff9b9b;
+}
+
+select,
+input[type=text],
+input[type=number],
+input[type=search]{
+  width:100%;
+  height:40px;
+  padding:0 11px;
+  color:#fff;
+  background:#080c09;
+  border:1px solid var(--line);
+  border-radius:10px;
+  outline:none;
+  font-size:9px;
+}
+
+select:focus,
+input:focus{
+  border-color:rgba(140,198,63,.65);
+}
+
+.field{
+  margin-top:10px;
+}
+
+.field label{
+  display:block;
+  margin-bottom:5px;
+  color:#747e75;
+  font-size:7px;
+  font-weight:950;
+  letter-spacing:1.5px;
+  text-transform:uppercase;
+}
+
+/* ============================================================
+   CHOICES
+============================================================ */
+
+.choice-grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:7px;
+  margin-top:10px;
+}
+
+.choice{
+  padding:11px;
+  text-align:left;
+  border-radius:12px;
+  color:#b8c0b8;
+  background:#080c09;
+  border:1px solid var(--line);
+}
+
+.choice strong{
+  display:block;
+  font-size:10px;
+  color:#fff;
+}
+
+.choice span{
+  display:block;
+  margin-top:4px;
+  color:#707970;
+  font-size:7px;
+  line-height:1.4;
+}
+
+.choice.active{
+  border-color:var(--lime);
+  box-shadow:
+    0 0 0 1px rgba(140,198,63,.13);
+}
+
+.choice.active strong{
+  color:var(--lime);
+}
+
+/* ============================================================
+   SCORE
+============================================================ */
+
+.score{
+  margin-top:12px;
+  padding:14px;
+  border-radius:16px;
+  background:#070b08;
+  border:1px solid var(--line);
+}
+
+.score-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.score-number{
+  font-size:28px;
+  font-weight:950;
+  color:var(--lime);
+}
+
+.score-bar{
+  height:7px;
+  margin-top:9px;
+  background:#151a16;
+  border-radius:99px;
+  overflow:hidden;
+}
+
+.score-fill{
+  height:100%;
+  width:0;
+  background:
+    linear-gradient(
+      90deg,
+      var(--orange),
+      var(--yellow),
+      var(--lime)
+    );
+  border-radius:99px;
+}
+
+.score-list{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:6px;
+  margin-top:10px;
+}
+
+.score-item{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 7px;
+  border-radius:7px;
+  background:#0b100c;
+  font-size:7px;
+  color:#788178;
+}
+
+.score-item b{
+  color:#dfe6df;
+}
+
+/* ============================================================
+   CREATIVE CONTROLS
+============================================================ */
+
+.control-grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:8px;
+  margin-top:10px;
+}
+
+.control{
+  padding:10px;
+  border:1px solid var(--line);
+  background:#080c09;
+  border-radius:11px;
+}
+
+.control label{
+  display:flex;
+  justify-content:space-between;
+  color:#7e887f;
+  font-size:7px;
+  font-weight:900;
+}
+
+.control output{
+  color:var(--lime);
+  font-size:7px;
+}
+
+input[type=range]{
+  width:100%;
+  accent-color:var(--lime);
+}
+
+/* ============================================================
+   PRODUCT MANAGER
+============================================================ */
+
+.section{
+  margin-top:14px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  align-items:end;
+}
+
+.section-title{
+  font-size:18px;
+  font-weight:950;
+}
+
+.section-note{
+  color:#727b73;
+  font-size:8px;
+}
+
+.product-grid{
+  display:grid;
+  grid-template-columns:
+    repeat(4,minmax(0,1fr));
+  gap:8px;
+  margin-top:10px;
+}
+
+.card{
+  position:relative;
+  overflow:hidden;
+  min-width:0;
+  min-height:230px;
+  background:#080d09;
+  border:1px solid var(--line);
+  border-radius:14px;
+  cursor:pointer;
+}
+
+.card.selected{
+  border-color:rgba(140,198,63,.75);
+}
+
+.card-image{
+  height:125px;
+  background:#050705;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+.card-image img{
+  width:100%;
+  height:100%;
+  padding:8px;
+  object-fit:contain;
+}
+
+.card-check{
+  position:absolute;
+  top:7px;
+  left:7px;
+  width:21px;
+  height:21px;
+  display:grid;
+  place-items:center;
+  border-radius:6px;
+  color:transparent;
+  background:rgba(0,0,0,.75);
+  border:1px solid rgba(255,255,255,.13);
+  font-size:11px;
+  font-weight:950;
+}
+
+.card.selected .card-check{
+  color:#071006;
+  background:var(--lime);
+}
+
+.card-info{
+  padding:10px;
+}
+
+.card-brand{
+  color:var(--lime);
+  font-size:6px;
+  font-weight:950;
+  letter-spacing:1.2px;
+}
+
+.card-name{
+  margin-top:5px;
+  font-size:9px;
+  font-weight:850;
+  line-height:1.3;
+}
+
+.card-price{
+  margin-top:7px;
+  font-size:9px;
+  font-weight:950;
+}
+
+.card-meta{
+  margin-top:4px;
+  color:#6f786f;
+  font-size:6px;
+}
+
+.card-edit{
+  position:absolute;
+  right:7px;
+  top:7px;
+  width:27px;
+  height:27px;
+  border-radius:7px;
+  color:white;
+  background:rgba(0,0,0,.75);
+  border:1px solid var(--line);
+}
+
+/* ============================================================
+   TABS
+============================================================ */
+
+.tabs{
+  display:flex;
+  gap:5px;
+  overflow:auto;
+  padding-bottom:2px;
+  margin-top:12px;
+}
+
+.tab{
+  flex:0 0 auto;
+  padding:8px 11px;
+  border-radius:999px;
+  color:#7e887f;
+  background:#080c09;
+  border:1px solid var(--line);
+  font-size:7px;
+  font-weight:950;
+}
+
+.tab.active{
+  color:#071006;
+  background:var(--lime);
+  border-color:var(--lime);
+}
+
+/* ============================================================
+   STATUS / MODAL / TOAST
+============================================================ */
+
+.status{
+  margin-top:10px;
+  padding:10px 12px;
+  border-radius:11px;
+  font-size:8px;
+  font-weight:800;
+  background:rgba(140,198,63,.06);
+  border:1px solid rgba(140,198,63,.13);
+  color:#a9c992;
+}
+
+.status.warn{
+  background:rgba(255,212,90,.06);
+  border-color:rgba(255,212,90,.18);
+  color:#ffe49a;
+}
+
+.status.bad{
+  background:rgba(255,98,98,.06);
+  border-color:rgba(255,98,98,.18);
+  color:#ffaaaa;
+}
+
+.modal{
+  position:fixed;
+  inset:0;
+  z-index:3000;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:18px;
+  background:rgba(0,0,0,.72);
+  backdrop-filter:blur(12px);
+}
+
+.modal.open{
+  display:flex;
+}
+
+.modal-box{
+  width:min(760px,100%);
+  max-height:90vh;
+  overflow:auto;
+  padding:20px;
+  border-radius:22px;
+  background:#090e0a;
+  border:1px solid var(--line);
+  box-shadow:var(--shadow);
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.close{
+  width:36px;
+  height:36px;
+  border-radius:10px;
+  color:white;
+  background:#111711;
+}
+
+.modal-content{
+  margin-top:14px;
+}
+
+pre{
+  white-space:pre-wrap;
+  word-break:break-word;
+  color:#b8c5b8;
+  background:#050805;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px;
+  font-size:8px;
+  line-height:1.5;
+}
+
+.toast{
+  position:fixed;
+  z-index:5000;
+  left:50%;
+  bottom:20px;
+  transform:translate(-50%,20px);
+  padding:10px 16px;
+  border-radius:999px;
+  color:#071006;
+  background:var(--lime);
+  font-size:8px;
+  font-weight:950;
+  opacity:0;
+  pointer-events:none;
+  transition:.2s;
+}
+
+.toast.show{
+  opacity:1;
+  transform:translate(-50%,0);
+}
+
+.error{
+  min-height:260px;
+  display:grid;
+  place-items:center;
+  padding:30px;
+  text-align:center;
+  color:#ffaaaa;
+  background:rgba(50,8,8,.3);
+  border:1px solid rgba(255,80,80,.2);
+  border-radius:18px;
+  font-size:10px;
+  line-height:1.7;
+}
+
+/* ============================================================
+   RESPONSIVE
+============================================================ */
+
+@media(max-width:1050px){
+  .grid-main{
+    grid-template-columns:1fr;
+  }
+
+  .product-grid{
+    grid-template-columns:
+      repeat(4,minmax(0,1fr));
+  }
+}
+
+@media(max-width:720px){
+  .product-grid{
+    grid-template-columns:
+      repeat(2,minmax(0,1fr));
+  }
+
+  .control-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+  .toolbar{
+    grid-template-columns:repeat(2,1fr);
+  }
+}
+
+@media(max-width:520px){
+  main{
+    padding:10px 10px 70px;
+  }
+
+  .panel{
+    padding:13px;
+    border-radius:18px;
+  }
+
+  .topbar{
+    padding:11px 13px;
+  }
+
+  .brand h1{
+    font-size:21px;
+  }
+
+  .brand p{
+    font-size:7px;
+  }
+
+  .primary-btn{
+    padding:0 11px;
+  }
+
+  .stage.r916 .promo-canvas{
+    max-width:430px;
+  }
+
+  .product-name{
+    font-size:23px;
+  }
+
+  .price{
+    font-size:31px;
+  }
+
+  .r169 .product-name{
+    font-size:17px;
+  }
+
+  .r169 .price{
+    font-size:23px;
+  }
+
+  .score-list{
+    grid-template-columns:1fr;
+  }
+}
 </style>
-  
 </head>
 
 <body>
@@ -823,13 +1413,36 @@ pre{
 <header class="topbar">
   <div class="brand">
     <h1>IMAM Creative Studio</h1>
-    <p>Intelligent Promo • Smart Composition • Creative QA</p>
+    <p>
+      Intelligent Promo • Smart Composition • Creative QA
+    </p>
   </div>
+
   <div class="header-actions">
-    <button class="icon-btn" id="motionBtn" title="Motion Preview">▶</button>
-    <button class="icon-btn" id="safeBtn" title="Safe Zone">⌖</button>
-    <button class="icon-btn" id="fullBtn" title="Fullscreen">⛶</button>
-    <button class="primary-btn" id="autoBtn">AUTO CREATE</button>
+    <button
+      class="icon-btn"
+      id="motionBtn"
+      title="Motion Preview"
+    >▶</button>
+
+    <button
+      class="icon-btn"
+      id="safeBtn"
+      title="Safe Zone"
+    >⌖</button>
+
+    <button
+      class="icon-btn"
+      id="fullBtn"
+      title="Fullscreen"
+    >⛶</button>
+
+    <button
+      class="primary-btn"
+      id="autoBtn"
+    >
+      AUTO CREATE
+    </button>
   </div>
 </header>
 
@@ -839,245 +1452,633 @@ pre{
 <div class="grid-main">
 
 <section>
+
   <div class="panel">
+
     <div class="stage-wrap">
-      <div class="stage r169" id="stage"></div>
+      <div
+        class="stage r169"
+        id="stage"
+      ></div>
     </div>
 
     <div class="toolbar">
-      <button class="tool" data-ratio="916">9:16 STORY</button>
-      <button class="tool" data-ratio="45">4:5 FEED</button>
-      <button class="tool active" data-ratio="169">16:9 LANDSCAPE</button>
-      <button class="tool" id="prevBtn">← PREV</button>
-      <button class="tool" id="playBtn">Ⅱ PLAY</button>
-      <button class="tool" id="nextBtn">NEXT →</button>
+      <button
+        class="tool"
+        data-ratio="916"
+      >
+        9:16 STORY
+      </button>
+
+      <button
+        class="tool"
+        data-ratio="45"
+      >
+        4:5 FEED
+      </button>
+
+      <button
+        class="tool active"
+        data-ratio="169"
+      >
+        16:9 LANDSCAPE
+      </button>
+
+      <button
+        class="tool"
+        id="prevBtn"
+      >
+        ← PREV
+      </button>
+
+      <button
+        class="tool"
+        id="playBtn"
+      >
+        Ⅱ PLAY
+      </button>
+
+      <button
+        class="tool"
+        id="nextBtn"
+      >
+        NEXT →
+      </button>
     </div>
 
     <div class="toolbar">
-      <button class="tool" id="downloadBtn">DOWNLOAD PNG</button>
-      <button class="tool" id="batchBtn">BATCH EXPORT</button>
-      <button class="tool" id="jsonBtn">EXPORT JSON</button>
+
+      <button
+        class="tool"
+        id="downloadBtn"
+      >
+        DOWNLOAD PNG
+      </button>
+
+      <button
+        class="tool"
+        id="batchBtn"
+      >
+        BATCH EXPORT
+      </button>
+
+      <button
+        class="tool"
+        id="jsonBtn"
+      >
+        EXPORT JSON
+      </button>
+
     </div>
 
-    <div class="download-status" id="downloadStatus">
-      <div id="downloadStatusText">Ready.</div>
+    <div
+      class="download-status"
+      id="downloadStatus"
+    >
+      <div id="downloadStatusText">
+        Ready.
+      </div>
+
       <div class="download-progress">
-        <div class="download-progress-fill" id="downloadProgress"></div>
+        <div
+          class="download-progress-fill"
+          id="downloadProgress"
+        ></div>
       </div>
     </div>
+
   </div>
 
   <div class="panel">
+
     <div class="section-head">
       <div>
-        <div class="eyebrow">Promo Manager</div>
-        <div class="panel-title">Produk Campaign</div>
+        <div class="eyebrow">
+          Promo Manager
+        </div>
+
+        <div class="panel-title">
+          Produk Campaign
+        </div>
       </div>
+
       <div class="section-note">
-        <b id="selectedCount">0</b> dipilih •
-        <b id="totalCount">0</b> total
+        <b id="selectedCount">0</b>
+        dipilih •
+        <b id="totalCount">0</b>
+        total
       </div>
     </div>
 
     <div class="toolbar">
-      <button class="tool" id="selectAll">PILIH SEMUA</button>
-      <button class="tool" id="clearAll">BERSIHKAN</button>
-      <button class="tool" id="applyBtn">TERAPKAN</button>
+
+      <button
+        class="tool"
+        id="selectAll"
+      >
+        PILIH SEMUA
+      </button>
+
+      <button
+        class="tool"
+        id="clearAll"
+      >
+        BERSIHKAN
+      </button>
+
+      <button
+        class="tool"
+        id="applyBtn"
+      >
+        TERAPKAN
+      </button>
+
     </div>
 
     <div class="field">
-      <input type="search" id="search" placeholder="Cari produk / SKU / nama...">
+      <input
+        type="search"
+        id="search"
+        placeholder="Cari produk / SKU / nama..."
+      >
     </div>
 
-    <div class="product-grid" id="productGrid"></div>
+    <div
+      class="product-grid"
+      id="productGrid"
+    ></div>
+
   </div>
+
 </section>
 
 <aside>
 
   <div class="panel">
-    <div class="eyebrow">Creative Director</div>
-    <div class="panel-title">Tujuan Creative</div>
+
+    <div class="eyebrow">
+      Creative Director
+    </div>
+
+    <div class="panel-title">
+      Tujuan Creative
+    </div>
+
     <div class="panel-sub">
-      Biarkan engine memilih hierarchy, visual treatment,
-      accent, dan emphasis berdasarkan objective.
+      Biarkan engine memilih hierarchy,
+      visual treatment, accent, dan
+      emphasis berdasarkan objective.
     </div>
 
-    <div class="choice-grid" id="goalGrid">
-      <button class="choice active" data-goal="conversion">
+    <div
+      class="choice-grid"
+      id="goalGrid"
+    >
+
+      <button
+        class="choice active"
+        data-goal="conversion"
+      >
         <strong>🎯 Conversion</strong>
-        <span>Balanced commerce hierarchy.</span>
+        <span>
+          Balanced commerce hierarchy.
+        </span>
       </button>
-      <button class="choice" data-goal="premium">
+
+      <button
+        class="choice"
+        data-goal="premium"
+      >
         <strong>💎 Premium</strong>
-        <span>Luxury spacing and restrained copy.</span>
+        <span>
+          Luxury spacing and restrained copy.
+        </span>
       </button>
-      <button class="choice" data-goal="hard">
+
+      <button
+        class="choice"
+        data-goal="hard"
+      >
         <strong>🔥 Hard Sell</strong>
-        <span>Price and offer dominate.</span>
+        <span>
+          Price and offer dominate.
+        </span>
       </button>
-      <button class="choice" data-goal="urgency">
+
+      <button
+        class="choice"
+        data-goal="urgency"
+      >
         <strong>⚡ Flash Sale</strong>
-        <span>High contrast and urgency.</span>
+        <span>
+          High contrast and urgency.
+        </span>
       </button>
-      <button class="choice" data-goal="performance">
+
+      <button
+        class="choice"
+        data-goal="performance"
+      >
         <strong>🏁 Performance</strong>
-        <span>Technical and dynamic.</span>
+        <span>
+          Technical and dynamic.
+        </span>
       </button>
-      <button class="choice" data-goal="informative">
+
+      <button
+        class="choice"
+        data-goal="informative"
+      >
         <strong>🧠 Informative</strong>
-        <span>Product-first communication.</span>
+        <span>
+          Product-first communication.
+        </span>
       </button>
+
     </div>
 
-    <div class="status" id="directorStatus">
+    <div
+      class="status"
+      id="directorStatus"
+    >
       Creative Director siap.
     </div>
+
   </div>
 
   <div class="panel">
-    <div class="eyebrow">Creative Archetype</div>
-    <div class="panel-title" id="archetypeName">Auto</div>
-    <div class="panel-sub" id="archetypeDesc">
-      Engine akan memilih archetype berdasarkan objective dan bentuk produk.
+
+    <div class="eyebrow">
+      Creative Archetype
     </div>
-    <div class="tabs" id="templateTabs"></div>
+
+    <div
+      class="panel-title"
+      id="archetypeName"
+    >
+      Auto
+    </div>
+
+    <div
+      class="panel-sub"
+      id="archetypeDesc"
+    >
+      Engine akan memilih archetype
+      berdasarkan objective dan bentuk produk.
+    </div>
+
+    <div
+      class="tabs"
+      id="templateTabs"
+    ></div>
+
   </div>
 
   <div class="panel">
-    <div class="eyebrow">Visual Quality Assurance</div>
-    <div class="panel-title">Creative Score</div>
+
+    <div class="eyebrow">
+      Visual Quality Assurance
+    </div>
+
+    <div class="panel-title">
+      Creative Score
+    </div>
 
     <div class="score">
+
       <div class="score-head">
         <div>
-          <div class="section-note">Overall publish readiness</div>
-          <div id="scoreLabel">Analyzing...</div>
+          <div class="section-note">
+            Overall publish readiness
+          </div>
+
+          <div id="scoreLabel">
+            Analyzing...
+          </div>
         </div>
-        <div class="score-number" id="scoreNumber">—</div>
+
+        <div
+          class="score-number"
+          id="scoreNumber"
+        >
+          —
+        </div>
       </div>
 
       <div class="score-bar">
-        <div class="score-fill" id="scoreFill"></div>
+        <div
+          class="score-fill"
+          id="scoreFill"
+        ></div>
       </div>
 
-      <div class="score-list" id="scoreList"></div>
+      <div
+        class="score-list"
+        id="scoreList"
+      ></div>
+
     </div>
 
-    <div class="status" id="integrityStatus">
+    <div
+      class="status"
+      id="integrityStatus"
+    >
       Checking price integrity...
     </div>
+
   </div>
 
   <div class="panel">
-    <div class="eyebrow">Smart Composition</div>
-    <div class="panel-title">Creative Controls</div>
+
+    <div class="eyebrow">
+      Smart Composition
+    </div>
+
+    <div class="panel-title">
+      Creative Controls
+    </div>
 
     <div class="control-grid">
+
       <div class="control">
-        <label>Scale <output id="scaleOut">100%</output></label>
-        <input type="range" id="scaleCtrl" min="85" max="120" value="100">
+        <label>
+          Scale
+          <output id="scaleOut">100%</output>
+        </label>
+
+        <input
+          type="range"
+          id="scaleCtrl"
+          min="85"
+          max="120"
+          value="100"
+        >
       </div>
 
       <div class="control">
-        <label>X <output id="xOut">0</output></label>
-        <input type="range" id="xCtrl" min="-20" max="20" value="0">
+        <label>
+          X
+          <output id="xOut">0</output>
+        </label>
+
+        <input
+          type="range"
+          id="xCtrl"
+          min="-20"
+          max="20"
+          value="0"
+        >
       </div>
 
       <div class="control">
-        <label>Y <output id="yOut">0</output></label>
-        <input type="range" id="yCtrl" min="-20" max="20" value="0">
+        <label>
+          Y
+          <output id="yOut">0</output>
+        </label>
+
+        <input
+          type="range"
+          id="yCtrl"
+          min="-20"
+          max="20"
+          value="0"
+        >
       </div>
+
     </div>
 
     <div class="toolbar">
-      <button class="tool" id="resetComposition">RESET AUTO</button>
-      <button class="tool" id="safeToggle2">SAFE ZONE</button>
-      <button class="tool" id="deviceBtn">DEVICE PREVIEW</button>
+
+      <button
+        class="tool"
+        id="resetComposition"
+      >
+        RESET AUTO
+      </button>
+
+      <button
+        class="tool"
+        id="safeToggle2"
+      >
+        SAFE ZONE
+      </button>
+
+      <button
+        class="tool"
+        id="deviceBtn"
+      >
+        DEVICE PREVIEW
+      </button>
+
     </div>
+
   </div>
 
   <div class="panel">
-    <div class="eyebrow">Campaign</div>
-    <div class="panel-title">Campaign Builder</div>
+
+    <div class="eyebrow">
+      Campaign
+    </div>
+
+    <div class="panel-title">
+      Campaign Builder
+    </div>
 
     <div class="field">
       <label>Campaign Name</label>
-      <input id="campaignName" type="text" value="Campaign Promo">
+
+      <input
+        id="campaignName"
+        type="text"
+        value="Campaign Promo"
+      >
     </div>
 
     <div class="field">
       <label>CTA</label>
+
       <select id="ctaSelect">
-        <option value="CEK HARGA">CEK HARGA</option>
-        <option value="BELI SEKARANG">BELI SEKARANG</option>
-        <option value="DAPATKAN SEKARANG">DAPATKAN SEKARANG</option>
-        <option value="TANYAKAN HARGA">TANYAKAN HARGA</option>
-        <option value="PROMO TERBATAS">PROMO TERBATAS</option>
+        <option value="CEK HARGA">
+          CEK HARGA
+        </option>
+
+        <option value="BELI SEKARANG">
+          BELI SEKARANG
+        </option>
+
+        <option value="DAPATKAN SEKARANG">
+          DAPATKAN SEKARANG
+        </option>
+
+        <option value="TANYAKAN HARGA">
+          TANYAKAN HARGA
+        </option>
+
+        <option value="PROMO TERBATAS">
+          PROMO TERBATAS
+        </option>
       </select>
     </div>
 
     <div class="field">
       <label>Export Quality</label>
+
       <select id="qualitySelect">
-        <option value="fast">FAST — 1280px</option>
-        <option value="standard" selected>STANDARD — 1440px</option>
-        <option value="high">HIGH — 1920px</option>
-        <option value="ultra">ULTRA — device dependent</option>
+        <option value="fast">
+          FAST — 1280px
+        </option>
+
+        <option
+          value="standard"
+          selected
+        >
+          STANDARD — 1440px
+        </option>
+
+        <option value="high">
+          HIGH — 1920px
+        </option>
+
+        <option value="ultra">
+          ULTRA — device dependent
+        </option>
       </select>
     </div>
 
     <div class="toolbar">
-      <button class="tool" id="saveProject">SAVE PROJECT</button>
-      <button class="tool" id="loadProject">LOAD PROJECT</button>
-      <button class="tool" id="snapshotBtn">VERSION SNAPSHOT</button>
+
+      <button
+        class="tool"
+        id="saveProject"
+      >
+        SAVE PROJECT
+      </button>
+
+      <button
+        class="tool"
+        id="loadProject"
+      >
+        LOAD PROJECT
+      </button>
+
+      <button
+        class="tool"
+        id="snapshotBtn"
+      >
+        VERSION SNAPSHOT
+      </button>
+
     </div>
+
   </div>
 
   <div class="panel">
-    <div class="eyebrow">Experiment</div>
-    <div class="panel-title">A / B / C Creative</div>
+
+    <div class="eyebrow">
+      Experiment
+    </div>
+
+    <div class="panel-title">
+      A / B / C Creative
+    </div>
+
     <div class="panel-sub">
-      Generate three creative directions untuk produk yang sama.
+      Generate three creative directions
+      untuk produk yang sama.
     </div>
 
     <div class="toolbar">
-      <button class="tool" data-variant="A">A — PREMIUM</button>
-      <button class="tool" data-variant="B">B — HARD SELL</button>
-      <button class="tool" data-variant="C">C — URGENCY</button>
+
+      <button
+        class="tool"
+        data-variant="A"
+      >
+        A — PREMIUM
+      </button>
+
+      <button
+        class="tool"
+        data-variant="B"
+      >
+        B — HARD SELL
+      </button>
+
+      <button
+        class="tool"
+        data-variant="C"
+      >
+        C — URGENCY
+      </button>
+
     </div>
+
   </div>
 
 </aside>
+
 </div>
 </div>
 </main>
 
-<div class="modal" id="modal">
+<div
+  class="modal"
+  id="modal"
+>
   <div class="modal-box">
+
     <div class="modal-head">
+
       <div>
-        <div class="eyebrow" id="modalEyebrow">Project</div>
-        <div class="panel-title" id="modalTitle">Project Data</div>
+        <div
+          class="eyebrow"
+          id="modalEyebrow"
+        >
+          Project
+        </div>
+
+        <div
+          class="panel-title"
+          id="modalTitle"
+        >
+          Project Data
+        </div>
       </div>
-      <button class="close" id="closeModal">×</button>
+
+      <button
+        class="close"
+        id="closeModal"
+      >
+        ×
+      </button>
+
     </div>
-    <div class="modal-content" id="modalContent"></div>
+
+    <div
+      class="modal-content"
+      id="modalContent"
+    ></div>
+
   </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div
+  class="toast"
+  id="toast"
+></div>
 
 <script>
+/* ============================================================
+   CONFIG
+============================================================ */
 
-const CONFIG = {
+const CONFIG={
   JSON:"produk.json",
   IMAGE_FOLDER:"images/produk/",
   MAX_PIXELS:16000000,
   AUTOPLAY_MS:8500
 };
 
-const STORAGE = {
+const STORAGE={
   project:"Imamsalesfr.project.v4",
   ratio:"Imamsalesfr.ratio",
   goal:"Imamsalesfr.goal",
@@ -1089,7 +2090,7 @@ const STORAGE = {
   versions:"Imamsalesfr.versions"
 };
 
-const ARCHETYPES = {
+const ARCHETYPES={
   luxury:{
     name:"Luxury Editorial",
     desc:"Large product, restrained copy, premium negative space.",
@@ -1097,6 +2098,7 @@ const ARCHETYPES = {
     glow:"rgba(159,211,91,.13)",
     base:"#050705"
   },
+
   flash:{
     name:"Flash Sale",
     desc:"Aggressive offer hierarchy with strong orange energy.",
@@ -1104,6 +2106,7 @@ const ARCHETYPES = {
     glow:"rgba(255,118,18,.2)",
     base:"#080604"
   },
+
   neon:{
     name:"Futuristic Neon",
     desc:"High-energy green glow with technical visual language.",
@@ -1111,6 +2114,7 @@ const ARCHETYPES = {
     glow:"rgba(166,232,77,.2)",
     base:"#020502"
   },
+
   carbon:{
     name:"Carbon Performance",
     desc:"Automotive/performance direction with cool blue contrast.",
@@ -1118,6 +2122,7 @@ const ARCHETYPES = {
     glow:"rgba(41,152,232,.2)",
     base:"#03080b"
   },
+
   editorial:{
     name:"Clean Editorial",
     desc:"Product-first composition with clean commercial hierarchy.",
@@ -1125,6 +2130,7 @@ const ARCHETYPES = {
     glow:"rgba(220,232,212,.08)",
     base:"#070907"
   },
+
   street:{
     name:"Street Energy",
     desc:"Bold geometry and stronger product scale.",
@@ -1132,6 +2138,7 @@ const ARCHETYPES = {
     glow:"rgba(255,138,37,.19)",
     base:"#080604"
   },
+
   minimal:{
     name:"Minimal Commerce",
     desc:"Simple, readable, marketplace-friendly presentation.",
@@ -1139,6 +2146,7 @@ const ARCHETYPES = {
     glow:"rgba(140,198,63,.11)",
     base:"#050705"
   },
+
   technical:{
     name:"Technical Grid",
     desc:"Information-led hierarchy with performance cues.",
@@ -1148,7 +2156,7 @@ const ARCHETYPES = {
   }
 };
 
-const GOALS = {
+const GOALS={
   conversion:["minimal","editorial","luxury"],
   premium:["luxury","editorial","carbon"],
   hard:["flash","street","minimal"],
@@ -1161,21 +2169,43 @@ let products=[];
 let selectedIds=[];
 let promoProducts=[];
 let priceOverrides={};
+
 let currentIndex=0;
-let currentRatio=localStorage.getItem(STORAGE.ratio)||"169";
-let currentGoal=localStorage.getItem(STORAGE.goal)||"conversion";
-let currentTemplate=localStorage.getItem(STORAGE.template)||"auto";
-let campaignName=localStorage.getItem(STORAGE.campaign)||"Campaign Promo";
+let currentRatio=
+  localStorage.getItem(STORAGE.ratio)||
+  "169";
+
+let currentGoal=
+  localStorage.getItem(STORAGE.goal)||
+  "conversion";
+
+let currentTemplate=
+  localStorage.getItem(STORAGE.template)||
+  "auto";
+
+let campaignName=
+  localStorage.getItem(STORAGE.campaign)||
+  "Campaign Promo";
+
 let currentVariant="A";
 let playing=true;
 let motion=false;
 let safe=false;
 let searchQuery="";
-let composition={scale:100,x:0,y:0};
+let composition={
+  scale:100,
+  x:0,
+  y:0
+};
+
 let currentDevice="desktop";
 let downloadBusy=false;
 let transitionBusy=false;
 let currentScores={};
+
+/* ============================================================
+   HELPERS
+============================================================ */
 
 const $=id=>document.getElementById(id);
 
@@ -1189,39 +2219,77 @@ function esc(v){
 }
 
 function txt(v,f=""){
-  if(v===null||v===undefined)return f;
-  if(typeof v==="string"||typeof v==="number")return String(v);
-  if(typeof v==="object")
-    return String(v.text??v.label??v.title??v.name??v.nama??v.value??f);
+  if(v===null||v===undefined)
+    return f;
+
+  if(
+    typeof v==="string"||
+    typeof v==="number"
+  ){
+    return String(v);
+  }
+
+  if(typeof v==="object"){
+    return String(
+      v.text??
+      v.label??
+      v.title??
+      v.name??
+      v.nama??
+      v.value??
+      f
+    );
+  }
+
   return f;
 }
 
 function rupiah(v){
-  return new Intl.NumberFormat("id-ID",{
-    style:"currency",
-    currency:"IDR",
-    minimumFractionDigits:0,
-    maximumFractionDigits:0
-  }).format(Number(v)||0);
+  return new Intl.NumberFormat(
+    "id-ID",
+    {
+      style:"currency",
+      currency:"IDR",
+      minimumFractionDigits:0,
+      maximumFractionDigits:0
+    }
+  ).format(Number(v)||0);
 }
 
 function slug(v){
-  return String(v||"produk").toLowerCase()
+  return String(v||"produk")
+    .toLowerCase()
     .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g,"")
-    .replace(/[^a-z0-9]+/g,"-")
-    .replace(/^-+|-+$/g,"");
+    .replace(
+      /[\u0300-\u036f]/g,
+      ""
+    )
+    .replace(
+      /[^a-z0-9]+/g,
+      "-"
+    )
+    .replace(
+      /^-+|-+$/g,
+      ""
+    );
 }
 
 function wait(ms){
-  return new Promise(r=>setTimeout(r,ms));
+  return new Promise(
+    resolve=>setTimeout(resolve,ms)
+  );
 }
 
 function toast(message){
   const el=$("toast");
+
+  if(!el)return;
+
   el.textContent=message;
   el.classList.add("show");
+
   clearTimeout(toast.timer);
+
   toast.timer=setTimeout(
     ()=>el.classList.remove("show"),
     2300
@@ -1229,57 +2297,74 @@ function toast(message){
 }
 
 function save(k,v){
-  localStorage.setItem(k,JSON.stringify(v));
+  localStorage.setItem(
+    k,
+    JSON.stringify(v)
+  );
 }
 
 function load(k,f){
   try{
-    return JSON.parse(localStorage.getItem(k))??f
+    return JSON.parse(
+      localStorage.getItem(k)
+    )??f;
   }catch{
-    return f
+    return f;
   }
 }
 
 /* ============================================================
    DOWNLOAD STATUS
+   SINGLE IMPLEMENTATION
 ============================================================ */
 
 function setDownloadStatus(
   message,
   state="running",
-  progress=null
+  progress=0
 ){
   const box=$("downloadStatus");
   const text=$("downloadStatusText");
   const bar=$("downloadProgress");
 
-  if(!box||!text||!bar)return;
+  if(!box)return;
 
-  box.className="download-status show "+state;
-  text.textContent=message;
+  box.className=
+    "download-status show "+
+    state;
 
-  if(progress===null){
-    bar.style.width=state==="success"?"100%":"0%";
-  }else{
-    const safeProgress=Math.min(
+  if(text)
+    text.textContent=message;
+
+  if(bar){
+    const p=Math.min(
       100,
-      Math.max(0,Number(progress)||0)
+      Math.max(
+        0,
+        Number(progress)||0
+      )
     );
-    bar.style.width=safeProgress+"%";
+
+    bar.style.width=
+      p+"%";
   }
 }
 
 function clearDownloadStatus(){
   const box=$("downloadStatus");
-  if(!box)return;
-  box.className="download-status";
+
+  if(box){
+    box.className=
+      "download-status";
+  }
 }
 
 /* ============================================================
-   PRODUCT ENGINE
+   PRODUCT NORMALIZATION
 ============================================================ */
 
 function normalizeProduct(raw,index){
+
   const id=String(
     raw.id??
     raw.kode??
@@ -1304,7 +2389,8 @@ function normalizeProduct(raw,index){
   ).trim();
 
   const harga=
-    raw.harga&&typeof raw.harga==="object"
+    raw.harga&&
+    typeof raw.harga==="object"
       ?raw.harga
       :{};
 
@@ -1324,7 +2410,7 @@ function normalizeProduct(raw,index){
     normal
   )||normal;
 
-  return {
+  return{
     ...raw,
     id,
     brand,
@@ -1338,6 +2424,7 @@ function normalizeProduct(raw,index){
 }
 
 function imagePath(p){
+
   const explicit=
     p.gambar??
     p.image??
@@ -1346,7 +2433,8 @@ function imagePath(p){
     p.image_url??
     p.imageUrl;
 
-  if(explicit)return txt(explicit).trim();
+  if(explicit)
+    return txt(explicit).trim();
 
   const file=
     p.file??
@@ -1355,30 +2443,41 @@ function imagePath(p){
     p.namaFile;
 
   return file
-    ?CONFIG.IMAGE_FOLDER+txt(file).trim()
+    ?CONFIG.IMAGE_FOLDER+
+      txt(file).trim()
     :"";
 }
 
 function displayTitle(p){
+
   let title=txt(
     p.nama??
     p.name??
     p.judul??
     p.title,
     "Produk Promo"
-  ).replace(/\s+/g," ").trim();
+  )
+    .replace(/\s+/g," ")
+    .trim();
 
-  const brand=txt(p.brand).trim();
+  const brand=txt(
+    p.brand
+  ).trim();
 
   if(
     brand&&
-    title.toLowerCase().startsWith(
-      brand.toLowerCase()
-    )
+    title
+      .toLowerCase()
+      .startsWith(
+        brand.toLowerCase()
+      )
   ){
     title=title
       .slice(brand.length)
-      .replace(/^[-–—:|•\s]+/,"")
+      .replace(
+        /^[-–—:|•\s]+/,
+        ""
+      )
       .trim();
   }
 
@@ -1386,6 +2485,7 @@ function displayTitle(p){
 }
 
 function isPromo(p){
+
   const v=
     p.promo??
     p.isPromo??
@@ -1393,15 +2493,18 @@ function isPromo(p){
     p.statusPromo??
     false;
 
-  if(v===true)return true;
+  if(v===true)
+    return true;
 
   if(typeof v==="string"){
-    return [
+    return[
       "true",
       "promo",
       "yes",
       "1"
-    ].includes(v.toLowerCase());
+    ].includes(
+      v.toLowerCase()
+    );
   }
 
   return false;
@@ -1418,7 +2521,12 @@ function warranty(p){
   );
 }
 
+/* ============================================================
+   PRICE ENGINE
+============================================================ */
+
 function priceData(p){
+
   const normal=Number(
     priceOverrides[p.id]?.normal??
     p.harga?.normal
@@ -1429,28 +2537,44 @@ function priceData(p){
     p.harga?.promo
   )||normal;
 
-  const o=priceOverrides[p.id]||{};
+  const o=
+    priceOverrides[p.id]||
+    {};
 
-  const extraEnabled=!!o.extraEnabled;
+  const extraEnabled=
+    !!o.extraEnabled;
 
-  const extraPercent=Math.min(
-    99,
-    Math.max(0,Number(o.extraPercent)||0)
-  );
+  const extraPercent=
+    Math.min(
+      99,
+      Math.max(
+        0,
+        Number(o.extraPercent)||0
+      )
+    );
 
-  const manualEnabled=!!o.manualEnabled;
+  const manualEnabled=
+    !!o.manualEnabled;
 
-  const manualFinal=Number(o.manualFinal)||0;
+  const manualFinal=
+    Number(o.manualFinal)||0;
 
   let final=promo;
 
-  if(extraEnabled&&extraPercent>0){
+  if(
+    extraEnabled&&
+    extraPercent>0
+  ){
     final=Math.round(
-      promo*(1-extraPercent/100)
+      promo*
+      (1-extraPercent/100)
     );
   }
 
-  if(manualEnabled&&manualFinal>0){
+  if(
+    manualEnabled&&
+    manualFinal>0
+  ){
     final=manualFinal;
   }
 
@@ -1459,7 +2583,9 @@ function priceData(p){
       ?Math.max(
         0,
         Math.round(
-          (normal-promo)/normal*100
+          (normal-promo)/
+          normal*
+          100
         )
       )
       :0;
@@ -1469,12 +2595,14 @@ function priceData(p){
       ?Math.max(
         0,
         Math.round(
-          (normal-final)/normal*100
+          (normal-final)/
+          normal*
+          100
         )
       )
       :0;
 
-  return {
+  return{
     normal,
     promo,
     final,
@@ -1487,102 +2615,150 @@ function priceData(p){
   };
 }
 
-/* ============================================================
-   SMART PRICE DISPLAY
-============================================================ */
-
 function compactPrice(value){
+
   const n=Number(value)||0;
 
-  if(n>=1000000000)
-    return "Rp "+
+  if(n>=1000000000){
+    return(
+      "Rp "+
       (n/1000000000)
-      .toFixed(2)
-      .replace(/\.00$/,"")+
-      " M";
+        .toFixed(2)
+        .replace(/\.00$/,"")+
+      " M"
+    );
+  }
 
-  if(n>=1000000)
-    return "Rp "+
+  if(n>=1000000){
+    return(
+      "Rp "+
       (n/1000000)
-      .toFixed(2)
-      .replace(/\.00$/,"")+
-      " JT";
+        .toFixed(2)
+        .replace(/\.00$/,"")+
+      " JT"
+    );
+  }
 
-  if(n>=1000)
-    return "Rp "+
+  if(n>=1000){
+    return(
+      "Rp "+
       (n/1000)
-      .toFixed(0)+
-      " RB";
+        .toFixed(0)+
+      " RB"
+    );
+  }
 
   return rupiah(n);
 }
 
 function priceDisplay(p){
-  const price=priceData(p);
+
+  const price=
+    priceData(p);
 
   if(
     currentRatio==="169"||
     currentGoal==="premium"
   ){
-    return compactPrice(price.final);
+    return compactPrice(
+      price.final
+    );
   }
 
-  return rupiah(price.final);
+  return rupiah(
+    price.final
+  );
 }
 
 /* ============================================================
-   SMART COMPOSITION
+   COMPOSITION
 ============================================================ */
 
 function inferShape(p){
+
   const known=
     p.aspectRatio??
     p.imageAspectRatio??
     p.orientation;
 
   if(known){
-    const s=String(known).toLowerCase();
+
+    const s=
+      String(known)
+        .toLowerCase();
 
     if(
       s.includes("portrait")||
       s.includes("vertical")
-    )return"portrait";
+    ){
+      return"portrait";
+    }
 
     if(
       s.includes("landscape")||
       s.includes("horizontal")
-    )return"landscape";
+    ){
+      return"landscape";
+    }
   }
 
   if(p.width&&p.height){
-    const r=Number(p.width)/Number(p.height);
 
-    if(r<.72)return"portrait";
-    if(r>1.35)return"landscape";
+    const r=
+      Number(p.width)/
+      Number(p.height);
+
+    if(r<.72)
+      return"portrait";
+
+    if(r>1.35)
+      return"landscape";
   }
 
   return"square";
 }
 
 function autoComposition(p){
-  const shape=inferShape(p);
+
+  const shape=
+    inferShape(p);
 
   let scale=100;
   let x=0;
   let y=0;
 
   if(shape==="portrait"){
-    scale=currentRatio==="169"?94:102;
-    x=currentRatio==="169"?-3:0;
+
+    scale=
+      currentRatio==="169"
+        ?94
+        :102;
+
+    x=
+      currentRatio==="169"
+        ?-3
+        :0;
+
     y=-1;
+
   }else if(shape==="landscape"){
-    scale=currentRatio==="169"?108:100;
+
+    scale=
+      currentRatio==="169"
+        ?108
+        :100;
+
     y=1;
+
   }else{
-    scale=currentRatio==="169"?104:100;
+
+    scale=
+      currentRatio==="169"
+        ?104
+        :100;
   }
 
-  return {
+  return{
     scale,
     x,
     y,
@@ -1591,12 +2767,23 @@ function autoComposition(p){
 }
 
 function effectiveComposition(p){
-  const a=autoComposition(p);
 
-  return {
-    scale:a.scale*(composition.scale/100),
-    x:a.x+composition.x,
-    y:a.y+composition.y,
+  const a=
+    autoComposition(p);
+
+  return{
+    scale:
+      a.scale*
+      (composition.scale/100),
+
+    x:
+      a.x+
+      composition.x,
+
+    y:
+      a.y+
+      composition.y,
+
     shape:a.shape
   };
 }
@@ -1606,67 +2793,102 @@ function effectiveComposition(p){
 ============================================================ */
 
 function chooseTemplate(p){
-  if(currentTemplate!=="auto")
+
+  if(
+    currentTemplate!=="auto"
+  ){
     return currentTemplate;
+  }
 
   const list=
     GOALS[currentGoal]||
     GOALS.conversion;
 
-  const shape=inferShape(p);
+  const shape=
+    inferShape(p);
 
   if(
     currentGoal==="premium"&&
     shape==="portrait"
-  )return"luxury";
+  ){
+    return"luxury";
+  }
 
   if(
     currentGoal==="performance"&&
     shape==="landscape"
-  )return"carbon";
+  ){
+    return"carbon";
+  }
 
   if(
     currentGoal==="urgency"&&
     shape==="landscape"
-  )return"flash";
+  ){
+    return"flash";
+  }
 
   return list[0]||"minimal";
 }
 
 function directorReason(p,t){
-  const shape=inferShape(p);
-  const goal=currentGoal;
+
+  const shape=
+    inferShape(p);
 
   const reasons={
-    premium:"Luxury spacing prioritizes product authority.",
-    hard:"Offer hierarchy prioritizes price and conversion.",
-    urgency:"High-energy treatment amplifies urgency.",
-    performance:"Technical visual language reinforces performance.",
-    informative:"Readable hierarchy keeps information dominant.",
-    conversion:"Balanced hierarchy optimizes commercial clarity."
+    premium:
+      "Luxury spacing prioritizes product authority.",
+
+    hard:
+      "Offer hierarchy prioritizes price and conversion.",
+
+    urgency:
+      "High-energy treatment amplifies urgency.",
+
+    performance:
+      "Technical visual language reinforces performance.",
+
+    informative:
+      "Readable hierarchy keeps information dominant.",
+
+    conversion:
+      "Balanced hierarchy optimizes commercial clarity."
   };
 
-  return `${
-    reasons[goal]||reasons.conversion
-  } Product shape: ${shape}.`;
+  return(
+    `${
+      reasons[currentGoal]||
+      reasons.conversion
+    } Product shape: ${shape}.`
+  );
 }
 
 /* ============================================================
-   RENDER PREVIEW
+   PREVIEW
 ============================================================ */
 
 function renderPreview(){
+
   const stage=$("stage");
 
   if(!promoProducts.length){
-    stage.className="stage r"+currentRatio;
+
+    stage.className=
+      "stage r"+
+      currentRatio;
 
     stage.innerHTML=`
       <div class="error">
         <div>
-          <strong>Belum ada produk.</strong>
+          <strong>
+            Belum ada produk.
+          </strong>
+
           <br><br>
-          Pilih produk lalu tekan TERAPKAN.
+
+          Pilih produk lalu tekan
+          TERAPKAN.
         </div>
       </div>
     `;
@@ -1675,54 +2897,90 @@ function renderPreview(){
     return;
   }
 
-  if(currentIndex>=promoProducts.length)
+  if(
+    currentIndex>=
+    promoProducts.length
+  ){
     currentIndex=0;
+  }
 
-  const p=promoProducts[currentIndex];
-  const t=chooseTemplate(p);
-  const theme=ARCHETYPES[t]||ARCHETYPES.minimal;
-  const price=priceData(p);
-  const comp=effectiveComposition(p);
-  const image=imagePath(p);
-  const title=displayTitle(p);
+  const p=
+    promoProducts[currentIndex];
+
+  const t=
+    chooseTemplate(p);
+
+  const theme=
+    ARCHETYPES[t]||
+    ARCHETYPES.minimal;
+
+  const price=
+    priceData(p);
+
+  const comp=
+    effectiveComposition(p);
+
+  const image=
+    imagePath(p);
+
+  const title=
+    displayTitle(p);
 
   const extra=
-    price.extraEnabled&&price.extraPercent>0
-      ?`<span class="badge extra">EXTRA ${price.extraPercent}%</span>`
+    price.extraEnabled&&
+    price.extraPercent>0
+
+      ?`
+        <span class="badge extra">
+          EXTRA ${price.extraPercent}%
+        </span>
+      `
+
       :"";
 
   const extraNote=
-    price.extraEnabled&&price.extraPercent>0
-      ?`<div class="extra-note">FINAL PRICE AFTER EXTRA DISCOUNT</div>`
+    price.extraEnabled&&
+    price.extraPercent>0
+
+      ?`
+        <div class="extra-note">
+          FINAL PRICE AFTER EXTRA DISCOUNT
+        </div>
+      `
+
       :"";
 
-  const cta=$("ctaSelect").value;
+  const cta=
+    $("ctaSelect").value;
 
   stage.className=
     `stage r${currentRatio} `+
     `${motion?"motion-active":""} `+
     `${safe?"show-safe":""}`;
 
-  const imageHTML=image
-    ?`
-      <img
-        class="product-image ${comp.shape}"
-        id="heroImage"
-        src="${esc(image)}"
-        alt="${esc(title)}"
-        crossorigin="anonymous"
-        decoding="async"
-      >
-    `
-    :`
-      <div style="
-        color:#697169;
-        font-size:9px;
-        font-weight:900
-      ">
-        IMAGE NOT FOUND
-      </div>
-    `;
+  const imageHTML=
+    image
+
+      ?`
+        <img
+          class="product-image ${comp.shape}"
+          id="heroImage"
+          src="${esc(image)}"
+          alt="${esc(title)}"
+          crossorigin="anonymous"
+          decoding="async"
+        >
+      `
+
+      :`
+        <div style="
+          color:#697169;
+          font-size:9px;
+          font-weight:900
+        ">
+          IMAGE NOT FOUND
+        </div>
+      `;
 
   stage.innerHTML=`
     <article
@@ -1742,22 +3000,33 @@ function renderPreview(){
       </div>
 
       <div class="product-visual">
+
         ${imageHTML}
+
         <div class="contact-shadow"></div>
+
         <div class="visual-gradient"></div>
+
       </div>
 
       <div class="info-zone">
+
         <div class="product-info">
 
           <div class="rule"></div>
 
           <div class="badges">
-            <span class="badge promo">PROMO</span>
+
+            <span class="badge promo">
+              PROMO
+            </span>
+
             ${extra}
+
             <span class="badge warranty">
               ◇ ${esc(warranty(p))}
             </span>
+
           </div>
 
           <div class="brand-line">
@@ -1777,19 +3046,24 @@ function renderPreview(){
           </div>
 
           <div class="price-meta">
+
             <span class="old">
               <s>${rupiah(price.normal)}</s>
             </span>
 
             ${
               price.finalDiscount>0
+
                 ?`
                   <span class="discount">
-                    HEMAT ${price.finalDiscount}%
+                    HEMAT
+                    ${price.finalDiscount}%
                   </span>
                 `
+
                 :""
             }
+
           </div>
 
           ${extraNote}
@@ -1799,6 +3073,7 @@ function renderPreview(){
           </div>
 
         </div>
+
       </div>
 
       <div class="safe-zone"></div>
@@ -1814,7 +3089,8 @@ function renderPreview(){
       </div>
 
       <div class="signature">
-        Imamsalesfr • ${esc(currentVariant)}
+        Imamsalesfr •
+        ${esc(currentVariant)}
       </div>
 
     </article>
@@ -1828,16 +3104,22 @@ function renderPreview(){
 }
 
 /* ============================================================
-   COMPOSITION
+   COMPOSITION UI
 ============================================================ */
 
 function applyComposition(){
-  const p=promoProducts[currentIndex];
-  const img=$("heroImage");
 
-  if(!img||!p)return;
+  const p=
+    promoProducts[currentIndex];
 
-  const c=effectiveComposition(p);
+  const img=
+    $("heroImage");
+
+  if(!img||!p)
+    return;
+
+  const c=
+    effectiveComposition(p);
 
   img.style.transform=
     `translate(${c.x}%,${c.y}%) `+
@@ -1849,10 +3131,12 @@ function applyComposition(){
 ============================================================ */
 
 function updateDirectorUI(p,t){
+
   if(!p)return;
 
   $("archetypeName").textContent=
-    ARCHETYPES[t]?.name||"Auto";
+    ARCHETYPES[t]?.name||
+    "Auto";
 
   $("archetypeDesc").textContent=
     ARCHETYPES[t]?.desc||
@@ -1861,34 +3145,48 @@ function updateDirectorUI(p,t){
   $("directorStatus").textContent=
     directorReason(p,t);
 
-  document.querySelectorAll(".choice").forEach(x=>{
-    x.classList.toggle(
-      "active",
-      x.dataset.goal===currentGoal
-    );
-  });
+  document
+    .querySelectorAll(".choice")
+    .forEach(x=>{
+      x.classList.toggle(
+        "active",
+        x.dataset.goal===
+          currentGoal
+      );
+    });
 
-  document.querySelectorAll(".tab").forEach(x=>{
-    x.classList.toggle(
-      "active",
-      x.dataset.template===t
-    );
-  });
+  document
+    .querySelectorAll(".tab")
+    .forEach(x=>{
+      x.classList.toggle(
+        "active",
+        x.dataset.template===t
+      );
+    });
 }
 
 /* ============================================================
-   VISUAL QA
+   SCORE
 ============================================================ */
 
 function scoreVisual(p){
+
   if(!p)return null;
 
-  const price=priceData(p);
-  const comp=effectiveComposition(p);
-  const title=displayTitle(p);
-  const shape=comp.shape;
+  const price=
+    priceData(p);
+
+  const comp=
+    effectiveComposition(p);
+
+  const title=
+    displayTitle(p);
+
+  const shape=
+    comp.shape;
 
   let composition=90;
+
   let productVisibility=
     shape==="portrait"
       ?94
@@ -1897,12 +3195,26 @@ function scoreVisual(p){
         :96;
 
   let priceLegibility=
-    currentRatio==="169"?91:96;
+    currentRatio==="169"
+      ?91
+      :96;
 
   let contrast=94;
-  let brand=title.length>42?84:93;
-  let whitespace=currentRatio==="169"?90:94;
-  let mobile=currentRatio==="916"?97:90;
+
+  let brand=
+    title.length>42
+      ?84
+      :93;
+
+  let whitespace=
+    currentRatio==="169"
+      ?90
+      :94;
+
+  let mobile=
+    currentRatio==="916"
+      ?97
+      :90;
 
   if(comp.scale>115){
     composition-=7;
@@ -1914,8 +3226,11 @@ function scoreVisual(p){
     productVisibility-=8;
   }
 
-  if(title.length>55)brand-=10;
-  if(price.final<=0)priceLegibility=20;
+  if(title.length>55)
+    brand-=10;
+
+  if(price.final<=0)
+    priceLegibility=20;
 
   if(
     price.normal>0&&
@@ -1936,13 +3251,47 @@ function scoreVisual(p){
     brand+=3;
 
   const vals={
-    composition:Math.min(100,Math.max(0,composition)),
-    product:Math.min(100,Math.max(0,productVisibility)),
-    price:Math.min(100,Math.max(0,priceLegibility)),
-    contrast:Math.min(100,Math.max(0,contrast)),
-    brand:Math.min(100,Math.max(0,brand)),
-    whitespace:Math.min(100,Math.max(0,whitespace)),
-    mobile:Math.min(100,Math.max(0,mobile))
+    composition:
+      Math.min(
+        100,
+        Math.max(0,composition)
+      ),
+
+    product:
+      Math.min(
+        100,
+        Math.max(0,productVisibility)
+      ),
+
+    price:
+      Math.min(
+        100,
+        Math.max(0,priceLegibility)
+      ),
+
+    contrast:
+      Math.min(
+        100,
+        Math.max(0,contrast)
+      ),
+
+    brand:
+      Math.min(
+        100,
+        Math.max(0,brand)
+      ),
+
+    whitespace:
+      Math.min(
+        100,
+        Math.max(0,whitespace)
+      ),
+
+    mobile:
+      Math.min(
+        100,
+        Math.max(0,mobile)
+      )
   };
 
   const overall=Math.round(
@@ -1955,30 +3304,43 @@ function scoreVisual(p){
     vals.mobile*.12
   );
 
-  return {
+  return{
     overall,
     ...vals
   };
 }
 
 function updateScore(p){
-  const score=scoreVisual(p);
+
+  const score=
+    scoreVisual(p);
 
   if(!score){
-    $("scoreNumber").textContent="—";
-    $("scoreFill").style.width="0";
-    $("scoreList").innerHTML="";
+
+    $("scoreNumber")
+      .textContent="—";
+
+    $("scoreFill")
+      .style.width="0";
+
+    $("scoreList")
+      .innerHTML="";
+
     return;
   }
 
   currentScores=score;
 
-  $("scoreNumber").textContent=score.overall;
+  $("scoreNumber")
+    .textContent=
+    score.overall;
 
-  $("scoreFill").style.width=
+  $("scoreFill")
+    .style.width=
     score.overall+"%";
 
-  $("scoreLabel").textContent=
+  $("scoreLabel")
+    .textContent=
     score.overall>=90
       ?"READY TO PUBLISH"
       :score.overall>=80
@@ -1997,17 +3359,16 @@ function updateScore(p){
     mobile:"Mobile"
   };
 
-  $("scoreList").innerHTML=
-    Object.entries(names)
-      .map(([k,n])=>
-        `
+  $("scoreList")
+    .innerHTML=
+      Object.entries(names)
+        .map(([k,n])=>`
           <div class="score-item">
             <span>${n}</span>
             <b>${score[k]}</b>
           </div>
-        `
-      )
-      .join("");
+        `)
+        .join("");
 }
 
 /* ============================================================
@@ -2015,39 +3376,66 @@ function updateScore(p){
 ============================================================ */
 
 function updateIntegrity(p){
-  const el=$("integrityStatus");
+
+  const el=
+    $("integrityStatus");
 
   if(!p){
-    el.textContent="No product.";
-    el.className="status";
+    el.textContent=
+      "No product.";
+
+    el.className=
+      "status";
+
     return;
   }
 
-  const x=priceData(p);
+  const x=
+    priceData(p);
 
-  if(x.normal<=0||x.final<=0){
-    el.textContent="⚠ Harga belum lengkap.";
-    el.className="status bad";
+  if(
+    x.normal<=0||
+    x.final<=0
+  ){
+    el.textContent=
+      "⚠ Harga belum lengkap.";
+
+    el.className=
+      "status bad";
+
     return;
   }
 
   if(x.promo>x.normal){
+
     el.textContent=
       "⚠ Promo price lebih tinggi dari normal price.";
-    el.className="status bad";
+
+    el.className=
+      "status bad";
+
     return;
   }
 
   if(x.final>x.promo){
+
     el.textContent=
       "⚠ Final price tidak boleh lebih tinggi dari promo.";
-    el.className="status bad";
+
+    el.className=
+      "status bad";
+
     return;
   }
 
   if(x.finalDiscount>99){
-    el.textContent="⚠ Discount tidak valid.";
-    el.className="status bad";
+
+    el.textContent=
+      "⚠ Discount tidak valid.";
+
+    el.className=
+      "status bad";
+
     return;
   }
 
@@ -2055,7 +3443,8 @@ function updateIntegrity(p){
     `✓ Price integrity verified • `+
     `${x.finalDiscount}% total discount`;
 
-  el.className="status";
+  el.className=
+    "status";
 }
 
 /* ============================================================
@@ -2063,30 +3452,44 @@ function updateIntegrity(p){
 ============================================================ */
 
 function renderManager(){
-  const grid=$("productGrid");
 
-  const filtered=products.filter(p=>{
-    if(!searchQuery)return true;
+  const grid=
+    $("productGrid");
 
-    const hay=[
-      p.brand,
-      p.nama,
-      p.name,
-      p.id,
-      p.sku
-    ]
-      .filter(Boolean)
-      .join(" ")
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"");
+  const filtered=
+    products.filter(p=>{
 
-    return hay.includes(searchQuery);
-  });
+      if(!searchQuery)
+        return true;
+
+      const hay=[
+        p.brand,
+        p.nama,
+        p.name,
+        p.id,
+        p.sku
+      ]
+        .filter(Boolean)
+        .join(" ")
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(
+          /[\u0300-\u036f]/g,
+          ""
+        );
+
+      return hay.includes(
+        searchQuery
+      );
+    });
 
   grid.innerHTML=
     filtered.length
-      ?filtered.map(createCard).join("")
+
+      ?filtered
+        .map(createCard)
+        .join("")
+
       :`
         <div
           class="error"
@@ -2096,23 +3499,27 @@ function renderManager(){
         </div>
       `;
 
-  $("selectedCount").textContent=
-    selectedIds.length;
-
-  $("totalCount").textContent=
-    products.length;
+  updateCounts();
 }
 
 function createCard(p){
+
   const selected=
-    selectedIds.includes(String(p.id));
+    selectedIds.includes(
+      String(p.id)
+    );
 
-  const price=priceData(p);
-  const img=imagePath(p);
+  const price=
+    priceData(p);
 
-  return `
+  const img=
+    imagePath(p);
+
+  return`
     <article
-      class="card ${selected?"selected":""}"
+      class="card ${
+        selected?"selected":""
+      }"
       data-id="${esc(p.id)}"
     >
 
@@ -2141,6 +3548,7 @@ function createCard(p){
       </div>
 
       <div class="card-info">
+
         <div class="card-brand">
           ${esc(p.brand)}
         </div>
@@ -2161,107 +3569,155 @@ function createCard(p){
               :""
           }
         </div>
+
       </div>
 
     </article>
   `;
 }
 
-$("productGrid").addEventListener("click",e=>{
-  const edit=e.target.closest("[data-edit]");
+$("productGrid")
+  .addEventListener(
+    "click",
+    e=>{
 
-  if(edit){
-    e.stopPropagation();
-    openPriceEditor(edit.dataset.edit);
-    return;
-  }
+      const edit=
+        e.target.closest(
+          "[data-edit]"
+        );
 
-  const card=e.target.closest(".card");
+      if(edit){
 
-  if(!card)return;
+        e.stopPropagation();
 
-  const id=String(card.dataset.id);
+        openPriceEditor(
+          edit.dataset.edit
+        );
 
-  selectedIds=
-    selectedIds.includes(id)
-      ?selectedIds.filter(x=>x!==id)
-      :[...selectedIds,id];
+        return;
+      }
 
-  save(STORAGE.selection,selectedIds);
+      const card=
+        e.target.closest(
+          ".card"
+        );
 
-  renderManager();
-});
+      if(!card)return;
+
+      const id=
+        String(card.dataset.id);
+
+      selectedIds=
+        selectedIds.includes(id)
+
+          ?selectedIds.filter(
+            x=>x!==id
+          )
+
+          :[
+            ...selectedIds,
+            id
+          ];
+
+      save(
+        STORAGE.selection,
+        selectedIds
+      );
+
+      renderManager();
+    }
+  );
 
 /* ============================================================
    PRICE EDITOR
 ============================================================ */
 
 function openPriceEditor(id){
-  const p=products.find(
-    x=>String(x.id)===String(id)
-  );
+
+  const p=
+    products.find(
+      x=>String(x.id)===String(id)
+    );
 
   if(!p)return;
 
-  const x=priceData(p);
+  const x=
+    priceData(p);
 
-  $("modalEyebrow").textContent="Price Engine";
-  $("modalTitle").textContent=
+  $("modalEyebrow")
+    .textContent=
+    "Price Engine";
+
+  $("modalTitle")
+    .textContent=
     displayTitle(p);
 
-  $("modalContent").innerHTML=`
-    <div class="field">
-      <label>Normal Price</label>
-      <input
-        id="editNormal"
-        type="number"
-        value="${x.normal}"
-      >
-    </div>
+  $("modalContent")
+    .innerHTML=`
 
-    <div class="field">
-      <label>Promo Price</label>
-      <input
-        id="editPromo"
-        type="number"
-        value="${x.promo}"
-      >
-    </div>
+      <div class="field">
+        <label>Normal Price</label>
+        <input
+          id="editNormal"
+          type="number"
+          value="${x.normal}"
+        >
+      </div>
 
-    <div class="field">
-      <label>Extra Discount %</label>
-      <input
-        id="editExtra"
-        type="number"
-        min="0"
-        max="99"
-        value="${x.extraPercent}"
-      >
-    </div>
+      <div class="field">
+        <label>Promo Price</label>
+        <input
+          id="editPromo"
+          type="number"
+          value="${x.promo}"
+        >
+      </div>
 
-    <div class="field">
-      <label>Manual Final Price</label>
-      <input
-        id="editFinal"
-        type="number"
-        value="${x.manualFinal}"
-      >
-    </div>
+      <div class="field">
+        <label>Extra Discount %</label>
+        <input
+          id="editExtra"
+          type="number"
+          min="0"
+          max="99"
+          value="${x.extraPercent}"
+        >
+      </div>
 
-    <div class="toolbar">
-      <button class="tool" id="resetPrice">
-        RESET
-      </button>
+      <div class="field">
+        <label>Manual Final Price</label>
+        <input
+          id="editFinal"
+          type="number"
+          value="${x.manualFinal}"
+        >
+      </div>
 
-      <button class="tool active" id="savePrice">
-        SAVE PRICE
-      </button>
-    </div>
-  `;
+      <div class="toolbar">
 
-  $("modal").classList.add("open");
+        <button
+          class="tool"
+          id="resetPrice"
+        >
+          RESET
+        </button>
+
+        <button
+          class="tool active"
+          id="savePrice"
+        >
+          SAVE PRICE
+        </button>
+
+      </div>
+    `;
+
+  $("modal")
+    .classList
+    .add("open");
 
   $("resetPrice").onclick=()=>{
+
     delete priceOverrides[id];
 
     save(
@@ -2269,31 +3725,56 @@ function openPriceEditor(id){
       priceOverrides
     );
 
-    $("modal").classList.remove("open");
+    $("modal")
+      .classList
+      .remove("open");
 
     renderManager();
     renderPreview();
 
-    toast("Harga dikembalikan ke JSON.");
+    toast(
+      "Harga dikembalikan ke JSON."
+    );
   };
 
   $("savePrice").onclick=()=>{
+
     priceOverrides[id]={
-      normal:Number($("editNormal").value)||0,
-      promo:Number($("editPromo").value)||0,
+      normal:
+        Number(
+          $("editNormal").value
+        )||0,
+
+      promo:
+        Number(
+          $("editPromo").value
+        )||0,
+
       extraEnabled:
-        Number($("editExtra").value)>0,
-      extraPercent:Math.min(
-        99,
-        Math.max(
-          0,
-          Number($("editExtra").value)||0
-        )
-      ),
+        Number(
+          $("editExtra").value
+        )>0,
+
+      extraPercent:
+        Math.min(
+          99,
+          Math.max(
+            0,
+            Number(
+              $("editExtra").value
+            )||0
+          )
+        ),
+
       manualEnabled:
-        Number($("editFinal").value)>0,
+        Number(
+          $("editFinal").value
+        )>0,
+
       manualFinal:
-        Number($("editFinal").value)||0
+        Number(
+          $("editFinal").value
+        )||0
     };
 
     save(
@@ -2301,23 +3782,30 @@ function openPriceEditor(id){
       priceOverrides
     );
 
-    $("modal").classList.remove("open");
+    $("modal")
+      .classList
+      .remove("open");
 
     renderManager();
     renderPreview();
 
-    toast("Harga promo diperbarui ✓");
+    toast(
+      "Harga promo diperbarui ✓"
+    );
   };
 }
 
 /* ============================================================
-   APPLY / NAVIGATION
+   NAVIGATION
 ============================================================ */
 
 function applyPromo(notify=true){
+
   promoProducts=
     products.filter(p=>
-      selectedIds.includes(String(p.id))
+      selectedIds.includes(
+        String(p.id)
+      )
     );
 
   currentIndex=0;
@@ -2337,30 +3825,38 @@ function applyPromo(notify=true){
 }
 
 function changeSlide(dir){
+
   if(
     transitionBusy||
     promoProducts.length<2
-  )return;
+  ){
+    return;
+  }
 
   transitionBusy=true;
+
   stopAutoplay();
 
-  const canvas=$("promoCanvas");
+  const canvas=
+    $("promoCanvas");
 
   if(canvas)
     canvas.style.opacity="0";
 
   setTimeout(()=>{
+
     currentIndex=
       (
         currentIndex+
         dir+
         promoProducts.length
-      )%promoProducts.length;
+      )%
+      promoProducts.length;
 
     renderPreview();
 
-    const next=$("promoCanvas");
+    const next=
+      $("promoCanvas");
 
     if(next)
       next.style.opacity="1";
@@ -2382,34 +3878,45 @@ function previousSlide(){
 }
 
 function startAutoplay(){
+
   stopAutoplay();
 
   if(
     !playing||
     promoProducts.length<2
-  )return;
+  ){
+    return;
+  }
 
-  window.autoplay=setInterval(
-    nextSlide,
-    CONFIG.AUTOPLAY_MS
-  );
+  window.autoplay=
+    setInterval(
+      nextSlide,
+      CONFIG.AUTOPLAY_MS
+    );
 }
 
 function stopAutoplay(){
+
   if(window.autoplay){
-    clearInterval(window.autoplay);
+
+    clearInterval(
+      window.autoplay
+    );
+
     window.autoplay=null;
   }
 }
 
 /* ============================================================
-   MOTION
+   MOTION / SAFE
 ============================================================ */
 
 function toggleMotion(){
+
   motion=!motion;
 
-  $("motionBtn").textContent=
+  $("motionBtn")
+    .textContent=
     motion?"Ⅱ":"▶";
 
   renderPreview();
@@ -2421,17 +3928,16 @@ function toggleMotion(){
   );
 }
 
-/* ============================================================
-   SAFE ZONE
-============================================================ */
-
 function toggleSafe(){
+
   safe=!safe;
 
-  $("safeBtn").classList.toggle(
-    "active",
-    safe
-  );
+  $("safeBtn")
+    .classList
+    .toggle(
+      "active",
+      safe
+    );
 
   renderPreview();
 }
@@ -2441,20 +3947,27 @@ function toggleSafe(){
 ============================================================ */
 
 function autoCreate(){
+
   if(!promoProducts.length){
     toast("Pilih produk dulu.");
     return;
   }
 
   currentTemplate="auto";
+
   composition={
     scale:100,
     x:0,
     y:0
   };
 
-  const p=promoProducts[currentIndex];
-  const t=chooseTemplate(p);
+  const p=
+    promoProducts[
+      currentIndex
+    ];
+
+  const t=
+    chooseTemplate(p);
 
   $("scaleCtrl").value=100;
   $("xCtrl").value=0;
@@ -2469,19 +3982,19 @@ function autoCreate(){
 }
 
 /* ============================================================
-   A/B/C
+   A / B / C
 ============================================================ */
 
 function applyVariant(v){
+
   currentVariant=v;
 
-  if(v==="A"){
+  if(v==="A")
     currentGoal="premium";
-  }else if(v==="B"){
+  else if(v==="B")
     currentGoal="hard";
-  }else{
+  else
     currentGoal="urgency";
-  }
 
   localStorage.setItem(
     STORAGE.goal,
@@ -2491,30 +4004,42 @@ function applyVariant(v){
   renderPreview();
 
   const analytics=
-    load(STORAGE.analytics,{});
+    load(
+      STORAGE.analytics,
+      {}
+    );
 
-  analytics[v]=(analytics[v]||0)+1;
+  analytics[v]=
+    (analytics[v]||0)+1;
 
   save(
     STORAGE.analytics,
     analytics
   );
 
-  toast(`Variant ${v} aktif.`);
+  toast(
+    `Variant ${v} aktif.`
+  );
 }
 
 /* ============================================================
-   PROJECT SYSTEM
+   PROJECT
 ============================================================ */
 
 function projectData(){
-  return {
-    schemaVersion:4,
-    createdAt:new Date().toISOString(),
+
+  return{
+    schemaVersion:5,
+
+    createdAt:
+      new Date().toISOString(),
 
     campaign:{
-      name:$("campaignName").value,
-      cta:$("ctaSelect").value
+      name:
+        $("campaignName").value,
+
+      cta:
+        $("ctaSelect").value
     },
 
     creative:{
@@ -2529,20 +4054,27 @@ function projectData(){
 
     products:{
       selectedIds,
+
       promoIds:
-        promoProducts.map(p=>
-          String(p.id)
+        promoProducts.map(
+          p=>String(p.id)
         ),
+
       priceOverrides
     },
 
-    quality:$("qualitySelect").value,
-    scores:currentScores
+    quality:
+      $("qualitySelect").value,
+
+    scores:
+      currentScores
   };
 }
 
 function saveProject(){
-  const data=projectData();
+
+  const data=
+    projectData();
 
   save(
     STORAGE.project,
@@ -2554,17 +4086,25 @@ function saveProject(){
     $("campaignName").value
   );
 
-  toast("Project tersimpan ✓");
+  toast(
+    "Project tersimpan ✓"
+  );
 }
 
 function loadProject(){
+
   const data=
-    load(STORAGE.project,null);
+    load(
+      STORAGE.project,
+      null
+    );
 
   if(!data){
+
     toast(
       "Belum ada project tersimpan."
     );
+
     return;
   }
 
@@ -2584,8 +4124,11 @@ function loadProject(){
     data.creative?.variant||
     "A";
 
-  motion=!!data.creative?.motion;
-  safe=!!data.creative?.safe;
+  motion=
+    !!data.creative?.motion;
+
+  safe=
+    !!data.creative?.safe;
 
   composition=
     data.creative?.composition||
@@ -2606,6 +4149,9 @@ function loadProject(){
   $("campaignName").value=
     data.campaign?.name||
     "Campaign Promo";
+
+  campaignName=
+    $("campaignName").value;
 
   $("ctaSelect").value=
     data.campaign?.cta||
@@ -2634,12 +4180,19 @@ function loadProject(){
 }
 
 function snapshot(){
+
   const versions=
-    load(STORAGE.versions,[]);
+    load(
+      STORAGE.versions,
+      []
+    );
 
   versions.unshift({
-    timestamp:new Date().toISOString(),
-    project:projectData()
+    timestamp:
+      new Date().toISOString(),
+
+    project:
+      projectData()
   });
 
   save(
@@ -2653,10 +4206,11 @@ function snapshot(){
 }
 
 /* ============================================================
-   EXPORT JSON
+   JSON EXPORT
 ============================================================ */
 
 function exportJSON(){
+
   const output=
     products
       .filter(p=>
@@ -2665,22 +4219,37 @@ function exportJSON(){
         )
       )
       .map(p=>{
-        const x=priceData(p);
 
-        return {
+        const x=
+          priceData(p);
+
+        return{
           ...p,
+
           harga:{
             ...p.harga,
-            normal:x.normal,
-            promo:x.final,
-            hargaDasarPromo:x.promo,
-            diskon:x.finalDiscount,
+
+            normal:
+              x.normal,
+
+            promo:
+              x.final,
+
+            hargaDasarPromo:
+              x.promo,
+
+            diskon:
+              x.finalDiscount,
+
             diskonExtraAktif:
               x.extraEnabled,
+
             diskonExtra:
               x.extraPercent,
+
             hargaFinalCustomAktif:
               x.manualEnabled,
+
             hargaFinalCustom:
               x.manualFinal
           }
@@ -2688,15 +4257,28 @@ function exportJSON(){
       });
 
   const data={
-    project:projectData(),
-    products:output
+    project:
+      projectData(),
+
+    products:
+      output
   };
 
   downloadBlob(
     new Blob(
-      [JSON.stringify(data,null,2)],
-      {type:"application/json"}
+      [
+        JSON.stringify(
+          data,
+          null,
+          2
+        )
+      ],
+      {
+        type:
+          "application/json"
+      }
     ),
+
     `${slug(
       $("campaignName").value
     )}-campaign.json`
@@ -2707,110 +4289,27 @@ function exportJSON(){
   );
 }
 
-
 /* ============================================================
-   EXPORT ENGINE — FINAL PREVIEW LOCK
-   Version: FIXED-PREVIEW-RENDER v5
+   FINAL EXPORT ENGINE
+   SINGLE IMPLEMENTATION
 ============================================================ */
 
-const EXPORT_CONFIG = {
-  maxPixels: 16000000,
-  revokeDelay: 12000,
-  imageTimeout: 20000,
-  settleDelay: 180
+const EXPORT_CONFIG={
+  maxPixels:16000000,
+  revokeDelay:12000,
+  imageTimeout:20000,
+  settleDelay:180
 };
 
 /* ------------------------------------------------------------
-   DOWNLOAD STATUS UI
------------------------------------------------------------- */
-
-function ensureDownloadStatus(){
-  let box=$("downloadStatus");
-
-  if(box)return box;
-
-  const anchor=$("downloadBtn");
-
-  if(!anchor)return null;
-
-  box=document.createElement("div");
-  box.id="downloadStatus";
-  box.className="download-status";
-
-  box.innerHTML=`
-    <div id="downloadStatusText">
-      Ready.
-    </div>
-
-    <div class="download-progress">
-      <div
-        id="downloadProgress"
-        class="download-progress-fill"
-      ></div>
-    </div>
-  `;
-
-  anchor.closest(".panel")
-    ?.querySelector(".toolbar:last-of-type")
-    ?.insertAdjacentElement(
-      "afterend",
-      box
-    );
-
-  return box;
-}
-
-function setDownloadStatus(
-  message,
-  state="running",
-  progress=0
-){
-  const box=
-    ensureDownloadStatus();
-
-  if(!box)return;
-
-  const text=
-    $("downloadStatusText");
-
-  const bar=
-    $("downloadProgress");
-
-  box.className=
-    `download-status show ${state}`;
-
-  if(text)
-    text.textContent=message;
-
-  if(bar){
-    const p=Math.min(
-      100,
-      Math.max(
-        0,
-        Number(progress)||0
-      )
-    );
-
-    bar.style.width=p+"%";
-  }
-}
-
-function clearDownloadStatus(){
-  const box=
-    $("downloadStatus");
-
-  if(box)
-    box.className=
-      "download-status";
-}
-
-/* ------------------------------------------------------------
-   TARGET DIMENSIONS
+   EXPORT RATIO
 ------------------------------------------------------------ */
 
 function exportRatio(){
+
   if(currentRatio==="916"){
-    return {
+
+    return{
       name:"9x16",
       width:9,
       height:16
@@ -2818,21 +4317,27 @@ function exportRatio(){
   }
 
   if(currentRatio==="45"){
-    return {
+
+    return{
       name:"4x5",
       width:4,
       height:5
     };
   }
 
-  return {
+  return{
     name:"16x9",
     width:16,
     height:9
   };
 }
 
+/* ------------------------------------------------------------
+   EXPORT WIDTH
+------------------------------------------------------------ */
+
 function qualityWidth(){
+
   const q=
     $("qualitySelect")?.value||
     "standard";
@@ -2849,12 +4354,12 @@ function qualityWidth(){
   return 1440;
 }
 
-/*
-  IMPORTANT:
-  Target dimensions are mathematically fixed.
-  No more DOM-derived 2558px / 1279px surprises.
-*/
+/* ------------------------------------------------------------
+   EXACT OUTPUT DIMENSIONS
+------------------------------------------------------------ */
+
 function exportDimensions(){
+
   const ratio=
     exportRatio();
 
@@ -2869,20 +4374,20 @@ function exportDimensions(){
     );
 
   /*
-    Force exact common 9:16 sizes.
+    Explicit common 9:16 sizes.
   */
-  if(
-    ratio.name==="9x16"&&
-    width===1440
-  ){
-    height=2560;
-  }
-
   if(
     ratio.name==="9x16"&&
     width===1280
   ){
     height=2276;
+  }
+
+  if(
+    ratio.name==="9x16"&&
+    width===1440
+  ){
+    height=2560;
   }
 
   if(
@@ -2902,6 +4407,7 @@ function exportDimensions(){
     pixels>
     EXPORT_CONFIG.maxPixels
   ){
+
     const factor=
       Math.sqrt(
         EXPORT_CONFIG.maxPixels/
@@ -2909,13 +4415,17 @@ function exportDimensions(){
       );
 
     width=
-      Math.floor(width*factor);
+      Math.floor(
+        width*factor
+      );
 
     height=
-      Math.floor(height*factor);
+      Math.floor(
+        height*factor
+      );
   }
 
-  return {
+  return{
     width,
     height,
     ratio:ratio.name
@@ -2923,66 +4433,83 @@ function exportDimensions(){
 }
 
 /* ------------------------------------------------------------
-   IMAGE / FONT READINESS
+   IMAGE WAIT
 ------------------------------------------------------------ */
 
 async function waitForImages(root){
-  const images=
-    [
-      ...root.querySelectorAll("img")
-    ];
+
+  const images=[
+    ...root.querySelectorAll(
+      "img"
+    )
+  ];
 
   await Promise.all(
     images.map(img=>{
+
       if(
         img.complete&&
         img.naturalWidth>0
       ){
+
         if(
-          typeof img.decode==="function"
+          typeof img.decode===
+          "function"
         ){
-          return img.decode()
-            .catch(()=>{});
+
+          return img
+            .decode()
+            .catch(
+              ()=>{}
+            );
         }
 
         return Promise.resolve();
       }
 
-      return new Promise(resolve=>{
-        let finished=false;
+      return new Promise(
+        resolve=>{
 
-        const done=()=>{
-          if(finished)return;
-          finished=true;
-          resolve();
-        };
+          let finished=false;
 
-        img.addEventListener(
-          "load",
-          done,
-          {once:true}
-        );
+          const done=()=>{
 
-        img.addEventListener(
-          "error",
-          done,
-          {once:true}
-        );
+            if(finished)
+              return;
 
-        setTimeout(
-          done,
-          EXPORT_CONFIG.imageTimeout
-        );
-      });
+            finished=true;
+            resolve();
+          };
+
+          img.addEventListener(
+            "load",
+            done,
+            {once:true}
+          );
+
+          img.addEventListener(
+            "error",
+            done,
+            {once:true}
+          );
+
+          setTimeout(
+            done,
+            EXPORT_CONFIG.imageTimeout
+          );
+        }
+      );
     })
   );
 }
 
 async function waitForFonts(){
+
   if(
     document.fonts&&
     document.fonts.ready
   ){
+
     try{
       await document.fonts.ready;
     }catch{}
@@ -2994,13 +4521,16 @@ async function waitForFonts(){
 ------------------------------------------------------------ */
 
 function previewSnapshot(){
+
   const el=
     $("promoCanvas");
 
-  if(!el)
+  if(!el){
+
     throw new Error(
       "PREVIEW_NOT_READY"
     );
+  }
 
   const rect=
     el.getBoundingClientRect();
@@ -3009,14 +4539,16 @@ function previewSnapshot(){
     rect.width<=0||
     rect.height<=0
   ){
+
     throw new Error(
       "PREVIEW_HAS_NO_SIZE"
     );
   }
 
-  return {
+  return{
     width:rect.width,
     height:rect.height,
+
     ratio:
       rect.width/
       rect.height,
@@ -3026,7 +4558,8 @@ function previewSnapshot(){
         currentIndex
       ]?.id??null,
 
-    index:currentIndex
+    index:
+      currentIndex
   };
 }
 
@@ -3034,133 +4567,106 @@ function previewSnapshot(){
    CLONE LOCK
 ------------------------------------------------------------ */
 
-/*
-  html2canvas internally creates a clone.
-  The biggest previous problem was that CSS using
-  vw/clamp/media queries could be recalculated inside
-  that clone.
-
-  We explicitly lock the clone to the same viewport
-  used by the visible preview.
-*/
 function lockExportClone(
   clonedDocument,
   snapshot
 ){
-  try{
 
-    const html=
-      clonedDocument.documentElement;
+  const html=
+    clonedDocument.documentElement;
 
-    const body=
-      clonedDocument.body;
+  const body=
+    clonedDocument.body;
 
-    /*
-      Preserve actual browser viewport.
-    */
-    html.style.width=
-      `${window.innerWidth}px`;
+  /*
+    Keep clone viewport identical to
+    the real browser viewport.
+  */
+  html.style.width=
+    `${window.innerWidth}px`;
 
-    html.style.minWidth=
-      `${window.innerWidth}px`;
+  html.style.minWidth=
+    `${window.innerWidth}px`;
 
-    body.style.width=
-      `${window.innerWidth}px`;
+  body.style.width=
+    `${window.innerWidth}px`;
 
-    body.style.minWidth=
-      `${window.innerWidth}px`;
+  body.style.minWidth=
+    `${window.innerWidth}px`;
 
-    /*
-      Find cloned artwork.
-    */
-    const clone=
-      clonedDocument.getElementById(
-        "promoCanvas"
-      );
-
-    if(!clone)return;
-
-    /*
-      Kill all time-based visual changes.
-    */
-    clone.classList.add(
-      "export-static"
+  const clone=
+    clonedDocument.getElementById(
+      "promoCanvas"
     );
 
-    clone.style.animation=
-      "none";
+  if(!clone)
+    return;
 
-    clone.style.transition=
-      "none";
+  /*
+    Static clone.
+  */
+  clone.classList.add(
+    "export-static"
+  );
 
-    clone.style.opacity=
-      "1";
+  clone.style.animation=
+    "none";
 
-    /*
-      Hide editor-only guides.
-    */
-    const safeZone=
-      clone.querySelector(
-        ".safe-zone"
-      );
+  clone.style.transition=
+    "none";
 
-    if(safeZone){
-      safeZone.style.display=
+  clone.style.opacity=
+    "1";
+
+  clone.style.width=
+    `${snapshot.width}px`;
+
+  clone.style.height=
+    `${snapshot.height}px`;
+
+  clone.style.maxWidth=
+    "none";
+
+  clone.style.maxHeight=
+    "none";
+
+  clone.style.aspectRatio=
+    `${snapshot.width}/${snapshot.height}`;
+
+  /*
+    Kill all motion.
+  */
+  clone
+    .querySelectorAll("*")
+    .forEach(node=>{
+
+      node.style.animation=
         "none";
-    }
 
-    const ratioMark=
-      clone.querySelector(
-        ".ratio-mark"
-      );
-
-    if(ratioMark){
-      ratioMark.style.display=
+      node.style.transition=
         "none";
-    }
+    });
 
-    /*
-      Lock every animation/transition.
-    */
-    clone
-      .querySelectorAll("*")
-      .forEach(node=>{
-        node.style.animation=
-          "none";
-
-        node.style.transition=
-          "none";
-      });
-
-    /*
-      Make sure source artwork has the
-      exact same dimensions as preview.
-    */
-    clone.style.width=
-      `${snapshot.width}px`;
-
-    clone.style.height=
-      `${snapshot.height}px`;
-
-    clone.style.maxWidth=
-      "none";
-
-    clone.style.maxHeight=
-      "none";
-
-    /*
-      Prevent accidental responsive
-      width changes.
-    */
-    clone.style.aspectRatio=
-      `${snapshot.width}/${snapshot.height}`;
-
-  }catch(error){
-    console.warn(
-      "EXPORT_CLONE_LOCK",
-      error
+  /*
+    Hide editor overlays.
+  */
+  const safeZone=
+    clone.querySelector(
+      ".safe-zone"
     );
-  }
+
+  if(safeZone)
+    safeZone.style.display=
+      "none";
+
+  const ratioMark=
+    clone.querySelector(
+      ".ratio-mark"
+    );
+
+  if(ratioMark)
+    ratioMark.style.display=
+      "none";
 }
 
 /* ------------------------------------------------------------
@@ -3172,6 +4678,7 @@ function resizeCanvasExact(
   targetWidth,
   targetHeight
 ){
+
   if(
     sourceCanvas.width===
       targetWidth&&
@@ -3201,10 +4708,12 @@ function resizeCanvasExact(
       }
     );
 
-  if(!ctx)
+  if(!ctx){
+
     throw new Error(
       "CANVAS_CONTEXT_FAILED"
     );
+  }
 
   ctx.imageSmoothingEnabled=
     true;
@@ -3222,11 +4731,6 @@ function resizeCanvasExact(
     targetHeight
   );
 
-  /*
-    Because source and target are locked
-    to the exact same ratio, this is a
-    pure resolution normalization.
-  */
   ctx.drawImage(
     sourceCanvas,
     0,
@@ -3247,17 +4751,21 @@ function resizeCanvasExact(
 ------------------------------------------------------------ */
 
 async function renderPNG(){
+
   const source=
     $("promoCanvas");
 
-  if(!source)
+  if(!source){
+
     throw new Error(
       "PREVIEW_NOT_READY"
     );
+  }
 
   if(
     typeof html2canvas!=="function"
   ){
+
     throw new Error(
       "HTML2CANVAS_UNAVAILABLE"
     );
@@ -3269,210 +4777,171 @@ async function renderPNG(){
   const target=
     exportDimensions();
 
-  /*
-    Make absolutely sure the user isn't
-    exporting a different product than
-    the one currently visible.
-  */
   const activeProduct=
     promoProducts[
       snapshot.index
     ];
 
   if(!activeProduct){
+
     throw new Error(
       "ACTIVE_PRODUCT_NOT_FOUND"
     );
   }
 
+  await waitForImages(
+    source
+  );
+
+  await waitForFonts();
+
   /*
-    Freeze animation state without
-    touching the actual preview.
+    Wait for the browser to commit
+    current preview layout.
   */
-  const oldMotion=
-    motion;
+  await new Promise(
+    resolve=>
+      requestAnimationFrame(
+        ()=>resolve()
+      )
+  );
 
-  try{
+  await wait(
+    EXPORT_CONFIG.settleDelay
+  );
 
-    /*
-      Wait for exact visible preview.
-    */
-    await waitForImages(
-      source
-    );
+  /*
+    Scale from visible preview
+    to requested output width.
+  */
+  let scale=
+    target.width/
+    snapshot.width;
 
-    await waitForFonts();
+  const estimatedPixels=
+    snapshot.width*
+    snapshot.height*
+    scale*
+    scale;
 
-    await new Promise(
-      resolve=>
-        requestAnimationFrame(
-          ()=>resolve()
+  if(
+    estimatedPixels>
+    EXPORT_CONFIG.maxPixels
+  ){
+
+    scale=
+      Math.sqrt(
+        EXPORT_CONFIG.maxPixels/
+        (
+          snapshot.width*
+          snapshot.height
         )
-    );
-
-    await wait(
-      EXPORT_CONFIG.settleDelay
-    );
-
-    /*
-      Calculate scale from the actual
-      preview width.
-
-      This preserves the exact preview
-      layout and only increases resolution.
-    */
-    let scale=
-      target.width/
-      snapshot.width;
-
-    const estimatedPixels=
-      snapshot.width*
-      snapshot.height*
-      scale*
-      scale;
-
-    if(
-      estimatedPixels>
-      EXPORT_CONFIG.maxPixels
-    ){
-      scale=
-        Math.sqrt(
-          EXPORT_CONFIG.maxPixels/
-          (
-            snapshot.width*
-            snapshot.height
-          )
-        );
-    }
-
-    setDownloadStatus(
-      "Rendering locked preview...",
-      "running",
-      48
-    );
-
-    const captured=
-      await html2canvas(
-        source,
-        {
-          backgroundColor:
-            "#050705",
-
-          /*
-            Critical:
-            use the exact current browser
-            viewport, not html2canvas's
-            default clone viewport.
-          */
-          windowWidth:
-            window.innerWidth,
-
-          windowHeight:
-            window.innerHeight,
-
-          /*
-            Capture exact preview box.
-          */
-          width:
-            Math.round(
-              snapshot.width
-            ),
-
-          height:
-            Math.round(
-              snapshot.height
-            ),
-
-          x:0,
-          y:0,
-
-          scale,
-
-          useCORS:true,
-
-          allowTaint:false,
-
-          imageTimeout:
-            EXPORT_CONFIG.imageTimeout,
-
-          logging:false,
-
-          foreignObjectRendering:
-            false,
-
-          removeContainer:true,
-
-          scrollX:0,
-          scrollY:0,
-
-          onclone:
-            clonedDocument=>{
-              lockExportClone(
-                clonedDocument,
-                snapshot
-              );
-            }
-        }
       );
-
-    if(
-      !captured||
-      !captured.width||
-      !captured.height
-    ){
-      throw new Error(
-        "EMPTY_RENDER"
-      );
-    }
-
-    /*
-      Normalize to exact requested
-      output dimensions.
-    */
-    const finalCanvas=
-      resizeCanvasExact(
-        captured,
-        target.width,
-        target.height
-      );
-
-    /*
-      Validate aspect ratio.
-    */
-    const expected=
-      target.width/
-      target.height;
-
-    const actual=
-      finalCanvas.width/
-      finalCanvas.height;
-
-    if(
-      Math.abs(
-        expected-actual
-      )>0.0001
-    ){
-      throw new Error(
-        "FINAL_RATIO_INVALID"
-      );
-    }
-
-    return {
-      canvas:finalCanvas,
-      width:target.width,
-      height:target.height,
-      ratio:target.ratio,
-      product:activeProduct
-    };
-
-  }finally{
-    /*
-      Motion state belongs to preview only.
-      No mutation required, but keeping this
-      explicit protects future extensions.
-    */
-    void oldMotion;
   }
+
+  const captured=
+    await html2canvas(
+      source,
+      {
+        backgroundColor:
+          "#050705",
+
+        /*
+          CRITICAL:
+          keep same browser viewport.
+        */
+        windowWidth:
+          window.innerWidth,
+
+        windowHeight:
+          window.innerHeight,
+
+        width:
+          Math.round(
+            snapshot.width
+          ),
+
+        height:
+          Math.round(
+            snapshot.height
+          ),
+
+        x:0,
+        y:0,
+
+        scale,
+
+        useCORS:true,
+
+        allowTaint:false,
+
+        imageTimeout:
+          EXPORT_CONFIG.imageTimeout,
+
+        logging:false,
+
+        foreignObjectRendering:
+          false,
+
+        removeContainer:true,
+
+        scrollX:0,
+        scrollY:0,
+
+        onclone:
+          clonedDocument=>{
+            lockExportClone(
+              clonedDocument,
+              snapshot
+            );
+          }
+      }
+    );
+
+  if(
+    !captured||
+    !captured.width||
+    !captured.height
+  ){
+
+    throw new Error(
+      "EMPTY_RENDER"
+    );
+  }
+
+  const finalCanvas=
+    resizeCanvasExact(
+      captured,
+      target.width,
+      target.height
+    );
+
+  const expected=
+    target.width/
+    target.height;
+
+  const actual=
+    finalCanvas.width/
+    finalCanvas.height;
+
+  if(
+    Math.abs(
+      expected-actual
+    )>0.0001
+  ){
+
+    throw new Error(
+      "FINAL_RATIO_INVALID"
+    );
+  }
+
+  return{
+    canvas:finalCanvas,
+    width:target.width,
+    height:target.height,
+    ratio:target.ratio,
+    product:activeProduct
+  };
 }
 
 /* ------------------------------------------------------------
@@ -3480,19 +4949,22 @@ async function renderPNG(){
 ------------------------------------------------------------ */
 
 function canvasBlob(canvas){
+
   return new Promise(
     (resolve,reject)=>{
+
       canvas.toBlob(
         blob=>{
-          if(blob){
+
+          if(blob)
             resolve(blob);
-          }else{
+
+          else
             reject(
               new Error(
                 "EMPTY_BLOB"
               )
             );
-          }
         },
         "image/png",
         1
@@ -3502,17 +4974,20 @@ function canvasBlob(canvas){
 }
 
 /* ------------------------------------------------------------
-   SAFE DOWNLOAD
+   DOWNLOAD
 ------------------------------------------------------------ */
 
 function downloadBlob(
   blob,
   filename
 ){
-  if(!blob)
+
+  if(!blob){
+
     throw new Error(
       "DOWNLOAD_EMPTY_BLOB"
     );
+  }
 
   const url=
     URL.createObjectURL(
@@ -3535,10 +5010,6 @@ function downloadBlob(
     link
   );
 
-  /*
-    Mobile Chromium/WebView is happier
-    when click happens while element exists.
-  */
   link.click();
 
   link.remove();
@@ -3554,20 +5025,21 @@ function downloadBlob(
 }
 
 /* ------------------------------------------------------------
-   FILE NAME
+   EXPORT FILENAME
 ------------------------------------------------------------ */
 
 function exportFilename(
   product,
   prefix="PROMO"
 ){
+
   const archetype=
     chooseTemplate(product);
 
   const ratio=
     exportRatio().name;
 
-  return (
+  return(
     `${slug(prefix)}-`+
     `${slug(displayTitle(product))}-`+
     `${slug(
@@ -3582,10 +5054,11 @@ function exportFilename(
 }
 
 /* ------------------------------------------------------------
-   DOWNLOAD CURRENT
+   CURRENT DOWNLOAD
 ------------------------------------------------------------ */
 
 async function downloadCurrent(){
+
   if(downloadBusy)
     return;
 
@@ -3613,31 +5086,24 @@ async function downloadCurrent(){
 
   try{
 
+    const product=
+      promoProducts[
+        currentIndex
+      ];
+
+    if(!product){
+
+      throw new Error(
+        "ACTIVE_PRODUCT_NOT_FOUND"
+      );
+    }
+
     setDownloadStatus(
       "Preparing current preview...",
       "running",
       8
     );
 
-    /*
-      Never change currentIndex here.
-      The current visible artwork is
-      the only artwork allowed to export.
-    */
-    const product=
-      promoProducts[
-        currentIndex
-      ];
-
-    if(!product)
-      throw new Error(
-        "ACTIVE_PRODUCT_NOT_FOUND"
-      );
-
-    /*
-      Wait one browser frame so all
-      current UI changes are committed.
-    */
     await new Promise(
       resolve=>
         requestAnimationFrame(
@@ -3665,11 +5131,8 @@ async function downloadCurrent(){
       await renderPNG();
 
     setDownloadStatus(
-      `Encoding PNG • ${
-        result.width
-      }×${
-        result.height
-      }`,
+      `Encoding PNG • `+
+      `${result.width}×${result.height}`,
       "running",
       70
     );
@@ -3693,11 +5156,8 @@ async function downloadCurrent(){
     );
 
     setDownloadStatus(
-      `Download selesai • ${
-        result.width
-      }×${
-        result.height
-      }`,
+      `Download selesai • `+
+      `${result.width}×${result.height}`,
       "success",
       100
     );
@@ -3743,6 +5203,7 @@ async function downloadCurrent(){
 ------------------------------------------------------------ */
 
 async function batchExport(){
+
   if(downloadBusy)
     return;
 
@@ -3761,16 +5222,15 @@ async function batchExport(){
     return;
   }
 
-  downloadBusy=true;
-
   const oldIndex=
     currentIndex;
 
   const oldPlaying=
     playing;
 
-  stopAutoplay();
+  downloadBusy=true;
 
+  stopAutoplay();
   playing=false;
 
   const total=
@@ -3786,10 +5246,6 @@ async function batchExport(){
 
       currentIndex=i;
 
-      /*
-        Build the visible preview first.
-        Export always follows this exact state.
-      */
       renderPreview();
 
       await new Promise(
@@ -3806,40 +5262,27 @@ async function batchExport(){
       const product=
         promoProducts[i];
 
-      const baseProgress=
-        (i/total)*100;
-
       setDownloadStatus(
-        `Preparing ${
-          i+1
-        }/${total} • ${
-          displayTitle(product)
-        }`,
+        `Preparing ${i+1}/${total} • `+
+        `${displayTitle(product)}`,
         "running",
-        baseProgress+5
+        (i/total)*100+5
       );
 
       setDownloadStatus(
-        `Rendering ${
-          i+1
-        }/${total}...`,
+        `Rendering ${i+1}/${total}...`,
         "running",
-        baseProgress+35
+        (i/total)*100+30
       );
 
       const result=
         await renderPNG();
 
       setDownloadStatus(
-        `Encoding ${
-          i+1
-        }/${total} • ${
-          result.width
-        }×${
-          result.height
-        }`,
+        `Encoding ${i+1}/${total} • `+
+        `${result.width}×${result.height}`,
         "running",
-        baseProgress+60
+        (i/total)*100+60
       );
 
       const blob=
@@ -3847,43 +5290,27 @@ async function batchExport(){
           result.canvas
         );
 
-      setDownloadStatus(
-        `Downloading ${
-          i+1
-        }/${total}...`,
-        "running",
-        baseProgress+82
-      );
-
       downloadBlob(
         blob,
         exportFilename(
           product,
           $("campaignName")
-            ?.value||
+            .value||
           "Campaign"
         )
       );
 
-      /*
-        Give Android/browser download manager
-        time to register each Blob.
-      */
-      await wait(350);
-
       setDownloadStatus(
-        `Batch ${
-          i+1
-        }/${total} selesai`,
+        `Batch ${i+1}/${total} selesai`,
         "running",
         ((i+1)/total)*100
       );
+
+      await wait(350);
     }
 
     setDownloadStatus(
-      `Batch export selesai • ${
-        total
-      } PNG`,
+      `Batch export selesai • ${total} PNG`,
       "success",
       100
     );
@@ -3929,127 +5356,12 @@ async function batchExport(){
   }
 }
 
-/* ------------------------------------------------------------
-   RE-BIND EXPORT BUTTONS
-   Existing handlers point to the old
-   function objects, so explicitly bind
-   them again after the replacement.
------------------------------------------------------------- */
-
-if($("downloadBtn")){
-  $("downloadBtn").onclick=
-    downloadCurrent;
-}
-
-if($("batchBtn")){
-  $("batchBtn").onclick=
-    batchExport;
-}
-
-/* ------------------------------------------------------------
-   EXPORT STATUS STYLE
------------------------------------------------------------- */
-
-(function installExportStatusStyle(){
-
-  if(
-    document.getElementById(
-      "exportStatusStyle"
-    )
-  )return;
-
-  const style=
-    document.createElement(
-      "style"
-    );
-
-  style.id=
-    "exportStatusStyle";
-
-  style.textContent=`
-    .download-status{
-      display:none;
-      margin-top:10px;
-      padding:11px 13px;
-      border-radius:11px;
-      background:#080c09;
-      border:1px solid rgba(255,255,255,.09);
-      color:#aeb9ae;
-      font-size:8px;
-      font-weight:900;
-      line-height:1.45;
-    }
-
-    .download-status.show{
-      display:block;
-    }
-
-    .download-status.running{
-      color:#d8efbd;
-      border-color:rgba(140,198,63,.28);
-      background:rgba(140,198,63,.055);
-    }
-
-    .download-status.success{
-      color:#c8f59e;
-      border-color:rgba(140,198,63,.42);
-      background:rgba(140,198,63,.09);
-    }
-
-    .download-status.warn{
-      color:#ffe49a;
-      border-color:rgba(255,212,90,.28);
-      background:rgba(255,212,90,.06);
-    }
-
-    .download-status.error{
-      color:#ffaaaa;
-      border-color:rgba(255,98,98,.28);
-      background:rgba(255,98,98,.06);
-    }
-
-    .download-progress{
-      width:100%;
-      height:4px;
-      margin-top:8px;
-      overflow:hidden;
-      border-radius:99px;
-      background:#151a16;
-    }
-
-    .download-progress-fill{
-      width:0%;
-      height:100%;
-      border-radius:99px;
-      background:
-        linear-gradient(
-          90deg,
-          #8cc63f,
-          #b5f45d
-        );
-      transition:
-        width .22s ease;
-    }
-
-    .export-static,
-    .export-static *{
-      animation:none!important;
-      transition:none!important;
-      caret-color:transparent!important;
-    }
-  `;
-
-  document.head.appendChild(
-    style
-  );
-
-})();
-
 /* ============================================================
    DEVICE PREVIEW
 ============================================================ */
 
 function devicePreview(){
+
   currentDevice=
     currentDevice==="desktop"
       ?"phone"
@@ -4058,7 +5370,8 @@ function devicePreview(){
   const canvas=
     $("promoCanvas");
 
-  if(!canvas)return;
+  if(!canvas)
+    return;
 
   canvas.style.maxWidth=
     currentDevice==="phone"
@@ -4073,18 +5386,23 @@ function devicePreview(){
 }
 
 /* ============================================================
-   PROJECT EXPORT / UI
+   SYNC CONTROLS
 ============================================================ */
 
 function syncControls(){
-  document.querySelectorAll(
-    "[data-ratio]"
-  ).forEach(b=>{
-    b.classList.toggle(
-      "active",
-      b.dataset.ratio===currentRatio
-    );
-  });
+
+  document
+    .querySelectorAll(
+      "[data-ratio]"
+    )
+    .forEach(b=>{
+
+      b.classList.toggle(
+        "active",
+        b.dataset.ratio===
+          currentRatio
+      );
+    });
 
   $("campaignName").value=
     campaignName;
@@ -4107,77 +5425,89 @@ function syncControls(){
   $("yOut").textContent=
     composition.y;
 
-  document.querySelectorAll(
-    "[data-goal]"
-  ).forEach(b=>{
-    b.classList.toggle(
-      "active",
-      b.dataset.goal===currentGoal
-    );
-  });
+  document
+    .querySelectorAll(
+      "[data-goal]"
+    )
+    .forEach(b=>{
+
+      b.classList.toggle(
+        "active",
+        b.dataset.goal===
+          currentGoal
+      );
+    });
 
   renderTemplateTabs();
 }
 
 function renderTemplateTabs(){
+
   const tabs=
     $("templateTabs");
 
   tabs.innerHTML=
-    `<button class="tab ${
-      currentTemplate==="auto"
-        ?"active"
-        :""
-    }"
-      data-template="auto">
-      AUTO
-    </button>`+
+    `
+      <button
+        class="tab ${
+          currentTemplate==="auto"
+            ?"active"
+            :""
+        }"
+        data-template="auto"
+      >
+        AUTO
+      </button>
+    `+
     Object.entries(
       ARCHETYPES
     )
-      .map(([k,v])=>
-        `
-          <button
-            class="tab ${
-              currentTemplate===k
-                ?"active"
-                :""
-            }"
-            data-template="${k}"
-          >
-            ${v.name}
-          </button>
-        `
-      )
+      .map(([k,v])=>`
+        <button
+          class="tab ${
+            currentTemplate===k
+              ?"active"
+              :""
+          }"
+          data-template="${k}"
+        >
+          ${v.name}
+        </button>
+      `)
       .join("");
 
-  tabs.querySelectorAll(
-    ".tab"
-  ).forEach(tab=>{
-    tab.onclick=()=>{
-      currentTemplate=
-        tab.dataset.template;
+  tabs
+    .querySelectorAll(".tab")
+    .forEach(tab=>{
 
-      localStorage.setItem(
-        STORAGE.template,
-        currentTemplate
-      );
+      tab.onclick=()=>{
 
-      renderPreview();
-      syncControls();
+        currentTemplate=
+          tab.dataset.template;
 
-      toast(
-        `${tab.textContent.trim()} aktif`
-      );
-    };
-  });
+        localStorage.setItem(
+          STORAGE.template,
+          currentTemplate
+        );
+
+        renderPreview();
+        syncControls();
+
+        toast(
+          `${tab.textContent.trim()} aktif`
+        );
+      };
+    });
 }
 
 function updateCounts(){
-  $("selectedCount").textContent=
+
+  $("selectedCount")
+    .textContent=
     selectedIds.length;
 
-  $("totalCount").textContent=
+  $("totalCount")
+    .textContent=
     products.length;
 }
 
@@ -4185,45 +5515,53 @@ function updateCounts(){
    EVENTS
 ============================================================ */
 
-document.querySelectorAll(
-  "[data-ratio]"
-).forEach(btn=>{
-  btn.onclick=()=>{
-    currentRatio=
-      btn.dataset.ratio;
+document
+  .querySelectorAll(
+    "[data-ratio]"
+  )
+  .forEach(btn=>{
 
-    localStorage.setItem(
-      STORAGE.ratio,
-      currentRatio
-    );
+    btn.onclick=()=>{
 
-    renderPreview();
-    syncControls();
-  };
-});
+      currentRatio=
+        btn.dataset.ratio;
 
-document.querySelectorAll(
-  "[data-goal]"
-).forEach(btn=>{
-  btn.onclick=()=>{
-    currentGoal=
-      btn.dataset.goal;
+      localStorage.setItem(
+        STORAGE.ratio,
+        currentRatio
+      );
 
-    localStorage.setItem(
-      STORAGE.goal,
-      currentGoal
-    );
+      renderPreview();
+      syncControls();
+    };
+  });
 
-    currentTemplate="auto";
+document
+  .querySelectorAll(
+    "[data-goal]"
+  )
+  .forEach(btn=>{
 
-    renderPreview();
-    syncControls();
+    btn.onclick=()=>{
 
-    toast(
-      "Creative objective diperbarui ✓"
-    );
-  };
-});
+      currentGoal=
+        btn.dataset.goal;
+
+      localStorage.setItem(
+        STORAGE.goal,
+        currentGoal
+      );
+
+      currentTemplate="auto";
+
+      renderPreview();
+      syncControls();
+
+      toast(
+        "Creative objective diperbarui ✓"
+      );
+    };
+  });
 
 $("autoBtn").onclick=
   autoCreate;
@@ -4247,9 +5585,11 @@ $("nextBtn").onclick=
   nextSlide;
 
 $("playBtn").onclick=()=>{
+
   playing=!playing;
 
-  $("playBtn").textContent=
+  $("playBtn")
+    .textContent=
     playing
       ?"Ⅱ PLAY"
       :"▶ PLAY";
@@ -4270,9 +5610,10 @@ $("jsonBtn").onclick=
   exportJSON;
 
 $("selectAll").onclick=()=>{
+
   selectedIds=
-    products.map(p=>
-      String(p.id)
+    products.map(
+      p=>String(p.id)
     );
 
   save(
@@ -4284,6 +5625,7 @@ $("selectAll").onclick=()=>{
 };
 
 $("clearAll").onclick=()=>{
+
   selectedIds=[];
   promoProducts=[];
 
@@ -4294,7 +5636,6 @@ $("clearAll").onclick=()=>{
 
   renderManager();
   renderPreview();
-
   clearDownloadStatus();
 };
 
@@ -4302,17 +5643,22 @@ $("applyBtn").onclick=
   ()=>applyPromo(true);
 
 $("search").oninput=e=>{
+
   searchQuery=
     e.target.value
       .trim()
       .toLowerCase()
       .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g,"");
+      .replace(
+        /[\u0300-\u036f]/g,
+        ""
+      );
 
   renderManager();
 };
 
 $("campaignName").oninput=e=>{
+
   campaignName=
     e.target.value;
 
@@ -4325,49 +5671,71 @@ $("campaignName").oninput=e=>{
 $("ctaSelect").onchange=
   renderPreview;
 
-$("qualitySelect").onchange=
-  ()=>{
-    clearDownloadStatus();
+$("qualitySelect").onchange=()=>{
 
-    toast(
-      "Export quality diperbarui."
-    );
-  };
+  clearDownloadStatus();
+
+  toast(
+    "Export quality diperbarui."
+  );
+};
 
 $("scaleCtrl").oninput=e=>{
+
   composition.scale=
-    Number(e.target.value);
+    Number(
+      e.target.value
+    );
 
   syncControls();
+
   applyComposition();
+
   updateScore(
-    promoProducts[currentIndex]
+    promoProducts[
+      currentIndex
+    ]
   );
 };
 
 $("xCtrl").oninput=e=>{
+
   composition.x=
-    Number(e.target.value);
+    Number(
+      e.target.value
+    );
 
   syncControls();
+
   applyComposition();
+
   updateScore(
-    promoProducts[currentIndex]
+    promoProducts[
+      currentIndex
+    ]
   );
 };
 
 $("yCtrl").oninput=e=>{
+
   composition.y=
-    Number(e.target.value);
+    Number(
+      e.target.value
+    );
 
   syncControls();
+
   applyComposition();
+
   updateScore(
-    promoProducts[currentIndex]
+    promoProducts[
+      currentIndex
+    ]
   );
 };
 
 $("resetComposition").onclick=()=>{
+
   composition={
     scale:100,
     x:0,
@@ -4391,38 +5759,52 @@ $("loadProject").onclick=
 $("snapshotBtn").onclick=
   snapshot;
 
-document.querySelectorAll(
-  "[data-variant]"
-).forEach(btn=>{
-  btn.onclick=()=>
-    applyVariant(
-      btn.dataset.variant
-    );
-});
+document
+  .querySelectorAll(
+    "[data-variant]"
+  )
+  .forEach(btn=>{
+
+    btn.onclick=()=>{
+      applyVariant(
+        btn.dataset.variant
+      );
+    };
+  });
 
 $("closeModal").onclick=()=>
-  $("modal").classList.remove(
-    "open"
-  );
+  $("modal")
+    .classList
+    .remove("open");
 
 $("modal").onclick=e=>{
+
   if(e.target.id==="modal"){
-    $("modal").classList.remove(
-      "open"
-    );
+
+    $("modal")
+      .classList
+      .remove("open");
   }
 };
 
 $("fullBtn").onclick=async()=>{
+
   try{
-    if(!document.fullscreenElement){
+
+    if(
+      !document.fullscreenElement
+    ){
+
       await document
         .documentElement
         .requestFullscreen();
+
     }else{
+
       await document
         .exitFullscreen();
     }
+
   }catch{}
 };
 
@@ -4433,13 +5815,16 @@ $("fullBtn").onclick=async()=>{
 document.addEventListener(
   "keydown",
   e=>{
+
     const t=e.target;
 
     if(
       t?.tagName==="INPUT"||
       t?.tagName==="TEXTAREA"||
       t?.isContentEditable
-    )return;
+    ){
+      return;
+    }
 
     if(e.key==="ArrowRight")
       nextSlide();
@@ -4448,7 +5833,9 @@ document.addEventListener(
       previousSlide();
 
     if(e.key===" "){
+
       e.preventDefault();
+
       $("playBtn").click();
     }
 
@@ -4482,11 +5869,15 @@ let touchY=0;
 $("stage").addEventListener(
   "touchstart",
   e=>{
+
     touchX=
-      e.changedTouches[0].screenX;
+      e.changedTouches[0]
+        .screenX;
 
     touchY=
-      e.changedTouches[0].screenY;
+      e.changedTouches[0]
+        .screenY;
+
   },
   {passive:true}
 );
@@ -4494,22 +5885,28 @@ $("stage").addEventListener(
 $("stage").addEventListener(
   "touchend",
   e=>{
+
     const dx=
-      e.changedTouches[0].screenX-
+      e.changedTouches[0]
+        .screenX-
       touchX;
 
     const dy=
-      e.changedTouches[0].screenY-
+      e.changedTouches[0]
+        .screenY-
       touchY;
 
     if(
       Math.abs(dx)<45||
       Math.abs(dx)<Math.abs(dy)
-    )return;
+    ){
+      return;
+    }
 
     dx<0
       ?nextSlide()
       :previousSlide();
+
   },
   {passive:true}
 );
@@ -4519,7 +5916,9 @@ $("stage").addEventListener(
 ============================================================ */
 
 async function loadProducts(){
+
   try{
+
     priceOverrides=
       load(
         STORAGE.prices,
@@ -4535,10 +5934,13 @@ async function loadProducts(){
     const response=
       await fetch(
         CONFIG.JSON,
-        {cache:"no-store"}
+        {
+          cache:"no-store"
+        }
       );
 
     if(!response.ok){
+
       throw new Error(
         `produk.json HTTP ${response.status}`
       );
@@ -4549,14 +5951,25 @@ async function loadProducts(){
 
     const source=
       Array.isArray(data)
+
         ?data
-        :Array.isArray(data.products)
+
+        :Array.isArray(
+          data.products
+        )
+
           ?data.products
-          :Array.isArray(data.produk)
+
+          :Array.isArray(
+            data.produk
+          )
+
             ?data.produk
+
             :[];
 
     if(!source.length){
+
       throw new Error(
         "produk.json kosong atau format tidak dikenali."
       );
@@ -4576,17 +5989,21 @@ async function loadProducts(){
 
     selectedIds=
       selectedIds.filter(
-        id=>valid.has(
-          String(id)
-        )
+        id=>
+          valid.has(
+            String(id)
+          )
       );
 
-    if(!selectedIds.length){
+    if(
+      !selectedIds.length
+    ){
+
       selectedIds=
         products
           .filter(isPromo)
-          .map(p=>
-            String(p.id)
+          .map(
+            p=>String(p.id)
           );
     }
 
@@ -4599,29 +6016,33 @@ async function loadProducts(){
     startAutoplay();
 
   }catch(e){
+
     console.error(e);
 
-    $("stage").innerHTML=`
-      <div class="error">
-        <div>
-          <strong>
-            Gagal memuat produk.
-          </strong>
+    $("stage")
+      .innerHTML=`
+        <div class="error">
+          <div>
 
-          <br><br>
+            <strong>
+              Gagal memuat produk.
+            </strong>
 
-          ${esc(e.message)}
+            <br><br>
 
-          <br><br>
+            ${esc(e.message)}
 
-          Pastikan
-          <strong>
-            produk.json
-          </strong>
-          tersedia.
+            <br><br>
+
+            Pastikan
+            <strong>
+              produk.json
+            </strong>
+            tersedia.
+
+          </div>
         </div>
-      </div>
-    `;
+      `;
   }
 }
 
@@ -4632,9 +6053,13 @@ async function loadProducts(){
 document.addEventListener(
   "visibilitychange",
   ()=>{
+
     if(document.hidden){
+
       stopAutoplay();
+
     }else if(playing){
+
       startAutoplay();
     }
   }
