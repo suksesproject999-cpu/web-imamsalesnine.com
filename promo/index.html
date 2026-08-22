@@ -6469,43 +6469,59 @@ async function waitForFonts(){
    CLONE LOCK
 ============================================================ */
 
+/* ============================================================
+   EXPORT CLONE LOCK — FINAL
+   ONLY FOR PNG EXPORT
+============================================================ */
+
 function lockExportClone(
   doc,
-  snapshot
+  snapshot,
+  target
 ){
 
-  const html=
+  const html =
     doc.documentElement;
 
-  const body=
+  const body =
     doc.body;
 
   /*
-    Keep the clone at exactly the same
-    browser viewport as preview.
+    IMPORTANT:
+    Export layout must be calculated
+    from the FINAL target canvas size,
+    NOT from the phone/browser viewport.
   */
 
-  html.style.width=
-    window.innerWidth+
-    "px";
+  const exportWidth =
+    target.width;
 
-  html.style.minWidth=
-    window.innerWidth+
-    "px";
+  const exportHeight =
+    target.height;
 
-  body.style.width=
-    window.innerWidth+
-    "px";
+  html.style.width =
+    exportWidth + "px";
 
-  body.style.minWidth=
-    window.innerWidth+
-    "px";
+  html.style.minWidth =
+    exportWidth + "px";
+
+  html.style.height =
+    exportHeight + "px";
+
+  body.style.width =
+    exportWidth + "px";
+
+  body.style.minWidth =
+    exportWidth + "px";
+
+  body.style.height =
+    exportHeight + "px";
 
   /*
     Find artwork.
   */
 
-  const clone=
+  const clone =
     doc.getElementById(
       "promoCanvas"
     );
@@ -6514,46 +6530,50 @@ function lockExportClone(
     return;
 
   /*
-    Freeze clone.
+    Freeze animation / transition.
   */
 
   clone.classList.add(
     "export-static"
   );
 
-  clone.style.animation=
+  clone.style.animation =
     "none";
 
-  clone.style.transition=
+  clone.style.transition =
     "none";
 
-  clone.style.opacity=
+  clone.style.opacity =
     "1";
 
   /*
-    IMPORTANT:
-    Preserve the exact visible preview
-    geometry.
+    HARD EXPORT GEOMETRY.
+    The artwork itself owns the final
+    export dimensions.
   */
 
-  clone.style.width=
-    snapshot.width+
-    "px";
+  clone.style.width =
+    exportWidth + "px";
 
-  clone.style.height=
-    snapshot.height+
-    "px";
+  clone.style.height =
+    exportHeight + "px";
 
-  clone.style.maxWidth=
+  clone.style.minWidth =
+    exportWidth + "px";
+
+  clone.style.minHeight =
+    exportHeight + "px";
+
+  clone.style.maxWidth =
     "none";
 
-  clone.style.maxHeight=
+  clone.style.maxHeight =
     "none";
 
-  clone.style.aspectRatio=
-    snapshot.width+
+  clone.style.aspectRatio =
+    exportWidth +
     "/" +
-    snapshot.height;
+    exportHeight;
 
   /*
     Freeze every descendant.
@@ -6564,11 +6584,12 @@ function lockExportClone(
     .forEach(
       node=>{
 
-        node.style.animation=
+        node.style.animation =
           "none";
 
-        node.style.transition=
+        node.style.transition =
           "none";
+
       }
     );
 
@@ -6576,26 +6597,30 @@ function lockExportClone(
     Hide editor-only overlays.
   */
 
-  const safeZone=
+  const safeZone =
     clone.querySelector(
       ".safe-zone"
     );
 
-  if(safeZone)
-    safeZone.style.display=
-      "none";
+  if(safeZone){
 
-  const ratioMark=
+    safeZone.style.display =
+      "none";
+  }
+
+  const ratioMark =
     clone.querySelector(
       ".ratio-mark"
     );
 
-  if(ratioMark)
-    ratioMark.style.display=
+  if(ratioMark){
+
+    ratioMark.style.display =
       "none";
+  }
 
   /*
-    Re-apply badge centering.
+    Badge geometry remains clean.
   */
 
   clone
@@ -6605,34 +6630,39 @@ function lockExportClone(
     .forEach(
       badge=>{
 
-        badge.style.display=
+        badge.style.display =
           "inline-flex";
 
-        badge.style.alignItems=
+        badge.style.alignItems =
           "center";
 
-        badge.style.justifyContent=
+        badge.style.justifyContent =
           "center";
 
-        badge.style.textAlign=
+        badge.style.textAlign =
           "center";
 
-        badge.style.lineHeight=
+        badge.style.lineHeight =
           "1";
 
-        badge.style.transform=
+        badge.style.transform =
           "none";
+
+        badge.style.overflow =
+          "hidden";
+
       }
     );
 }
 
+
 /* ============================================================
-   EXACT PNG RENDER
+   EXACT PNG RENDER — FINAL
 ============================================================ */
 
 async function renderPNG(){
 
-  const source=
+  const source =
     $("promoCanvas");
 
   if(!source){
@@ -6643,7 +6673,7 @@ async function renderPNG(){
   }
 
   if(
-    typeof html2canvas!==
+    typeof html2canvas !==
     "function"
   ){
 
@@ -6653,8 +6683,8 @@ async function renderPNG(){
   }
 
   /*
-    Freeze current visual state
-    before reading geometry.
+    Keep current product and visual
+    content exactly as selected.
   */
 
   fitBadges();
@@ -6678,22 +6708,13 @@ async function renderPNG(){
 
   fitBadges();
 
-  /*
-    Read the actual preview.
-  */
-
-  const snapshot=
+  const snapshot =
     previewSnapshot();
 
-  const target=
+  const target =
     exportDimensions();
 
-  /*
-    The export must correspond to
-    exactly the current product.
-  */
-
-  const product=
+  const product =
     promoProducts[
       snapshot.index
     ];
@@ -6706,43 +6727,36 @@ async function renderPNG(){
   }
 
   /*
-    Render scale derives ONLY from
-    the visible preview dimensions.
+    IMPORTANT:
+    Render at target geometry directly.
+    Do NOT calculate scale from the
+    current phone/desktop preview size.
   */
 
-  let scale=
-    target.width/
-    snapshot.width;
+  let renderScale = 1;
 
-  const estimatedPixels=
-    snapshot.width*
-    snapshot.height*
-    scale*
-    scale;
+  const estimatedPixels =
+    target.width *
+    target.height;
 
   if(
-    estimatedPixels>
+    estimatedPixels >
     EXPORT_CONFIG.maxPixels
   ){
 
-    scale=
+    renderScale =
       Math.sqrt(
-        EXPORT_CONFIG.maxPixels/
-        (
-          snapshot.width*
-          snapshot.height
-        )
+        EXPORT_CONFIG.maxPixels /
+        estimatedPixels
       );
   }
 
   /*
-    Capture.
-    NO sanitizeClone.
-    NO color rewriting.
-    NO alternate layout.
+    html2canvas will use the target
+    dimensions as its CSS viewport.
   */
 
-  const captured=
+  const captured =
     await html2canvas(
       source,
       {
@@ -6750,26 +6764,36 @@ async function renderPNG(){
         backgroundColor:
           "#050705",
 
+        /*
+          NEVER use window.innerWidth
+          as export geometry.
+        */
+
         windowWidth:
-          window.innerWidth,
+          Math.round(
+            target.width
+          ),
 
         windowHeight:
-          window.innerHeight,
+          Math.round(
+            target.height
+          ),
 
         width:
           Math.round(
-            snapshot.width
+            target.width
           ),
 
         height:
           Math.round(
-            snapshot.height
+            target.height
           ),
 
         x:0,
         y:0,
 
-        scale,
+        scale:
+          renderScale,
 
         useCORS:true,
 
@@ -6790,10 +6814,13 @@ async function renderPNG(){
 
         onclone:
           clonedDocument=>{
+
             lockExportClone(
               clonedDocument,
-              snapshot
+              snapshot,
+              target
             );
+
           }
       }
     );
@@ -6810,21 +6837,22 @@ async function renderPNG(){
   }
 
   /*
-    Normalize to exact requested dimensions.
+    Final PNG canvas.
+    Always exact target dimensions.
   */
 
-  const finalCanvas=
+  const finalCanvas =
     document.createElement(
       "canvas"
     );
 
-  finalCanvas.width=
+  finalCanvas.width =
     target.width;
 
-  finalCanvas.height=
+  finalCanvas.height =
     target.height;
 
-  const ctx=
+  const ctx =
     finalCanvas.getContext(
       "2d",
       {
@@ -6840,13 +6868,13 @@ async function renderPNG(){
     );
   }
 
-  ctx.imageSmoothingEnabled=
+  ctx.imageSmoothingEnabled =
     true;
 
-  ctx.imageSmoothingQuality=
+  ctx.imageSmoothingQuality =
     "high";
 
-  ctx.fillStyle=
+  ctx.fillStyle =
     "#050705";
 
   ctx.fillRect(
@@ -6855,6 +6883,11 @@ async function renderPNG(){
     target.width,
     target.height
   );
+
+  /*
+    Fit captured render exactly into
+    the final ratio. No crop.
+  */
 
   ctx.drawImage(
     captured,
@@ -6872,19 +6905,19 @@ async function renderPNG(){
     Final ratio validation.
   */
 
-  const expectedRatio=
-    target.width/
+  const expectedRatio =
+    target.width /
     target.height;
 
-  const actualRatio=
-    finalCanvas.width/
+  const actualRatio =
+    finalCanvas.width /
     finalCanvas.height;
 
   if(
     Math.abs(
-      expectedRatio-
+      expectedRatio -
       actualRatio
-    )>
+    ) >
     .0001
   ){
 
@@ -6894,6 +6927,7 @@ async function renderPNG(){
   }
 
   return{
+
     canvas:
       finalCanvas,
 
@@ -6907,6 +6941,7 @@ async function renderPNG(){
       target.ratio,
 
     product
+
   };
 }
 
