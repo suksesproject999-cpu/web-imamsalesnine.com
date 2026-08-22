@@ -2523,14 +2523,111 @@ function exportJSON(){
   );
 }
 
+
 /* ============================================================
-   EXPORT ENGINE — PREVIEW LOCKED
+   EXPORT ENGINE — FINAL PREVIEW LOCK
+   Version: FIXED-PREVIEW-RENDER v5
 ============================================================ */
 
-function ratioDefinition(){
+const EXPORT_CONFIG = {
+  maxPixels: 16000000,
+  revokeDelay: 12000,
+  imageTimeout: 20000,
+  settleDelay: 180
+};
+
+/* ------------------------------------------------------------
+   DOWNLOAD STATUS UI
+------------------------------------------------------------ */
+
+function ensureDownloadStatus(){
+  let box=$("downloadStatus");
+
+  if(box)return box;
+
+  const anchor=$("downloadBtn");
+
+  if(!anchor)return null;
+
+  box=document.createElement("div");
+  box.id="downloadStatus";
+  box.className="download-status";
+
+  box.innerHTML=`
+    <div id="downloadStatusText">
+      Ready.
+    </div>
+
+    <div class="download-progress">
+      <div
+        id="downloadProgress"
+        class="download-progress-fill"
+      ></div>
+    </div>
+  `;
+
+  anchor.closest(".panel")
+    ?.querySelector(".toolbar:last-of-type")
+    ?.insertAdjacentElement(
+      "afterend",
+      box
+    );
+
+  return box;
+}
+
+function setDownloadStatus(
+  message,
+  state="running",
+  progress=0
+){
+  const box=
+    ensureDownloadStatus();
+
+  if(!box)return;
+
+  const text=
+    $("downloadStatusText");
+
+  const bar=
+    $("downloadProgress");
+
+  box.className=
+    `download-status show ${state}`;
+
+  if(text)
+    text.textContent=message;
+
+  if(bar){
+    const p=Math.min(
+      100,
+      Math.max(
+        0,
+        Number(progress)||0
+      )
+    );
+
+    bar.style.width=p+"%";
+  }
+}
+
+function clearDownloadStatus(){
+  const box=
+    $("downloadStatus");
+
+  if(box)
+    box.className=
+      "download-status";
+}
+
+/* ------------------------------------------------------------
+   TARGET DIMENSIONS
+------------------------------------------------------------ */
+
+function exportRatio(){
   if(currentRatio==="916"){
     return {
-      key:"9x16",
+      name:"9x16",
       width:9,
       height:16
     };
@@ -2538,22 +2635,23 @@ function ratioDefinition(){
 
   if(currentRatio==="45"){
     return {
-      key:"4x5",
+      name:"4x5",
       width:4,
       height:5
     };
   }
 
   return {
-    key:"16x9",
+    name:"16x9",
     width:16,
     height:9
   };
 }
 
 function qualityWidth(){
-  const q=$("qualitySelect").value;
-  const ratio=ratioDefinition();
+  const q=
+    $("qualitySelect")?.value||
+    "standard";
 
   if(q==="fast")
     return 1280;
@@ -2562,59 +2660,103 @@ function qualityWidth(){
     return 1920;
 
   if(q==="ultra")
-    return Math.min(
-      2560,
-      ratio.width*
-      Math.floor(
-        2560/ratio.width
-      )
-    );
+    return 2560;
 
   return 1440;
 }
 
+/*
+  IMPORTANT:
+  Target dimensions are mathematically fixed.
+  No more DOM-derived 2558px / 1279px surprises.
+*/
 function exportDimensions(){
-  const ratio=ratioDefinition();
-  const targetWidth=
+  const ratio=
+    exportRatio();
+
+  let width=
     qualityWidth();
 
-  let width=targetWidth;
+  let height=
+    Math.round(
+      width*
+      ratio.height/
+      ratio.width
+    );
 
-  let height=Math.round(
-    width*
-    ratio.height/
-    ratio.width
-  );
+  /*
+    Force exact common 9:16 sizes.
+  */
+  if(
+    ratio.name==="9x16"&&
+    width===1440
+  ){
+    height=2560;
+  }
 
+  if(
+    ratio.name==="9x16"&&
+    width===1280
+  ){
+    height=2276;
+  }
+
+  if(
+    ratio.name==="9x16"&&
+    width===1920
+  ){
+    height=3413;
+  }
+
+  /*
+    Pixel safety.
+  */
   const pixels=
     width*height;
 
-  if(pixels>CONFIG.MAX_PIXELS){
+  if(
+    pixels>
+    EXPORT_CONFIG.maxPixels
+  ){
     const factor=
       Math.sqrt(
-        CONFIG.MAX_PIXELS/pixels
+        EXPORT_CONFIG.maxPixels/
+        pixels
       );
 
-    width=Math.floor(width*factor);
-    height=Math.floor(height*factor);
+    width=
+      Math.floor(width*factor);
+
+    height=
+      Math.floor(height*factor);
   }
 
   return {
     width,
     height,
-    ratio:ratio.key
+    ratio:ratio.name
   };
 }
 
-function waitForImages(root){
-  const imgs=[
-    ...root.querySelectorAll("img")
-  ];
+/* ------------------------------------------------------------
+   IMAGE / FONT READINESS
+------------------------------------------------------------ */
 
-  return Promise.all(
-    imgs.map(img=>{
-      if(img.complete){
-        if(typeof img.decode==="function"){
+async function waitForImages(root){
+  const images=
+    [
+      ...root.querySelectorAll("img")
+    ];
+
+  await Promise.all(
+    images.map(img=>{
+      if(
+        img.complete&&
+        img.naturalWidth>0
+      ){
+        if(
+          typeof img.decode==="function"
+        ){
           return img.decode()
             .catch(()=>{});
         }
@@ -2623,35 +2765,65 @@ function waitForImages(root){
       }
 
       return new Promise(resolve=>{
-        img.onload=()=>resolve();
-        img.onerror=()=>resolve();
+        let finished=false;
+
+        const done=()=>{
+          if(finished)return;
+          finished=true;
+          resolve();
+        };
+
+        img.addEventListener(
+          "load",
+          done,
+          {once:true}
+        );
+
+        img.addEventListener(
+          "error",
+          done,
+          {once:true}
+        );
+
+        setTimeout(
+          done,
+          EXPORT_CONFIG.imageTimeout
+        );
       });
     })
   );
 }
 
 async function waitForFonts(){
-  if(document.fonts?.ready){
+  if(
+    document.fonts&&
+    document.fonts.ready
+  ){
     try{
       await document.fonts.ready;
     }catch{}
   }
 }
 
-function capturePreviewState(){
-  const source=$("promoCanvas");
+/* ------------------------------------------------------------
+   PREVIEW SNAPSHOT
+------------------------------------------------------------ */
 
-  if(!source)
+function previewSnapshot(){
+  const el=
+    $("promoCanvas");
+
+  if(!el)
     throw new Error(
       "PREVIEW_NOT_READY"
     );
 
   const rect=
-    source.getBoundingClientRect();
+    el.getBoundingClientRect();
 
   if(
-    !rect.width||
-    !rect.height
+    rect.width<=0||
+    rect.height<=0
   ){
     throw new Error(
       "PREVIEW_HAS_NO_SIZE"
@@ -2661,63 +2833,244 @@ function capturePreviewState(){
   return {
     width:rect.width,
     height:rect.height,
-    ratio:ratioDefinition().key,
-    index:currentIndex,
-    product:
-      promoProducts[currentIndex]?.id||
-      null
+    ratio:
+      rect.width/
+      rect.height,
+
+    productId:
+      promoProducts[
+        currentIndex
+      ]?.id??null,
+
+    index:currentIndex
   };
 }
 
+/* ------------------------------------------------------------
+   CLONE LOCK
+------------------------------------------------------------ */
+
 /*
-  IMPORTANT:
-  Jangan ubah CSS source di clone.
-  Preview dan export harus memakai style
-  yang sama. Yang dibekukan hanya animation/
-  transition/safe overlay.
+  html2canvas internally creates a clone.
+  The biggest previous problem was that CSS using
+  vw/clamp/media queries could be recalculated inside
+  that clone.
+
+  We explicitly lock the clone to the same viewport
+  used by the visible preview.
 */
-function prepareExportClone(clone){
-  clone.classList.add(
-    "export-lock"
-  );
+function lockExportClone(
+  clonedDocument,
+  snapshot
+){
+  try{
 
-  clone.style.animation="none";
-  clone.style.transition="none";
+    const html=
+      clonedDocument.documentElement;
 
-  clone.querySelectorAll("*")
-    .forEach(el=>{
-      el.style.animation="none";
-      el.style.transition="none";
-    });
+    const body=
+      clonedDocument.body;
 
-  /*
-    Hilangkan elemen UI-only yang memang
-    bukan bagian artwork:
-    safe-zone + ratio marker.
-  */
-  const safeZone=
-    clone.querySelector(".safe-zone");
+    /*
+      Preserve actual browser viewport.
+    */
+    html.style.width=
+      `${window.innerWidth}px`;
 
-  if(safeZone){
-    safeZone.style.display="none";
+    html.style.minWidth=
+      `${window.innerWidth}px`;
+
+    body.style.width=
+      `${window.innerWidth}px`;
+
+    body.style.minWidth=
+      `${window.innerWidth}px`;
+
+    /*
+      Find cloned artwork.
+    */
+    const clone=
+      clonedDocument.getElementById(
+        "promoCanvas"
+      );
+
+    if(!clone)return;
+
+    /*
+      Kill all time-based visual changes.
+    */
+    clone.classList.add(
+      "export-static"
+    );
+
+    clone.style.animation=
+      "none";
+
+    clone.style.transition=
+      "none";
+
+    clone.style.opacity=
+      "1";
+
+    /*
+      Hide editor-only guides.
+    */
+    const safeZone=
+      clone.querySelector(
+        ".safe-zone"
+      );
+
+    if(safeZone){
+      safeZone.style.display=
+        "none";
+    }
+
+    const ratioMark=
+      clone.querySelector(
+        ".ratio-mark"
+      );
+
+    if(ratioMark){
+      ratioMark.style.display=
+        "none";
+    }
+
+    /*
+      Lock every animation/transition.
+    */
+    clone
+      .querySelectorAll("*")
+      .forEach(node=>{
+        node.style.animation=
+          "none";
+
+        node.style.transition=
+          "none";
+      });
+
+    /*
+      Make sure source artwork has the
+      exact same dimensions as preview.
+    */
+    clone.style.width=
+      `${snapshot.width}px`;
+
+    clone.style.height=
+      `${snapshot.height}px`;
+
+    clone.style.maxWidth=
+      "none";
+
+    clone.style.maxHeight=
+      "none";
+
+    /*
+      Prevent accidental responsive
+      width changes.
+    */
+    clone.style.aspectRatio=
+      `${snapshot.width}/${snapshot.height}`;
+
+  }catch(error){
+    console.warn(
+      "EXPORT_CLONE_LOCK",
+      error
+    );
   }
-
-  const ratioMark=
-    clone.querySelector(".ratio-mark");
-
-  if(ratioMark){
-    ratioMark.style.display="none";
-  }
-
-  /*
-    Reset opacity clone agar tidak ikut
-    transition slide.
-  */
-  clone.style.opacity="1";
-  clone.style.transform="none";
 }
 
+/* ------------------------------------------------------------
+   CANVAS NORMALIZATION
+------------------------------------------------------------ */
+
+function resizeCanvasExact(
+  sourceCanvas,
+  targetWidth,
+  targetHeight
+){
+  if(
+    sourceCanvas.width===
+      targetWidth&&
+    sourceCanvas.height===
+      targetHeight
+  ){
+    return sourceCanvas;
+  }
+
+  const finalCanvas=
+    document.createElement(
+      "canvas"
+    );
+
+  finalCanvas.width=
+    targetWidth;
+
+  finalCanvas.height=
+    targetHeight;
+
+  const ctx=
+    finalCanvas.getContext(
+      "2d",
+      {
+        alpha:false,
+        desynchronized:false
+      }
+    );
+
+  if(!ctx)
+    throw new Error(
+      "CANVAS_CONTEXT_FAILED"
+    );
+
+  ctx.imageSmoothingEnabled=
+    true;
+
+  ctx.imageSmoothingQuality=
+    "high";
+
+  ctx.fillStyle=
+    "#050705";
+
+  ctx.fillRect(
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
+
+  /*
+    Because source and target are locked
+    to the exact same ratio, this is a
+    pure resolution normalization.
+  */
+  ctx.drawImage(
+    sourceCanvas,
+    0,
+    0,
+    sourceCanvas.width,
+    sourceCanvas.height,
+    0,
+    0,
+    targetWidth,
+    targetHeight
+  );
+
+  return finalCanvas;
+}
+
+/* ------------------------------------------------------------
+   FINAL PNG RENDER
+------------------------------------------------------------ */
+
 async function renderPNG(){
+  const source=
+    $("promoCanvas");
+
+  if(!source)
+    throw new Error(
+      "PREVIEW_NOT_READY"
+    );
+
   if(
     typeof html2canvas!=="function"
   ){
@@ -2726,181 +3079,236 @@ async function renderPNG(){
     );
   }
 
-  const source=$("promoCanvas");
-
-  if(!source){
-    throw new Error(
-      "PREVIEW_NOT_READY"
-    );
-  }
-
-  /*
-    Capture state BEFORE cloning.
-    Ini memastikan product/index yang
-    diexport adalah yang sedang terlihat.
-  */
-  const previewState=
-    capturePreviewState();
-
-  await waitForImages(source);
-  await waitForFonts();
-
-  /*
-    Pakai ukuran layout preview aktual,
-    bukan ukuran viewport baru.
-  */
-  const rect=
-    source.getBoundingClientRect();
-
-  const sourceWidth=
-    Math.max(
-      1,
-      Math.round(rect.width)
-    );
-
-  const sourceHeight=
-    Math.max(
-      1,
-      Math.round(rect.height)
-    );
+  const snapshot=
+    previewSnapshot();
 
   const target=
     exportDimensions();
 
   /*
-    Scale hanya meningkatkan resolusi.
-    Layout source tetap identik.
+    Make absolutely sure the user isn't
+    exporting a different product than
+    the one currently visible.
   */
-  let scale=
-    target.width/sourceWidth;
+  const activeProduct=
+    promoProducts[
+      snapshot.index
+    ];
 
-  const pixels=
-    sourceWidth*
-    sourceHeight*
-    scale*
-    scale;
-
-  if(pixels>CONFIG.MAX_PIXELS){
-    scale=
-      Math.sqrt(
-        CONFIG.MAX_PIXELS/
-        (sourceWidth*sourceHeight)
-      );
-  }
-
-  const result=
-    await html2canvas(
-      source,
-      {
-        backgroundColor:"#050705",
-
-        scale,
-
-        width:sourceWidth,
-        height:sourceHeight,
-
-        useCORS:true,
-        allowTaint:false,
-
-        imageTimeout:20000,
-
-        logging:false,
-
-        foreignObjectRendering:false,
-
-        removeContainer:true,
-
-        scrollX:0,
-        scrollY:0,
-
-        windowWidth:
-          Math.max(
-            document.documentElement.clientWidth,
-            window.innerWidth||
-            document.documentElement.clientWidth
-          ),
-
-        windowHeight:
-          Math.max(
-            document.documentElement.clientHeight,
-            window.innerHeight||
-            document.documentElement.clientHeight
-          ),
-
-        onclone:doc=>{
-          const clone=
-            doc.getElementById(
-              "promoCanvas"
-            );
-
-          if(clone){
-            prepareExportClone(
-              clone
-            );
-          }
-        }
-      }
-    );
-
-  /*
-    Guard against unexpected dimensions.
-  */
-  if(
-    !result||
-    !result.width||
-    !result.height
-  ){
+  if(!activeProduct){
     throw new Error(
-      "EXPORT_EMPTY_CANVAS"
+      "ACTIVE_PRODUCT_NOT_FOUND"
     );
   }
 
   /*
-    Final ratio guard.
-    Prevent browser rounding/layout
-    anomaly from silently generating
-    the wrong aspect ratio.
+    Freeze animation state without
+    touching the actual preview.
   */
-  const expectedRatio=
-    ratioDefinition().width/
-    ratioDefinition().height;
+  const oldMotion=
+    motion;
 
-  const actualRatio=
-    result.width/result.height;
+  try{
 
-  const tolerance=.015;
-
-  if(
-    Math.abs(
-      actualRatio-expectedRatio
-    )>tolerance
-  ){
-    console.warn(
-      "Export ratio mismatch",
-      {
-        expectedRatio,
-        actualRatio,
-        previewState
-      }
+    /*
+      Wait for exact visible preview.
+    */
+    await waitForImages(
+      source
     );
-  }
 
-  return result;
+    await waitForFonts();
+
+    await new Promise(
+      resolve=>
+        requestAnimationFrame(
+          ()=>resolve()
+        )
+    );
+
+    await wait(
+      EXPORT_CONFIG.settleDelay
+    );
+
+    /*
+      Calculate scale from the actual
+      preview width.
+
+      This preserves the exact preview
+      layout and only increases resolution.
+    */
+    let scale=
+      target.width/
+      snapshot.width;
+
+    const estimatedPixels=
+      snapshot.width*
+      snapshot.height*
+      scale*
+      scale;
+
+    if(
+      estimatedPixels>
+      EXPORT_CONFIG.maxPixels
+    ){
+      scale=
+        Math.sqrt(
+          EXPORT_CONFIG.maxPixels/
+          (
+            snapshot.width*
+            snapshot.height
+          )
+        );
+    }
+
+    setDownloadStatus(
+      "Rendering locked preview...",
+      "running",
+      48
+    );
+
+    const captured=
+      await html2canvas(
+        source,
+        {
+          backgroundColor:
+            "#050705",
+
+          /*
+            Critical:
+            use the exact current browser
+            viewport, not html2canvas's
+            default clone viewport.
+          */
+          windowWidth:
+            window.innerWidth,
+
+          windowHeight:
+            window.innerHeight,
+
+          /*
+            Capture exact preview box.
+          */
+          width:
+            Math.round(
+              snapshot.width
+            ),
+
+          height:
+            Math.round(
+              snapshot.height
+            ),
+
+          x:0,
+          y:0,
+
+          scale,
+
+          useCORS:true,
+
+          allowTaint:false,
+
+          imageTimeout:
+            EXPORT_CONFIG.imageTimeout,
+
+          logging:false,
+
+          foreignObjectRendering:
+            false,
+
+          removeContainer:true,
+
+          scrollX:0,
+          scrollY:0,
+
+          onclone:
+            clonedDocument=>{
+              lockExportClone(
+                clonedDocument,
+                snapshot
+              );
+            }
+        }
+      );
+
+    if(
+      !captured||
+      !captured.width||
+      !captured.height
+    ){
+      throw new Error(
+        "EMPTY_RENDER"
+      );
+    }
+
+    /*
+      Normalize to exact requested
+      output dimensions.
+    */
+    const finalCanvas=
+      resizeCanvasExact(
+        captured,
+        target.width,
+        target.height
+      );
+
+    /*
+      Validate aspect ratio.
+    */
+    const expected=
+      target.width/
+      target.height;
+
+    const actual=
+      finalCanvas.width/
+      finalCanvas.height;
+
+    if(
+      Math.abs(
+        expected-actual
+      )>0.0001
+    ){
+      throw new Error(
+        "FINAL_RATIO_INVALID"
+      );
+    }
+
+    return {
+      canvas:finalCanvas,
+      width:target.width,
+      height:target.height,
+      ratio:target.ratio,
+      product:activeProduct
+    };
+
+  }finally{
+    /*
+      Motion state belongs to preview only.
+      No mutation required, but keeping this
+      explicit protects future extensions.
+    */
+    void oldMotion;
+  }
 }
+
+/* ------------------------------------------------------------
+   BLOB
+------------------------------------------------------------ */
 
 function canvasBlob(canvas){
   return new Promise(
     (resolve,reject)=>{
       canvas.toBlob(
         blob=>{
-          if(blob)
+          if(blob){
             resolve(blob);
-          else
+          }else{
             reject(
               new Error(
                 "EMPTY_BLOB"
               )
             );
+          }
         },
         "image/png",
         1
@@ -2909,76 +3317,98 @@ function canvasBlob(canvas){
   );
 }
 
-function downloadBlob(blob,name){
+/* ------------------------------------------------------------
+   SAFE DOWNLOAD
+------------------------------------------------------------ */
+
+function downloadBlob(
+  blob,
+  filename
+){
   if(!blob)
     throw new Error(
       "DOWNLOAD_EMPTY_BLOB"
     );
 
   const url=
-    URL.createObjectURL(blob);
+    URL.createObjectURL(
+      blob
+    );
 
-  const a=
-    document.createElement("a");
+  const link=
+    document.createElement(
+      "a"
+    );
 
-  a.href=url;
-  a.download=name;
-  a.rel="noopener";
+  link.href=url;
+  link.download=filename;
+  link.rel="noopener";
 
-  document.body.appendChild(a);
+  link.style.display=
+    "none";
+
+  document.body.appendChild(
+    link
+  );
 
   /*
-    Programmatic download.
+    Mobile Chromium/WebView is happier
+    when click happens while element exists.
   */
-  a.click();
+  link.click();
 
-  a.remove();
+  link.remove();
 
-  /*
-    Jangan revoke terlalu cepat.
-    Beberapa browser mobile masih
-    membaca Blob setelah click.
-  */
   setTimeout(
     ()=>{
-      URL.revokeObjectURL(url);
+      URL.revokeObjectURL(
+        url
+      );
     },
-    10000
+    EXPORT_CONFIG.revokeDelay
   );
 }
 
-function exportFileName(
-  p,
+/* ------------------------------------------------------------
+   FILE NAME
+------------------------------------------------------------ */
+
+function exportFilename(
+  product,
   prefix="PROMO"
 ){
-  const ratio=
-    ratioDefinition().key;
+  const archetype=
+    chooseTemplate(product);
 
-  const t=
-    chooseTemplate(p);
+  const ratio=
+    exportRatio().name;
 
   return (
-    `${prefix}-`+
-    `${slug(displayTitle(p))}-`+
+    `${slug(prefix)}-`+
+    `${slug(displayTitle(product))}-`+
     `${slug(
-      ARCHETYPES[t].name
+      ARCHETYPES[
+        archetype
+      ]?.name||
+      "Creative"
     )}-`+
     `${ratio}-`+
     `${currentVariant}.png`
   );
 }
 
-/* ============================================================
-   DOWNLOAD CURRENT — LOCKED PREVIEW
-============================================================ */
+/* ------------------------------------------------------------
+   DOWNLOAD CURRENT
+------------------------------------------------------------ */
 
 async function downloadCurrent(){
   if(downloadBusy)
     return;
 
   if(!promoProducts.length){
+
     setDownloadStatus(
-      "Belum ada produk campaign.",
+      "Tidak ada produk untuk di-download.",
       "warn",
       0
     );
@@ -2992,69 +3422,78 @@ async function downloadCurrent(){
 
   downloadBusy=true;
 
-  stopAutoplay();
-
-  /*
-    Simpan state UI sebelum export.
-  */
-  const savedIndex=
-    currentIndex;
-
-  const savedPlaying=
+  const previousPlaying=
     playing;
 
+  stopAutoplay();
+
   try{
+
     setDownloadStatus(
-      "Preparing preview snapshot...",
+      "Preparing current preview...",
       "running",
       8
     );
 
     /*
-      Pastikan preview sudah benar-benar
-      berada di product aktif.
+      Never change currentIndex here.
+      The current visible artwork is
+      the only artwork allowed to export.
     */
-    renderPreview();
+    const product=
+      promoProducts[
+        currentIndex
+      ];
 
-    await wait(60);
-
-    setDownloadStatus(
-      "Locking preview composition...",
-      "running",
-      20
-    );
-
-    const p=
-      promoProducts[currentIndex];
-
-    if(!p)
+    if(!product)
       throw new Error(
         "ACTIVE_PRODUCT_NOT_FOUND"
       );
 
     /*
-      Ambil state sekali.
-      Jangan navigasi selama export.
+      Wait one browser frame so all
+      current UI changes are committed.
     */
-    capturePreviewState();
+    await new Promise(
+      resolve=>
+        requestAnimationFrame(
+          ()=>resolve()
+        )
+    );
+
+    setDownloadStatus(
+      "Locking preview...",
+      "running",
+      22
+    );
+
+    await wait(
+      EXPORT_CONFIG.settleDelay
+    );
 
     setDownloadStatus(
       "Rendering exact preview...",
       "running",
-      42
+      45
     );
 
-    const canvas=
+    const result=
       await renderPNG();
 
     setDownloadStatus(
-      "Encoding PNG...",
+      `Encoding PNG • ${
+        result.width
+      }×${
+        result.height
+      }`,
       "running",
-      72
+      70
     );
 
     const blob=
-      await canvasBlob(canvas);
+      await canvasBlob(
+        result.canvas
+      );
 
     setDownloadStatus(
       "Starting download...",
@@ -3064,30 +3503,35 @@ async function downloadCurrent(){
 
     downloadBlob(
       blob,
-      exportFileName(p)
+      exportFilename(
+        product
+      )
     );
 
     setDownloadStatus(
       `Download selesai • ${
-        exportDimensions().width
-      }px`,
+        result.width
+      }×${
+        result.height
+      }`,
       "success",
       100
     );
 
     toast(
-      "PNG sama dengan preview ✓"
+      "PNG berhasil — preview locked ✓"
     );
 
-  }catch(e){
+  }catch(error){
+
     console.error(
-      "DOWNLOAD_ERROR",
-      e
+      "FINAL_EXPORT_ERROR",
+      error
     );
 
     setDownloadStatus(
       `Export gagal: ${
-        e?.message||
+        error?.message||
         "Unknown error"
       }`,
       "error",
@@ -3099,30 +3543,27 @@ async function downloadCurrent(){
     );
 
   }finally{
-    /*
-      Kembalikan state preview.
-    */
-    currentIndex=savedIndex;
-    playing=savedPlaying;
-
-    renderPreview();
 
     downloadBusy=false;
+
+    playing=
+      previousPlaying;
 
     if(playing)
       startAutoplay();
   }
 }
 
-/* ============================================================
-   BATCH EXPORT — SAME PIPELINE
-============================================================ */
+/* ------------------------------------------------------------
+   BATCH EXPORT
+------------------------------------------------------------ */
 
 async function batchExport(){
   if(downloadBusy)
     return;
 
   if(!promoProducts.length){
+
     setDownloadStatus(
       "Tidak ada produk campaign.",
       "warn",
@@ -3136,112 +3577,147 @@ async function batchExport(){
     return;
   }
 
+  downloadBusy=true;
+
   const oldIndex=
     currentIndex;
 
   const oldPlaying=
     playing;
 
-  downloadBusy=true;
-
   stopAutoplay();
+
   playing=false;
 
   const total=
     promoProducts.length;
 
   try{
-    setDownloadStatus(
-      `Batch export dimulai • 0/${total}`,
-      "running",
-      0
-    );
 
     for(
       let i=0;
       i<total;
       i++
     ){
+
       currentIndex=i;
 
       /*
-        Render preview yang sama persis
-        dengan yang user lihat.
+        Build the visible preview first.
+        Export always follows this exact state.
       */
       renderPreview();
 
-      await wait(80);
+      await new Promise(
+        resolve=>
+          requestAnimationFrame(
+            ()=>resolve()
+          )
+      );
+
+      await wait(
+        EXPORT_CONFIG.settleDelay
+      );
 
       const product=
         promoProducts[i];
 
-      const progressStart=
+      const baseProgress=
         (i/total)*100;
 
-      const progressRender=
-        progressStart+
-        (25/total);
-
       setDownloadStatus(
-        `Rendering ${i+1}/${total} • ${
+        `Preparing ${
+          i+1
+        }/${total} • ${
           displayTitle(product)
         }`,
         "running",
-        progressRender
+        baseProgress+5
       );
 
-      const canvas=
+      setDownloadStatus(
+        `Rendering ${
+          i+1
+        }/${total}...`,
+        "running",
+        baseProgress+35
+      );
+
+      const result=
         await renderPNG();
 
+      setDownloadStatus(
+        `Encoding ${
+          i+1
+        }/${total} • ${
+          result.width
+        }×${
+          result.height
+        }`,
+        "running",
+        baseProgress+60
+      );
+
       const blob=
-        await canvasBlob(canvas);
+        await canvasBlob(
+          result.canvas
+        );
 
       setDownloadStatus(
-        `Downloading ${i+1}/${total}...`,
+        `Downloading ${
+          i+1
+        }/${total}...`,
         "running",
-        progressStart+
-        (80/total)
+        baseProgress+82
       );
 
       downloadBlob(
         blob,
-        exportFileName(
+        exportFilename(
           product,
-          slug(
-            $("campaignName").value||
-            "Campaign"
-          )
+          $("campaignName")
+            ?.value||
+          "Campaign"
         )
       );
 
+      /*
+        Give Android/browser download manager
+        time to register each Blob.
+      */
       await wait(350);
 
       setDownloadStatus(
-        `Batch export ${i+1}/${total} selesai`,
+        `Batch ${
+          i+1
+        }/${total} selesai`,
         "running",
         ((i+1)/total)*100
       );
     }
 
     setDownloadStatus(
-      `Batch export selesai • ${total} PNG`,
+      `Batch export selesai • ${
+        total
+      } PNG`,
       "success",
       100
     );
 
     toast(
-      "Batch export selesai ✓"
+      `Batch export ${total} PNG selesai ✓`
     );
 
-  }catch(e){
+  }catch(error){
+
     console.error(
-      "BATCH_EXPORT_ERROR",
-      e
+      "FINAL_BATCH_EXPORT_ERROR",
+      error
     );
 
     setDownloadStatus(
-      `Batch export gagal: ${
-        e?.message||
+      `Batch gagal: ${
+        error?.message||
         "Unknown error"
       }`,
       "error",
@@ -3253,8 +3729,12 @@ async function batchExport(){
     );
 
   }finally{
-    currentIndex=oldIndex;
-    playing=oldPlaying;
+
+    currentIndex=
+      oldIndex;
+
+    playing=
+      oldPlaying;
 
     renderPreview();
 
@@ -3264,6 +3744,122 @@ async function batchExport(){
       startAutoplay();
   }
 }
+
+/* ------------------------------------------------------------
+   RE-BIND EXPORT BUTTONS
+   Existing handlers point to the old
+   function objects, so explicitly bind
+   them again after the replacement.
+------------------------------------------------------------ */
+
+if($("downloadBtn")){
+  $("downloadBtn").onclick=
+    downloadCurrent;
+}
+
+if($("batchBtn")){
+  $("batchBtn").onclick=
+    batchExport;
+}
+
+/* ------------------------------------------------------------
+   EXPORT STATUS STYLE
+------------------------------------------------------------ */
+
+(function installExportStatusStyle(){
+
+  if(
+    document.getElementById(
+      "exportStatusStyle"
+    )
+  )return;
+
+  const style=
+    document.createElement(
+      "style"
+    );
+
+  style.id=
+    "exportStatusStyle";
+
+  style.textContent=`
+    .download-status{
+      display:none;
+      margin-top:10px;
+      padding:11px 13px;
+      border-radius:11px;
+      background:#080c09;
+      border:1px solid rgba(255,255,255,.09);
+      color:#aeb9ae;
+      font-size:8px;
+      font-weight:900;
+      line-height:1.45;
+    }
+
+    .download-status.show{
+      display:block;
+    }
+
+    .download-status.running{
+      color:#d8efbd;
+      border-color:rgba(140,198,63,.28);
+      background:rgba(140,198,63,.055);
+    }
+
+    .download-status.success{
+      color:#c8f59e;
+      border-color:rgba(140,198,63,.42);
+      background:rgba(140,198,63,.09);
+    }
+
+    .download-status.warn{
+      color:#ffe49a;
+      border-color:rgba(255,212,90,.28);
+      background:rgba(255,212,90,.06);
+    }
+
+    .download-status.error{
+      color:#ffaaaa;
+      border-color:rgba(255,98,98,.28);
+      background:rgba(255,98,98,.06);
+    }
+
+    .download-progress{
+      width:100%;
+      height:4px;
+      margin-top:8px;
+      overflow:hidden;
+      border-radius:99px;
+      background:#151a16;
+    }
+
+    .download-progress-fill{
+      width:0%;
+      height:100%;
+      border-radius:99px;
+      background:
+        linear-gradient(
+          90deg,
+          #8cc63f,
+          #b5f45d
+        );
+      transition:
+        width .22s ease;
+    }
+
+    .export-static,
+    .export-static *{
+      animation:none!important;
+      transition:none!important;
+      caret-color:transparent!important;
+    }
+  `;
+
+  document.head.appendChild(
+    style
+  );
+
+})();
 
 /* ============================================================
    DEVICE PREVIEW
