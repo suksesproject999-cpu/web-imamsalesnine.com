@@ -17,17 +17,9 @@
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
-
-
 <style>
 /* ============================================================
-   LARAS PROMO STUDIO — FULL CSS REPLACEMENT
-   RULE:
-   - ONE CSS SYSTEM
-   - NO EXPORT-ONLY LAYOUT
-   - NO .export-static
-   - NO viewport-based typography inside canvas
-   - PREVIEW = PNG
+   ROOT
 ============================================================ */
 
 :root{
@@ -74,15 +66,12 @@ html,
 body{
   margin:0;
   min-height:100%;
-
   background:var(--bg);
 }
 
 body{
   color:var(--text);
-
   font-family:var(--body);
-
   background:
     radial-gradient(
       circle at 50% -20%,
@@ -138,7 +127,8 @@ img{
   border-bottom:
     1px solid var(--line);
 
-  backdrop-filter:blur(20px);
+  backdrop-filter:
+    blur(20px);
 }
 
 .brand{
@@ -161,7 +151,9 @@ img{
 
 .brand p{
   margin:
-    5px 0 0;
+    5px
+    0
+    0;
 
   color:var(--lime);
 
@@ -184,7 +176,7 @@ img{
 
   border-radius:14px;
 
-  color:#fff;
+  color:white;
   background:#080c09;
 
   border:
@@ -193,9 +185,7 @@ img{
 
 .icon-btn.active{
   color:#071006;
-
   background:var(--lime);
-
   border-color:var(--lime);
 }
 
@@ -212,9 +202,7 @@ img{
   border-color:var(--lime);
 
   font-weight:950;
-
-  padding:
-    0 17px;
+  padding:0 17px;
 }
 
 /* ============================================================
@@ -281,7 +269,6 @@ main{
 
   font-size:8px;
   font-weight:950;
-
   letter-spacing:2.5px;
 
   text-transform:uppercase;
@@ -289,23 +276,24 @@ main{
 
 .panel-title{
   margin:
-    7px 0 0;
+    7px
+    0
+    0;
 
   font-size:24px;
-
   font-weight:950;
-
   letter-spacing:-.8px;
 }
 
 .panel-sub{
   margin:
-    7px 0 0;
+    7px
+    0
+    0;
 
   color:#778178;
 
   font-size:10px;
-
   line-height:1.5;
 }
 
@@ -317,7 +305,6 @@ main{
   position:relative;
 
   display:flex;
-
   justify-content:center;
 
   width:100%;
@@ -327,64 +314,49 @@ main{
   width:100%;
 
   display:flex;
-
   justify-content:center;
-
-  min-width:0;
 }
 
 .promo-canvas{
   position:relative;
 
-  width:100%;
-
   overflow:hidden;
-
   isolation:isolate;
 
-  container-type:size;
+  width:100%;
 
   background:#050705;
 
   border:
     1px solid rgba(255,255,255,.11);
 
-  box-shadow:var(--shadow);
+  box-shadow:
+    var(--shadow);
 
   transition:
     opacity .18s ease;
 }
 
-/* ============================================================
-   RATIO BOXES
-============================================================ */
-
 .stage.r916 .promo-canvas{
   width:100%;
-
   max-width:520px;
-
   aspect-ratio:9 / 16;
 }
 
 .stage.r45 .promo-canvas{
   width:100%;
-
   max-width:760px;
-
   aspect-ratio:4 / 5;
 }
 
 .stage.r169 .promo-canvas{
   width:100%;
-
   max-width:none;
-
   aspect-ratio:16 / 9;
 }
 
 /* ============================================================
-   CANVAS BACKGROUND
+   BACKGROUND
 ============================================================ */
 
 .canvas-bg{
@@ -406,13 +378,11 @@ main{
   content:"";
 
   position:absolute;
-
   inset:-20%;
 
   background:
     repeating-linear-gradient(
       125deg,
-
       transparent 0 34px,
 
       color-mix(
@@ -465,7 +435,6 @@ main{
   overflow:hidden;
 
   display:flex;
-
   align-items:center;
   justify-content:center;
 
@@ -478,46 +447,28 @@ main{
     #020302;
 }
 
-/* -------------------- 9:16 -------------------- */
-
-.r916 .product-visual{
-  left:0;
-  top:0;
-
-  width:100%;
-  height:56%;
-}
-
-/* -------------------- 4:5 -------------------- */
-
+.r916 .product-visual,
 .r45 .product-visual{
   left:0;
+  right:0;
   top:0;
 
-  width:100%;
   height:56%;
 }
-
-/* -------------------- 16:9 -------------------- */
 
 .r169 .product-visual{
   left:0;
   top:0;
   bottom:0;
 
-  width:60%;
-  height:100%;
+  width:58%;
 }
-
-/* ============================================================
-   PRODUCT IMAGE
-============================================================ */
 
 .product-image{
   width:100%;
   height:100%;
 
-  padding:6%;
+  padding:7%;
 
   object-fit:contain;
   object-position:center;
@@ -532,80 +483,18 @@ main{
 }
 
 .product-image.portrait{
-  padding-left:12%;
-  padding-right:12%;
-}
-
-.product-image.landscape{
-  padding-top:8%;
-  padding-bottom:8%;
-}
-
-.product-image.square{
-  padding:7%;
-}
-
-/* ============================================================
-   PRODUCT IMAGE PER RATIO
-============================================================ */
-
-.r916 .product-image{
-  padding:6%;
-}
-
-.r916 .product-image.portrait{
-  padding-left:14%;
-  padding-right:14%;
-}
-
-.r916 .product-image.landscape{
-  padding-top:10%;
-  padding-bottom:10%;
-}
-
-.r916 .product-image.square{
-  padding:8%;
-}
-
-.r45 .product-image{
-  padding:6%;
-}
-
-.r45 .product-image.portrait{
   padding-left:13%;
   padding-right:13%;
 }
 
-.r45 .product-image.landscape{
-  padding-top:9%;
-  padding-bottom:9%;
+.product-image.landscape{
+  padding-top:13%;
+  padding-bottom:13%;
 }
 
-.r45 .product-image.square{
-  padding:8%;
+.product-image.square{
+  padding:9%;
 }
-
-.r169 .product-image{
-  padding:5%;
-}
-
-.r169 .product-image.portrait{
-  padding-left:11%;
-  padding-right:11%;
-}
-
-.r169 .product-image.landscape{
-  padding-top:7%;
-  padding-bottom:7%;
-}
-
-.r169 .product-image.square{
-  padding:6%;
-}
-
-/* ============================================================
-   CONTACT SHADOW
-============================================================ */
 
 .contact-shadow{
   position:absolute;
@@ -623,23 +512,18 @@ main{
   background:
     rgba(0,0,0,.62);
 
-  filter:blur(14px);
+  filter:
+    blur(14px);
 
   transform:
     scaleY(.45);
 }
 
 .r169 .contact-shadow{
-  left:18%;
-
+  left:20%;
   width:55%;
-
-  bottom:17%;
+  bottom:18%;
 }
-
-/* ============================================================
-   VISUAL GRADIENT
-============================================================ */
 
 .visual-gradient{
   position:absolute;
@@ -652,9 +536,9 @@ main{
   background:
     linear-gradient(
       to bottom,
-      transparent 40%,
+      transparent 42%,
       rgba(5,7,5,.08) 58%,
-      rgba(5,7,5,.65) 91%,
+      rgba(5,7,5,.72) 91%,
       #050705 100%
     );
 }
@@ -663,9 +547,9 @@ main{
   background:
     linear-gradient(
       to right,
-      transparent 38%,
-      rgba(5,7,5,.04) 55%,
-      rgba(5,7,5,.82) 100%
+      transparent 35%,
+      rgba(5,7,5,.08) 55%,
+      rgba(5,7,5,.84) 100%
     );
 }
 
@@ -679,8 +563,34 @@ main{
   z-index:20;
 
   overflow:visible;
+}
 
-  box-sizing:border-box;
+.r916 .info-zone,
+.r45 .info-zone{
+  left:0;
+  right:0;
+  bottom:0;
+
+  height:44%;
+
+  padding:
+    4.6%
+    7.8%
+    5.6%;
+}
+
+.r169 .info-zone{
+  right:0;
+  top:0;
+  bottom:0;
+
+  width:42%;
+
+  padding:
+    7%
+    6%
+    6%
+    5%;
 }
 
 .product-info{
@@ -689,75 +599,13 @@ main{
   z-index:30;
 
   width:100%;
-
   min-width:0;
-  max-width:100%;
 
   display:flex;
-
   flex-direction:column;
-
   align-items:flex-start;
 
   overflow:visible;
-
-  box-sizing:border-box;
-}
-
-/* ============================================================
-   INFO — 9:16
-============================================================ */
-
-.r916 .info-zone{
-  left:0;
-  right:0;
-  bottom:0;
-
-  width:100%;
-  height:44%;
-
-  padding:
-    4.2cqw
-    7.2cqw
-    5cqw;
-}
-
-/* ============================================================
-   INFO — 4:5
-============================================================ */
-
-.r45 .info-zone{
-  left:0;
-  right:0;
-  bottom:0;
-
-  width:100%;
-  height:44%;
-
-  padding:
-    4.4cqw
-    7cqw
-    5.5cqw;
-}
-
-/* ============================================================
-   INFO — 16:9
-============================================================ */
-
-.r169 .info-zone{
-  right:0;
-  top:0;
-  bottom:0;
-
-  left:auto;
-
-  width:40%;
-  height:100%;
-
-  padding:
-    6cqw
-    5cqw
-    5cqw;
 }
 
 /* ============================================================
@@ -765,18 +613,15 @@ main{
 ============================================================ */
 
 .rule{
-  width:5cqw;
-
-  min-width:38px;
-
-  max-width:70px;
-
+  width:58px;
   height:2px;
 
   flex:0 0 auto;
 
   margin:
-    0 0 1.15cqw;
+    0
+    0
+    12px;
 
   background:
     linear-gradient(
@@ -787,49 +632,54 @@ main{
 }
 
 /* ============================================================
-   BADGES
+   BADGES — HARD LOCKED
 ============================================================ */
 
 .badges{
   width:100%;
 
-  min-width:0;
-
   display:flex;
 
   align-items:center;
-
   justify-content:flex-start;
 
-  flex-direction:row;
+  gap:8px;
 
   flex-wrap:wrap;
 
-  gap:1cqw;
+  min-width:0;
 
   overflow:visible;
 }
 
 .badge{
+  /*
+    IMPORTANT:
+    Badge is a real flex box.
+    Text is centered on both axes.
+  */
+
   position:relative;
-
-  flex:
-    0 1 auto;
-
-  min-width:0;
-  max-width:100%;
-
-  min-height:3cqw;
-
-  padding:
-    0 1.25cqw;
-
-  border-radius:999px;
 
   display:inline-flex;
 
   align-items:center;
   justify-content:center;
+
+  flex:
+    0 1 auto;
+
+  min-width:0;
+
+  max-width:100%;
+
+  min-height:31px;
+
+  padding:
+    0
+    13px;
+
+  border-radius:999px;
 
   box-sizing:border-box;
 
@@ -839,17 +689,17 @@ main{
 
   overflow:hidden;
 
-  text-overflow:clip;
+  text-overflow:ellipsis;
 
   font-family:var(--body);
 
-  font-size:.62cqw;
+  font-size:7px;
 
   line-height:1;
 
   font-weight:950;
 
-  letter-spacing:.16cqw;
+  letter-spacing:1.7px;
 
   vertical-align:middle;
 
@@ -859,11 +709,12 @@ main{
 .badge.promo{
   flex:0 0 auto;
 
-  min-width:6.4cqw;
+  min-width:76px;
 
   color:#190a03;
 
-  background:var(--orange);
+  background:
+    var(--orange);
 }
 
 .badge.extra{
@@ -877,9 +728,8 @@ main{
 }
 
 .badge.warranty{
-  flex:0 1 auto;
-
-  min-width:11.5cqw;
+  flex:
+    0 1 auto;
 
   color:var(--accent);
 
@@ -890,35 +740,41 @@ main{
     1px solid var(--accent);
 }
 
+/*
+  The badge itself owns the text.
+  No inherited line box / inline baseline.
+*/
+.badge,
+.badge::before,
+.badge::after{
+  box-sizing:border-box;
+}
+
 /* ============================================================
-   BRAND — NEVER CLIP
+   BRAND
 ============================================================ */
 
 .brand-line{
   width:100%;
 
-  min-width:0;
-  max-width:100%;
-
-  margin-top:1.7cqw;
+  margin-top:11px;
 
   color:var(--accent);
 
-  font-size:.72cqw;
-
-  line-height:1.15;
+  font-size:8px;
+  line-height:1.2;
 
   font-weight:950;
 
-  letter-spacing:.23cqw;
+  letter-spacing:2.4px;
 
   text-transform:uppercase;
 
   white-space:nowrap;
 
-  overflow:visible;
+  overflow:hidden;
 
-  text-overflow:clip;
+  text-overflow:ellipsis;
 }
 
 /* ============================================================
@@ -928,34 +784,24 @@ main{
 .product-name{
   width:100%;
 
-  min-width:0;
-  max-width:100%;
-
-  margin-top:1cqw;
+  margin-top:7px;
 
   color:#fff;
 
-  /*
-    Based on canvas width.
-    NOT viewport width.
-  */
-
   font-size:
     clamp(
-      18px,
-      2.75cqw,
-      42px
+      22px,
+      3.7vw,
+      43px
     );
 
   line-height:1.05;
 
   font-weight:950;
 
-  letter-spacing:-.06cqw;
+  letter-spacing:-1.1px;
 
   white-space:normal;
-
-  overflow:visible;
 
   overflow-wrap:anywhere;
 
@@ -963,174 +809,102 @@ main{
 
   display:block;
 
-  box-sizing:border-box;
+  overflow:visible;
 }
 
 /* ============================================================
-   PRICE LABEL
+   PRICE
 ============================================================ */
 
 .price-label{
   width:100%;
 
-  margin-top:2cqw;
+  margin-top:15px;
 
-  color:#707970;
+  color:#6f786f;
 
-  font-size:.68cqw;
-
+  font-size:7px;
   line-height:1.15;
 
   font-weight:950;
 
-  letter-spacing:.22cqw;
+  letter-spacing:2px;
 
   text-transform:uppercase;
-
-  white-space:nowrap;
 }
-
-/* ============================================================
-   MAIN PRICE
-============================================================ */
 
 .price{
   width:100%;
 
-  min-width:0;
-
-  margin-top:.55cqw;
+  margin-top:4px;
 
   color:#fff;
 
   font-size:
     clamp(
-      24px,
-      3.8cqw,
-      62px
+      28px,
+      4.5vw,
+      55px
     );
 
-  line-height:.98;
+  line-height:1;
 
   font-weight:950;
 
-  letter-spacing:-.12cqw;
+  letter-spacing:-1.7px;
 
   white-space:nowrap;
-
-  overflow:visible;
-
-  box-sizing:border-box;
 }
-
-/* ============================================================
-   PRICE META
-============================================================ */
 
 .price-meta{
   width:100%;
 
-  min-width:0;
-
-  min-height:1.5cqw;
-
-  margin-top:.8cqw;
-
   display:flex;
 
   align-items:center;
-
   justify-content:flex-start;
 
-  flex-direction:row;
+  gap:9px;
 
-  flex-wrap:nowrap;
+  margin-top:8px;
 
-  gap:1cqw;
-
-  overflow:visible;
+  min-height:14px;
 }
 
 .old{
-  flex:
-    0 1 auto;
+  color:#6d756d;
 
-  min-width:0;
-
-  display:inline-flex;
-
-  align-items:center;
-
-  color:#737a73;
-
-  font-size:.7cqw;
-
-  line-height:1;
+  font-size:8px;
+  line-height:1.1;
 
   white-space:nowrap;
-
-  overflow:visible;
-}
-
-.old s{
-  display:inline-block;
-
-  color:#737a73;
-
-  white-space:nowrap;
-
-  line-height:1;
-
-  text-decoration-line:line-through;
-  text-decoration-style:solid;
-  text-decoration-thickness:.11cqw;
-  text-decoration-color:#737a73;
-
-  text-decoration-skip-ink:none;
 }
 
 .discount{
-  flex:
-    0 0 auto;
-
-  display:inline-flex;
-
-  align-items:center;
-
   color:var(--lime);
 
-  font-size:.72cqw;
-
-  line-height:1;
+  font-size:8px;
+  line-height:1.1;
 
   font-weight:950;
 
   white-space:nowrap;
 }
-
-/* ============================================================
-   EXTRA NOTE
-============================================================ */
 
 .extra-note{
   width:100%;
 
-  margin-top:.7cqw;
+  margin-top:7px;
 
   color:#ff974a;
 
-  font-size:.62cqw;
-
+  font-size:7px;
   line-height:1.15;
 
   font-weight:950;
 
-  letter-spacing:.08cqw;
+  letter-spacing:1px;
 }
-
-/* ============================================================
-   CTA
-============================================================ */
 
 .cta{
   display:inline-flex;
@@ -1138,14 +912,13 @@ main{
   align-items:center;
   justify-content:center;
 
-  min-height:2.8cqw;
+  min-height:28px;
 
-  height:2.8cqw;
-
-  margin-top:1.6cqw;
+  margin-top:11px;
 
   padding:
-    0 1.7cqw;
+    0
+    13px;
 
   border-radius:999px;
 
@@ -1153,13 +926,12 @@ main{
 
   background:var(--accent);
 
-  font-size:.65cqw;
-
+  font-size:6.5px;
   line-height:1;
 
   font-weight:950;
 
-  letter-spacing:.16cqw;
+  letter-spacing:1.3px;
 
   white-space:nowrap;
 
@@ -1167,65 +939,166 @@ main{
 }
 
 /* ============================================================
-   RATIO-SPECIFIC TYPOGRAPHY
+   9:16 — MASTER TYPOGRAPHY
 ============================================================ */
 
-/* -------------------- 9:16 -------------------- */
+.r916 .info-zone{
+  height:46%;
+
+  padding:
+    4.4%
+    7.8%
+    5.4%;
+
+  overflow:visible;
+}
+
+.r916 .product-info{
+  width:100%;
+
+  align-items:flex-start;
+
+  overflow:visible;
+}
+
+.r916 .rule{
+  width:56px;
+
+  margin-bottom:10px;
+}
+
+.r916 .badges{
+  gap:7px;
+}
+
+.r916 .badge{
+  min-height:29px;
+
+  padding:
+    0
+    11px;
+
+  font-size:6.5px;
+
+  letter-spacing:1.45px;
+}
+
+.r916 .badge.promo{
+  min-width:72px;
+}
 
 .r916 .brand-line{
-  font-size:.78cqw;
-  letter-spacing:.22cqw;
+  margin-top:10px;
+
+  font-size:7.5px;
+
+  line-height:1.15;
+
+  letter-spacing:2.2px;
 }
 
 .r916 .product-name{
+  margin-top:7px;
+
   font-size:
     clamp(
       20px,
-      3.25cqw,
-      40px
+      3.15vw,
+      38px
     );
 
-  line-height:1.06;
+  line-height:1.08;
+
+  max-width:100%;
+
+  display:block;
+
+  overflow:visible;
+
+  white-space:normal;
+
+  overflow-wrap:anywhere;
+
+  word-break:normal;
+
+  -webkit-line-clamp:unset!important;
+
+  -webkit-box-orient:initial!important;
 }
 
 .r916 .price-label{
-  margin-top:1.8cqw;
+  margin-top:12px;
+
+  font-size:6.8px;
+
+  line-height:1.15;
 }
 
 .r916 .price{
+  margin-top:4px;
+
   font-size:
     clamp(
-      26px,
-      4.25cqw,
-      52px
+      27px,
+      4.15vw,
+      48px
     );
+
+  line-height:1;
 }
 
 .r916 .price-meta{
-  gap:.9cqw;
+  margin-top:7px;
+
+  gap:8px;
+
+  min-height:13px;
 }
 
 .r916 .old,
 .r916 .discount{
-  font-size:.72cqw;
+  font-size:7.5px;
+
+  line-height:1.1;
+}
+
+.r916 .extra-note{
+  margin-top:6px;
+
+  font-size:6.8px;
 }
 
 .r916 .cta{
-  margin-top:1.35cqw;
+  min-height:27px;
+
+  margin-top:9px;
+
+  padding:
+    0
+    12px;
+
+  font-size:6.2px;
 }
 
-/* -------------------- 4:5 -------------------- */
+/* ============================================================
+   4:5
+============================================================ */
 
-.r45 .brand-line{
-  font-size:.76cqw;
+.r45 .info-zone{
+  height:43%;
+
+  padding:
+    4.8%
+    7.5%
+    6%;
 }
 
 .r45 .product-name{
   font-size:
     clamp(
-      20px,
-      3.05cqw,
-      40px
+      21px,
+      3.2vw,
+      39px
     );
 
   line-height:1.06;
@@ -1234,133 +1107,68 @@ main{
 .r45 .price{
   font-size:
     clamp(
-      26px,
-      4.1cqw,
-      52px
+      28px,
+      4.2vw,
+      49px
     );
 }
 
-/* -------------------- 16:9 -------------------- */
+/* ============================================================
+   16:9
+============================================================ */
+
+.r169 .info-zone{
+  overflow:visible;
+}
 
 .r169 .badges{
-  flex-wrap:nowrap;
-
-  gap:.8cqw;
+  gap:7px;
 }
 
 .r169 .badge{
-  min-height:2.7cqw;
+  min-height:28px;
 
   padding:
-    0 1.05cqw;
+    0
+    11px;
 
-  font-size:.57cqw;
+  font-size:6.3px;
 
-  letter-spacing:.13cqw;
+  letter-spacing:1.35px;
 }
 
 .r169 .badge.promo{
-  min-width:5.8cqw;
-}
-
-.r169 .badge.warranty{
-  min-width:10.7cqw;
+  min-width:72px;
 }
 
 .r169 .brand-line{
-  margin-top:1.55cqw;
+  font-size:7px;
 
-  font-size:.66cqw;
-
-  letter-spacing:.20cqw;
+  letter-spacing:2px;
 }
 
 .r169 .product-name{
-  margin-top:.9cqw;
-
   font-size:
     clamp(
-      18px,
-      2.45cqw,
-      40px
+      20px,
+      2.7vw,
+      38px
     );
 
-  line-height:1.04;
+  line-height:1.05;
 }
 
 .r169 .price-label{
-  margin-top:1.8cqw;
-
-  font-size:.62cqw;
+  margin-top:13px;
 }
 
 .r169 .price{
   font-size:
     clamp(
-      24px,
-      3.55cqw,
-      58px
+      27px,
+      3.8vw,
+      46px
     );
-}
-
-.r169 .old,
-.r169 .discount{
-  font-size:.64cqw;
-}
-
-.r169 .cta{
-  min-height:2.65cqw;
-
-  height:2.65cqw;
-
-  margin-top:1.45cqw;
-
-  padding:
-    0 1.55cqw;
-
-  font-size:.58cqw;
-}
-
-/* ============================================================
-   INFORMATION SAFETY
-============================================================ */
-
-.info-zone,
-.product-info,
-.badges,
-.brand-line,
-.product-name,
-.price-label,
-.price,
-.price-meta,
-.old,
-.discount,
-.extra-note,
-.cta{
-  overflow:visible;
-}
-
-/*
-  IMPORTANT:
-  Never clamp product name.
-*/
-
-.product-name{
-  max-height:none!important;
-
-  -webkit-line-clamp:unset!important;
-
-  -webkit-box-orient:initial!important;
-}
-
-/*
-  Brand must never be ellipsized.
-*/
-
-.brand-line{
-  text-overflow:clip!important;
-
-  overflow:visible!important;
 }
 
 /* ============================================================
@@ -1376,7 +1184,6 @@ main{
   pointer-events:none;
 
   display:grid;
-
   place-items:center;
 
   color:
@@ -1390,7 +1197,7 @@ main{
   font-size:
     clamp(
       14px,
-      4cqw,
+      4vw,
       52px
     );
 
@@ -1430,7 +1237,8 @@ main{
   right:2.5%;
 
   padding:
-    4px 6px;
+    4px
+    6px;
 
   background:
     rgba(0,0,0,.7);
@@ -1443,13 +1251,8 @@ main{
   color:#fff;
 
   font-size:6px;
-
   font-weight:950;
 }
-
-/* ============================================================
-   SAFE ZONE
-============================================================ */
 
 .safe-zone{
   position:absolute;
@@ -1484,7 +1287,6 @@ main{
     );
 
   font-size:6px;
-
   font-weight:950;
 
   letter-spacing:1px;
@@ -1524,7 +1326,6 @@ main{
 }
 
 @keyframes heroIn{
-
   from{
     transform:scale(1);
   }
@@ -1537,7 +1338,6 @@ main{
 }
 
 @keyframes pricePulse{
-
   0%,65%{
     transform:scale(1);
   }
@@ -1552,7 +1352,6 @@ main{
 }
 
 @keyframes badgePop{
-
   0%,60%{
     transform:scale(1);
   }
@@ -1564,6 +1363,77 @@ main{
   76%,100%{
     transform:scale(1);
   }
+}
+
+/* ============================================================
+   EXPORT LOCK
+============================================================ */
+
+.export-static,
+.export-static *{
+  animation:none!important;
+  transition:none!important;
+  caret-color:transparent!important;
+}
+
+.export-static .safe-zone,
+.export-static .ratio-mark{
+  display:none!important;
+}
+
+.export-static .promo-canvas{
+  opacity:1!important;
+}
+
+/*
+  Export must use exactly the same
+  typography geometry as preview.
+*/
+.export-static .info-zone{
+  overflow:visible!important;
+}
+
+.export-static .product-info{
+  overflow:visible!important;
+}
+
+.export-static .product-name{
+  overflow:visible!important;
+  display:block!important;
+
+  white-space:normal!important;
+
+  max-height:none!important;
+
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+}
+
+/*
+  Badge export lock.
+*/
+.export-static .badges{
+  display:flex!important;
+
+  align-items:center!important;
+  justify-content:flex-start!important;
+
+  flex-wrap:wrap!important;
+}
+
+.export-static .badge{
+  display:inline-flex!important;
+
+  align-items:center!important;
+  justify-content:center!important;
+
+  text-align:center!important;
+
+  line-height:1!important;
+
+  overflow:hidden!important;
+
+  transform:none!important;
 }
 
 /* ============================================================
@@ -1588,7 +1458,8 @@ main{
   min-height:43px;
 
   padding:
-    0 9px;
+    0
+    9px;
 
   border-radius:11px;
 
@@ -1600,7 +1471,6 @@ main{
     1px solid var(--line);
 
   font-size:8px;
-
   font-weight:950;
 }
 
@@ -1626,7 +1496,8 @@ main{
   margin-top:10px;
 
   padding:
-    11px 13px;
+    11px
+    13px;
 
   border-radius:11px;
 
@@ -1638,7 +1509,6 @@ main{
   color:#aeb9ae;
 
   font-size:8px;
-
   font-weight:900;
 
   line-height:1.4;
@@ -1652,40 +1522,80 @@ main{
   color:#d8efbd;
 
   border-color:
-    rgba(140,198,63,.25);
+    rgba(
+      140,
+      198,
+      63,
+      .25
+    );
 
   background:
-    rgba(140,198,63,.06);
+    rgba(
+      140,
+      198,
+      63,
+      .06
+    );
 }
 
 .download-status.success{
   color:#bdf18c;
 
   border-color:
-    rgba(140,198,63,.35);
+    rgba(
+      140,
+      198,
+      63,
+      .35
+    );
 
   background:
-    rgba(140,198,63,.08);
+    rgba(
+      140,
+      198,
+      63,
+      .08
+    );
 }
 
 .download-status.warn{
   color:#ffe49a;
 
   border-color:
-    rgba(255,212,90,.25);
+    rgba(
+      255,
+      212,
+      90,
+      .25
+    );
 
   background:
-    rgba(255,212,90,.06);
+    rgba(
+      255,
+      212,
+      90,
+      .06
+    );
 }
 
 .download-status.error{
   color:#ffaaaa;
 
   border-color:
-    rgba(255,98,98,.25);
+    rgba(
+      255,
+      98,
+      98,
+      .25
+    );
 
   background:
-    rgba(255,98,98,.06);
+    rgba(
+      255,
+      98,
+      98,
+      .06
+    );
 }
 
 .download-progress{
@@ -1726,11 +1636,11 @@ input[type=text],
 input[type=number],
 input[type=search]{
   width:100%;
-
   height:40px;
 
   padding:
-    0 11px;
+    0
+    11px;
 
   color:#fff;
 
@@ -1749,7 +1659,12 @@ input[type=search]{
 select:focus,
 input:focus{
   border-color:
-    rgba(140,198,63,.65);
+    rgba(
+      140,
+      198,
+      63,
+      .65
+    );
 }
 
 .field{
@@ -1764,7 +1679,6 @@ input:focus{
   color:#747e75;
 
   font-size:7px;
-
   font-weight:950;
 
   letter-spacing:1.5px;
@@ -1780,7 +1694,10 @@ input:focus{
   display:grid;
 
   grid-template-columns:
-    repeat(2,1fr);
+    repeat(
+      2,
+      1fr
+    );
 
   gap:7px;
 
@@ -1827,7 +1744,12 @@ input:focus{
 
   box-shadow:
     0 0 0 1px
-    rgba(140,198,63,.13);
+    rgba(
+      140,
+      198,
+      63,
+      .13
+    );
 }
 
 .choice.active strong{
@@ -1842,40 +1764,70 @@ input:focus{
   margin-top:10px;
 
   padding:
-    10px 12px;
+    10px
+    12px;
 
   border-radius:11px;
 
   font-size:8px;
-
   font-weight:800;
 
   background:
-    rgba(140,198,63,.06);
+    rgba(
+      140,
+      198,
+      63,
+      .06
+    );
 
   border:
     1px solid
-    rgba(140,198,63,.13);
+    rgba(
+      140,
+      198,
+      63,
+      .13
+    );
 
   color:#a9c992;
 }
 
 .status.warn{
   background:
-    rgba(255,212,90,.06);
+    rgba(
+      255,
+      212,
+      90,
+      .06
+    );
 
   border-color:
-    rgba(255,212,90,.18);
+    rgba(
+      255,
+      212,
+      90,
+      .18
+    );
 
   color:#ffe49a;
 }
 
 .status.bad{
   background:
-    rgba(255,98,98,.06);
+    rgba(
+      255,
+      98,
+      98,
+      .06
+    );
 
   border-color:
-    rgba(255,98,98,.18);
+    rgba(
+      255,
+      98,
+      98,
+      .18
+    );
 
   color:#ffaaaa;
 }
@@ -1906,7 +1858,6 @@ input:focus{
 
 .score-number{
   font-size:28px;
-
   font-weight:950;
 
   color:var(--lime);
@@ -1926,7 +1877,6 @@ input:focus{
 
 .score-fill{
   height:100%;
-
   width:0;
 
   background:
@@ -1957,7 +1907,8 @@ input:focus{
   justify-content:space-between;
 
   padding:
-    6px 7px;
+    6px
+    7px;
 
   border-radius:7px;
 
@@ -1980,7 +1931,10 @@ input:focus{
   display:grid;
 
   grid-template-columns:
-    repeat(3,1fr);
+    repeat(
+      3,
+      1fr
+    );
 
   gap:8px;
 
@@ -2056,7 +2010,10 @@ input[type=range]{
   display:grid;
 
   grid-template-columns:
-    repeat(4,minmax(0,1fr));
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
 
   gap:8px;
 
@@ -2083,7 +2040,12 @@ input[type=range]{
 
 .card.selected{
   border-color:
-    rgba(140,198,63,.75);
+    rgba(
+      140,
+      198,
+      63,
+      .75
+    );
 }
 
 .card-image{
@@ -2116,7 +2078,6 @@ input[type=range]{
   height:21px;
 
   display:grid;
-
   place-items:center;
 
   border-radius:6px;
@@ -2128,10 +2089,14 @@ input[type=range]{
 
   border:
     1px solid
-    rgba(255,255,255,.13);
+    rgba(
+      255,
+      255,
+      255,
+      .13
+    );
 
   font-size:11px;
-
   font-weight:950;
 }
 
@@ -2149,7 +2114,6 @@ input[type=range]{
   color:var(--lime);
 
   font-size:6px;
-
   font-weight:950;
 
   letter-spacing:1.2px;
@@ -2159,7 +2123,6 @@ input[type=range]{
   margin-top:5px;
 
   font-size:9px;
-
   font-weight:850;
 
   line-height:1.3;
@@ -2169,7 +2132,6 @@ input[type=range]{
   margin-top:7px;
 
   font-size:9px;
-
   font-weight:950;
 }
 
@@ -2192,7 +2154,7 @@ input[type=range]{
 
   border-radius:7px;
 
-  color:#fff;
+  color:white;
 
   background:
     rgba(0,0,0,.75);
@@ -2221,7 +2183,8 @@ input[type=range]{
   flex:0 0 auto;
 
   padding:
-    8px 11px;
+    8px
+    11px;
 
   border-radius:999px;
 
@@ -2233,7 +2196,6 @@ input[type=range]{
     1px solid var(--line);
 
   font-size:7px;
-
   font-weight:950;
 }
 
@@ -2266,7 +2228,8 @@ input[type=range]{
   background:
     rgba(0,0,0,.72);
 
-  backdrop-filter:blur(12px);
+  backdrop-filter:
+    blur(12px);
 }
 
 .modal.open{
@@ -2292,14 +2255,14 @@ input[type=range]{
   border:
     1px solid var(--line);
 
-  box-shadow:var(--shadow);
+  box-shadow:
+    var(--shadow);
 }
 
 .modal-head{
   display:flex;
 
   justify-content:space-between;
-
   align-items:center;
 }
 
@@ -2309,7 +2272,7 @@ input[type=range]{
 
   border-radius:10px;
 
-  color:#fff;
+  color:white;
 
   background:#111711;
 }
@@ -2358,7 +2321,8 @@ pre{
     );
 
   padding:
-    10px 16px;
+    10px
+    16px;
 
   border-radius:999px;
 
@@ -2367,7 +2331,6 @@ pre{
   background:var(--lime);
 
   font-size:8px;
-
   font-weight:950;
 
   opacity:0;
@@ -2395,7 +2358,6 @@ pre{
   min-height:260px;
 
   display:grid;
-
   place-items:center;
 
   padding:30px;
@@ -2405,11 +2367,21 @@ pre{
   color:#ffaaaa;
 
   background:
-    rgba(50,8,8,.3);
+    rgba(
+      50,
+      8,
+      8,
+      .3
+    );
 
   border:
     1px solid
-    rgba(255,80,80,.2);
+    rgba(
+      255,
+      80,
+      80,
+      .2
+    );
 
   border-radius:18px;
 
@@ -2419,10 +2391,7 @@ pre{
 }
 
 /* ============================================================
-   RESPONSIVE UI
-   NOTE:
-   This only affects the APPLICATION UI.
-   It does NOT alter canvas typography.
+   RESPONSIVE
 ============================================================ */
 
 @media(max-width:1050px){
@@ -2495,662 +2464,42 @@ pre{
 
   .primary-btn{
     padding:
-      0 11px;
+      0
+      11px;
   }
 
   .stage.r916 .promo-canvas{
     max-width:430px;
   }
 
+  .r916 .badge{
+    font-size:6px;
+    padding:
+      0
+      9px;
+  }
+
+  .r916 .product-name{
+    font-size:23px;
+  }
+
+  .r916 .price{
+    font-size:31px;
+  }
+
+  .r169 .product-name{
+    font-size:17px;
+  }
+
+  .r169 .price{
+    font-size:23px;
+  }
+
   .score-list{
     grid-template-columns:1fr;
   }
 }
-
-/* ============================================================
-   EXPORT SAFETY
-============================================================ */
-
-/*
-  NO:
-  .export-static
-  .export-clone
-  transform:scale(...) on layout
-  fixed export typography
-  clone-specific geometry
-
-  PNG engine captures #promoCanvas directly.
-*/
-
-.export-static,
-.export-clone{
-  all:revert!important;
-}
-
-/*
-  Prevent accidental selection/caret
-  inside exported creative.
-*/
-
-.promo-canvas{
-  user-select:none;
-  -webkit-user-select:none;
-}
-
-/*
-  Make sure canvas contents remain inside
-  their own coordinate system.
-*/
-
-.promo-canvas *{
-  box-sizing:border-box;
-}
-
-/*
-  Critical text stays above visual layers.
-*/
-
-.promo-canvas .info-zone{
-  isolation:isolate;
-}
-
-/*
-  Never let a child create horizontal
-  page overflow.
-*/
-
-.promo-canvas .product-info{
-  max-width:100%;
-}
-
-/* ============================================================
-   END — FULL REPLACEMENT CSS
-============================================================ */
-
-
-
-
-
-/* ============================================================
-   BADGE TYPOGRAPHY — MEDIUM / PROPORSIONAL SEMUA RASIO
-============================================================ */
-
-.promo-canvas .badge{
-  /*
-    Medium readable size.
-    Clamp menjaga badge tetap proporsional:
-    tidak kekecilan di portrait,
-    tidak kegedean di landscape.
-  */
-
-  min-height:
-    clamp(
-      30px,
-      2.5cqw,
-      40px
-    );
-
-  height:
-    clamp(
-      30px,
-      2.5cqw,
-      40px
-    );
-
-  padding-left:
-    clamp(
-      12px,
-      1.15cqw,
-      18px
-    );
-
-  padding-right:
-    clamp(
-      12px,
-      1.15cqw,
-      18px
-    );
-
-  font-size:
-    clamp(
-      9px,
-      .85cqw,
-      13px
-    );
-
-  line-height:1;
-
-  font-weight:950;
-
-  letter-spacing:
-    clamp(
-      1px,
-      .13cqw,
-      1.8px
-    );
-
-  white-space:nowrap;
-
-  display:inline-flex;
-
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-
-  box-sizing:border-box;
-
-  overflow:visible;
-}
-
-/* PROMO */
-
-.promo-canvas .badge.promo{
-  min-width:
-    clamp(
-      78px,
-      6.2cqw,
-      105px
-    );
-
-  flex:0 0 auto;
-}
-
-/* GARANSI */
-
-.promo-canvas .badge.warranty{
-  min-width:
-    clamp(
-      145px,
-      11.5cqw,
-      190px
-    );
-
-  flex:0 1 auto;
-}
-
-/* EXTRA BADGE */
-
-.promo-canvas .badge.extra{
-  min-width:
-    clamp(
-      90px,
-      7.5cqw,
-      125px
-    );
-}
-
-/* ============================================================
-   RATIO OVERRIDE
-   Jangan biarkan aturan 16:9 lama mengecilkan badge lagi.
-============================================================ */
-
-.r916 .badge,
-.r45 .badge,
-.r169 .badge{
-  min-height:
-    clamp(
-      30px,
-      2.5cqw,
-      40px
-    );
-
-  height:
-    clamp(
-      30px,
-      2.5cqw,
-      40px
-    );
-
-  font-size:
-    clamp(
-      9px,
-      .85cqw,
-      13px
-    );
-
-  letter-spacing:
-    clamp(
-      1px,
-      .13cqw,
-      1.8px
-    );
-}
-
-/* 16:9 tetap medium, jangan dikecilkan */
-
-.r169 .badge{
-  padding-left:
-    clamp(
-      12px,
-      1.1cqw,
-      18px
-    );
-
-  padding-right:
-    clamp(
-      12px,
-      1.1cqw,
-      18px
-    );
-}
-
-/* ============================================================
-   BADGE CONTENT — CENTER PERFECT
-============================================================ */
-
-.promo-canvas .badge span,
-.promo-canvas .badge b,
-.promo-canvas .badge strong{
-  display:inline-block;
-
-  line-height:1;
-
-  white-space:nowrap;
-
-  text-align:center;
-
-  vertical-align:middle;
-}
-
-
-
-
-
-
-
-
-
-
-/* ============================================================
-   FINAL BADGE — MEDIUM BESAR
-============================================================ */
-
-.promo-canvas .badges{
-  display:flex;
-
-  align-items:center;
-  justify-content:flex-start;
-
-  flex-wrap:wrap;
-
-  gap:
-    clamp(
-      10px,
-      1cqw,
-      16px
-    );
-
-  width:100%;
-
-  overflow:visible;
-}
-
-/* =========================
-   ALL BADGES
-========================= */
-
-.promo-canvas .badge{
-
-  flex:0 0 auto;
-
-  min-width:fit-content;
-
-  height:
-    clamp(
-      40px,
-      3.2cqw,
-      52px
-    );
-
-  min-height:
-    clamp(
-      40px,
-      3.2cqw,
-      52px
-    );
-
-  padding:
-    0
-    clamp(
-      16px,
-      1.5cqw,
-      24px
-    );
-
-  border-radius:999px;
-
-  display:inline-flex;
-
-  align-items:center;
-  justify-content:center;
-
-  font-size:
-    clamp(
-      12px,
-      1.15cqw,
-      17px
-    ) !important;
-
-  line-height:1;
-
-  font-weight:950;
-
-  letter-spacing:
-    clamp(
-      1px,
-      .14cqw,
-      2px
-    );
-
-  white-space:nowrap;
-
-  overflow:visible;
-
-  text-overflow:clip;
-
-  box-sizing:border-box;
-
-  transform:none!important;
-}
-
-/* =========================
-   PROMO
-========================= */
-
-.promo-canvas .badge.promo{
-
-  min-width:
-    clamp(
-      105px,
-      8cqw,
-      145px
-    );
-
-  padding-left:
-    clamp(
-      20px,
-      1.8cqw,
-      28px
-    );
-
-  padding-right:
-    clamp(
-      20px,
-      1.8cqw,
-      28px
-    );
-
-  background:var(--orange);
-
-  color:#180900;
-}
-
-/* =========================
-   GARANSI
-========================= */
-
-.promo-canvas .badge.warranty{
-
-  min-width:
-    clamp(
-      175px,
-      14cqw,
-      250px
-    );
-
-  padding-left:
-    clamp(
-      18px,
-      1.5cqw,
-      25px
-    );
-
-  padding-right:
-    clamp(
-      18px,
-      1.5cqw,
-      25px
-    );
-
-  color:var(--accent);
-
-  background:
-    rgba(0,0,0,.22);
-
-  border:
-    1px solid var(--accent);
-}
-
-/* =========================
-   EXTRA BADGE
-========================= */
-
-.promo-canvas .badge.extra{
-
-  min-width:
-    clamp(
-      120px,
-      9cqw,
-      160px
-    );
-
-  color:#ff974a;
-
-  background:
-    rgba(255,118,18,.06);
-
-  border:
-    1px solid
-    rgba(255,118,18,.55);
-}
-
-/* ============================================================
-   9:16
-============================================================ */
-
-.r916 .badge{
-
-  height:
-    clamp(
-      40px,
-      3.5cqw,
-      52px
-    );
-
-  min-height:
-    clamp(
-      40px,
-      3.5cqw,
-      52px
-    );
-
-  font-size:
-    clamp(
-      12px,
-      1.25cqw,
-      17px
-    ) !important;
-}
-
-.r916 .badge.promo{
-  min-width:
-    clamp(
-      105px,
-      8.5cqw,
-      145px
-    );
-}
-
-.r916 .badge.warranty{
-  min-width:
-    clamp(
-      175px,
-      14.5cqw,
-      250px
-    );
-}
-
-/* ============================================================
-   4:5
-============================================================ */
-
-.r45 .badge{
-
-  height:
-    clamp(
-      40px,
-      3.4cqw,
-      52px
-    );
-
-  min-height:
-    clamp(
-      40px,
-      3.4cqw,
-      52px
-    );
-
-  font-size:
-    clamp(
-      12px,
-      1.2cqw,
-      17px
-    ) !important;
-}
-
-.r45 .badge.promo{
-  min-width:
-    clamp(
-      105px,
-      8cqw,
-      145px
-    );
-}
-
-.r45 .badge.warranty{
-  min-width:
-    clamp(
-      175px,
-      14cqw,
-      245px
-    );
-}
-
-/* ============================================================
-   16:9
-============================================================ */
-
-.r169 .badges{
-
-  flex-wrap:wrap;
-
-  gap:
-    clamp(
-      9px,
-      .9cqw,
-      14px
-    );
-}
-
-.r169 .badge{
-
-  height:
-    clamp(
-      40px,
-      3cqw,
-      48px
-    );
-
-  min-height:
-    clamp(
-      40px,
-      3cqw,
-      48px
-    );
-
-  font-size:
-    clamp(
-      12px,
-      1.05cqw,
-      15px
-    ) !important;
-
-  padding-left:
-    clamp(
-      16px,
-      1.3cqw,
-      22px
-    );
-
-  padding-right:
-    clamp(
-      16px,
-      1.3cqw,
-      22px
-    );
-}
-
-.r169 .badge.promo{
-  min-width:
-    clamp(
-      105px,
-      7.5cqw,
-      135px
-    );
-}
-
-.r169 .badge.warranty{
-  min-width:
-    clamp(
-      175px,
-      13cqw,
-      220px
-    );
-}
-
-/* ============================================================
-   NEVER SHRINK / NEVER ELLIPSIZE
-============================================================ */
-
-.promo-canvas .badge,
-.promo-canvas .badge.promo,
-.promo-canvas .badge.warranty,
-.promo-canvas .badge.extra{
-
-  overflow:visible!important;
-
-  text-overflow:clip!important;
-
-  transform:none!important;
-}
-
-
-  
-
-
-
-
-
-
-  
 </style>
-
-
-
-
-
-
-
-
-
-
-
-
-  
-
-
-  
 </head>
 
 <body>
@@ -5003,23 +4352,74 @@ function directorReason(
    BADGE TEXT FIT
    Prevent badge content from visually running outside.
 ============================================================ */
+
 function fitBadges(){
 
-  const root = $("promoCanvas");
-  if(!root) return;
+  const root=
+    $("promoCanvas");
 
-  root.querySelectorAll(".badge").forEach(badge => {
+  if(!root)return;
 
-    /* Jangan pernah mengecilkan badge lagi */
-    badge.style.fontSize = "";
-    badge.style.letterSpacing = "";
-    badge.style.transform = "none";
+  const badges=[
+    ...root.querySelectorAll(
+      ".badge"
+    )
+  ];
 
-    badge.style.display = "inline-flex";
-    badge.style.alignItems = "center";
-    badge.style.justifyContent = "center";
-    badge.style.lineHeight = "1";
-  });
+  badges.forEach(
+    badge=>{
+
+      badge.style.transform=
+        "none";
+
+      badge.style.textAlign=
+        "center";
+
+      badge.style.alignItems=
+        "center";
+
+      badge.style.justifyContent=
+        "center";
+
+      badge.style.lineHeight=
+        "1";
+
+      /*
+        Dynamically reduce only when
+        a badge's own text is too wide.
+      */
+
+      let size=
+        parseFloat(
+          getComputedStyle(
+            badge
+          ).fontSize
+        );
+
+      const minSize=
+        currentRatio==="916"
+          ?5.2
+          :5.5;
+
+      let guard=0;
+
+      while(
+        badge.scrollWidth>
+        badge.clientWidth+
+        1&&
+        size>minSize&&
+        guard<12
+      ){
+
+        size-=.25;
+
+        badge.style.fontSize=
+          size+"px";
+
+        guard++;
+      }
+    }
+  );
 }
 
 /* ============================================================
@@ -7065,199 +6465,171 @@ async function waitForFonts(){
   }
 }
 
-
-
-
-function capturePreviewGeometry(
-  root
-){
-
-  const rootRect=
-    root.getBoundingClientRect();
-
-  const nodes=[
-    root,
-    ...root.querySelectorAll("*")
-  ];
-
-  return nodes.map(
-    node=>{
-
-      const rect=
-        node.getBoundingClientRect();
-
-      const cs=
-        getComputedStyle(
-          node
-        );
-
-      return{
-
-        left:
-          rect.left-
-          rootRect.left,
-
-        top:
-          rect.top-
-          rootRect.top,
-
-        width:
-          rect.width,
-
-        height:
-          rect.height,
-
-        display:
-          cs.display,
-
-        boxSizing:
-          cs.boxSizing,
-
-        fontFamily:
-          cs.fontFamily,
-
-        fontSize:
-          cs.fontSize,
-
-        fontWeight:
-          cs.fontWeight,
-
-        fontStyle:
-          cs.fontStyle,
-
-        lineHeight:
-          cs.lineHeight,
-
-        letterSpacing:
-          cs.letterSpacing,
-
-        wordSpacing:
-          cs.wordSpacing,
-
-        whiteSpace:
-          cs.whiteSpace,
-
-        wordBreak:
-          cs.wordBreak,
-
-        overflowWrap:
-          cs.overflowWrap,
-
-        textAlign:
-          cs.textAlign,
-
-        textTransform:
-          cs.textTransform,
-
-        padding:
-          cs.padding,
-
-        margin:
-          cs.margin,
-
-        gap:
-          cs.gap,
-
-        rowGap:
-          cs.rowGap,
-
-        columnGap:
-          cs.columnGap,
-
-        flexDirection:
-          cs.flexDirection,
-
-        alignItems:
-          cs.alignItems,
-
-        justifyContent:
-          cs.justifyContent,
-
-        alignSelf:
-          cs.alignSelf,
-
-        flex:
-          cs.flex,
-
-        flexGrow:
-          cs.flexGrow,
-
-        flexShrink:
-          cs.flexShrink,
-
-        flexBasis:
-          cs.flexBasis,
-
-        position:
-          cs.position,
-
-        inset:
-          cs.inset,
-
-        border:
-          cs.border,
-
-        borderRadius:
-          cs.borderRadius,
-
-        background:
-          cs.background,
-
-        backgroundColor:
-          cs.backgroundColor,
-
-        backgroundImage:
-          cs.backgroundImage,
-
-        boxShadow:
-          cs.boxShadow,
-
-        opacity:
-          cs.opacity,
-
-        transform:
-          cs.transform,
-
-        transformOrigin:
-          cs.transformOrigin,
-
-        filter:
-          cs.filter,
-
-        color:
-          cs.color,
-
-        zIndex:
-          cs.zIndex,
-
-        minWidth:
-          cs.minWidth,
-
-        maxWidth:
-          cs.maxWidth,
-
-        minHeight:
-          cs.minHeight,
-
-        maxHeight:
-          cs.maxHeight
-      };
-    }
-  );
-    }
-
-
-      
 /* ============================================================
    CLONE LOCK
 ============================================================ */
 
+function lockExportClone(
+  doc,
+  snapshot
+){
 
-  
+  const html=
+    doc.documentElement;
+
+  const body=
+    doc.body;
+
+  /*
+    Keep the clone at exactly the same
+    browser viewport as preview.
+  */
+
+  html.style.width=
+    window.innerWidth+
+    "px";
+
+  html.style.minWidth=
+    window.innerWidth+
+    "px";
+
+  body.style.width=
+    window.innerWidth+
+    "px";
+
+  body.style.minWidth=
+    window.innerWidth+
+    "px";
+
+  /*
+    Find artwork.
+  */
+
+  const clone=
+    doc.getElementById(
+      "promoCanvas"
+    );
+
+  if(!clone)
+    return;
+
+  /*
+    Freeze clone.
+  */
+
+  clone.classList.add(
+    "export-static"
+  );
+
+  clone.style.animation=
+    "none";
+
+  clone.style.transition=
+    "none";
+
+  clone.style.opacity=
+    "1";
+
+  /*
+    IMPORTANT:
+    Preserve the exact visible preview
+    geometry.
+  */
+
+  clone.style.width=
+    snapshot.width+
+    "px";
+
+  clone.style.height=
+    snapshot.height+
+    "px";
+
+  clone.style.maxWidth=
+    "none";
+
+  clone.style.maxHeight=
+    "none";
+
+  clone.style.aspectRatio=
+    snapshot.width+
+    "/" +
+    snapshot.height;
+
+  /*
+    Freeze every descendant.
+  */
+
+  clone
+    .querySelectorAll("*")
+    .forEach(
+      node=>{
+
+        node.style.animation=
+          "none";
+
+        node.style.transition=
+          "none";
+      }
+    );
+
+  /*
+    Hide editor-only overlays.
+  */
+
+  const safeZone=
+    clone.querySelector(
+      ".safe-zone"
+    );
+
+  if(safeZone)
+    safeZone.style.display=
+      "none";
+
+  const ratioMark=
+    clone.querySelector(
+      ".ratio-mark"
+    );
+
+  if(ratioMark)
+    ratioMark.style.display=
+      "none";
+
+  /*
+    Re-apply badge centering.
+  */
+
+  clone
+    .querySelectorAll(
+      ".badge"
+    )
+    .forEach(
+      badge=>{
+
+        badge.style.display=
+          "inline-flex";
+
+        badge.style.alignItems=
+          "center";
+
+        badge.style.justifyContent=
+          "center";
+
+        badge.style.textAlign=
+          "center";
+
+        badge.style.lineHeight=
+          "1";
+
+        badge.style.transform=
+          "none";
+      }
+    );
+}
 
 /* ============================================================
    EXACT PNG RENDER
 ============================================================ */
+
 async function renderPNG(){
 
   const source=
@@ -7281,36 +6653,17 @@ async function renderPNG(){
   }
 
   /*
-    ==========================================================
-    FREEZE ONLY THE STATE.
-    
-    DO NOT MODIFY:
-    - typography
-    - badges
-    - price
-    - layout
-    - width
-    - height
-    - ratio
-    ==========================================================
+    Freeze current visual state
+    before reading geometry.
   */
+
+  fitBadges();
 
   await waitForImages(
     source
   );
 
   await waitForFonts();
-
-  /*
-    Let browser finish its final paint.
-  */
-
-  await new Promise(
-    resolve=>
-      requestAnimationFrame(
-        ()=>resolve()
-      )
-  );
 
   await new Promise(
     resolve=>
@@ -7323,58 +6676,26 @@ async function renderPNG(){
     EXPORT_CONFIG.settleDelay
   );
 
-  /*
-    ==========================================================
-    READ THE ACTUAL VISIBLE PREVIEW
-    ==========================================================
-  */
-
-  const rect=
-    source.getBoundingClientRect();
-
-  if(
-    rect.width<=0||
-    rect.height<=0
-  ){
-
-    throw new Error(
-      "PREVIEW_HAS_NO_SIZE"
-    );
-  }
-
-  const snapshot={
-    width:
-      rect.width,
-
-    height:
-      rect.height,
-
-    ratio:
-      rect.width/
-      rect.height,
-
-    index:
-      currentIndex,
-
-    productId:
-      promoProducts[
-        currentIndex
-      ]?.id||
-      null
-  };
+  fitBadges();
 
   /*
-    ==========================================================
-    FINAL PNG RESOLUTION
-    ==========================================================
+    Read the actual preview.
   */
+
+  const snapshot=
+    previewSnapshot();
 
   const target=
     exportDimensions();
 
+  /*
+    The export must correspond to
+    exactly the current product.
+  */
+
   const product=
     promoProducts[
-      currentIndex
+      snapshot.index
     ];
 
   if(!product){
@@ -7385,12 +6706,8 @@ async function renderPNG(){
   }
 
   /*
-    ==========================================================
-    SCALE ONLY.
-    
-    The design itself is NEVER resized by CSS.
-    We only scale the finished screenshot.
-    ==========================================================
+    Render scale derives ONLY from
+    the visible preview dimensions.
   */
 
   let scale=
@@ -7419,16 +6736,10 @@ async function renderPNG(){
   }
 
   /*
-    ==========================================================
-    CAPTURE THE REAL PREVIEW
-    
-    IMPORTANT:
-    NO onclone.
-    NO CSS injection.
-    NO geometry override.
-    NO badge adjustment.
-    NO typography adjustment.
-    ==========================================================
+    Capture.
+    NO sanitizeClone.
+    NO color rewriting.
+    NO alternate layout.
   */
 
   const captured=
@@ -7445,10 +6756,6 @@ async function renderPNG(){
         windowHeight:
           window.innerHeight,
 
-        /*
-          Use the actual preview size.
-        */
-
         width:
           Math.round(
             snapshot.width
@@ -7460,12 +6767,7 @@ async function renderPNG(){
           ),
 
         x:0,
-
         y:0,
-
-        /*
-          Resolution scaling only.
-        */
 
         scale,
 
@@ -7478,20 +6780,21 @@ async function renderPNG(){
 
         logging:false,
 
-        /*
-          Keep normal html2canvas DOM
-          rendering. Do not replace it
-          with foreignObject rendering.
-        */
-
         foreignObjectRendering:
           false,
 
         removeContainer:true,
 
         scrollX:0,
+        scrollY:0,
 
-        scrollY:0
+        onclone:
+          clonedDocument=>{
+            lockExportClone(
+              clonedDocument,
+              snapshot
+            );
+          }
       }
     );
 
@@ -7507,9 +6810,7 @@ async function renderPNG(){
   }
 
   /*
-    ==========================================================
-    FINAL PNG CANVAS
-    ==========================================================
+    Normalize to exact requested dimensions.
   */
 
   const finalCanvas=
@@ -7527,7 +6828,8 @@ async function renderPNG(){
     finalCanvas.getContext(
       "2d",
       {
-        alpha:false
+        alpha:false,
+        desynchronized:false
       }
     );
 
@@ -7544,10 +6846,6 @@ async function renderPNG(){
   ctx.imageSmoothingQuality=
     "high";
 
-  /*
-    Same background as preview.
-  */
-
   ctx.fillStyle=
     "#050705";
 
@@ -7558,29 +6856,12 @@ async function renderPNG(){
     target.height
   );
 
-  /*
-    ==========================================================
-    THE ONLY TRANSFORMATION:
-    
-    Preview screenshot
-             ↓
-       pixel scaling
-             ↓
-        final PNG
-    
-    Nothing inside the design is
-    repositioned or recalculated.
-    ==========================================================
-  */
-
   ctx.drawImage(
     captured,
-
     0,
     0,
     captured.width,
     captured.height,
-
     0,
     0,
     target.width,
@@ -7588,9 +6869,7 @@ async function renderPNG(){
   );
 
   /*
-    ==========================================================
-    VALIDATE FINAL RATIO
-    ==========================================================
+    Final ratio validation.
   */
 
   const expectedRatio=
@@ -7606,7 +6885,7 @@ async function renderPNG(){
       expectedRatio-
       actualRatio
     )>
-    0.0001
+    .0001
   ){
 
     throw new Error(
@@ -7615,7 +6894,6 @@ async function renderPNG(){
   }
 
   return{
-
     canvas:
       finalCanvas,
 
@@ -7630,7 +6908,7 @@ async function renderPNG(){
 
     product
   };
-  }
+}
 
 /* ============================================================
    CANVAS -> BLOB
