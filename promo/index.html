@@ -631,7 +631,191 @@ pre{
   .r169 .price{font-size:23px}
   .score-list{grid-template-columns:1fr}
 }
+
+
+
+
+
+
+/* ============================================================
+   FINAL 9:16 TYPOGRAPHY / INFO-ZONE FIX
+   Prevent product title clipping in preview + PNG export
+============================================================ */
+
+.r916 .info-zone{
+  left:0;
+  right:0;
+  bottom:0;
+
+  /*
+    Give typography more vertical room.
+    Old value: 44%
+  */
+  height:47%;
+
+  /*
+    Reduce excessive vertical padding.
+  */
+  padding:
+    4.2%
+    8%
+    5.2%;
+
+  /*
+    IMPORTANT:
+    Do not clip typography at the container edge.
+  */
+  overflow:visible;
+}
+
+.r916 .product-info{
+  width:100%;
+  min-width:0;
+  overflow:visible;
+}
+
+.r916 .rule{
+  margin-bottom:9px;
+}
+
+.r916 .badges{
+  gap:6px;
+}
+
+.r916 .badge{
+  min-height:26px;
+  padding:0 9px;
+  font-size:6.2px;
+}
+
+.r916 .brand-line{
+  margin-top:8px;
+  font-size:7.5px;
+  line-height:1.15;
+}
+
+.r916 .product-name{
+  /*
+    Smaller and safer typography.
+    This prevents the descender/bottom
+    of the glyphs from being clipped.
+  */
+  margin-top:6px;
+
+  font-size:
+    clamp(
+      20px,
+      3.15vw,
+      38px
+    );
+
+  line-height:1.08;
+
+  /*
+    Remove WebKit line box clipping.
+  */
+  display:block;
+  overflow:visible;
+
+  /*
+    Allow long product names to wrap naturally.
+  */
+  white-space:normal;
+
+  word-break:normal;
+  overflow-wrap:anywhere;
+
+  /*
+    Maximum 2 lines without clipping
+    the actual glyph box.
+  */
+  max-height:
+    calc(
+      2 * 1.08em
+    );
+}
+
+.r916 .price-label{
+  margin-top:11px;
+  font-size:6.8px;
+  line-height:1.15;
+}
+
+.r916 .price{
+  margin-top:4px;
+
+  font-size:
+    clamp(
+      27px,
+      4.15vw,
+      48px
+    );
+
+  line-height:1;
+}
+
+.r916 .price-meta{
+  margin-top:7px;
+  gap:7px;
+}
+
+.r916 .old,
+.r916 .discount{
+  font-size:7.5px;
+  line-height:1.1;
+}
+
+.r916 .extra-note{
+  margin-top:6px;
+  font-size:6.8px;
+  line-height:1.15;
+}
+
+.r916 .cta{
+  margin-top:9px;
+  min-height:25px;
+  padding:0 11px;
+  font-size:6px;
+  line-height:1;
+}
+
+/*
+  Export clone must obey the same geometry.
+*/
+.export-static .r916 .info-zone,
+.export-lock .r916 .info-zone{
+  overflow:visible!important;
+}
+
+.export-static .r916 .product-name,
+.export-lock .r916 .product-name{
+  display:block!important;
+  overflow:visible!important;
+  white-space:normal!important;
+  max-height:none!important;
+}
+
+/*
+  Never let the title itself get clipped by
+  an inherited line-clamp.
+*/
+.r916 .product-name{
+  -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+}
+
+
+
+
+
+
+
+
+
+
+  
 </style>
+  
 </head>
 
 <body>
