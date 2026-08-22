@@ -2,38 +2,68 @@
 <html lang="id">
 <head>
 <meta charset="UTF-8">
+
 <meta
   name="viewport"
   content="width=device-width,initial-scale=1,viewport-fit=cover"
 >
-<meta name="theme-color" content="#050705">
+
+<meta
+  name="theme-color"
+  content="#050705"
+>
+
 <title>Imam_salesfr — Creative Promo Studio</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
+/* ============================================================
+   ROOT
+============================================================ */
+
 :root{
   --bg:#050705;
   --panel:#090d0a;
   --panel2:#0d130e;
+
   --line:rgba(255,255,255,.09);
   --soft:rgba(255,255,255,.06);
+
   --text:#f7faf5;
   --muted:#7e887f;
+
   --lime:#8cc63f;
   --lime2:#b5f45d;
+
   --orange:#ff7612;
   --blue:#2998e8;
   --red:#ff6262;
   --yellow:#ffd45a;
-  --display:Inter,Manrope,system-ui,sans-serif;
-  --body:Inter,system-ui,sans-serif;
-  --shadow:0 30px 90px rgba(0,0,0,.5);
+
+  --shadow:
+    0 30px 90px rgba(0,0,0,.5);
+
+  --body:
+    Inter,
+    Manrope,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
 }
 
-*{box-sizing:border-box}
+/* ============================================================
+   RESET
+============================================================ */
 
-html,body{
+*{
+  box-sizing:border-box;
+}
+
+html,
+body{
   margin:0;
   min-height:100%;
   background:var(--bg);
@@ -45,51 +75,92 @@ body{
   background:
     radial-gradient(
       circle at 50% -20%,
-      rgba(140,198,63,.1),
+      rgba(140,198,63,.10),
       transparent 35%
     ),
     var(--bg);
+
   -webkit-font-smoothing:antialiased;
+  text-rendering:geometricPrecision;
 }
 
-button,input,select{font:inherit}
-button{cursor:pointer;border:0}
-img{display:block;max-width:100%}
+button,
+input,
+select{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+  border:0;
+}
+
+img{
+  display:block;
+  max-width:100%;
+}
 
 /* ============================================================
-   TOPBAR
+   TOP BAR
 ============================================================ */
 
 .topbar{
   position:sticky;
   top:0;
   z-index:1000;
+
   display:flex;
   align-items:center;
   justify-content:space-between;
+
   gap:18px;
-  padding:14px clamp(14px,4vw,40px);
+
+  padding:
+    14px
+    clamp(14px,4vw,40px);
+
   min-height:78px;
-  background:rgba(4,6,4,.94);
-  border-bottom:1px solid var(--line);
-  backdrop-filter:blur(20px);
+
+  background:
+    rgba(4,6,4,.94);
+
+  border-bottom:
+    1px solid var(--line);
+
+  backdrop-filter:
+    blur(20px);
 }
 
-.brand{min-width:0}
+.brand{
+  min-width:0;
+}
 
 .brand h1{
   margin:0;
-  font-size:clamp(22px,3vw,34px);
+
+  font-size:
+    clamp(
+      22px,
+      3vw,
+      34px
+    );
+
   font-weight:950;
   letter-spacing:-1.4px;
 }
 
 .brand p{
-  margin:5px 0 0;
+  margin:
+    5px
+    0
+    0;
+
   color:var(--lime);
+
   font-size:9px;
   font-weight:900;
   letter-spacing:1.5px;
+
   text-transform:uppercase;
 }
 
@@ -102,45 +173,73 @@ img{display:block;max-width:100%}
 .primary-btn{
   min-width:48px;
   height:48px;
+
   border-radius:14px;
+
   color:white;
   background:#080c09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+}
+
+.icon-btn.active{
+  color:#071006;
+  background:var(--lime);
+  border-color:var(--lime);
 }
 
 .primary-btn{
   color:#081006;
-  background:linear-gradient(
-    135deg,
-    var(--lime),
-    var(--lime2)
-  );
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--lime),
+      var(--lime2)
+    );
+
   border-color:var(--lime);
+
   font-weight:950;
   padding:0 17px;
 }
 
 /* ============================================================
-   LAYOUT
+   PAGE
 ============================================================ */
 
 main{
-  padding:16px 16px 90px;
+  padding:
+    16px
+    16px
+    90px;
 }
 
 .container{
-  width:min(1240px,100%);
+  width:min(
+    1240px,
+    100%
+  );
+
   margin:auto;
 }
 
 .grid-main{
   display:grid;
+
   grid-template-columns:
     minmax(0,1.6fr)
     minmax(330px,.9fr);
+
   gap:14px;
+
   align-items:start;
 }
+
+/* ============================================================
+   PANEL
+============================================================ */
 
 .panel{
   background:
@@ -149,10 +248,16 @@ main{
       rgba(12,18,13,.98),
       rgba(6,10,7,.98)
     );
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:22px;
+
   padding:18px;
-  box-shadow:0 18px 60px rgba(0,0,0,.16);
+
+  box-shadow:
+    0 18px 60px rgba(0,0,0,.16);
 }
 
 .panel + .panel{
@@ -161,74 +266,105 @@ main{
 
 .eyebrow{
   color:#748075;
+
   font-size:8px;
   font-weight:950;
   letter-spacing:2.5px;
+
   text-transform:uppercase;
 }
 
 .panel-title{
-  margin:7px 0 0;
+  margin:
+    7px
+    0
+    0;
+
   font-size:24px;
   font-weight:950;
   letter-spacing:-.8px;
 }
 
 .panel-sub{
-  margin:7px 0 0;
+  margin:
+    7px
+    0
+    0;
+
   color:#778178;
+
   font-size:10px;
   line-height:1.5;
 }
 
 /* ============================================================
-   STAGE
+   PREVIEW STAGE
 ============================================================ */
 
 .stage-wrap{
   position:relative;
+
   display:flex;
   justify-content:center;
+
+  width:100%;
 }
 
 .stage{
   width:100%;
+
   display:flex;
   justify-content:center;
 }
 
 .promo-canvas{
   position:relative;
+
   overflow:hidden;
   isolation:isolate;
+
   width:100%;
+
   background:#050705;
-  border:1px solid rgba(255,255,255,.11);
-  box-shadow:var(--shadow);
+
+  border:
+    1px solid rgba(255,255,255,.11);
+
+  box-shadow:
+    var(--shadow);
+
   transition:
-    opacity .2s ease,
-    transform .3s ease;
+    opacity .18s ease;
 }
 
 .stage.r916 .promo-canvas{
+  width:100%;
   max-width:520px;
-  aspect-ratio:9/16;
+  aspect-ratio:9 / 16;
 }
 
 .stage.r45 .promo-canvas{
+  width:100%;
   max-width:760px;
-  aspect-ratio:4/5;
+  aspect-ratio:4 / 5;
 }
 
 .stage.r169 .promo-canvas{
+  width:100%;
   max-width:none;
-  aspect-ratio:16/9;
+  aspect-ratio:16 / 9;
 }
+
+/* ============================================================
+   BACKGROUND
+============================================================ */
 
 .canvas-bg{
   position:absolute;
   inset:0;
+
   z-index:0;
+
   background:
     radial-gradient(
       circle at 78% 20%,
@@ -238,31 +374,41 @@ main{
     var(--base);
 }
 
-.canvas-bg:before{
+.canvas-bg::before{
   content:"";
+
   position:absolute;
   inset:-20%;
+
   background:
     repeating-linear-gradient(
       125deg,
       transparent 0 34px,
+
       color-mix(
         in srgb,
         var(--accent) 5%,
         transparent
-      ) 34px 36px,
+      )
+      34px 36px,
+
       transparent 36px 78px
     );
+
   opacity:.55;
 }
 
-.canvas-bg:after{
+.canvas-bg::after{
   content:"";
+
   position:absolute;
+
   right:-12%;
   top:-25%;
+
   width:42%;
   height:150%;
+
   background:
     linear-gradient(
       135deg,
@@ -270,17 +416,28 @@ main{
       var(--accent) 9%,
       transparent 70%
     );
+
   opacity:.22;
-  transform:skewX(-13deg);
+
+  transform:
+    skewX(-13deg);
 }
+
+/* ============================================================
+   PRODUCT VISUAL
+============================================================ */
 
 .product-visual{
   position:absolute;
+
   z-index:5;
+
   overflow:hidden;
+
   display:flex;
   align-items:center;
   justify-content:center;
+
   background:
     radial-gradient(
       circle at 50% 45%,
@@ -288,7 +445,6 @@ main{
       transparent 58%
     ),
     #020302;
-  transition:all .35s ease;
 }
 
 .r916 .product-visual,
@@ -296,6 +452,7 @@ main{
   left:0;
   right:0;
   top:0;
+
   height:56%;
 }
 
@@ -303,19 +460,26 @@ main{
   left:0;
   top:0;
   bottom:0;
+
   width:58%;
 }
 
 .product-image{
   width:100%;
   height:100%;
+
   padding:7%;
+
   object-fit:contain;
   object-position:center;
-  transition:
-    transform .35s ease,
-    filter .35s ease;
+
   user-select:none;
+
+  transform-origin:center;
+
+  transition:
+    transform .25s ease,
+    filter .25s ease;
 }
 
 .product-image.portrait{
@@ -334,15 +498,25 @@ main{
 
 .contact-shadow{
   position:absolute;
+
   z-index:2;
+
   width:42%;
   height:8%;
+
   left:29%;
   bottom:12%;
+
   border-radius:50%;
-  background:rgba(0,0,0,.62);
-  filter:blur(14px);
-  transform:scaleY(.45);
+
+  background:
+    rgba(0,0,0,.62);
+
+  filter:
+    blur(14px);
+
+  transform:
+    scaleY(.45);
 }
 
 .r169 .contact-shadow{
@@ -354,8 +528,11 @@ main{
 .visual-gradient{
   position:absolute;
   inset:0;
+
   z-index:3;
+
   pointer-events:none;
+
   background:
     linear-gradient(
       to bottom,
@@ -377,13 +554,15 @@ main{
 }
 
 /* ============================================================
-   INFO ZONE
+   INFO AREA
 ============================================================ */
 
 .info-zone{
   position:absolute;
+
   z-index:20;
-  overflow:hidden;
+
+  overflow:visible;
 }
 
 .r916 .info-zone,
@@ -391,208 +570,725 @@ main{
   left:0;
   right:0;
   bottom:0;
+
   height:44%;
-  padding:5% 8% 7%;
+
+  padding:
+    4.6%
+    7.8%
+    5.6%;
 }
 
 .r169 .info-zone{
   right:0;
   top:0;
   bottom:0;
+
   width:42%;
-  padding:7% 6% 6% 5%;
+
+  padding:
+    7%
+    6%
+    6%
+    5%;
 }
 
 .product-info{
   position:relative;
+
   z-index:30;
+
+  width:100%;
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+
+  overflow:visible;
 }
 
+/* ============================================================
+   RULE
+============================================================ */
+
 .rule{
-  width:48px;
+  width:58px;
   height:2px;
+
+  flex:0 0 auto;
+
+  margin:
+    0
+    0
+    12px;
+
   background:
     linear-gradient(
       90deg,
       var(--accent),
       transparent
     );
-  margin-bottom:11px;
 }
 
+/* ============================================================
+   BADGES — HARD LOCKED
+============================================================ */
+
 .badges{
+  width:100%;
+
   display:flex;
-  gap:7px;
+
+  align-items:center;
+  justify-content:flex-start;
+
+  gap:8px;
+
   flex-wrap:wrap;
+
+  min-width:0;
+
+  overflow:visible;
 }
 
 .badge{
-  min-height:27px;
-  padding:0 10px;
-  border-radius:999px;
+  /*
+    IMPORTANT:
+    Badge is a real flex box.
+    Text is centered on both axes.
+  */
+
+  position:relative;
+
   display:inline-flex;
+
   align-items:center;
-  font-size:6.5px;
-  font-weight:950;
-  letter-spacing:1.5px;
+  justify-content:center;
+
+  flex:
+    0 1 auto;
+
+  min-width:0;
+
+  max-width:100%;
+
+  min-height:31px;
+
+  padding:
+    0
+    13px;
+
+  border-radius:999px;
+
+  box-sizing:border-box;
+
+  text-align:center;
+
   white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  font-family:var(--body);
+
+  font-size:7px;
+
+  line-height:1;
+
+  font-weight:950;
+
+  letter-spacing:1.7px;
+
+  vertical-align:middle;
+
+  transform:none!important;
 }
 
 .badge.promo{
-  background:var(--orange);
+  flex:0 0 auto;
+
+  min-width:76px;
+
   color:#190a03;
+
+  background:
+    var(--orange);
 }
 
 .badge.extra{
   color:#ff974a;
-  border:1px solid rgba(255,118,18,.55);
-  background:rgba(255,118,18,.06);
+
+  background:
+    rgba(255,118,18,.06);
+
+  border:
+    1px solid rgba(255,118,18,.55);
 }
 
 .badge.warranty{
+  flex:
+    0 1 auto;
+
   color:var(--accent);
-  border:1px solid var(--accent);
-  background:rgba(0,0,0,.28);
+
+  background:
+    rgba(0,0,0,.28);
+
+  border:
+    1px solid var(--accent);
 }
 
+/*
+  The badge itself owns the text.
+  No inherited line box / inline baseline.
+*/
+.badge,
+.badge::before,
+.badge::after{
+  box-sizing:border-box;
+}
+
+/* ============================================================
+   BRAND
+============================================================ */
+
 .brand-line{
-  margin-top:9px;
+  width:100%;
+
+  margin-top:11px;
+
   color:var(--accent);
+
   font-size:8px;
+  line-height:1.2;
+
   font-weight:950;
-  letter-spacing:2px;
+
+  letter-spacing:2.4px;
+
   text-transform:uppercase;
+
   white-space:nowrap;
+
   overflow:hidden;
+
   text-overflow:ellipsis;
 }
 
+/* ============================================================
+   PRODUCT NAME
+============================================================ */
+
 .product-name{
-  margin:6px 0 0;
+  width:100%;
+
+  margin-top:7px;
+
   color:#fff;
-  font-size:clamp(22px,3.7vw,43px);
-  line-height:1.02;
+
+  font-size:
+    clamp(
+      22px,
+      3.7vw,
+      43px
+    );
+
+  line-height:1.05;
+
   font-weight:950;
+
   letter-spacing:-1.1px;
-  display:-webkit-box;
-  -webkit-line-clamp:2;
-  -webkit-box-orient:vertical;
-  overflow:hidden;
+
+  white-space:normal;
+
+  overflow-wrap:anywhere;
+
+  word-break:normal;
+
+  display:block;
+
+  overflow:visible;
 }
 
+/* ============================================================
+   PRICE
+============================================================ */
+
 .price-label{
-  margin-top:13px;
+  width:100%;
+
+  margin-top:15px;
+
   color:#6f786f;
+
   font-size:7px;
+  line-height:1.15;
+
   font-weight:950;
+
   letter-spacing:2px;
+
+  text-transform:uppercase;
 }
 
 .price{
+  width:100%;
+
   margin-top:4px;
-  color:white;
-  font-size:clamp(28px,4.5vw,55px);
-  line-height:.95;
+
+  color:#fff;
+
+  font-size:
+    clamp(
+      28px,
+      4.5vw,
+      55px
+    );
+
+  line-height:1;
+
   font-weight:950;
+
   letter-spacing:-1.7px;
+
   white-space:nowrap;
 }
 
 .price-meta{
+  width:100%;
+
   display:flex;
-  gap:8px;
+
   align-items:center;
+  justify-content:flex-start;
+
+  gap:9px;
+
   margin-top:8px;
-  flex-wrap:wrap;
+
+  min-height:14px;
 }
 
 .old{
   color:#6d756d;
+
   font-size:8px;
+  line-height:1.1;
+
+  white-space:nowrap;
 }
 
 .discount{
   color:var(--lime);
+
   font-size:8px;
+  line-height:1.1;
+
   font-weight:950;
+
+  white-space:nowrap;
 }
 
 .extra-note{
+  width:100%;
+
   margin-top:7px;
+
   color:#ff974a;
+
   font-size:7px;
+  line-height:1.15;
+
   font-weight:950;
+
   letter-spacing:1px;
 }
 
 .cta{
   display:inline-flex;
-  margin-top:10px;
-  min-height:25px;
-  padding:0 11px;
+
   align-items:center;
-  color:#071006;
-  background:var(--accent);
+  justify-content:center;
+
+  min-height:28px;
+
+  margin-top:11px;
+
+  padding:
+    0
+    13px;
+
   border-radius:999px;
-  font-size:6px;
+
+  color:#071006;
+
+  background:var(--accent);
+
+  font-size:6.5px;
+  line-height:1;
+
   font-weight:950;
-  letter-spacing:1.2px;
+
+  letter-spacing:1.3px;
+
+  white-space:nowrap;
+
+  text-align:center;
 }
+
+/* ============================================================
+   9:16 — MASTER TYPOGRAPHY
+============================================================ */
+
+.r916 .info-zone{
+  height:46%;
+
+  padding:
+    4.4%
+    7.8%
+    5.4%;
+
+  overflow:visible;
+}
+
+.r916 .product-info{
+  width:100%;
+
+  align-items:flex-start;
+
+  overflow:visible;
+}
+
+.r916 .rule{
+  width:56px;
+
+  margin-bottom:10px;
+}
+
+.r916 .badges{
+  gap:7px;
+}
+
+.r916 .badge{
+  min-height:29px;
+
+  padding:
+    0
+    11px;
+
+  font-size:6.5px;
+
+  letter-spacing:1.45px;
+}
+
+.r916 .badge.promo{
+  min-width:72px;
+}
+
+.r916 .brand-line{
+  margin-top:10px;
+
+  font-size:7.5px;
+
+  line-height:1.15;
+
+  letter-spacing:2.2px;
+}
+
+.r916 .product-name{
+  margin-top:7px;
+
+  font-size:
+    clamp(
+      20px,
+      3.15vw,
+      38px
+    );
+
+  line-height:1.08;
+
+  max-width:100%;
+
+  display:block;
+
+  overflow:visible;
+
+  white-space:normal;
+
+  overflow-wrap:anywhere;
+
+  word-break:normal;
+
+  -webkit-line-clamp:unset!important;
+
+  -webkit-box-orient:initial!important;
+}
+
+.r916 .price-label{
+  margin-top:12px;
+
+  font-size:6.8px;
+
+  line-height:1.15;
+}
+
+.r916 .price{
+  margin-top:4px;
+
+  font-size:
+    clamp(
+      27px,
+      4.15vw,
+      48px
+    );
+
+  line-height:1;
+}
+
+.r916 .price-meta{
+  margin-top:7px;
+
+  gap:8px;
+
+  min-height:13px;
+}
+
+.r916 .old,
+.r916 .discount{
+  font-size:7.5px;
+
+  line-height:1.1;
+}
+
+.r916 .extra-note{
+  margin-top:6px;
+
+  font-size:6.8px;
+}
+
+.r916 .cta{
+  min-height:27px;
+
+  margin-top:9px;
+
+  padding:
+    0
+    12px;
+
+  font-size:6.2px;
+}
+
+/* ============================================================
+   4:5
+============================================================ */
+
+.r45 .info-zone{
+  height:43%;
+
+  padding:
+    4.8%
+    7.5%
+    6%;
+}
+
+.r45 .product-name{
+  font-size:
+    clamp(
+      21px,
+      3.2vw,
+      39px
+    );
+
+  line-height:1.06;
+}
+
+.r45 .price{
+  font-size:
+    clamp(
+      28px,
+      4.2vw,
+      49px
+    );
+}
+
+/* ============================================================
+   16:9
+============================================================ */
+
+.r169 .info-zone{
+  overflow:visible;
+}
+
+.r169 .badges{
+  gap:7px;
+}
+
+.r169 .badge{
+  min-height:28px;
+
+  padding:
+    0
+    11px;
+
+  font-size:6.3px;
+
+  letter-spacing:1.35px;
+}
+
+.r169 .badge.promo{
+  min-width:72px;
+}
+
+.r169 .brand-line{
+  font-size:7px;
+
+  letter-spacing:2px;
+}
+
+.r169 .product-name{
+  font-size:
+    clamp(
+      20px,
+      2.7vw,
+      38px
+    );
+
+  line-height:1.05;
+}
+
+.r169 .price-label{
+  margin-top:13px;
+}
+
+.r169 .price{
+  font-size:
+    clamp(
+      27px,
+      3.8vw,
+      46px
+    );
+}
+
+/* ============================================================
+   WATERMARK
+============================================================ */
 
 .watermark{
   position:absolute;
   inset:0;
+
   z-index:70;
+
   pointer-events:none;
-  color:rgba(190,220,170,.035);
-  font-size:clamp(14px,4vw,52px);
-  font-weight:950;
-  letter-spacing:3px;
+
   display:grid;
   place-items:center;
-  transform:rotate(-25deg);
+
+  color:
+    rgba(
+      190,
+      220,
+      170,
+      .035
+    );
+
+  font-size:
+    clamp(
+      14px,
+      4vw,
+      52px
+    );
+
+  font-weight:950;
+
+  letter-spacing:3px;
+
+  transform:
+    rotate(-25deg);
 }
 
 .signature{
   position:absolute;
+
   right:3%;
   bottom:2.5%;
+
   z-index:90;
-  color:rgba(210,216,208,.45);
+
+  color:
+    rgba(
+      210,
+      216,
+      208,
+      .45
+    );
+
   font-size:6px;
 }
 
 .ratio-mark{
   position:absolute;
+
   z-index:90;
+
   top:2.5%;
   right:2.5%;
-  padding:4px 6px;
-  background:rgba(0,0,0,.7);
-  border:1px solid rgba(255,255,255,.12);
+
+  padding:
+    4px
+    6px;
+
+  background:
+    rgba(0,0,0,.7);
+
+  border:
+    1px solid rgba(255,255,255,.12);
+
   border-radius:5px;
+
   color:#fff;
+
   font-size:6px;
   font-weight:950;
 }
 
 .safe-zone{
   position:absolute;
+
   inset:5%;
+
   z-index:95;
-  border:1px dashed rgba(255,255,255,.34);
+
+  border:
+    1px dashed
+    rgba(255,255,255,.34);
+
   pointer-events:none;
+
   display:none;
 }
 
-.safe-zone:after{
+.safe-zone::after{
   content:"SAFE ZONE";
+
   position:absolute;
+
   left:6px;
   top:6px;
-  color:rgba(255,255,255,.45);
+
+  color:
+    rgba(
+      255,
+      255,
+      255,
+      .45
+    );
+
   font-size:6px;
   font-weight:950;
+
   letter-spacing:1px;
 }
 
@@ -606,23 +1302,34 @@ main{
 
 .motion-active .product-image{
   animation:
-    heroIn 8s ease-in-out infinite alternate;
+    heroIn
+    8s
+    ease-in-out
+    infinite
+    alternate;
 }
 
 .motion-active .price{
   animation:
-    pricePulse 8s ease-in-out infinite;
+    pricePulse
+    8s
+    ease-in-out
+    infinite;
 }
 
 .motion-active .badge.promo{
   animation:
-    badgePop 8s ease-in-out infinite;
+    badgePop
+    8s
+    ease-in-out
+    infinite;
 }
 
 @keyframes heroIn{
   from{
     transform:scale(1);
   }
+
   to{
     transform:
       scale(1.055)
@@ -634,9 +1341,11 @@ main{
   0%,65%{
     transform:scale(1);
   }
+
   72%{
     transform:scale(1.045);
   }
+
   80%,100%{
     transform:scale(1);
   }
@@ -646,106 +1355,18 @@ main{
   0%,60%{
     transform:scale(1);
   }
+
   68%{
-    transform:scale(1.07);
+    transform:scale(1.06);
   }
+
   76%,100%{
     transform:scale(1);
   }
 }
 
 /* ============================================================
-   FINAL 9:16 TYPOGRAPHY FIX
-============================================================ */
-
-.r916 .info-zone{
-  left:0;
-  right:0;
-  bottom:0;
-  height:47%;
-  padding:4.2% 8% 5.2%;
-  overflow:visible;
-}
-
-.r916 .product-info{
-  width:100%;
-  min-width:0;
-  overflow:visible;
-}
-
-.r916 .rule{
-  margin-bottom:9px;
-}
-
-.r916 .badges{
-  gap:6px;
-}
-
-.r916 .badge{
-  min-height:26px;
-  padding:0 9px;
-  font-size:6.2px;
-}
-
-.r916 .brand-line{
-  margin-top:8px;
-  font-size:7.5px;
-  line-height:1.15;
-}
-
-.r916 .product-name{
-  margin-top:6px;
-  font-size:clamp(20px,3.15vw,38px);
-  line-height:1.08;
-  display:block;
-  overflow:visible;
-  white-space:normal;
-  word-break:normal;
-  overflow-wrap:anywhere;
-  max-height:calc(2 * 1.08em);
-  -webkit-line-clamp:unset!important;
-  -webkit-box-orient:initial!important;
-}
-
-.r916 .price-label{
-  margin-top:11px;
-  font-size:6.8px;
-  line-height:1.15;
-}
-
-.r916 .price{
-  margin-top:4px;
-  font-size:clamp(27px,4.15vw,48px);
-  line-height:1;
-}
-
-.r916 .price-meta{
-  margin-top:7px;
-  gap:7px;
-}
-
-.r916 .old,
-.r916 .discount{
-  font-size:7.5px;
-  line-height:1.1;
-}
-
-.r916 .extra-note{
-  margin-top:6px;
-  font-size:6.8px;
-  line-height:1.15;
-}
-
-.r916 .cta{
-  margin-top:9px;
-  min-height:25px;
-  padding:0 11px;
-  font-size:6px;
-  line-height:1;
-}
-
-/* ============================================================
-   EXPORT STATIC LOCK
+   EXPORT LOCK
 ============================================================ */
 
 .export-static,
@@ -760,16 +1381,109 @@ main{
   display:none!important;
 }
 
-.export-static .r916 .info-zone{
+.export-static .promo-canvas{
+  opacity:1!important;
+}
+
+/*
+  Export must use exactly the same
+  typography geometry as preview.
+*/
+.export-static .info-zone{
   overflow:visible!important;
 }
 
-.export-static .r916 .product-name{
-  display:block!important;
+.export-static .product-info{
   overflow:visible!important;
+}
+
+.export-static .product-name{
+  overflow:visible!important;
+  display:block!important;
+
   white-space:normal!important;
+
   max-height:none!important;
+
   -webkit-line-clamp:unset!important;
+  -webkit-box-orient:initial!important;
+}
+
+/*
+  Badge export lock.
+*/
+.export-static .badges{
+  display:flex!important;
+
+  align-items:center!important;
+  justify-content:flex-start!important;
+
+  flex-wrap:wrap!important;
+}
+
+.export-static .badge{
+  display:inline-flex!important;
+
+  align-items:center!important;
+  justify-content:center!important;
+
+  text-align:center!important;
+
+  line-height:1!important;
+
+  overflow:hidden!important;
+
+  transform:none!important;
+}
+
+/* ============================================================
+   TOOLBAR
+============================================================ */
+
+.toolbar{
+  display:grid;
+
+  grid-template-columns:
+    repeat(
+      3,
+      minmax(0,1fr)
+    );
+
+  gap:7px;
+
+  margin-top:12px;
+}
+
+.tool{
+  min-height:43px;
+
+  padding:
+    0
+    9px;
+
+  border-radius:11px;
+
+  color:#dce4dc;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  font-size:8px;
+  font-weight:950;
+}
+
+.tool.active{
+  color:#081006;
+
+  background:var(--lime);
+
+  border-color:var(--lime);
+}
+
+.tool.danger{
+  color:#ff9b9b;
 }
 
 /* ============================================================
@@ -778,14 +1492,25 @@ main{
 
 .download-status{
   display:none;
+
   margin-top:10px;
-  padding:11px 13px;
+
+  padding:
+    11px
+    13px;
+
   border-radius:11px;
+
   background:#080c09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   color:#aeb9ae;
+
   font-size:8px;
   font-weight:900;
+
   line-height:1.4;
 }
 
@@ -795,80 +1520,116 @@ main{
 
 .download-status.running{
   color:#d8efbd;
-  border-color:rgba(140,198,63,.25);
-  background:rgba(140,198,63,.06);
+
+  border-color:
+    rgba(
+      140,
+      198,
+      63,
+      .25
+    );
+
+  background:
+    rgba(
+      140,
+      198,
+      63,
+      .06
+    );
 }
 
 .download-status.success{
   color:#bdf18c;
-  border-color:rgba(140,198,63,.35);
-  background:rgba(140,198,63,.08);
+
+  border-color:
+    rgba(
+      140,
+      198,
+      63,
+      .35
+    );
+
+  background:
+    rgba(
+      140,
+      198,
+      63,
+      .08
+    );
 }
 
 .download-status.warn{
   color:#ffe49a;
-  border-color:rgba(255,212,90,.25);
-  background:rgba(255,212,90,.06);
+
+  border-color:
+    rgba(
+      255,
+      212,
+      90,
+      .25
+    );
+
+  background:
+    rgba(
+      255,
+      212,
+      90,
+      .06
+    );
 }
 
 .download-status.error{
   color:#ffaaaa;
-  border-color:rgba(255,98,98,.25);
-  background:rgba(255,98,98,.06);
+
+  border-color:
+    rgba(
+      255,
+      98,
+      98,
+      .25
+    );
+
+  background:
+    rgba(
+      255,
+      98,
+      98,
+      .06
+    );
 }
 
 .download-progress{
   height:4px;
+
   margin-top:8px;
+
   overflow:hidden;
+
   border-radius:99px;
+
   background:#151a16;
 }
 
 .download-progress-fill{
-  width:0%;
+  width:0;
   height:100%;
+
   border-radius:99px;
+
   background:
     linear-gradient(
       90deg,
       var(--lime),
       var(--lime2)
     );
-  transition:width .25s ease;
+
+  transition:
+    width .25s ease;
 }
 
 /* ============================================================
-   CONTROLS
+   FORM
 ============================================================ */
-
-.toolbar{
-  display:grid;
-  grid-template-columns:repeat(3,minmax(0,1fr));
-  gap:7px;
-  margin-top:12px;
-}
-
-.tool{
-  min-height:43px;
-  padding:0 9px;
-  border-radius:11px;
-  color:#dce4dc;
-  background:#080c09;
-  border:1px solid var(--line);
-  font-size:8px;
-  font-weight:950;
-}
-
-.tool.active{
-  color:#081006;
-  background:var(--lime);
-  border-color:var(--lime);
-}
-
-.tool.danger{
-  color:#ff9b9b;
-}
 
 select,
 input[type=text],
@@ -876,18 +1637,34 @@ input[type=number],
 input[type=search]{
   width:100%;
   height:40px;
-  padding:0 11px;
+
+  padding:
+    0
+    11px;
+
   color:#fff;
+
   background:#080c09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:10px;
+
   outline:none;
+
   font-size:9px;
 }
 
 select:focus,
 input:focus{
-  border-color:rgba(140,198,63,.65);
+  border-color:
+    rgba(
+      140,
+      198,
+      63,
+      .65
+    );
 }
 
 .field{
@@ -896,11 +1673,16 @@ input:focus{
 
 .field label{
   display:block;
+
   margin-bottom:5px;
+
   color:#747e75;
+
   font-size:7px;
   font-weight:950;
+
   letter-spacing:1.5px;
+
   text-transform:uppercase;
 }
 
@@ -910,42 +1692,144 @@ input:focus{
 
 .choice-grid{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
+
+  grid-template-columns:
+    repeat(
+      2,
+      1fr
+    );
+
   gap:7px;
+
   margin-top:10px;
 }
 
 .choice{
   padding:11px;
+
   text-align:left;
+
   border-radius:12px;
+
   color:#b8c0b8;
+
   background:#080c09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
 }
 
 .choice strong{
   display:block;
+
   font-size:10px;
+
   color:#fff;
 }
 
 .choice span{
   display:block;
+
   margin-top:4px;
+
   color:#707970;
+
   font-size:7px;
+
   line-height:1.4;
 }
 
 .choice.active{
   border-color:var(--lime);
+
   box-shadow:
-    0 0 0 1px rgba(140,198,63,.13);
+    0 0 0 1px
+    rgba(
+      140,
+      198,
+      63,
+      .13
+    );
 }
 
 .choice.active strong{
   color:var(--lime);
+}
+
+/* ============================================================
+   STATUS
+============================================================ */
+
+.status{
+  margin-top:10px;
+
+  padding:
+    10px
+    12px;
+
+  border-radius:11px;
+
+  font-size:8px;
+  font-weight:800;
+
+  background:
+    rgba(
+      140,
+      198,
+      63,
+      .06
+    );
+
+  border:
+    1px solid
+    rgba(
+      140,
+      198,
+      63,
+      .13
+    );
+
+  color:#a9c992;
+}
+
+.status.warn{
+  background:
+    rgba(
+      255,
+      212,
+      90,
+      .06
+    );
+
+  border-color:
+    rgba(
+      255,
+      212,
+      90,
+      .18
+    );
+
+  color:#ffe49a;
+}
+
+.status.bad{
+  background:
+    rgba(
+      255,
+      98,
+      98,
+      .06
+    );
+
+  border-color:
+    rgba(
+      255,
+      98,
+      98,
+      .18
+    );
+
+  color:#ffaaaa;
 }
 
 /* ============================================================
@@ -954,14 +1838,20 @@ input:focus{
 
 .score{
   margin-top:12px;
+
   padding:14px;
+
   border-radius:16px;
+
   background:#070b08;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
 }
 
 .score-head{
   display:flex;
+
   justify-content:space-between;
   align-items:center;
 }
@@ -969,20 +1859,26 @@ input:focus{
 .score-number{
   font-size:28px;
   font-weight:950;
+
   color:var(--lime);
 }
 
 .score-bar{
   height:7px;
+
   margin-top:9px;
+
   background:#151a16;
+
   border-radius:99px;
+
   overflow:hidden;
 }
 
 .score-fill{
   height:100%;
   width:0;
+
   background:
     linear-gradient(
       90deg,
@@ -990,23 +1886,36 @@ input:focus{
       var(--yellow),
       var(--lime)
     );
+
   border-radius:99px;
 }
 
 .score-list{
   display:grid;
-  grid-template-columns:1fr 1fr;
+
+  grid-template-columns:
+    1fr 1fr;
+
   gap:6px;
+
   margin-top:10px;
 }
 
 .score-item{
   display:flex;
+
   justify-content:space-between;
-  padding:6px 7px;
+
+  padding:
+    6px
+    7px;
+
   border-radius:7px;
+
   background:#0b100c;
+
   font-size:7px;
+
   color:#788178;
 }
 
@@ -1015,38 +1924,55 @@ input:focus{
 }
 
 /* ============================================================
-   CREATIVE CONTROLS
+   CONTROLS
 ============================================================ */
 
 .control-grid{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
+
+  grid-template-columns:
+    repeat(
+      3,
+      1fr
+    );
+
   gap:8px;
+
   margin-top:10px;
 }
 
 .control{
   padding:10px;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   background:#080c09;
+
   border-radius:11px;
 }
 
 .control label{
   display:flex;
+
   justify-content:space-between;
+
   color:#7e887f;
+
   font-size:7px;
+
   font-weight:900;
 }
 
 .control output{
   color:var(--lime);
+
   font-size:7px;
 }
 
 input[type=range]{
   width:100%;
+
   accent-color:var(--lime);
 }
 
@@ -1060,48 +1986,75 @@ input[type=range]{
 
 .section-head{
   display:flex;
+
   justify-content:space-between;
+
   gap:10px;
+
   align-items:end;
 }
 
 .section-title{
   font-size:18px;
+
   font-weight:950;
 }
 
 .section-note{
   color:#727b73;
+
   font-size:8px;
 }
 
 .product-grid{
   display:grid;
+
   grid-template-columns:
-    repeat(4,minmax(0,1fr));
+    repeat(
+      4,
+      minmax(0,1fr)
+    );
+
   gap:8px;
+
   margin-top:10px;
 }
 
 .card{
   position:relative;
+
   overflow:hidden;
+
   min-width:0;
   min-height:230px;
+
   background:#080d09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:14px;
+
   cursor:pointer;
 }
 
 .card.selected{
-  border-color:rgba(140,198,63,.75);
+  border-color:
+    rgba(
+      140,
+      198,
+      63,
+      .75
+    );
 }
 
 .card-image{
   height:125px;
+
   background:#050705;
+
   display:flex;
+
   align-items:center;
   justify-content:center;
 }
@@ -1109,28 +2062,47 @@ input[type=range]{
 .card-image img{
   width:100%;
   height:100%;
+
   padding:8px;
+
   object-fit:contain;
 }
 
 .card-check{
   position:absolute;
+
   top:7px;
   left:7px;
+
   width:21px;
   height:21px;
+
   display:grid;
   place-items:center;
+
   border-radius:6px;
+
   color:transparent;
-  background:rgba(0,0,0,.75);
-  border:1px solid rgba(255,255,255,.13);
+
+  background:
+    rgba(0,0,0,.75);
+
+  border:
+    1px solid
+    rgba(
+      255,
+      255,
+      255,
+      .13
+    );
+
   font-size:11px;
   font-weight:950;
 }
 
 .card.selected .card-check{
   color:#071006;
+
   background:var(--lime);
 }
 
@@ -1140,40 +2112,55 @@ input[type=range]{
 
 .card-brand{
   color:var(--lime);
+
   font-size:6px;
   font-weight:950;
+
   letter-spacing:1.2px;
 }
 
 .card-name{
   margin-top:5px;
+
   font-size:9px;
   font-weight:850;
+
   line-height:1.3;
 }
 
 .card-price{
   margin-top:7px;
+
   font-size:9px;
   font-weight:950;
 }
 
 .card-meta{
   margin-top:4px;
+
   color:#6f786f;
+
   font-size:6px;
 }
 
 .card-edit{
   position:absolute;
+
   right:7px;
   top:7px;
+
   width:27px;
   height:27px;
+
   border-radius:7px;
+
   color:white;
-  background:rgba(0,0,0,.75);
-  border:1px solid var(--line);
+
+  background:
+    rgba(0,0,0,.75);
+
+  border:
+    1px solid var(--line);
 }
 
 /* ============================================================
@@ -1182,66 +2169,67 @@ input[type=range]{
 
 .tabs{
   display:flex;
+
   gap:5px;
+
   overflow:auto;
+
   padding-bottom:2px;
+
   margin-top:12px;
 }
 
 .tab{
   flex:0 0 auto;
-  padding:8px 11px;
+
+  padding:
+    8px
+    11px;
+
   border-radius:999px;
+
   color:#7e887f;
+
   background:#080c09;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   font-size:7px;
   font-weight:950;
 }
 
 .tab.active{
   color:#071006;
+
   background:var(--lime);
+
   border-color:var(--lime);
 }
 
 /* ============================================================
-   STATUS / MODAL / TOAST
+   MODAL
 ============================================================ */
-
-.status{
-  margin-top:10px;
-  padding:10px 12px;
-  border-radius:11px;
-  font-size:8px;
-  font-weight:800;
-  background:rgba(140,198,63,.06);
-  border:1px solid rgba(140,198,63,.13);
-  color:#a9c992;
-}
-
-.status.warn{
-  background:rgba(255,212,90,.06);
-  border-color:rgba(255,212,90,.18);
-  color:#ffe49a;
-}
-
-.status.bad{
-  background:rgba(255,98,98,.06);
-  border-color:rgba(255,98,98,.18);
-  color:#ffaaaa;
-}
 
 .modal{
   position:fixed;
+
   inset:0;
+
   z-index:3000;
+
   display:none;
+
   align-items:center;
   justify-content:center;
+
   padding:18px;
-  background:rgba(0,0,0,.72);
-  backdrop-filter:blur(12px);
+
+  background:
+    rgba(0,0,0,.72);
+
+  backdrop-filter:
+    blur(12px);
 }
 
 .modal.open{
@@ -1249,18 +2237,31 @@ input[type=range]{
 }
 
 .modal-box{
-  width:min(760px,100%);
+  width:min(
+    760px,
+    100%
+  );
+
   max-height:90vh;
+
   overflow:auto;
+
   padding:20px;
+
   border-radius:22px;
+
   background:#090e0a;
-  border:1px solid var(--line);
-  box-shadow:var(--shadow);
+
+  border:
+    1px solid var(--line);
+
+  box-shadow:
+    var(--shadow);
 }
 
 .modal-head{
   display:flex;
+
   justify-content:space-between;
   align-items:center;
 }
@@ -1268,8 +2269,11 @@ input[type=range]{
 .close{
   width:36px;
   height:36px;
+
   border-radius:10px;
+
   color:white;
+
   background:#111711;
 }
 
@@ -1279,49 +2283,110 @@ input[type=range]{
 
 pre{
   white-space:pre-wrap;
+
   word-break:break-word;
+
   color:#b8c5b8;
+
   background:#050805;
-  border:1px solid var(--line);
+
+  border:
+    1px solid var(--line);
+
   border-radius:12px;
+
   padding:12px;
+
   font-size:8px;
+
   line-height:1.5;
 }
 
+/* ============================================================
+   TOAST
+============================================================ */
+
 .toast{
   position:fixed;
+
   z-index:5000;
+
   left:50%;
   bottom:20px;
-  transform:translate(-50%,20px);
-  padding:10px 16px;
+
+  transform:
+    translate(
+      -50%,
+      20px
+    );
+
+  padding:
+    10px
+    16px;
+
   border-radius:999px;
+
   color:#071006;
+
   background:var(--lime);
+
   font-size:8px;
   font-weight:950;
+
   opacity:0;
+
   pointer-events:none;
+
   transition:.2s;
 }
 
 .toast.show{
   opacity:1;
-  transform:translate(-50%,0);
+
+  transform:
+    translate(
+      -50%,
+      0
+    );
 }
+
+/* ============================================================
+   ERROR
+============================================================ */
 
 .error{
   min-height:260px;
+
   display:grid;
   place-items:center;
+
   padding:30px;
+
   text-align:center;
+
   color:#ffaaaa;
-  background:rgba(50,8,8,.3);
-  border:1px solid rgba(255,80,80,.2);
+
+  background:
+    rgba(
+      50,
+      8,
+      8,
+      .3
+    );
+
+  border:
+    1px solid
+    rgba(
+      255,
+      80,
+      80,
+      .2
+    );
+
   border-radius:18px;
+
   font-size:10px;
+
   line-height:1.7;
 }
 
@@ -1330,43 +2395,63 @@ pre{
 ============================================================ */
 
 @media(max-width:1050px){
+
   .grid-main{
     grid-template-columns:1fr;
   }
 
   .product-grid{
     grid-template-columns:
-      repeat(4,minmax(0,1fr));
+      repeat(
+        4,
+        minmax(0,1fr)
+      );
   }
 }
 
 @media(max-width:720px){
+
   .product-grid{
     grid-template-columns:
-      repeat(2,minmax(0,1fr));
+      repeat(
+        2,
+        minmax(0,1fr)
+      );
   }
 
   .control-grid{
-    grid-template-columns:1fr 1fr;
+    grid-template-columns:
+      1fr 1fr;
   }
 
   .toolbar{
-    grid-template-columns:repeat(2,1fr);
+    grid-template-columns:
+      repeat(
+        2,
+        1fr
+      );
   }
 }
 
 @media(max-width:520px){
+
   main{
-    padding:10px 10px 70px;
+    padding:
+      10px
+      10px
+      70px;
   }
 
   .panel{
     padding:13px;
+
     border-radius:18px;
   }
 
   .topbar{
-    padding:11px 13px;
+    padding:
+      11px
+      13px;
   }
 
   .brand h1{
@@ -1378,18 +2463,27 @@ pre{
   }
 
   .primary-btn{
-    padding:0 11px;
+    padding:
+      0
+      11px;
   }
 
   .stage.r916 .promo-canvas{
     max-width:430px;
   }
 
-  .product-name{
+  .r916 .badge{
+    font-size:6px;
+    padding:
+      0
+      9px;
+  }
+
+  .r916 .product-name{
     font-size:23px;
   }
 
-  .price{
+  .r916 .price{
     font-size:31px;
   }
 
@@ -1410,32 +2504,49 @@ pre{
 
 <body>
 
+<!-- ==========================================================
+     HEADER
+=========================================================== -->
+
 <header class="topbar">
+
   <div class="brand">
-    <h1>IMAM Creative Studio</h1>
+
+    <h1>
+      IMAM Creative Studio
+    </h1>
+
     <p>
       Intelligent Promo • Smart Composition • Creative QA
     </p>
+
   </div>
 
   <div class="header-actions">
+
     <button
       class="icon-btn"
       id="motionBtn"
       title="Motion Preview"
-    >▶</button>
+    >
+      ▶
+    </button>
 
     <button
       class="icon-btn"
       id="safeBtn"
       title="Safe Zone"
-    >⌖</button>
+    >
+      ⌖
+    </button>
 
     <button
       class="icon-btn"
       id="fullBtn"
       title="Fullscreen"
-    >⛶</button>
+    >
+      ⛶
+    </button>
 
     <button
       class="primary-btn"
@@ -1443,26 +2554,38 @@ pre{
     >
       AUTO CREATE
     </button>
+
   </div>
+
 </header>
 
 <main>
+
 <div class="container">
 
 <div class="grid-main">
 
+<!-- ========================================================
+     LEFT
+========================================================= -->
+
 <section>
+
+  <!-- PREVIEW -->
 
   <div class="panel">
 
     <div class="stage-wrap">
+
       <div
         class="stage r169"
         id="stage"
       ></div>
+
     </div>
 
     <div class="toolbar">
+
       <button
         class="tool"
         data-ratio="916"
@@ -1504,6 +2627,7 @@ pre{
       >
         NEXT →
       </button>
+
     </div>
 
     <div class="toolbar">
@@ -1535,24 +2659,35 @@ pre{
       class="download-status"
       id="downloadStatus"
     >
-      <div id="downloadStatusText">
+
+      <div
+        id="downloadStatusText"
+      >
         Ready.
       </div>
 
       <div class="download-progress">
+
         <div
           class="download-progress-fill"
           id="downloadProgress"
         ></div>
+
       </div>
+
     </div>
 
   </div>
 
+
+  <!-- PRODUCT MANAGER -->
+
   <div class="panel">
 
     <div class="section-head">
+
       <div>
+
         <div class="eyebrow">
           Promo Manager
         </div>
@@ -1560,14 +2695,25 @@ pre{
         <div class="panel-title">
           Produk Campaign
         </div>
+
       </div>
 
       <div class="section-note">
-        <b id="selectedCount">0</b>
+
+        <b id="selectedCount">
+          0
+        </b>
+
         dipilih •
-        <b id="totalCount">0</b>
+
+        <b id="totalCount">
+          0
+        </b>
+
         total
+
       </div>
+
     </div>
 
     <div class="toolbar">
@@ -1596,11 +2742,13 @@ pre{
     </div>
 
     <div class="field">
+
       <input
         type="search"
         id="search"
         placeholder="Cari produk / SKU / nama..."
       >
+
     </div>
 
     <div
@@ -1612,7 +2760,14 @@ pre{
 
 </section>
 
+
+<!-- ========================================================
+     RIGHT
+========================================================= -->
+
 <aside>
+
+  <!-- CREATIVE DIRECTOR -->
 
   <div class="panel">
 
@@ -1625,9 +2780,9 @@ pre{
     </div>
 
     <div class="panel-sub">
-      Biarkan engine memilih hierarchy,
-      visual treatment, accent, dan
-      emphasis berdasarkan objective.
+      Engine memilih hierarchy,
+      visual treatment, accent,
+      dan emphasis berdasarkan objective.
     </div>
 
     <div
@@ -1639,60 +2794,90 @@ pre{
         class="choice active"
         data-goal="conversion"
       >
-        <strong>🎯 Conversion</strong>
+
+        <strong>
+          🎯 Conversion
+        </strong>
+
         <span>
           Balanced commerce hierarchy.
         </span>
+
       </button>
 
       <button
         class="choice"
         data-goal="premium"
       >
-        <strong>💎 Premium</strong>
+
+        <strong>
+          💎 Premium
+        </strong>
+
         <span>
           Luxury spacing and restrained copy.
         </span>
+
       </button>
 
       <button
         class="choice"
         data-goal="hard"
       >
-        <strong>🔥 Hard Sell</strong>
+
+        <strong>
+          🔥 Hard Sell
+        </strong>
+
         <span>
           Price and offer dominate.
         </span>
+
       </button>
 
       <button
         class="choice"
         data-goal="urgency"
       >
-        <strong>⚡ Flash Sale</strong>
+
+        <strong>
+          ⚡ Flash Sale
+        </strong>
+
         <span>
           High contrast and urgency.
         </span>
+
       </button>
 
       <button
         class="choice"
         data-goal="performance"
       >
-        <strong>🏁 Performance</strong>
+
+        <strong>
+          🏁 Performance
+        </strong>
+
         <span>
           Technical and dynamic.
         </span>
+
       </button>
 
       <button
         class="choice"
         data-goal="informative"
       >
-        <strong>🧠 Informative</strong>
+
+        <strong>
+          🧠 Informative
+        </strong>
+
         <span>
           Product-first communication.
         </span>
+
       </button>
 
     </div>
@@ -1705,6 +2890,9 @@ pre{
     </div>
 
   </div>
+
+
+  <!-- ARCHETYPE -->
 
   <div class="panel">
 
@@ -1734,6 +2922,9 @@ pre{
 
   </div>
 
+
+  <!-- QA -->
+
   <div class="panel">
 
     <div class="eyebrow">
@@ -1747,7 +2938,9 @@ pre{
     <div class="score">
 
       <div class="score-head">
+
         <div>
+
           <div class="section-note">
             Overall publish readiness
           </div>
@@ -1755,6 +2948,7 @@ pre{
           <div id="scoreLabel">
             Analyzing...
           </div>
+
         </div>
 
         <div
@@ -1763,13 +2957,16 @@ pre{
         >
           —
         </div>
+
       </div>
 
       <div class="score-bar">
+
         <div
           class="score-fill"
           id="scoreFill"
         ></div>
+
       </div>
 
       <div
@@ -1788,6 +2985,9 @@ pre{
 
   </div>
 
+
+  <!-- COMPOSITION -->
+
   <div class="panel">
 
     <div class="eyebrow">
@@ -1801,9 +3001,12 @@ pre{
     <div class="control-grid">
 
       <div class="control">
+
         <label>
           Scale
-          <output id="scaleOut">100%</output>
+          <output id="scaleOut">
+            100%
+          </output>
         </label>
 
         <input
@@ -1813,12 +3016,16 @@ pre{
           max="120"
           value="100"
         >
+
       </div>
 
       <div class="control">
+
         <label>
           X
-          <output id="xOut">0</output>
+          <output id="xOut">
+            0
+          </output>
         </label>
 
         <input
@@ -1828,12 +3035,16 @@ pre{
           max="20"
           value="0"
         >
+
       </div>
 
       <div class="control">
+
         <label>
           Y
-          <output id="yOut">0</output>
+          <output id="yOut">
+            0
+          </output>
         </label>
 
         <input
@@ -1843,6 +3054,7 @@ pre{
           max="20"
           value="0"
         >
+
       </div>
 
     </div>
@@ -1874,6 +3086,9 @@ pre{
 
   </div>
 
+
+  <!-- CAMPAIGN -->
+
   <div class="panel">
 
     <div class="eyebrow">
@@ -1885,19 +3100,27 @@ pre{
     </div>
 
     <div class="field">
-      <label>Campaign Name</label>
+
+      <label>
+        Campaign Name
+      </label>
 
       <input
         id="campaignName"
         type="text"
         value="Campaign Promo"
       >
+
     </div>
 
     <div class="field">
-      <label>CTA</label>
+
+      <label>
+        CTA
+      </label>
 
       <select id="ctaSelect">
+
         <option value="CEK HARGA">
           CEK HARGA
         </option>
@@ -1917,13 +3140,19 @@ pre{
         <option value="PROMO TERBATAS">
           PROMO TERBATAS
         </option>
+
       </select>
+
     </div>
 
     <div class="field">
-      <label>Export Quality</label>
+
+      <label>
+        Export Quality
+      </label>
 
       <select id="qualitySelect">
+
         <option value="fast">
           FAST — 1280px
         </option>
@@ -1942,7 +3171,9 @@ pre{
         <option value="ultra">
           ULTRA — device dependent
         </option>
+
       </select>
+
     </div>
 
     <div class="toolbar">
@@ -1971,6 +3202,9 @@ pre{
     </div>
 
   </div>
+
+
+  <!-- A/B/C -->
 
   <div class="panel">
 
@@ -2018,17 +3252,25 @@ pre{
 
 </div>
 </div>
+
 </main>
+
+
+<!-- ==========================================================
+     MODAL
+=========================================================== -->
 
 <div
   class="modal"
   id="modal"
 >
+
   <div class="modal-box">
 
     <div class="modal-head">
 
       <div>
+
         <div
           class="eyebrow"
           id="modalEyebrow"
@@ -2042,6 +3284,7 @@ pre{
         >
           Project Data
         </div>
+
       </div>
 
       <button
@@ -2059,12 +3302,15 @@ pre{
     ></div>
 
   </div>
+
 </div>
+
 
 <div
   class="toast"
   id="toast"
 ></div>
+
 
 <script>
 /* ============================================================
@@ -2078,8 +3324,15 @@ const CONFIG={
   AUTOPLAY_MS:8500
 };
 
+const EXPORT_CONFIG={
+  maxPixels:16000000,
+  imageTimeout:20000,
+  settleDelay:220,
+  revokeDelay:15000
+};
+
 const STORAGE={
-  project:"Imamsalesfr.project.v4",
+  project:"Imamsalesfr.project.v5",
   ratio:"Imamsalesfr.ratio",
   goal:"Imamsalesfr.goal",
   template:"Imamsalesfr.template",
@@ -2090,7 +3343,12 @@ const STORAGE={
   versions:"Imamsalesfr.versions"
 };
 
+/* ============================================================
+   ARCHETYPES
+============================================================ */
+
 const ARCHETYPES={
+
   luxury:{
     name:"Luxury Editorial",
     desc:"Large product, restrained copy, premium negative space.",
@@ -2103,7 +3361,7 @@ const ARCHETYPES={
     name:"Flash Sale",
     desc:"Aggressive offer hierarchy with strong orange energy.",
     accent:"#ff7612",
-    glow:"rgba(255,118,18,.2)",
+    glow:"rgba(255,118,18,.20)",
     base:"#080604"
   },
 
@@ -2111,7 +3369,7 @@ const ARCHETYPES={
     name:"Futuristic Neon",
     desc:"High-energy green glow with technical visual language.",
     accent:"#a6e84d",
-    glow:"rgba(166,232,77,.2)",
+    glow:"rgba(166,232,77,.20)",
     base:"#020502"
   },
 
@@ -2119,7 +3377,7 @@ const ARCHETYPES={
     name:"Carbon Performance",
     desc:"Automotive/performance direction with cool blue contrast.",
     accent:"#2998e8",
-    glow:"rgba(41,152,232,.2)",
+    glow:"rgba(41,152,232,.20)",
     base:"#03080b"
   },
 
@@ -2157,13 +3415,46 @@ const ARCHETYPES={
 };
 
 const GOALS={
-  conversion:["minimal","editorial","luxury"],
-  premium:["luxury","editorial","carbon"],
-  hard:["flash","street","minimal"],
-  urgency:["flash","neon","street"],
-  performance:["carbon","technical","neon"],
-  informative:["technical","editorial","minimal"]
+  conversion:[
+    "minimal",
+    "editorial",
+    "luxury"
+  ],
+
+  premium:[
+    "luxury",
+    "editorial",
+    "carbon"
+  ],
+
+  hard:[
+    "flash",
+    "street",
+    "minimal"
+  ],
+
+  urgency:[
+    "flash",
+    "neon",
+    "street"
+  ],
+
+  performance:[
+    "carbon",
+    "technical",
+    "neon"
+  ],
+
+  informative:[
+    "technical",
+    "editorial",
+    "minimal"
+  ]
 };
+
+/* ============================================================
+   STATE
+============================================================ */
 
 let products=[];
 let selectedIds=[];
@@ -2171,56 +3462,96 @@ let promoProducts=[];
 let priceOverrides={};
 
 let currentIndex=0;
+
 let currentRatio=
-  localStorage.getItem(STORAGE.ratio)||
+  localStorage.getItem(
+    STORAGE.ratio
+  )||
   "169";
 
 let currentGoal=
-  localStorage.getItem(STORAGE.goal)||
+  localStorage.getItem(
+    STORAGE.goal
+  )||
   "conversion";
 
 let currentTemplate=
-  localStorage.getItem(STORAGE.template)||
+  localStorage.getItem(
+    STORAGE.template
+  )||
   "auto";
 
 let campaignName=
-  localStorage.getItem(STORAGE.campaign)||
+  localStorage.getItem(
+    STORAGE.campaign
+  )||
   "Campaign Promo";
 
 let currentVariant="A";
+
 let playing=true;
 let motion=false;
 let safe=false;
+
+let currentDevice="desktop";
+
 let searchQuery="";
+
 let composition={
   scale:100,
   x:0,
   y:0
 };
 
-let currentDevice="desktop";
+let currentScores={};
+
 let downloadBusy=false;
 let transitionBusy=false;
-let currentScores={};
+let exportFreeze=false;
 
 /* ============================================================
    HELPERS
 ============================================================ */
 
-const $=id=>document.getElementById(id);
+const $=
+  id=>
+    document.getElementById(id);
 
 function esc(v){
-  return String(v??"")
-    .replace(/&/g,"&amp;")
-    .replace(/</g,"&lt;")
-    .replace(/>/g,"&gt;")
-    .replace(/"/g,"&quot;")
-    .replace(/'/g,"&#039;");
+
+  return String(
+    v??""
+  )
+  .replace(
+    /&/g,
+    "&amp;"
+  )
+  .replace(
+    /</g,
+    "&lt;"
+  )
+  .replace(
+    />/g,
+    "&gt;"
+  )
+  .replace(
+    /"/g,
+    "&quot;"
+  )
+  .replace(
+    /'/g,
+    "&#039;"
+  );
 }
 
 function txt(v,f=""){
-  if(v===null||v===undefined)
+
+  if(
+    v===null||
+    v===undefined
+  ){
     return f;
+  }
 
   if(
     typeof v==="string"||
@@ -2229,7 +3560,9 @@ function txt(v,f=""){
     return String(v);
   }
 
-  if(typeof v==="object"){
+  if(
+    typeof v==="object"
+  ){
     return String(
       v.text??
       v.label??
@@ -2245,6 +3578,7 @@ function txt(v,f=""){
 }
 
 function rupiah(v){
+
   return new Intl.NumberFormat(
     "id-ID",
     {
@@ -2253,50 +3587,45 @@ function rupiah(v){
       minimumFractionDigits:0,
       maximumFractionDigits:0
     }
-  ).format(Number(v)||0);
-}
-
-function slug(v){
-  return String(v||"produk")
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(
-      /[\u0300-\u036f]/g,
-      ""
-    )
-    .replace(
-      /[^a-z0-9]+/g,
-      "-"
-    )
-    .replace(
-      /^-+|-+$/g,
-      ""
-    );
-}
-
-function wait(ms){
-  return new Promise(
-    resolve=>setTimeout(resolve,ms)
+  ).format(
+    Number(v)||0
   );
 }
 
-function toast(message){
-  const el=$("toast");
+function slug(v){
 
-  if(!el)return;
+  return String(
+    v||"produk"
+  )
+  .toLowerCase()
+  .normalize("NFD")
+  .replace(
+    /[\u0300-\u036f]/g,
+    ""
+  )
+  .replace(
+    /[^a-z0-9]+/g,
+    "-"
+  )
+  .replace(
+    /^-+|-+$/g,
+    ""
+  );
+}
 
-  el.textContent=message;
-  el.classList.add("show");
+function wait(ms){
 
-  clearTimeout(toast.timer);
-
-  toast.timer=setTimeout(
-    ()=>el.classList.remove("show"),
-    2300
+  return new Promise(
+    resolve=>
+      setTimeout(
+        resolve,
+        ms
+      )
   );
 }
 
 function save(k,v){
+
   localStorage.setItem(
     k,
     JSON.stringify(v)
@@ -2304,18 +3633,51 @@ function save(k,v){
 }
 
 function load(k,f){
+
   try{
+
     return JSON.parse(
       localStorage.getItem(k)
     )??f;
+
   }catch{
+
     return f;
   }
 }
 
+function toast(message){
+
+  const el=
+    $("toast");
+
+  if(!el)return;
+
+  el.textContent=
+    message;
+
+  el.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    toast.timer
+  );
+
+  toast.timer=
+    setTimeout(
+      ()=>{
+        el.classList.remove(
+          "show"
+        );
+      },
+      2400
+    );
+}
+
 /* ============================================================
    DOWNLOAD STATUS
-   SINGLE IMPLEMENTATION
+   ONE IMPLEMENTATION ONLY
 ============================================================ */
 
 function setDownloadStatus(
@@ -2323,9 +3685,15 @@ function setDownloadStatus(
   state="running",
   progress=0
 ){
-  const box=$("downloadStatus");
-  const text=$("downloadStatusText");
-  const bar=$("downloadProgress");
+
+  const box=
+    $("downloadStatus");
+
+  const text=
+    $("downloadStatusText");
+
+  const bar=
+    $("downloadProgress");
 
   if(!box)return;
 
@@ -2334,16 +3702,19 @@ function setDownloadStatus(
     state;
 
   if(text)
-    text.textContent=message;
+    text.textContent=
+      message;
 
   if(bar){
-    const p=Math.min(
-      100,
-      Math.max(
-        0,
-        Number(progress)||0
-      )
-    );
+
+    const p=
+      Math.min(
+        100,
+        Math.max(
+          0,
+          Number(progress)||0
+        )
+      );
 
     bar.style.width=
       p+"%";
@@ -2351,42 +3722,51 @@ function setDownloadStatus(
 }
 
 function clearDownloadStatus(){
-  const box=$("downloadStatus");
 
-  if(box){
+  const box=
+    $("downloadStatus");
+
+  if(box)
     box.className=
       "download-status";
-  }
 }
 
 /* ============================================================
-   PRODUCT NORMALIZATION
+   PRODUCT ENGINE
 ============================================================ */
 
-function normalizeProduct(raw,index){
+function normalizeProduct(
+  raw,
+  index
+){
 
-  const id=String(
-    raw.id??
-    raw.kode??
-    raw.sku??
-    `product-${index+1}`
-  );
+  const id=
+    String(
+      raw.id??
+      raw.kode??
+      raw.sku??
+      `product-${index+1}`
+    );
 
-  const brand=txt(
-    raw.brand??
-    raw.merek??
-    raw.brandName,
-    "Nine Luximos"
-  ).trim();
+  const brand=
+    txt(
+      raw.brand??
+      raw.merek??
+      raw.brandName,
+      "Nine Luximos"
+    )
+    .trim();
 
-  const name=txt(
-    raw.nama??
-    raw.name??
-    raw.judul??
-    raw.title??
-    raw.productName,
-    "Produk Promo"
-  ).trim();
+  const name=
+    txt(
+      raw.nama??
+      raw.name??
+      raw.judul??
+      raw.title??
+      raw.productName,
+      "Produk Promo"
+    )
+    .trim();
 
   const harga=
     raw.harga&&
@@ -2394,27 +3774,35 @@ function normalizeProduct(raw,index){
       ?raw.harga
       :{};
 
-  const normal=Number(
-    harga.normal??
-    raw.hargaNormal??
-    raw.normal??
-    raw.priceNormal??
-    0
-  )||0;
+  const normal=
+    Number(
+      harga.normal??
+      raw.hargaNormal??
+      raw.normal??
+      raw.priceNormal??
+      0
+    )||
+    0;
 
-  const promo=Number(
-    harga.promo??
-    raw.hargaPromo??
-    raw.promoPrice??
-    raw.pricePromo??
-    normal
-  )||normal;
+  const promo=
+    Number(
+      harga.promo??
+      raw.hargaPromo??
+      raw.promoPrice??
+      raw.pricePromo??
+      normal
+    )||
+    normal;
 
   return{
     ...raw,
+
     id,
+
     brand,
+
     nama:name,
+
     harga:{
       ...harga,
       normal,
@@ -2434,7 +3822,9 @@ function imagePath(p){
     p.imageUrl;
 
   if(explicit)
-    return txt(explicit).trim();
+    return txt(
+      explicit
+    ).trim();
 
   const file=
     p.file??
@@ -2450,19 +3840,24 @@ function imagePath(p){
 
 function displayTitle(p){
 
-  let title=txt(
-    p.nama??
-    p.name??
-    p.judul??
-    p.title,
-    "Produk Promo"
-  )
-    .replace(/\s+/g," ")
+  let title=
+    txt(
+      p.nama??
+      p.name??
+      p.judul??
+      p.title,
+      "Produk Promo"
+    )
+    .replace(
+      /\s+/g,
+      " "
+    )
     .trim();
 
-  const brand=txt(
-    p.brand
-  ).trim();
+  const brand=
+    txt(
+      p.brand
+    ).trim();
 
   if(
     brand&&
@@ -2472,16 +3867,23 @@ function displayTitle(p){
         brand.toLowerCase()
       )
   ){
-    title=title
-      .slice(brand.length)
-      .replace(
-        /^[-–—:|•\s]+/,
-        ""
-      )
-      .trim();
+
+    title=
+      title
+        .slice(
+          brand.length
+        )
+        .replace(
+          /^[-–—:|•\s]+/,
+          ""
+        )
+        .trim();
   }
 
-  return title||"Produk Promo";
+  return(
+    title||
+    "Produk Promo"
+  );
 }
 
 function isPromo(p){
@@ -2496,7 +3898,10 @@ function isPromo(p){
   if(v===true)
     return true;
 
-  if(typeof v==="string"){
+  if(
+    typeof v==="string"
+  ){
+
     return[
       "true",
       "promo",
@@ -2511,6 +3916,7 @@ function isPromo(p){
 }
 
 function warranty(p){
+
   return txt(
     p.garansi??
     p.warranty??
@@ -2522,60 +3928,77 @@ function warranty(p){
 }
 
 /* ============================================================
-   PRICE ENGINE
+   PRICE
 ============================================================ */
 
 function priceData(p){
 
-  const normal=Number(
-    priceOverrides[p.id]?.normal??
-    p.harga?.normal
-  )||0;
-
-  const promo=Number(
-    priceOverrides[p.id]?.promo??
-    p.harga?.promo
-  )||normal;
-
-  const o=
+  const override=
     priceOverrides[p.id]||
     {};
 
+  const normal=
+    Number(
+      override.normal??
+      p.harga?.normal
+    )||
+    0;
+
+  const promo=
+    Number(
+      override.promo??
+      p.harga?.promo
+    )||
+    normal;
+
   const extraEnabled=
-    !!o.extraEnabled;
+    !!override.extraEnabled;
 
   const extraPercent=
     Math.min(
       99,
       Math.max(
         0,
-        Number(o.extraPercent)||0
+        Number(
+          override.extraPercent
+        )||0
       )
     );
 
   const manualEnabled=
-    !!o.manualEnabled;
+    !!override.manualEnabled;
 
   const manualFinal=
-    Number(o.manualFinal)||0;
+    Number(
+      override.manualFinal
+    )||
+    0;
 
-  let final=promo;
+  let final=
+    promo;
 
   if(
     extraEnabled&&
     extraPercent>0
   ){
-    final=Math.round(
-      promo*
-      (1-extraPercent/100)
-    );
+
+    final=
+      Math.round(
+        promo*
+        (
+          1-
+          extraPercent/100
+        )
+      );
   }
 
   if(
     manualEnabled&&
     manualFinal>0
   ){
-    final=manualFinal;
+
+    final=
+      manualFinal;
   }
 
   const baseDiscount=
@@ -2583,7 +4006,10 @@ function priceData(p){
       ?Math.max(
         0,
         Math.round(
-          (normal-promo)/
+          (
+            normal-
+            promo
+          )/
           normal*
           100
         )
@@ -2595,7 +4021,10 @@ function priceData(p){
       ?Math.max(
         0,
         Math.round(
-          (normal-final)/
+          (
+            normal-
+            final
+          )/
           normal*
           100
         )
@@ -2606,44 +4035,73 @@ function priceData(p){
     normal,
     promo,
     final,
+
     extraEnabled,
     extraPercent,
+
     manualEnabled,
     manualFinal,
+
     baseDiscount,
     finalDiscount
   };
 }
 
-function compactPrice(value){
+function compactPrice(v){
 
-  const n=Number(value)||0;
+  const n=
+    Number(v)||
+    0;
 
-  if(n>=1000000000){
+  if(
+    n>=1000000000
+  ){
+
     return(
       "Rp "+
-      (n/1000000000)
-        .toFixed(2)
-        .replace(/\.00$/,"")+
+      (
+        n/
+        1000000000
+      )
+      .toFixed(2)
+      .replace(
+        /\.00$/,
+        ""
+      )+
       " M"
     );
   }
 
-  if(n>=1000000){
+  if(
+    n>=1000000
+  ){
+
     return(
       "Rp "+
-      (n/1000000)
-        .toFixed(2)
-        .replace(/\.00$/,"")+
+      (
+        n/
+        1000000
+      )
+      .toFixed(2)
+      .replace(
+        /\.00$/,
+        ""
+      )+
       " JT"
     );
   }
 
-  if(n>=1000){
+  if(
+    n>=1000
+  ){
+
     return(
       "Rp "+
-      (n/1000)
-        .toFixed(0)+
+      (
+        n/
+        1000
+      )
+      .toFixed(0)+
       " RB"
     );
   }
@@ -2653,25 +4111,23 @@ function compactPrice(value){
 
 function priceDisplay(p){
 
-  const price=
+  const x=
     priceData(p);
 
-  if(
+  return(
     currentRatio==="169"||
     currentGoal==="premium"
-  ){
-    return compactPrice(
-      price.final
+  )
+    ?compactPrice(
+      x.final
+    )
+    :rupiah(
+      x.final
     );
-  }
-
-  return rupiah(
-    price.final
-  );
 }
 
 /* ============================================================
-   COMPOSITION
+   SHAPE / COMPOSITION
 ============================================================ */
 
 function inferShape(p){
@@ -2684,8 +4140,9 @@ function inferShape(p){
   if(known){
 
     const s=
-      String(known)
-        .toLowerCase();
+      String(
+        known
+      ).toLowerCase();
 
     if(
       s.includes("portrait")||
@@ -2702,7 +4159,10 @@ function inferShape(p){
     }
   }
 
-  if(p.width&&p.height){
+  if(
+    p.width&&
+    p.height
+  ){
 
     const r=
       Number(p.width)/
@@ -2727,7 +4187,9 @@ function autoComposition(p){
   let x=0;
   let y=0;
 
-  if(shape==="portrait"){
+  if(
+    shape==="portrait"
+  ){
 
     scale=
       currentRatio==="169"
@@ -2741,7 +4203,9 @@ function autoComposition(p){
 
     y=-1;
 
-  }else if(shape==="landscape"){
+  }else if(
+    shape==="landscape"
+  ){
 
     scale=
       currentRatio==="169"
@@ -2774,7 +4238,10 @@ function effectiveComposition(p){
   return{
     scale:
       a.scale*
-      (composition.scale/100),
+      (
+        composition.scale/
+        100
+      ),
 
     x:
       a.x+
@@ -2784,7 +4251,8 @@ function effectiveComposition(p){
       a.y+
       composition.y,
 
-    shape:a.shape
+    shape:
+      a.shape
   };
 }
 
@@ -2797,11 +4265,14 @@ function chooseTemplate(p){
   if(
     currentTemplate!=="auto"
   ){
+
     return currentTemplate;
   }
 
   const list=
-    GOALS[currentGoal]||
+    GOALS[
+      currentGoal
+    ]||
     GOALS.conversion;
 
   const shape=
@@ -2811,6 +4282,7 @@ function chooseTemplate(p){
     currentGoal==="premium"&&
     shape==="portrait"
   ){
+
     return"luxury";
   }
 
@@ -2818,6 +4290,7 @@ function chooseTemplate(p){
     currentGoal==="performance"&&
     shape==="landscape"
   ){
+
     return"carbon";
   }
 
@@ -2825,18 +4298,26 @@ function chooseTemplate(p){
     currentGoal==="urgency"&&
     shape==="landscape"
   ){
+
     return"flash";
   }
 
-  return list[0]||"minimal";
+  return(
+    list[0]||
+    "minimal"
+  );
 }
 
-function directorReason(p,t){
+function directorReason(
+  p,
+  t
+){
 
   const shape=
     inferShape(p);
 
   const reasons={
+
     premium:
       "Luxury spacing prioritizes product authority.",
 
@@ -2857,22 +4338,102 @@ function directorReason(p,t){
   };
 
   return(
-    `${
-      reasons[currentGoal]||
+    (
+      reasons[
+        currentGoal
+      ]||
       reasons.conversion
-    } Product shape: ${shape}.`
+    )+
+    ` Product shape: ${shape}.`
   );
 }
 
 /* ============================================================
-   PREVIEW
+   BADGE TEXT FIT
+   Prevent badge content from visually running outside.
+============================================================ */
+
+function fitBadges(){
+
+  const root=
+    $("promoCanvas");
+
+  if(!root)return;
+
+  const badges=[
+    ...root.querySelectorAll(
+      ".badge"
+    )
+  ];
+
+  badges.forEach(
+    badge=>{
+
+      badge.style.transform=
+        "none";
+
+      badge.style.textAlign=
+        "center";
+
+      badge.style.alignItems=
+        "center";
+
+      badge.style.justifyContent=
+        "center";
+
+      badge.style.lineHeight=
+        "1";
+
+      /*
+        Dynamically reduce only when
+        a badge's own text is too wide.
+      */
+
+      let size=
+        parseFloat(
+          getComputedStyle(
+            badge
+          ).fontSize
+        );
+
+      const minSize=
+        currentRatio==="916"
+          ?5.2
+          :5.5;
+
+      let guard=0;
+
+      while(
+        badge.scrollWidth>
+        badge.clientWidth+
+        1&&
+        size>minSize&&
+        guard<12
+      ){
+
+        size-=.25;
+
+        badge.style.fontSize=
+          size+"px";
+
+        guard++;
+      }
+    }
+  );
+}
+
+/* ============================================================
+   PREVIEW RENDER
 ============================================================ */
 
 function renderPreview(){
 
-  const stage=$("stage");
+  const stage=
+    $("stage");
 
-  if(!promoProducts.length){
+  if(
+    !promoProducts.length
+  ){
 
     stage.className=
       "stage r"+
@@ -2894,6 +4455,7 @@ function renderPreview(){
     `;
 
     updateScore(null);
+
     return;
   }
 
@@ -2901,17 +4463,22 @@ function renderPreview(){
     currentIndex>=
     promoProducts.length
   ){
+
     currentIndex=0;
   }
 
   const p=
-    promoProducts[currentIndex];
+    promoProducts[
+      currentIndex
+    ];
 
-  const t=
+  const template=
     chooseTemplate(p);
 
   const theme=
-    ARCHETYPES[t]||
+    ARCHETYPES[
+      template
+    ]||
     ARCHETYPES.minimal;
 
   const price=
@@ -2951,7 +4518,8 @@ function renderPreview(){
       :"";
 
   const cta=
-    $("ctaSelect").value;
+    $("ctaSelect")?.value||
+    "CEK HARGA";
 
   stage.className=
     `stage r${currentRatio} `+
@@ -2973,89 +4541,139 @@ function renderPreview(){
       `
 
       :`
-        <div style="
-          color:#697169;
-          font-size:9px;
-          font-weight:900
-        ">
+        <div
+          style="
+            color:#697169;
+            font-size:9px;
+            font-weight:900;
+          "
+        >
           IMAGE NOT FOUND
         </div>
       `;
 
   stage.innerHTML=`
+
     <article
       class="promo-canvas"
       id="promoCanvas"
+
       style="
         --accent:${theme.accent};
         --glow:${theme.glow};
-        --base:${theme.base}
+        --base:${theme.base};
       "
     >
 
-      <div class="canvas-bg"></div>
+      <div
+        class="canvas-bg"
+      ></div>
 
-      <div class="watermark">
+      <div
+        class="watermark"
+      >
         Imamsalesfr • CREATIVE STUDIO
       </div>
 
-      <div class="product-visual">
+      <div
+        class="product-visual"
+      >
 
         ${imageHTML}
 
-        <div class="contact-shadow"></div>
+        <div
+          class="contact-shadow"
+        ></div>
 
-        <div class="visual-gradient"></div>
+        <div
+          class="visual-gradient"
+        ></div>
 
       </div>
 
-      <div class="info-zone">
+      <div
+        class="info-zone"
+      >
 
-        <div class="product-info">
+        <div
+          class="product-info"
+        >
 
-          <div class="rule"></div>
+          <div
+            class="rule"
+          ></div>
 
-          <div class="badges">
+          <div
+            class="badges"
+          >
 
-            <span class="badge promo">
+            <span
+              class="badge promo"
+            >
               PROMO
             </span>
 
             ${extra}
 
-            <span class="badge warranty">
-              ◇ ${esc(warranty(p))}
+            <span
+              class="badge warranty"
+            >
+              ◇ ${esc(
+                warranty(p)
+              )}
             </span>
 
           </div>
 
-          <div class="brand-line">
-            ${esc(p.brand)}
+          <div
+            class="brand-line"
+          >
+            ${esc(
+              p.brand
+            )}
           </div>
 
-          <div class="product-name">
+          <div
+            class="product-name"
+          >
             ${esc(title)}
           </div>
 
-          <div class="price-label">
+          <div
+            class="price-label"
+          >
             HARGA PROMO
           </div>
 
-          <div class="price">
-            ${esc(priceDisplay(p))}
+          <div
+            class="price"
+          >
+            ${esc(
+              priceDisplay(p)
+            )}
           </div>
 
-          <div class="price-meta">
+          <div
+            class="price-meta"
+          >
 
-            <span class="old">
-              <s>${rupiah(price.normal)}</s>
+            <span
+              class="old"
+            >
+              <s>
+                ${rupiah(
+                  price.normal
+                )}
+              </s>
             </span>
 
             ${
               price.finalDiscount>0
 
                 ?`
-                  <span class="discount">
+                  <span
+                    class="discount"
+                  >
                     HEMAT
                     ${price.finalDiscount}%
                   </span>
@@ -3068,7 +4686,9 @@ function renderPreview(){
 
           ${extraNote}
 
-          <div class="cta">
+          <div
+            class="cta"
+          >
             ${esc(cta)}
           </div>
 
@@ -3076,47 +4696,81 @@ function renderPreview(){
 
       </div>
 
-      <div class="safe-zone"></div>
+      <div
+        class="safe-zone"
+      ></div>
 
-      <div class="ratio-mark">
+      <div
+        class="ratio-mark"
+      >
         ${
           currentRatio==="916"
             ?"9:16"
-            :currentRatio==="45"
-              ?"4:5"
-              :"16:9"
+            :
+          currentRatio==="45"
+            ?"4:5"
+            :
+            "16:9"
         }
       </div>
 
-      <div class="signature">
+      <div
+        class="signature"
+      >
         Imamsalesfr •
-        ${esc(currentVariant)}
+        ${esc(
+          currentVariant
+        )}
       </div>
 
     </article>
   `;
 
   applyComposition();
-  updateDirectorUI(p,t);
+
+  fitBadges();
+
+  updateDirectorUI(
+    p,
+    template
+  );
+
   updateScore(p);
+
   updateIntegrity(p);
+
   updateCounts();
+
+  /*
+    Final browser layout pass.
+  */
+  requestAnimationFrame(
+    ()=>{
+      fitBadges();
+    }
+  );
 }
 
 /* ============================================================
-   COMPOSITION UI
+   COMPOSITION
 ============================================================ */
 
 function applyComposition(){
 
   const p=
-    promoProducts[currentIndex];
+    promoProducts[
+      currentIndex
+    ];
 
   const img=
     $("heroImage");
 
-  if(!img||!p)
+  if(
+    !img||
+    !p
+  ){
     return;
+  }
 
   const c=
     effectiveComposition(p);
@@ -3130,48 +4784,71 @@ function applyComposition(){
    DIRECTOR UI
 ============================================================ */
 
-function updateDirectorUI(p,t){
+function updateDirectorUI(
+  p,
+  template
+){
 
   if(!p)return;
 
-  $("archetypeName").textContent=
-    ARCHETYPES[t]?.name||
-    "Auto";
+  $("archetypeName")
+    .textContent=
+      ARCHETYPES[
+        template
+      ]?.name||
+      "Auto";
 
-  $("archetypeDesc").textContent=
-    ARCHETYPES[t]?.desc||
-    "Automatic creative direction.";
+  $("archetypeDesc")
+    .textContent=
+      ARCHETYPES[
+        template
+      ]?.desc||
+      "Automatic creative direction.";
 
-  $("directorStatus").textContent=
-    directorReason(p,t);
+  $("directorStatus")
+    .textContent=
+      directorReason(
+        p,
+        template
+      );
 
   document
-    .querySelectorAll(".choice")
-    .forEach(x=>{
-      x.classList.toggle(
-        "active",
-        x.dataset.goal===
-          currentGoal
-      );
-    });
+    .querySelectorAll(
+      ".choice"
+    )
+    .forEach(
+      x=>{
+        x.classList.toggle(
+          "active",
+          x.dataset.goal===
+            currentGoal
+        );
+      }
+    );
 
   document
-    .querySelectorAll(".tab")
-    .forEach(x=>{
-      x.classList.toggle(
-        "active",
-        x.dataset.template===t
-      );
-    });
+    .querySelectorAll(
+      ".tab"
+    )
+    .forEach(
+      x=>{
+        x.classList.toggle(
+          "active",
+          x.dataset.template===
+            template
+        );
+      }
+    );
 }
 
 /* ============================================================
-   SCORE
+   QA SCORE
 ============================================================ */
 
 function scoreVisual(p){
 
-  if(!p)return null;
+  if(!p)
+    return null;
 
   const price=
     priceData(p);
@@ -3185,124 +4862,167 @@ function scoreVisual(p){
   const shape=
     comp.shape;
 
-  let composition=90;
+  let composition=92;
 
   let productVisibility=
     shape==="portrait"
       ?94
-      :shape==="landscape"
-        ?93
-        :96;
+      :
+    shape==="landscape"
+      ?93
+      :
+      96;
 
   let priceLegibility=
     currentRatio==="169"
-      ?91
-      :96;
+      ?92
+      :
+      96;
 
   let contrast=94;
 
   let brand=
     title.length>42
-      ?84
-      :93;
+      ?86
+      :
+      94;
 
   let whitespace=
     currentRatio==="169"
-      ?90
-      :94;
+      ?91
+      :
+      95;
 
   let mobile=
     currentRatio==="916"
       ?97
-      :90;
+      :
+      91;
 
-  if(comp.scale>115){
+  if(
+    comp.scale>115
+  ){
+
     composition-=7;
     productVisibility-=4;
   }
 
-  if(comp.scale<88){
+  if(
+    comp.scale<88
+  ){
+
     composition-=5;
     productVisibility-=8;
   }
 
-  if(title.length>55)
-    brand-=10;
+  if(
+    title.length>55
+  ){
 
-  if(price.final<=0)
+    brand-=8;
+  }
+
+  if(
+    price.final<=0
+  ){
+
     priceLegibility=20;
+  }
 
   if(
     price.normal>0&&
-    price.final>price.normal
+    price.final>
+    price.normal
   ){
+
     priceLegibility=35;
   }
 
-  if(currentGoal==="premium"){
+  if(
+    currentGoal==="premium"
+  ){
+
     contrast-=2;
     whitespace+=3;
   }
 
-  if(currentGoal==="hard")
-    priceLegibility+=2;
-
-  if(currentGoal==="informative")
-    brand+=3;
-
   const vals={
+
     composition:
       Math.min(
         100,
-        Math.max(0,composition)
+        Math.max(
+          0,
+          composition
+        )
       ),
 
     product:
       Math.min(
         100,
-        Math.max(0,productVisibility)
+        Math.max(
+          0,
+          productVisibility
+        )
       ),
 
     price:
       Math.min(
         100,
-        Math.max(0,priceLegibility)
+        Math.max(
+          0,
+          priceLegibility
+        )
       ),
 
     contrast:
       Math.min(
         100,
-        Math.max(0,contrast)
+        Math.max(
+          0,
+          contrast
+        )
       ),
 
     brand:
       Math.min(
         100,
-        Math.max(0,brand)
+        Math.max(
+          0,
+          brand
+        )
       ),
 
     whitespace:
       Math.min(
         100,
-        Math.max(0,whitespace)
+        Math.max(
+          0,
+          whitespace
+        )
       ),
 
     mobile:
       Math.min(
         100,
-        Math.max(0,mobile)
+        Math.max(
+          0,
+          mobile
+        )
       )
   };
 
-  const overall=Math.round(
-    vals.composition*.18+
-    vals.product*.20+
-    vals.price*.18+
-    vals.contrast*.12+
-    vals.brand*.10+
-    vals.whitespace*.10+
-    vals.mobile*.12
-  );
+  const overall=
+    Math.round(
+
+      vals.composition*.18+
+      vals.product*.20+
+      vals.price*.18+
+      vals.contrast*.12+
+      vals.brand*.10+
+      vals.whitespace*.10+
+      vals.mobile*.12
+    );
 
   return{
     overall,
@@ -3329,25 +5049,30 @@ function updateScore(p){
     return;
   }
 
-  currentScores=score;
+  currentScores=
+    score;
 
   $("scoreNumber")
     .textContent=
-    score.overall;
+      score.overall;
 
   $("scoreFill")
     .style.width=
-    score.overall+"%";
+      score.overall+
+      "%";
 
   $("scoreLabel")
     .textContent=
-    score.overall>=90
-      ?"READY TO PUBLISH"
-      :score.overall>=80
+      score.overall>=90
+        ?"READY TO PUBLISH"
+        :
+      score.overall>=80
         ?"GOOD — MINOR TUNING"
-        :score.overall>=70
-          ?"NEEDS ATTENTION"
-          :"DO NOT PUBLISH YET";
+        :
+      score.overall>=70
+        ?"NEEDS ATTENTION"
+        :
+        "DO NOT PUBLISH YET";
 
   const names={
     composition:"Composition",
@@ -3361,13 +5086,16 @@ function updateScore(p){
 
   $("scoreList")
     .innerHTML=
-      Object.entries(names)
-        .map(([k,n])=>`
-          <div class="score-item">
-            <span>${n}</span>
-            <b>${score[k]}</b>
-          </div>
-        `)
+      Object
+        .entries(names)
+        .map(
+          ([k,n])=>`
+            <div class="score-item">
+              <span>${n}</span>
+              <b>${score[k]}</b>
+            </div>
+          `
+        )
         .join("");
 }
 
@@ -3381,6 +5109,7 @@ function updateIntegrity(p){
     $("integrityStatus");
 
   if(!p){
+
     el.textContent=
       "No product.";
 
@@ -3397,6 +5126,7 @@ function updateIntegrity(p){
     x.normal<=0||
     x.final<=0
   ){
+
     el.textContent=
       "⚠ Harga belum lengkap.";
 
@@ -3406,7 +5136,10 @@ function updateIntegrity(p){
     return;
   }
 
-  if(x.promo>x.normal){
+  if(
+    x.promo>
+    x.normal
+  ){
 
     el.textContent=
       "⚠ Promo price lebih tinggi dari normal price.";
@@ -3417,21 +5150,13 @@ function updateIntegrity(p){
     return;
   }
 
-  if(x.final>x.promo){
+  if(
+    x.final>
+    x.promo
+  ){
 
     el.textContent=
       "⚠ Final price tidak boleh lebih tinggi dari promo.";
-
-    el.className=
-      "status bad";
-
-    return;
-  }
-
-  if(x.finalDiscount>99){
-
-    el.textContent=
-      "⚠ Discount tidak valid.";
 
     el.className=
       "status bad";
@@ -3457,18 +5182,19 @@ function renderManager(){
     $("productGrid");
 
   const filtered=
-    products.filter(p=>{
+    products.filter(
+      p=>{
 
-      if(!searchQuery)
-        return true;
+        if(!searchQuery)
+          return true;
 
-      const hay=[
-        p.brand,
-        p.nama,
-        p.name,
-        p.id,
-        p.sku
-      ]
+        const hay=[
+          p.brand,
+          p.nama,
+          p.name,
+          p.id,
+          p.sku
+        ]
         .filter(Boolean)
         .join(" ")
         .toLowerCase()
@@ -3478,22 +5204,27 @@ function renderManager(){
           ""
         );
 
-      return hay.includes(
-        searchQuery
-      );
-    });
+        return hay.includes(
+          searchQuery
+        );
+      }
+    );
 
   grid.innerHTML=
     filtered.length
 
       ?filtered
-        .map(createCard)
+        .map(
+          createCard
+        )
         .join("")
 
       :`
         <div
           class="error"
-          style="grid-column:1/-1"
+          style="
+            grid-column:1/-1;
+          "
         >
           Produk tidak ditemukan.
         </div>
@@ -3516,15 +5247,24 @@ function createCard(p){
     imagePath(p);
 
   return`
+
     <article
       class="card ${
-        selected?"selected":""
+        selected
+          ?"selected"
+          :""
       }"
       data-id="${esc(p.id)}"
     >
 
-      <div class="card-check">
-        ${selected?"✓":""}
+      <div
+        class="card-check"
+      >
+        ${
+          selected
+            ?"✓"
+            :""
+        }
       </div>
 
       <button
@@ -3534,35 +5274,59 @@ function createCard(p){
         ✎
       </button>
 
-      <div class="card-image">
+      <div
+        class="card-image"
+      >
+
         ${
           img
+
             ?`
               <img
                 src="${esc(img)}"
                 crossorigin="anonymous"
               >
             `
+
             :""
         }
+
       </div>
 
-      <div class="card-info">
+      <div
+        class="card-info"
+      >
 
-        <div class="card-brand">
+        <div
+          class="card-brand"
+        >
           ${esc(p.brand)}
         </div>
 
-        <div class="card-name">
-          ${esc(displayTitle(p))}
+        <div
+          class="card-name"
+        >
+          ${esc(
+            displayTitle(p)
+          )}
         </div>
 
-        <div class="card-price">
-          ${rupiah(price.final)}
+        <div
+          class="card-price"
+        >
+          ${rupiah(
+            price.final
+          )}
         </div>
 
-        <div class="card-meta">
-          Normal ${rupiah(price.normal)}
+        <div
+          class="card-meta"
+        >
+          Normal
+          ${rupiah(
+            price.normal
+          )}
+
           ${
             price.finalDiscount
               ?` • -${price.finalDiscount}%`
@@ -3577,56 +5341,59 @@ function createCard(p){
 }
 
 $("productGrid")
-  .addEventListener(
-    "click",
-    e=>{
+.addEventListener(
+  "click",
+  e=>{
 
-      const edit=
-        e.target.closest(
-          "[data-edit]"
-        );
-
-      if(edit){
-
-        e.stopPropagation();
-
-        openPriceEditor(
-          edit.dataset.edit
-        );
-
-        return;
-      }
-
-      const card=
-        e.target.closest(
-          ".card"
-        );
-
-      if(!card)return;
-
-      const id=
-        String(card.dataset.id);
-
-      selectedIds=
-        selectedIds.includes(id)
-
-          ?selectedIds.filter(
-            x=>x!==id
-          )
-
-          :[
-            ...selectedIds,
-            id
-          ];
-
-      save(
-        STORAGE.selection,
-        selectedIds
+    const edit=
+      e.target.closest(
+        "[data-edit]"
       );
 
-      renderManager();
+    if(edit){
+
+      e.stopPropagation();
+
+      openPriceEditor(
+        edit.dataset.edit
+      );
+
+      return;
     }
-  );
+
+    const card=
+      e.target.closest(
+        ".card"
+      );
+
+    if(!card)
+      return;
+
+    const id=
+      String(
+        card.dataset.id
+      );
+
+    selectedIds=
+      selectedIds.includes(id)
+
+        ?selectedIds.filter(
+          x=>x!==id
+        )
+
+        :[
+          ...selectedIds,
+          id
+        ];
+
+    save(
+      STORAGE.selection,
+      selectedIds
+    );
+
+    renderManager();
+  }
+);
 
 /* ============================================================
    PRICE EDITOR
@@ -3636,7 +5403,9 @@ function openPriceEditor(id){
 
   const p=
     products.find(
-      x=>String(x.id)===String(id)
+      x=>
+        String(x.id)===
+        String(id)
     );
 
   if(!p)return;
@@ -3646,35 +5415,49 @@ function openPriceEditor(id){
 
   $("modalEyebrow")
     .textContent=
-    "Price Engine";
+      "Price Engine";
 
   $("modalTitle")
     .textContent=
-    displayTitle(p);
+      displayTitle(p);
 
   $("modalContent")
     .innerHTML=`
 
       <div class="field">
-        <label>Normal Price</label>
+
+        <label>
+          Normal Price
+        </label>
+
         <input
           id="editNormal"
           type="number"
           value="${x.normal}"
         >
+
       </div>
 
       <div class="field">
-        <label>Promo Price</label>
+
+        <label>
+          Promo Price
+        </label>
+
         <input
           id="editPromo"
           type="number"
           value="${x.promo}"
         >
+
       </div>
 
       <div class="field">
-        <label>Extra Discount %</label>
+
+        <label>
+          Extra Discount %
+        </label>
+
         <input
           id="editExtra"
           type="number"
@@ -3682,15 +5465,21 @@ function openPriceEditor(id){
           max="99"
           value="${x.extraPercent}"
         >
+
       </div>
 
       <div class="field">
-        <label>Manual Final Price</label>
+
+        <label>
+          Manual Final Price
+        </label>
+
         <input
           id="editFinal"
           type="number"
           value="${x.manualFinal}"
         >
+
       </div>
 
       <div class="toolbar">
@@ -3710,102 +5499,119 @@ function openPriceEditor(id){
         </button>
 
       </div>
-    `;
+  `;
 
   $("modal")
     .classList
     .add("open");
 
-  $("resetPrice").onclick=()=>{
+  $("resetPrice")
+    .onclick=
+      ()=>{
 
-    delete priceOverrides[id];
+        delete priceOverrides[id];
 
-    save(
-      STORAGE.prices,
-      priceOverrides
-    );
+        save(
+          STORAGE.prices,
+          priceOverrides
+        );
 
-    $("modal")
-      .classList
-      .remove("open");
+        $("modal")
+          .classList
+          .remove("open");
 
-    renderManager();
-    renderPreview();
+        renderManager();
+        renderPreview();
 
-    toast(
-      "Harga dikembalikan ke JSON."
-    );
-  };
+        toast(
+          "Harga dikembalikan ke JSON."
+        );
+      };
 
-  $("savePrice").onclick=()=>{
+  $("savePrice")
+    .onclick=
+      ()=>{
 
-    priceOverrides[id]={
-      normal:
-        Number(
-          $("editNormal").value
-        )||0,
-
-      promo:
-        Number(
-          $("editPromo").value
-        )||0,
-
-      extraEnabled:
-        Number(
-          $("editExtra").value
-        )>0,
-
-      extraPercent:
-        Math.min(
-          99,
-          Math.max(
-            0,
+        priceOverrides[id]={
+          normal:
             Number(
-              $("editExtra").value
-            )||0
-          )
-        ),
+              $("editNormal")
+                .value
+            )||
+            0,
 
-      manualEnabled:
-        Number(
-          $("editFinal").value
-        )>0,
+          promo:
+            Number(
+              $("editPromo")
+                .value
+            )||
+            0,
 
-      manualFinal:
-        Number(
-          $("editFinal").value
-        )||0
-    };
+          extraEnabled:
+            Number(
+              $("editExtra")
+                .value
+            )>0,
 
-    save(
-      STORAGE.prices,
-      priceOverrides
-    );
+          extraPercent:
+            Math.min(
+              99,
+              Math.max(
+                0,
+                Number(
+                  $("editExtra")
+                    .value
+                )||
+                0
+              )
+            ),
 
-    $("modal")
-      .classList
-      .remove("open");
+          manualEnabled:
+            Number(
+              $("editFinal")
+                .value
+            )>0,
 
-    renderManager();
-    renderPreview();
+          manualFinal:
+            Number(
+              $("editFinal")
+                .value
+            )||
+            0
+        };
 
-    toast(
-      "Harga promo diperbarui ✓"
-    );
-  };
+        save(
+          STORAGE.prices,
+          priceOverrides
+        );
+
+        $("modal")
+          .classList
+          .remove("open");
+
+        renderManager();
+        renderPreview();
+
+        toast(
+          "Harga promo diperbarui ✓"
+        );
+      };
 }
 
 /* ============================================================
-   NAVIGATION
+   APPLY / NAVIGATION
 ============================================================ */
 
-function applyPromo(notify=true){
+function applyPromo(
+  notify=true
+){
 
   promoProducts=
-    products.filter(p=>
-      selectedIds.includes(
-        String(p.id)
-      )
+    products.filter(
+      p=>
+        selectedIds.includes(
+          String(p.id)
+        )
     );
 
   currentIndex=0;
@@ -3818,6 +5624,7 @@ function applyPromo(notify=true){
   renderPreview();
 
   if(notify){
+
     toast(
       `${promoProducts.length} produk diterapkan ✓`
     );
@@ -3826,7 +5633,14 @@ function applyPromo(notify=true){
 
 function changeSlide(dir){
 
+  /*
+    Absolutely no slide change while
+    export is in progress.
+  */
+
   if(
+    exportFreeze||
+    downloadBusy||
     transitionBusy||
     promoProducts.length<2
   ){
@@ -3841,32 +5655,37 @@ function changeSlide(dir){
     $("promoCanvas");
 
   if(canvas)
-    canvas.style.opacity="0";
+    canvas.style.opacity=
+      "0";
 
-  setTimeout(()=>{
+  setTimeout(
+    ()=>{
 
-    currentIndex=
-      (
-        currentIndex+
-        dir+
-        promoProducts.length
-      )%
-      promoProducts.length;
+      currentIndex=
+        (
+          currentIndex+
+          dir+
+          promoProducts.length
+        )%
+        promoProducts.length;
 
-    renderPreview();
+      renderPreview();
 
-    const next=
-      $("promoCanvas");
+      const next=
+        $("promoCanvas");
 
-    if(next)
-      next.style.opacity="1";
+      if(next)
+        next.style.opacity=
+          "1";
 
-    transitionBusy=false;
+      transitionBusy=false;
 
-    if(playing)
-      startAutoplay();
+      if(playing)
+        startAutoplay();
 
-  },220);
+    },
+    180
+  );
 }
 
 function nextSlide(){
@@ -3882,6 +5701,8 @@ function startAutoplay(){
   stopAutoplay();
 
   if(
+    exportFreeze||
+    downloadBusy||
     !playing||
     promoProducts.length<2
   ){
@@ -3897,13 +5718,16 @@ function startAutoplay(){
 
 function stopAutoplay(){
 
-  if(window.autoplay){
+  if(
+    window.autoplay
+  ){
 
     clearInterval(
       window.autoplay
     );
 
-    window.autoplay=null;
+    window.autoplay=
+      null;
   }
 }
 
@@ -3913,11 +5737,14 @@ function stopAutoplay(){
 
 function toggleMotion(){
 
-  motion=!motion;
+  motion=
+    !motion;
 
   $("motionBtn")
     .textContent=
-    motion?"Ⅱ":"▶";
+      motion
+        ?"Ⅱ"
+        :"▶";
 
   renderPreview();
 
@@ -3930,7 +5757,8 @@ function toggleMotion(){
 
 function toggleSafe(){
 
-  safe=!safe;
+  safe=
+    !safe;
 
   $("safeBtn")
     .classList
@@ -3948,18 +5776,39 @@ function toggleSafe(){
 
 function autoCreate(){
 
-  if(!promoProducts.length){
-    toast("Pilih produk dulu.");
+  if(
+    !promoProducts.length
+  ){
+
+    toast(
+      "Pilih produk dulu."
+    );
+
     return;
   }
 
-  currentTemplate="auto";
+  currentTemplate=
+    "auto";
 
   composition={
     scale:100,
     x:0,
     y:0
   };
+
+  $("scaleCtrl")
+    .value=
+      100;
+
+  $("xCtrl")
+    .value=
+      0;
+
+  $("yCtrl")
+    .value=
+      0;
+
+  renderPreview();
 
   const p=
     promoProducts[
@@ -3969,12 +5818,6 @@ function autoCreate(){
   const t=
     chooseTemplate(p);
 
-  $("scaleCtrl").value=100;
-  $("xCtrl").value=0;
-  $("yCtrl").value=0;
-
-  renderPreview();
-
   toast(
     `Auto Creative → `+
     `${ARCHETYPES[t].name} ✓`
@@ -3982,19 +5825,25 @@ function autoCreate(){
 }
 
 /* ============================================================
-   A / B / C
+   A/B/C
 ============================================================ */
 
 function applyVariant(v){
 
-  currentVariant=v;
+  currentVariant=
+    v;
 
   if(v==="A")
-    currentGoal="premium";
+    currentGoal=
+      "premium";
+
   else if(v==="B")
-    currentGoal="hard";
+    currentGoal=
+      "hard";
+
   else
-    currentGoal="urgency";
+    currentGoal=
+      "urgency";
 
   localStorage.setItem(
     STORAGE.goal,
@@ -4010,7 +5859,11 @@ function applyVariant(v){
     );
 
   analytics[v]=
-    (analytics[v]||0)+1;
+    (
+      analytics[v]||
+      0
+    )+
+    1;
 
   save(
     STORAGE.analytics,
@@ -4029,42 +5882,61 @@ function applyVariant(v){
 function projectData(){
 
   return{
+
     schemaVersion:5,
 
     createdAt:
-      new Date().toISOString(),
+      new Date()
+        .toISOString(),
 
     campaign:{
+
       name:
-        $("campaignName").value,
+        $("campaignName")
+          .value,
 
       cta:
-        $("ctaSelect").value
+        $("ctaSelect")
+          .value
     },
 
     creative:{
-      ratio:currentRatio,
-      goal:currentGoal,
-      template:currentTemplate,
-      variant:currentVariant,
+
+      ratio:
+        currentRatio,
+
+      goal:
+        currentGoal,
+
+      template:
+        currentTemplate,
+
+      variant:
+        currentVariant,
+
       motion,
+
       safe,
+
       composition
     },
 
     products:{
+
       selectedIds,
 
       promoIds:
         promoProducts.map(
-          p=>String(p.id)
+          p=>
+            String(p.id)
         ),
 
       priceOverrides
     },
 
     quality:
-      $("qualitySelect").value,
+      $("qualitySelect")
+        .value,
 
     scores:
       currentScores
@@ -4073,17 +5945,15 @@ function projectData(){
 
 function saveProject(){
 
-  const data=
-    projectData();
-
   save(
     STORAGE.project,
-    data
+    projectData()
   );
 
   localStorage.setItem(
     STORAGE.campaign,
-    $("campaignName").value
+    $("campaignName")
+      .value
   );
 
   toast(
@@ -4146,20 +6016,24 @@ function loadProject(){
     data.products?.priceOverrides||
     {};
 
-  $("campaignName").value=
-    data.campaign?.name||
-    "Campaign Promo";
+  $("campaignName")
+    .value=
+      data.campaign?.name||
+      "Campaign Promo";
 
   campaignName=
-    $("campaignName").value;
+    $("campaignName")
+      .value;
 
-  $("ctaSelect").value=
-    data.campaign?.cta||
-    "CEK HARGA";
+  $("ctaSelect")
+    .value=
+      data.campaign?.cta||
+      "CEK HARGA";
 
-  $("qualitySelect").value=
-    data.quality||
-    "standard";
+  $("qualitySelect")
+    .value=
+      data.quality||
+      "standard";
 
   save(
     STORAGE.selection,
@@ -4172,6 +6046,7 @@ function loadProject(){
   );
 
   applyPromo(false);
+
   syncControls();
 
   toast(
@@ -4189,7 +6064,8 @@ function snapshot(){
 
   versions.unshift({
     timestamp:
-      new Date().toISOString(),
+      new Date()
+        .toISOString(),
 
     project:
       projectData()
@@ -4197,7 +6073,10 @@ function snapshot(){
 
   save(
     STORAGE.versions,
-    versions.slice(0,20)
+    versions.slice(
+      0,
+      20
+    )
   );
 
   toast(
@@ -4213,48 +6092,53 @@ function exportJSON(){
 
   const output=
     products
-      .filter(p=>
-        selectedIds.includes(
-          String(p.id)
-        )
+      .filter(
+        p=>
+          selectedIds.includes(
+            String(p.id)
+          )
       )
-      .map(p=>{
+      .map(
+        p=>{
 
-        const x=
-          priceData(p);
+          const x=
+            priceData(p);
 
-        return{
-          ...p,
+          return{
 
-          harga:{
-            ...p.harga,
+            ...p,
 
-            normal:
-              x.normal,
+            harga:{
 
-            promo:
-              x.final,
+              ...p.harga,
 
-            hargaDasarPromo:
-              x.promo,
+              normal:
+                x.normal,
 
-            diskon:
-              x.finalDiscount,
+              promo:
+                x.final,
 
-            diskonExtraAktif:
-              x.extraEnabled,
+              hargaDasarPromo:
+                x.promo,
 
-            diskonExtra:
-              x.extraPercent,
+              diskon:
+                x.finalDiscount,
 
-            hargaFinalCustomAktif:
-              x.manualEnabled,
+              diskonExtraAktif:
+                x.extraEnabled,
 
-            hargaFinalCustom:
-              x.manualFinal
-          }
-        };
-      });
+              diskonExtra:
+                x.extraPercent,
+
+              hargaFinalCustomAktif:
+                x.manualEnabled,
+
+              hargaFinalCustom:
+                x.manualFinal
+            }
+          };
+        }
+      );
 
   const data={
     project:
@@ -4265,6 +6149,7 @@ function exportJSON(){
   };
 
   downloadBlob(
+
     new Blob(
       [
         JSON.stringify(
@@ -4280,7 +6165,8 @@ function exportJSON(){
     ),
 
     `${slug(
-      $("campaignName").value
+      $("campaignName")
+        .value
     )}-campaign.json`
   );
 
@@ -4290,24 +6176,15 @@ function exportJSON(){
 }
 
 /* ============================================================
-   FINAL EXPORT ENGINE
-   SINGLE IMPLEMENTATION
+   EXPORT ENGINE
+   ONE ENGINE ONLY
 ============================================================ */
-
-const EXPORT_CONFIG={
-  maxPixels:16000000,
-  revokeDelay:12000,
-  imageTimeout:20000,
-  settleDelay:180
-};
-
-/* ------------------------------------------------------------
-   EXPORT RATIO
------------------------------------------------------------- */
 
 function exportRatio(){
 
-  if(currentRatio==="916"){
+  if(
+    currentRatio==="916"
+  ){
 
     return{
       name:"9x16",
@@ -4316,7 +6193,9 @@ function exportRatio(){
     };
   }
 
-  if(currentRatio==="45"){
+  if(
+    currentRatio==="45"
+  ){
 
     return{
       name:"4x5",
@@ -4332,31 +6211,24 @@ function exportRatio(){
   };
 }
 
-/* ------------------------------------------------------------
-   EXPORT WIDTH
------------------------------------------------------------- */
-
 function qualityWidth(){
 
   const q=
-    $("qualitySelect")?.value||
+    $("qualitySelect")
+      ?.value||
     "standard";
 
   if(q==="fast")
-    return 1280;
+    return1280;
 
   if(q==="high")
-    return 1920;
+    return1920;
 
   if(q==="ultra")
-    return 2560;
+    return2560;
 
-  return 1440;
+  return1440;
 }
-
-/* ------------------------------------------------------------
-   EXACT OUTPUT DIMENSIONS
------------------------------------------------------------- */
 
 function exportDimensions(){
 
@@ -4374,34 +6246,34 @@ function exportDimensions(){
     );
 
   /*
-    Explicit common 9:16 sizes.
+    Exact standard canvas sizes.
   */
+
   if(
     ratio.name==="9x16"&&
     width===1280
-  ){
+  )
     height=2276;
-  }
 
   if(
     ratio.name==="9x16"&&
     width===1440
-  ){
+  )
     height=2560;
-  }
 
   if(
     ratio.name==="9x16"&&
     width===1920
-  ){
+  )
     height=3413;
-  }
 
   /*
     Pixel safety.
   */
-  const pixels=
-    width*height;
+
+  let pixels=
+    width*
+    height;
 
   if(
     pixels>
@@ -4416,109 +6288,33 @@ function exportDimensions(){
 
     width=
       Math.floor(
-        width*factor
+        width*
+        factor
       );
 
     height=
       Math.floor(
-        height*factor
+        height*
+        factor
       );
+
+    pixels=
+      width*
+      height;
   }
 
   return{
     width,
     height,
-    ratio:ratio.name
+    ratio:
+      ratio.name,
+    pixels
   };
 }
 
-/* ------------------------------------------------------------
-   IMAGE WAIT
------------------------------------------------------------- */
-
-async function waitForImages(root){
-
-  const images=[
-    ...root.querySelectorAll(
-      "img"
-    )
-  ];
-
-  await Promise.all(
-    images.map(img=>{
-
-      if(
-        img.complete&&
-        img.naturalWidth>0
-      ){
-
-        if(
-          typeof img.decode===
-          "function"
-        ){
-
-          return img
-            .decode()
-            .catch(
-              ()=>{}
-            );
-        }
-
-        return Promise.resolve();
-      }
-
-      return new Promise(
-        resolve=>{
-
-          let finished=false;
-
-          const done=()=>{
-
-            if(finished)
-              return;
-
-            finished=true;
-            resolve();
-          };
-
-          img.addEventListener(
-            "load",
-            done,
-            {once:true}
-          );
-
-          img.addEventListener(
-            "error",
-            done,
-            {once:true}
-          );
-
-          setTimeout(
-            done,
-            EXPORT_CONFIG.imageTimeout
-          );
-        }
-      );
-    })
-  );
-}
-
-async function waitForFonts(){
-
-  if(
-    document.fonts&&
-    document.fonts.ready
-  ){
-
-    try{
-      await document.fonts.ready;
-    }catch{}
-  }
-}
-
-/* ------------------------------------------------------------
+/* ============================================================
    PREVIEW SNAPSHOT
------------------------------------------------------------- */
+============================================================ */
 
 function previewSnapshot(){
 
@@ -4546,56 +6342,169 @@ function previewSnapshot(){
   }
 
   return{
-    width:rect.width,
-    height:rect.height,
+
+    width:
+      rect.width,
+
+    height:
+      rect.height,
 
     ratio:
       rect.width/
       rect.height,
 
+    index:
+      currentIndex,
+
     productId:
       promoProducts[
         currentIndex
-      ]?.id??null,
-
-    index:
-      currentIndex
+      ]?.id??
+      null
   };
 }
 
-/* ------------------------------------------------------------
+/* ============================================================
+   IMAGE WAIT
+============================================================ */
+
+async function waitForImages(
+  root
+){
+
+  const images=[
+    ...root.querySelectorAll(
+      "img"
+    )
+  ];
+
+  await Promise.all(
+
+    images.map(
+      img=>{
+
+        if(
+          img.complete&&
+          img.naturalWidth>0
+        ){
+
+          if(
+            typeof img.decode===
+            "function"
+          ){
+
+            return img
+              .decode()
+              .catch(
+                ()=>{}
+              );
+          }
+
+          return Promise.resolve();
+        }
+
+        return new Promise(
+          resolve=>{
+
+            let finished=false;
+
+            const done=
+              ()=>{
+
+                if(
+                  finished
+                )
+                  return;
+
+                finished=true;
+
+                resolve();
+              };
+
+            img.addEventListener(
+              "load",
+              done,
+              {
+                once:true
+              }
+            );
+
+            img.addEventListener(
+              "error",
+              done,
+              {
+                once:true
+              }
+            );
+
+            setTimeout(
+              done,
+              EXPORT_CONFIG.imageTimeout
+            );
+          }
+        );
+      }
+    )
+  );
+}
+
+async function waitForFonts(){
+
+  if(
+    document.fonts&&
+    document.fonts.ready
+  ){
+
+    try{
+
+      await document.fonts.ready;
+
+    }catch{}
+  }
+}
+
+/* ============================================================
    CLONE LOCK
------------------------------------------------------------- */
+============================================================ */
 
 function lockExportClone(
-  clonedDocument,
+  doc,
   snapshot
 ){
 
   const html=
-    clonedDocument.documentElement;
+    doc.documentElement;
 
   const body=
-    clonedDocument.body;
+    doc.body;
 
   /*
-    Keep clone viewport identical to
-    the real browser viewport.
+    Keep the clone at exactly the same
+    browser viewport as preview.
   */
+
   html.style.width=
-    `${window.innerWidth}px`;
+    window.innerWidth+
+    "px";
 
   html.style.minWidth=
-    `${window.innerWidth}px`;
+    window.innerWidth+
+    "px";
 
   body.style.width=
-    `${window.innerWidth}px`;
+    window.innerWidth+
+    "px";
 
   body.style.minWidth=
-    `${window.innerWidth}px`;
+    window.innerWidth+
+    "px";
+
+  /*
+    Find artwork.
+  */
 
   const clone=
-    clonedDocument.getElementById(
+    doc.getElementById(
       "promoCanvas"
     );
 
@@ -4603,8 +6512,9 @@ function lockExportClone(
     return;
 
   /*
-    Static clone.
+    Freeze clone.
   */
+
   clone.classList.add(
     "export-static"
   );
@@ -4618,11 +6528,19 @@ function lockExportClone(
   clone.style.opacity=
     "1";
 
+  /*
+    IMPORTANT:
+    Preserve the exact visible preview
+    geometry.
+  */
+
   clone.style.width=
-    `${snapshot.width}px`;
+    snapshot.width+
+    "px";
 
   clone.style.height=
-    `${snapshot.height}px`;
+    snapshot.height+
+    "px";
 
   clone.style.maxWidth=
     "none";
@@ -4631,25 +6549,31 @@ function lockExportClone(
     "none";
 
   clone.style.aspectRatio=
-    `${snapshot.width}/${snapshot.height}`;
+    snapshot.width+
+    "/" +
+    snapshot.height;
 
   /*
-    Kill all motion.
+    Freeze every descendant.
   */
+
   clone
     .querySelectorAll("*")
-    .forEach(node=>{
+    .forEach(
+      node=>{
 
-      node.style.animation=
-        "none";
+        node.style.animation=
+          "none";
 
-      node.style.transition=
-        "none";
-    });
+        node.style.transition=
+          "none";
+      }
+    );
 
   /*
-    Hide editor overlays.
+    Hide editor-only overlays.
   */
+
   const safeZone=
     clone.querySelector(
       ".safe-zone"
@@ -4667,88 +6591,42 @@ function lockExportClone(
   if(ratioMark)
     ratioMark.style.display=
       "none";
-}
 
-/* ------------------------------------------------------------
-   CANVAS NORMALIZATION
------------------------------------------------------------- */
+  /*
+    Re-apply badge centering.
+  */
 
-function resizeCanvasExact(
-  sourceCanvas,
-  targetWidth,
-  targetHeight
-){
+  clone
+    .querySelectorAll(
+      ".badge"
+    )
+    .forEach(
+      badge=>{
 
-  if(
-    sourceCanvas.width===
-      targetWidth&&
-    sourceCanvas.height===
-      targetHeight
-  ){
-    return sourceCanvas;
-  }
+        badge.style.display=
+          "inline-flex";
 
-  const finalCanvas=
-    document.createElement(
-      "canvas"
-    );
+        badge.style.alignItems=
+          "center";
 
-  finalCanvas.width=
-    targetWidth;
+        badge.style.justifyContent=
+          "center";
 
-  finalCanvas.height=
-    targetHeight;
+        badge.style.textAlign=
+          "center";
 
-  const ctx=
-    finalCanvas.getContext(
-      "2d",
-      {
-        alpha:false,
-        desynchronized:false
+        badge.style.lineHeight=
+          "1";
+
+        badge.style.transform=
+          "none";
       }
     );
-
-  if(!ctx){
-
-    throw new Error(
-      "CANVAS_CONTEXT_FAILED"
-    );
-  }
-
-  ctx.imageSmoothingEnabled=
-    true;
-
-  ctx.imageSmoothingQuality=
-    "high";
-
-  ctx.fillStyle=
-    "#050705";
-
-  ctx.fillRect(
-    0,
-    0,
-    targetWidth,
-    targetHeight
-  );
-
-  ctx.drawImage(
-    sourceCanvas,
-    0,
-    0,
-    sourceCanvas.width,
-    sourceCanvas.height,
-    0,
-    0,
-    targetWidth,
-    targetHeight
-  );
-
-  return finalCanvas;
 }
 
-/* ------------------------------------------------------------
-   FINAL PNG RENDER
------------------------------------------------------------- */
+/* ============================================================
+   EXACT PNG RENDER
+============================================================ */
 
 async function renderPNG(){
 
@@ -4763,7 +6641,8 @@ async function renderPNG(){
   }
 
   if(
-    typeof html2canvas!=="function"
+    typeof html2canvas!==
+    "function"
   ){
 
     throw new Error(
@@ -4771,23 +6650,12 @@ async function renderPNG(){
     );
   }
 
-  const snapshot=
-    previewSnapshot();
+  /*
+    Freeze current visual state
+    before reading geometry.
+  */
 
-  const target=
-    exportDimensions();
-
-  const activeProduct=
-    promoProducts[
-      snapshot.index
-    ];
-
-  if(!activeProduct){
-
-    throw new Error(
-      "ACTIVE_PRODUCT_NOT_FOUND"
-    );
-  }
+  fitBadges();
 
   await waitForImages(
     source
@@ -4795,10 +6663,6 @@ async function renderPNG(){
 
   await waitForFonts();
 
-  /*
-    Wait for the browser to commit
-    current preview layout.
-  */
   await new Promise(
     resolve=>
       requestAnimationFrame(
@@ -4810,10 +6674,40 @@ async function renderPNG(){
     EXPORT_CONFIG.settleDelay
   );
 
+  fitBadges();
+
   /*
-    Scale from visible preview
-    to requested output width.
+    Read the actual preview.
   */
+
+  const snapshot=
+    previewSnapshot();
+
+  const target=
+    exportDimensions();
+
+  /*
+    The export must correspond to
+    exactly the current product.
+  */
+
+  const product=
+    promoProducts[
+      snapshot.index
+    ];
+
+  if(!product){
+
+    throw new Error(
+      "ACTIVE_PRODUCT_NOT_FOUND"
+    );
+  }
+
+  /*
+    Render scale derives ONLY from
+    the visible preview dimensions.
+  */
+
   let scale=
     target.width/
     snapshot.width;
@@ -4839,17 +6733,21 @@ async function renderPNG(){
       );
   }
 
+  /*
+    Capture.
+    NO sanitizeClone.
+    NO color rewriting.
+    NO alternate layout.
+  */
+
   const captured=
     await html2canvas(
       source,
       {
+
         backgroundColor:
           "#050705",
 
-        /*
-          CRITICAL:
-          keep same browser viewport.
-        */
         windowWidth:
           window.innerWidth,
 
@@ -4909,25 +6807,83 @@ async function renderPNG(){
     );
   }
 
+  /*
+    Normalize to exact requested dimensions.
+  */
+
   const finalCanvas=
-    resizeCanvasExact(
-      captured,
-      target.width,
-      target.height
+    document.createElement(
+      "canvas"
     );
 
-  const expected=
+  finalCanvas.width=
+    target.width;
+
+  finalCanvas.height=
+    target.height;
+
+  const ctx=
+    finalCanvas.getContext(
+      "2d",
+      {
+        alpha:false,
+        desynchronized:false
+      }
+    );
+
+  if(!ctx){
+
+    throw new Error(
+      "CANVAS_CONTEXT_FAILED"
+    );
+  }
+
+  ctx.imageSmoothingEnabled=
+    true;
+
+  ctx.imageSmoothingQuality=
+    "high";
+
+  ctx.fillStyle=
+    "#050705";
+
+  ctx.fillRect(
+    0,
+    0,
+    target.width,
+    target.height
+  );
+
+  ctx.drawImage(
+    captured,
+    0,
+    0,
+    captured.width,
+    captured.height,
+    0,
+    0,
+    target.width,
+    target.height
+  );
+
+  /*
+    Final ratio validation.
+  */
+
+  const expectedRatio=
     target.width/
     target.height;
 
-  const actual=
+  const actualRatio=
     finalCanvas.width/
     finalCanvas.height;
 
   if(
     Math.abs(
-      expected-actual
-    )>0.0001
+      expectedRatio-
+      actualRatio
+    )>
+    .0001
   ){
 
     throw new Error(
@@ -4936,19 +6892,29 @@ async function renderPNG(){
   }
 
   return{
-    canvas:finalCanvas,
-    width:target.width,
-    height:target.height,
-    ratio:target.ratio,
-    product:activeProduct
+    canvas:
+      finalCanvas,
+
+    width:
+      target.width,
+
+    height:
+      target.height,
+
+    ratio:
+      target.ratio,
+
+    product
   };
 }
 
-/* ------------------------------------------------------------
-   BLOB
------------------------------------------------------------- */
+/* ============================================================
+   CANVAS -> BLOB
+============================================================ */
 
-function canvasBlob(canvas){
+function canvasBlob(
+  canvas
+){
 
   return new Promise(
     (resolve,reject)=>{
@@ -4966,16 +6932,18 @@ function canvasBlob(canvas){
               )
             );
         },
+
         "image/png",
+
         1
       );
     }
   );
 }
 
-/* ------------------------------------------------------------
-   DOWNLOAD
------------------------------------------------------------- */
+/* ============================================================
+   DOWNLOAD BLOB
+============================================================ */
 
 function downloadBlob(
   blob,
@@ -4994,25 +6962,29 @@ function downloadBlob(
       blob
     );
 
-  const link=
+  const a=
     document.createElement(
       "a"
     );
 
-  link.href=url;
-  link.download=filename;
-  link.rel="noopener";
+  a.href=url;
 
-  link.style.display=
+  a.download=
+    filename;
+
+  a.rel=
+    "noopener";
+
+  a.style.display=
     "none";
 
   document.body.appendChild(
-    link
+    a
   );
 
-  link.click();
+  a.click();
 
-  link.remove();
+  a.remove();
 
   setTimeout(
     ()=>{
@@ -5024,27 +6996,32 @@ function downloadBlob(
   );
 }
 
-/* ------------------------------------------------------------
-   EXPORT FILENAME
------------------------------------------------------------- */
+/* ============================================================
+   FILENAME
+============================================================ */
 
 function exportFilename(
   product,
   prefix="PROMO"
 ){
 
-  const archetype=
-    chooseTemplate(product);
+  const template=
+    chooseTemplate(
+      product
+    );
 
   const ratio=
-    exportRatio().name;
+    exportRatio()
+      .name;
 
   return(
     `${slug(prefix)}-`+
-    `${slug(displayTitle(product))}-`+
+    `${slug(
+      displayTitle(product)
+    )}-`+
     `${slug(
       ARCHETYPES[
-        archetype
+        template
       ]?.name||
       "Creative"
     )}-`+
@@ -5053,16 +7030,21 @@ function exportFilename(
   );
 }
 
-/* ------------------------------------------------------------
-   CURRENT DOWNLOAD
------------------------------------------------------------- */
+/* ============================================================
+   DOWNLOAD CURRENT
+============================================================ */
 
 async function downloadCurrent(){
 
-  if(downloadBusy)
+  if(
+    downloadBusy
+  ){
     return;
+  }
 
-  if(!promoProducts.length){
+  if(
+    !promoProducts.length
+  ){
 
     setDownloadStatus(
       "Tidak ada produk untuk di-download.",
@@ -5070,71 +7052,85 @@ async function downloadCurrent(){
       0
     );
 
-    toast(
-      "Belum ada produk."
-    );
-
     return;
   }
 
   downloadBusy=true;
+  exportFreeze=true;
 
-  const previousPlaying=
+  const oldPlaying=
     playing;
 
   stopAutoplay();
 
+  /*
+    Freeze the exact current slide.
+  */
+
+  const lockedIndex=
+    currentIndex;
+
   try{
 
-    const product=
-      promoProducts[
-        currentIndex
-      ];
-
-    if(!product){
-
-      throw new Error(
-        "ACTIVE_PRODUCT_NOT_FOUND"
-      );
-    }
-
     setDownloadStatus(
-      "Preparing current preview...",
+      "LOCKING CURRENT PREVIEW...",
       "running",
       8
-    );
-
-    await new Promise(
-      resolve=>
-        requestAnimationFrame(
-          ()=>resolve()
-        )
-    );
-
-    setDownloadStatus(
-      "Locking preview...",
-      "running",
-      22
     );
 
     await wait(
       EXPORT_CONFIG.settleDelay
     );
 
+    if(
+      currentIndex!==
+      lockedIndex
+    ){
+
+      throw new Error(
+        "SLIDE_CHANGED_DURING_EXPORT"
+      );
+    }
+
     setDownloadStatus(
-      "Rendering exact preview...",
+      "CHECKING IMAGES & FONTS...",
       "running",
-      45
+      22
+    );
+
+    await waitForImages(
+      $("promoCanvas")
+    );
+
+    await waitForFonts();
+
+    setDownloadStatus(
+      "CAPTURING EXACT PREVIEW...",
+      "running",
+      42
     );
 
     const result=
       await renderPNG();
 
+    /*
+      Verify slide identity again.
+    */
+
+    if(
+      currentIndex!==
+      lockedIndex
+    ){
+
+      throw new Error(
+        "SLIDE_IDENTITY_MISMATCH"
+      );
+    }
+
     setDownloadStatus(
-      `Encoding PNG • `+
-      `${result.width}×${result.height}`,
+      `ENCODING ${result.width}×${result.height}...`,
       "running",
-      70
+      72
     );
 
     const blob=
@@ -5143,27 +7139,26 @@ async function downloadCurrent(){
       );
 
     setDownloadStatus(
-      "Starting download...",
+      "STARTING DOWNLOAD...",
       "running",
-      88
+      90
     );
 
     downloadBlob(
       blob,
       exportFilename(
-        product
+        result.product
       )
     );
 
     setDownloadStatus(
-      `Download selesai • `+
-      `${result.width}×${result.height}`,
+      `DOWNLOAD READY • ${result.width}×${result.height}`,
       "success",
       100
     );
 
     toast(
-      "PNG berhasil — preview locked ✓"
+      "PNG final berhasil dibuat ✓"
     );
 
   }catch(error){
@@ -5174,10 +7169,11 @@ async function downloadCurrent(){
     );
 
     setDownloadStatus(
-      `Export gagal: ${
+      "EXPORT GAGAL: "+
+      (
         error?.message||
         "Unknown error"
-      }`,
+      ),
       "error",
       0
     );
@@ -5188,35 +7184,46 @@ async function downloadCurrent(){
 
   }finally{
 
+    /*
+      Keep the same slide visible.
+      Autoplay resumes only after export.
+    */
+
+    currentIndex=
+      lockedIndex;
+
     downloadBusy=false;
+    exportFreeze=false;
 
     playing=
-      previousPlaying;
+      oldPlaying;
 
-    if(playing)
+    renderPreview();
+
+    if(
+      playing
+    )
       startAutoplay();
   }
 }
 
-/* ------------------------------------------------------------
+/* ============================================================
    BATCH EXPORT
------------------------------------------------------------- */
+============================================================ */
 
 async function batchExport(){
 
   if(downloadBusy)
     return;
 
-  if(!promoProducts.length){
+  if(
+    !promoProducts.length
+  ){
 
     setDownloadStatus(
       "Tidak ada produk campaign.",
       "warn",
       0
-    );
-
-    toast(
-      "Tidak ada produk campaign."
     );
 
     return;
@@ -5229,9 +7236,10 @@ async function batchExport(){
     playing;
 
   downloadBusy=true;
+  exportFreeze=true;
+  playing=false;
 
   stopAutoplay();
-  playing=false;
 
   const total=
     promoProducts.length;
@@ -5263,26 +7271,30 @@ async function batchExport(){
         promoProducts[i];
 
       setDownloadStatus(
-        `Preparing ${i+1}/${total} • `+
+        `PREPARING ${i+1}/${total} • `+
         `${displayTitle(product)}`,
         "running",
-        (i/total)*100+5
-      );
-
-      setDownloadStatus(
-        `Rendering ${i+1}/${total}...`,
-        "running",
-        (i/total)*100+30
+        (
+          i/
+          total
+        )*
+        100+
+        5
       );
 
       const result=
         await renderPNG();
 
       setDownloadStatus(
-        `Encoding ${i+1}/${total} • `+
+        `ENCODING ${i+1}/${total} • `+
         `${result.width}×${result.height}`,
         "running",
-        (i/total)*100+60
+        (
+          i/
+          total
+        )*
+        100+
+        55
       );
 
       const blob=
@@ -5301,16 +7313,24 @@ async function batchExport(){
       );
 
       setDownloadStatus(
-        `Batch ${i+1}/${total} selesai`,
+        `BATCH ${i+1}/${total} COMPLETE`,
         "running",
-        ((i+1)/total)*100
+        (
+          (
+            i+1
+          )/
+          total
+        )*
+        100
       );
 
-      await wait(350);
+      await wait(
+        300
+      );
     }
 
     setDownloadStatus(
-      `Batch export selesai • ${total} PNG`,
+      `BATCH COMPLETE • ${total} PNG`,
       "success",
       100
     );
@@ -5322,15 +7342,16 @@ async function batchExport(){
   }catch(error){
 
     console.error(
-      "FINAL_BATCH_EXPORT_ERROR",
+      "BATCH_EXPORT_ERROR",
       error
     );
 
     setDownloadStatus(
-      `Batch gagal: ${
+      "BATCH GAGAL: "+
+      (
         error?.message||
         "Unknown error"
-      }`,
+      ),
       "error",
       0
     );
@@ -5347,11 +7368,14 @@ async function batchExport(){
     playing=
       oldPlaying;
 
+    downloadBusy=false;
+    exportFreeze=false;
+
     renderPreview();
 
-    downloadBusy=false;
-
-    if(playing)
+    if(
+      playing
+    )
       startAutoplay();
   }
 }
@@ -5395,48 +7419,58 @@ function syncControls(){
     .querySelectorAll(
       "[data-ratio]"
     )
-    .forEach(b=>{
+    .forEach(
+      b=>{
+        b.classList.toggle(
+          "active",
+          b.dataset.ratio===
+            currentRatio
+        );
+      }
+    );
 
-      b.classList.toggle(
-        "active",
-        b.dataset.ratio===
-          currentRatio
-      );
-    });
+  $("campaignName")
+    .value=
+      campaignName;
 
-  $("campaignName").value=
-    campaignName;
+  $("scaleCtrl")
+    .value=
+      composition.scale;
 
-  $("scaleCtrl").value=
-    composition.scale;
+  $("xCtrl")
+    .value=
+      composition.x;
 
-  $("xCtrl").value=
-    composition.x;
+  $("yCtrl")
+    .value=
+      composition.y;
 
-  $("yCtrl").value=
-    composition.y;
+  $("scaleOut")
+    .textContent=
+      composition.scale+
+      "%";
 
-  $("scaleOut").textContent=
-    composition.scale+"%";
+  $("xOut")
+    .textContent=
+      composition.x;
 
-  $("xOut").textContent=
-    composition.x;
-
-  $("yOut").textContent=
-    composition.y;
+  $("yOut")
+    .textContent=
+      composition.y;
 
   document
     .querySelectorAll(
       "[data-goal]"
     )
-    .forEach(b=>{
-
-      b.classList.toggle(
-        "active",
-        b.dataset.goal===
-          currentGoal
-      );
-    });
+    .forEach(
+      b=>{
+        b.classList.toggle(
+          "active",
+          b.dataset.goal===
+            currentGoal
+        );
+      }
+    );
 
   renderTemplateTabs();
 }
@@ -5447,6 +7481,7 @@ function renderTemplateTabs(){
     $("templateTabs");
 
   tabs.innerHTML=
+
     `
       <button
         class="tab ${
@@ -5459,56 +7494,67 @@ function renderTemplateTabs(){
         AUTO
       </button>
     `+
-    Object.entries(
-      ARCHETYPES
-    )
-      .map(([k,v])=>`
-        <button
-          class="tab ${
-            currentTemplate===k
-              ?"active"
-              :""
-          }"
-          data-template="${k}"
-        >
-          ${v.name}
-        </button>
-      `)
+
+    Object
+      .entries(
+        ARCHETYPES
+      )
+      .map(
+        ([k,v])=>`
+
+          <button
+            class="tab ${
+              currentTemplate===k
+                ?"active"
+                :""
+            }"
+            data-template="${k}"
+          >
+            ${v.name}
+          </button>
+        `
+      )
       .join("");
 
   tabs
-    .querySelectorAll(".tab")
-    .forEach(tab=>{
+    .querySelectorAll(
+      ".tab"
+    )
+    .forEach(
+      tab=>{
 
-      tab.onclick=()=>{
+        tab.onclick=
+          ()=>{
 
-        currentTemplate=
-          tab.dataset.template;
+            currentTemplate=
+              tab.dataset.template;
 
-        localStorage.setItem(
-          STORAGE.template,
-          currentTemplate
-        );
+            localStorage.setItem(
+              STORAGE.template,
+              currentTemplate
+            );
 
-        renderPreview();
-        syncControls();
+            renderPreview();
 
-        toast(
-          `${tab.textContent.trim()} aktif`
-        );
-      };
-    });
+            syncControls();
+
+            toast(
+              `${tab.textContent.trim()} aktif`
+            );
+          };
+      }
+    );
 }
 
 function updateCounts(){
 
   $("selectedCount")
     .textContent=
-    selectedIds.length;
+      selectedIds.length;
 
   $("totalCount")
     .textContent=
-    products.length;
+      products.length;
 }
 
 /* ============================================================
@@ -5519,294 +7565,370 @@ document
   .querySelectorAll(
     "[data-ratio]"
   )
-  .forEach(btn=>{
+  .forEach(
+    btn=>{
 
-    btn.onclick=()=>{
+      btn.onclick=
+        ()=>{
 
-      currentRatio=
-        btn.dataset.ratio;
+          currentRatio=
+            btn.dataset.ratio;
 
-      localStorage.setItem(
-        STORAGE.ratio,
-        currentRatio
-      );
+          localStorage.setItem(
+            STORAGE.ratio,
+            currentRatio
+          );
 
-      renderPreview();
-      syncControls();
-    };
-  });
+          renderPreview();
+
+          syncControls();
+        };
+    }
+  );
 
 document
   .querySelectorAll(
     "[data-goal]"
   )
-  .forEach(btn=>{
+  .forEach(
+    btn=>{
 
-    btn.onclick=()=>{
+      btn.onclick=
+        ()=>{
 
-      currentGoal=
-        btn.dataset.goal;
+          currentGoal=
+            btn.dataset.goal;
 
-      localStorage.setItem(
-        STORAGE.goal,
-        currentGoal
+          localStorage.setItem(
+            STORAGE.goal,
+            currentGoal
+          );
+
+          currentTemplate=
+            "auto";
+
+          renderPreview();
+
+          syncControls();
+
+          toast(
+            "Creative objective diperbarui ✓"
+          );
+        };
+    }
+  );
+
+$("autoBtn")
+  .onclick=
+    autoCreate;
+
+$("motionBtn")
+  .onclick=
+    toggleMotion;
+
+$("safeBtn")
+  .onclick=
+    toggleSafe;
+
+$("safeToggle2")
+  .onclick=
+    toggleSafe;
+
+$("deviceBtn")
+  .onclick=
+    devicePreview;
+
+$("prevBtn")
+  .onclick=
+    previousSlide;
+
+$("nextBtn")
+  .onclick=
+    nextSlide;
+
+$("playBtn")
+  .onclick=
+    ()=>{
+
+      if(
+        exportFreeze||
+        downloadBusy
+      )
+        return;
+
+      playing=
+        !playing;
+
+      $("playBtn")
+        .textContent=
+          playing
+            ?"Ⅱ PLAY"
+            :"▶ PLAY";
+
+      if(
+        playing
+      )
+        startAutoplay();
+
+      else
+        stopAutoplay();
+    };
+
+$("downloadBtn")
+  .onclick=
+    downloadCurrent;
+
+$("batchBtn")
+  .onclick=
+    batchExport;
+
+$("jsonBtn")
+  .onclick=
+    exportJSON;
+
+$("selectAll")
+  .onclick=
+    ()=>{
+
+      selectedIds=
+        products.map(
+          p=>
+            String(p.id)
+        );
+
+      save(
+        STORAGE.selection,
+        selectedIds
       );
 
-      currentTemplate="auto";
+      renderManager();
+    };
+
+$("clearAll")
+  .onclick=
+    ()=>{
+
+      selectedIds=[];
+      promoProducts=[];
+
+      save(
+        STORAGE.selection,
+        selectedIds
+      );
+
+      renderManager();
 
       renderPreview();
-      syncControls();
 
-      toast(
-        "Creative objective diperbarui ✓"
+      clearDownloadStatus();
+    };
+
+$("applyBtn")
+  .onclick=
+    ()=>applyPromo(true);
+
+$("search")
+  .oninput=
+    e=>{
+
+      searchQuery=
+        e.target.value
+          .trim()
+          .toLowerCase()
+          .normalize("NFD")
+          .replace(
+            /[\u0300-\u036f]/g,
+            ""
+          );
+
+      renderManager();
+    };
+
+$("campaignName")
+  .oninput=
+    e=>{
+
+      campaignName=
+        e.target.value;
+
+      localStorage.setItem(
+        STORAGE.campaign,
+        campaignName
       );
     };
-  });
 
-$("autoBtn").onclick=
-  autoCreate;
+$("ctaSelect")
+  .onchange=
+    renderPreview;
 
-$("motionBtn").onclick=
-  toggleMotion;
+$("qualitySelect")
+  .onchange=
+    ()=>{
 
-$("safeBtn").onclick=
-  toggleSafe;
+      clearDownloadStatus();
 
-$("safeToggle2").onclick=
-  toggleSafe;
-
-$("deviceBtn").onclick=
-  devicePreview;
-
-$("prevBtn").onclick=
-  previousSlide;
-
-$("nextBtn").onclick=
-  nextSlide;
-
-$("playBtn").onclick=()=>{
-
-  playing=!playing;
-
-  $("playBtn")
-    .textContent=
-    playing
-      ?"Ⅱ PLAY"
-      :"▶ PLAY";
-
-  if(playing)
-    startAutoplay();
-  else
-    stopAutoplay();
-};
-
-$("downloadBtn").onclick=
-  downloadCurrent;
-
-$("batchBtn").onclick=
-  batchExport;
-
-$("jsonBtn").onclick=
-  exportJSON;
-
-$("selectAll").onclick=()=>{
-
-  selectedIds=
-    products.map(
-      p=>String(p.id)
-    );
-
-  save(
-    STORAGE.selection,
-    selectedIds
-  );
-
-  renderManager();
-};
-
-$("clearAll").onclick=()=>{
-
-  selectedIds=[];
-  promoProducts=[];
-
-  save(
-    STORAGE.selection,
-    selectedIds
-  );
-
-  renderManager();
-  renderPreview();
-  clearDownloadStatus();
-};
-
-$("applyBtn").onclick=
-  ()=>applyPromo(true);
-
-$("search").oninput=e=>{
-
-  searchQuery=
-    e.target.value
-      .trim()
-      .toLowerCase()
-      .normalize("NFD")
-      .replace(
-        /[\u0300-\u036f]/g,
-        ""
+      toast(
+        "Export quality diperbarui."
       );
+    };
 
-  renderManager();
-};
+$("scaleCtrl")
+  .oninput=
+    e=>{
 
-$("campaignName").oninput=e=>{
+      composition.scale=
+        Number(
+          e.target.value
+        );
 
-  campaignName=
-    e.target.value;
+      syncControls();
 
-  localStorage.setItem(
-    STORAGE.campaign,
-    campaignName
-  );
-};
+      applyComposition();
 
-$("ctaSelect").onchange=
-  renderPreview;
+      fitBadges();
 
-$("qualitySelect").onchange=()=>{
+      updateScore(
+        promoProducts[
+          currentIndex
+        ]
+      );
+    };
 
-  clearDownloadStatus();
+$("xCtrl")
+  .oninput=
+    e=>{
 
-  toast(
-    "Export quality diperbarui."
-  );
-};
+      composition.x=
+        Number(
+          e.target.value
+        );
 
-$("scaleCtrl").oninput=e=>{
+      syncControls();
 
-  composition.scale=
-    Number(
-      e.target.value
-    );
+      applyComposition();
 
-  syncControls();
+      updateScore(
+        promoProducts[
+          currentIndex
+        ]
+      );
+    };
 
-  applyComposition();
+$("yCtrl")
+  .oninput=
+    e=>{
 
-  updateScore(
-    promoProducts[
-      currentIndex
-    ]
-  );
-};
+      composition.y=
+        Number(
+          e.target.value
+        );
 
-$("xCtrl").oninput=e=>{
+      syncControls();
 
-  composition.x=
-    Number(
-      e.target.value
-    );
+      applyComposition();
 
-  syncControls();
+      updateScore(
+        promoProducts[
+          currentIndex
+        ]
+      );
+    };
 
-  applyComposition();
+$("resetComposition")
+  .onclick=
+    ()=>{
 
-  updateScore(
-    promoProducts[
-      currentIndex
-    ]
-  );
-};
+      composition={
+        scale:100,
+        x:0,
+        y:0
+      };
 
-$("yCtrl").oninput=e=>{
+      syncControls();
 
-  composition.y=
-    Number(
-      e.target.value
-    );
+      renderPreview();
 
-  syncControls();
+      toast(
+        "Composition kembali AUTO ✓"
+      );
+    };
 
-  applyComposition();
+$("saveProject")
+  .onclick=
+    saveProject;
 
-  updateScore(
-    promoProducts[
-      currentIndex
-    ]
-  );
-};
+$("loadProject")
+  .onclick=
+    loadProject;
 
-$("resetComposition").onclick=()=>{
-
-  composition={
-    scale:100,
-    x:0,
-    y:0
-  };
-
-  syncControls();
-  renderPreview();
-
-  toast(
-    "Composition kembali AUTO ✓"
-  );
-};
-
-$("saveProject").onclick=
-  saveProject;
-
-$("loadProject").onclick=
-  loadProject;
-
-$("snapshotBtn").onclick=
-  snapshot;
+$("snapshotBtn")
+  .onclick=
+    snapshot;
 
 document
   .querySelectorAll(
     "[data-variant]"
   )
-  .forEach(btn=>{
+  .forEach(
+    btn=>{
 
-    btn.onclick=()=>{
-      applyVariant(
-        btn.dataset.variant
-      );
-    };
-  });
-
-$("closeModal").onclick=()=>
-  $("modal")
-    .classList
-    .remove("open");
-
-$("modal").onclick=e=>{
-
-  if(e.target.id==="modal"){
-
-    $("modal")
-      .classList
-      .remove("open");
-  }
-};
-
-$("fullBtn").onclick=async()=>{
-
-  try{
-
-    if(
-      !document.fullscreenElement
-    ){
-
-      await document
-        .documentElement
-        .requestFullscreen();
-
-    }else{
-
-      await document
-        .exitFullscreen();
+      btn.onclick=
+        ()=>{
+          applyVariant(
+            btn.dataset.variant
+          );
+        };
     }
+  );
 
-  }catch{}
-};
+$("closeModal")
+  .onclick=
+    ()=>
+      $("modal")
+        .classList
+        .remove(
+          "open"
+        );
+
+$("modal")
+  .onclick=
+    e=>{
+
+      if(
+        e.target.id===
+        "modal"
+      ){
+
+        $("modal")
+          .classList
+          .remove(
+            "open"
+          );
+      }
+    };
+
+$("fullBtn")
+  .onclick=
+    async()=>{
+
+      try{
+
+        if(
+          !document.fullscreenElement
+        ){
+
+          await document
+            .documentElement
+            .requestFullscreen();
+
+        }else{
+
+          await document
+            .exitFullscreen();
+        }
+
+      }catch{}
+    };
 
 /* ============================================================
    KEYBOARD
@@ -5816,46 +7938,56 @@ document.addEventListener(
   "keydown",
   e=>{
 
-    const t=e.target;
+    const t=
+      e.target;
 
     if(
-      t?.tagName==="INPUT"||
-      t?.tagName==="TEXTAREA"||
+      t?.tagName===
+        "INPUT"||
+      t?.tagName===
+        "TEXTAREA"||
       t?.isContentEditable
     ){
       return;
     }
 
-    if(e.key==="ArrowRight")
+    if(
+      e.key===
+      "ArrowRight"
+    )
       nextSlide();
 
-    if(e.key==="ArrowLeft")
+    if(
+      e.key===
+      "ArrowLeft"
+    )
       previousSlide();
 
-    if(e.key===" "){
+    if(
+      e.key===
+      " "
+    ){
 
       e.preventDefault();
 
-      $("playBtn").click();
+      $("playBtn")
+        .click();
     }
 
     if(
       e.key.toLowerCase()==="d"
-    ){
+    )
       downloadCurrent();
-    }
 
     if(
       e.key.toLowerCase()==="m"
-    ){
+    )
       toggleMotion();
-    }
 
     if(
       e.key.toLowerCase()==="s"
-    ){
+    )
       toggleSafe();
-    }
   }
 );
 
@@ -5866,50 +7998,60 @@ document.addEventListener(
 let touchX=0;
 let touchY=0;
 
-$("stage").addEventListener(
-  "touchstart",
-  e=>{
+$("stage")
+  .addEventListener(
+    "touchstart",
+    e=>{
 
-    touchX=
-      e.changedTouches[0]
-        .screenX;
+      touchX=
+        e.changedTouches[0]
+          .screenX;
 
-    touchY=
-      e.changedTouches[0]
-        .screenY;
-
-  },
-  {passive:true}
-);
-
-$("stage").addEventListener(
-  "touchend",
-  e=>{
-
-    const dx=
-      e.changedTouches[0]
-        .screenX-
-      touchX;
-
-    const dy=
-      e.changedTouches[0]
-        .screenY-
-      touchY;
-
-    if(
-      Math.abs(dx)<45||
-      Math.abs(dx)<Math.abs(dy)
-    ){
-      return;
+      touchY=
+        e.changedTouches[0]
+          .screenY;
+    },
+    {
+      passive:true
     }
+  );
 
-    dx<0
-      ?nextSlide()
-      :previousSlide();
+$("stage")
+  .addEventListener(
+    "touchend",
+    e=>{
 
-  },
-  {passive:true}
-);
+      if(
+        exportFreeze||
+        downloadBusy
+      )
+        return;
+
+      const dx=
+        e.changedTouches[0]
+          .screenX-
+        touchX;
+
+      const dy=
+        e.changedTouches[0]
+          .screenY-
+        touchY;
+
+      if(
+        Math.abs(dx)<45||
+        Math.abs(dx)<
+        Math.abs(dy)
+      )
+        return;
+
+      dx<0
+        ?nextSlide()
+        :previousSlide();
+    },
+    {
+      passive:true
+    }
+  );
 
 /* ============================================================
    LOAD PRODUCTS
@@ -5939,7 +8081,9 @@ async function loadProducts(){
         }
       );
 
-    if(!response.ok){
+    if(
+      !response.ok
+    ){
 
       throw new Error(
         `produk.json HTTP ${response.status}`
@@ -5954,21 +8098,25 @@ async function loadProducts(){
 
         ?data
 
-        :Array.isArray(
-          data.products
-        )
+        :
+      Array.isArray(
+        data.products
+      )
 
-          ?data.products
+        ?data.products
 
-          :Array.isArray(
-            data.produk
-          )
+        :
+      Array.isArray(
+        data.produk
+      )
 
-            ?data.produk
+        ?data.produk
 
-            :[];
+        :[];
 
-    if(!source.length){
+    if(
+      !source.length
+    ){
 
       throw new Error(
         "produk.json kosong atau format tidak dikenali."
@@ -5983,7 +8131,8 @@ async function loadProducts(){
     const valid=
       new Set(
         products.map(
-          p=>String(p.id)
+          p=>
+            String(p.id)
         )
       );
 
@@ -6001,9 +8150,12 @@ async function loadProducts(){
 
       selectedIds=
         products
-          .filter(isPromo)
+          .filter(
+            isPromo
+          )
           .map(
-            p=>String(p.id)
+            p=>
+              String(p.id)
           );
     }
 
@@ -6021,7 +8173,9 @@ async function loadProducts(){
 
     $("stage")
       .innerHTML=`
+
         <div class="error">
+
           <div>
 
             <strong>
@@ -6030,7 +8184,9 @@ async function loadProducts(){
 
             <br><br>
 
-            ${esc(e.message)}
+            ${esc(
+              e.message
+            )}
 
             <br><br>
 
@@ -6041,6 +8197,7 @@ async function loadProducts(){
             tersedia.
 
           </div>
+
         </div>
       `;
   }
@@ -6054,11 +8211,17 @@ document.addEventListener(
   "visibilitychange",
   ()=>{
 
-    if(document.hidden){
+    if(
+      document.hidden
+    ){
 
       stopAutoplay();
 
-    }else if(playing){
+    }else if(
+      playing&&
+      !exportFreeze&&
+      !downloadBusy
+    ){
 
       startAutoplay();
     }
