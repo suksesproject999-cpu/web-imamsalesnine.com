@@ -1365,78 +1365,8 @@ main{
   }
 }
 
-/* ============================================================
-   EXPORT LOCK
-============================================================ */
-
-.export-static,
-.export-static *{
-  animation:none!important;
-  transition:none!important;
-  caret-color:transparent!important;
-}
-
-.export-static .safe-zone,
-.export-static .ratio-mark{
-  display:none!important;
-}
-
-.export-static .promo-canvas{
-  opacity:1!important;
-}
-
-/*
-  Export must use exactly the same
-  typography geometry as preview.
-*/
-.export-static .info-zone{
-  overflow:visible!important;
-}
-
-.export-static .product-info{
-  overflow:visible!important;
-}
-
-.export-static .product-name{
-  overflow:visible!important;
-  display:block!important;
-
-  white-space:normal!important;
-
-  max-height:none!important;
-
-  -webkit-line-clamp:unset!important;
-  -webkit-box-orient:initial!important;
-}
-
-/*
-  Badge export lock.
-*/
-.export-static .badges{
-  display:flex!important;
-
-  align-items:center!important;
-  justify-content:flex-start!important;
-
-  flex-wrap:wrap!important;
-}
-
-.export-static .badge{
-  display:inline-flex!important;
-
-  align-items:center!important;
-  justify-content:center!important;
-
-  text-align:center!important;
-
-  line-height:1!important;
-
-  overflow:hidden!important;
-
-  transform:none!important;
-}
-
-/* ============================================================
+  
+  /*============================================================
    TOOLBAR
 ============================================================ */
 
@@ -6477,128 +6407,437 @@ async function waitForFonts(){
   }
 }
 
+
+
+
+function capturePreviewGeometry(
+  root
+){
+
+  const rootRect=
+    root.getBoundingClientRect();
+
+  const nodes=[
+    root,
+    ...root.querySelectorAll("*")
+  ];
+
+  return nodes.map(
+    node=>{
+
+      const rect=
+        node.getBoundingClientRect();
+
+      const cs=
+        getComputedStyle(
+          node
+        );
+
+      return{
+
+        left:
+          rect.left-
+          rootRect.left,
+
+        top:
+          rect.top-
+          rootRect.top,
+
+        width:
+          rect.width,
+
+        height:
+          rect.height,
+
+        display:
+          cs.display,
+
+        boxSizing:
+          cs.boxSizing,
+
+        fontFamily:
+          cs.fontFamily,
+
+        fontSize:
+          cs.fontSize,
+
+        fontWeight:
+          cs.fontWeight,
+
+        fontStyle:
+          cs.fontStyle,
+
+        lineHeight:
+          cs.lineHeight,
+
+        letterSpacing:
+          cs.letterSpacing,
+
+        wordSpacing:
+          cs.wordSpacing,
+
+        whiteSpace:
+          cs.whiteSpace,
+
+        wordBreak:
+          cs.wordBreak,
+
+        overflowWrap:
+          cs.overflowWrap,
+
+        textAlign:
+          cs.textAlign,
+
+        textTransform:
+          cs.textTransform,
+
+        padding:
+          cs.padding,
+
+        margin:
+          cs.margin,
+
+        gap:
+          cs.gap,
+
+        rowGap:
+          cs.rowGap,
+
+        columnGap:
+          cs.columnGap,
+
+        flexDirection:
+          cs.flexDirection,
+
+        alignItems:
+          cs.alignItems,
+
+        justifyContent:
+          cs.justifyContent,
+
+        alignSelf:
+          cs.alignSelf,
+
+        flex:
+          cs.flex,
+
+        flexGrow:
+          cs.flexGrow,
+
+        flexShrink:
+          cs.flexShrink,
+
+        flexBasis:
+          cs.flexBasis,
+
+        position:
+          cs.position,
+
+        inset:
+          cs.inset,
+
+        border:
+          cs.border,
+
+        borderRadius:
+          cs.borderRadius,
+
+        background:
+          cs.background,
+
+        backgroundColor:
+          cs.backgroundColor,
+
+        backgroundImage:
+          cs.backgroundImage,
+
+        boxShadow:
+          cs.boxShadow,
+
+        opacity:
+          cs.opacity,
+
+        transform:
+          cs.transform,
+
+        transformOrigin:
+          cs.transformOrigin,
+
+        filter:
+          cs.filter,
+
+        color:
+          cs.color,
+
+        zIndex:
+          cs.zIndex,
+
+        minWidth:
+          cs.minWidth,
+
+        maxWidth:
+          cs.maxWidth,
+
+        minHeight:
+          cs.minHeight,
+
+        maxHeight:
+          cs.maxHeight
+      };
+    }
+  );
+    }
+
+
+      
 /* ============================================================
    CLONE LOCK
 ============================================================ */
 
 function lockExportClone(
   doc,
-  snapshot
+  snapshot,
+  geometry
 ){
 
-  const stage=
+  const clone=
     doc.getElementById(
-      "stage"
+      "promoCanvas"
     );
 
-  if(!stage)
+  if(!clone)
     return;
 
   /*
-    KEEP THE ACTIVE RATIO ON STAGE.
-    This is where r916/r45/r169
-    actually controls the layout.
+    ROOT = EXACT PREVIEW SIZE
   */
 
-  stage.classList.remove(
-    "r916",
-    "r45",
-    "r169"
+  clone.style.width=
+    snapshot.width+
+    "px";
+
+  clone.style.height=
+    snapshot.height+
+    "px";
+
+  clone.style.maxWidth=
+    "none";
+
+  clone.style.maxHeight=
+    "none";
+
+  clone.style.minWidth=
+    "0";
+
+  clone.style.minHeight=
+    "0";
+
+  clone.style.aspectRatio=
+    "auto";
+
+  clone.style.animation=
+    "none";
+
+  clone.style.transition=
+    "none";
+
+  clone.style.opacity=
+    "1";
+
+  /*
+    Freeze every visual element
+    to the geometry calculated by
+    the real browser preview.
+  */
+
+  const nodes=[
+    clone,
+    ...clone.querySelectorAll("*")
+  ];
+
+  nodes.forEach(
+    (node,index)=>{
+
+      const g=
+        geometry[index];
+
+      if(!g)
+        return;
+
+      node.style.animation=
+        "none";
+
+      node.style.transition=
+        "none";
+
+      /*
+        Typography
+      */
+
+      node.style.fontFamily=
+        g.fontFamily;
+
+      node.style.fontSize=
+        g.fontSize;
+
+      node.style.fontWeight=
+        g.fontWeight;
+
+      node.style.fontStyle=
+        g.fontStyle;
+
+      node.style.lineHeight=
+        g.lineHeight;
+
+      node.style.letterSpacing=
+        g.letterSpacing;
+
+      node.style.wordSpacing=
+        g.wordSpacing;
+
+      node.style.whiteSpace=
+        g.whiteSpace;
+
+      node.style.wordBreak=
+        g.wordBreak;
+
+      node.style.overflowWrap=
+        g.overflowWrap;
+
+      node.style.textAlign=
+        g.textAlign;
+
+      node.style.textTransform=
+        g.textTransform;
+
+      /*
+        Box geometry
+      */
+
+      node.style.boxSizing=
+        g.boxSizing;
+
+      node.style.width=
+        g.width+
+        "px";
+
+      node.style.height=
+        g.height+
+        "px";
+
+      node.style.minWidth=
+        g.minWidth;
+
+      node.style.maxWidth=
+        g.maxWidth;
+
+      node.style.minHeight=
+        g.minHeight;
+
+      node.style.maxHeight=
+        g.maxHeight;
+
+      /*
+        Spacing
+      */
+
+      node.style.padding=
+        g.padding;
+
+      node.style.margin=
+        g.margin;
+
+      node.style.gap=
+        g.gap;
+
+      node.style.rowGap=
+        g.rowGap;
+
+      node.style.columnGap=
+        g.columnGap;
+
+      /*
+        Flex geometry
+      */
+
+      node.style.flexDirection=
+        g.flexDirection;
+
+      node.style.alignItems=
+        g.alignItems;
+
+      node.style.justifyContent=
+        g.justifyContent;
+
+      node.style.alignSelf=
+        g.alignSelf;
+
+      node.style.flex=
+        g.flex;
+
+      node.style.flexGrow=
+        g.flexGrow;
+
+      node.style.flexShrink=
+        g.flexShrink;
+
+      node.style.flexBasis=
+        g.flexBasis;
+
+      /*
+        Visual geometry
+      */
+
+      node.style.border=
+        g.border;
+
+      node.style.borderRadius=
+        g.borderRadius;
+
+      node.style.background=
+        g.background;
+
+      node.style.backgroundColor=
+        g.backgroundColor;
+
+      node.style.backgroundImage=
+        g.backgroundImage;
+
+      node.style.boxShadow=
+        g.boxShadow;
+
+      node.style.opacity=
+        g.opacity;
+
+      node.style.transform=
+        g.transform;
+
+      node.style.transformOrigin=
+        g.transformOrigin;
+
+      node.style.filter=
+        g.filter;
+
+      node.style.color=
+        g.color;
+
+      node.style.zIndex=
+        g.zIndex;
+
+      /*
+        Do NOT change position/inset.
+        The original preview layout
+        must remain responsible for
+        positioning.
+      */
+    }
   );
 
-  stage.classList.add(
-    "r"+currentRatio
-  );
-
   /*
-    Freeze the exact preview dimensions.
+    Hide editor-only elements only.
   */
 
-  stage.style.width=
-    snapshot.width+"px";
-
-  stage.style.height=
-    snapshot.height+"px";
-
-  stage.style.minWidth=
-    snapshot.width+"px";
-
-  stage.style.minHeight=
-    snapshot.height+"px";
-
-  stage.style.maxWidth=
-    snapshot.width+"px";
-
-  stage.style.maxHeight=
-    snapshot.height+"px";
-
-  stage.style.display=
-    "flex";
-
-  stage.style.justifyContent=
-    "center";
-
-  stage.style.alignItems=
-    "flex-start";
-
-  /*
-    Freeze animations only.
-  */
-
-  stage
-    .querySelectorAll("*")
-    .forEach(
-      node=>{
-
-        node.style.animation=
-          "none";
-
-        node.style.transition=
-          "none";
-      }
-    );
-
-  /*
-    Keep promo canvas as a normal child.
-    DO NOT force its width/height to
-    export dimensions.
-  */
-
-  const canvas=
-    stage.querySelector(
-      ".promo-canvas"
-    );
-
-  if(canvas){
-
-    canvas.classList.add(
-      "export-static"
-    );
-
-    canvas.style.width=
-      "100%";
-
-    canvas.style.height=
-      "100%";
-
-    canvas.style.maxWidth=
-      "none";
-
-    canvas.style.maxHeight=
-      "none";
-
-    canvas.style.aspectRatio=
-      "auto";
-
-    canvas.style.opacity=
-      "1";
-  }
-
-  /*
-    Hide editor overlays.
-  */
-
-  stage
+  clone
     .querySelectorAll(
       ".safe-zone,.ratio-mark"
     )
@@ -6608,40 +6847,7 @@ function lockExportClone(
           "none";
       }
     );
-
-  /*
-    Badge alignment only.
-    No forced width, height,
-    font-size or position.
-  */
-
-  stage
-    .querySelectorAll(
-      ".badge"
-    )
-    .forEach(
-      badge=>{
-
-        badge.style.display=
-          "inline-flex";
-
-        badge.style.alignItems=
-          "center";
-
-        badge.style.justifyContent=
-          "center";
-
-        badge.style.textAlign=
-          "center";
-
-        badge.style.lineHeight=
-          "1";
-
-        badge.style.transform=
-          "none";
-      }
-    );
-}
+    }
 
 /* ============================================================
    EXACT PNG RENDER
@@ -6650,7 +6856,7 @@ function lockExportClone(
 async function renderPNG(){
 
   const source=
-    $("stage");
+    $("promoCanvas");
 
   if(!source){
 
@@ -6670,10 +6876,10 @@ async function renderPNG(){
   }
 
   /*
-    Freeze current preview.
+    ==========================================================
+    WAIT UNTIL THE CURRENT PREVIEW IS COMPLETELY READY
+    ==========================================================
   */
-
-  fitBadges();
 
   await waitForImages(
     source
@@ -6688,57 +6894,59 @@ async function renderPNG(){
       )
   );
 
+  await new Promise(
+    resolve=>
+      requestAnimationFrame(
+        ()=>resolve()
+      )
+  );
+
   await wait(
     EXPORT_CONFIG.settleDelay
   );
 
-  fitBadges();
-
   /*
-    Snapshot THE STAGE, not promoCanvas.
-    Stage owns the active ratio layout.
+    ==========================================================
+    DO NOT RECALCULATE THE DESIGN.
+    
+    Read the preview exactly as it currently appears.
+    ==========================================================
   */
 
-  const rect=
-    source.getBoundingClientRect();
+  const snapshot=
+    previewSnapshot();
 
-  if(
-    rect.width<=0||
-    rect.height<=0
-  ){
+  /*
+    Capture every computed visual geometry
+    from the REAL preview before html2canvas
+    creates its clone.
+  */
 
-    throw new Error(
-      "PREVIEW_HAS_NO_SIZE"
+  const geometry=
+    capturePreviewGeometry(
+      source
     );
-  }
 
-  const snapshot={
-    width:
-      rect.width,
-
-    height:
-      rect.height,
-
-    ratio:
-      rect.width/
-      rect.height,
-
-    index:
-      currentIndex,
-
-    productId:
-      promoProducts[
-        currentIndex
-      ]?.id||
-      null
-  };
+  /*
+    ==========================================================
+    EXPORT SIZE
+    Only determines final pixel resolution.
+    It does NOT determine layout.
+    ==========================================================
+  */
 
   const target=
     exportDimensions();
 
+  /*
+    ==========================================================
+    VERIFY CURRENT PRODUCT
+    ==========================================================
+  */
+
   const product=
     promoProducts[
-      currentIndex
+      snapshot.index
     ];
 
   if(!product){
@@ -6749,7 +6957,10 @@ async function renderPNG(){
   }
 
   /*
-    Scale from preview to final PNG.
+    ==========================================================
+    SCALE ONLY
+    Preview geometry remains the master.
+    ==========================================================
   */
 
   let scale=
@@ -6778,7 +6989,9 @@ async function renderPNG(){
   }
 
   /*
-    Capture the complete stage.
+    ==========================================================
+    EXACT PREVIEW CAPTURE
+    ==========================================================
   */
 
   const captured=
@@ -6789,11 +7002,20 @@ async function renderPNG(){
         backgroundColor:
           "#050705",
 
+        /*
+          Keep the same browser environment
+          used by the visible preview.
+        */
+
         windowWidth:
           window.innerWidth,
 
         windowHeight:
           window.innerHeight,
+
+        /*
+          Capture the exact preview box.
+        */
 
         width:
           Math.round(
@@ -6806,7 +7028,13 @@ async function renderPNG(){
           ),
 
         x:0,
+
         y:0,
+
+        /*
+          Resolution scaling ONLY.
+          No layout scaling.
+        */
 
         scale,
 
@@ -6825,18 +7053,34 @@ async function renderPNG(){
         removeContainer:true,
 
         scrollX:0,
+
         scrollY:0,
+
+        /*
+          ====================================================
+          CRITICAL:
+          Freeze clone using the geometry already
+          calculated by the real browser preview.
+          ====================================================
+        */
 
         onclone:
           clonedDocument=>{
 
             lockExportClone(
               clonedDocument,
-              snapshot
+              snapshot,
+              geometry
             );
           }
       }
     );
+
+  /*
+    ==========================================================
+    VALIDATE CAPTURE
+    ==========================================================
+  */
 
   if(
     !captured||
@@ -6850,7 +7094,9 @@ async function renderPNG(){
   }
 
   /*
-    Final PNG canvas.
+    ==========================================================
+    FINAL PNG CANVAS
+    ==========================================================
   */
 
   const finalCanvas=
@@ -6868,7 +7114,8 @@ async function renderPNG(){
     finalCanvas.getContext(
       "2d",
       {
-        alpha:false
+        alpha:false,
+        desynchronized:false
       }
     );
 
@@ -6879,11 +7126,21 @@ async function renderPNG(){
     );
   }
 
+  /*
+    Highest available interpolation
+    when converting preview pixels
+    to final PNG resolution.
+  */
+
   ctx.imageSmoothingEnabled=
     true;
 
   ctx.imageSmoothingQuality=
     "high";
+
+  /*
+    Background matches preview.
+  */
 
   ctx.fillStyle=
     "#050705";
@@ -6895,17 +7152,65 @@ async function renderPNG(){
     target.height
   );
 
+  /*
+    ==========================================================
+    IMPORTANT:
+    The captured preview is simply scaled
+    into the requested PNG resolution.
+
+    No element is repositioned.
+    No text is recalculated.
+    No badge is rebuilt.
+    No price is redrawn.
+    ==========================================================
+  */
+
   ctx.drawImage(
     captured,
+
     0,
     0,
     captured.width,
     captured.height,
+
     0,
     0,
     target.width,
     target.height
   );
+
+  /*
+    ==========================================================
+    FINAL RATIO VALIDATION
+    ==========================================================
+  */
+
+  const expectedRatio=
+    target.width/
+    target.height;
+
+  const actualRatio=
+    finalCanvas.width/
+    finalCanvas.height;
+
+  if(
+    Math.abs(
+      expectedRatio-
+      actualRatio
+    )>
+    0.0001
+  ){
+
+    throw new Error(
+      "FINAL_RATIO_INVALID"
+    );
+  }
+
+  /*
+    ==========================================================
+    RETURN FINAL RESULT
+    ==========================================================
+  */
 
   return{
 
@@ -6923,7 +7228,7 @@ async function renderPNG(){
 
     product
   };
-    }
+            }
 
 /* ============================================================
    CANVAS -> BLOB
