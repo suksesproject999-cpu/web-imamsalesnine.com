@@ -2505,128 +2505,6 @@ pre{
 
 
 
-/* ============================================================
-   EXPORT GEOMETRY FIX
-   Preview and PNG must use identical geometry.
-============================================================ */
-
-.export-static .product-info{
-  width:100%!important;
-  min-width:0!important;
-  max-width:100%!important;
-  box-sizing:border-box!important;
-}
-
-.export-static .brand-line{
-  width:100%!important;
-  max-width:100%!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  white-space:nowrap!important;
-  box-sizing:border-box!important;
-}
-
-.export-static .product-name{
-  width:100%!important;
-  max-width:100%!important;
-  box-sizing:border-box!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  white-space:nowrap!important;
-  overflow-wrap:normal!important;
-  word-break:normal!important;
-}
-
-.export-static .price{
-  width:max-content!important;
-  max-width:100%!important;
-  white-space:nowrap!important;
-  box-sizing:border-box!important;
-}
-
-.export-static .price-meta{
-  width:max-content!important;
-  max-width:100%!important;
-  display:flex!important;
-  flex-direction:row!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:9px!important;
-  min-height:14px!important;
-  white-space:nowrap!important;
-  box-sizing:border-box!important;
-}
-
-.export-static .old{
-  position:relative!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  flex:0 0 auto!important;
-  white-space:nowrap!important;
-  line-height:1!important;
-  height:16px!important;
-}
-
-.export-static .old s{
-  display:inline-block!important;
-  line-height:1!important;
-  text-decoration-thickness:1.5px!important;
-  text-decoration-color:#ff6262!important;
-  text-decoration-skip-ink:none!important;
-}
-
-.export-static .discount{
-  display:inline-flex!important;
-  align-items:center!important;
-  flex:0 0 auto!important;
-  white-space:nowrap!important;
-}
-
-.export-static .badges{
-  width:100%!important;
-  max-width:100%!important;
-  display:flex!important;
-  flex-wrap:nowrap!important;
-  align-items:center!important;
-  justify-content:flex-start!important;
-  gap:8px!important;
-  box-sizing:border-box!important;
-}
-
-.export-static .badge{
-  flex:0 0 auto!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  vertical-align:middle!important;
-  text-align:center!important;
-  white-space:nowrap!important;
-  line-height:1!important;
-  height:31px!important;
-  min-height:31px!important;
-  box-sizing:border-box!important;
-  padding:0 13px!important;
-  margin:0!important;
-}
-
-.export-static .badge.promo{
-  min-width:76px!important;
-}
-
-.export-static .badge.warranty{
-  min-width:max-content!important;
-}
-
-.export-static .cta{
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  white-space:nowrap!important;
-  line-height:1!important;
-  box-sizing:border-box!important;
-}
-
 
 
 
@@ -6608,33 +6486,6 @@ function lockExportClone(
   snapshot
 ){
 
-  const html=
-    doc.documentElement;
-
-  const body=
-    doc.body;
-
-  /*
-    Keep clone viewport identical
-    to the visible preview.
-  */
-
-  html.style.width=
-    window.innerWidth+
-    "px";
-
-  html.style.minWidth=
-    window.innerWidth+
-    "px";
-
-  body.style.width=
-    window.innerWidth+
-    "px";
-
-  body.style.minWidth=
-    window.innerWidth+
-    "px";
-
   const clone=
     doc.getElementById(
       "promoCanvas"
@@ -6644,7 +6495,7 @@ function lockExportClone(
     return;
 
   /*
-    Freeze export state.
+    LOCK EXPORT STATE
   */
 
   clone.classList.add(
@@ -6661,7 +6512,7 @@ function lockExportClone(
     "1";
 
   /*
-    Lock canvas to exact preview size.
+    LOCK EXACT CANVAS SIZE
   */
 
   clone.style.width=
@@ -6684,7 +6535,38 @@ function lockExportClone(
     snapshot.height;
 
   /*
-    Stop every animation/transition.
+    IMPORTANT:
+    The responsive ratio rules are normally
+    attached to .stage, while html2canvas
+    captures .promo-canvas.
+    
+    Put the ratio class directly on the
+    cloned promo canvas so its internal
+    layout survives export.
+  */
+
+  const ratioClass=
+    currentRatio==="916"
+      ?"r916"
+      :
+    currentRatio==="45"
+      ?"r45"
+      :
+      "r169";
+
+  clone.classList.remove(
+    "r916",
+    "r45",
+    "r169"
+  );
+
+  clone.classList.add(
+    ratioClass
+  );
+
+  /*
+    Freeze animation only.
+    DO NOT change typography geometry.
   */
 
   clone
@@ -6710,388 +6592,26 @@ function lockExportClone(
       ".safe-zone"
     );
 
-  if(safeZone)
+  if(safeZone){
+
     safeZone.style.display=
       "none";
+  }
 
   const ratioMark=
     clone.querySelector(
       ".ratio-mark"
     );
 
-  if(ratioMark)
+  if(ratioMark){
+
     ratioMark.style.display=
       "none";
-
-  /*
-    ==========================================================
-    HARD LOCK INFO WIDTH
-    Prevent text from changing geometry in PNG export.
-    ==========================================================
-  */
-
-  const liveCanvas=
-    document.getElementById(
-      "promoCanvas"
-    );
-
-  const liveInfo=
-    liveCanvas?.querySelector(
-      ".info-zone"
-    );
-
-  const cloneInfo=
-    clone.querySelector(
-      ".info-zone"
-    );
-
-  if(
-    liveInfo&&
-    cloneInfo
-  ){
-
-    const infoRect=
-      liveInfo.getBoundingClientRect();
-
-    cloneInfo.style.width=
-      infoRect.width+
-      "px";
-
-    cloneInfo.style.height=
-      infoRect.height+
-      "px";
-
-    cloneInfo.style.boxSizing=
-      "border-box";
-
-    cloneInfo.style.overflow=
-      "visible";
   }
 
   /*
-    ==========================================================
-    HARD LOCK TYPOGRAPHY GEOMETRY
-    Copy computed dimensions from preview.
-    ==========================================================
-  */
-
-  const geometrySelectors=[
-    ".brand-line",
-    ".product-name",
-    ".price-label",
-    ".price",
-    ".price-meta",
-    ".old",
-    ".discount",
-    ".extra-note",
-    ".cta"
-  ];
-
-  geometrySelectors.forEach(
-    selector=>{
-
-      const live=
-        liveCanvas?.querySelector(
-          selector
-        );
-
-      const target=
-        clone.querySelector(
-          selector
-        );
-
-      if(
-        !live||
-        !target
-      )
-        return;
-
-      const cs=
-        getComputedStyle(
-          live
-        );
-
-      target.style.fontFamily=
-        cs.fontFamily;
-
-      target.style.fontSize=
-        cs.fontSize;
-
-      target.style.fontWeight=
-        cs.fontWeight;
-
-      target.style.lineHeight=
-        cs.lineHeight;
-
-      target.style.letterSpacing=
-        cs.letterSpacing;
-
-      target.style.width=
-        cs.width;
-
-      target.style.height=
-        cs.height;
-
-      target.style.marginTop=
-        cs.marginTop;
-
-      target.style.marginRight=
-        cs.marginRight;
-
-      target.style.marginBottom=
-        cs.marginBottom;
-
-      target.style.marginLeft=
-        cs.marginLeft;
-
-      target.style.paddingTop=
-        cs.paddingTop;
-
-      target.style.paddingRight=
-        cs.paddingRight;
-
-      target.style.paddingBottom=
-        cs.paddingBottom;
-
-      target.style.paddingLeft=
-        cs.paddingLeft;
-
-      target.style.boxSizing=
-        "border-box";
-    }
-  );
-
-  /*
-    ==========================================================
-    BADGE HARD LOCK
-    Text must stay perfectly centered.
-    ==========================================================
-  */
-
-  const liveBadges=
-    liveCanvas?.querySelectorAll(
-      ".badge"
-    )||
-    [];
-
-  const cloneBadges=
-    clone.querySelectorAll(
-      ".badge"
-    );
-
-  liveBadges.forEach(
-    (liveBadge,index)=>{
-
-      const badge=
-        cloneBadges[index];
-
-      if(!badge)
-        return;
-
-      const cs=
-        getComputedStyle(
-          liveBadge
-        );
-
-      const rect=
-        liveBadge.getBoundingClientRect();
-
-      badge.style.display=
-        "inline-flex";
-
-      badge.style.alignItems=
-        "center";
-
-      badge.style.justifyContent=
-        "center";
-
-      badge.style.textAlign=
-        "center";
-
-      badge.style.boxSizing=
-        "border-box";
-
-      badge.style.width=
-        rect.width+
-        "px";
-
-      badge.style.height=
-        rect.height+
-        "px";
-
-      badge.style.minWidth=
-        rect.width+
-        "px";
-
-      badge.style.minHeight=
-        rect.height+
-        "px";
-
-      badge.style.paddingLeft=
-        cs.paddingLeft;
-
-      badge.style.paddingRight=
-        cs.paddingRight;
-
-      badge.style.paddingTop=
-        "0px";
-
-      badge.style.paddingBottom=
-        "0px";
-
-      badge.style.fontFamily=
-        cs.fontFamily;
-
-      badge.style.fontSize=
-        cs.fontSize;
-
-      badge.style.fontWeight=
-        cs.fontWeight;
-
-      badge.style.lineHeight=
-        "1";
-
-      badge.style.letterSpacing=
-        cs.letterSpacing;
-
-      badge.style.whiteSpace=
-        "nowrap";
-
-      badge.style.overflow=
-        "hidden";
-
-      badge.style.textOverflow=
-        "clip";
-
-      badge.style.transform=
-        "none";
-
-      badge.style.margin=
-        "0";
-    }
-  );
-
-  /*
-    ==========================================================
-    PRICE META HARD LOCK
-    Old price + discount stay on one line.
-    ==========================================================
-  */
-
-  const liveMeta=
-    liveCanvas?.querySelector(
-      ".price-meta"
-    );
-
-  const cloneMeta=
-    clone.querySelector(
-      ".price-meta"
-    );
-
-  if(
-    liveMeta&&
-    cloneMeta
-  ){
-
-    const rect=
-      liveMeta.getBoundingClientRect();
-
-    const cs=
-      getComputedStyle(
-        liveMeta
-      );
-
-    cloneMeta.style.display=
-      "flex";
-
-    cloneMeta.style.alignItems=
-      "center";
-
-    cloneMeta.style.justifyContent=
-      "flex-start";
-
-    cloneMeta.style.flexWrap=
-      "nowrap";
-
-    cloneMeta.style.width=
-      rect.width+
-      "px";
-
-    cloneMeta.style.height=
-      rect.height+
-      "px";
-
-    cloneMeta.style.gap=
-      cs.gap;
-
-    cloneMeta.style.whiteSpace=
-      "nowrap";
-
-    cloneMeta.style.boxSizing=
-      "border-box";
-  }
-
-  /*
-    ==========================================================
-    OLD PRICE
-    Keep Rp 20.000 intact and prevent line drift.
-    ==========================================================
-  */
-
-  const liveOld=
-    liveCanvas?.querySelector(
-      ".old"
-    );
-
-  const cloneOld=
-    clone.querySelector(
-      ".old"
-    );
-
-  if(
-    liveOld&&
-    cloneOld
-  ){
-
-    const rect=
-      liveOld.getBoundingClientRect();
-
-    const cs=
-      getComputedStyle(
-        liveOld
-      );
-
-    cloneOld.style.display=
-      "inline-flex";
-
-    cloneOld.style.alignItems=
-      "center";
-
-    cloneOld.style.flex=
-      "0 0 auto";
-
-    cloneOld.style.width=
-      rect.width+
-      "px";
-
-    cloneOld.style.height=
-      rect.height+
-      "px";
-
-    cloneOld.style.whiteSpace=
-      "nowrap";
-
-    cloneOld.style.lineHeight=
-      cs.lineHeight;
-
-    cloneOld.style.boxSizing=
-      "border-box";
-  }
-
-  /*
-    ==========================================================
-    FINAL BADGE PASS
-    ==========================================================
+    Badge centering only.
+    No forced width/height.
   */
 
   clone
@@ -7113,18 +6633,14 @@ function lockExportClone(
         badge.style.textAlign=
           "center";
 
-        badge.style.verticalAlign=
-          "middle";
-
         badge.style.lineHeight=
           "1";
 
         badge.style.transform=
           "none";
-
       }
     );
-    }
+}
 
 /* ============================================================
    EXACT PNG RENDER
