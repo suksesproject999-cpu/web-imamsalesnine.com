@@ -18,15 +18,28 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 
+
+
+
+
 <style>
+
+/* ============================================================
+   IMAM SALESFR — CREATIVE PROMO STUDIO
+   MASTER CSS — SINGLE SOURCE OF TRUTH
+   ------------------------------------------------------------
+   SUPPORTED:
+   9:16
+   4:5
+   16:9
+
+   MASTER RULE:
+   PREVIEW GEOMETRY = EXPORT GEOMETRY
+============================================================ */
 
 
 /* ============================================================
-   IMAM SALESFR — PROMO CREATIVE
-   MASTER CSS — SINGLE SOURCE OF TRUTH
-   RATIOS:
-   9:16 / 4:5 / 16:9
-   PREVIEW = EXPORT GEOMETRY
+   ROOT
 ============================================================ */
 
 :root{
@@ -63,7 +76,9 @@
    RESET
 ============================================================ */
 
-*{
+*,
+*::before,
+*::after{
   box-sizing:border-box;
 }
 
@@ -87,7 +102,8 @@ body{
 
 button,
 input,
-select{
+select,
+textarea{
   font:inherit;
 }
 
@@ -122,11 +138,9 @@ img{
     14px
     clamp(14px,4vw,40px);
 
-  background:
-    rgba(4,6,4,.94);
+  background:rgba(4,6,4,.94);
 
-  border-bottom:
-    1px solid var(--line);
+  border-bottom:1px solid var(--line);
 
   backdrop-filter:blur(20px);
 }
@@ -151,10 +165,7 @@ img{
 }
 
 .brand p{
-  margin:
-    5px
-    0
-    0;
+  margin:5px 0 0;
 
   color:var(--lime);
 
@@ -171,6 +182,8 @@ img{
   display:flex;
 
   gap:8px;
+
+  flex-wrap:wrap;
 }
 
 .icon-btn,
@@ -183,8 +196,7 @@ img{
 
   background:#080c09;
 
-  border:
-    1px solid var(--line);
+  border:1px solid var(--line);
 }
 
 .icon-btn{
@@ -200,9 +212,7 @@ img{
 }
 
 .primary-btn{
-  padding:
-    0
-    17px;
+  padding:0 17px;
 
   color:#081006;
 
@@ -253,7 +263,7 @@ main{
 
 
 /* ============================================================
-   PANELS
+   PANEL
 ============================================================ */
 
 .panel{
@@ -266,8 +276,7 @@ main{
       rgba(6,10,7,.98)
     );
 
-  border:
-    1px solid var(--line);
+  border:1px solid var(--line);
 
   border-radius:22px;
 
@@ -292,10 +301,7 @@ main{
 }
 
 .panel-title{
-  margin:
-    7px
-    0
-    0;
+  margin:7px 0 0;
 
   font-size:24px;
 
@@ -305,10 +311,7 @@ main{
 }
 
 .panel-sub{
-  margin:
-    7px
-    0
-    0;
+  margin:7px 0 0;
 
   color:#778178;
 
@@ -351,9 +354,7 @@ main{
 
   background:#050705;
 
-  border:
-    1px solid
-    rgba(255,255,255,.11);
+  border:1px solid rgba(255,255,255,.11);
 
   box-shadow:
     0 30px 90px rgba(0,0,0,.5);
@@ -361,11 +362,12 @@ main{
 
 
 /* ============================================================
-   RATIO MASTER
+   RATIO
 ============================================================ */
 
 .stage.r916 .promo-canvas{
   width:100%;
+
   max-width:520px;
 
   aspect-ratio:9 / 16;
@@ -373,6 +375,7 @@ main{
 
 .stage.r45 .promo-canvas{
   width:100%;
+
   max-width:760px;
 
   aspect-ratio:4 / 5;
@@ -380,6 +383,7 @@ main{
 
 .stage.r169 .promo-canvas{
   width:100%;
+
   max-width:none;
 
   aspect-ratio:16 / 9;
@@ -417,14 +421,12 @@ main{
     repeating-linear-gradient(
       125deg,
       transparent 0 34px,
-
       color-mix(
         in srgb,
         var(--accent) 5%,
         transparent
       )
       34px 36px,
-
       transparent 36px 78px
     );
 
@@ -482,15 +484,25 @@ main{
 }
 
 
-/* 9:16 + 4:5 */
+/* 9:16 */
 
-.r916 .product-visual,
+.r916 .product-visual{
+  top:0;
+  left:0;
+  right:0;
+
+  height:53%;
+}
+
+
+/* 4:5 */
+
 .r45 .product-visual{
   top:0;
   left:0;
   right:0;
 
-  height:56%;
+  height:55%;
 }
 
 
@@ -564,7 +576,7 @@ main{
 
 
 /* ============================================================
-   INFO ZONE — MASTER
+   INFO ZONE
 ============================================================ */
 
 .info-zone{
@@ -573,6 +585,8 @@ main{
   z-index:20;
 
   box-sizing:border-box;
+
+  overflow:visible;
 }
 
 
@@ -583,12 +597,12 @@ main{
   right:0;
   bottom:0;
 
-  height:44%;
+  height:47%;
 
   padding:
-    4.6%
-    7.8%
-    5.6%;
+    3.8%
+    7.5%
+    4.8%;
 
   overflow:visible;
 }
@@ -601,12 +615,12 @@ main{
   right:0;
   bottom:0;
 
-  height:43%;
+  height:44%;
 
   padding:
-    4.8%
+    4%
     7.5%
-    6%;
+    5%;
 
   overflow:visible;
 }
@@ -622,12 +636,12 @@ main{
   width:42%;
 
   padding:
+    5.5%
     6%
-    6%
-    4%
+    4.5%
     5%;
 
-  overflow:hidden;
+  overflow:visible;
 }
 
 
@@ -641,27 +655,32 @@ main{
   z-index:30;
 
   width:100%;
-
   min-width:0;
+  min-height:0;
 
   display:flex;
 
   flex-direction:column;
 
   align-items:flex-start;
+
+  overflow:visible;
 }
 
 
-/* 16:9 gets a reserved bottom contact zone */
+/* ============================================================
+   16:9 PRODUCT INFO
+   CONTACT DAPAT SLOT SENDIRI
+============================================================ */
 
 .r169 .product-info{
   height:100%;
 
   min-height:0;
 
-  padding-bottom:40px;
+  padding:0;
 
-  overflow:hidden;
+  overflow:visible;
 }
 
 
@@ -678,7 +697,7 @@ main{
   margin:
     0
     0
-    12px;
+    10px;
 
   background:
     linear-gradient(
@@ -689,62 +708,137 @@ main{
 }
 
 .r916 .rule{
-  width:56px;
+  width:52px;
 
-  margin-bottom:10px;
+  margin-bottom:8px;
+}
+
+.r45 .rule{
+  width:55px;
+
+  margin-bottom:9px;
+}
+
+.r169 .rule{
+  width:54px;
+
+  margin-bottom:9px;
 }
 
 
 /* ============================================================
-   BADGES — ONE MASTER
+   BADGE ROW
+   URUTAN:
+   CAMPAIGN DINAMIS
+   EXTRA
+   GARANSI
+
+   .cta = campaign dynamic badge
 ============================================================ */
 
 .badges{
   width:100%;
 
+  min-width:0;
+
   display:flex;
+
+  flex-direction:row;
+
+  flex-wrap:nowrap;
 
   align-items:center;
 
   justify-content:flex-start;
 
-  gap:8px;
+  gap:7px;
+
+  margin:0;
+
+  padding:0;
+
+  overflow:visible;
+
+  box-sizing:border-box;
+}
+
+
+/* ============================================================
+   ALL BADGE BASE
+============================================================ */
+
+.badges > *{
+  box-sizing:border-box;
 
   min-width:0;
 
-  overflow:visible;
+  margin:0;
+
+  flex-shrink:1;
 }
 
-.badge{
+
+/* ============================================================
+   DUMMY PROMO
+   HAPUS TOTAL SECARA VISUAL
+============================================================ */
+
+.badges > .badge.promo{
+  display:none !important;
+
+  width:0 !important;
+  min-width:0 !important;
+  max-width:0 !important;
+
+  height:0 !important;
+  min-height:0 !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  border:0 !important;
+}
+
+
+/* ============================================================
+   CAMPAIGN DINAMIS
+   .cta
+============================================================ */
+
+.product-info > .badges > .cta{
   position:relative;
+
+  order:1;
 
   display:inline-flex;
 
   align-items:center;
   justify-content:center;
 
-  flex:0 1 auto;
+  flex:
+    1 1 auto;
 
   min-width:0;
+
   max-width:100%;
 
   min-height:31px;
+
+  height:auto;
+
+  margin:0;
 
   padding:
     0
     13px;
 
-  box-sizing:border-box;
+  border:0;
 
   border-radius:999px;
 
-  text-align:center;
+  color:#071006;
 
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
+  background:var(--accent);
 
   font-size:7px;
 
@@ -752,20 +846,42 @@ main{
 
   font-weight:950;
 
-  letter-spacing:1.7px;
+  letter-spacing:1.35px;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:clip;
+
+  transform:none;
+
+  z-index:31;
 }
 
-.badge.promo{
-  flex:0 0 auto;
 
-  min-width:76px;
+/* ============================================================
+   EXTRA BADGE
+============================================================ */
 
-  color:#190a03;
+.product-info > .badges > .badge.extra{
+  order:2;
 
-  background:var(--orange);
-}
+  flex:
+    0 1 auto;
 
-.badge.extra{
+  min-width:0;
+
+  max-width:31%;
+
+  min-height:31px;
+
+  padding:
+    0
+    10px;
+
   color:#ff974a;
 
   background:
@@ -774,10 +890,46 @@ main{
   border:
     1px solid
     rgba(255,118,18,.55);
+
+  border-radius:999px;
+
+  font-size:7px;
+
+  line-height:1;
+
+  font-weight:950;
+
+  letter-spacing:1.05px;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:clip;
 }
 
-.badge.warranty{
-  flex:0 1 auto;
+
+/* ============================================================
+   WARRANTY BADGE
+============================================================ */
+
+.product-info > .badges > .badge.warranty{
+  order:3;
+
+  flex:
+    0 1 auto;
+
+  min-width:0;
+
+  max-width:38%;
+
+  min-height:31px;
+
+  padding:
+    0
+    10px;
 
   color:var(--accent);
 
@@ -785,98 +937,26 @@ main{
     rgba(0,0,0,.28);
 
   border:
-    1px solid var(--accent);
-}
+    1px solid
+    var(--accent);
 
-
-/* ============================================================
-   9:16 BADGES
-============================================================ */
-
-.r916 .badges{
-  gap:7px;
-}
-
-.r916 .badge{
-  min-height:29px;
-
-  padding:
-    0
-    11px;
-
-  font-size:6.5px;
-
-  letter-spacing:1.45px;
-}
-
-.r916 .badge.promo{
-  min-width:72px;
-}
-
-
-/* ============================================================
-   4:5 BADGES
-============================================================ */
-
-.r45 .badges{
-  gap:7px;
-}
-
-
-/* ============================================================
-   16:9 BADGES
-============================================================ */
-
-.r169 .badges{
-  flex-wrap:nowrap;
-
-  gap:4px;
-
-  min-width:0;
-
-  max-width:100%;
-
-  overflow:visible;
-}
-
-.r169 .badge{
-  flex:0 0 auto;
-
-  min-width:max-content;
-
-  max-width:none;
-
-  min-height:28px;
-
-  padding:
-    0
-    7px;
+  border-radius:999px;
 
   font-size:7px;
 
-  letter-spacing:.9px;
+  line-height:1;
+
+  font-weight:950;
+
+  letter-spacing:.85px;
+
+  text-align:center;
 
   white-space:nowrap;
 
-  overflow:visible;
+  overflow:hidden;
 
   text-overflow:clip;
-}
-
-.r169 .badge.promo{
-  min-width:68px;
-
-  padding-left:8px;
-  padding-right:8px;
-}
-
-.r169 .badge.warranty{
-  min-width:max-content;
-
-  padding-left:6px;
-  padding-right:6px;
-
-  letter-spacing:.7px;
 }
 
 
@@ -887,15 +967,15 @@ main{
 .brand-line{
   width:100%;
 
-  margin-top:10px;
+  min-width:0;
 
-  min-height:14px;
+  margin-top:10px;
 
   color:var(--accent);
 
   font-size:10px;
 
-  line-height:1.35;
+  line-height:1.3;
 
   font-weight:950;
 
@@ -909,8 +989,6 @@ main{
 
   text-overflow:clip;
 
-  display:block;
-
   position:relative;
 
   z-index:40;
@@ -919,6 +997,7 @@ main{
 
 /* ============================================================
    PRODUCT NAME
+   NO LINE CLAMP
 ============================================================ */
 
 .product-name{
@@ -926,28 +1005,37 @@ main{
 
   min-width:0;
 
-  margin-top:7px;
+  height:auto;
+  max-height:none;
+
+  margin-top:6px;
 
   color:#fff;
 
   font-size:
     clamp(
-      22px,
-      3.7vw,
-      43px
+      20px,
+      3.3vw,
+      42px
     );
 
-  line-height:1.05;
+  line-height:1.06;
 
   font-weight:950;
 
-  letter-spacing:-1.1px;
+  letter-spacing:-1px;
 
   white-space:normal;
 
-  overflow-wrap:anywhere;
+  overflow:visible;
+
+  overflow-wrap:break-word;
 
   word-break:normal;
+
+  text-overflow:clip;
+
+  display:block;
 
   flex:0 0 auto;
 }
@@ -958,12 +1046,14 @@ main{
 .r916 .product-name{
   font-size:
     clamp(
-      20px,
-      3.15vw,
-      38px
+      17px,
+      3.1vw,
+      34px
     );
 
-  line-height:1.08;
+  line-height:1.05;
+
+  letter-spacing:-.65px;
 }
 
 
@@ -972,12 +1062,12 @@ main{
 .r45 .product-name{
   font-size:
     clamp(
-      21px,
-      3.2vw,
-      39px
+      18px,
+      3.15vw,
+      37px
     );
 
-  line-height:1.06;
+  line-height:1.05;
 }
 
 
@@ -986,29 +1076,27 @@ main{
 .r169 .product-name{
   font-size:
     clamp(
-      15px,
-      2.15vw,
-      30px
+      14px,
+      2vw,
+      29px
     );
 
   line-height:1.04;
 
-  letter-spacing:-.2px;
+  letter-spacing:-.25px;
 
-  display:-webkit-box;
+  white-space:normal;
 
-  -webkit-box-orient:vertical;
+  overflow:visible;
 
-  -webkit-line-clamp:2;
+  max-height:none;
 
-  max-height:2.08em;
-
-  overflow:hidden;
+  display:block;
 }
 
 
 /* ============================================================
-   PRICE
+   PRICE LABEL
 ============================================================ */
 
 .price-label{
@@ -1016,7 +1104,7 @@ main{
 
   flex:0 0 auto;
 
-  margin-top:15px;
+  margin-top:13px;
 
   color:#6f786f;
 
@@ -1031,14 +1119,22 @@ main{
   text-transform:uppercase;
 }
 
-.r916 .price-label,
+.r916 .price-label{
+  margin-top:10px;
+}
+
 .r45 .price-label{
-  margin-top:12px;
+  margin-top:11px;
 }
 
 .r169 .price-label{
-  margin-top:13px;
+  margin-top:11px;
 }
+
+
+/* ============================================================
+   PRICE
+============================================================ */
 
 .price{
   width:100%;
@@ -1068,17 +1164,17 @@ main{
 .r916 .price{
   font-size:
     clamp(
-      27px,
-      4.15vw,
-      48px
+      26px,
+      4.1vw,
+      47px
     );
 }
 
 .r45 .price{
   font-size:
     clamp(
-      28px,
-      4.2vw,
+      27px,
+      4.15vw,
       49px
     );
 }
@@ -1086,9 +1182,9 @@ main{
 .r169 .price{
   font-size:
     clamp(
-      27px,
-      3.8vw,
-      46px
+      22px,
+      3.45vw,
+      43px
     );
 }
 
@@ -1100,6 +1196,8 @@ main{
 .price-meta{
   width:100%;
 
+  min-width:0;
+
   min-height:14px;
 
   display:flex;
@@ -1108,17 +1206,15 @@ main{
 
   justify-content:flex-start;
 
-  gap:9px;
-
-  margin-top:8px;
-
-  flex:0 0 auto;
-}
-
-.r916 .price-meta{
-  margin-top:7px;
+  flex-wrap:nowrap;
 
   gap:8px;
+
+  margin-top:7px;
+
+  flex:0 0 auto;
+
+  overflow:visible;
 }
 
 .old{
@@ -1137,15 +1233,6 @@ main{
   white-space:nowrap;
 
   opacity:.95;
-}
-
-.r916 .old,
-.r169 .old{
-  font-size:7.5px;
-}
-
-.r169 .old{
-  font-size:8px;
 }
 
 .old-price{
@@ -1183,14 +1270,10 @@ main{
   white-space:nowrap;
 }
 
-.r916 .discount{
-  font-size:7.5px;
-}
-
 
 /* ============================================================
    EXTRA NOTE
-   USER REQUEST: HIDDEN
+   FINAL PRICE AFTER EXTRA DISCOUNT DIHILANGKAN
 ============================================================ */
 
 .extra-note{
@@ -1199,85 +1282,31 @@ main{
 
 
 /* ============================================================
-   CTA / NEW PRODUCT
-============================================================ */
-
-.cta{
-  position:relative;
-
-  z-index:31;
-
-  display:inline-flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  flex:0 0 auto;
-
-  min-height:28px;
-
-  margin-top:11px;
-
-  padding:
-    0
-    13px;
-
-  border-radius:999px;
-
-  color:#071006;
-
-  background:var(--accent);
-
-  font-size:6.5px;
-
-  line-height:1;
-
-  font-weight:950;
-
-  letter-spacing:1.3px;
-
-  white-space:nowrap;
-
-  text-align:center;
-}
-
-.r916 .cta{
-  min-height:27px;
-
-  margin-top:9px;
-
-  padding:
-    0
-    12px;
-
-  font-size:6.2px;
-}
-
-
-/* ============================================================
-   CONTACT CARD — MASTER
+   CONTACT CARD
+   CONTACT SELALU PUNYA SLOT SENDIRI
 ============================================================ */
 
 .contact-card{
+  position:relative;
+
   width:100%;
 
-  margin-top:9px;
+  min-width:0;
+
+  min-height:46px;
+
+  height:auto;
+
+  margin:
+    9px
+    0
+    0;
 
   padding:
     7px
     9px;
 
   box-sizing:border-box;
-
-  border:
-    1px solid
-    rgba(139,198,63,.55);
-
-  border-radius:7px;
-
-  background:
-    rgba(0,0,0,.28);
 
   display:flex;
 
@@ -1289,16 +1318,46 @@ main{
 
   gap:3px;
 
-  min-width:0;
+  flex:0 0 auto;
 
   overflow:hidden;
 
-  flex:0 0 auto;
+  border:
+    1px solid
+    rgba(139,198,63,.55);
+
+  border-radius:7px;
+
+  background:
+    rgba(0,0,0,.28);
+
+  z-index:60;
+}
+
+
+/* ============================================================
+   CONTACT TEXT
+============================================================ */
+
+.contact-label,
+.contact-name,
+.contact-phone{
+  width:100%;
+
+  min-width:0;
+
+  display:block;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  text-overflow:ellipsis;
+
+  box-sizing:border-box;
 }
 
 .contact-label{
-  width:100%;
-
   color:var(--accent);
 
   font-size:6px;
@@ -1307,51 +1366,31 @@ main{
 
   font-weight:950;
 
-  letter-spacing:1.3px;
+  letter-spacing:1.2px;
 
   text-transform:uppercase;
-
-  white-space:nowrap;
-
-  overflow:hidden;
 }
 
 .contact-name{
-  width:100%;
-
   color:#fff;
 
   font-size:8px;
 
-  line-height:1.15;
+  line-height:1.1;
 
   font-weight:950;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
 }
 
 .contact-phone{
-  width:100%;
-
   color:#fff;
 
   font-size:7px;
 
-  line-height:1.15;
+  line-height:1.1;
 
   font-weight:800;
 
-  letter-spacing:.45px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
+  letter-spacing:.4px;
 }
 
 
@@ -1360,23 +1399,25 @@ main{
 ============================================================ */
 
 .r916 .contact-card{
-  margin-top:9px;
+  min-height:44px;
+
+  margin-top:8px;
 
   padding:
-    7px
-    9px;
+    6px
+    8px;
 }
 
 .r916 .contact-label{
-  font-size:6px;
+  font-size:5.6px;
 }
 
 .r916 .contact-name{
-  font-size:8px;
+  font-size:7px;
 }
 
 .r916 .contact-phone{
-  font-size:7px;
+  font-size:6.4px;
 }
 
 
@@ -1385,116 +1426,74 @@ main{
 ============================================================ */
 
 .r45 .contact-card{
-  margin-top:9px;
+  min-height:45px;
 
-  padding:
-    7px
-    9px;
+  margin-top:8px;
 }
 
 
 /* ============================================================
-   16:9 CONTACT — DEDICATED BOTTOM SLOT
+   16:9 CONTACT
+   FLOW-BASED.
+   BUKAN ABSOLUTE.
+   JADI NGGAK NIMPA HARGA / CTA / BADGE.
 ============================================================ */
 
-.r169 .contact-card{
-  position:absolute;
+.r169 .product-info > .contact-card{
+  position:relative;
 
-  left:0;
-  right:0;
-  bottom:0;
+  left:auto;
+  right:auto;
+  top:auto;
+  bottom:auto;
 
   width:100%;
 
+  min-height:46px;
+
   height:auto;
 
-  min-height:30px;
-
-  margin:0;
+  margin:
+    auto
+    0
+    0;
 
   padding:
-    5px
-    7px;
+    6px
+    8px;
 
-  box-sizing:border-box;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:flex-start;
-
-  justify-content:center;
-
-  gap:2px;
-
-  border:
-    1px solid
-    rgba(139,198,63,.55);
-
-  border-radius:5px;
-
-  background:
-    rgba(0,0,0,.28);
+  flex:0 0 auto;
 
   overflow:hidden;
 
-  z-index:50;
+  z-index:60;
 }
 
 .r169 .contact-label{
-  font-size:4.8px;
+  font-size:5px;
 
   line-height:1;
 
-  letter-spacing:.8px;
+  letter-spacing:.9px;
 }
 
 .r169 .contact-name{
-  font-size:5.8px;
+  font-size:6.2px;
 
-  line-height:1.05;
+  line-height:1.08;
 }
 
 .r169 .contact-phone{
-  font-size:5.2px;
+  font-size:5.5px;
 
-  line-height:1.05;
+  line-height:1.08;
 
   letter-spacing:.2px;
 }
 
 
 /* ============================================================
-   16:9 — CTA NAIK DI ATAS CONTACT
-============================================================ */
-
-.r169 .product-info:has(.contact-card) .cta{
-  position:relative !important;
-
-  z-index:31 !important;
-
-  margin-bottom:0 !important;
-
-  transform:translateY(-42px);
-}
-
-
-/* EXPORT HARUS IDENTIK DENGAN PREVIEW */
-
-.export-static .r169 .product-info:has(.contact-card) .cta{
-  position:relative !important;
-
-  z-index:31 !important;
-
-  margin-bottom:0 !important;
-
-  transform:translateY(-42px) !important;
-  }
-
-
-/* ============================================================
-   WATERMARK
+   SIGNATURE / WATERMARK
 ============================================================ */
 
 .watermark{
@@ -1579,6 +1578,11 @@ main{
   font-weight:950;
 }
 
+
+/* ============================================================
+   SAFE ZONE
+============================================================ */
+
 .safe-zone{
   position:absolute;
 
@@ -1644,7 +1648,7 @@ main{
     infinite;
 }
 
-.motion-active .badge.promo{
+.motion-active .badges > .cta{
   animation:
     badgePop
     8s
@@ -1694,8 +1698,9 @@ main{
 
 
 /* ============================================================
-   EXPORT — SINGLE MASTER
-   Preview geometry is preserved.
+   EXPORT
+   TIDAK ADA LAYOUT ALTERNATIF.
+   EXPORT = PREVIEW.
 ============================================================ */
 
 .export-static,
@@ -1722,71 +1727,134 @@ main{
 
 
 /* ============================================================
-   EXPORT — PRODUCT TITLE
-============================================================ */
-
-.export-static .product-name{
-  display:-webkit-box !important;
-
-  -webkit-box-orient:vertical !important;
-
-  -webkit-line-clamp:2 !important;
-
-  overflow:hidden !important;
-
-  max-height:2.08em !important;
-
-  white-space:normal !important;
-}
-
-
-/* ============================================================
-   EXPORT — BADGES
+   EXPORT — MASTER BADGE
 ============================================================ */
 
 .export-static .badges{
   display:flex !important;
 
+  flex-direction:row !important;
+
+  flex-wrap:nowrap !important;
+
   align-items:center !important;
 
   justify-content:flex-start !important;
 
-  gap:4px !important;
-
-  flex-wrap:nowrap !important;
-
   min-width:0 !important;
+
+  width:100% !important;
+
+  gap:7px !important;
 
   overflow:visible !important;
 }
 
-.export-static .badge{
+.export-static .badges > .badge.promo{
+  display:none !important;
+}
+
+.export-static .badges > .cta{
   display:inline-flex !important;
 
+  position:relative !important;
+
+  inset:auto !important;
+
+  order:1 !important;
+
   flex:
-    0 0 auto !important;
+    1 1 auto !important;
 
-  align-items:center !important;
+  min-width:0 !important;
 
-  justify-content:center !important;
+  max-width:100% !important;
 
-  min-width:max-content !important;
+  margin:0 !important;
 
-  max-width:none !important;
+  transform:none !important;
+
+  overflow:hidden !important;
 
   white-space:nowrap !important;
 
-  overflow:visible !important;
-
   text-overflow:clip !important;
+}
 
-  transform:none !important;
+.export-static .badges > .badge.extra{
+  order:2 !important;
+
+  flex:
+    0 1 auto !important;
+
+  min-width:0 !important;
+
+  max-width:31% !important;
+
+  margin:0 !important;
+
+  overflow:hidden !important;
+}
+
+.export-static .badges > .badge.warranty{
+  order:3 !important;
+
+  flex:
+    0 1 auto !important;
+
+  min-width:0 !important;
+
+  max-width:38% !important;
+
+  margin:0 !important;
+
+  overflow:hidden !important;
 }
 
 
 /* ============================================================
-   EXPORT — 16:9 CONTACT GEOMETRY
+   EXPORT — PRODUCT NAME
 ============================================================ */
+
+.export-static .product-name{
+  display:block !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  max-height:none !important;
+
+  overflow:visible !important;
+
+  white-space:normal !important;
+
+  text-overflow:clip !important;
+
+  overflow-wrap:break-word !important;
+
+  word-break:normal !important;
+
+  -webkit-line-clamp:unset !important;
+
+  -webkit-box-orient:unset !important;
+}
+
+
+/* ============================================================
+   EXPORT — CONTACT
+============================================================ */
+
+.export-static .contact-card{
+  box-sizing:border-box !important;
+
+  overflow:hidden !important;
+
+  flex-shrink:0 !important;
+}
+
+
+/* 16:9 */
 
 .export-static .r169 .product-info{
   position:relative !important;
@@ -1795,35 +1863,69 @@ main{
 
   height:100% !important;
 
-  min-width:0 !important;
-
   min-height:0 !important;
 
-  padding-bottom:40px !important;
+  padding:0 !important;
 
-  overflow:hidden !important;
+  overflow:visible !important;
 }
 
-.export-static .r169 .contact-card{
-  position:absolute !important;
+.export-static .r169 .product-info > .contact-card{
+  position:relative !important;
 
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
 
   width:100% !important;
 
-  margin:0 !important;
+  min-height:46px !important;
 
-  box-sizing:border-box !important;
+  height:auto !important;
+
+  margin:
+    auto
+    0
+    0 !important;
+
+  padding:
+    6px
+    8px !important;
 
   overflow:hidden !important;
 
-  z-index:50 !important;
+  flex:0 0 auto !important;
+
+  z-index:60 !important;
 }
 
-.export-static .r169 .product-info:has(.contact-card) .cta{
-  margin-bottom:40px !important;
+
+/* 9:16 / 4:5 */
+
+.export-static .r916 .product-info,
+.export-static .r45 .product-info{
+  width:100% !important;
+
+  height:100% !important;
+
+  overflow:visible !important;
+}
+
+.export-static .r916 .contact-card,
+.export-static .r45 .contact-card{
+  position:relative !important;
+
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+
+  width:100% !important;
+
+  margin-top:8px !important;
+
+  overflow:hidden !important;
 }
 
 
@@ -1858,8 +1960,7 @@ main{
 
   background:#080c09;
 
-  border:
-    1px solid var(--line);
+  border:1px solid var(--line);
 
   font-size:8px;
 
@@ -1896,8 +1997,7 @@ main{
 
   background:#080c09;
 
-  border:
-    1px solid var(--line);
+  border:1px solid var(--line);
 
   color:#aeb9ae;
 
@@ -1916,80 +2016,40 @@ main{
   color:#d8efbd;
 
   border-color:
-    rgba(
-      140,
-      198,
-      63,
-      .25
-    );
+    rgba(140,198,63,.25);
 
   background:
-    rgba(
-      140,
-      198,
-      63,
-      .06
-    );
+    rgba(140,198,63,.06);
 }
 
 .download-status.success{
   color:#bdf18c;
 
   border-color:
-    rgba(
-      140,
-      198,
-      63,
-      .35
-    );
+    rgba(140,198,63,.35);
 
   background:
-    rgba(
-      140,
-      198,
-      63,
-      .08
-    );
+    rgba(140,198,63,.08);
 }
 
 .download-status.warn{
   color:#ffe49a;
 
   border-color:
-    rgba(
-      255,
-      212,
-      90,
-      .25
-    );
+    rgba(255,212,90,.25);
 
   background:
-    rgba(
-      255,
-      212,
-      90,
-      .06
-    );
+    rgba(255,212,90,.06);
 }
 
 .download-status.error{
   color:#ffaaaa;
 
   border-color:
-    rgba(
-      255,
-      98,
-      98,
-      .25
-    );
+    rgba(255,98,98,.25);
 
   background:
-    rgba(
-      255,
-      98,
-      98,
-      .06
-    );
+    rgba(255,98,98,.06);
 }
 
 .download-progress{
@@ -2055,12 +2115,7 @@ input[type=search]{
 select:focus,
 input:focus{
   border-color:
-    rgba(
-      140,
-      198,
-      63,
-      .65
-    );
+    rgba(140,198,63,.65);
 }
 
 .field{
@@ -2142,12 +2197,7 @@ input:focus{
 
   box-shadow:
     0 0 0 1px
-    rgba(
-      140,
-      198,
-      63,
-      .13
-    );
+    rgba(140,198,63,.13);
 }
 
 .choice.active strong{
@@ -2173,61 +2223,31 @@ input:focus{
   font-weight:800;
 
   background:
-    rgba(
-      140,
-      198,
-      63,
-      .06
-    );
+    rgba(140,198,63,.06);
 
   border:
     1px solid
-    rgba(
-      140,
-      198,
-      63,
-      .13
-    );
+    rgba(140,198,63,.13);
 
   color:#a9c992;
 }
 
 .status.warn{
   background:
-    rgba(
-      255,
-      212,
-      90,
-      .06
-    );
+    rgba(255,212,90,.06);
 
   border-color:
-    rgba(
-      255,
-      212,
-      90,
-      .18
-    );
+    rgba(255,212,90,.18);
 
   color:#ffe49a;
 }
 
 .status.bad{
   background:
-    rgba(
-      255,
-      98,
-      98,
-      .06
-    );
+    rgba(255,98,98,.06);
 
   border-color:
-    rgba(
-      255,
-      98,
-      98,
-      .18
-    );
+    rgba(255,98,98,.18);
 
   color:#ffaaaa;
 }
@@ -2445,12 +2465,7 @@ input[type=range]{
 
 .card.selected{
   border-color:
-    rgba(
-      140,
-      198,
-      63,
-      .75
-    );
+    rgba(140,198,63,.75);
 }
 
 .card-image{
@@ -2495,12 +2510,7 @@ input[type=range]{
 
   border:
     1px solid
-    rgba(
-      255,
-      255,
-      255,
-      .13
-    );
+    rgba(255,255,255,.13);
 
   font-size:11px;
 
@@ -2785,21 +2795,11 @@ pre{
   color:#ffaaaa;
 
   background:
-    rgba(
-      50,
-      8,
-      8,
-      .3
-    );
+    rgba(50,8,8,.3);
 
   border:
     1px solid
-    rgba(
-      255,
-      80,
-      80,
-      .2
-    );
+    rgba(255,80,80,.2);
 
   border-radius:18px;
 
@@ -2810,7 +2810,7 @@ pre{
 
 
 /* ============================================================
-   RESPONSIVE
+   RESPONSIVE EDITOR
 ============================================================ */
 
 @media(max-width:1050px){
@@ -2852,6 +2852,11 @@ pre{
   }
 }
 
+
+/* ============================================================
+   MOBILE
+============================================================ */
+
 @media(max-width:520px){
 
   main{
@@ -2891,24 +2896,45 @@ pre{
     max-width:430px;
   }
 
-  .r916 .badge{
-    font-size:6px;
+  .r916 .badges{
+    gap:4px;
+  }
+
+  .r916 .badges > .cta{
+    min-height:28px;
 
     padding:
       0
-      9px;
+      8px;
+
+    font-size:5.8px;
+
+    letter-spacing:.8px;
+  }
+
+  .r916 .badges > .badge.extra,
+  .r916 .badges > .badge.warranty{
+    min-height:28px;
+
+    padding:
+      0
+      6px;
+
+    font-size:5.5px;
+
+    letter-spacing:.55px;
   }
 
   .r916 .product-name{
-    font-size:23px;
+    font-size:20px;
   }
 
   .r916 .price{
-    font-size:31px;
+    font-size:30px;
   }
 
   .r169 .product-name{
-    font-size:17px;
+    font-size:16px;
   }
 
   .r169 .price{
@@ -2921,72 +2947,108 @@ pre{
 }
 
 
-
-
-
 /* ============================================================
-   FINAL MASTER FIX
-   BADGE + PRODUCT NAME + CONTACT
-   9:16 / 4:5 / 16:9
-   PREVIEW = PNG
+   EXPORT HARD RESET
+   MENCEGAH CSS EDITOR LAMA MENYISIPKAN GEOMETRY
 ============================================================ */
 
-
-/* ============================================================
-   1. MASTER CONTAINER
-============================================================ */
-
-.promo-canvas{
-  overflow:hidden !important;
+.export-static .product-info,
+.export-static .info-zone,
+.export-static .badges,
+.export-static .contact-card{
+  transform:none !important;
 }
 
-.info-zone{
-  overflow:visible !important;
+.export-static .product-info > .cta{
+  transform:none !important;
 }
 
-.product-info{
+.export-static .product-info > .contact-card{
   position:relative !important;
 
-  width:100% !important;
-  min-width:0 !important;
-  min-height:0 !important;
-
-  display:flex !important;
-  flex-direction:column !important;
-
-  align-items:flex-start !important;
-
-  overflow:visible !important;
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
 }
 
 
 /* ============================================================
-   2. BADGE ROW
-   [CAMPAIGN DINAMIS] [EXTRA] [GARANSI]
+   FINAL:
+   CONTACT TIDAK BOLEH MENIMPA ELEMEN APAPUN
+============================================================ */
+
+.r916 .product-info,
+.r45 .product-info,
+.r169 .product-info{
+  isolation:isolate;
+}
+
+.r916 .contact-card,
+.r45 .contact-card,
+.r169 .contact-card{
+  z-index:60;
+}
+
+.r916 .badges,
+.r45 .badges,
+.r169 .badges{
+  z-index:35;
+}
+
+.r916 .brand-line,
+.r45 .brand-line,
+.r169 .brand-line{
+  z-index:36;
+}
+
+.r916 .product-name,
+.r45 .product-name,
+.r169 .product-name{
+  z-index:36;
+}
+
+.r916 .price-label,
+.r45 .price-label,
+.r169 .price-label,
+.r916 .price,
+.r45 .price,
+.r169 .price,
+.r916 .price-meta,
+.r45 .price-meta,
+.r169 .price-meta{
+  position:relative;
+
+  z-index:36;
+}
+
+
+/* ============================================================
+   END — SINGLE MASTER CSS
+============================================================ */
+
+
+/* ============================================================
+   FINAL BADGE SYSTEM
+   DYNAMIC CAMPAIGN | EXTRA | WARRANTY
+   NO OVERLAP / NO CUT / NO GIANT CTA
 ============================================================ */
 
 .product-info > .badges{
-  position:relative !important;
-
   width:100% !important;
-
   min-width:0 !important;
 
   display:flex !important;
-
   flex-direction:row !important;
-
   flex-wrap:nowrap !important;
 
   align-items:center !important;
-
   justify-content:flex-start !important;
 
   gap:6px !important;
 
-  padding:0 !important;
-
   margin:0 !important;
+  padding:0 !important;
 
   overflow:visible !important;
 
@@ -2994,28 +3056,52 @@ pre{
 }
 
 
-/* Semua badge harus benar-benar punya kursi sendiri */
+/* --------------------------------
+   Dummy PROMO = MATI TOTAL
+-------------------------------- */
 
-.product-info > .badges > *{
-  box-sizing:border-box !important;
+.product-info > .badges > .badge.promo{
+  display:none !important;
 
-  flex-shrink:1 !important;
-
+  width:0 !important;
   min-width:0 !important;
+  max-width:0 !important;
+
+  height:0 !important;
+  min-height:0 !important;
+
+  padding:0 !important;
+  margin:0 !important;
+
+  border:0 !important;
+}
+
+
+/* --------------------------------
+   Slot kosong lama = MATI
+-------------------------------- */
+
+.product-info > .badges > .cta-badge-slot{
+  display:none !important;
+
+  width:0 !important;
+  min-width:0 !important;
+  max-width:0 !important;
+
+  height:0 !important;
 
   margin:0 !important;
+  padding:0 !important;
 }
 
 
 /* ============================================================
-   3. CAMPAIGN BADGE DINAMIS
-   .cta sekarang ADA DI DALAM .badges
+   1. CAMPAIGN DINAMIS
+   NEW PRODUK / PROMO TERBATAS / TERLARIS / DLL
 ============================================================ */
 
 .product-info > .badges > .cta{
   position:relative !important;
-
-  inset:auto !important;
 
   order:1 !important;
 
@@ -3024,23 +3110,32 @@ pre{
   align-items:center !important;
   justify-content:center !important;
 
-  flex:
-    1 1 auto !important;
+  /*
+    JANGAN flex:1.
+    Badge hanya mengambil ruang sesuai kebutuhan teks.
+  */
+  flex:0 1 auto !important;
 
   width:auto !important;
 
   min-width:0 !important;
 
-  max-width:100% !important;
+  /*
+    Ada batas supaya Extra + Warranty
+    selalu punya kursi.
+  */
+  max-width:42% !important;
 
-  min-height:31px !important;
+  min-height:30px !important;
 
   height:auto !important;
 
   margin:0 !important;
 
   padding:
-    0 11px !important;
+    0 12px !important;
+
+  box-sizing:border-box !important;
 
   border-radius:999px !important;
 
@@ -3054,7 +3149,7 @@ pre{
 
   font-weight:950 !important;
 
-  letter-spacing:1.15px !important;
+  letter-spacing:1px !important;
 
   text-align:center !important;
 
@@ -3071,23 +3166,56 @@ pre{
 
 
 /* ============================================================
-   4. EXTRA
+   2. EXTRA
 ============================================================ */
 
 .product-info > .badges > .badge.extra{
   order:2 !important;
 
-  flex:
-    0 1 auto !important;
+  display:inline-flex !important;
+
+  align-items:center !important;
+  justify-content:center !important;
+
+  flex:0 1 auto !important;
+
+  width:auto !important;
 
   min-width:0 !important;
 
-  max-width:34% !important;
+  max-width:28% !important;
 
-  min-height:31px !important;
+  min-height:30px !important;
+
+  height:auto !important;
+
+  margin:0 !important;
 
   padding:
     0 9px !important;
+
+  box-sizing:border-box !important;
+
+  color:#ff984e !important;
+
+  background:
+    rgba(255,118,18,.06) !important;
+
+  border:
+    1px solid
+    rgba(255,118,18,.58) !important;
+
+  border-radius:999px !important;
+
+  font-size:7px !important;
+
+  line-height:1 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:.75px !important;
+
+  text-align:center !important;
 
   white-space:nowrap !important;
 
@@ -3095,250 +3223,87 @@ pre{
 
   text-overflow:ellipsis !important;
 
-  margin:0 !important;
+  transform:none !important;
+
+  z-index:31 !important;
 }
 
 
 /* ============================================================
-   5. WARRANTY
+   3. WARRANTY
 ============================================================ */
 
 .product-info > .badges > .badge.warranty{
   order:3 !important;
 
-  flex:
-    0 1 auto !important;
+  display:inline-flex !important;
+
+  align-items:center !important;
+  justify-content:center !important;
+
+  flex:0 1 auto !important;
+
+  width:auto !important;
 
   min-width:0 !important;
 
-  max-width:38% !important;
+  max-width:32% !important;
 
-  min-height:31px !important;
+  min-height:30px !important;
+
+  height:auto !important;
+
+  margin:0 !important;
 
   padding:
     0 9px !important;
 
-  white-space:nowrap !important;
-
-  overflow:hidden !important;
-
-  text-overflow:ellipsis !important;
-
-  margin:0 !important;
-}
-
-
-/* Dummy PROMO kalau masih tersisa */
-.product-info > .badges > .badge.promo{
-  display:none !important;
-
-  width:0 !important;
-  min-width:0 !important;
-  max-width:0 !important;
-
-  height:0 !important;
-  min-height:0 !important;
-
-  margin:0 !important;
-  padding:0 !important;
-
-  border:0 !important;
-}
-
-
-/* ============================================================
-   6. BRAND
-============================================================ */
-
-.product-info > .brand-line{
-  width:100% !important;
-
-  min-width:0 !important;
-
-  margin-top:10px !important;
-
-  overflow:visible !important;
-
-  white-space:nowrap !important;
-
-  text-overflow:clip !important;
-}
-
-
-/* ============================================================
-   7. PRODUCT NAME
-   Tidak boleh dipotong.
-============================================================ */
-
-.product-info > .product-name{
-  width:100% !important;
-
-  min-width:0 !important;
-
-  height:auto !important;
-
-  max-height:none !important;
-
-  margin-top:7px !important;
-
-  overflow:visible !important;
-
-  white-space:normal !important;
-
-  text-overflow:clip !important;
-
-  overflow-wrap:anywhere !important;
-
-  word-break:normal !important;
-
-  display:block !important;
-
-  -webkit-line-clamp:unset !important;
-
-  -webkit-box-orient:unset !important;
-}
-
-
-/* ============================================================
-   8. PRICE
-============================================================ */
-
-.product-info > .price-label{
-  width:100% !important;
-
-  flex:0 0 auto !important;
-}
-
-.product-info > .price{
-  width:100% !important;
-
-  flex:0 0 auto !important;
-
-  white-space:nowrap !important;
-}
-
-.product-info > .price-meta{
-  width:100% !important;
-
-  min-width:0 !important;
-
-  display:flex !important;
-
-  flex-wrap:nowrap !important;
-
-  align-items:center !important;
-
-  gap:8px !important;
-
-  overflow:visible !important;
-
-  flex:0 0 auto !important;
-}
-
-
-/* ============================================================
-   9. EXTRA NOTE
-   Sudah tidak dipakai
-============================================================ */
-
-.product-info > .extra-note{
-  display:none !important;
-}
-
-
-/* ============================================================
-   10. CONTACT
-   CONTACT SELALU PUNYA SLOT SENDIRI
-============================================================ */
-
-.product-info > .contact-card{
-  position:relative !important;
-
-  left:auto !important;
-  right:auto !important;
-  top:auto !important;
-  bottom:auto !important;
-
-  width:100% !important;
-
-  min-width:0 !important;
-
-  height:auto !important;
-
-  min-height:42px !important;
-
-  margin:
-    10px
-    0
-    0 !important;
-
-  padding:
-    7px
-    9px !important;
-
   box-sizing:border-box !important;
 
-  display:flex !important;
+  color:var(--accent) !important;
 
-  flex-direction:column !important;
+  background:
+    rgba(0,0,0,.22) !important;
 
-  align-items:flex-start !important;
+  border:
+    1px solid
+    var(--accent) !important;
 
-  justify-content:center !important;
+  border-radius:999px !important;
 
-  gap:3px !important;
+  font-size:7px !important;
 
-  overflow:hidden !important;
+  line-height:1 !important;
 
-  flex:0 0 auto !important;
+  font-weight:950 !important;
 
-  z-index:50 !important;
-}
+  letter-spacing:.65px !important;
 
+  text-align:center !important;
 
-/* Isi contact tidak boleh keluar dari kartu */
-
-.product-info > .contact-card .contact-label,
-.product-info > .contact-card .contact-name,
-.product-info > .contact-card .contact-phone{
-  width:100% !important;
-
-  min-width:0 !important;
+  white-space:nowrap !important;
 
   overflow:hidden !important;
 
   text-overflow:ellipsis !important;
 
-  white-space:nowrap !important;
+  transform:none !important;
+
+  z-index:31 !important;
 }
 
 
 /* ============================================================
-   11. 9:16
+   9:16
 ============================================================ */
 
-.r916 .info-zone{
-  height:44% !important;
-
-  padding:
-    4%
-    7%
-    5% !important;
-
-  overflow:visible !important;
-}
-
-.r916 .product-info{
-  height:100% !important;
-
-  overflow:visible !important;
-}
-
-.r916 .badges{
+.r916 .product-info > .badges{
   gap:5px !important;
 }
 
 .r916 .product-info > .badges > .cta{
+  max-width:42% !important;
+
   min-height:29px !important;
 
   padding:
@@ -3346,135 +3311,72 @@ pre{
 
   font-size:6.2px !important;
 
-  letter-spacing:1px !important;
+  letter-spacing:.75px !important;
 }
 
-.r916 .product-info > .badges > .badge.extra,
-.r916 .product-info > .badges > .badge.warranty{
+.r916 .product-info > .badges > .badge.extra{
+  max-width:28% !important;
+
   min-height:29px !important;
 
   padding:
     0 7px !important;
 
   font-size:6px !important;
-
-  letter-spacing:.7px !important;
 }
 
-.r916 .product-name{
-  font-size:
-    clamp(
-      17px,
-      3vw,
-      31px
-    ) !important;
+.r916 .product-info > .badges > .badge.warranty{
+  max-width:32% !important;
 
-  line-height:1.05 !important;
-}
-
-.r916 .contact-card{
-  min-height:39px !important;
+  min-height:29px !important;
 
   padding:
-    6px
-    8px !important;
+    0 7px !important;
 
-  margin-top:8px !important;
+  font-size:6px !important;
 }
 
-.r916 .contact-label{
-  font-size:5.5px !important;
+
+/* ============================================================
+   4:5
+============================================================ */
+
+.r45 .product-info > .badges{
+  gap:5px !important;
 }
 
-.r916 .contact-name{
-  font-size:7px !important;
-}
+.r45 .product-info > .badges > .cta{
+  max-width:42% !important;
 
-.r916 .contact-phone{
+  min-height:30px !important;
+
   font-size:6.5px !important;
 }
 
+.r45 .product-info > .badges > .badge.extra{
+  max-width:28% !important;
 
-/* ============================================================
-   12. 4:5
-============================================================ */
-
-.r45 .info-zone{
-  height:43% !important;
-
-  padding:
-    4.5%
-    7.5%
-    5.5% !important;
-
-  overflow:visible !important;
+  font-size:6.3px !important;
 }
 
-.r45 .product-info{
-  height:100% !important;
+.r45 .product-info > .badges > .badge.warranty{
+  max-width:32% !important;
 
-  overflow:visible !important;
-}
-
-.r45 .product-name{
-  font-size:
-    clamp(
-      18px,
-      3.1vw,
-      36px
-    ) !important;
-
-  line-height:1.05 !important;
-}
-
-.r45 .contact-card{
-  min-height:41px !important;
+  font-size:6.3px !important;
 }
 
 
 /* ============================================================
-   13. 16:9
-   INFO AREA TIDAK BOLEH MEMOTONG ISI
+   16:9
 ============================================================ */
 
-.r169 .info-zone{
-  top:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  width:42% !important;
-
-  padding:
-    5.5%
-    6%
-    4% !important;
-
-  overflow:visible !important;
-}
-
-.r169 .product-info{
-  width:100% !important;
-
-  height:100% !important;
-
-  min-height:0 !important;
-
-  padding:0 !important;
-
-  overflow:visible !important;
-}
-
-
-/* Badge 16:9 */
 .r169 .product-info > .badges{
-  width:100% !important;
-
-  gap:4px !important;
-
-  overflow:visible !important;
+  gap:5px !important;
 }
 
 .r169 .product-info > .badges > .cta{
+  max-width:39% !important;
+
   min-height:28px !important;
 
   padding:
@@ -3482,11 +3384,12 @@ pre{
 
   font-size:5.8px !important;
 
-  letter-spacing:.8px !important;
+  letter-spacing:.65px !important;
 }
 
-.r169 .product-info > .badges > .badge.extra,
-.r169 .product-info > .badges > .badge.warranty{
+.r169 .product-info > .badges > .badge.extra{
+  max-width:27% !important;
+
   min-height:28px !important;
 
   padding:
@@ -3494,138 +3397,46 @@ pre{
 
   font-size:5.7px !important;
 
-  letter-spacing:.55px !important;
+  letter-spacing:.45px !important;
 }
 
+.r169 .product-info > .badges > .badge.warranty{
+  max-width:34% !important;
 
-/* Nama produk 16:9 */
-.r169 .product-name{
-  width:100% !important;
-
-  font-size:
-    clamp(
-      13px,
-      2vw,
-      27px
-    ) !important;
-
-  line-height:1.04 !important;
-
-  margin-top:6px !important;
-
-  overflow:visible !important;
-
-  max-height:none !important;
-
-  display:block !important;
-
-  -webkit-line-clamp:unset !important;
-}
-
-
-/* Harga */
-.r169 .price-label{
-  margin-top:11px !important;
-}
-
-.r169 .price{
-  font-size:
-    clamp(
-      23px,
-      3.5vw,
-      43px
-    ) !important;
-}
-
-
-/* ============================================================
-   14. CONTACT 16:9
-   BUKAN absolute lagi.
-   Ikut flow supaya tidak tenggelam / kepotong.
-============================================================ */
-
-.r169 .product-info > .contact-card{
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  width:100% !important;
-
-  min-height:40px !important;
-
-  height:auto !important;
-
-  margin:0 !important;
+  min-height:28px !important;
 
   padding:
-    6px
-    8px !important;
+    0 6px !important;
 
-  overflow:hidden !important;
+  font-size:5.7px !important;
 
-  z-index:60 !important;
-}
-
-.r169 .contact-label{
-  font-size:4.8px !important;
-
-  line-height:1 !important;
-}
-
-.r169 .contact-name{
-  font-size:6px !important;
-
-  line-height:1.1 !important;
-}
-
-.r169 .contact-phone{
-  font-size:5.5px !important;
-
-  line-height:1.1 !important;
+  letter-spacing:.4px !important;
 }
 
 
 /* ============================================================
-   15. 16:9 — RESERVE CONTACT SLOT
-   Semua elemen atas berhenti sebelum contact.
+   EXPORT = PREVIEW
 ============================================================ */
 
-.r169 .product-info{
-  padding-bottom:48px !important;
-}
-
-
-/* ============================================================
-   16. EXPORT
-   Preview dan PNG harus identik.
-============================================================ */
-
-.export-static .info-zone{
-  overflow:visible !important;
-}
-
-.export-static .product-info{
-  overflow:visible !important;
-}
-
-
-/* Badge export */
 .export-static .product-info > .badges{
   display:flex !important;
 
   flex-direction:row !important;
-
   flex-wrap:nowrap !important;
 
   align-items:center !important;
-
   justify-content:flex-start !important;
 
-  gap:5px !important;
+  gap:6px !important;
+
+  width:100% !important;
 
   overflow:visible !important;
+}
+
+.export-static .product-info > .badges > .badge.promo,
+.export-static .product-info > .badges > .cta-badge-slot{
+  display:none !important;
 }
 
 .export-static .product-info > .badges > .cta{
@@ -3633,133 +3444,51 @@ pre{
 
   inset:auto !important;
 
-  display:inline-flex !important;
+  order:1 !important;
 
-  flex:1 1 auto !important;
-
-  min-width:0 !important;
-
-  margin:0 !important;
-
-  transform:none !important;
-
-  overflow:hidden !important;
-}
-
-.export-static .product-info > .badges > .badge.extra,
-.export-static .product-info > .badges > .badge.warranty{
   flex:0 1 auto !important;
 
   min-width:0 !important;
 
-  margin:0 !important;
-}
-
-
-/* Product name export */
-.export-static .product-name{
-  overflow:visible !important;
-
-  max-height:none !important;
-
-  display:block !important;
-
-  -webkit-line-clamp:unset !important;
-
-  white-space:normal !important;
-
-  overflow-wrap:anywhere !important;
-}
-
-
-/* ============================================================
-   17. EXPORT 16:9 CONTACT
-============================================================ */
-
-.export-static .r169 .product-info{
-  position:relative !important;
-
-  width:100% !important;
-
-  height:100% !important;
-
-  padding-bottom:48px !important;
-
-  overflow:visible !important;
-}
-
-.export-static .r169 .product-info > .contact-card{
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  width:100% !important;
-
-  min-height:40px !important;
+  max-width:42% !important;
 
   margin:0 !important;
 
-  box-sizing:border-box !important;
-
-  overflow:hidden !important;
-
-  z-index:60 !important;
-}
-
-
-/* ============================================================
-   18. EXPORT 9:16 / 4:5 CONTACT
-============================================================ */
-
-.export-static .r916 .product-info,
-.export-static .r45 .product-info{
-  height:100% !important;
-
-  overflow:visible !important;
-}
-
-.export-static .r916 .contact-card,
-.export-static .r45 .contact-card{
-  position:relative !important;
-
-  left:auto !important;
-  right:auto !important;
-  bottom:auto !important;
-
-  width:100% !important;
-
-  margin-top:8px !important;
-
-  overflow:hidden !important;
-}
-
-
-/* ============================================================
-   19. MATIKAN SEMUA SISA TRANSFORM CTA LAMA
-============================================================ */
-
-.r916 .cta,
-.r45 .cta,
-.r169 .cta,
-.export-static .cta{
   transform:none !important;
+
+  overflow:hidden !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:ellipsis !important;
 }
 
+.export-static .product-info > .badges > .badge.extra{
+  order:2 !important;
 
-/* ============================================================
-   20. MATIKAN SEMUA OLD CTA SPACING
-============================================================ */
+  flex:0 1 auto !important;
 
-.r916 .product-info > .cta,
-.r45 .product-info > .cta,
-.r169 .product-info > .cta{
-  margin-top:0 !important;
+  min-width:0 !important;
 
-  margin-bottom:0 !important;
+  max-width:28% !important;
+
+  margin:0 !important;
 }
 
+.export-static .product-info > .badges > .badge.warranty{
+  order:3 !important;
+
+  flex:0 1 auto !important;
+
+  min-width:0 !important;
+
+  max-width:32% !important;
+
+  margin:0 !important;
+  }
+
+
+  
   
 </style>
 
@@ -5665,29 +5394,39 @@ function directorReason(
 
 
   
-
 function fitBadges(){
 
   const root=
     $("promoCanvas");
 
-  if(!root)return;
+  if(!root)
+    return;
 
   const row=
     root.querySelector(
       ".badges"
     );
 
-  if(!row)return;
+  if(!row)
+    return;
 
+  /*
+    CTA = campaign badge dinamis
+    + EXTRA
+    + WARRANTY
+  */
   const badges=[
     ...row.querySelectorAll(
-      ".badge"
+      ".badge, .cta"
     )
   ];
 
-  if(!badges.length)return;
+  if(!badges.length)
+    return;
 
+  /*
+    Reset ukuran dulu.
+  */
   badges.forEach(
     badge=>{
 
@@ -5706,78 +5445,50 @@ function fitBadges(){
       badge.style.lineHeight=
         "1";
 
-      badge.style.flex=
-        "0 0 auto";
-
-      badge.style.minWidth=
-        "max-content";
-
-      badge.style.maxWidth=
-        "none";
-
       badge.style.overflow=
-        "visible";
+        "hidden";
 
       badge.style.textOverflow=
-        "clip";
-
-      badge.style.whiteSpace=
-        "nowrap";
+        "ellipsis";
     }
   );
 
   /*
-    Only 16:9 needs
-    single-row fitting.
+    Ukuran awal berdasarkan rasio.
   */
+  let size;
 
-  if(
-    currentRatio!=="169"
-  ){
-    return;
-  }
+  if(currentRatio==="916")
+    size=6.5;
 
-  row.style.flexWrap=
-    "nowrap";
+  else if(currentRatio==="45")
+    size=6.5;
 
-  row.style.overflow=
-    "visible";
+  else
+    size=6.2;
+
+  badges.forEach(
+    badge=>{
+
+      badge.style.fontSize=
+        size+"px";
+    }
+  );
 
   /*
-    Reserve 12px breathing room
-    on the right side.
+    Kurangi font HANYA jika
+    seluruh baris badge tidak muat.
   */
-
-  const safeRight=
-    12;
-
-  let size=
-    Math.min(
-      ...badges.map(
-        badge=>
-          parseFloat(
-            getComputedStyle(
-              badge
-            ).fontSize
-          )||6
-      )
-    );
-
   let guard=0;
 
   while(
-    row.scrollWidth >
-    row.clientWidth-
-    safeRight+
-    1 &&
-    guard<20
+    row.scrollWidth>
+    row.clientWidth+1&&
+    size>4.2&&
+    guard<18
   ){
 
-    size=
-      Math.max(
-        4.2,
-        size-.2
-      );
+    size-=.2;
 
     badges.forEach(
       badge=>{
@@ -5788,69 +5499,22 @@ function fitBadges(){
     );
 
     guard++;
+  }
 
-    if(
-      size<=4.2
-    ){
-      break;
+  /*
+    Pastikan tidak ada child
+    yang keluar horizontal.
+  */
+  badges.forEach(
+    badge=>{
+
+      badge.style.maxWidth=
+        "100%";
+
+      badge.style.boxSizing=
+        "border-box";
     }
-  }
-
-  /*
-    Fine adjustment:
-    reduce badge horizontal padding,
-    not the text.
-  */
-
-  if(
-    row.scrollWidth >
-    row.clientWidth-
-    safeRight+
-    1
-  ){
-
-    badges.forEach(
-      badge=>{
-
-        badge.style.paddingLeft=
-          "5px";
-
-        badge.style.paddingRight=
-          "5px";
-      }
-    );
-  }
-
-  /*
-    Final pass.
-  */
-
-  guard=0;
-
-  while(
-    row.scrollWidth >
-    row.clientWidth-
-    safeRight+
-    1 &&
-    guard<10
-  ){
-
-    size=
-      Math.max(
-        3.8,
-        size-.15
-      );
-
-    badges.forEach(
-      badge=>{
-
-        badge.style.fontSize=
-          size+"px";
-      }
-    );
-
-    guard++;
-  }
+  );
     }
 /* ============================================================
    PREVIEW RENDER
