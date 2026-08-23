@@ -2711,12 +2711,39 @@ pre{
 
 
 
+
+
+
+
+
+
+
+
+
+
 /* ============================================================
-   CONTACT INFO
+   CONTACT CARD
 ============================================================ */
 
-.contact-block{
+.contact-card{
+  width:100%;
+
   margin-top:9px;
+
+  padding:
+    7px
+    9px;
+
+  box-sizing:border-box;
+
+  border:
+    1px solid
+    rgba(139,198,63,.55);
+
+  border-radius:7px;
+
+  background:
+    rgba(0,0,0,.28);
 
   display:flex;
 
@@ -2726,29 +2753,36 @@ pre{
 
   gap:3px;
 
-  color:#fff;
-
   min-width:0;
 
-  max-width:100%;
+  overflow:hidden;
+}
 
-  overflow:visible;
+.contact-label{
+  color:
+    var(--accent);
+
+  font-size:6px;
+
+  line-height:1;
+
+  font-weight:950;
+
+  letter-spacing:1.3px;
+
+  text-transform:uppercase;
 }
 
 .contact-name{
-  color:#8cc63f;
+  color:#fff;
 
-  font-size:7px;
+  font-size:8px;
 
   line-height:1.15;
 
   font-weight:950;
 
-  letter-spacing:1.1px;
-
-  text-transform:uppercase;
-
-  white-space:normal;
+  max-width:100%;
 
   overflow-wrap:anywhere;
 }
@@ -2756,78 +2790,77 @@ pre{
 .contact-phone{
   color:#fff;
 
-  font-size:8px;
+  font-size:7px;
 
   line-height:1.15;
 
-  font-weight:900;
+  font-weight:800;
 
-  letter-spacing:.7px;
+  letter-spacing:.45px;
 
   white-space:nowrap;
+
+  max-width:100%;
 }
 
 
-.r169 .contact-block{
-  margin-top:7px;
+.r169 .contact-card{
+  margin-top:5px;
+
+  padding:
+    4px
+    6px;
 
   gap:2px;
+
+  border-radius:4px;
+
+  min-height:0;
+}
+
+.r169 .contact-label{
+  font-size:4.5px;
+
+  letter-spacing:.8px;
 }
 
 .r169 .contact-name{
-  font-size:5.2px;
+  font-size:5.5px;
 
-  letter-spacing:.75px;
+  line-height:1.05;
 }
 
 .r169 .contact-phone{
-  font-size:6.2px;
+  font-size:5px;
 
-  letter-spacing:.45px;
+  line-height:1.05;
+
+  letter-spacing:.25px;
 }
 
 
 
-  .r916 .contact-block{
+.r45 .contact-card{
   margin-top:9px;
 
-  gap:3px;
+  padding:
+    7px
+    9px;
 }
 
-.r916 .contact-name{
-  font-size:6.2px;
-
-  letter-spacing:.9px;
-}
-
-.r916 .contact-phone{
-  font-size:7px;
-
-  letter-spacing:.55px;
-}
-
-
-
-
-
-.r45 .contact-block{
-  margin-top:9px;
-
-  gap:3px;
+.r45 .contact-label{
+  font-size:6px;
 }
 
 .r45 .contact-name{
-  font-size:6.5px;
+  font-size:8px;
 }
 
 .r45 .contact-phone{
-  font-size:7.5px;
+  font-size:7px;
 }
 
-
-
   
-
   
 </style>
 </head>
@@ -5059,6 +5092,68 @@ const contact=
     $("ctaSelect")?.value||
     "CEK HARGA";
 
+
+
+const contactNameValue=
+  (
+    $("contactName")?.value||
+    ""
+  ).trim();
+
+const contactPhoneValue=
+  (
+    $("contactPhone")?.value||
+    ""
+  ).trim();
+
+const contactCard=
+  (
+    contactNameValue||
+    contactPhoneValue
+  )
+
+    ?`
+
+      <div class="contact-card">
+
+        <div class="contact-label">
+          HUBUNGI
+        </div>
+
+        ${
+          contactNameValue
+            ?`
+              <div class="contact-name">
+                ${esc(
+                  contactNameValue
+                )}
+              </div>
+            `
+            :""
+        }
+
+        ${
+          contactPhoneValue
+            ?`
+              <div class="contact-phone">
+                ☎
+                ${esc(
+                  contactPhoneValue
+                )}
+              </div>
+            `
+            :""
+        }
+
+      </div>
+
+    `
+
+    :"";
+
+
+  
+
   stage.className=
     `stage r${currentRatio} `+
     `${motion?"motion-active":""} `+
@@ -5225,7 +5320,7 @@ const contact=
             ${esc(cta)}
           </div>
 
-          ${contact}
+          ${contactCard}
 
         </div>
 
@@ -6592,15 +6687,7 @@ contactPhone=
   $("contactPhone")
     .value;
 
-localStorage.setItem(
-  "contact_name",
-  contactName
-);
 
-localStorage.setItem(
-  "contact_phone",
-  contactPhone
-);
 
   $("qualitySelect")
     .value=
@@ -8250,7 +8337,7 @@ $("campaignName")
         e.target.value;
 
       localStorage.setItem(
-        "laras_contact_name",
+        "contact_name",
         contactName
       );
 
@@ -8265,7 +8352,7 @@ $("contactPhone")
         e.target.value;
 
       localStorage.setItem(
-        "laras_contact_phone",
+        "contact_phone",
         contactPhone
       );
 
