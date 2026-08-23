@@ -536,7 +536,7 @@ main{
 
   z-index:20;
 
-  overflow:visible;
+  overflow:hidden;
 }
 
 .r916 .info-zone,
@@ -4838,6 +4838,69 @@ function directorReason(
    Prevent badge content from visually running outside.
 ============================================================ */
 
+
+
+function fitContactCard(){
+
+  const root=
+    $("promoCanvas");
+
+  if(!root)return;
+
+  if(
+    currentRatio!=="169"
+  ){
+    return;
+  }
+
+  const card=
+    root.querySelector(
+      ".contact-card"
+    );
+
+  if(!card)return;
+
+  /*
+    Reset first.
+  */
+
+  card.style.transform=
+    "none";
+
+  /*
+    Give the card a little
+    breathing room from bottom.
+  */
+
+  const rootRect=
+    root.getBoundingClientRect();
+
+  const cardRect=
+    card.getBoundingClientRect();
+
+  const safeBottom=
+    8;
+
+  const overflow=
+    cardRect.bottom-
+    (
+      rootRect.bottom-
+      safeBottom
+    );
+
+  if(
+    overflow>0
+  ){
+
+    card.style.transform=
+      `translateY(-${overflow}px)`;
+  }
+}
+
+
+
+  
+
 function fitBadges(){
 
   const root=
@@ -5458,6 +5521,8 @@ const contactCard=
   requestAnimationFrame(
     ()=>{
       fitBadges();
+
+      fitContactCard();
     }
   );
 }
@@ -7310,6 +7375,8 @@ async function renderPNG(){
 
   fitBadges();
 
+  fitContactCard();
+
   await waitForImages(
     source
   );
@@ -7328,6 +7395,8 @@ async function renderPNG(){
   );
 
   fitBadges();
+
+  fitContactCard();
 
   /*
     Read the actual preview.
