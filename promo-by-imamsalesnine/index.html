@@ -18,13 +18,15 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 
-
 <style>
 
 
-
 /* ============================================================
-   ROOT
+   IMAM SALESFR — PROMO CREATIVE
+   MASTER CSS — SINGLE SOURCE OF TRUTH
+   RATIOS:
+   9:16 / 4:5 / 16:9
+   PREVIEW = EXPORT GEOMETRY
 ============================================================ */
 
 :root{
@@ -33,7 +35,7 @@
   --panel2:#0d130e;
 
   --line:rgba(255,255,255,.09);
-  --soft:rgba(255,255,255,.06);
+  --soft:rgba(255,255,255,.055);
 
   --text:#f7faf5;
   --muted:#7e887f;
@@ -42,12 +44,9 @@
   --lime2:#b5f45d;
 
   --orange:#ff7612;
-  --blue:#2998e8;
-  --red:#ff6262;
   --yellow:#ffd45a;
-
-  --shadow:
-    0 30px 90px rgba(0,0,0,.5);
+  --red:#ff6262;
+  --blue:#2998e8;
 
   --body:
     Inter,
@@ -72,6 +71,7 @@ html,
 body{
   margin:0;
   min-height:100%;
+
   background:var(--bg);
 }
 
@@ -80,15 +80,8 @@ body{
 
   font-family:var(--body);
 
-  background:
-    radial-gradient(
-      circle at 50% -20%,
-      rgba(140,198,63,.10),
-      transparent 35%
-    ),
-    var(--bg);
-
   -webkit-font-smoothing:antialiased;
+
   text-rendering:geometricPrecision;
 }
 
@@ -100,7 +93,6 @@ select{
 
 button{
   cursor:pointer;
-  border:0;
 }
 
 img{
@@ -110,13 +102,15 @@ img{
 
 
 /* ============================================================
-   TOP BAR
+   HEADER
 ============================================================ */
 
 .topbar{
   position:sticky;
   top:0;
   z-index:1000;
+
+  min-height:78px;
 
   display:flex;
   align-items:center;
@@ -128,16 +122,13 @@ img{
     14px
     clamp(14px,4vw,40px);
 
-  min-height:78px;
-
   background:
     rgba(4,6,4,.94);
 
   border-bottom:
     1px solid var(--line);
 
-  backdrop-filter:
-    blur(20px);
+  backdrop-filter:blur(20px);
 }
 
 .brand{
@@ -155,6 +146,7 @@ img{
     );
 
   font-weight:950;
+
   letter-spacing:-1.4px;
 }
 
@@ -167,6 +159,7 @@ img{
   color:var(--lime);
 
   font-size:9px;
+
   font-weight:900;
 
   letter-spacing:1.5px;
@@ -176,21 +169,26 @@ img{
 
 .header-actions{
   display:flex;
+
   gap:8px;
 }
 
 .icon-btn,
 .primary-btn{
-  min-width:48px;
   height:48px;
 
   border-radius:14px;
 
-  color:white;
+  color:#fff;
+
   background:#080c09;
 
   border:
     1px solid var(--line);
+}
+
+.icon-btn{
+  min-width:48px;
 }
 
 .icon-btn.active{
@@ -202,6 +200,10 @@ img{
 }
 
 .primary-btn{
+  padding:
+    0
+    17px;
+
   color:#081006;
 
   background:
@@ -214,10 +216,6 @@ img{
   border-color:var(--lime);
 
   font-weight:950;
-
-  padding:
-    0
-    17px;
 }
 
 
@@ -255,10 +253,12 @@ main{
 
 
 /* ============================================================
-   PANEL
+   PANELS
 ============================================================ */
 
 .panel{
+  padding:18px;
+
   background:
     linear-gradient(
       145deg,
@@ -270,8 +270,6 @@ main{
     1px solid var(--line);
 
   border-radius:22px;
-
-  padding:18px;
 
   box-shadow:
     0 18px 60px rgba(0,0,0,.16);
@@ -285,6 +283,7 @@ main{
   color:#748075;
 
   font-size:8px;
+
   font-weight:950;
 
   letter-spacing:2.5px;
@@ -320,44 +319,50 @@ main{
 
 
 /* ============================================================
-   PREVIEW STAGE
+   STAGE
 ============================================================ */
 
 .stage-wrap{
   position:relative;
 
-  display:flex;
-  justify-content:center;
-
   width:100%;
+
+  display:flex;
+
+  justify-content:center;
 }
 
 .stage{
   width:100%;
 
   display:flex;
+
   justify-content:center;
 }
 
 .promo-canvas{
   position:relative;
 
-  overflow:hidden;
-  isolation:isolate;
-
   width:100%;
+
+  overflow:hidden;
+
+  isolation:isolate;
 
   background:#050705;
 
   border:
-    1px solid rgba(255,255,255,.11);
+    1px solid
+    rgba(255,255,255,.11);
 
   box-shadow:
-    var(--shadow);
-
-  transition:
-    opacity .18s ease;
+    0 30px 90px rgba(0,0,0,.5);
 }
+
+
+/* ============================================================
+   RATIO MASTER
+============================================================ */
 
 .stage.r916 .promo-canvas{
   width:100%;
@@ -382,11 +387,12 @@ main{
 
 
 /* ============================================================
-   BACKGROUND
+   CANVAS BACKGROUND
 ============================================================ */
 
 .canvas-bg{
   position:absolute;
+
   inset:0;
 
   z-index:0;
@@ -404,6 +410,7 @@ main{
   content:"";
 
   position:absolute;
+
   inset:-20%;
 
   background:
@@ -429,8 +436,8 @@ main{
 
   position:absolute;
 
-  right:-12%;
   top:-25%;
+  right:-12%;
 
   width:42%;
   height:150%;
@@ -445,8 +452,7 @@ main{
 
   opacity:.22;
 
-  transform:
-    skewX(-13deg);
+  transform:skewX(-13deg);
 }
 
 
@@ -475,18 +481,24 @@ main{
     #020302;
 }
 
+
+/* 9:16 + 4:5 */
+
 .r916 .product-visual,
 .r45 .product-visual{
+  top:0;
   left:0;
   right:0;
-  top:0;
 
   height:56%;
 }
 
+
+/* 16:9 */
+
 .r169 .product-visual{
-  left:0;
   top:0;
+  left:0;
   bottom:0;
 
   width:58%;
@@ -499,15 +511,12 @@ main{
   padding:7%;
 
   object-fit:contain;
+
   object-position:center;
 
   user-select:none;
 
   transform-origin:center;
-
-  transition:
-    transform .25s ease,
-    filter .25s ease;
 }
 
 .product-image.portrait{
@@ -526,6 +535,7 @@ main{
 
 .visual-gradient{
   position:absolute;
+
   inset:0;
 
   z-index:3;
@@ -554,7 +564,7 @@ main{
 
 
 /* ============================================================
-   INFO AREA
+   INFO ZONE — MASTER
 ============================================================ */
 
 .info-zone{
@@ -562,11 +572,13 @@ main{
 
   z-index:20;
 
-  overflow:hidden;
+  box-sizing:border-box;
 }
 
-.r916 .info-zone,
-.r45 .info-zone{
+
+/* 9:16 */
+
+.r916 .info-zone{
   left:0;
   right:0;
   bottom:0;
@@ -577,11 +589,34 @@ main{
     4.6%
     7.8%
     5.6%;
+
+  overflow:visible;
 }
 
-.r169 .info-zone{
+
+/* 4:5 */
+
+.r45 .info-zone{
+  left:0;
   right:0;
+  bottom:0;
+
+  height:43%;
+
+  padding:
+    4.8%
+    7.5%
+    6%;
+
+  overflow:visible;
+}
+
+
+/* 16:9 */
+
+.r169 .info-zone{
   top:0;
+  right:0;
   bottom:0;
 
   width:42%;
@@ -595,6 +630,11 @@ main{
   overflow:hidden;
 }
 
+
+/* ============================================================
+   PRODUCT INFO
+============================================================ */
+
 .product-info{
   position:relative;
 
@@ -607,9 +647,21 @@ main{
   display:flex;
 
   flex-direction:column;
-  align-items:flex-start;
 
-  overflow:visible;
+  align-items:flex-start;
+}
+
+
+/* 16:9 gets a reserved bottom contact zone */
+
+.r169 .product-info{
+  height:100%;
+
+  min-height:0;
+
+  padding-bottom:40px;
+
+  overflow:hidden;
 }
 
 
@@ -636,9 +688,15 @@ main{
     );
 }
 
+.r916 .rule{
+  width:56px;
+
+  margin-bottom:10px;
+}
+
 
 /* ============================================================
-   BADGES
+   BADGES — ONE MASTER
 ============================================================ */
 
 .badges{
@@ -647,11 +705,10 @@ main{
   display:flex;
 
   align-items:center;
+
   justify-content:flex-start;
 
   gap:8px;
-
-  flex-wrap:wrap;
 
   min-width:0;
 
@@ -666,8 +723,7 @@ main{
   align-items:center;
   justify-content:center;
 
-  flex:
-    0 1 auto;
+  flex:0 1 auto;
 
   min-width:0;
   max-width:100%;
@@ -678,9 +734,9 @@ main{
     0
     13px;
 
-  border-radius:999px;
-
   box-sizing:border-box;
+
+  border-radius:999px;
 
   text-align:center;
 
@@ -690,8 +746,6 @@ main{
 
   text-overflow:ellipsis;
 
-  font-family:var(--body);
-
   font-size:7px;
 
   line-height:1;
@@ -699,10 +753,6 @@ main{
   font-weight:950;
 
   letter-spacing:1.7px;
-
-  vertical-align:middle;
-
-  transform:none!important;
 }
 
 .badge.promo{
@@ -727,8 +777,7 @@ main{
 }
 
 .badge.warranty{
-  flex:
-    0 1 auto;
+  flex:0 1 auto;
 
   color:var(--accent);
 
@@ -739,10 +788,95 @@ main{
     1px solid var(--accent);
 }
 
-.badge,
-.badge::before,
-.badge::after{
-  box-sizing:border-box;
+
+/* ============================================================
+   9:16 BADGES
+============================================================ */
+
+.r916 .badges{
+  gap:7px;
+}
+
+.r916 .badge{
+  min-height:29px;
+
+  padding:
+    0
+    11px;
+
+  font-size:6.5px;
+
+  letter-spacing:1.45px;
+}
+
+.r916 .badge.promo{
+  min-width:72px;
+}
+
+
+/* ============================================================
+   4:5 BADGES
+============================================================ */
+
+.r45 .badges{
+  gap:7px;
+}
+
+
+/* ============================================================
+   16:9 BADGES
+============================================================ */
+
+.r169 .badges{
+  flex-wrap:nowrap;
+
+  gap:4px;
+
+  min-width:0;
+
+  max-width:100%;
+
+  overflow:visible;
+}
+
+.r169 .badge{
+  flex:0 0 auto;
+
+  min-width:max-content;
+
+  max-width:none;
+
+  min-height:28px;
+
+  padding:
+    0
+    7px;
+
+  font-size:7px;
+
+  letter-spacing:.9px;
+
+  white-space:nowrap;
+
+  overflow:visible;
+
+  text-overflow:clip;
+}
+
+.r169 .badge.promo{
+  min-width:68px;
+
+  padding-left:8px;
+  padding-right:8px;
+}
+
+.r169 .badge.warranty{
+  min-width:max-content;
+
+  padding-left:6px;
+  padding-right:6px;
+
+  letter-spacing:.7px;
 }
 
 
@@ -754,6 +888,8 @@ main{
   width:100%;
 
   margin-top:10px;
+
+  min-height:14px;
 
   color:var(--accent);
 
@@ -775,8 +911,6 @@ main{
 
   display:block;
 
-  min-height:14px;
-
   position:relative;
 
   z-index:40;
@@ -789,6 +923,8 @@ main{
 
 .product-name{
   width:100%;
+
+  min-width:0;
 
   margin-top:7px;
 
@@ -813,9 +949,61 @@ main{
 
   word-break:normal;
 
-  display:block;
+  flex:0 0 auto;
+}
 
-  overflow:visible;
+
+/* 9:16 */
+
+.r916 .product-name{
+  font-size:
+    clamp(
+      20px,
+      3.15vw,
+      38px
+    );
+
+  line-height:1.08;
+}
+
+
+/* 4:5 */
+
+.r45 .product-name{
+  font-size:
+    clamp(
+      21px,
+      3.2vw,
+      39px
+    );
+
+  line-height:1.06;
+}
+
+
+/* 16:9 */
+
+.r169 .product-name{
+  font-size:
+    clamp(
+      15px,
+      2.15vw,
+      30px
+    );
+
+  line-height:1.04;
+
+  letter-spacing:-.2px;
+
+  display:-webkit-box;
+
+  -webkit-box-orient:vertical;
+
+  -webkit-line-clamp:2;
+
+  max-height:2.08em;
+
+  overflow:hidden;
 }
 
 
@@ -825,6 +1013,8 @@ main{
 
 .price-label{
   width:100%;
+
+  flex:0 0 auto;
 
   margin-top:15px;
 
@@ -841,8 +1031,19 @@ main{
   text-transform:uppercase;
 }
 
+.r916 .price-label,
+.r45 .price-label{
+  margin-top:12px;
+}
+
+.r169 .price-label{
+  margin-top:13px;
+}
+
 .price{
   width:100%;
+
+  flex:0 0 auto;
 
   margin-top:4px;
 
@@ -864,19 +1065,60 @@ main{
   white-space:nowrap;
 }
 
+.r916 .price{
+  font-size:
+    clamp(
+      27px,
+      4.15vw,
+      48px
+    );
+}
+
+.r45 .price{
+  font-size:
+    clamp(
+      28px,
+      4.2vw,
+      49px
+    );
+}
+
+.r169 .price{
+  font-size:
+    clamp(
+      27px,
+      3.8vw,
+      46px
+    );
+}
+
+
+/* ============================================================
+   PRICE META
+============================================================ */
+
 .price-meta{
   width:100%;
+
+  min-height:14px;
 
   display:flex;
 
   align-items:center;
+
   justify-content:flex-start;
 
   gap:9px;
 
   margin-top:8px;
 
-  min-height:14px;
+  flex:0 0 auto;
+}
+
+.r916 .price-meta{
+  margin-top:7px;
+
+  gap:8px;
 }
 
 .old{
@@ -894,19 +1136,22 @@ main{
 
   white-space:nowrap;
 
-  text-decoration:none;
-
-  vertical-align:middle;
-
   opacity:.95;
+}
+
+.r916 .old,
+.r169 .old{
+  font-size:7.5px;
+}
+
+.r169 .old{
+  font-size:8px;
 }
 
 .old-price{
   position:relative;
 
   display:inline-block;
-
-  line-height:1.1;
 }
 
 .strike-line{
@@ -938,27 +1183,37 @@ main{
   white-space:nowrap;
 }
 
-.extra-note{
-  width:100%;
-
-  margin-top:7px;
-
-  color:#ff974a;
-
-  font-size:7px;
-
-  line-height:1.15;
-
-  font-weight:950;
-
-  letter-spacing:1px;
+.r916 .discount{
+  font-size:7.5px;
 }
 
+
+/* ============================================================
+   EXTRA NOTE
+   USER REQUEST: HIDDEN
+============================================================ */
+
+.extra-note{
+  display:none !important;
+}
+
+
+/* ============================================================
+   CTA / NEW PRODUCT
+============================================================ */
+
 .cta{
+  position:relative;
+
+  z-index:31;
+
   display:inline-flex;
 
   align-items:center;
+
   justify-content:center;
+
+  flex:0 0 auto;
 
   min-height:28px;
 
@@ -987,9 +1242,21 @@ main{
   text-align:center;
 }
 
+.r916 .cta{
+  min-height:27px;
+
+  margin-top:9px;
+
+  padding:
+    0
+    12px;
+
+  font-size:6.2px;
+}
+
 
 /* ============================================================
-   CONTACT CARD — BASE
+   CONTACT CARD — MASTER
 ============================================================ */
 
 .contact-card{
@@ -1018,14 +1285,20 @@ main{
 
   align-items:flex-start;
 
+  justify-content:center;
+
   gap:3px;
 
   min-width:0;
 
   overflow:hidden;
+
+  flex:0 0 auto;
 }
 
 .contact-label{
+  width:100%;
+
   color:var(--accent);
 
   font-size:6px;
@@ -1037,9 +1310,15 @@ main{
   letter-spacing:1.3px;
 
   text-transform:uppercase;
+
+  white-space:nowrap;
+
+  overflow:hidden;
 }
 
 .contact-name{
+  width:100%;
+
   color:#fff;
 
   font-size:8px;
@@ -1048,12 +1327,16 @@ main{
 
   font-weight:950;
 
-  max-width:100%;
+  white-space:nowrap;
 
-  overflow-wrap:anywhere;
+  overflow:hidden;
+
+  text-overflow:ellipsis;
 }
 
 .contact-phone{
+  width:100%;
+
   color:#fff;
 
   font-size:7px;
@@ -1066,182 +1349,40 @@ main{
 
   white-space:nowrap;
 
-  max-width:100%;
+  overflow:hidden;
+
+  text-overflow:ellipsis;
 }
 
 
 /* ============================================================
-   9:16
+   9:16 CONTACT
 ============================================================ */
 
-.r916 .info-zone{
-  height:46%;
-
-  padding:
-    4.4%
-    7.8%
-    5.4%;
-
-  overflow:visible;
-}
-
-.r916 .product-info{
-  width:100%;
-
-  align-items:flex-start;
-
-  overflow:visible;
-}
-
-.r916 .rule{
-  width:56px;
-
-  margin-bottom:10px;
-}
-
-.r916 .badges{
-  gap:7px;
-}
-
-.r916 .badge{
-  min-height:29px;
-
-  padding:
-    0
-    11px;
-
-  font-size:6.5px;
-
-  letter-spacing:1.45px;
-}
-
-.r916 .badge.promo{
-  min-width:72px;
-}
-
-.r916 .product-name{
-  margin-top:7px;
-
-  font-size:
-    clamp(
-      20px,
-      3.15vw,
-      38px
-    );
-
-  line-height:1.08;
-
-  max-width:100%;
-
-  display:block;
-
-  overflow:visible;
-
-  white-space:normal;
-
-  overflow-wrap:anywhere;
-
-  word-break:normal;
-}
-
-.r916 .price-label{
-  margin-top:12px;
-
-  font-size:6.8px;
-
-  line-height:1.15;
-}
-
-.r916 .price{
-  margin-top:4px;
-
-  font-size:
-    clamp(
-      27px,
-      4.15vw,
-      48px
-    );
-
-  line-height:1;
-}
-
-.r916 .price-meta{
-  margin-top:7px;
-
-  gap:8px;
-
-  min-height:13px;
-}
-
-.r916 .old{
-  font-size:7.5px;
-
-  line-height:1.1;
-}
-
-.r916 .strike-line{
-  top:50%;
-
-  height:1.5px;
-}
-
-.r916 .discount{
-  font-size:7.5px;
-
-  line-height:1.1;
-}
-
-.r916 .extra-note{
-  margin-top:6px;
-
-  font-size:6.8px;
-}
-
-.r916 .cta{
-  min-height:27px;
-
+.r916 .contact-card{
   margin-top:9px;
 
   padding:
-    0
-    12px;
+    7px
+    9px;
+}
 
-  font-size:6.2px;
+.r916 .contact-label{
+  font-size:6px;
+}
+
+.r916 .contact-name{
+  font-size:8px;
+}
+
+.r916 .contact-phone{
+  font-size:7px;
 }
 
 
 /* ============================================================
-   4:5
+   4:5 CONTACT
 ============================================================ */
-
-.r45 .info-zone{
-  height:43%;
-
-  padding:
-    4.8%
-    7.5%
-    6%;
-}
-
-.r45 .product-name{
-  font-size:
-    clamp(
-      21px,
-      3.2vw,
-      39px
-    );
-
-  line-height:1.06;
-}
-
-.r45 .price{
-  font-size:
-    clamp(
-      28px,
-      4.2vw,
-      49px
-    );
-}
 
 .r45 .contact-card{
   margin-top:9px;
@@ -1251,206 +1392,10 @@ main{
     9px;
 }
 
-.r45 .contact-label{
-  font-size:6px;
-}
-
-.r45 .contact-name{
-  font-size:8px;
-}
-
-.r45 .contact-phone{
-  font-size:7px;
-}
-
 
 /* ============================================================
-   16:9 — MASTER
+   16:9 CONTACT — DEDICATED BOTTOM SLOT
 ============================================================ */
-
-.r169 .info-zone{
-  right:0;
-  top:0;
-  bottom:0;
-
-  width:42%;
-
-  padding:
-    6%
-    6%
-    4%
-    5%;
-
-  box-sizing:border-box;
-
-  overflow:hidden;
-}
-
-.r169 .product-info{
-  position:relative;
-
-  width:100%;
-  height:100%;
-
-  min-width:0;
-  min-height:0;
-
-  box-sizing:border-box;
-
-  padding-bottom:38px;
-
-  overflow:hidden;
-}
-
-.r169 .badges{
-  width:100%;
-
-  display:flex;
-
-  flex-wrap:nowrap;
-
-  align-items:center;
-  justify-content:flex-start;
-
-  gap:4px;
-
-  min-width:0;
-  max-width:100%;
-
-  overflow:visible;
-
-  box-sizing:border-box;
-}
-
-.r169 .badge{
-  flex:0 0 auto;
-
-  min-width:max-content;
-  max-width:none;
-
-  min-height:28px;
-
-  padding:
-    0
-    7px;
-
-  font-size:7px;
-
-  line-height:1;
-
-  letter-spacing:.9px;
-
-  font-weight:950;
-
-  white-space:nowrap;
-
-  overflow:visible;
-
-  text-overflow:clip;
-
-  box-sizing:border-box;
-
-  display:inline-flex;
-
-  align-items:center;
-  justify-content:center;
-
-  text-align:center;
-}
-
-.r169 .badge.promo{
-  min-width:68px;
-
-  padding-left:8px;
-  padding-right:8px;
-}
-
-.r169 .badge.warranty{
-  min-width:max-content;
-
-  padding-left:6px;
-  padding-right:6px;
-
-  letter-spacing:.7px;
-}
-
-.r169 .brand-line{
-  font-size:10px;
-
-  line-height:1.35;
-
-  letter-spacing:2px;
-
-  min-height:14px;
-
-  overflow:visible;
-
-  display:block;
-
-  position:relative;
-
-  z-index:40;
-}
-
-.r169 .product-name{
-  width:100%;
-  max-width:100%;
-
-  display:-webkit-box;
-
-  -webkit-box-orient:vertical;
-  -webkit-line-clamp:2;
-
-  overflow:hidden;
-
-  max-height:2.08em;
-
-  margin-top:7px;
-
-  font-size:
-    clamp(
-      15px,
-      2.15vw,
-      30px
-    );
-
-  line-height:1.04;
-
-  letter-spacing:-.2px;
-
-  white-space:normal;
-
-  overflow-wrap:break-word;
-
-  word-break:normal;
-
-  box-sizing:border-box;
-}
-
-.r169 .price-label{
-  margin-top:13px;
-}
-
-.r169 .price{
-  font-size:
-    clamp(
-      27px,
-      3.8vw,
-      46px
-    );
-}
-
-.r169 .old{
-  font-size:8px;
-
-  line-height:1.1;
-}
-
-.r169 .strike-line{
-  top:50%;
-
-  height:1.5px;
-}
 
 .r169 .contact-card{
   position:absolute;
@@ -1461,9 +1406,11 @@ main{
 
   width:100%;
 
-  margin:0;
+  height:auto;
 
   min-height:30px;
+
+  margin:0;
 
   padding:
     5px
@@ -1481,8 +1428,6 @@ main{
 
   gap:2px;
 
-  overflow:hidden;
-
   border:
     1px solid
     rgba(139,198,63,.55);
@@ -1492,67 +1437,41 @@ main{
   background:
     rgba(0,0,0,.28);
 
+  overflow:hidden;
+
   z-index:50;
 }
 
 .r169 .contact-label{
-  display:block;
-
-  width:100%;
-
   font-size:4.8px;
 
   line-height:1;
 
   letter-spacing:.8px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
 }
 
 .r169 .contact-name{
-  display:block;
-
-  width:100%;
-
   font-size:5.8px;
 
   line-height:1.05;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
 }
 
 .r169 .contact-phone{
-  display:block;
-
-  width:100%;
-
   font-size:5.2px;
 
   line-height:1.05;
 
   letter-spacing:.2px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
 }
 
-.r169 .cta{
-  position:relative;
 
-  transform:none;
+/* ============================================================
+   16:9 — CONTACT AWARE CTA
+   Contact gets its own seat.
+============================================================ */
 
-  margin-bottom:0;
-
-  z-index:31;
+.r169 .product-info:has(.contact-card) .cta{
+  margin-bottom:40px;
 }
 
 
@@ -1562,6 +1481,7 @@ main{
 
 .watermark{
   position:absolute;
+
   inset:0;
 
   z-index:70;
@@ -1569,6 +1489,7 @@ main{
   pointer-events:none;
 
   display:grid;
+
   place-items:center;
 
   color:
@@ -1590,8 +1511,7 @@ main{
 
   letter-spacing:3px;
 
-  transform:
-    rotate(-25deg);
+  transform:rotate(-25deg);
 }
 
 .signature{
@@ -1625,6 +1545,8 @@ main{
     4px
     6px;
 
+  color:#fff;
+
   background:
     rgba(0,0,0,.7);
 
@@ -1633,8 +1555,6 @@ main{
     rgba(255,255,255,.12);
 
   border-radius:5px;
-
-  color:#fff;
 
   font-size:6px;
 
@@ -1648,13 +1568,13 @@ main{
 
   z-index:95;
 
+  display:none;
+
   border:
     1px dashed
     rgba(255,255,255,.34);
 
   pointer-events:none;
-
-  display:none;
 }
 
 .safe-zone::after{
@@ -1715,7 +1635,6 @@ main{
 }
 
 @keyframes heroIn{
-
   from{
     transform:scale(1);
   }
@@ -1728,7 +1647,6 @@ main{
 }
 
 @keyframes pricePulse{
-
   0%,65%{
     transform:scale(1);
   }
@@ -1743,7 +1661,6 @@ main{
 }
 
 @keyframes badgePop{
-
   0%,60%{
     transform:scale(1);
   }
@@ -1759,171 +1676,136 @@ main{
 
 
 /* ============================================================
-   EXPORT LOCK
+   EXPORT — SINGLE MASTER
+   Preview geometry is preserved.
 ============================================================ */
 
 .export-static,
 .export-static *{
-  animation:none!important;
-  transition:none!important;
-  caret-color:transparent!important;
+  animation:none !important;
+
+  transition:none !important;
+
+  caret-color:transparent !important;
 }
 
 .export-static .safe-zone,
 .export-static .ratio-mark{
-  display:none!important;
+  display:none !important;
 }
 
 .export-static .promo-canvas{
-  opacity:1!important;
-}
+  opacity:1 !important;
 
-.export-static .info-zone{
-  overflow:hidden!important;
-}
+  animation:none !important;
 
-.export-static .product-info{
-  overflow:hidden!important;
-}
-
-.export-static .product-name{
-  display:-webkit-box!important;
-
-  -webkit-box-orient:vertical!important;
-  -webkit-line-clamp:2!important;
-
-  overflow:hidden!important;
-
-  max-height:2.08em!important;
-
-  white-space:normal!important;
-}
-
-.export-static .badges{
-  display:flex!important;
-
-  align-items:center!important;
-  justify-content:flex-start!important;
-
-  gap:4px!important;
-
-  flex-wrap:nowrap!important;
-
-  min-width:0!important;
-
-  overflow:visible!important;
-}
-
-.export-static .badge{
-  display:inline-flex!important;
-
-  flex:
-    0 0 auto!important;
-
-  align-items:center!important;
-  justify-content:center!important;
-
-  min-width:max-content!important;
-  max-width:none!important;
-
-  text-align:center!important;
-
-  line-height:1!important;
-
-  white-space:nowrap!important;
-
-  overflow:visible!important;
-
-  text-overflow:clip!important;
-
-  transform:none!important;
+  transition:none !important;
 }
 
 
 /* ============================================================
-   EXPORT 16:9 GEOMETRY
+   EXPORT — PRODUCT TITLE
 ============================================================ */
 
-.export-static .r169 .info-zone{
-  overflow:hidden!important;
+.export-static .product-name{
+  display:-webkit-box !important;
 
-  box-sizing:border-box!important;
+  -webkit-box-orient:vertical !important;
+
+  -webkit-line-clamp:2 !important;
+
+  overflow:hidden !important;
+
+  max-height:2.08em !important;
+
+  white-space:normal !important;
 }
 
+
+/* ============================================================
+   EXPORT — BADGES
+============================================================ */
+
+.export-static .badges{
+  display:flex !important;
+
+  align-items:center !important;
+
+  justify-content:flex-start !important;
+
+  gap:4px !important;
+
+  flex-wrap:nowrap !important;
+
+  min-width:0 !important;
+
+  overflow:visible !important;
+}
+
+.export-static .badge{
+  display:inline-flex !important;
+
+  flex:
+    0 0 auto !important;
+
+  align-items:center !important;
+
+  justify-content:center !important;
+
+  min-width:max-content !important;
+
+  max-width:none !important;
+
+  white-space:nowrap !important;
+
+  overflow:visible !important;
+
+  text-overflow:clip !important;
+
+  transform:none !important;
+}
+
+
+/* ============================================================
+   EXPORT — 16:9 CONTACT GEOMETRY
+============================================================ */
+
 .export-static .r169 .product-info{
-  position:relative!important;
+  position:relative !important;
 
-  width:100%!important;
-  height:100%!important;
+  width:100% !important;
 
-  min-width:0!important;
-  min-height:0!important;
+  height:100% !important;
 
-  padding-bottom:38px!important;
+  min-width:0 !important;
 
-  overflow:hidden!important;
+  min-height:0 !important;
 
-  box-sizing:border-box!important;
+  padding-bottom:40px !important;
+
+  overflow:hidden !important;
 }
 
 .export-static .r169 .contact-card{
-  position:absolute!important;
+  position:absolute !important;
 
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
 
-  width:100%!important;
+  width:100% !important;
 
-  margin:0!important;
+  margin:0 !important;
 
-  min-height:30px!important;
+  box-sizing:border-box !important;
 
-  box-sizing:border-box!important;
+  overflow:hidden !important;
 
-  overflow:hidden!important;
+  z-index:50 !important;
 }
 
-.export-static .r169 .contact-label{
-  display:block!important;
-
-  width:100%!important;
-
-  font-size:4.8px!important;
-
-  line-height:1!important;
-}
-
-.export-static .r169 .contact-name{
-  display:block!important;
-
-  width:100%!important;
-
-  font-size:5.8px!important;
-
-  line-height:1.05!important;
-
-  white-space:nowrap!important;
-
-  overflow:hidden!important;
-
-  text-overflow:ellipsis!important;
-}
-
-.export-static .r169 .contact-phone{
-  display:block!important;
-
-  width:100%!important;
-
-  font-size:5.2px!important;
-
-  line-height:1.05!important;
-
-  white-space:nowrap!important;
-
-  overflow:hidden!important;
-
-  text-overflow:ellipsis!important;
+.export-static .r169 .product-info:has(.contact-card) .cta{
+  margin-bottom:40px !important;
 }
 
 
@@ -2131,6 +2013,7 @@ input[type=text],
 input[type=number],
 input[type=search]{
   width:100%;
+
   height:40px;
 
   padding:
@@ -2184,7 +2067,7 @@ input:focus{
 
 
 /* ============================================================
-   CHOICES
+   CHOICE
 ============================================================ */
 
 .choice-grid{
@@ -2219,9 +2102,9 @@ input:focus{
 .choice strong{
   display:block;
 
-  font-size:10px;
-
   color:#fff;
+
+  font-size:10px;
 }
 
 .choice span{
@@ -2353,15 +2236,16 @@ input:focus{
   display:flex;
 
   justify-content:space-between;
+
   align-items:center;
 }
 
 .score-number{
+  color:var(--lime);
+
   font-size:28px;
 
   font-weight:950;
-
-  color:var(--lime);
 }
 
 .score-bar{
@@ -2377,8 +2261,8 @@ input:focus{
 }
 
 .score-fill{
-  height:100%;
   width:0;
+  height:100%;
 
   background:
     linear-gradient(
@@ -2554,12 +2438,12 @@ input[type=range]{
 .card-image{
   height:125px;
 
-  background:#050705;
-
   display:flex;
 
   align-items:center;
   justify-content:center;
+
+  background:#050705;
 }
 
 .card-image img{
@@ -2581,6 +2465,7 @@ input[type=range]{
   height:21px;
 
   display:grid;
+
   place-items:center;
 
   border-radius:6px;
@@ -2661,7 +2546,7 @@ input[type=range]{
 
   border-radius:7px;
 
-  color:white;
+  color:#fff;
 
   background:
     rgba(0,0,0,.75);
@@ -2731,6 +2616,7 @@ input[type=range]{
   display:none;
 
   align-items:center;
+
   justify-content:center;
 
   padding:18px;
@@ -2738,8 +2624,7 @@ input[type=range]{
   background:
     rgba(0,0,0,.72);
 
-  backdrop-filter:
-    blur(12px);
+  backdrop-filter:blur(12px);
 }
 
 .modal.open{
@@ -2766,13 +2651,14 @@ input[type=range]{
     1px solid var(--line);
 
   box-shadow:
-    var(--shadow);
+    0 30px 90px rgba(0,0,0,.5);
 }
 
 .modal-head{
   display:flex;
 
   justify-content:space-between;
+
   align-items:center;
 }
 
@@ -2782,7 +2668,7 @@ input[type=range]{
 
   border-radius:10px;
 
-  color:white;
+  color:#fff;
 
   background:#111711;
 }
@@ -2871,6 +2757,7 @@ pre{
   min-height:260px;
 
   display:grid;
+
   place-items:center;
 
   padding:30px;
@@ -3018,374 +2905,14 @@ pre{
 
 
 
-/* ============================================================
-   FINAL 16:9 — TITLE / PRICE / CONTACT STABLE
-============================================================ */
 
-.r169 .info-zone{
-  overflow:hidden !important;
 
-  box-sizing:border-box;
-}
-
-.r169 .product-info{
-  position:relative;
-
-  width:100%;
-  height:100%;
-
-  min-width:0;
-  min-height:0;
-
-  box-sizing:border-box;
-
-  padding-bottom:38px;
-
-  overflow:hidden;
-
-  display:flex;
-  flex-direction:column;
-  align-items:flex-start;
-}
-
-
-/* ------------------------------------------------------------
-   IMPORTANT:
-   Jangan biarkan elemen utama menyusut sampai 0
------------------------------------------------------------- */
-
-.r169 .product-info > .rule,
-.r169 .product-info > .badges,
-.r169 .product-info > .brand-line,
-.r169 .product-info > .product-name,
-.r169 .product-info > .price-label,
-.r169 .product-info > .price,
-.r169 .product-info > .price-meta,
-.r169 .product-info > .extra-note,
-.r169 .product-info > .cta{
-  flex-shrink:0 !important;
-}
-
-
-/* ------------------------------------------------------------
-   PRODUCT TITLE
------------------------------------------------------------- */
-
-.r169 .product-name{
-  width:100%;
-  max-width:100%;
-
-  display:-webkit-box !important;
-
-  -webkit-box-orient:vertical !important;
-  -webkit-line-clamp:2 !important;
-
-  overflow:hidden !important;
-
-  min-height:1.04em !important;
-  max-height:2.08em !important;
-
-  margin-top:7px;
-
-  color:#fff !important;
-
-  font-size:
-    clamp(
-      15px,
-      2.15vw,
-      30px
-    ) !important;
-
-  line-height:1.04 !important;
-
-  font-weight:950 !important;
-
-  letter-spacing:-.2px;
-
-  white-space:normal !important;
-
-  overflow-wrap:break-word;
-  word-break:normal;
-
-  box-sizing:border-box;
-}
-
-
-/* ------------------------------------------------------------
-   PRICE
------------------------------------------------------------- */
-
-.r169 .price-label{
-  flex:0 0 auto !important;
-
-  margin-top:13px;
-}
-
-.r169 .price{
-  flex:0 0 auto !important;
-
-  margin-top:4px;
-
-  font-size:
-    clamp(
-      27px,
-      3.8vw,
-      46px
-    );
-
-  line-height:1;
-}
-
-
-/* ------------------------------------------------------------
-   CTA
------------------------------------------------------------- */
-
-.r169 .cta{
-  position:relative !important;
-
-  flex:0 0 auto !important;
-
-  z-index:31 !important;
-
-  margin-bottom:0 !important;
-}
-
-
-/* ------------------------------------------------------------
-   CONTACT — FIXED BOTTOM SLOT
------------------------------------------------------------- */
-
-.r169 .contact-card{
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  width:100% !important;
-
-  margin:0 !important;
-
-  min-height:30px;
-
-  padding:
-    5px
-    7px;
-
-  box-sizing:border-box;
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:flex-start;
-
-  justify-content:center;
-
-  gap:2px;
-
-  overflow:hidden;
-
-  border:
-    1px solid
-    rgba(139,198,63,.55);
-
-  border-radius:5px;
-
-  background:
-    rgba(0,0,0,.28);
-
-  z-index:50;
-}
-
-.r169 .contact-label{
-  flex:0 0 auto !important;
-
-  display:block;
-
-  width:100%;
-
-  font-size:4.8px !important;
-
-  line-height:1 !important;
-
-  letter-spacing:.8px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-}
-
-.r169 .contact-name{
-  flex:0 0 auto !important;
-
-  display:block;
-
-  width:100%;
-
-  font-size:5.8px !important;
-
-  line-height:1.05 !important;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-.r169 .contact-phone{
-  flex:0 0 auto !important;
-
-  display:block;
-
-  width:100%;
-
-  font-size:5.2px !important;
-
-  line-height:1.05 !important;
-
-  letter-spacing:.2px;
-
-  white-space:nowrap;
-
-  overflow:hidden;
-
-  text-overflow:ellipsis;
-}
-
-
-/* ============================================================
-   EXPORT — 16:9 HARUS IDENTIK DENGAN PREVIEW
-============================================================ */
-
-.export-static .r169 .info-zone,
-.r169.export-static .info-zone{
-  overflow:hidden !important;
-
-  box-sizing:border-box !important;
-}
-
-.export-static .r169 .product-info,
-.r169.export-static .product-info{
-  position:relative !important;
-
-  width:100% !important;
-  height:100% !important;
-
-  min-width:0 !important;
-  min-height:0 !important;
-
-  padding-bottom:38px !important;
-
-  overflow:hidden !important;
-
-  display:flex !important;
-  flex-direction:column !important;
-}
-
-.export-static .r169 .product-info > *,
-.r169.export-static .product-info > *{
-  flex-shrink:0 !important;
-}
-
-
-/* Export title — JANGAN PERNAH DI-RESET */
-
-.export-static .r169 .product-name,
-.r169.export-static .product-name{
-  display:-webkit-box !important;
-
-  -webkit-box-orient:vertical !important;
-  -webkit-line-clamp:2 !important;
-
-  overflow:hidden !important;
-
-  min-height:1.04em !important;
-  max-height:2.08em !important;
-
-  width:100% !important;
-  max-width:100% !important;
-
-  color:#fff !important;
-
-  white-space:normal !important;
-
-  overflow-wrap:break-word !important;
-
-  word-break:normal !important;
-}
-
-
-/* Export contact tetap bottom */
-
-.export-static .r169 .contact-card,
-.r169.export-static .contact-card{
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  width:100% !important;
-
-  margin:0 !important;
-
-  box-sizing:border-box !important;
-
-  overflow:hidden !important;
-
-  z-index:50 !important;
-}
-
-
-/* ============================================================
-   HIDE FINAL PRICE AFTER EXTRA DISCOUNT
-============================================================ */
-
-.extra-note{
-  display:none !important;
-}
-
-/* ============================================================
-   16:9 — CTA / NEW PRODUK ANTI TABRAK CONTACT
-============================================================ */
-
-.r169 .product-info:has(.contact-card) .cta{
-  position:relative !important;
-
-  z-index:31 !important;
-
-  /* reserve seat for contact card */
-  margin-bottom:38px !important;
-}
-
-
-/* Contact tetap duduk di slot paling bawah */
-
-.r169 .contact-card{
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  z-index:50 !important;
-}
-
-
-/* EXPORT PNG harus sama dengan preview */
-
-.export-static .r169 .product-info:has(.contact-card) .cta,
-.r169.export-static .product-info:has(.contact-card) .cta{
-  margin-bottom:56px !important;
-  }
 
 
 
   
 </style>
+
 
 
 
