@@ -3508,6 +3508,379 @@ pre{
   height:6px !important;
   }
 
+
+
+
+
+
+
+/* ============================================================
+   FINAL CONTACT ENGINE vFINAL
+   FIX:
+   - contact tenggelam
+   - contact kepotong saat PNG
+   - contact keluar canvas
+   - export-static mengubah absolute -> relative
+   - berlaku 9:16 / 4:5 / 16:9
+   ============================================================ */
+
+/* PRODUCT INFO = ANCHOR */
+.r916 .product-info,
+.r45 .product-info,
+.r169 .product-info,
+.export-static .r916 .product-info,
+.export-static .r45 .product-info,
+.export-static .r169 .product-info{
+  position:relative !important;
+
+  width:100% !important;
+  height:100% !important;
+
+  min-width:0 !important;
+  min-height:0 !important;
+
+  overflow:visible !important;
+
+  box-sizing:border-box !important;
+}
+
+
+/* ============================================================
+   CONTACT CARD
+   SELALU MENJADI ELEMEN PALING BAWAH CANVAS
+   BUKAN LAGI BAGIAN FLOW FLEX
+   ============================================================ */
+
+.r916 .product-info > .contact-card,
+.r45 .product-info > .contact-card,
+.r169 .product-info > .contact-card,
+.export-static .r916 .product-info > .contact-card,
+.export-static .r45 .product-info > .contact-card,
+.export-static .r169 .product-info > .contact-card{
+
+  position:absolute !important;
+
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+
+  top:auto !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-width:0 !important;
+  min-height:0 !important;
+
+  margin:0 !important;
+
+  box-sizing:border-box !important;
+
+  display:flex !important;
+
+  flex-direction:column !important;
+
+  align-items:flex-start !important;
+
+  justify-content:center !important;
+
+  gap:2px !important;
+
+  padding:
+    7px
+    9px !important;
+
+  overflow:hidden !important;
+
+  flex:none !important;
+
+  transform:none !important;
+
+  z-index:200 !important;
+
+  border:
+    1px solid
+    rgba(139,198,63,.58) !important;
+
+  border-radius:7px !important;
+
+  background:
+    rgba(0,0,0,.32) !important;
+}
+
+
+/* ============================================================
+   RESERVE RUANG DI PRODUCT INFO
+   Supaya konten harga tidak pernah duduk di belakang contact
+   ============================================================ */
+
+.r916 .product-info,
+.export-static .r916 .product-info{
+  padding-bottom:52px !important;
+}
+
+.r45 .product-info,
+.export-static .r45 .product-info{
+  padding-bottom:52px !important;
+}
+
+.r169 .product-info,
+.export-static .r169 .product-info{
+  padding-bottom:50px !important;
+}
+
+
+/* ============================================================
+   CONTACT TEXT
+   ============================================================ */
+
+.r916 .product-info > .contact-card .contact-label,
+.r916 .product-info > .contact-card .contact-name,
+.r916 .product-info > .contact-card .contact-phone,
+
+.r45 .product-info > .contact-card .contact-label,
+.r45 .product-info > .contact-card .contact-name,
+.r45 .product-info > .contact-card .contact-phone,
+
+.r169 .product-info > .contact-card .contact-label,
+.r169 .product-info > .contact-card .contact-name,
+.r169 .product-info > .contact-card .contact-phone,
+
+.export-static .contact-card .contact-label,
+.export-static .contact-card .contact-name,
+.export-static .contact-card .contact-phone{
+
+  position:relative !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+  max-height:none !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  flex:0 0 auto !important;
+
+  overflow:hidden !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:ellipsis !important;
+
+  box-sizing:border-box !important;
+
+  transform:none !important;
+}
+
+
+/* ============================================================
+   LABEL
+   ============================================================ */
+
+.r916 .contact-card .contact-label,
+.r45 .contact-card .contact-label,
+.r169 .contact-card .contact-label,
+.export-static .contact-card .contact-label{
+
+  color:var(--accent) !important;
+
+  font-size:6px !important;
+
+  line-height:7px !important;
+
+  height:7px !important;
+
+  letter-spacing:.8px !important;
+
+  font-weight:950 !important;
+}
+
+
+/* ============================================================
+   NAMA
+   ============================================================ */
+
+.r916 .contact-card .contact-name,
+.r45 .contact-card .contact-name,
+.r169 .contact-card .contact-name,
+.export-static .contact-card .contact-name{
+
+  color:#fff !important;
+
+  font-size:7.5px !important;
+
+  line-height:8px !important;
+
+  height:8px !important;
+
+  letter-spacing:0 !important;
+
+  font-weight:950 !important;
+}
+
+
+/* ============================================================
+   PHONE
+   ============================================================ */
+
+.r916 .contact-card .contact-phone,
+.r45 .contact-card .contact-phone,
+.r169 .contact-card .contact-phone,
+.export-static .contact-card .contact-phone{
+
+  color:#fff !important;
+
+  font-size:6.5px !important;
+
+  line-height:7px !important;
+
+  height:7px !important;
+
+  letter-spacing:.2px !important;
+
+  font-weight:850 !important;
+}
+
+
+/* ============================================================
+   16:9 — KHUSUS LEBIH KECIL
+   ============================================================ */
+
+.r169 .product-info > .contact-card,
+.export-static .r169 .product-info > .contact-card{
+
+  min-height:39px !important;
+
+  padding:
+    5px
+    8px !important;
+
+  gap:1px !important;
+
+  border-radius:5px !important;
+}
+
+.r169 .product-info,
+.export-static .r169 .product-info{
+  padding-bottom:43px !important;
+}
+
+.r169 .contact-card .contact-label,
+.export-static .r169 .contact-card .contact-label{
+
+  font-size:5px !important;
+
+  line-height:6px !important;
+
+  height:6px !important;
+}
+
+.r169 .contact-card .contact-name,
+.export-static .r169 .contact-card .contact-name{
+
+  font-size:6px !important;
+
+  line-height:7px !important;
+
+  height:7px !important;
+}
+
+.r169 .contact-card .contact-phone,
+.export-static .r169 .contact-card .contact-phone{
+
+  font-size:5.2px !important;
+
+  line-height:6px !important;
+
+  height:6px !important;
+}
+
+
+/* ============================================================
+   9:16 / 4:5 — CONTACT LEBIH LEGIBLE
+   ============================================================ */
+
+.r916 .product-info > .contact-card,
+.export-static .r916 .product-info > .contact-card,
+.r45 .product-info > .contact-card,
+.export-static .r45 .product-info > .contact-card{
+
+  min-height:43px !important;
+
+  padding:
+    6px
+    8px !important;
+}
+
+
+/* ============================================================
+   EXPORT OVERRIDE
+   INI PENTING:
+   export-static TIDAK BOLEH MENGEMBALIKAN CONTACT KE RELATIVE
+   ============================================================ */
+
+.export-static .product-info > .contact-card{
+
+  position:absolute !important;
+
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+
+  top:auto !important;
+
+  margin:0 !important;
+
+  flex:none !important;
+
+  overflow:hidden !important;
+
+  z-index:200 !important;
+}
+
+
+/* ============================================================
+   CONTACT TIDAK BOLEH DIPOTONG OLEH INFO ZONE
+   ============================================================ */
+
+.r916 .info-zone,
+.r45 .info-zone,
+.r169 .info-zone,
+
+.export-static .r916 .info-zone,
+.export-static .r45 .info-zone,
+.export-static .r169 .info-zone{
+
+  overflow:visible !important;
+}
+
+
+/* ============================================================
+   CONTACT SELALU DI ATAS BACKGROUND,
+   TAPI TIDAK MENIMPA TEKS KARENA SUDAH ADA RESERVED SPACE
+   ============================================================ */
+
+.r916 .contact-card,
+.r45 .contact-card,
+.r169 .contact-card,
+
+.export-static .contact-card{
+
+  isolation:isolate !important;
+
+  z-index:999 !important;
+  }
+
+
+
+
+
+  
+
   
   
   
