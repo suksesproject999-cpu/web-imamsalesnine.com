@@ -757,7 +757,7 @@ main{
 .brand-line{
   width:100%;
 
-  margin-top:11px;
+  margin-top:8px;
 
   color:var(--accent);
 
@@ -990,7 +990,7 @@ main{
 .r916 .brand-line{
   margin-top:10px;
 
-  font-size:7.5px;
+  font-size:5.5px;
 
   line-height:1.15;
 
@@ -2513,11 +2513,11 @@ pre{
   <div class="brand">
 
     <h1>
-      IMAM Creative Studio
+      Imam_salesfr
     </h1>
 
     <p>
-      Intelligent Promo • Smart Composition • Creative QA
+      Sales Representative • nine autoseries
     </p>
 
   </div>
@@ -2552,7 +2552,7 @@ pre{
       class="primary-btn"
       id="autoBtn"
     >
-      AUTO CREATE
+      auto creative
     </button>
 
   </div>
@@ -2646,12 +2646,7 @@ pre{
         BATCH EXPORT
       </button>
 
-      <button
-        class="tool"
-        id="jsonBtn"
-      >
-        EXPORT JSON
-      </button>
+      
 
     </div>
 
@@ -3121,24 +3116,24 @@ pre{
 
       <select id="ctaSelect">
 
-        <option value="CEK HARGA">
-          CEK HARGA
+        <option value="NEW PRODUK">
+          NEW PRODUK
         </option>
 
-        <option value="BELI SEKARANG">
-          BELI SEKARANG
-        </option>
-
-        <option value="DAPATKAN SEKARANG">
-          DAPATKAN SEKARANG
-        </option>
-
-        <option value="TANYAKAN HARGA">
-          TANYAKAN HARGA
+        <option value="STOK TERBATAS">
+          STOK TERBATAS
         </option>
 
         <option value="PROMO TERBATAS">
           PROMO TERBATAS
+        </option>
+
+        <option value="DISKON TERBATAS">
+          DISKON TERBATAS
+        </option>
+
+        <option value="TERLARIS">
+          TERLARIS
         </option>
 
       </select>
@@ -4572,7 +4567,7 @@ function renderPreview(){
       <div
         class="watermark"
       >
-        Imamsalesfr • CREATIVE STUDIO
+        Imam_salesfr • salesnine.com
       </div>
 
       <div
@@ -6084,96 +6079,7 @@ function snapshot(){
   );
 }
 
-/* ============================================================
-   JSON EXPORT
-============================================================ */
 
-function exportJSON(){
-
-  const output=
-    products
-      .filter(
-        p=>
-          selectedIds.includes(
-            String(p.id)
-          )
-      )
-      .map(
-        p=>{
-
-          const x=
-            priceData(p);
-
-          return{
-
-            ...p,
-
-            harga:{
-
-              ...p.harga,
-
-              normal:
-                x.normal,
-
-              promo:
-                x.final,
-
-              hargaDasarPromo:
-                x.promo,
-
-              diskon:
-                x.finalDiscount,
-
-              diskonExtraAktif:
-                x.extraEnabled,
-
-              diskonExtra:
-                x.extraPercent,
-
-              hargaFinalCustomAktif:
-                x.manualEnabled,
-
-              hargaFinalCustom:
-                x.manualFinal
-            }
-          };
-        }
-      );
-
-  const data={
-    project:
-      projectData(),
-
-    products:
-      output
-  };
-
-  downloadBlob(
-
-    new Blob(
-      [
-        JSON.stringify(
-          data,
-          null,
-          2
-        )
-      ],
-      {
-        type:
-          "application/json"
-      }
-    ),
-
-    `${slug(
-      $("campaignName")
-        .value
-    )}-campaign.json`
-  );
-
-  toast(
-    "Campaign JSON berhasil dibuat ✓"
-  );
-}
 
 /* ============================================================
    EXPORT ENGINE
@@ -7684,9 +7590,7 @@ $("batchBtn")
   .onclick=
     batchExport;
 
-$("jsonBtn")
-  .onclick=
-    exportJSON;
+
 
 $("selectAll")
   .onclick=
