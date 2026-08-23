@@ -21,25 +21,31 @@
 
 
 
-
 <style>
 
-/* ============================================================
-   IMAM SALESFR — CREATIVE PROMO STUDIO
-   MASTER CSS — SINGLE SOURCE OF TRUTH
-   ------------------------------------------------------------
-   SUPPORTED:
-   9:16
-   4:5
-   16:9
 
-   MASTER RULE:
-   PREVIEW GEOMETRY = EXPORT GEOMETRY
+
+/* ============================================================
+   IMAM SALESFR — MASTER CSS vΩ
+   FULL REPLACEMENT
+   ------------------------------------------------------------
+   DESIGN:
+   Ultra-clean dark automotive creative studio.
+
+   CORE CONTRACT:
+   1. Preview geometry = export geometry.
+   2. Contact is always inside promo-canvas.
+   3. Contact never relies on viewport height.
+   4. Contact never escapes canvas.
+   5. Contact never overlaps critical commerce copy.
+   6. No legacy Contact geometry is allowed.
+   7. 9:16 / 4:5 / 16:9 are independently tuned.
+   8. html2canvas export remains deterministic.
 ============================================================ */
 
 
 /* ============================================================
-   ROOT
+   01 — ROOT
 ============================================================ */
 
 :root{
@@ -48,7 +54,7 @@
   --panel2:#0d130e;
 
   --line:rgba(255,255,255,.09);
-  --soft:rgba(255,255,255,.055);
+  --line-soft:rgba(255,255,255,.055);
 
   --text:#f7faf5;
   --muted:#7e887f;
@@ -69,11 +75,26 @@
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
+
+  /*
+    Contact geometry constants.
+
+    These are intentionally conservative.
+    The card lives INSIDE the canvas, never outside it.
+  */
+
+  --contact-h-916:48px;
+  --contact-h-45:48px;
+  --contact-h-169:42px;
+
+  --contact-gap-916:10px;
+  --contact-gap-45:10px;
+  --contact-gap-169:9px;
 }
 
 
 /* ============================================================
-   RESET
+   02 — RESET
 ============================================================ */
 
 *,
@@ -86,17 +107,13 @@ html,
 body{
   margin:0;
   min-height:100%;
-
   background:var(--bg);
 }
 
 body{
   color:var(--text);
-
   font-family:var(--body);
-
   -webkit-font-smoothing:antialiased;
-
   text-rendering:geometricPrecision;
 }
 
@@ -118,7 +135,7 @@ img{
 
 
 /* ============================================================
-   HEADER
+   03 — HEADER
 ============================================================ */
 
 .topbar{
@@ -153,11 +170,7 @@ img{
   margin:0;
 
   font-size:
-    clamp(
-      22px,
-      3vw,
-      34px
-    );
+    clamp(22px,3vw,34px);
 
   font-weight:950;
 
@@ -180,9 +193,7 @@ img{
 
 .header-actions{
   display:flex;
-
   gap:8px;
-
   flex-wrap:wrap;
 }
 
@@ -205,9 +216,7 @@ img{
 
 .icon-btn.active{
   color:#071006;
-
   background:var(--lime);
-
   border-color:var(--lime);
 }
 
@@ -230,7 +239,7 @@ img{
 
 
 /* ============================================================
-   PAGE
+   04 — PAGE
 ============================================================ */
 
 main{
@@ -241,11 +250,7 @@ main{
 }
 
 .container{
-  width:min(
-    1240px,
-    100%
-  );
-
+  width:min(1240px,100%);
   margin:auto;
 }
 
@@ -263,7 +268,7 @@ main{
 
 
 /* ============================================================
-   PANEL
+   05 — PANELS
 ============================================================ */
 
 .panel{
@@ -322,7 +327,7 @@ main{
 
 
 /* ============================================================
-   STAGE
+   06 — STAGE
 ============================================================ */
 
 .stage-wrap{
@@ -331,7 +336,6 @@ main{
   width:100%;
 
   display:flex;
-
   justify-content:center;
 }
 
@@ -339,8 +343,13 @@ main{
   width:100%;
 
   display:flex;
-
   justify-content:center;
+
+  /*
+    Critical:
+    stage itself never clips artwork.
+  */
+  overflow:visible;
 }
 
 .promo-canvas{
@@ -358,45 +367,43 @@ main{
 
   box-shadow:
     0 30px 90px rgba(0,0,0,.5);
+
+  /*
+    The canvas itself is the absolute export boundary.
+  */
+  contain:layout paint style;
 }
 
 
 /* ============================================================
-   RATIO
+   07 — RATIOS
 ============================================================ */
 
 .stage.r916 .promo-canvas{
   width:100%;
-
   max-width:520px;
-
   aspect-ratio:9 / 16;
 }
 
 .stage.r45 .promo-canvas{
   width:100%;
-
   max-width:760px;
-
   aspect-ratio:4 / 5;
 }
 
 .stage.r169 .promo-canvas{
   width:100%;
-
   max-width:none;
-
   aspect-ratio:16 / 9;
 }
 
 
 /* ============================================================
-   CANVAS BACKGROUND
+   08 — BACKGROUND
 ============================================================ */
 
 .canvas-bg{
   position:absolute;
-
   inset:0;
 
   z-index:0;
@@ -414,7 +421,6 @@ main{
   content:"";
 
   position:absolute;
-
   inset:-20%;
 
   background:
@@ -459,7 +465,7 @@ main{
 
 
 /* ============================================================
-   PRODUCT VISUAL
+   09 — PRODUCT VISUAL
 ============================================================ */
 
 .product-visual{
@@ -470,7 +476,6 @@ main{
   overflow:hidden;
 
   display:flex;
-
   align-items:center;
   justify-content:center;
 
@@ -483,36 +488,24 @@ main{
     #020302;
 }
 
-
-/* 9:16 */
-
 .r916 .product-visual{
   top:0;
   left:0;
   right:0;
-
   height:53%;
 }
-
-
-/* 4:5 */
 
 .r45 .product-visual{
   top:0;
   left:0;
   right:0;
-
   height:55%;
 }
-
-
-/* 16:9 */
 
 .r169 .product-visual{
   top:0;
   left:0;
   bottom:0;
-
   width:58%;
 }
 
@@ -523,7 +516,6 @@ main{
   padding:7%;
 
   object-fit:contain;
-
   object-position:center;
 
   user-select:none;
@@ -547,7 +539,6 @@ main{
 
 .visual-gradient{
   position:absolute;
-
   inset:0;
 
   z-index:3;
@@ -576,7 +567,18 @@ main{
 
 
 /* ============================================================
-   INFO ZONE
+   10 — INFO ZONE
+   ------------------------------------------------------------
+   IMPORTANT ARCHITECTURE
+
+   The info-zone occupies the entire lower/right information
+   region.
+
+   Contact does NOT determine canvas height.
+   Contact is anchored INSIDE product-info.
+
+   Reserved contact space is calculated into product-info
+   BEFORE contact is positioned.
 ============================================================ */
 
 .info-zone{
@@ -586,11 +588,13 @@ main{
 
   box-sizing:border-box;
 
-  overflow:visible;
+  overflow:hidden;
+
+  /*
+    Prevent accidental content escape during html2canvas.
+  */
+  contain:layout paint;
 }
-
-
-/* 9:16 */
 
 .r916 .info-zone{
   left:0;
@@ -603,12 +607,7 @@ main{
     3.8%
     7.5%
     4.8%;
-
-  overflow:visible;
 }
-
-
-/* 4:5 */
 
 .r45 .info-zone{
   left:0;
@@ -621,12 +620,7 @@ main{
     4%
     7.5%
     5%;
-
-  overflow:visible;
 }
-
-
-/* 16:9 */
 
 .r169 .info-zone{
   top:0;
@@ -640,13 +634,11 @@ main{
     6%
     4.5%
     5%;
-
-  overflow:visible;
 }
 
 
 /* ============================================================
-   PRODUCT INFO
+   11 — PRODUCT INFO
 ============================================================ */
 
 .product-info{
@@ -655,37 +647,68 @@ main{
   z-index:30;
 
   width:100%;
+  height:100%;
+
   min-width:0;
   min-height:0;
 
   display:flex;
-
   flex-direction:column;
-
   align-items:flex-start;
 
-  overflow:visible;
+  /*
+    NO overflow visible.
+    Everything must remain inside the information zone.
+  */
+  overflow:hidden;
+
+  isolation:isolate;
 }
 
 
 /* ============================================================
-   16:9 PRODUCT INFO
-   CONTACT DAPAT SLOT SENDIRI
+   12 — CONTACT RESERVATION
+   ------------------------------------------------------------
+   Contact occupies a dedicated reserved strip at the bottom.
+
+   This is the key fix.
+
+   The card itself is absolute.
+   The reserved space exists independently.
+   Therefore:
+   - no collision
+   - no flex reflow
+   - no export jump
+   - no bottom clipping
 ============================================================ */
 
+.r916 .product-info{
+  padding-bottom:
+    calc(
+      var(--contact-h-916) +
+      var(--contact-gap-916)
+    );
+}
+
+.r45 .product-info{
+  padding-bottom:
+    calc(
+      var(--contact-h-45) +
+      var(--contact-gap-45)
+    );
+}
+
 .r169 .product-info{
-  height:100%;
-
-  min-height:0;
-
-  padding:0;
-
-  overflow:visible;
+  padding-bottom:
+    calc(
+      var(--contact-h-169) +
+      var(--contact-gap-169)
+    );
 }
 
 
 /* ============================================================
-   RULE
+   13 — RULE
 ============================================================ */
 
 .rule{
@@ -709,63 +732,49 @@ main{
 
 .r916 .rule{
   width:52px;
-
   margin-bottom:8px;
 }
 
 .r45 .rule{
   width:55px;
-
   margin-bottom:9px;
 }
 
 .r169 .rule{
   width:54px;
-
   margin-bottom:9px;
 }
 
 
 /* ============================================================
-   BADGE ROW
-   URUTAN:
-   CAMPAIGN DINAMIS
-   EXTRA
-   GARANSI
-
-   .cta = campaign dynamic badge
+   14 — BADGES
 ============================================================ */
 
 .badges{
   width:100%;
-
   min-width:0;
 
   display:flex;
 
   flex-direction:row;
-
   flex-wrap:nowrap;
 
   align-items:center;
-
   justify-content:flex-start;
 
-  gap:7px;
+  gap:6px;
 
   margin:0;
-
   padding:0;
 
-  overflow:visible;
+  overflow:hidden;
 
   box-sizing:border-box;
+
+  flex:0 0 auto;
+
+  z-index:35;
 }
-
-
-/* ============================================================
-   ALL BADGE BASE
-============================================================ */
 
 .badges > *{
   box-sizing:border-box;
@@ -777,13 +786,8 @@ main{
   flex-shrink:1;
 }
 
-
-/* ============================================================
-   DUMMY PROMO
-   HAPUS TOTAL SECARA VISUAL
-============================================================ */
-
-.badges > .badge.promo{
+.badges > .badge.promo,
+.badges > .cta-badge-slot{
   display:none !important;
 
   width:0 !important;
@@ -791,7 +795,6 @@ main{
   max-width:0 !important;
 
   height:0 !important;
-  min-height:0 !important;
 
   margin:0 !important;
   padding:0 !important;
@@ -800,14 +803,185 @@ main{
 }
 
 
+/* ============================================================
+   15 — CAMPAIGN BADGE
+============================================================ */
+
+.product-info > .badges > .cta{
+  position:relative;
+
+  order:1;
+
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  flex:0 1 auto;
+
+  width:auto;
+  min-width:0;
+
+  max-width:42%;
+
+  min-height:30px;
+
+  height:auto;
+
+  margin:0;
+  padding:0 12px;
+
+  box-sizing:border-box;
+
+  border-radius:999px;
+
+  color:#071006;
+
+  background:var(--accent);
+
+  font-size:7px;
+  line-height:1;
+  font-weight:950;
+
+  letter-spacing:1px;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transform:none;
+
+  z-index:36;
+}
+
 
 /* ============================================================
-   BRAND
+   16 — EXTRA BADGE
+============================================================ */
+
+.product-info > .badges > .badge.extra{
+  order:2;
+
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  flex:0 1 auto;
+
+  width:auto;
+  min-width:0;
+
+  max-width:28%;
+
+  min-height:30px;
+
+  height:auto;
+
+  margin:0;
+  padding:0 9px;
+
+  box-sizing:border-box;
+
+  color:#ff984e;
+
+  background:
+    rgba(255,118,18,.06);
+
+  border:
+    1px solid
+    rgba(255,118,18,.58);
+
+  border-radius:999px;
+
+  font-size:7px;
+  line-height:1;
+  font-weight:950;
+
+  letter-spacing:.75px;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transform:none;
+
+  z-index:36;
+}
+
+
+/* ============================================================
+   17 — WARRANTY BADGE
+============================================================ */
+
+.product-info > .badges > .badge.warranty{
+  order:3;
+
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  flex:0 1 auto;
+
+  width:auto;
+  min-width:0;
+
+  max-width:32%;
+
+  min-height:30px;
+
+  height:auto;
+
+  margin:0;
+  padding:0 9px;
+
+  box-sizing:border-box;
+
+  color:var(--accent);
+
+  background:
+    rgba(0,0,0,.22);
+
+  border:
+    1px solid
+    var(--accent);
+
+  border-radius:999px;
+
+  font-size:7px;
+  line-height:1;
+  font-weight:950;
+
+  letter-spacing:.65px;
+
+  text-align:center;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+  text-overflow:ellipsis;
+
+  transform:none;
+
+  z-index:36;
+}
+
+
+/* ============================================================
+   18 — BRAND
 ============================================================ */
 
 .brand-line{
-  width:100%;
+  position:relative;
 
+  width:100%;
   min-width:0;
 
   margin-top:10px;
@@ -815,9 +989,7 @@ main{
   color:var(--accent);
 
   font-size:10px;
-
   line-height:1.3;
-
   font-weight:950;
 
   letter-spacing:2px;
@@ -826,28 +998,26 @@ main{
 
   white-space:nowrap;
 
-  overflow:visible;
+  overflow:hidden;
+  text-overflow:ellipsis;
 
-  text-overflow:clip;
+  z-index:37;
 
-  position:relative;
-
-  z-index:40;
+  flex:0 0 auto;
 }
 
 
 /* ============================================================
-   PRODUCT NAME
-   NO LINE CLAMP
+   19 — PRODUCT NAME
 ============================================================ */
 
 .product-name{
-  width:100%;
+  position:relative;
 
+  width:100%;
   min-width:0;
 
   height:auto;
-  max-height:none;
 
   margin-top:6px;
 
@@ -868,10 +1038,9 @@ main{
 
   white-space:normal;
 
-  overflow:visible;
+  overflow:hidden;
 
-  overflow-wrap:break-word;
-
+  overflow-wrap:anywhere;
   word-break:normal;
 
   text-overflow:clip;
@@ -879,10 +1048,9 @@ main{
   display:block;
 
   flex:0 0 auto;
+
+  z-index:37;
 }
-
-
-/* 9:16 */
 
 .r916 .product-name{
   font-size:
@@ -897,9 +1065,6 @@ main{
   letter-spacing:-.65px;
 }
 
-
-/* 4:5 */
-
 .r45 .product-name{
   font-size:
     clamp(
@@ -910,9 +1075,6 @@ main{
 
   line-height:1.05;
 }
-
-
-/* 16:9 */
 
 .r169 .product-name{
   font-size:
@@ -925,22 +1087,16 @@ main{
   line-height:1.04;
 
   letter-spacing:-.25px;
-
-  white-space:normal;
-
-  overflow:visible;
-
-  max-height:none;
-
-  display:block;
 }
 
 
 /* ============================================================
-   PRICE LABEL
+   20 — PRICE LABEL
 ============================================================ */
 
 .price-label{
+  position:relative;
+
   width:100%;
 
   flex:0 0 auto;
@@ -958,6 +1114,8 @@ main{
   letter-spacing:2px;
 
   text-transform:uppercase;
+
+  z-index:37;
 }
 
 .r916 .price-label{
@@ -974,10 +1132,12 @@ main{
 
 
 /* ============================================================
-   PRICE
+   21 — PRICE
 ============================================================ */
 
 .price{
+  position:relative;
+
   width:100%;
 
   flex:0 0 auto;
@@ -1000,6 +1160,8 @@ main{
   letter-spacing:-1.7px;
 
   white-space:nowrap;
+
+  z-index:37;
 }
 
 .r916 .price{
@@ -1031,20 +1193,19 @@ main{
 
 
 /* ============================================================
-   PRICE META
+   22 — PRICE META
 ============================================================ */
 
 .price-meta{
+  position:relative;
+
   width:100%;
-
   min-width:0;
-
   min-height:14px;
 
   display:flex;
 
   align-items:center;
-
   justify-content:flex-start;
 
   flex-wrap:nowrap;
@@ -1055,7 +1216,9 @@ main{
 
   flex:0 0 auto;
 
-  overflow:visible;
+  overflow:hidden;
+
+  z-index:37;
 }
 
 .old{
@@ -1066,7 +1229,6 @@ main{
   color:#6d756d;
 
   font-size:8px;
-
   line-height:1.1;
 
   font-weight:700;
@@ -1078,7 +1240,6 @@ main{
 
 .old-price{
   position:relative;
-
   display:inline-block;
 }
 
@@ -1103,7 +1264,6 @@ main{
   color:var(--lime);
 
   font-size:8px;
-
   line-height:1.1;
 
   font-weight:950;
@@ -1113,8 +1273,7 @@ main{
 
 
 /* ============================================================
-   EXTRA NOTE
-   FINAL PRICE AFTER EXTRA DISCOUNT DIHILANGKAN
+   23 — EXTRA NOTE
 ============================================================ */
 
 .extra-note{
@@ -1123,25 +1282,40 @@ main{
 
 
 /* ============================================================
-   CONTACT CARD
-   CONTACT SELALU PUNYA SLOT SENDIRI
+   24 — CONTACT CARD
+   ------------------------------------------------------------
+   MASTER FIX
+
+   Contact is anchored to PRODUCT-INFO's content box.
+
+   Because product-info already reserves the required height,
+   the card cannot cover price content.
+
+   Because product-info is inside info-zone,
+   the card cannot leave promo-canvas.
+
+   Because info-zone is inside promo-canvas,
+   html2canvas captures the entire card.
+
+   Because the card dimensions are deterministic,
+   preview and export remain identical.
 ============================================================ */
 
 .contact-card{
-  position:relative;
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
 
   width:100%;
 
   min-width:0;
 
-  min-height:46px;
+  height:
+    var(--contact-h-916);
 
-  height:auto;
-
-  margin:
-    9px
-    0
-    0;
+  margin:0;
 
   padding:
     7px
@@ -1157,37 +1331,62 @@ main{
 
   justify-content:center;
 
-  gap:3px;
+  gap:2px;
 
-  flex:0 0 auto;
+  flex:none;
 
   overflow:hidden;
 
   border:
     1px solid
-    rgba(139,198,63,.55);
+    rgba(139,198,63,.58);
 
   border-radius:7px;
 
   background:
-    rgba(0,0,0,.28);
+    linear-gradient(
+      135deg,
+      rgba(0,0,0,.42),
+      rgba(0,0,0,.24)
+    );
 
-  z-index:60;
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.045),
+    0 8px 20px
+    rgba(0,0,0,.16);
+
+  isolation:isolate;
+
+  z-index:200;
 }
 
 
 /* ============================================================
-   CONTACT TEXT
+   25 — CONTACT TYPOGRAPHY
 ============================================================ */
 
 .contact-label,
 .contact-name,
 .contact-phone{
-  width:100%;
+  position:relative;
 
+  width:100%;
   min-width:0;
 
+  height:auto;
+
+  min-height:0;
+  max-height:none;
+
+  margin:0;
+  padding:0;
+
   display:block;
+
+  flex:0 0 auto;
+
+  box-sizing:border-box;
 
   overflow:hidden;
 
@@ -1195,7 +1394,7 @@ main{
 
   text-overflow:ellipsis;
 
-  box-sizing:border-box;
+  transform:none;
 }
 
 .contact-label{
@@ -1203,11 +1402,13 @@ main{
 
   font-size:6px;
 
-  line-height:1;
+  line-height:7px;
+
+  height:7px;
 
   font-weight:950;
 
-  letter-spacing:1.2px;
+  letter-spacing:.9px;
 
   text-transform:uppercase;
 }
@@ -1215,126 +1416,147 @@ main{
 .contact-name{
   color:#fff;
 
-  font-size:8px;
+  font-size:7.5px;
 
-  line-height:1.1;
+  line-height:8px;
+
+  height:8px;
 
   font-weight:950;
+
+  letter-spacing:0;
 }
 
 .contact-phone{
   color:#fff;
 
-  font-size:7px;
+  font-size:6.5px;
 
-  line-height:1.1;
+  line-height:7px;
 
-  font-weight:800;
+  height:7px;
 
-  letter-spacing:.4px;
-}
-
-
-/* ============================================================
-   9:16 CONTACT
-============================================================ */
-
-.r916 .contact-card{
-  min-height:44px;
-
-  margin-top:8px;
-
-  padding:
-    6px
-    8px;
-}
-
-.r916 .contact-label{
-  font-size:5.6px;
-}
-
-.r916 .contact-name{
-  font-size:7px;
-}
-
-.r916 .contact-phone{
-  font-size:6.4px;
-}
-
-
-/* ============================================================
-   4:5 CONTACT
-============================================================ */
-
-.r45 .contact-card{
-  min-height:45px;
-
-  margin-top:8px;
-}
-
-
-/* ============================================================
-   16:9 CONTACT
-   FLOW-BASED.
-   BUKAN ABSOLUTE.
-   JADI NGGAK NIMPA HARGA / CTA / BADGE.
-============================================================ */
-
-.r169 .product-info > .contact-card{
-  position:relative;
-
-  left:auto;
-  right:auto;
-  top:auto;
-  bottom:auto;
-
-  width:100%;
-
-  min-height:46px;
-
-  height:auto;
-
-  margin:
-    auto
-    0
-    0;
-
-  padding:
-    6px
-    8px;
-
-  flex:0 0 auto;
-
-  overflow:hidden;
-
-  z-index:60;
-}
-
-.r169 .contact-label{
-  font-size:5px;
-
-  line-height:1;
-
-  letter-spacing:.9px;
-}
-
-.r169 .contact-name{
-  font-size:6.2px;
-
-  line-height:1.08;
-}
-
-.r169 .contact-phone{
-  font-size:5.5px;
-
-  line-height:1.08;
+  font-weight:850;
 
   letter-spacing:.2px;
 }
 
 
 /* ============================================================
-   SIGNATURE / WATERMARK
+   26 — 9:16 CONTACT
+============================================================ */
+
+.r916 .contact-card{
+  height:
+    var(--contact-h-916);
+
+  min-height:
+    var(--contact-h-916);
+
+  padding:
+    6px
+    8px;
+
+  border-radius:7px;
+}
+
+.r916 .contact-label{
+  font-size:6px;
+  line-height:7px;
+  height:7px;
+}
+
+.r916 .contact-name{
+  font-size:7.5px;
+  line-height:8px;
+  height:8px;
+}
+
+.r916 .contact-phone{
+  font-size:6.5px;
+  line-height:7px;
+  height:7px;
+}
+
+
+/* ============================================================
+   27 — 4:5 CONTACT
+============================================================ */
+
+.r45 .contact-card{
+  height:
+    var(--contact-h-45);
+
+  min-height:
+    var(--contact-h-45);
+
+  padding:
+    6px
+    8px;
+
+  border-radius:7px;
+}
+
+.r45 .contact-label{
+  font-size:6px;
+  line-height:7px;
+  height:7px;
+}
+
+.r45 .contact-name{
+  font-size:7.5px;
+  line-height:8px;
+  height:8px;
+}
+
+.r45 .contact-phone{
+  font-size:6.5px;
+  line-height:7px;
+  height:7px;
+}
+
+
+/* ============================================================
+   28 — 16:9 CONTACT
+============================================================ */
+
+.r169 .contact-card{
+  height:
+    var(--contact-h-169);
+
+  min-height:
+    var(--contact-h-169);
+
+  padding:
+    5px
+    8px;
+
+  border-radius:6px;
+}
+
+.r169 .contact-label{
+  font-size:5px;
+  line-height:6px;
+  height:6px;
+
+  letter-spacing:.8px;
+}
+
+.r169 .contact-name{
+  font-size:6.2px;
+  line-height:7px;
+  height:7px;
+}
+
+.r169 .contact-phone{
+  font-size:5.4px;
+  line-height:6px;
+  height:6px;
+}
+
+
+/* ============================================================
+   29 — WATERMARK
 ============================================================ */
 
 .watermark{
@@ -1421,7 +1643,7 @@ main{
 
 
 /* ============================================================
-   SAFE ZONE
+   30 — SAFE ZONE
 ============================================================ */
 
 .safe-zone{
@@ -1469,7 +1691,7 @@ main{
 
 
 /* ============================================================
-   MOTION
+   31 — MOTION
 ============================================================ */
 
 .motion-active .product-image{
@@ -1539,17 +1761,23 @@ main{
 
 
 /* ============================================================
-   EXPORT
-   TIDAK ADA LAYOUT ALTERNATIF.
-   EXPORT = PREVIEW.
+   32 — EXPORT STATIC
+   ------------------------------------------------------------
+   IMPORTANT:
+   DO NOT CHANGE GEOMETRY HERE.
+
+   The JS already locks:
+   width
+   height
+   aspect-ratio
+
+   Therefore export-static only freezes motion and UI helpers.
 ============================================================ */
 
 .export-static,
 .export-static *{
   animation:none !important;
-
   transition:none !important;
-
   caret-color:transparent !important;
 }
 
@@ -1562,36 +1790,239 @@ main{
   opacity:1 !important;
 
   animation:none !important;
-
   transition:none !important;
+
+  /*
+    Do not override width/height here.
+    lockExportClone() owns them.
+  */
+
+  overflow:hidden !important;
 }
 
 
 /* ============================================================
-   EXPORT — MASTER BADGE
+   33 — EXPORT GEOMETRY LOCK
+============================================================ */
+
+.export-static .info-zone{
+  overflow:hidden !important;
+}
+
+.export-static .product-info{
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+
+.export-static .contact-card{
+  position:absolute !important;
+
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+
+  top:auto !important;
+
+  width:100% !important;
+
+  margin:0 !important;
+
+  transform:none !important;
+
+  flex:none !important;
+
+  overflow:hidden !important;
+
+  z-index:200 !important;
+}
+
+
+/* ============================================================
+   34 — EXPORT CONTACT HEIGHT
+   ------------------------------------------------------------
+   Explicit values prevent browser-dependent auto sizing.
+============================================================ */
+
+.export-static .r916 .product-info{
+  padding-bottom:
+    calc(
+      var(--contact-h-916) +
+      var(--contact-gap-916)
+    ) !important;
+}
+
+.export-static .r45 .product-info{
+  padding-bottom:
+    calc(
+      var(--contact-h-45) +
+      var(--contact-gap-45)
+    ) !important;
+}
+
+.export-static .r169 .product-info{
+  padding-bottom:
+    calc(
+      var(--contact-h-169) +
+      var(--contact-gap-169)
+    ) !important;
+}
+
+.export-static .r916 .contact-card{
+  height:
+    var(--contact-h-916) !important;
+
+  min-height:
+    var(--contact-h-916) !important;
+}
+
+.export-static .r45 .contact-card{
+  height:
+    var(--contact-h-45) !important;
+
+  min-height:
+    var(--contact-h-45) !important;
+}
+
+.export-static .r169 .contact-card{
+  height:
+    var(--contact-h-169) !important;
+
+  min-height:
+    var(--contact-h-169) !important;
+}
+
+
+/* ============================================================
+   35 — EXPORT CONTACT TEXT
+============================================================ */
+
+.export-static .contact-card .contact-label,
+.export-static .contact-card .contact-name,
+.export-static .contact-card .contact-phone{
+  display:block !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+  max-height:none !important;
+
+  margin:0 !important;
+  padding:0 !important;
+
+  overflow:hidden !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:ellipsis !important;
+
+  transform:none !important;
+}
+
+.export-static .r916 .contact-card{
+  padding:
+    6px
+    8px !important;
+
+  gap:2px !important;
+}
+
+.export-static .r916 .contact-label{
+  font-size:6px !important;
+  line-height:7px !important;
+  height:7px !important;
+}
+
+.export-static .r916 .contact-name{
+  font-size:7.5px !important;
+  line-height:8px !important;
+  height:8px !important;
+}
+
+.export-static .r916 .contact-phone{
+  font-size:6.5px !important;
+  line-height:7px !important;
+  height:7px !important;
+}
+
+
+.export-static .r45 .contact-card{
+  padding:
+    6px
+    8px !important;
+
+  gap:2px !important;
+}
+
+.export-static .r45 .contact-label{
+  font-size:6px !important;
+  line-height:7px !important;
+  height:7px !important;
+}
+
+.export-static .r45 .contact-name{
+  font-size:7.5px !important;
+  line-height:8px !important;
+  height:8px !important;
+}
+
+.export-static .r45 .contact-phone{
+  font-size:6.5px !important;
+  line-height:7px !important;
+  height:7px !important;
+}
+
+
+.export-static .r169 .contact-card{
+  padding:
+    5px
+    8px !important;
+
+  gap:1px !important;
+}
+
+.export-static .r169 .contact-label{
+  font-size:5px !important;
+  line-height:6px !important;
+  height:6px !important;
+}
+
+.export-static .r169 .contact-name{
+  font-size:6.2px !important;
+  line-height:7px !important;
+  height:7px !important;
+}
+
+.export-static .r169 .contact-phone{
+  font-size:5.4px !important;
+  line-height:6px !important;
+  height:6px !important;
+}
+
+
+/* ============================================================
+   36 — EXPORT BADGES
 ============================================================ */
 
 .export-static .badges{
   display:flex !important;
 
   flex-direction:row !important;
-
   flex-wrap:nowrap !important;
 
   align-items:center !important;
-
   justify-content:flex-start !important;
 
-  min-width:0 !important;
+  gap:6px !important;
 
   width:100% !important;
 
-  gap:7px !important;
-
-  overflow:visible !important;
+  overflow:hidden !important;
 }
 
-.export-static .badges > .badge.promo{
+.export-static .badges > .badge.promo,
+.export-static .badges > .cta-badge-slot{
   display:none !important;
 }
 
@@ -1604,12 +2035,11 @@ main{
 
   order:1 !important;
 
-  flex:
-    1 1 auto !important;
+  flex:0 1 auto !important;
 
   min-width:0 !important;
 
-  max-width:100% !important;
+  max-width:42% !important;
 
   margin:0 !important;
 
@@ -1619,42 +2049,36 @@ main{
 
   white-space:nowrap !important;
 
-  text-overflow:clip !important;
+  text-overflow:ellipsis !important;
 }
 
 .export-static .badges > .badge.extra{
   order:2 !important;
 
-  flex:
-    0 1 auto !important;
+  flex:0 1 auto !important;
 
   min-width:0 !important;
 
-  max-width:31% !important;
+  max-width:28% !important;
 
   margin:0 !important;
-
-  overflow:hidden !important;
 }
 
 .export-static .badges > .badge.warranty{
   order:3 !important;
 
-  flex:
-    0 1 auto !important;
+  flex:0 1 auto !important;
 
   min-width:0 !important;
 
-  max-width:38% !important;
+  max-width:32% !important;
 
   margin:0 !important;
-
-  overflow:hidden !important;
 }
 
 
 /* ============================================================
-   EXPORT — PRODUCT NAME
+   37 — EXPORT PRODUCT NAME
 ============================================================ */
 
 .export-static .product-name{
@@ -1666,13 +2090,13 @@ main{
 
   max-height:none !important;
 
-  overflow:visible !important;
+  overflow:hidden !important;
 
   white-space:normal !important;
 
   text-overflow:clip !important;
 
-  overflow-wrap:break-word !important;
+  overflow-wrap:anywhere !important;
 
   word-break:normal !important;
 
@@ -1683,52 +2107,7 @@ main{
 
 
 /* ============================================================
-   EXPORT — CONTACT
-============================================================ */
-
-.export-static .contact-card{
-  box-sizing:border-box !important;
-
-  overflow:hidden !important;
-
-  flex-shrink:0 !important;
-}
-
-
-/* 16:9 */
-
-.export-static .r169 .product-info{
-  position:relative !important;
-
-  width:100% !important;
-
-  height:100% !important;
-
-  min-height:0 !important;
-
-  padding:0 !important;
-
-  overflow:visible !important;
-}
-
-
-
-/* 9:16 / 4:5 */
-
-.export-static .r916 .product-info,
-.export-static .r45 .product-info{
-  width:100% !important;
-
-  height:100% !important;
-
-  overflow:visible !important;
-}
-
-
-
-
-/* ============================================================
-   TOOLBAR
+   38 — TOOLBAR
 ============================================================ */
 
 .toolbar{
@@ -1779,7 +2158,7 @@ main{
 
 
 /* ============================================================
-   DOWNLOAD STATUS
+   39 — DOWNLOAD STATUS
 ============================================================ */
 
 .download-status{
@@ -1881,7 +2260,7 @@ main{
 
 
 /* ============================================================
-   FORM
+   40 — FORM
 ============================================================ */
 
 select,
@@ -1938,17 +2317,14 @@ input:focus{
 
 
 /* ============================================================
-   CHOICE
+   41 — CHOICE
 ============================================================ */
 
 .choice-grid{
   display:grid;
 
   grid-template-columns:
-    repeat(
-      2,
-      1fr
-    );
+    repeat(2,1fr);
 
   gap:7px;
 
@@ -2004,7 +2380,7 @@ input:focus{
 
 
 /* ============================================================
-   STATUS
+   42 — STATUS
 ============================================================ */
 
 .status{
@@ -2052,7 +2428,7 @@ input:focus{
 
 
 /* ============================================================
-   SCORE
+   43 — SCORE
 ============================================================ */
 
 .score{
@@ -2146,17 +2522,14 @@ input:focus{
 
 
 /* ============================================================
-   CONTROLS
+   44 — CONTROLS
 ============================================================ */
 
 .control-grid{
   display:grid;
 
   grid-template-columns:
-    repeat(
-      3,
-      1fr
-    );
+    repeat(3,1fr);
 
   gap:8px;
 
@@ -2200,7 +2573,7 @@ input[type=range]{
 
 
 /* ============================================================
-   PRODUCT MANAGER
+   45 — PRODUCT MANAGER
 ============================================================ */
 
 .section{
@@ -2383,7 +2756,7 @@ input[type=range]{
 
 
 /* ============================================================
-   TABS
+   46 — TABS
 ============================================================ */
 
 .tabs{
@@ -2429,7 +2802,7 @@ input[type=range]{
 
 
 /* ============================================================
-   MODAL
+   47 — MODAL
 ============================================================ */
 
 .modal{
@@ -2442,7 +2815,6 @@ input[type=range]{
   display:none;
 
   align-items:center;
-
   justify-content:center;
 
   padding:18px;
@@ -2458,10 +2830,7 @@ input[type=range]{
 }
 
 .modal-box{
-  width:min(
-    760px,
-    100%
-  );
+  width:min(760px,100%);
 
   max-height:90vh;
 
@@ -2526,7 +2895,7 @@ pre{
 
 
 /* ============================================================
-   TOAST
+   48 — TOAST
 ============================================================ */
 
 .toast{
@@ -2576,7 +2945,7 @@ pre{
 
 
 /* ============================================================
-   ERROR
+   49 — ERROR
 ============================================================ */
 
 .error{
@@ -2608,7 +2977,7 @@ pre{
 
 
 /* ============================================================
-   RESPONSIVE EDITOR
+   50 — RESPONSIVE EDITOR
 ============================================================ */
 
 @media(max-width:1050px){
@@ -2625,6 +2994,7 @@ pre{
       );
   }
 }
+
 
 @media(max-width:720px){
 
@@ -2652,7 +3022,7 @@ pre{
 
 
 /* ============================================================
-   MOBILE
+   51 — MOBILE
 ============================================================ */
 
 @media(max-width:520px){
@@ -2666,7 +3036,6 @@ pre{
 
   .panel{
     padding:13px;
-
     border-radius:18px;
   }
 
@@ -2698,25 +3067,23 @@ pre{
     gap:4px;
   }
 
-  .r916 .badges > .cta{
+  .r916 .product-info > .badges > .cta{
     min-height:28px;
 
     padding:
-      0
-      8px;
+      0 8px;
 
     font-size:5.8px;
 
     letter-spacing:.8px;
   }
 
-  .r916 .badges > .badge.extra,
-  .r916 .badges > .badge.warranty{
+  .r916 .product-info > .badges > .badge.extra,
+  .r916 .product-info > .badges > .badge.warranty{
     min-height:28px;
 
     padding:
-      0
-      6px;
+      0 6px;
 
     font-size:5.5px;
 
@@ -2746,1145 +3113,132 @@ pre{
 
 
 /* ============================================================
-   EXPORT HARD RESET
-   MENCEGAH CSS EDITOR LAMA MENYISIPKAN GEOMETRY
+   52 — MOBILE CONTACT SAFETY
 ============================================================ */
 
-.export-static .product-info,
-.export-static .info-zone,
-.export-static .badges,
-.export-static .contact-card{
-  transform:none !important;
-}
-
-.export-static .product-info > .cta{
-  transform:none !important;
-}
-
-.export-static .product-info > .contact-card{
-  position:relative !important;
-
-  left:auto !important;
-  right:auto !important;
-  top:auto !important;
-  bottom:auto !important;
-}
-
-
-/* ============================================================
-   FINAL:
-   CONTACT TIDAK BOLEH MENIMPA ELEMEN APAPUN
-============================================================ */
-
-.r916 .product-info,
-.r45 .product-info,
-.r169 .product-info{
-  isolation:isolate;
-}
-
-.r916 .contact-card,
-.r45 .contact-card,
-.r169 .contact-card{
-  z-index:60;
-}
-
-.r916 .badges,
-.r45 .badges,
-.r169 .badges{
-  z-index:35;
-}
-
-.r916 .brand-line,
-.r45 .brand-line,
-.r169 .brand-line{
-  z-index:36;
-}
-
-.r916 .product-name,
-.r45 .product-name,
-.r169 .product-name{
-  z-index:36;
-}
-
-.r916 .price-label,
-.r45 .price-label,
-.r169 .price-label,
-.r916 .price,
-.r45 .price,
-.r169 .price,
-.r916 .price-meta,
-.r45 .price-meta,
-.r169 .price-meta{
-  position:relative;
-
-  z-index:36;
-}
-
-
-/* ============================================================
-   END — SINGLE MASTER CSS
-============================================================ */
-
-
-/* ============================================================
-   FINAL BADGE SYSTEM
-   DYNAMIC CAMPAIGN | EXTRA | WARRANTY
-   NO OVERLAP / NO CUT / NO GIANT CTA
-============================================================ */
-
-.product-info > .badges{
-  width:100% !important;
-  min-width:0 !important;
-
-  display:flex !important;
-  flex-direction:row !important;
-  flex-wrap:nowrap !important;
-
-  align-items:center !important;
-  justify-content:flex-start !important;
-
-  gap:6px !important;
-
-  margin:0 !important;
-  padding:0 !important;
-
-  overflow:visible !important;
-
-  box-sizing:border-box !important;
-}
-
-
-/* --------------------------------
-   Dummy PROMO = MATI TOTAL
--------------------------------- */
-
-.product-info > .badges > .badge.promo{
-  display:none !important;
-
-  width:0 !important;
-  min-width:0 !important;
-  max-width:0 !important;
-
-  height:0 !important;
-  min-height:0 !important;
-
-  padding:0 !important;
-  margin:0 !important;
-
-  border:0 !important;
-}
-
-
-/* --------------------------------
-   Slot kosong lama = MATI
--------------------------------- */
-
-.product-info > .badges > .cta-badge-slot{
-  display:none !important;
-
-  width:0 !important;
-  min-width:0 !important;
-  max-width:0 !important;
-
-  height:0 !important;
-
-  margin:0 !important;
-  padding:0 !important;
-}
-
-
-/* ============================================================
-   1. CAMPAIGN DINAMIS
-   NEW PRODUK / PROMO TERBATAS / TERLARIS / DLL
-============================================================ */
-
-.product-info > .badges > .cta{
-  position:relative !important;
-
-  order:1 !important;
-
-  display:inline-flex !important;
-
-  align-items:center !important;
-  justify-content:center !important;
-
-  /*
-    JANGAN flex:1.
-    Badge hanya mengambil ruang sesuai kebutuhan teks.
-  */
-  flex:0 1 auto !important;
-
-  width:auto !important;
-
-  min-width:0 !important;
-
-  /*
-    Ada batas supaya Extra + Warranty
-    selalu punya kursi.
-  */
-  max-width:42% !important;
-
-  min-height:30px !important;
-
-  height:auto !important;
-
-  margin:0 !important;
-
-  padding:
-    0 12px !important;
-
-  box-sizing:border-box !important;
-
-  border-radius:999px !important;
-
-  color:#071006 !important;
-
-  background:var(--accent) !important;
-
-  font-size:7px !important;
-
-  line-height:1 !important;
-
-  font-weight:950 !important;
-
-  letter-spacing:1px !important;
-
-  text-align:center !important;
-
-  white-space:nowrap !important;
-
-  overflow:hidden !important;
-
-  text-overflow:ellipsis !important;
-
-  transform:none !important;
-
-  z-index:31 !important;
-}
-
-
-/* ============================================================
-   2. EXTRA
-============================================================ */
-
-.product-info > .badges > .badge.extra{
-  order:2 !important;
-
-  display:inline-flex !important;
-
-  align-items:center !important;
-  justify-content:center !important;
-
-  flex:0 1 auto !important;
-
-  width:auto !important;
-
-  min-width:0 !important;
-
-  max-width:28% !important;
-
-  min-height:30px !important;
-
-  height:auto !important;
-
-  margin:0 !important;
-
-  padding:
-    0 9px !important;
-
-  box-sizing:border-box !important;
-
-  color:#ff984e !important;
-
-  background:
-    rgba(255,118,18,.06) !important;
-
-  border:
-    1px solid
-    rgba(255,118,18,.58) !important;
-
-  border-radius:999px !important;
-
-  font-size:7px !important;
-
-  line-height:1 !important;
-
-  font-weight:950 !important;
-
-  letter-spacing:.75px !important;
-
-  text-align:center !important;
-
-  white-space:nowrap !important;
-
-  overflow:hidden !important;
-
-  text-overflow:ellipsis !important;
-
-  transform:none !important;
-
-  z-index:31 !important;
-}
-
-
-/* ============================================================
-   3. WARRANTY
-============================================================ */
-
-.product-info > .badges > .badge.warranty{
-  order:3 !important;
-
-  display:inline-flex !important;
-
-  align-items:center !important;
-  justify-content:center !important;
-
-  flex:0 1 auto !important;
-
-  width:auto !important;
-
-  min-width:0 !important;
-
-  max-width:32% !important;
-
-  min-height:30px !important;
-
-  height:auto !important;
-
-  margin:0 !important;
-
-  padding:
-    0 9px !important;
-
-  box-sizing:border-box !important;
-
-  color:var(--accent) !important;
-
-  background:
-    rgba(0,0,0,.22) !important;
-
-  border:
-    1px solid
-    var(--accent) !important;
-
-  border-radius:999px !important;
-
-  font-size:7px !important;
-
-  line-height:1 !important;
-
-  font-weight:950 !important;
-
-  letter-spacing:.65px !important;
-
-  text-align:center !important;
-
-  white-space:nowrap !important;
-
-  overflow:hidden !important;
-
-  text-overflow:ellipsis !important;
-
-  transform:none !important;
-
-  z-index:31 !important;
-}
-
-
-/* ============================================================
-   9:16
-============================================================ */
-
-.r916 .product-info > .badges{
-  gap:5px !important;
-}
-
-.r916 .product-info > .badges > .cta{
-  max-width:42% !important;
-
-  min-height:29px !important;
-
-  padding:
-    0 9px !important;
-
-  font-size:6.2px !important;
-
-  letter-spacing:.75px !important;
-}
-
-.r916 .product-info > .badges > .badge.extra{
-  max-width:28% !important;
-
-  min-height:29px !important;
-
-  padding:
-    0 7px !important;
-
-  font-size:6px !important;
-}
-
-.r916 .product-info > .badges > .badge.warranty{
-  max-width:32% !important;
-
-  min-height:29px !important;
-
-  padding:
-    0 7px !important;
-
-  font-size:6px !important;
-}
-
-
-/* ============================================================
-   4:5
-============================================================ */
-
-.r45 .product-info > .badges{
-  gap:5px !important;
-}
-
-.r45 .product-info > .badges > .cta{
-  max-width:42% !important;
-
-  min-height:30px !important;
-
-  font-size:6.5px !important;
-}
-
-.r45 .product-info > .badges > .badge.extra{
-  max-width:28% !important;
-
-  font-size:6.3px !important;
-}
-
-.r45 .product-info > .badges > .badge.warranty{
-  max-width:32% !important;
-
-  font-size:6.3px !important;
-}
-
-
-/* ============================================================
-   16:9
-============================================================ */
-
-.r169 .product-info > .badges{
-  gap:5px !important;
-}
-
-.r169 .product-info > .badges > .cta{
-  max-width:39% !important;
-
-  min-height:28px !important;
-
-  padding:
-    0 7px !important;
-
-  font-size:5.8px !important;
-
-  letter-spacing:.65px !important;
-}
-
-.r169 .product-info > .badges > .badge.extra{
-  max-width:27% !important;
-
-  min-height:28px !important;
-
-  padding:
-    0 6px !important;
-
-  font-size:5.7px !important;
-
-  letter-spacing:.45px !important;
-}
-
-.r169 .product-info > .badges > .badge.warranty{
-  max-width:34% !important;
-
-  min-height:28px !important;
-
-  padding:
-    0 6px !important;
-
-  font-size:5.7px !important;
-
-  letter-spacing:.4px !important;
-}
-
-
-/* ============================================================
-   EXPORT = PREVIEW
-============================================================ */
-
-.export-static .product-info > .badges{
-  display:flex !important;
-
-  flex-direction:row !important;
-  flex-wrap:nowrap !important;
-
-  align-items:center !important;
-  justify-content:flex-start !important;
-
-  gap:6px !important;
-
-  width:100% !important;
-
-  overflow:visible !important;
-}
-
-.export-static .product-info > .badges > .badge.promo,
-.export-static .product-info > .badges > .cta-badge-slot{
-  display:none !important;
-}
-
-.export-static .product-info > .badges > .cta{
-  position:relative !important;
-
-  inset:auto !important;
-
-  order:1 !important;
-
-  flex:0 1 auto !important;
-
-  min-width:0 !important;
-
-  max-width:42% !important;
-
-  margin:0 !important;
-
-  transform:none !important;
-
-  overflow:hidden !important;
-
-  white-space:nowrap !important;
-
-  text-overflow:ellipsis !important;
-}
-
-.export-static .product-info > .badges > .badge.extra{
-  order:2 !important;
-
-  flex:0 1 auto !important;
-
-  min-width:0 !important;
-
-  max-width:28% !important;
-
-  margin:0 !important;
-}
-
-.export-static .product-info > .badges > .badge.warranty{
-  order:3 !important;
-
-  flex:0 1 auto !important;
-
-  min-width:0 !important;
-
-  max-width:32% !important;
-
-  margin:0 !important;
+@media(max-width:520px){
+
+  .r916 .product-info{
+    padding-bottom:
+      calc(
+        var(--contact-h-916) +
+        var(--contact-gap-916)
+      );
   }
 
-
-
-
-
-
-
-
-/* ============================================================
-   FINAL CONTACT TEXT — EXPORT ONLY
-   FIX VERTICAL CLIPPING
-   POSISI CARD TIDAK DIUBAH
-============================================================ */
-
-.export-static .contact-card{
-  box-sizing:border-box !important;
-
-  overflow:hidden !important;
-
-  /*
-    Jangan pakai vertical center yang
-    bisa membuat baris pertama/bawah terpotong.
-  */
-  display:flex !important;
-
-  flex-direction:column !important;
-
-  align-items:flex-start !important;
-
-  justify-content:flex-start !important;
-
-  gap:1px !important;
-
-  padding:
-    5px
-    8px !important;
-}
-
-
-/* --------------------------------
-   Semua baris contact
--------------------------------- */
-
-.export-static .contact-card .contact-label,
-.export-static .contact-card .contact-name,
-.export-static .contact-card .contact-phone{
-
-  display:block !important;
-
-  width:100% !important;
-
-  height:auto !important;
-
-  min-height:0 !important;
-
-  max-height:none !important;
-
-  margin:0 !important;
-
-  padding:0 !important;
-
-  flex:0 0 auto !important;
-
-  box-sizing:border-box !important;
-
-  overflow:hidden !important;
-
-  white-space:nowrap !important;
-
-  text-overflow:ellipsis !important;
-
-  transform:none !important;
-}
-
-
-/* --------------------------------
-   LABEL
--------------------------------- */
-
-.export-static .contact-card .contact-label{
-
-  font-size:6px !important;
-
-  line-height:7px !important;
-
-  height:7px !important;
-
-  letter-spacing:.8px !important;
-
-  font-weight:950 !important;
-}
-
-
-/* --------------------------------
-   NAMA CONTACT
--------------------------------- */
-
-.export-static .contact-card .contact-name{
-
-  font-size:7px !important;
-
-  line-height:8px !important;
-
-  height:8px !important;
-
-  letter-spacing:0 !important;
-
-  font-weight:950 !important;
-}
-
-
-/* --------------------------------
-   PHONE
--------------------------------- */
-
-.export-static .contact-card .contact-phone{
-
-  font-size:6px !important;
-
-  line-height:7px !important;
-
-  height:7px !important;
-
-  letter-spacing:.2px !important;
-
-  font-weight:850 !important;
-}
-
-
-/* ============================================================
-   9:16
-============================================================ */
-
-.export-static .r916 .contact-card{
-
-  padding:
-    5px
-    8px !important;
-
-  gap:1px !important;
-}
-
-.export-static .r916 .contact-card .contact-label{
-  font-size:6px !important;
-  line-height:7px !important;
-  height:7px !important;
-}
-
-.export-static .r916 .contact-card .contact-name{
-  font-size:7.5px !important;
-  line-height:8px !important;
-  height:8px !important;
-}
-
-.export-static .r916 .contact-card .contact-phone{
-  font-size:6.5px !important;
-  line-height:7px !important;
-  height:7px !important;
-}
-
-
-/* ============================================================
-   4:5
-============================================================ */
-
-.export-static .r45 .contact-card{
-
-  padding:
-    5px
-    8px !important;
-
-  gap:1px !important;
-}
-
-.export-static .r45 .contact-card .contact-label{
-  font-size:6px !important;
-  line-height:7px !important;
-  height:7px !important;
-}
-
-.export-static .r45 .contact-card .contact-name{
-  font-size:7.5px !important;
-  line-height:8px !important;
-  height:8px !important;
-}
-
-.export-static .r45 .contact-card .contact-phone{
-  font-size:6.5px !important;
-  line-height:7px !important;
-  height:7px !important;
-}
-
-
-/* ============================================================
-   16:9
-============================================================ */
-
-.export-static .r169 .contact-card{
-
-  padding:
-    4px
-    8px !important;
-
-  gap:1px !important;
-}
-
-.export-static .r169 .contact-card .contact-label{
-  font-size:5px !important;
-  line-height:6px !important;
-  height:6px !important;
-}
-
-.export-static .r169 .contact-card .contact-name{
-  font-size:6px !important;
-  line-height:7px !important;
-  height:7px !important;
-}
-
-.export-static .r169 .contact-card .contact-phone{
-  font-size:5.2px !important;
-  line-height:6px !important;
-  height:6px !important;
+  .r45 .product-info{
+    padding-bottom:
+      calc(
+        var(--contact-h-45) +
+        var(--contact-gap-45)
+      );
   }
 
+  .r169 .product-info{
+    padding-bottom:
+      calc(
+        var(--contact-h-169) +
+        var(--contact-gap-169)
+      );
+  }
 
-
-
-
-
-
-/* ============================================================
-   FINAL CONTACT ENGINE vFINAL
-   FIX:
-   - contact tenggelam
-   - contact kepotong saat PNG
-   - contact keluar canvas
-   - export-static mengubah absolute -> relative
-   - berlaku 9:16 / 4:5 / 16:9
-   ============================================================ */
-
-/* PRODUCT INFO = ANCHOR */
-.r916 .product-info,
-.r45 .product-info,
-.r169 .product-info,
-.export-static .r916 .product-info,
-.export-static .r45 .product-info,
-.export-static .r169 .product-info{
-  position:relative !important;
-
-  width:100% !important;
-  height:100% !important;
-
-  min-width:0 !important;
-  min-height:0 !important;
-
-  overflow:visible !important;
-
-  box-sizing:border-box !important;
+  .r916 .contact-card,
+  .r45 .contact-card{
+    padding:
+      6px
+      8px;
+  }
 }
 
 
 /* ============================================================
-   CONTACT CARD
-   SELALU MENJADI ELEMEN PALING BAWAH CANVAS
-   BUKAN LAGI BAGIAN FLOW FLEX
-   ============================================================ */
+   53 — HARD EXPORT SAFETY
+   ------------------------------------------------------------
+   This block is deliberately last.
 
-.r916 .product-info > .contact-card,
-.r45 .product-info > .contact-card,
-.r169 .product-info > .contact-card,
-.export-static .r916 .product-info > .contact-card,
-.export-static .r45 .product-info > .contact-card,
-.export-static .r169 .product-info > .contact-card{
+   It contains ONLY deterministic export rules.
+   No legacy relative/absolute switching.
+============================================================ */
 
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  top:auto !important;
-
-  width:100% !important;
-
-  height:auto !important;
-
-  min-width:0 !important;
-  min-height:0 !important;
-
-  margin:0 !important;
-
-  box-sizing:border-box !important;
-
-  display:flex !important;
-
-  flex-direction:column !important;
-
-  align-items:flex-start !important;
-
-  justify-content:center !important;
-
-  gap:2px !important;
-
-  padding:
-    7px
-    9px !important;
-
+.export-static .promo-canvas{
   overflow:hidden !important;
-
-  flex:none !important;
-
-  transform:none !important;
-
-  z-index:200 !important;
-
-  border:
-    1px solid
-    rgba(139,198,63,.58) !important;
-
-  border-radius:7px !important;
-
-  background:
-    rgba(0,0,0,.32) !important;
-}
-
-
-/* ============================================================
-   RESERVE RUANG DI PRODUCT INFO
-   Supaya konten harga tidak pernah duduk di belakang contact
-   ============================================================ */
-
-.r916 .product-info,
-.export-static .r916 .product-info{
-  padding-bottom:52px !important;
-}
-
-.r45 .product-info,
-.export-static .r45 .product-info{
-  padding-bottom:52px !important;
-}
-
-.r169 .product-info,
-.export-static .r169 .product-info{
-  padding-bottom:50px !important;
-}
-
-
-/* ============================================================
-   CONTACT TEXT
-   ============================================================ */
-
-.r916 .product-info > .contact-card .contact-label,
-.r916 .product-info > .contact-card .contact-name,
-.r916 .product-info > .contact-card .contact-phone,
-
-.r45 .product-info > .contact-card .contact-label,
-.r45 .product-info > .contact-card .contact-name,
-.r45 .product-info > .contact-card .contact-phone,
-
-.r169 .product-info > .contact-card .contact-label,
-.r169 .product-info > .contact-card .contact-name,
-.r169 .product-info > .contact-card .contact-phone,
-
-.export-static .contact-card .contact-label,
-.export-static .contact-card .contact-name,
-.export-static .contact-card .contact-phone{
-
-  position:relative !important;
-
-  width:100% !important;
-
-  height:auto !important;
-
-  min-height:0 !important;
-  max-height:none !important;
-
-  margin:0 !important;
-  padding:0 !important;
-
-  flex:0 0 auto !important;
-
-  overflow:hidden !important;
-
-  white-space:nowrap !important;
-
-  text-overflow:ellipsis !important;
-
-  box-sizing:border-box !important;
-
-  transform:none !important;
-}
-
-
-/* ============================================================
-   LABEL
-   ============================================================ */
-
-.r916 .contact-card .contact-label,
-.r45 .contact-card .contact-label,
-.r169 .contact-card .contact-label,
-.export-static .contact-card .contact-label{
-
-  color:var(--accent) !important;
-
-  font-size:6px !important;
-
-  line-height:7px !important;
-
-  height:7px !important;
-
-  letter-spacing:.8px !important;
-
-  font-weight:950 !important;
-}
-
-
-/* ============================================================
-   NAMA
-   ============================================================ */
-
-.r916 .contact-card .contact-name,
-.r45 .contact-card .contact-name,
-.r169 .contact-card .contact-name,
-.export-static .contact-card .contact-name{
-
-  color:#fff !important;
-
-  font-size:7.5px !important;
-
-  line-height:8px !important;
-
-  height:8px !important;
-
-  letter-spacing:0 !important;
-
-  font-weight:950 !important;
-}
-
-
-/* ============================================================
-   PHONE
-   ============================================================ */
-
-.r916 .contact-card .contact-phone,
-.r45 .contact-card .contact-phone,
-.r169 .contact-card .contact-phone,
-.export-static .contact-card .contact-phone{
-
-  color:#fff !important;
-
-  font-size:6.5px !important;
-
-  line-height:7px !important;
-
-  height:7px !important;
-
-  letter-spacing:.2px !important;
-
-  font-weight:850 !important;
-}
-
-
-/* ============================================================
-   16:9 — KHUSUS LEBIH KECIL
-   ============================================================ */
-
-.r169 .product-info > .contact-card,
-.export-static .r169 .product-info > .contact-card{
-
-  min-height:39px !important;
-
-  padding:
-    5px
-    8px !important;
-
-  gap:1px !important;
-
-  border-radius:5px !important;
-}
-
-.r169 .product-info,
-.export-static .r169 .product-info{
-  padding-bottom:43px !important;
-}
-
-.r169 .contact-card .contact-label,
-.export-static .r169 .contact-card .contact-label{
-
-  font-size:5px !important;
-
-  line-height:6px !important;
-
-  height:6px !important;
-}
-
-.r169 .contact-card .contact-name,
-.export-static .r169 .contact-card .contact-name{
-
-  font-size:6px !important;
-
-  line-height:7px !important;
-
-  height:7px !important;
-}
-
-.r169 .contact-card .contact-phone,
-.export-static .r169 .contact-card .contact-phone{
-
-  font-size:5.2px !important;
-
-  line-height:6px !important;
-
-  height:6px !important;
-}
-
-
-/* ============================================================
-   9:16 / 4:5 — CONTACT LEBIH LEGIBLE
-   ============================================================ */
-
-.r916 .product-info > .contact-card,
-.export-static .r916 .product-info > .contact-card,
-.r45 .product-info > .contact-card,
-.export-static .r45 .product-info > .contact-card{
-
-  min-height:43px !important;
-
-  padding:
-    6px
-    8px !important;
-}
-
-
-/* ============================================================
-   EXPORT OVERRIDE
-   INI PENTING:
-   export-static TIDAK BOLEH MENGEMBALIKAN CONTACT KE RELATIVE
-   ============================================================ */
-
-.export-static .product-info > .contact-card{
-
-  position:absolute !important;
-
-  left:0 !important;
-  right:0 !important;
-  bottom:0 !important;
-
-  top:auto !important;
-
-  margin:0 !important;
-
-  flex:none !important;
-
-  overflow:hidden !important;
-
-  z-index:200 !important;
-}
-
-
-/* ============================================================
-   CONTACT TIDAK BOLEH DIPOTONG OLEH INFO ZONE
-   ============================================================ */
-
-.r916 .info-zone,
-.r45 .info-zone,
-.r169 .info-zone,
-
-.export-static .r916 .info-zone,
-.export-static .r45 .info-zone,
-.export-static .r169 .info-zone{
-
-  overflow:visible !important;
-}
-
-
-/* ============================================================
-   CONTACT SELALU DI ATAS BACKGROUND,
-   TAPI TIDAK MENIMPA TEKS KARENA SUDAH ADA RESERVED SPACE
-   ============================================================ */
-
-.r916 .contact-card,
-.r45 .contact-card,
-.r169 .contact-card,
-
-.export-static .contact-card{
-
   isolation:isolate !important;
+}
+
+.export-static .info-zone{
+  overflow:hidden !important;
+}
+
+.export-static .product-info{
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+
+.export-static .contact-card{
+  position:absolute !important;
+
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  top:auto !important;
+
+  width:100% !important;
+
+  margin:0 !important;
+
+  transform:none !important;
+
+  opacity:1 !important;
+
+  visibility:visible !important;
+
+  display:flex !important;
+
+  overflow:hidden !important;
 
   z-index:999 !important;
-  }
+}
+
+
+/* ============================================================
+   54 — FINAL CONTACT VISIBILITY
+============================================================ */
+
+.contact-card{
+  opacity:1;
+  visibility:visible;
+}
+
+.contact-card,
+.contact-card *{
+  transform:none;
+}
+
+
+/* ============================================================
+   END — MASTER vΩ
+============================================================ */
 
 
 
 
 
-  
 
-  
-  
+
+
+
+
+
+
+
+
+
+
+
+
   
 </style>
+
 
 
 
