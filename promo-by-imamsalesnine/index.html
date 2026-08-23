@@ -5410,90 +5410,80 @@ function fitBadges(){
   if(!row)
     return;
 
-  /*
-    CTA = campaign badge dinamis
-    + EXTRA
-    + WARRANTY
-  */
-  const badges=[
+  const items=[
     ...row.querySelectorAll(
-      ".badge, .cta"
+      ".cta, .badge.extra, .badge.warranty"
     )
   ];
 
-  if(!badges.length)
+  if(!items.length)
     return;
 
   /*
-    Reset ukuran dulu.
+    Reset.
   */
-  badges.forEach(
-    badge=>{
+  items.forEach(
+    item=>{
 
-      badge.style.transform=
+      item.style.transform=
         "none";
 
-      badge.style.textAlign=
+      item.style.textAlign=
         "center";
 
-      badge.style.alignItems=
+      item.style.alignItems=
         "center";
 
-      badge.style.justifyContent=
+      item.style.justifyContent=
         "center";
 
-      badge.style.lineHeight=
+      item.style.lineHeight=
         "1";
 
-      badge.style.overflow=
-        "hidden";
-
-      badge.style.textOverflow=
-        "ellipsis";
+      item.style.textOverflow=
+        "clip";
     }
   );
 
   /*
-    Ukuran awal berdasarkan rasio.
+    Ukuran awal.
   */
-  let size;
+  let size=
+    currentRatio==="916"
+      ?6.2
+      :
+    currentRatio==="45"
+      ?6.5
+      :
+      5.8;
 
-  if(currentRatio==="916")
-    size=6.5;
+  items.forEach(
+    item=>{
 
-  else if(currentRatio==="45")
-    size=6.5;
-
-  else
-    size=6.2;
-
-  badges.forEach(
-    badge=>{
-
-      badge.style.fontSize=
+      item.style.fontSize=
         size+"px";
     }
   );
 
   /*
-    Kurangi font HANYA jika
-    seluruh baris badge tidak muat.
+    Kecilkan SEMUA badge
+    kalau satu baris belum muat.
   */
   let guard=0;
 
   while(
     row.scrollWidth>
     row.clientWidth+1&&
-    size>4.2&&
-    guard<18
+    size>4.4&&
+    guard<20
   ){
 
     size-=.2;
 
-    badges.forEach(
-      badge=>{
+    items.forEach(
+      item=>{
 
-        badge.style.fontSize=
+        item.style.fontSize=
           size+"px";
       }
     );
@@ -5502,20 +5492,28 @@ function fitBadges(){
   }
 
   /*
-    Pastikan tidak ada child
-    yang keluar horizontal.
+    Final centering.
   */
-  badges.forEach(
-    badge=>{
+  items.forEach(
+    item=>{
 
-      badge.style.maxWidth=
-        "100%";
+      item.style.display=
+        "inline-flex";
 
-      badge.style.boxSizing=
-        "border-box";
+      item.style.alignItems=
+        "center";
+
+      item.style.justifyContent=
+        "center";
+
+      item.style.textAlign=
+        "center";
+
+      item.style.transform=
+        "none";
     }
   );
-    }
+}
 /* ============================================================
    PREVIEW RENDER
 ============================================================ */
@@ -5770,7 +5768,7 @@ const contactCard=
   ${esc(cta)}
 </div>
 
-  <div class="cta-badge-slot"></div>
+  
 
   ${extra}
 
