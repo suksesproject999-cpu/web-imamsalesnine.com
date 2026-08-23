@@ -880,12 +880,68 @@ main{
 }
 
 .old{
+  position:relative;
+
+  display:inline-block;
+
   color:#6d756d;
 
   font-size:8px;
   line-height:1.1;
 
+  font-weight:700;
+
   white-space:nowrap;
+
+  text-decoration:none;
+
+  vertical-align:middle;
+
+  opacity:.95;
+}
+
+.old{
+  position:relative;
+
+  display:inline-block;
+
+  color:#6d756d;
+
+  font-size:8px;
+  line-height:1.1;
+
+  font-weight:700;
+
+  white-space:nowrap;
+
+  text-decoration:none;
+
+  vertical-align:middle;
+}
+
+.old-price{
+  position:relative;
+
+  display:inline-block;
+
+  line-height:1.1;
+}
+
+.strike-line{
+  position:absolute;
+
+  left:0;
+  right:0;
+
+  top:50%;
+
+  height:1.5px;
+
+  background:#858b85;
+
+  transform:translateY(-50%);
+
+  pointer-events:none;
 }
 
 .discount{
@@ -1064,7 +1120,20 @@ main{
   min-height:13px;
 }
 
-.r916 .old,
+
+
+.r916 .old{
+  font-size:7.5px;
+  line-height:1.1;
+}
+
+.r916 .strike-line{
+  top:50%;
+  height:1.5px;
+}
+
+
+  
 .r916 .discount{
   font-size:7.5px;
 
@@ -1192,6 +1261,17 @@ main{
     );
 }
 
+
+.r169 .old{
+  font-size:8px;
+  line-height:1.1;
+}
+
+.r169 .strike-line{
+  top:50%;
+  height:1.5px;
+}
+  
 /* ============================================================
    WATERMARK
 ============================================================ */
@@ -1457,6 +1537,11 @@ main{
   transform:none!important;
 }
 
+
+
+
+
+  
 /* ============================================================
    TOOLBAR
 ============================================================ */
@@ -4673,15 +4758,12 @@ function renderPreview(){
             class="price-meta"
           >
 
-            <span
-              class="old"
-            >
-              <s>
-                ${rupiah(
-                  price.normal
-                )}
-              </s>
-            </span>
+            <span class="old">
+  <span class="old-price">
+    ${rupiah(price.normal)}
+  </span>
+  <span class="strike-line"></span>
+</span>
 
             ${
               price.finalDiscount>0
