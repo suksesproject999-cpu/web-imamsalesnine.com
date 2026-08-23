@@ -3898,7 +3898,346 @@ pre{
 
 
 
+/* ============================================================
+   16:9 CTA BADGE — FINAL PREMIUM FIT
+   ------------------------------------------------------------
+   Fix:
+   - PROMO TERBATAS clipped
+   - CTA terlalu sempit
+   - badge row terlalu padat
+   - preview/export mismatch
+   ------------------------------------------------------------
+   ONLY affects 16:9
+============================================================ */
 
+
+/* ============================================================
+   01 — USE CONTROLLED 3-COLUMN GRID
+============================================================ */
+
+.r169 .product-info > .badges{
+
+  display:grid !important;
+
+  grid-template-columns:
+    1.18fr
+    .82fr
+    1fr !important;
+
+  align-items:center !important;
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  gap:5px !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
+  overflow:visible !important;
+
+  box-sizing:border-box !important;
+}
+
+
+/* ============================================================
+   02 — ALL THREE BADGES GET REAL SEATS
+============================================================ */
+
+.r169 .product-info > .badges > .cta,
+.r169 .product-info > .badges > .badge.extra,
+.r169 .product-info > .badges > .badge.warranty{
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  max-width:none !important;
+
+  margin:0 !important;
+
+  box-sizing:border-box !important;
+
+  display:flex !important;
+
+  align-items:center !important;
+
+  justify-content:center !important;
+
+  overflow:hidden !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:clip !important;
+
+  transform:none !important;
+}
+
+
+/* ============================================================
+   03 — CTA
+============================================================ */
+
+.r169 .product-info > .badges > .cta{
+
+  min-height:28px !important;
+
+  height:28px !important;
+
+  padding:
+    0
+    5px !important;
+
+  border-radius:999px !important;
+
+  font-size:5.35px !important;
+
+  line-height:1 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:.42px !important;
+
+  text-align:center !important;
+
+  white-space:nowrap !important;
+
+  overflow:hidden !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   04 — EXTRA
+============================================================ */
+
+.r169 .product-info > .badges > .badge.extra{
+
+  min-height:28px !important;
+
+  height:28px !important;
+
+  padding:
+    0
+    4px !important;
+
+  border-radius:999px !important;
+
+  font-size:5.15px !important;
+
+  line-height:1 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:.28px !important;
+
+  white-space:nowrap !important;
+
+  overflow:hidden !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   05 — WARRANTY
+============================================================ */
+
+.r169 .product-info > .badges > .badge.warranty{
+
+  min-height:28px !important;
+
+  height:28px !important;
+
+  padding:
+    0
+    4px !important;
+
+  border-radius:999px !important;
+
+  font-size:5.15px !important;
+
+  line-height:1 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:.24px !important;
+
+  white-space:nowrap !important;
+
+  overflow:hidden !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   06 — EXPORT MUST USE IDENTICAL GEOMETRY
+============================================================ */
+
+.export-static .r169 .product-info > .badges{
+
+  display:grid !important;
+
+  grid-template-columns:
+    1.18fr
+    .82fr
+    1fr !important;
+
+  align-items:center !important;
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  gap:5px !important;
+
+  overflow:visible !important;
+}
+
+
+/* ============================================================
+   07 — EXPORT CHILDREN
+============================================================ */
+
+.export-static .r169 .product-info > .badges > .cta,
+.export-static .r169 .product-info > .badges > .badge.extra,
+.export-static .r169 .product-info > .badges > .badge.warranty{
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  max-width:none !important;
+
+  flex:none !important;
+
+  margin:0 !important;
+
+  transform:none !important;
+
+  overflow:hidden !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   08 — EXPORT CTA
+============================================================ */
+
+.export-static .r169 .product-info > .badges > .cta{
+
+  height:28px !important;
+
+  min-height:28px !important;
+
+  padding:
+    0
+    5px !important;
+
+  font-size:5.35px !important;
+
+  line-height:1 !important;
+
+  letter-spacing:.42px !important;
+}
+
+
+/* ============================================================
+   09 — EXPORT EXTRA
+============================================================ */
+
+.export-static .r169 .product-info > .badges > .badge.extra{
+
+  height:28px !important;
+
+  min-height:28px !important;
+
+  padding:
+    0
+    4px !important;
+
+  font-size:5.15px !important;
+
+  line-height:1 !important;
+
+  letter-spacing:.28px !important;
+}
+
+
+/* ============================================================
+   10 — EXPORT WARRANTY
+============================================================ */
+
+.export-static .r169 .product-info > .badges > .badge.warranty{
+
+  height:28px !important;
+
+  min-height:28px !important;
+
+  padding:
+    0
+    4px !important;
+
+  font-size:5.15px !important;
+
+  line-height:1 !important;
+
+  letter-spacing:.24px !important;
+}
+
+
+/* ============================================================
+   11 — KILL LEGACY FLEX LIMITS
+============================================================ */
+
+.r169 .product-info > .badges > .cta,
+.r169 .product-info > .badges > .badge.extra,
+.r169 .product-info > .badges > .badge.warranty,
+
+.export-static .r169 .product-info > .badges > .cta,
+.export-static .r169 .product-info > .badges > .badge.extra,
+.export-static .r169 .product-info > .badges > .badge.warranty{
+
+  flex-grow:0 !important;
+  flex-shrink:0 !important;
+  flex-basis:auto !important;
+}
+
+
+/* ============================================================
+   12 — CTA TEXT SAFETY
+============================================================ */
+
+.r169 .product-info > .badges > .cta *,
+.r169 .product-info > .badges > .badge.extra *,
+.r169 .product-info > .badges > .badge.warranty *,
+
+.export-static .r169 .product-info > .badges > .cta *,
+.export-static .r169 .product-info > .badges > .badge.extra *,
+.export-static .r169 .product-info > .badges > .badge.warranty *{
+
+  max-width:100% !important;
+
+  min-width:0 !important;
+
+  white-space:nowrap !important;
+
+  overflow:hidden !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   END — 16:9 CTA PREMIUM FIT
+============================================================ */
 
 
 
