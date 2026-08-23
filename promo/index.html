@@ -1174,23 +1174,54 @@ main{
 }
 
 .r169 .badges{
-  gap:7px;
+  width:100%;
+
+  display:flex;
+
+  flex-wrap:nowrap;
+
+  align-items:center;
+  justify-content:flex-start;
+
+  gap:6px;
+
+  min-width:0;
+
+  overflow:visible;
 }
 
 .r169 .badge{
+  flex:0 0 auto;
+
+  min-width:max-content;
+
+  max-width:none;
+
   min-height:28px;
 
   padding:
     0
-    11px;
+    8px;
 
-  font-size:6.3px;
+  font-size:6px;
 
-  letter-spacing:1.35px;
+  line-height:1;
+
+  letter-spacing:1.05px;
+
+  white-space:nowrap;
+
+  overflow:visible;
+
+  text-overflow:clip;
+
+  box-sizing:border-box;
 }
 
 .r169 .badge.promo{
-  min-width:72px;
+  flex:0 0 auto;
+
+  min-width:68px;
 }
 
 .r169 .brand-line{
@@ -4428,11 +4459,32 @@ function fitBadges(){
 
   if(!root)return;
 
+  const row=
+    root.querySelector(
+      ".badges"
+    );
+
+  if(!row)return;
+
   const badges=[
-    ...root.querySelectorAll(
+    ...row.querySelectorAll(
       ".badge"
     )
   ];
+
+  if(!badges.length)return;
+
+  /*
+    RESET
+  */
+
+  row.style.flexWrap=
+    currentRatio==="169"
+      ? "nowrap"
+      : "wrap";
+
+  row.style.overflow=
+    "visible";
 
   badges.forEach(
     badge=>{
@@ -4452,42 +4504,142 @@ function fitBadges(){
       badge.style.lineHeight=
         "1";
 
-      /*
-        Dynamically reduce only when
-        a badge's own text is too wide.
-      */
+      badge.style.flex=
+        "0 0 auto";
 
-      let size=
-        parseFloat(
-          getComputedStyle(
-            badge
-          ).fontSize
-        );
+      badge.style.minWidth=
+        "max-content";
 
-      const minSize=
-        currentRatio==="916"
-          ?5.2
-          :5.5;
+      badge.style.maxWidth=
+        "none";
 
-      let guard=0;
+      badge.style.overflow=
+        "visible";
 
-      while(
-        badge.scrollWidth>
-        badge.clientWidth+
-        1&&
-        size>minSize&&
-        guard<12
-      ){
+      badge.style.textOverflow=
+        "clip";
 
-        size-=.25;
+      badge.style.whiteSpace=
+        "nowrap";
+    }
+  );
+
+  /*
+    ONLY 16:9 NEEDS
+    TOTAL ROW FITTING.
+  */
+
+  if(
+    currentRatio!=="169"
+  ){
+    return;
+  }
+
+  /*
+    Start from CSS font size.
+  */
+
+  let size=
+    Math.min(
+      ...badges.map(
+        badge=>
+          parseFloat(
+            getComputedStyle(
+              badge
+            ).fontSize
+          )||6
+      )
+    );
+
+  /*
+    Reduce font until
+    ALL badges fit together.
+  */
+
+  let guard=0;
+
+  while(
+    row.scrollWidth>
+    row.clientWidth+
+    1&&
+    guard<20
+  ){
+
+    size=
+      Math.max(
+        4.2,
+        size-.2
+      );
+
+    badges.forEach(
+      badge=>{
 
         badge.style.fontSize=
           size+"px";
-
-        guard++;
       }
+    );
+
+    guard++;
+
+    if(size<=4.2){
+      break;
     }
-  );
+  }
+
+  /*
+    If still slightly wide,
+    reduce padding.
+    NEVER clip the text.
+  */
+
+  if(
+    row.scrollWidth>
+    row.clientWidth+
+    1
+  ){
+
+    badges.forEach(
+      badge=>{
+
+        badge.style.paddingLeft=
+          "5px";
+
+        badge.style.paddingRight=
+          "5px";
+      }
+    );
+  }
+
+  /*
+    One final font adjustment
+    after padding reduction.
+  */
+
+  guard=0;
+
+  while(
+    row.scrollWidth>
+    row.clientWidth+
+    1&&
+    guard<10
+  ){
+
+    size=
+      Math.max(
+        3.8,
+        size-.15
+      );
+
+    badges.forEach(
+      badge=>{
+
+        badge.style.fontSize=
+          size+"px";
+      }
+    );
+
+    guard++;
+  }
 }
 
 /* ============================================================
