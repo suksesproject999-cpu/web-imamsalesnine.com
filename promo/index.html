@@ -724,6 +724,12 @@ main{
   box-sizing:border-box;
 }
 
+
+
+
+
+
+  
 /* ============================================================
    BRAND
 ============================================================ */
@@ -1515,33 +1521,49 @@ main{
   -webkit-box-orient:initial!important;
 }
 
-/*
-  Badge export lock.
-*/
+/* ============================================================
+   EXPORT BADGE LOCK — MATCH PREVIEW
+============================================================ */
+
 .export-static .badges{
   display:flex!important;
 
   align-items:center!important;
   justify-content:flex-start!important;
 
-  flex-wrap:wrap!important;
+  gap:4px!important;
+
+  flex-wrap:nowrap!important;
+
+  min-width:0!important;
+
+  overflow:visible!important;
 }
 
 .export-static .badge{
   display:inline-flex!important;
 
+  flex:
+    0 0 auto!important;
+
   align-items:center!important;
   justify-content:center!important;
+
+  min-width:max-content!important;
+  max-width:none!important;
 
   text-align:center!important;
 
   line-height:1!important;
 
-  overflow:hidden!important;
+  white-space:nowrap!important;
+
+  overflow:visible!important;
+
+  text-overflow:clip!important;
 
   transform:none!important;
-}
-
+  }
 
 
 
@@ -2610,6 +2632,84 @@ pre{
     grid-template-columns:1fr;
   }
 }
+
+
+
+
+
+/* ============================================================
+   FINAL 16:9 BADGE
+============================================================ */
+
+.r169 .badges{
+  width:100%;
+
+  display:flex;
+  flex-wrap:nowrap;
+
+  align-items:center;
+  justify-content:flex-start;
+
+  gap:4px;
+
+  min-width:0;
+  max-width:100%;
+
+  overflow:visible;
+
+  box-sizing:border-box;
+}
+
+.r169 .badge{
+  flex:0 0 auto;
+
+  min-width:max-content;
+  max-width:none;
+
+  min-height:26px;
+
+  padding:0 6px;
+
+  font-size:5px;
+  line-height:1;
+
+  letter-spacing:.8px;
+  font-weight:950;
+
+  white-space:nowrap;
+
+  overflow:visible;
+  text-overflow:clip;
+
+  box-sizing:border-box;
+
+  display:inline-flex;
+
+  align-items:center;
+  justify-content:center;
+
+  text-align:center;
+}
+
+.r169 .badge.promo{
+  min-width:66px;
+
+  padding-left:7px;
+  padding-right:7px;
+}
+
+.r169 .badge.warranty{
+  min-width:max-content;
+
+  padding-left:5px;
+  padding-right:5px;
+
+  letter-spacing:.65px;
+}
+
+
+
+  
 </style>
 </head>
 
@@ -4474,18 +4574,6 @@ function fitBadges(){
 
   if(!badges.length)return;
 
-  /*
-    RESET
-  */
-
-  row.style.flexWrap=
-    currentRatio==="169"
-      ? "nowrap"
-      : "wrap";
-
-  row.style.overflow=
-    "visible";
-
   badges.forEach(
     badge=>{
 
@@ -4525,8 +4613,8 @@ function fitBadges(){
   );
 
   /*
-    ONLY 16:9 NEEDS
-    TOTAL ROW FITTING.
+    Only 16:9 needs
+    single-row fitting.
   */
 
   if(
@@ -4535,9 +4623,19 @@ function fitBadges(){
     return;
   }
 
+  row.style.flexWrap=
+    "nowrap";
+
+  row.style.overflow=
+    "visible";
+
   /*
-    Start from CSS font size.
+    Reserve 12px breathing room
+    on the right side.
   */
+
+  const safeRight=
+    12;
 
   let size=
     Math.min(
@@ -4551,17 +4649,13 @@ function fitBadges(){
       )
     );
 
-  /*
-    Reduce font until
-    ALL badges fit together.
-  */
-
   let guard=0;
 
   while(
-    row.scrollWidth>
-    row.clientWidth+
-    1&&
+    row.scrollWidth >
+    row.clientWidth-
+    safeRight+
+    1 &&
     guard<20
   ){
 
@@ -4581,20 +4675,23 @@ function fitBadges(){
 
     guard++;
 
-    if(size<=4.2){
+    if(
+      size<=4.2
+    ){
       break;
     }
   }
 
   /*
-    If still slightly wide,
-    reduce padding.
-    NEVER clip the text.
+    Fine adjustment:
+    reduce badge horizontal padding,
+    not the text.
   */
 
   if(
-    row.scrollWidth>
-    row.clientWidth+
+    row.scrollWidth >
+    row.clientWidth-
+    safeRight+
     1
   ){
 
@@ -4611,16 +4708,16 @@ function fitBadges(){
   }
 
   /*
-    One final font adjustment
-    after padding reduction.
+    Final pass.
   */
 
   guard=0;
 
   while(
-    row.scrollWidth>
-    row.clientWidth+
-    1&&
+    row.scrollWidth >
+    row.clientWidth-
+    safeRight+
+    1 &&
     guard<10
   ){
 
@@ -4640,8 +4737,7 @@ function fitBadges(){
 
     guard++;
   }
-}
-
+    }
 /* ============================================================
    PREVIEW RENDER
 ============================================================ */
