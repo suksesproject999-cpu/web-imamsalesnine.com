@@ -5089,57 +5089,105 @@ pre{
   }
   }
 
+
+
   /* ============================================================
-   WARRANTY — FINAL FIT
-   ============================================================ */
+   16:9 WARRANTY — NO CLIP / NO WIDTH LIMIT
+   FINAL OVERRIDE
+============================================================ */
 
-.r916 .product-info > .badges > .badge.warranty,
-.r45 .product-info > .badges > .badge.warranty,
-.r169 .product-info > .badges > .badge.warranty{
-
-  font-size:5.5px !important;
-
-  letter-spacing:.2px !important;
-
-  flex:0 0 auto !important;
-
-  white-space:nowrap !important;
-
-  overflow:visible !important;
-
-  text-overflow:clip !important;
-}
-
-
-/* Export PNG harus sama */
-.export-static .r916 .product-info > .badges > .badge.warranty,
-.export-static .r45 .product-info > .badges > .badge.warranty,
+.r169 .product-info > .badges > .badge.warranty,
 .export-static .r169 .product-info > .badges > .badge.warranty{
 
-  font-size:5.5px !important;
+  /* jangan kasih batas lebar */
+  width:max-content !important;
 
-  letter-spacing:.2px !important;
+  min-width:max-content !important;
 
+  max-width:none !important;
+
+  /* jangan shrink */
   flex:0 0 auto !important;
+
+  /* teks */
+  font-size:5.6px !important;
+
+  letter-spacing:0 !important;
+
+  line-height:1.2 !important;
 
   white-space:nowrap !important;
 
+  /* WAJIB visible */
   overflow:visible !important;
 
   text-overflow:clip !important;
+
+  /* no padding tambahan */
+  padding:0 !important;
+
+  margin:0 !important;
+
+  border:0 !important;
+
+  background:transparent !important;
+
+  box-shadow:none !important;
+
+  border-radius:0 !important;
+
+  box-sizing:content-box !important;
 }
 
 
-/* Separator sedikit dirapatkan */
-.r916 .product-info > .badges > .badge.warranty::before,
-.r45 .product-info > .badges > .badge.warranty::before,
-.r169 .product-info > .badges > .badge.warranty::before{
+/* ============================================================
+   WARRANTY SYMBOL
+============================================================ */
 
-  margin-right:5px !important;
+.r169 .product-info > .badges > .badge.warranty::before,
+.export-static .r169 .product-info > .badges > .badge.warranty::before{
 
-  font-size:5.5px !important;
+  margin-right:3px !important;
+
+  font-size:5px !important;
+
+  letter-spacing:0 !important;
+}
+
+
+/* ============================================================
+   PARENT ROW — JANGAN CLIP CHILD
+============================================================ */
+
+.r169 .product-info > .badges,
+.export-static .r169 .product-info > .badges{
+
+  overflow:visible !important;
+
+  flex-wrap:nowrap !important;
+
+  min-width:0 !important;
+}
+
+
+/* ============================================================
+   EXPORT — KILL LEGACY WIDTH LIMIT
+============================================================ */
+
+.export-static .r169 .product-info > .badges > .badge.warranty{
+
+  max-width:none !important;
+
+  width:max-content !important;
+
+  min-width:max-content !important;
+
+  overflow:visible !important;
+
+  flex-shrink:0 !important;
+
+  white-space:nowrap !important;
   }
-
 
 
   
