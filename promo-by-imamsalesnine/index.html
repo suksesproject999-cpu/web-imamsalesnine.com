@@ -2709,6 +2709,125 @@ pre{
 
 
 
+
+
+/* ============================================================
+   CONTACT INFO
+============================================================ */
+
+.contact-block{
+  margin-top:9px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:flex-start;
+
+  gap:3px;
+
+  color:#fff;
+
+  min-width:0;
+
+  max-width:100%;
+
+  overflow:visible;
+}
+
+.contact-name{
+  color:#8cc63f;
+
+  font-size:7px;
+
+  line-height:1.15;
+
+  font-weight:950;
+
+  letter-spacing:1.1px;
+
+  text-transform:uppercase;
+
+  white-space:normal;
+
+  overflow-wrap:anywhere;
+}
+
+.contact-phone{
+  color:#fff;
+
+  font-size:8px;
+
+  line-height:1.15;
+
+  font-weight:900;
+
+  letter-spacing:.7px;
+
+  white-space:nowrap;
+}
+
+
+.r169 .contact-block{
+  margin-top:7px;
+
+  gap:2px;
+}
+
+.r169 .contact-name{
+  font-size:5.2px;
+
+  letter-spacing:.75px;
+}
+
+.r169 .contact-phone{
+  font-size:6.2px;
+
+  letter-spacing:.45px;
+}
+
+
+
+  .r916 .contact-block{
+  margin-top:9px;
+
+  gap:3px;
+}
+
+.r916 .contact-name{
+  font-size:6.2px;
+
+  letter-spacing:.9px;
+}
+
+.r916 .contact-phone{
+  font-size:7px;
+
+  letter-spacing:.55px;
+}
+
+
+
+
+
+.r45 .contact-block{
+  margin-top:9px;
+
+  gap:3px;
+}
+
+.r45 .contact-name{
+  font-size:6.5px;
+}
+
+.r45 .contact-phone{
+  font-size:7.5px;
+}
+
+
+
+  
+
   
 </style>
 </head>
@@ -3351,6 +3470,46 @@ pre{
 
     </div>
 
+
+
+
+
+      <div class="field">
+
+  <label>
+    Contact / Nama Toko
+  </label>
+
+  <input
+    id="contactName"
+    type="text"
+    placeholder="nama"
+    maxlength="40"
+  >
+
+</div>
+
+<div class="field">
+
+  <label>
+    Nomor Telepon / WhatsApp
+  </label>
+
+  <input
+    id="contactPhone"
+    type="tel"
+    inputmode="tel"
+    placeholder="nomor telepon"
+    maxlength="24"
+  >
+
+</div>
+
+
+
+
+    
+
     <div class="field">
 
       <label>
@@ -3692,6 +3851,19 @@ let campaignName=
     STORAGE.campaign
   )||
   "Campaign Promo";
+
+
+  let contactName=
+  localStorage.getItem(
+    "contact_name"
+  )||
+  "";
+
+let contactPhone=
+  localStorage.getItem(
+    "contact_phone"
+  )||
+  "";
 
 let currentVariant="A";
 
@@ -4833,6 +5005,56 @@ function renderPreview(){
 
       :"";
 
+
+
+const contact=
+  (
+    contactName.trim()||
+    contactPhone.trim()
+  )
+
+    ?`
+
+      <div
+        class="contact-block"
+      >
+
+        ${
+          contactName.trim()
+            ?`
+              <div
+                class="contact-name"
+              >
+                HUBUNGI:
+                ${esc(
+                  contactName.trim()
+                )}
+              </div>
+            `
+            :""
+        }
+
+        ${
+          contactPhone.trim()
+            ?`
+              <div
+                class="contact-phone"
+              >
+                ${esc(
+                  contactPhone.trim()
+                )}
+              </div>
+            `
+            :""
+        }
+
+      </div>
+
+    `
+
+    :"";
+  
+
   const cta=
     $("ctaSelect")?.value||
     "CEK HARGA";
@@ -5002,6 +5224,8 @@ function renderPreview(){
           >
             ${esc(cta)}
           </div>
+
+          ${contact}
 
         </div>
 
@@ -6202,14 +6426,22 @@ function projectData(){
 
     campaign:{
 
-      name:
-        $("campaignName")
-          .value,
+  name:
+    $("campaignName")
+      .value,
 
-      cta:
-        $("ctaSelect")
-          .value
-    },
+  cta:
+    $("ctaSelect")
+      .value,
+
+  contactName:
+    $("contactName")?.value||
+    "",
+
+  contactPhone:
+    $("contactPhone")?.value||
+    ""
+},
 
     creative:{
 
@@ -6340,6 +6572,35 @@ function loadProject(){
     .value=
       data.campaign?.cta||
       "CEK HARGA";
+
+
+  $("contactName")
+  .value=
+    data.campaign?.contactName||
+    "";
+
+$("contactPhone")
+  .value=
+    data.campaign?.contactPhone||
+    "";
+
+contactName=
+  $("contactName")
+    .value;
+
+contactPhone=
+  $("contactPhone")
+    .value;
+
+localStorage.setItem(
+  "contact_name",
+  contactName
+);
+
+localStorage.setItem(
+  "contact_phone",
+  contactPhone
+);
 
   $("qualitySelect")
     .value=
@@ -7977,6 +8238,38 @@ $("campaignName")
         STORAGE.campaign,
         campaignName
       );
+    };
+
+
+
+  $("contactName")
+  .oninput=
+    e=>{
+
+      contactName=
+        e.target.value;
+
+      localStorage.setItem(
+        "laras_contact_name",
+        contactName
+      );
+
+      renderPreview();
+    };
+
+$("contactPhone")
+  .oninput=
+    e=>{
+
+      contactPhone=
+        e.target.value;
+
+      localStorage.setItem(
+        "laras_contact_phone",
+        contactPhone
+      );
+
+      renderPreview();
     };
 
 $("ctaSelect")
