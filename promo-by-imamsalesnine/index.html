@@ -3223,7 +3223,512 @@ pre{
 
 
 
+/* ============================================================
+   CONTACT + PRODUCT NAME — FINAL SAFE PATCH
+   ------------------------------------------------------------
+   PURPOSE:
+   - Nine Luximos / long product name must NOT be clipped
+   - Contact must NOT be clipped
+   - Preview geometry remains untouched
+   - Export geometry remains untouched
+   - No viewport dependency
+   - No overflow hidden on info-zone/product-info
+============================================================ */
 
+
+/* ============================================================
+   01 — PRODUCT INFO
+============================================================ */
+
+.r916 .product-info,
+.r45 .product-info,
+.r169 .product-info{
+  position:relative !important;
+
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+
+  overflow:visible !important;
+
+  isolation:isolate !important;
+}
+
+
+/* ============================================================
+   02 — INFO ZONE
+   NEVER CLIP PRODUCT NAME OR CONTACT
+============================================================ */
+
+.r916 .info-zone,
+.r45 .info-zone,
+.r169 .info-zone{
+  overflow:visible !important;
+}
+
+
+/* ============================================================
+   03 — PRODUCT NAME
+   RESTORE FULL WRAP BEHAVIOR
+============================================================ */
+
+.r916 .product-name,
+.r45 .product-name,
+.r169 .product-name{
+
+  position:relative !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  max-height:none !important;
+
+  margin-top:6px !important;
+
+  display:block !important;
+
+  color:#fff !important;
+
+  white-space:normal !important;
+
+  overflow:visible !important;
+
+  overflow-wrap:break-word !important;
+
+  word-break:normal !important;
+
+  text-overflow:clip !important;
+
+  -webkit-line-clamp:unset !important;
+
+  -webkit-box-orient:unset !important;
+
+  flex:0 0 auto !important;
+
+  z-index:40 !important;
+}
+
+
+/* ============================================================
+   04 — CONTACT
+   FLOW-BASED, NOT ABSOLUTE
+   ------------------------------------------------------------
+   This is intentional.
+
+   The contact follows all commerce information naturally.
+   No bottom pinning.
+   No clipping.
+============================================================ */
+
+.r916 .product-info > .contact-card,
+.r45 .product-info > .contact-card,
+.r169 .product-info > .contact-card{
+
+  position:relative !important;
+
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-width:0 !important;
+
+  margin:
+    10px
+    0
+    0 !important;
+
+  padding:
+    7px
+    9px !important;
+
+  box-sizing:border-box !important;
+
+  display:flex !important;
+
+  flex-direction:column !important;
+
+  align-items:flex-start !important;
+
+  justify-content:center !important;
+
+  gap:2px !important;
+
+  flex:0 0 auto !important;
+
+  overflow:visible !important;
+
+  border:
+    1px solid
+    rgba(139,198,63,.58) !important;
+
+  border-radius:7px !important;
+
+  background:
+    rgba(0,0,0,.30) !important;
+
+  transform:none !important;
+
+  z-index:80 !important;
+}
+
+
+/* ============================================================
+   05 — CONTACT TEXT
+   NO FIXED HEIGHT
+============================================================ */
+
+.r916 .product-info > .contact-card .contact-label,
+.r45 .product-info > .contact-card .contact-label,
+.r169 .product-info > .contact-card .contact-label,
+
+.r916 .product-info > .contact-card .contact-name,
+.r45 .product-info > .contact-card .contact-name,
+.r169 .product-info > .contact-card .contact-name,
+
+.r916 .product-info > .contact-card .contact-phone,
+.r45 .product-info > .contact-card .contact-phone,
+.r169 .product-info > .contact-card .contact-phone{
+
+  position:relative !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  max-height:none !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
+  display:block !important;
+
+  flex:0 0 auto !important;
+
+  overflow:visible !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:clip !important;
+
+  box-sizing:border-box !important;
+
+  transform:none !important;
+}
+
+
+/* ============================================================
+   06 — CONTACT LABEL
+============================================================ */
+
+.r916 .product-info > .contact-card .contact-label,
+.r45 .product-info > .contact-card .contact-label,
+.r169 .product-info > .contact-card .contact-label{
+
+  color:var(--accent) !important;
+
+  font-size:6px !important;
+
+  line-height:1.15 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:.9px !important;
+
+  text-transform:uppercase !important;
+}
+
+
+/* ============================================================
+   07 — CONTACT NAME
+============================================================ */
+
+.r916 .product-info > .contact-card .contact-name,
+.r45 .product-info > .contact-card .contact-name,
+.r169 .product-info > .contact-card .contact-name{
+
+  color:#fff !important;
+
+  font-size:7.5px !important;
+
+  line-height:1.2 !important;
+
+  font-weight:950 !important;
+
+  letter-spacing:0 !important;
+}
+
+
+/* ============================================================
+   08 — CONTACT PHONE
+============================================================ */
+
+.r916 .product-info > .contact-card .contact-phone,
+.r45 .product-info > .contact-card .contact-phone,
+.r169 .product-info > .contact-card .contact-phone{
+
+  color:#fff !important;
+
+  font-size:6.5px !important;
+
+  line-height:1.2 !important;
+
+  font-weight:850 !important;
+
+  letter-spacing:.2px !important;
+}
+
+
+/* ============================================================
+   09 — 16:9
+============================================================ */
+
+.r169 .product-info > .contact-card{
+
+  margin-top:9px !important;
+
+  padding:
+    6px
+    8px !important;
+
+  border-radius:6px !important;
+}
+
+.r169 .product-info > .contact-card .contact-label{
+  font-size:5px !important;
+}
+
+.r169 .product-info > .contact-card .contact-name{
+  font-size:6.2px !important;
+}
+
+.r169 .product-info > .contact-card .contact-phone{
+  font-size:5.4px !important;
+}
+
+
+/* ============================================================
+   10 — 9:16
+============================================================ */
+
+.r916 .product-info > .contact-card{
+
+  margin-top:9px !important;
+
+  padding:
+    7px
+    8px !important;
+}
+
+
+/* ============================================================
+   11 — 4:5
+============================================================ */
+
+.r45 .product-info > .contact-card{
+
+  margin-top:10px !important;
+
+  padding:
+    7px
+    8px !important;
+}
+
+
+/* ============================================================
+   12 — EXPORT
+   ------------------------------------------------------------
+   CRITICAL:
+   Export must use EXACT SAME flow as preview.
+
+   No absolute.
+   No fixed height.
+   No overflow hidden.
+============================================================ */
+
+.export-static .r916 .info-zone,
+.export-static .r45 .info-zone,
+.export-static .r169 .info-zone{
+
+  overflow:visible !important;
+}
+
+.export-static .r916 .product-info,
+.export-static .r45 .product-info,
+.export-static .r169 .product-info{
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  overflow:visible !important;
+
+  padding-bottom:0 !important;
+}
+
+
+/* ============================================================
+   13 — EXPORT PRODUCT NAME
+============================================================ */
+
+.export-static .product-name{
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  max-height:none !important;
+
+  display:block !important;
+
+  overflow:visible !important;
+
+  white-space:normal !important;
+
+  overflow-wrap:break-word !important;
+
+  word-break:normal !important;
+
+  text-overflow:clip !important;
+
+  -webkit-line-clamp:unset !important;
+
+  -webkit-box-orient:unset !important;
+}
+
+
+/* ============================================================
+   14 — EXPORT CONTACT
+============================================================ */
+
+.export-static .product-info > .contact-card{
+
+  position:relative !important;
+
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  margin:
+    10px
+    0
+    0 !important;
+
+  padding:
+    7px
+    9px !important;
+
+  display:flex !important;
+
+  flex-direction:column !important;
+
+  justify-content:center !important;
+
+  align-items:flex-start !important;
+
+  gap:2px !important;
+
+  flex:0 0 auto !important;
+
+  overflow:visible !important;
+
+  transform:none !important;
+
+  z-index:80 !important;
+}
+
+
+/* ============================================================
+   15 — EXPORT CONTACT TEXT
+============================================================ */
+
+.export-static .contact-card .contact-label,
+.export-static .contact-card .contact-name,
+.export-static .contact-card .contact-phone{
+
+  width:100% !important;
+
+  height:auto !important;
+
+  min-height:0 !important;
+
+  max-height:none !important;
+
+  margin:0 !important;
+
+  padding:0 !important;
+
+  overflow:visible !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:clip !important;
+
+  flex:0 0 auto !important;
+
+  transform:none !important;
+}
+
+
+/* ============================================================
+   16 — REMOVE OLD CONTACT GEOMETRY
+   This is the actual override layer.
+============================================================ */
+
+.export-static .product-info > .contact-card,
+.r916 .product-info > .contact-card,
+.r45 .product-info > .contact-card,
+.r169 .product-info > .contact-card{
+
+  float:none !important;
+
+  inset:auto !important;
+
+  translate:none !important;
+
+  scale:1 !important;
+
+  rotate:none !important;
+}
+
+
+/* ============================================================
+   17 — FINAL SAFETY
+   Product name and contact must remain visible.
+============================================================ */
+
+.product-info,
+.info-zone,
+.product-name,
+.contact-card,
+.contact-card *{
+
+  visibility:visible;
+}
+
+
+/* ============================================================
+   END — SAFE PATCH
+============================================================ */
 
 
 
