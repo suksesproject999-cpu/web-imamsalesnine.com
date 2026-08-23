@@ -900,36 +900,48 @@ main{
   opacity:.95;
 }
 
-/* CUSTOM STRIKETHROUGH */
-.old s{
+.old{
   position:relative;
 
   display:inline-block;
 
+  color:#6d756d;
+
+  font-size:8px;
+  line-height:1.1;
+
+  font-weight:700;
+
+  white-space:nowrap;
+
   text-decoration:none;
 
-  color:inherit;
+  vertical-align:middle;
 }
 
-.old s::after{
-  content:"";
+.old-price{
+  position:relative;
 
+  display:inline-block;
+
+  line-height:1.1;
+}
+
+.strike-line{
   position:absolute;
 
   left:0;
   right:0;
 
-  top:45%;
+  top:50%;
 
   height:1.5px;
 
   background:#858b85;
 
-  transform:none;
+  transform:translateY(-50%);
 
   pointer-events:none;
-
-  z-index:2;
 }
 
 .discount{
@@ -1112,20 +1124,12 @@ main{
 
 .r916 .old{
   font-size:7.5px;
-
   line-height:1.1;
-
-  font-weight:700;
 }
 
-.r916 .old s::after{
+.r916 .strike-line{
+  top:50%;
   height:1.5px;
-
-  top:45%;
-
-  background:#858b85;
-
-  transform:none;
 }
 
 
@@ -1260,20 +1264,12 @@ main{
 
 .r169 .old{
   font-size:8px;
-
   line-height:1.1;
-
-  font-weight:700;
 }
 
-.r169 .old s::after{
-  top:45%;
-
+.r169 .strike-line{
+  top:50%;
   height:1.5px;
-
-  background:#858b85;
-
-  transform:none;
 }
   
 /* ============================================================
@@ -1543,11 +1539,7 @@ main{
 
 
 
-.export-static .old s::after{
-  top:50%;
-  height:1.5px;
-  transform:translateY(-50%);
-}
+
 
   
 /* ============================================================
@@ -4766,15 +4758,12 @@ function renderPreview(){
             class="price-meta"
           >
 
-            <span
-              class="old"
-            >
-              <s>
-                ${rupiah(
-                  price.normal
-                )}
-              </s>
-            </span>
+            <span class="old">
+  <span class="old-price">
+    ${rupiah(price.normal)}
+  </span>
+  <span class="strike-line"></span>
+</span>
 
             ${
               price.finalDiscount>0
