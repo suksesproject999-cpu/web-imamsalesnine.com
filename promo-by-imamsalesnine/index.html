@@ -2869,7 +2869,7 @@ pre{
 
 
 /* ============================================================
-   FINAL 16:9 CONTACT LAYOUT
+   FINAL 16:9 CONTACT CARD — FIXED INSIDE CANVAS
 ============================================================ */
 
 .r169 .info-zone{
@@ -2880,9 +2880,9 @@ pre{
   width:42%;
 
   padding:
-    5%
     6%
-    4%
+    6%
+    5%
     5%;
 
   box-sizing:border-box;
@@ -2891,37 +2891,56 @@ pre{
 }
 
 .r169 .product-info{
+  position:relative;
+
   width:100%;
   height:100%;
 
   min-width:0;
   min-height:0;
 
+  overflow:hidden;
+
+  display:flex;
+  flex-direction:column;
+  align-items:flex-start;
+}
+
+.r169 .contact-card{
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  width:100%;
+
+  margin:0;
+
+  padding:
+    5px
+    7px;
+
+  gap:2px;
+
+  box-sizing:border-box;
+
+  border:
+    1px solid
+    rgba(139,198,63,.55);
+
+  border-radius:5px;
+
+  background:
+    rgba(0,0,0,.32);
+
+  overflow:hidden;
+
   display:flex;
   flex-direction:column;
   align-items:flex-start;
 
-  overflow:hidden;
-}
-
-.r169 .contact-card{
-  width:100%;
-
-  margin-top:auto;
-
-  flex:0 0 auto;
-
-  padding:
-    4px
-    6px;
-
-  gap:2px;
-
-  border-radius:5px;
-
-  box-sizing:border-box;
-
-  overflow:hidden;
+  min-width:0;
 }
 
 .r169 .contact-label{
@@ -2930,27 +2949,39 @@ pre{
   line-height:1;
 
   letter-spacing:.8px;
+
+  white-space:nowrap;
 }
 
 .r169 .contact-name{
   font-size:5.5px;
 
-  line-height:1.05;
+  line-height:1.1;
 
   max-width:100%;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
 }
 
 .r169 .contact-phone{
   font-size:5px;
 
-  line-height:1.05;
+  line-height:1.1;
 
   letter-spacing:.25px;
 
-  white-space:nowrap;
-
   max-width:100%;
-}
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+
+  white-space:nowrap;
+  }
   
 
   
