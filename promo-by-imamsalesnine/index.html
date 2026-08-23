@@ -2922,22 +2922,55 @@ pre{
 
 
 
-/* ============================================================
-   FINAL — DYNAMIC CAMPAIGN BADGE
-   Struktur:
-   [ CTA DINAMIS ] [ EXTRA ] [ GARANSI ]
 
-   CTA sudah berada di dalam .badges
-   Tidak ada badge PROMO dummy
+
+/* ============================================================
+   FINAL MASTER FIX
+   BADGE + PRODUCT NAME + CONTACT
+   9:16 / 4:5 / 16:9
+   PREVIEW = PNG
 ============================================================ */
 
 
-/* ------------------------------------------------------------
-   BADGE ROW
------------------------------------------------------------- */
+/* ============================================================
+   1. MASTER CONTAINER
+============================================================ */
+
+.promo-canvas{
+  overflow:hidden !important;
+}
+
+.info-zone{
+  overflow:visible !important;
+}
+
+.product-info{
+  position:relative !important;
+
+  width:100% !important;
+  min-width:0 !important;
+  min-height:0 !important;
+
+  display:flex !important;
+  flex-direction:column !important;
+
+  align-items:flex-start !important;
+
+  overflow:visible !important;
+}
+
+
+/* ============================================================
+   2. BADGE ROW
+   [CAMPAIGN DINAMIS] [EXTRA] [GARANSI]
+============================================================ */
 
 .product-info > .badges{
+  position:relative !important;
+
   width:100% !important;
+
+  min-width:0 !important;
 
   display:flex !important;
 
@@ -2951,9 +2984,9 @@ pre{
 
   gap:6px !important;
 
-  min-width:0 !important;
+  padding:0 !important;
 
-  max-width:100% !important;
+  margin:0 !important;
 
   overflow:visible !important;
 
@@ -2961,41 +2994,53 @@ pre{
 }
 
 
-/* ------------------------------------------------------------
-   DYNAMIC CAMPAIGN BADGE
-   .cta sekarang menjadi badge pertama
------------------------------------------------------------- */
+/* Semua badge harus benar-benar punya kursi sendiri */
+
+.product-info > .badges > *{
+  box-sizing:border-box !important;
+
+  flex-shrink:1 !important;
+
+  min-width:0 !important;
+
+  margin:0 !important;
+}
+
+
+/* ============================================================
+   3. CAMPAIGN BADGE DINAMIS
+   .cta sekarang ADA DI DALAM .badges
+============================================================ */
 
 .product-info > .badges > .cta{
   position:relative !important;
 
-  top:auto !important;
-  left:auto !important;
-  right:auto !important;
-  bottom:auto !important;
+  inset:auto !important;
 
   order:1 !important;
 
   display:inline-flex !important;
 
   align-items:center !important;
-
   justify-content:center !important;
 
-  flex:0 1 auto !important;
+  flex:
+    1 1 auto !important;
 
   width:auto !important;
 
-  min-width:max-content !important;
+  min-width:0 !important;
 
   max-width:100% !important;
 
   min-height:31px !important;
 
+  height:auto !important;
+
   margin:0 !important;
 
   padding:
-    0 13px !important;
+    0 11px !important;
 
   border-radius:999px !important;
 
@@ -3009,15 +3054,15 @@ pre{
 
   font-weight:950 !important;
 
-  letter-spacing:1.3px !important;
-
-  white-space:nowrap !important;
+  letter-spacing:1.15px !important;
 
   text-align:center !important;
 
-  overflow:visible !important;
+  white-space:nowrap !important;
 
-  text-overflow:clip !important;
+  overflow:hidden !important;
+
+  text-overflow:ellipsis !important;
 
   transform:none !important;
 
@@ -3025,85 +3070,406 @@ pre{
 }
 
 
-/* ------------------------------------------------------------
-   EXTRA
------------------------------------------------------------- */
+/* ============================================================
+   4. EXTRA
+============================================================ */
 
 .product-info > .badges > .badge.extra{
   order:2 !important;
 
-  flex:0 1 auto !important;
+  flex:
+    0 1 auto !important;
 
-  min-width:max-content !important;
+  min-width:0 !important;
 
-  max-width:none !important;
+  max-width:34% !important;
+
+  min-height:31px !important;
+
+  padding:
+    0 9px !important;
 
   white-space:nowrap !important;
 
-  overflow:visible !important;
+  overflow:hidden !important;
 
-  text-overflow:clip !important;
+  text-overflow:ellipsis !important;
 
   margin:0 !important;
 }
 
 
-/* ------------------------------------------------------------
-   WARRANTY
------------------------------------------------------------- */
+/* ============================================================
+   5. WARRANTY
+============================================================ */
 
 .product-info > .badges > .badge.warranty{
   order:3 !important;
 
-  flex:0 1 auto !important;
+  flex:
+    0 1 auto !important;
 
-  min-width:max-content !important;
+  min-width:0 !important;
 
-  max-width:none !important;
+  max-width:38% !important;
+
+  min-height:31px !important;
+
+  padding:
+    0 9px !important;
 
   white-space:nowrap !important;
 
-  overflow:visible !important;
+  overflow:hidden !important;
 
-  text-overflow:clip !important;
+  text-overflow:ellipsis !important;
 
   margin:0 !important;
 }
 
 
-/* ------------------------------------------------------------
-   PROMO DUMMY
-   Kalau masih ada sisa HTML lama, paksa hilang
------------------------------------------------------------- */
-
+/* Dummy PROMO kalau masih tersisa */
 .product-info > .badges > .badge.promo{
   display:none !important;
 
   width:0 !important;
   min-width:0 !important;
-
   max-width:0 !important;
 
   height:0 !important;
   min-height:0 !important;
 
-  padding:0 !important;
   margin:0 !important;
+  padding:0 !important;
 
   border:0 !important;
-
-  overflow:hidden !important;
 }
 
 
 /* ============================================================
-   16:9
+   6. BRAND
 ============================================================ */
 
-.r169 .product-info > .badges{
-  gap:5px !important;
+.product-info > .brand-line{
+  width:100% !important;
+
+  min-width:0 !important;
+
+  margin-top:10px !important;
+
+  overflow:visible !important;
+
+  white-space:nowrap !important;
+
+  text-overflow:clip !important;
+}
+
+
+/* ============================================================
+   7. PRODUCT NAME
+   Tidak boleh dipotong.
+============================================================ */
+
+.product-info > .product-name{
+  width:100% !important;
+
+  min-width:0 !important;
+
+  height:auto !important;
+
+  max-height:none !important;
+
+  margin-top:7px !important;
+
+  overflow:visible !important;
+
+  white-space:normal !important;
+
+  text-overflow:clip !important;
+
+  overflow-wrap:anywhere !important;
+
+  word-break:normal !important;
+
+  display:block !important;
+
+  -webkit-line-clamp:unset !important;
+
+  -webkit-box-orient:unset !important;
+}
+
+
+/* ============================================================
+   8. PRICE
+============================================================ */
+
+.product-info > .price-label{
+  width:100% !important;
+
+  flex:0 0 auto !important;
+}
+
+.product-info > .price{
+  width:100% !important;
+
+  flex:0 0 auto !important;
+
+  white-space:nowrap !important;
+}
+
+.product-info > .price-meta{
+  width:100% !important;
+
+  min-width:0 !important;
+
+  display:flex !important;
 
   flex-wrap:nowrap !important;
+
+  align-items:center !important;
+
+  gap:8px !important;
+
+  overflow:visible !important;
+
+  flex:0 0 auto !important;
+}
+
+
+/* ============================================================
+   9. EXTRA NOTE
+   Sudah tidak dipakai
+============================================================ */
+
+.product-info > .extra-note{
+  display:none !important;
+}
+
+
+/* ============================================================
+   10. CONTACT
+   CONTACT SELALU PUNYA SLOT SENDIRI
+============================================================ */
+
+.product-info > .contact-card{
+  position:relative !important;
+
+  left:auto !important;
+  right:auto !important;
+  top:auto !important;
+  bottom:auto !important;
+
+  width:100% !important;
+
+  min-width:0 !important;
+
+  height:auto !important;
+
+  min-height:42px !important;
+
+  margin:
+    10px
+    0
+    0 !important;
+
+  padding:
+    7px
+    9px !important;
+
+  box-sizing:border-box !important;
+
+  display:flex !important;
+
+  flex-direction:column !important;
+
+  align-items:flex-start !important;
+
+  justify-content:center !important;
+
+  gap:3px !important;
+
+  overflow:hidden !important;
+
+  flex:0 0 auto !important;
+
+  z-index:50 !important;
+}
+
+
+/* Isi contact tidak boleh keluar dari kartu */
+
+.product-info > .contact-card .contact-label,
+.product-info > .contact-card .contact-name,
+.product-info > .contact-card .contact-phone{
+  width:100% !important;
+
+  min-width:0 !important;
+
+  overflow:hidden !important;
+
+  text-overflow:ellipsis !important;
+
+  white-space:nowrap !important;
+}
+
+
+/* ============================================================
+   11. 9:16
+============================================================ */
+
+.r916 .info-zone{
+  height:44% !important;
+
+  padding:
+    4%
+    7%
+    5% !important;
+
+  overflow:visible !important;
+}
+
+.r916 .product-info{
+  height:100% !important;
+
+  overflow:visible !important;
+}
+
+.r916 .badges{
+  gap:5px !important;
+}
+
+.r916 .product-info > .badges > .cta{
+  min-height:29px !important;
+
+  padding:
+    0 9px !important;
+
+  font-size:6.2px !important;
+
+  letter-spacing:1px !important;
+}
+
+.r916 .product-info > .badges > .badge.extra,
+.r916 .product-info > .badges > .badge.warranty{
+  min-height:29px !important;
+
+  padding:
+    0 7px !important;
+
+  font-size:6px !important;
+
+  letter-spacing:.7px !important;
+}
+
+.r916 .product-name{
+  font-size:
+    clamp(
+      17px,
+      3vw,
+      31px
+    ) !important;
+
+  line-height:1.05 !important;
+}
+
+.r916 .contact-card{
+  min-height:39px !important;
+
+  padding:
+    6px
+    8px !important;
+
+  margin-top:8px !important;
+}
+
+.r916 .contact-label{
+  font-size:5.5px !important;
+}
+
+.r916 .contact-name{
+  font-size:7px !important;
+}
+
+.r916 .contact-phone{
+  font-size:6.5px !important;
+}
+
+
+/* ============================================================
+   12. 4:5
+============================================================ */
+
+.r45 .info-zone{
+  height:43% !important;
+
+  padding:
+    4.5%
+    7.5%
+    5.5% !important;
+
+  overflow:visible !important;
+}
+
+.r45 .product-info{
+  height:100% !important;
+
+  overflow:visible !important;
+}
+
+.r45 .product-name{
+  font-size:
+    clamp(
+      18px,
+      3.1vw,
+      36px
+    ) !important;
+
+  line-height:1.05 !important;
+}
+
+.r45 .contact-card{
+  min-height:41px !important;
+}
+
+
+/* ============================================================
+   13. 16:9
+   INFO AREA TIDAK BOLEH MEMOTONG ISI
+============================================================ */
+
+.r169 .info-zone{
+  top:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+
+  width:42% !important;
+
+  padding:
+    5.5%
+    6%
+    4% !important;
+
+  overflow:visible !important;
+}
+
+.r169 .product-info{
+  width:100% !important;
+
+  height:100% !important;
+
+  min-height:0 !important;
+
+  padding:0 !important;
+
+  overflow:visible !important;
+}
+
+
+/* Badge 16:9 */
+.r169 .product-info > .badges{
+  width:100% !important;
+
+  gap:4px !important;
 
   overflow:visible !important;
 }
@@ -3112,97 +3478,70 @@ pre{
   min-height:28px !important;
 
   padding:
-    0 9px !important;
+    0 7px !important;
 
-  font-size:6.5px !important;
+  font-size:5.8px !important;
 
-  letter-spacing:1px !important;
+  letter-spacing:.8px !important;
 }
 
-.r169 .product-info > .badges > .badge.extra{
-  padding-left:6px !important;
-  padding-right:6px !important;
-
-  font-size:7px !important;
-}
-
+.r169 .product-info > .badges > .badge.extra,
 .r169 .product-info > .badges > .badge.warranty{
-  padding-left:6px !important;
-  padding-right:6px !important;
-
-  font-size:7px !important;
-
-  letter-spacing:.7px !important;
-}
-
-
-/* ============================================================
-   9:16
-============================================================ */
-
-.r916 .product-info > .badges{
-  gap:7px !important;
-}
-
-.r916 .product-info > .badges > .cta{
-  min-height:29px !important;
+  min-height:28px !important;
 
   padding:
-    0 11px !important;
+    0 6px !important;
 
-  font-size:6.5px !important;
-}
+  font-size:5.7px !important;
 
-.r916 .product-info > .badges > .badge.extra{
-  font-size:6.5px !important;
-}
-
-.r916 .product-info > .badges > .badge.warranty{
-  font-size:6.5px !important;
+  letter-spacing:.55px !important;
 }
 
 
-/* ============================================================
-   4:5
-============================================================ */
+/* Nama produk 16:9 */
+.r169 .product-name{
+  width:100% !important;
 
-.r45 .product-info > .badges{
-  gap:7px !important;
+  font-size:
+    clamp(
+      13px,
+      2vw,
+      27px
+    ) !important;
+
+  line-height:1.04 !important;
+
+  margin-top:6px !important;
+
+  overflow:visible !important;
+
+  max-height:none !important;
+
+  display:block !important;
+
+  -webkit-line-clamp:unset !important;
 }
 
-.r45 .product-info > .badges > .cta{
-  min-height:30px !important;
 
-  padding:
-    0 12px !important;
-
-  font-size:6.5px !important;
+/* Harga */
+.r169 .price-label{
+  margin-top:11px !important;
 }
 
-
-/* ============================================================
-   CTA TIDAK BOLEH LAGI MUNCUL DI BAWAH HARGA
-============================================================ */
-
-.product-info > .cta{
-  margin-top:0 !important;
-}
-
-
-/* ============================================================
-   CONTACT
-   Tetap setelah price-meta
-============================================================ */
-
-.product-info > .contact-card{
-  margin-top:9px !important;
-
-  z-index:50 !important;
+.r169 .price{
+  font-size:
+    clamp(
+      23px,
+      3.5vw,
+      43px
+    ) !important;
 }
 
 
 /* ============================================================
-   16:9 CONTACT
+   14. CONTACT 16:9
+   BUKAN absolute lagi.
+   Ikut flow supaya tidak tenggelam / kepotong.
 ============================================================ */
 
 .r169 .product-info > .contact-card{
@@ -3214,16 +3553,65 @@ pre{
 
   width:100% !important;
 
+  min-height:40px !important;
+
+  height:auto !important;
+
   margin:0 !important;
 
-  z-index:50 !important;
+  padding:
+    6px
+    8px !important;
+
+  overflow:hidden !important;
+
+  z-index:60 !important;
+}
+
+.r169 .contact-label{
+  font-size:4.8px !important;
+
+  line-height:1 !important;
+}
+
+.r169 .contact-name{
+  font-size:6px !important;
+
+  line-height:1.1 !important;
+}
+
+.r169 .contact-phone{
+  font-size:5.5px !important;
+
+  line-height:1.1 !important;
 }
 
 
 /* ============================================================
-   EXPORT = PREVIEW
+   15. 16:9 — RESERVE CONTACT SLOT
+   Semua elemen atas berhenti sebelum contact.
 ============================================================ */
 
+.r169 .product-info{
+  padding-bottom:48px !important;
+}
+
+
+/* ============================================================
+   16. EXPORT
+   Preview dan PNG harus identik.
+============================================================ */
+
+.export-static .info-zone{
+  overflow:visible !important;
+}
+
+.export-static .product-info{
+  overflow:visible !important;
+}
+
+
+/* Badge export */
 .export-static .product-info > .badges{
   display:flex !important;
 
@@ -3243,50 +3631,64 @@ pre{
 .export-static .product-info > .badges > .cta{
   position:relative !important;
 
-  top:auto !important;
-  left:auto !important;
-  right:auto !important;
-  bottom:auto !important;
-
-  order:1 !important;
+  inset:auto !important;
 
   display:inline-flex !important;
+
+  flex:1 1 auto !important;
+
+  min-width:0 !important;
 
   margin:0 !important;
 
   transform:none !important;
 
-  z-index:60 !important;
+  overflow:hidden !important;
 }
 
-.export-static .product-info > .badges > .badge.extra{
-  order:2 !important;
-
-  margin:0 !important;
-}
-
+.export-static .product-info > .badges > .badge.extra,
 .export-static .product-info > .badges > .badge.warranty{
-  order:3 !important;
+  flex:0 1 auto !important;
+
+  min-width:0 !important;
 
   margin:0 !important;
 }
 
 
-/* ------------------------------------------------------------
-   EXPORT — 16:9 CONTACT
------------------------------------------------------------- */
+/* Product name export */
+.export-static .product-name{
+  overflow:visible !important;
+
+  max-height:none !important;
+
+  display:block !important;
+
+  -webkit-line-clamp:unset !important;
+
+  white-space:normal !important;
+
+  overflow-wrap:anywhere !important;
+}
+
+
+/* ============================================================
+   17. EXPORT 16:9 CONTACT
+============================================================ */
 
 .export-static .r169 .product-info{
   position:relative !important;
 
+  width:100% !important;
+
   height:100% !important;
 
-  padding-bottom:40px !important;
+  padding-bottom:48px !important;
 
-  overflow:hidden !important;
+  overflow:visible !important;
 }
 
-.export-static .r169 .contact-card{
+.export-static .r169 .product-info > .contact-card{
   position:absolute !important;
 
   left:0 !important;
@@ -3295,35 +3697,68 @@ pre{
 
   width:100% !important;
 
+  min-height:40px !important;
+
   margin:0 !important;
 
-  z-index:50 !important;
+  box-sizing:border-box !important;
+
+  overflow:hidden !important;
+
+  z-index:60 !important;
 }
 
 
 /* ============================================================
-   MATIKAN TOTAL SISTEM CTA LAMA
+   18. EXPORT 9:16 / 4:5 CONTACT
 ============================================================ */
 
-.r169 .product-info:has(.contact-card) .cta{
-  transform:none !important;
+.export-static .r916 .product-info,
+.export-static .r45 .product-info{
+  height:100% !important;
 
+  overflow:visible !important;
+}
+
+.export-static .r916 .contact-card,
+.export-static .r45 .contact-card{
+  position:relative !important;
+
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+
+  width:100% !important;
+
+  margin-top:8px !important;
+
+  overflow:hidden !important;
+}
+
+
+/* ============================================================
+   19. MATIKAN SEMUA SISA TRANSFORM CTA LAMA
+============================================================ */
+
+.r916 .cta,
+.r45 .cta,
+.r169 .cta,
+.export-static .cta{
+  transform:none !important;
+}
+
+
+/* ============================================================
+   20. MATIKAN SEMUA OLD CTA SPACING
+============================================================ */
+
+.r916 .product-info > .cta,
+.r45 .product-info > .cta,
+.r169 .product-info > .cta{
   margin-top:0 !important;
 
   margin-bottom:0 !important;
 }
-
-.export-static .r169 .product-info:has(.contact-card) .cta{
-  transform:none !important;
-
-  margin-top:0 !important;
-
-  margin-bottom:0 !important;
-}
-
-
-
-
 
   
 </style>
