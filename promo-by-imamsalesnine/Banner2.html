@@ -11,28 +11,23 @@
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
-
-/* =========================================================
-   UI CORE
-========================================================= */
-
 :root{
   --ui-bg:#07090c;
-  --ui-panel:#0d1116;
-  --ui-panel2:#151a20;
-  --ui-line:#29313a;
+  --ui-panel:#10151b;
+  --ui-panel2:#171c22;
+  --ui-line:#2b333d;
   --ui-text:#f5f7fa;
   --ui-muted:#89929d;
 
   --bg:#090b0f;
-  --primary:#8CC63F;
+  --primary:#8cc63f;
   --secondary:#101419;
-  --accent:#D9AD55;
-  --text:#FFFFFF;
-  --muted:#C4C9D0;
-  --cta:#8CC63F;
+  --accent:#d9ad55;
+  --text:#ffffff;
+  --muted:#c4c9d0;
+  --cta:#8cc63f;
   --ctaText:#101010;
-  --border:#8CC63F;
+  --border:#8cc63f;
 
   --imgZoom:100;
   --imgX:0;
@@ -50,7 +45,6 @@
 html,
 body{
   margin:0;
-  width:100%;
   min-height:100%;
   background:var(--ui-bg);
   color:var(--ui-text);
@@ -85,16 +79,17 @@ textarea{
   outline:none;
 }
 
+
 /* =========================================================
    APP
 ========================================================= */
 
 .app{
-  width:100%;
   min-height:100vh;
   display:grid;
   grid-template-columns:390px minmax(0,1fr);
 }
+
 
 /* =========================================================
    EDITOR
@@ -113,10 +108,12 @@ textarea{
     linear-gradient(
       180deg,
       #0d1116,
-      #080b0f
+      #07090c
     );
 
-  border-right:1px solid var(--ui-line);
+  border-right:
+    1px solid
+    var(--ui-line);
 }
 
 .editor::-webkit-scrollbar{
@@ -128,8 +125,9 @@ textarea{
   border-radius:20px;
 }
 
+
 /* =========================================================
-   UI BRAND
+   BRAND
 ========================================================= */
 
 .ui-brand{
@@ -144,11 +142,9 @@ textarea{
     var(--ui-line);
 }
 
-.ui-brand-mark{
+.ui-mark{
   width:44px;
   height:44px;
-
-  flex:0 0 44px;
 
   display:grid;
   place-items:center;
@@ -164,32 +160,32 @@ textarea{
 
   color:#111;
 
-  font-size:18px;
   font-weight:1000;
 
   box-shadow:
     0 10px 30px
-    rgba(140,198,63,.18);
+    rgba(140,198,63,.2);
 }
 
-.ui-brand-title{
+.ui-title{
   font-size:13px;
   font-weight:950;
   letter-spacing:1.3px;
 }
 
-.ui-brand-sub{
+.ui-sub{
   margin-top:3px;
 
   color:var(--primary);
 
   font-size:9px;
-  font-weight:800;
-  letter-spacing:1.6px;
+  font-weight:850;
+  letter-spacing:1.5px;
 }
 
+
 /* =========================================================
-   SECTIONS
+   SECTION
 ========================================================= */
 
 .section{
@@ -209,15 +205,16 @@ textarea{
 
   font-size:10px;
   font-weight:900;
-  letter-spacing:1.6px;
 
+  letter-spacing:1.6px;
   text-transform:uppercase;
 }
 
 .section-head span{
-  color:#5f6975;
+  color:#5e6873;
   font-size:9px;
 }
+
 
 /* =========================================================
    FORM
@@ -226,7 +223,9 @@ textarea{
 label{
   display:block;
 
-  margin:9px 0 5px;
+  margin:
+    9px 0
+    5px;
 
   color:#b8c0c9;
 
@@ -239,19 +238,17 @@ select,
 textarea{
   width:100%;
 
+  padding:10px 11px;
+
   border:
     1px solid
     var(--ui-line);
 
   border-radius:9px;
 
-  padding:10px 11px;
-
   background:#151a20;
 
   color:#fff;
-
-  transition:.18s;
 }
 
 input:focus,
@@ -281,6 +278,7 @@ textarea{
   gap:7px;
 }
 
+
 /* =========================================================
    FILE
 ========================================================= */
@@ -290,15 +288,15 @@ textarea{
 
   padding:12px;
 
-  text-align:center;
-
   border:
     1px dashed
     #424b56;
 
   border-radius:10px;
 
-  color:#89929d;
+  color:#8d97a2;
+
+  text-align:center;
 
   cursor:pointer;
 }
@@ -311,6 +309,7 @@ textarea{
 .file input{
   display:none;
 }
+
 
 /* =========================================================
    RATIO
@@ -336,21 +335,33 @@ textarea{
   color:#9fa8b2;
 
   font-size:9px;
-  font-weight:750;
+  font-weight:800;
 }
 
-.ratio.active,
-.ratio:hover{
-  color:#fff;
-
+.ratio.active{
   border-color:var(--primary);
-
   background:#182018;
+  color:#fff;
 }
+
 
 /* =========================================================
    COLOR
 ========================================================= */
+
+.color-field{
+  display:grid;
+
+  grid-template-columns:48px minmax(0,1fr);
+
+  gap:7px;
+}
+
+.color-field input[type="color"]{
+  width:48px;
+  height:40px;
+  padding:3px;
+}
 
 .palette-grid{
   display:grid;
@@ -372,15 +383,13 @@ textarea{
   border-radius:8px;
 
   cursor:pointer;
-
-  transition:.15s;
 }
 
 .color-chip:hover{
-  transform:translateY(-1px);
-
   border-color:
     rgba(255,255,255,.45);
+
+  transform:translateY(-1px);
 }
 
 .color-chip span{
@@ -400,20 +409,9 @@ textarea{
   color:#fff;
 
   font-size:6px;
-  font-weight:800;
+  font-weight:900;
 }
 
-.color-field{
-  display:grid;
-  grid-template-columns:48px minmax(0,1fr);
-  gap:7px;
-}
-
-.color-field input[type="color"]{
-  width:48px;
-  height:40px;
-  padding:3px;
-}
 
 /* =========================================================
    DESIGN
@@ -441,13 +439,6 @@ textarea{
   background:#151a20;
 
   color:#aeb6c0;
-
-  transition:.18s;
-}
-
-.design:hover{
-  border-color:#5d6874;
-  transform:translateY(-1px);
 }
 
 .design.active{
@@ -457,13 +448,13 @@ textarea{
 }
 
 .design-preview{
-  position:relative;
-
   height:29px;
 
-  margin-bottom:7px;
+  position:relative;
 
   overflow:hidden;
+
+  margin-bottom:7px;
 
   border-radius:5px;
 
@@ -480,15 +471,15 @@ textarea{
 
   position:absolute;
 
-  top:-50%;
   right:-10%;
+  top:-60%;
 
-  width:65%;
-  height:190%;
+  width:70%;
+  height:210%;
 
   border-radius:50%;
 
-  background:#8CC63F;
+  background:#8cc63f;
 }
 
 .design-preview.double::before{
@@ -496,15 +487,15 @@ textarea{
 
   position:absolute;
 
-  top:-50%;
   right:-5%;
+  top:-55%;
 
-  width:65%;
-  height:190%;
+  width:68%;
+  height:205%;
 
   border-radius:50%;
 
-  background:#D9AD55;
+  background:#d9ad55;
 }
 
 .design-preview.double::after{
@@ -512,15 +503,15 @@ textarea{
 
   position:absolute;
 
-  top:-45%;
   right:3%;
+  top:-48%;
 
-  width:58%;
-  height:180%;
+  width:59%;
+  height:195%;
 
   border-radius:50%;
 
-  background:#8CC63F;
+  background:#8cc63f;
 }
 
 .design-preview.angular::after{
@@ -528,9 +519,9 @@ textarea{
 
   position:absolute;
 
-  inset:0 0 0 50%;
+  inset:0 0 0 48%;
 
-  background:#8CC63F;
+  background:#8cc63f;
 
   clip-path:
     polygon(
@@ -546,7 +537,7 @@ textarea{
     linear-gradient(
       90deg,
       #252a31 0 47%,
-      #8CC63F 47% 51%,
+      #8cc63f 47% 51%,
       #dfe4e9 51%
     );
 }
@@ -556,15 +547,15 @@ textarea{
 
   position:absolute;
 
-  width:24px;
-  height:24px;
-
-  top:2px;
   right:8px;
+  top:3px;
+
+  width:23px;
+  height:23px;
 
   border-radius:50%;
 
-  background:#8CC63F;
+  background:#8cc63f;
 }
 
 .design-preview.glass::after{
@@ -575,7 +566,7 @@ textarea{
   left:20%;
   top:4px;
 
-  width:50%;
+  width:52%;
   height:20px;
 
   border:
@@ -641,7 +632,7 @@ textarea{
 
 .design-name{
   font-size:9px;
-  font-weight:850;
+  font-weight:900;
 }
 
 .design-desc{
@@ -652,8 +643,9 @@ textarea{
   font-size:7px;
 }
 
+
 /* =========================================================
-   RANGES
+   RANGE
 ========================================================= */
 
 .range-row{
@@ -663,9 +655,9 @@ textarea{
     minmax(0,1fr)
     47px;
 
-  align-items:center;
-
   gap:8px;
+
+  align-items:center;
 }
 
 input[type="range"]{
@@ -682,12 +674,13 @@ input[type="range"]{
 
   border-radius:7px;
 
-  text-align:center;
-
   color:#b9c0c8;
 
   font-size:9px;
+
+  text-align:center;
 }
+
 
 /* =========================================================
    BUTTONS
@@ -706,27 +699,27 @@ input[type="range"]{
 .btn{
   padding:12px;
 
-  border:0;
-
   border-radius:10px;
 
-  font-weight:900;
+  font-weight:950;
 }
 
 .btn-dark{
-  color:#fff;
-
-  background:#20262e;
-
   border:
     1px solid
     #303842;
+
+  background:#20262e;
+
+  color:#fff;
 }
 
 .btn-primary{
-  color:#101010;
+  border:0;
 
   background:var(--primary);
+
+  color:#101010;
 }
 
 .btn-full{
@@ -737,6 +730,7 @@ input[type="range"]{
   opacity:.5;
   cursor:wait;
 }
+
 
 /* =========================================================
    STAGE
@@ -760,13 +754,13 @@ input[type="range"]{
 
 .stagebar{
   min-height:68px;
-  flex:0 0 68px;
-
-  padding:0 24px;
 
   display:flex;
   align-items:center;
   justify-content:space-between;
+
+  padding:
+    0 24px;
 
   border-bottom:
     1px solid
@@ -786,7 +780,7 @@ input[type="range"]{
 
   align-items:center;
 
-  gap:14px;
+  gap:12px;
 
   color:#d9dde2;
 
@@ -819,13 +813,9 @@ input[type="range"]{
   font-size:8px;
 }
 
-.preview-tool:hover{
-  color:#fff;
-  border-color:var(--primary);
-}
 
 /* =========================================================
-   PREVIEW AREA
+   PREVIEW
 ========================================================= */
 
 .preview-area{
@@ -846,17 +836,16 @@ input[type="range"]{
 
   inset:0;
 
-  z-index:9999;
-
-  padding:30px;
+  z-index:99999;
 
   background:#05070a;
+
+  padding:30px;
 }
 
 .preview-shell{
   width:min(1250px,100%);
   max-width:1250px;
-
   margin:auto;
 }
 
@@ -865,13 +854,13 @@ input[type="range"]{
   max-width:none;
 }
 
+
 /* =========================================================
-   BANNER CANVAS
+   CANVAS
 ========================================================= */
 
 .canvas{
   width:100%;
-  max-width:100%;
 
   aspect-ratio:3/1;
 
@@ -890,32 +879,47 @@ input[type="range"]{
     rgba(0,0,0,.6);
 }
 
+
 /* =========================================================
-   BACKGROUND
+   FINAL PHOTO ARCHITECTURE
+   FOTO TIDAK LAGI NEGATIVE Z-INDEX
 ========================================================= */
 
 .base-bg{
   position:absolute;
+
   inset:0;
 
-  z-index:-10;
+  z-index:0;
 
   background:var(--bg);
 }
 
-.canvas-bg{
+
+/*
+  Ini adalah sumber foto sebenarnya.
+
+  Bukan <img>.
+  Bukan blob URL.
+
+  Background image = Data URL.
+*/
+
+.photo-layer{
   position:absolute;
 
-  inset:-1%;
+  z-index:1;
 
-  z-index:-8;
+  inset:-1%;
 
   width:102%;
   height:102%;
 
-  max-width:none;
+  background-repeat:no-repeat;
 
-  object-fit:cover;
+  background-size:cover;
+
+  background-position:center;
 
   transform:
     translate(
@@ -928,22 +932,26 @@ input[type="range"]{
 
   transform-origin:center;
 
-  /*
-    Important:
-    gambar harus tetap jadi bagian
-    normal DOM agar html2canvas bisa
-    menangkapnya.
-  */
+  pointer-events:none;
 
+  display:none;
+}
+
+.photo-layer.has-photo{
   display:block;
 }
+
+
+/* =========================================================
+   OVERLAY
+========================================================= */
 
 .overlay{
   position:absolute;
 
   inset:0;
 
-  z-index:-7;
+  z-index:2;
 
   background:
     linear-gradient(
@@ -952,6 +960,8 @@ input[type="range"]{
       rgba(0,0,0,.55) 42%,
       rgba(0,0,0,var(--overlayRight)) 100%
     );
+
+  pointer-events:none;
 }
 
 .grid-pattern{
@@ -959,7 +969,7 @@ input[type="range"]{
 
   inset:0;
 
-  z-index:-5;
+  z-index:3;
 
   pointer-events:none;
 
@@ -979,14 +989,10 @@ input[type="range"]{
   background-size:42px 42px;
 }
 
-/* =========================================================
-   EXPORT-SAFE GLOW
-========================================================= */
-
 .glow{
   position:absolute;
 
-  z-index:-4;
+  z-index:4;
 
   right:-8%;
   top:-15%;
@@ -1003,72 +1009,317 @@ input[type="range"]{
       transparent 68%
     );
 
-  opacity:.28;
+  opacity:.22;
 
   filter:blur(20px);
 
   pointer-events:none;
 }
 
+
 /* =========================================================
-   DECOR
+   DESIGN LAYERS
 ========================================================= */
 
-.edge{
-  position:absolute;
+.wave-svg{
+  display:none;
 
-  z-index:11;
-
-  left:0;
-  bottom:0;
-
-  width:34%;
-  height:4px;
-
-  background:var(--primary);
-}
-
-.frame{
-  position:absolute;
-
-  z-index:10;
-
-  inset:13px;
-
-  pointer-events:none;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-}
-
-.noise{
   position:absolute;
 
   inset:0;
 
-  z-index:50;
+  z-index:5;
+
+  width:100%;
+  height:100%;
 
   pointer-events:none;
+}
 
-  opacity:.025;
+.design-wave .wave-svg,
+.design-doublewave .wave-svg{
+  display:block;
+}
 
-  background:
-    repeating-linear-gradient(
-      0deg,
-      rgba(255,255,255,.03) 0 1px,
-      transparent 1px 3px
+.wave-main{
+  fill:var(--secondary);
+}
+
+.wave-accent{
+  fill:var(--primary);
+}
+
+.angular-main{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:0;
+  top:0;
+
+  width:53%;
+  height:100%;
+
+  background:var(--secondary);
+
+  clip-path:
+    polygon(
+      21% 0,
+      100% 0,
+      100% 100%,
+      0 100%
     );
 }
 
+.angular-accent{
+  display:none;
+
+  position:absolute;
+
+  z-index:6;
+
+  right:44%;
+  top:0;
+
+  width:8%;
+  height:100%;
+
+  background:var(--primary);
+
+  clip-path:
+    polygon(
+      42% 0,
+      100% 0,
+      57% 100%,
+      0 100%
+    );
+}
+
+.design-angular .angular-main,
+.design-angular .angular-accent{
+  display:block;
+}
+
+.split-panel{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:0;
+  top:0;
+
+  width:49%;
+  height:100%;
+
+  background:var(--secondary);
+}
+
+.design-split .split-panel{
+  display:block;
+}
+
+.circle-panel{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:6%;
+  top:50%;
+
+  width:47%;
+
+  aspect-ratio:1;
+
+  transform:translateY(-50%);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      circle,
+      var(--secondary) 0 58%,
+      var(--primary) 59% 61%,
+      transparent 62%
+    );
+}
+
+.design-circle .circle-panel{
+  display:block;
+}
+
+.spotlight{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:7%;
+  top:50%;
+
+  width:46%;
+  height:88%;
+
+  transform:translateY(-50%);
+
+  border-radius:50%;
+
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255,255,255,.2),
+      rgba(255,255,255,.05) 35%,
+      transparent 70%
+    );
+}
+
+.design-spotlight .spotlight{
+  display:block;
+}
+
+.glass-panel{
+  display:none;
+
+  position:absolute;
+
+  z-index:6;
+
+  left:5%;
+  top:14%;
+
+  width:53%;
+  height:72%;
+
+  border:
+    1px solid
+    rgba(255,255,255,.25);
+
+  border-radius:22px;
+
+  background:
+    rgba(255,255,255,.08);
+
+  box-shadow:
+    inset 0 1px
+    rgba(255,255,255,.17),
+    0 25px 70px
+    rgba(0,0,0,.25);
+}
+
+.design-glass .glass-panel{
+  display:block;
+}
+
+.racing-stripe{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:2%;
+  top:-10%;
+
+  width:34%;
+  height:120%;
+
+  opacity:.75;
+
+  transform:skewX(-15deg);
+
+  background:
+    repeating-linear-gradient(
+      -17deg,
+      var(--primary) 0 9px,
+      transparent 9px 18px
+    );
+}
+
+.design-racing .racing-stripe{
+  display:block;
+}
+
+.carbon-pattern{
+  display:none;
+
+  position:absolute;
+
+  inset:0;
+
+  z-index:4;
+
+  opacity:.25;
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.055) 0 2px,
+      transparent 2px 9px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,.035) 0 2px,
+      transparent 2px 9px
+    );
+}
+
+.design-carbon .carbon-pattern{
+  display:block;
+}
+
+.tech-lines{
+  display:none;
+
+  position:absolute;
+
+  z-index:5;
+
+  right:0;
+  top:0;
+
+  width:56%;
+  height:100%;
+
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 43%,
+      var(--primary) 43.2% 43.5%,
+      transparent 43.7%
+    ),
+    linear-gradient(
+      135deg,
+      transparent 0 55%,
+      rgba(255,255,255,.2) 55.2% 55.5%,
+      transparent 55.7%
+    ),
+    linear-gradient(
+      135deg,
+      transparent 0 67%,
+      rgba(255,255,255,.1) 67.2% 67.5%,
+      transparent 67.7%
+    );
+}
+
+.design-tech .tech-lines{
+  display:block;
+}
+
+
 /* =========================================================
-   BRAND
+   TEXT
 ========================================================= */
 
 .brand-lock{
   position:absolute;
 
-  z-index:12;
+  z-index:20;
 
   top:7%;
   right:5%;
@@ -1124,22 +1375,17 @@ input[type="range"]{
   letter-spacing:1.8px;
 }
 
-/* =========================================================
-   COPY
-========================================================= */
-
 .copy{
   position:absolute;
 
-  z-index:12;
+  z-index:20;
 
   left:7%;
   top:50%;
 
   width:53%;
 
-  transform:
-    translateY(-50%);
+  transform:translateY(-50%);
 }
 
 .kicker{
@@ -1259,14 +1505,10 @@ input[type="range"]{
   text-transform:uppercase;
 }
 
-/* =========================================================
-   CONTACT
-========================================================= */
-
 .contact{
   position:absolute;
 
-  z-index:12;
+  z-index:20;
 
   right:5%;
   bottom:7%;
@@ -1315,365 +1557,12 @@ input[type="range"]{
   font-weight:850;
 }
 
-/* =========================================================
-   WAVE
-========================================================= */
-
-.wave-svg{
-  display:none;
-
-  position:absolute;
-
-  inset:0;
-
-  z-index:-2;
-
-  width:100%;
-  height:100%;
-
-  pointer-events:none;
-}
-
-.wave-main{
-  fill:var(--secondary);
-}
-
-.wave-accent{
-  fill:var(--primary);
-}
-
-.design-wave .wave-svg,
-.design-doublewave .wave-svg{
-  display:block;
-}
-
-.design-wave .copy{
-  width:45%;
-}
-
-.design-doublewave .copy{
-  width:47%;
-}
 
 /* =========================================================
-   ANGULAR
+   SPECIAL DESIGNS
 ========================================================= */
 
-.angular-main,
-.angular-accent{
-  display:none;
-
-  position:absolute;
-
-  z-index:-2;
-
-  top:0;
-
-  height:100%;
-}
-
-.angular-main{
-  right:0;
-
-  width:53%;
-
-  background:var(--secondary);
-
-  clip-path:
-    polygon(
-      21% 0,
-      100% 0,
-      100% 100%,
-      0 100%
-    );
-}
-
-.angular-accent{
-  right:44%;
-
-  width:8%;
-
-  background:var(--primary);
-
-  clip-path:
-    polygon(
-      42% 0,
-      100% 0,
-      57% 100%,
-      0 100%
-    );
-}
-
-.design-angular .angular-main,
-.design-angular .angular-accent{
-  display:block;
-}
-
-.design-angular .copy{
-  width:49%;
-}
-
-/* =========================================================
-   SPLIT
-========================================================= */
-
-.split-panel{
-  display:none;
-
-  position:absolute;
-
-  z-index:-2;
-
-  right:0;
-  top:0;
-
-  width:49%;
-  height:100%;
-
-  background:var(--secondary);
-}
-
-.design-split .split-panel{
-  display:block;
-}
-
-.design-split .copy{
-  width:46%;
-}
-
-/* =========================================================
-   CIRCLE
-========================================================= */
-
-.circle-panel{
-  display:none;
-
-  position:absolute;
-
-  z-index:-3;
-
-  right:6%;
-  top:50%;
-
-  width:47%;
-
-  aspect-ratio:1;
-
-  transform:
-    translateY(-50%);
-
-  border-radius:50%;
-
-  background:
-    radial-gradient(
-      circle,
-      var(--secondary) 0 58%,
-      var(--primary) 59% 61%,
-      transparent 62%
-    );
-}
-
-.design-circle .circle-panel{
-  display:block;
-}
-
-/* =========================================================
-   GLASS
-========================================================= */
-
-.glass-panel{
-  display:none;
-
-  position:absolute;
-
-  z-index:4;
-
-  left:5%;
-  top:14%;
-
-  width:53%;
-  height:72%;
-
-  border-radius:22px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.25);
-
-  background:
-    rgba(255,255,255,.08);
-
-  box-shadow:
-    inset 0 1px
-    rgba(255,255,255,.17),
-    0 25px 70px
-    rgba(0,0,0,.25);
-}
-
-.design-glass .glass-panel{
-  display:block;
-}
-
-.design-glass .copy{
-  left:9%;
-  width:44%;
-}
-
-/* =========================================================
-   SPOTLIGHT
-========================================================= */
-
-.spotlight{
-  display:none;
-
-  position:absolute;
-
-  z-index:-3;
-
-  right:7%;
-  top:50%;
-
-  width:46%;
-  height:88%;
-
-  transform:
-    translateY(-50%);
-
-  border-radius:50%;
-
-  background:
-    radial-gradient(
-      ellipse,
-      rgba(255,255,255,.22),
-      rgba(255,255,255,.06) 34%,
-      transparent 70%
-    );
-}
-
-.design-spotlight .spotlight{
-  display:block;
-}
-
-/* =========================================================
-   LUXURY
-========================================================= */
-
-.design-luxury .headline{
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-weight:700;
-
-  letter-spacing:-1px;
-
-  text-transform:none;
-}
-
-.design-luxury .kicker{
-  letter-spacing:4px;
-}
-
-/* =========================================================
-   RACING
-========================================================= */
-
-.racing-stripe{
-  display:none;
-
-  position:absolute;
-
-  z-index:-2;
-
-  right:2%;
-  top:-10%;
-
-  width:34%;
-  height:120%;
-
-  opacity:.8;
-
-  transform:
-    skewX(-15deg);
-
-  background:
-    repeating-linear-gradient(
-      -17deg,
-      var(--primary) 0 9px,
-      transparent 9px 18px
-    );
-}
-
-.design-racing .racing-stripe{
-  display:block;
-}
-
-.design-racing .headline{
-  font-style:italic;
-
-  transform:
-    skewX(-5deg);
-}
-
-.design-racing .copy{
-  width:58%;
-}
-
-/* =========================================================
-   CARBON
-========================================================= */
-
-.carbon-pattern{
-  display:none;
-
-  position:absolute;
-
-  inset:0;
-
-  z-index:-4;
-
-  opacity:.25;
-
-  background:
-    repeating-linear-gradient(
-      45deg,
-      rgba(255,255,255,.055) 0 2px,
-      transparent 2px 9px
-    ),
-    repeating-linear-gradient(
-      -45deg,
-      rgba(255,255,255,.035) 0 2px,
-      transparent 2px 9px
-    );
-}
-
-.design-carbon .carbon-pattern{
-  display:block;
-}
-
-/* =========================================================
-   FULL BLEED
-========================================================= */
-
-.design-fullbleed .overlay{
-  background:
-    linear-gradient(
-      90deg,
-      rgba(0,0,0,.82),
-      rgba(0,0,0,.18),
-      rgba(0,0,0,.36)
-    );
-}
-
-.design-fullbleed .copy{
-  width:62%;
-}
-
-/* =========================================================
-   EDITORIAL
-========================================================= */
-
+.design-luxury .headline,
 .design-editorial .headline{
   font-family:
     Georgia,
@@ -1687,91 +1576,119 @@ input[type="range"]{
   text-transform:none;
 }
 
-.design-editorial .copy{
-  width:57%;
+.design-racing .headline{
+  font-style:italic;
+  transform:skewX(-5deg);
 }
 
-/* =========================================================
-   TECH
-========================================================= */
-
-.tech-lines{
-  display:none;
-
-  position:absolute;
-
-  z-index:-1;
-
-  right:0;
-  top:0;
-
-  width:56%;
-  height:100%;
-
+.design-fullbleed .overlay{
   background:
     linear-gradient(
-      135deg,
-      transparent 0 43%,
-      var(--primary) 43.2% 43.5%,
-      transparent 43.7%
-    ),
-    linear-gradient(
-      135deg,
-      transparent 0 55%,
-      rgba(255,255,255,.2) 55.2% 55.5%,
-      transparent 55.7%
-    ),
-    linear-gradient(
-      135deg,
-      transparent 0 67%,
-      rgba(255,255,255,.1) 67.2% 67.5%,
-      transparent 67.7%
+      90deg,
+      rgba(0,0,0,.82),
+      rgba(0,0,0,.18),
+      rgba(0,0,0,.36)
     );
 }
 
-.design-tech .tech-lines{
-  display:block;
-}
-
-.design-tech .copy{
-  width:52%;
-}
 
 /* =========================================================
-   EXPORT SAFE MODE
+   FRAME
+========================================================= */
+
+.edge{
+  position:absolute;
+
+  z-index:30;
+
+  left:0;
+  bottom:0;
+
+  width:34%;
+  height:4px;
+
+  background:var(--primary);
+}
+
+.frame{
+  position:absolute;
+
+  z-index:30;
+
+  inset:13px;
+
+  pointer-events:none;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12);
+}
+
+
+/* =========================================================
+   EXPORT MODE
 ========================================================= */
 
 .exporting{
   box-shadow:none !important;
 }
 
-.exporting .glow{
-  filter:none !important;
-  opacity:.22 !important;
-}
-
-.exporting .glass-panel{
-  backdrop-filter:none !important;
-  -webkit-backdrop-filter:none !important;
-
-  background:
-    rgba(255,255,255,.09) !important;
-}
-
-.exporting .noise{
-  display:none !important;
-}
-
-/*
-  Critical:
-  Image must remain visible during export.
-*/
-
-.exporting .canvas-bg{
+.exporting .photo-layer{
   display:block !important;
   visibility:visible !important;
   opacity:1 !important;
+  z-index:1 !important;
 }
+
+.exporting .base-bg{
+  z-index:0 !important;
+}
+
+.exporting .overlay{
+  z-index:2 !important;
+}
+
+.exporting .grid-pattern{
+  z-index:3 !important;
+}
+
+.exporting .glow,
+.exporting .carbon-pattern,
+.exporting .wave-svg,
+.exporting .angular-main,
+.exporting .angular-accent,
+.exporting .split-panel,
+.exporting .circle-panel,
+.exporting .spotlight,
+.exporting .glass-panel,
+.exporting .racing-stripe,
+.exporting .tech-lines{
+  z-index:5 !important;
+}
+
+.exporting .brand-lock,
+.exporting .copy,
+.exporting .contact{
+  z-index:20 !important;
+}
+
+.exporting .edge,
+.exporting .frame{
+  z-index:30 !important;
+}
+
+.exporting .glass-panel{
+  background:
+    rgba(255,255,255,.08) !important;
+
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+}
+
+.exporting .glow{
+  filter:none !important;
+}
+
 
 /* =========================================================
    EXPORT MODAL
@@ -1794,11 +1711,8 @@ input[type="range"]{
   background:
     rgba(0,0,0,.78);
 
-  backdrop-filter:
-    blur(12px);
-
-  -webkit-backdrop-filter:
-    blur(12px);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 
 .export-modal.show{
@@ -1806,8 +1720,7 @@ input[type="range"]{
 }
 
 .export-card{
-  width:
-    min(520px,100%);
+  width:min(520px,100%);
 
   padding:22px;
 
@@ -1833,7 +1746,6 @@ input[type="range"]{
   display:flex;
 
   align-items:center;
-
   justify-content:space-between;
 
   gap:15px;
@@ -1887,8 +1799,6 @@ input[type="range"]{
 }
 
 .export-option{
-  min-width:0;
-
   padding:16px;
 
   text-align:left;
@@ -1902,15 +1812,10 @@ input[type="range"]{
   background:#11161c;
 
   color:#fff;
-
-  transition:.18s;
 }
 
 .export-option:hover{
-  transform:translateY(-2px);
-
-  border-color:
-    var(--primary);
+  border-color:var(--primary);
 }
 
 .export-option:disabled{
@@ -1934,13 +1839,13 @@ input[type="range"]{
 }
 
 .export-icon.png{
-  color:#101010;
   background:var(--primary);
+  color:#101010;
 }
 
 .export-icon.pdf{
-  color:#fff;
   background:#d93434;
+  color:#fff;
 }
 
 .export-option-title{
@@ -1969,8 +1874,9 @@ input[type="range"]{
 
   font-size:9px;
 
-  font-weight:800;
+  font-weight:850;
 }
+
 
 /* =========================================================
    RESPONSIVE
@@ -1983,10 +1889,10 @@ input[type="range"]{
   }
 
   .editor{
-    position:relative;
-
     width:100%;
     height:auto;
+
+    position:relative;
 
     border-right:0;
 
@@ -2000,17 +1906,19 @@ input[type="range"]{
   }
 
   .preview-area{
-    align-items:flex-start;
-
     padding:
       25px
       15px
       40px;
+
+    align-items:flex-start;
   }
 
   .preview-shell{
     width:100%;
+    max-width:100%;
   }
+
 }
 
 @media(max-width:600px){
@@ -2025,14 +1933,6 @@ input[type="range"]{
     padding:
       13px
       15px;
-
-    gap:10px;
-  }
-
-  .stage-left{
-    max-width:45%;
-
-    line-height:1.3;
   }
 
   .preview-tools{
@@ -2045,6 +1945,7 @@ input[type="range"]{
       10px
       35px;
   }
+
 }
 
 @media(max-width:520px){
@@ -2052,6 +1953,7 @@ input[type="range"]{
   .export-options{
     grid-template-columns:1fr;
   }
+
 }
 
 </style>
@@ -2069,128 +1971,123 @@ input[type="range"]{
 
 <div class="ui-brand">
 
-  <div class="ui-brand-mark">
-    B
-  </div>
+<div class="ui-mark">
+B
+</div>
 
-  <div>
+<div>
 
-    <div class="ui-brand-title">
-      PREMIUM BANNER STUDIO
-    </div>
+<div class="ui-title">
+PREMIUM BANNER STUDIO
+</div>
 
-    <div class="ui-brand-sub">
-      AUTOMOTIVE • RETAIL • DISTRIBUTOR
-    </div>
-
-  </div>
+<div class="ui-sub">
+AUTOMOTIVE • RETAIL • DISTRIBUTOR
+</div>
 
 </div>
 
-<!-- ======================================================
-     BRAND
-====================================================== -->
+</div>
+
+
+<!-- BRAND -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Brand Identity</strong>
-  <span>01</span>
+<strong>Brand Identity</strong>
+<span>01</span>
 </div>
 
 <label>Nama toko / distributor</label>
 
 <input
-  id="brandName"
-  value="NINE AUTOSERIES"
-  placeholder="Nama toko / distributor"
+id="brandName"
+value="NINE AUTOSERIES"
 >
 
 <label>Tagline / status</label>
 
 <input
-  id="brandRole"
-  value="Official Distributor"
-  placeholder="Official Distributor"
+id="brandRole"
+value="Official Distributor"
 >
 
 <label>Nama sales</label>
 
 <input
-  id="salesName"
-  value="IMAM_SALESFR"
-  placeholder="Nama sales"
+id="salesName"
+value="IMAM_SALESFR"
 >
 
 <label>Jabatan</label>
 
 <input
-  id="salesRole"
-  value="Sales Representative"
-  placeholder="Sales Representative"
+id="salesRole"
+value="Sales Representative"
 >
 
 <label>WhatsApp</label>
 
 <input
-  id="phone"
-  value="08xxxxxxxxxx"
-  placeholder="08xxxxxxxxxx"
+id="phone"
+value="08xxxxxxxxxx"
 >
 
 <label>Logo</label>
 
 <label class="file">
-  + Upload Logo
 
-  <input
-    id="logo"
-    type="file"
-    accept="image/*"
-  >
++ Upload Logo
+
+<input
+id="logo"
+type="file"
+accept="image/*"
+>
+
 </label>
 
 </section>
 
-<!-- ======================================================
-     CANVAS
-====================================================== -->
+
+<!-- CANVAS -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Canvas</strong>
-  <span>02</span>
+<strong>Canvas</strong>
+<span>02</span>
 </div>
 
 <div class="ratio-grid">
 
 <button class="ratio active" data-ratio="3/1">
-  3 : 1
+3 : 1
 </button>
 
 <button class="ratio" data-ratio="4/1">
-  4 : 1
+4 : 1
 </button>
 
 <button class="ratio" data-ratio="10/1">
-  10 : 1
+10 : 1
 </button>
 
 <button class="ratio" data-ratio="16/9">
-  16 : 9
+16 : 9
 </button>
 
 <button class="ratio" data-ratio="1/1">
-  1 : 1
+1 : 1
 </button>
 
 <button class="ratio" data-ratio="4/3">
-  4 : 3
+4 : 3
 </button>
 
 <button class="ratio" data-ratio="9/16">
-  9 : 16
+9 : 16
 </button>
 
 </div>
@@ -2198,52 +2095,36 @@ input[type="range"]{
 <div class="row3">
 
 <div>
-
 <label>Width</label>
 
 <input
-  id="width"
-  type="number"
-  value="300"
-  min="1"
+id="width"
+type="number"
+value="300"
+min="1"
 >
-
 </div>
 
 <div>
-
 <label>Height</label>
 
 <input
-  id="height"
-  type="number"
-  value="100"
-  min="1"
+id="height"
+type="number"
+value="100"
+min="1"
 >
-
 </div>
 
 <div>
-
 <label>Unit</label>
 
 <select id="unit">
 
-<option value="cm">
-  cm
-</option>
-
-<option value="mm">
-  mm
-</option>
-
-<option value="px">
-  px
-</option>
-
-<option value="inch">
-  inch
-</option>
+<option value="cm">cm</option>
+<option value="mm">mm</option>
+<option value="px">px</option>
+<option value="inch">inch</option>
 
 </select>
 
@@ -2253,22 +2134,21 @@ input[type="range"]{
 
 </section>
 
-<!-- ======================================================
-     CONTENT
-====================================================== -->
+
+<!-- CONTENT -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Content</strong>
-  <span>03</span>
+<strong>Content</strong>
+<span>03</span>
 </div>
 
 <label>Kicker</label>
 
 <input
-  id="kicker"
-  value="PREMIUM AUTOMOTIVE"
+id="kicker"
+value="PREMIUM AUTOMOTIVE"
 >
 
 <label>Headline</label>
@@ -2286,8 +2166,8 @@ input[type="range"]{
 <label>Promo / Badge</label>
 
 <input
-  id="badge"
-  value="PROMO SPESIAL"
+id="badge"
+value="PROMO SPESIAL"
 >
 
 </div>
@@ -2297,8 +2177,8 @@ input[type="range"]{
 <label>CTA</label>
 
 <input
-  id="cta"
-  value="HUBUNGI KAMI"
+id="cta"
+value="HUBUNGI KAMI"
 >
 
 </div>
@@ -2307,28 +2187,27 @@ input[type="range"]{
 
 </section>
 
-<!-- ======================================================
-     VISUAL
-====================================================== -->
+
+<!-- PHOTO -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Visual</strong>
-  <span>04</span>
+<strong>Visual</strong>
+<span>04</span>
 </div>
 
 <label>Foto background / kendaraan</label>
 
 <label class="file">
 
-  + Upload Foto
++ Upload Foto
 
-  <input
-    id="photo"
-    type="file"
-    accept="image/*"
-  >
+<input
+id="photo"
+type="file"
+accept="image/*"
+>
 
 </label>
 
@@ -2337,18 +2216,18 @@ input[type="range"]{
 <div class="range-row">
 
 <input
-  id="zoom"
-  type="range"
-  min="100"
-  max="180"
-  value="100"
+id="zoom"
+type="range"
+min="100"
+max="180"
+value="100"
 >
 
 <div
-  class="range-value"
-  id="zoomVal"
+class="range-value"
+id="zoomVal"
 >
-  100%
+100%
 </div>
 
 </div>
@@ -2358,18 +2237,18 @@ input[type="range"]{
 <div class="range-row">
 
 <input
-  id="posX"
-  type="range"
-  min="-30"
-  max="30"
-  value="0"
+id="posX"
+type="range"
+min="-30"
+max="30"
+value="0"
 >
 
 <div
-  class="range-value"
-  id="posXVal"
+class="range-value"
+id="posXVal"
 >
-  0
+0
 </div>
 
 </div>
@@ -2379,46 +2258,45 @@ input[type="range"]{
 <div class="range-row">
 
 <input
-  id="posY"
-  type="range"
-  min="-30"
-  max="30"
-  value="0"
+id="posY"
+type="range"
+min="-30"
+max="30"
+value="0"
 >
 
 <div
-  class="range-value"
-  id="posYVal"
+class="range-value"
+id="posYVal"
 >
-  0
+0
 </div>
 
 </div>
 
 </section>
 
-<!-- ======================================================
-     BACKGROUND
-====================================================== -->
+
+<!-- BACKGROUND -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Background Color</strong>
-  <span>05</span>
+<strong>Background Color</strong>
+<span>05</span>
 </div>
 
 <div class="color-field">
 
 <input
-  id="bgColor"
-  type="color"
-  value="#090B0F"
+id="bgColor"
+type="color"
+value="#090B0F"
 >
 
 <input
-  id="bgHex"
-  value="#090B0F"
+id="bgHex"
+value="#090B0F"
 >
 
 </div>
@@ -2428,83 +2306,81 @@ input[type="range"]{
 <div class="palette-grid">
 
 <div
-  class="color-chip"
-  data-bg="#050505"
-  style="background:#050505"
+class="color-chip"
+data-bg="#050505"
+style="background:#050505"
 >
 <span>BLACK</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#111827"
-  style="background:#111827"
+class="color-chip"
+data-bg="#111827"
+style="background:#111827"
 >
 <span>NAVY</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#1C1C1C"
-  style="background:#1C1C1C"
+class="color-chip"
+data-bg="#1C1C1C"
+style="background:#1C1C1C"
 >
 <span>GRAPHITE</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#292524"
-  style="background:#292524"
+class="color-chip"
+data-bg="#292524"
+style="background:#292524"
 >
 <span>CHARCOAL</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#FFFFFF"
-  style="background:#FFFFFF"
+class="color-chip"
+data-bg="#FFFFFF"
+style="background:#FFFFFF"
 >
-<span style="color:#111">
-WHITE
-</span>
+<span style="color:#111">WHITE</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#172554"
-  style="background:#172554"
+class="color-chip"
+data-bg="#172554"
+style="background:#172554"
 >
 <span>ROYAL</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#3F0D0D"
-  style="background:#3F0D0D"
+class="color-chip"
+data-bg="#3F0D0D"
+style="background:#3F0D0D"
 >
 <span>BURGUNDY</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#431407"
-  style="background:#431407"
+class="color-chip"
+data-bg="#431407"
+style="background:#431407"
 >
 <span>BROWN</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#052E16"
-  style="background:#052E16"
+class="color-chip"
+data-bg="#052E16"
+style="background:#052E16"
 >
 <span>GREEN</span>
 </div>
 
 <div
-  class="color-chip"
-  data-bg="#0F172A"
-  style="background:#0F172A"
+class="color-chip"
+data-bg="#0F172A"
+style="background:#0F172A"
 >
 <span>SLATE</span>
 </div>
@@ -2513,15 +2389,14 @@ WHITE
 
 </section>
 
-<!-- ======================================================
-     ELEMENT COLORS
-====================================================== -->
+
+<!-- COLORS -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Element Colors</strong>
-  <span>06</span>
+<strong>Element Colors</strong>
+<span>06</span>
 </div>
 
 <label>Primary / Main Accent</label>
@@ -2582,419 +2457,295 @@ WHITE
 
 </section>
 
-<!-- ======================================================
-     QUICK PALETTE
-====================================================== -->
+
+<!-- QUICK PALETTE -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Quick Palette</strong>
-  <span>07</span>
+<strong>Quick Palette</strong>
+<span>07</span>
 </div>
 
 <div class="palette-grid">
 
 <div
-  class="color-chip quick"
-  data-p="#8CC63F"
-  data-s="#101419"
-  data-a="#D9AD55"
-  data-t="#FFFFFF"
-  data-m="#C4C9D0"
-  style="background:linear-gradient(135deg,#8CC63F,#101419)"
+class="color-chip quick"
+data-p="#8CC63F"
+data-s="#101419"
+data-a="#D9AD55"
+data-t="#FFFFFF"
+data-m="#C4C9D0"
+style="background:linear-gradient(135deg,#8CC63F,#101419)"
 >
 <span>NINE</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#D9AD55"
-  data-s="#090909"
-  data-a="#FFFFFF"
-  data-t="#FFFFFF"
-  data-m="#CFCFCF"
-  style="background:linear-gradient(135deg,#D9AD55,#090909)"
+class="color-chip quick"
+data-p="#D9AD55"
+data-s="#090909"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#CFCFCF"
+style="background:linear-gradient(135deg,#D9AD55,#090909)"
 >
 <span>LUXURY</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#EF3D3D"
-  data-s="#111111"
-  data-a="#FFFFFF"
-  data-t="#FFFFFF"
-  data-m="#CCCCCC"
-  style="background:linear-gradient(135deg,#EF3D3D,#111111)"
+class="color-chip quick"
+data-p="#EF3D3D"
+data-s="#111111"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#CCCCCC"
+style="background:linear-gradient(135deg,#EF3D3D,#111111)"
 >
 <span>RACING</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#277CFF"
-  data-s="#07111F"
-  data-a="#00D7E9"
-  data-t="#FFFFFF"
-  data-m="#C7D6E9"
-  style="background:linear-gradient(135deg,#277CFF,#07111F)"
+class="color-chip quick"
+data-p="#277CFF"
+data-s="#07111F"
+data-a="#00D7E9"
+data-t="#FFFFFF"
+data-m="#C7D6E9"
+style="background:linear-gradient(135deg,#277CFF,#07111F)"
 >
 <span>TECH</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#A855F7"
-  data-s="#100819"
-  data-a="#00D7E9"
-  data-t="#FFFFFF"
-  data-m="#D8C7E8"
-  style="background:linear-gradient(135deg,#A855F7,#100819)"
+class="color-chip quick"
+data-p="#A855F7"
+data-s="#100819"
+data-a="#00D7E9"
+data-t="#FFFFFF"
+data-m="#D8C7E8"
+style="background:linear-gradient(135deg,#A855F7,#100819)"
 >
 <span>NEON</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#00B878"
-  data-s="#06130F"
-  data-a="#8CC63F"
-  data-t="#FFFFFF"
-  data-m="#BEDBD1"
-  style="background:linear-gradient(135deg,#00B878,#06130F)"
+class="color-chip quick"
+data-p="#00B878"
+data-s="#06130F"
+data-a="#8CC63F"
+data-t="#FFFFFF"
+data-m="#BEDBD1"
+style="background:linear-gradient(135deg,#00B878,#06130F)"
 >
 <span>EMERALD</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#FF7A18"
-  data-s="#17100A"
-  data-a="#FFD166"
-  data-t="#FFFFFF"
-  data-m="#E4C6A8"
-  style="background:linear-gradient(135deg,#FF7A18,#17100A)"
+class="color-chip quick"
+data-p="#FF7A18"
+data-s="#17100A"
+data-a="#FFD166"
+data-t="#FFFFFF"
+data-m="#E4C6A8"
+style="background:linear-gradient(135deg,#FF7A18,#17100A)"
 >
 <span>ORANGE</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#B77A3B"
-  data-s="#160D07"
-  data-a="#E8C39E"
-  data-t="#FFFFFF"
-  data-m="#D0B9A5"
-  style="background:linear-gradient(135deg,#B77A3B,#160D07)"
+class="color-chip quick"
+data-p="#B77A3B"
+data-s="#160D07"
+data-a="#E8C39E"
+data-t="#FFFFFF"
+data-m="#D0B9A5"
+style="background:linear-gradient(135deg,#B77A3B,#160D07)"
 >
 <span>BRONZE</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#C7CCD3"
-  data-s="#181B20"
-  data-a="#FFFFFF"
-  data-t="#FFFFFF"
-  data-m="#B9BEC5"
-  style="background:linear-gradient(135deg,#C7CCD3,#181B20)"
+class="color-chip quick"
+data-p="#C7CCD3"
+data-s="#181B20"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#B9BEC5"
+style="background:linear-gradient(135deg,#C7CCD3,#181B20)"
 >
 <span>TITANIUM</span>
 </div>
 
 <div
-  class="color-chip quick"
-  data-p="#111111"
-  data-s="#FFFFFF"
-  data-a="#8CC63F"
-  data-t="#111111"
-  data-m="#555555"
-  style="background:linear-gradient(135deg,#111111,#FFFFFF)"
+class="color-chip quick"
+data-p="#111111"
+data-s="#FFFFFF"
+data-a="#8CC63F"
+data-t="#111111"
+data-m="#555555"
+style="background:linear-gradient(135deg,#111111,#FFFFFF)"
 >
-<span style="color:#111">
-MONO
-</span>
+<span style="color:#111">MONO</span>
 </div>
 
 </div>
 
 </section>
 
-<!-- ======================================================
-     PREMIUM DESIGNS
-====================================================== -->
+
+<!-- DESIGNS -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Premium Composition</strong>
-  <span>08</span>
+<strong>Premium Composition</strong>
+<span>08</span>
 </div>
 
 <div class="design-grid">
 
 <button class="design active" data-design="wave">
-
 <div class="design-preview wave"></div>
-
-<div class="design-name">
-Premium Wave
-</div>
-
-<div class="design-desc">
-Organic curved split
-</div>
-
+<div class="design-name">Premium Wave</div>
+<div class="design-desc">Organic curved split</div>
 </button>
 
 <button class="design" data-design="doublewave">
-
 <div class="design-preview double"></div>
-
-<div class="design-name">
-Double Wave
-</div>
-
-<div class="design-desc">
-Layered premium curve
-</div>
-
+<div class="design-name">Double Wave</div>
+<div class="design-desc">Layered premium curve</div>
 </button>
 
 <button class="design" data-design="angular">
-
 <div class="design-preview angular"></div>
-
-<div class="design-name">
-Angular
-</div>
-
-<div class="design-desc">
-Sharp automotive cut
-</div>
-
+<div class="design-name">Angular</div>
+<div class="design-desc">Sharp automotive cut</div>
 </button>
 
 <button class="design" data-design="split">
-
 <div class="design-preview split"></div>
-
-<div class="design-name">
-Split
-</div>
-
-<div class="design-desc">
-Balanced two panel
-</div>
-
+<div class="design-name">Split</div>
+<div class="design-desc">Balanced two panel</div>
 </button>
 
 <button class="design" data-design="circle">
-
 <div class="design-preview circle"></div>
-
-<div class="design-name">
-Circle Hero
-</div>
-
-<div class="design-desc">
-Focal composition
-</div>
-
+<div class="design-name">Circle Hero</div>
+<div class="design-desc">Focal composition</div>
 </button>
 
 <button class="design" data-design="glass">
-
 <div class="design-preview glass"></div>
-
-<div class="design-name">
-Glass
-</div>
-
-<div class="design-desc">
-Luxury glass panel
-</div>
-
+<div class="design-name">Glass</div>
+<div class="design-desc">Luxury glass panel</div>
 </button>
 
 <button class="design" data-design="spotlight">
-
 <div class="design-preview circle"></div>
-
-<div class="design-name">
-Spotlight
-</div>
-
-<div class="design-desc">
-Product illumination
-</div>
-
+<div class="design-name">Spotlight</div>
+<div class="design-desc">Product illumination</div>
 </button>
 
 <button class="design" data-design="luxury">
-
 <div class="design-preview"></div>
-
-<div class="design-name">
-Luxury
-</div>
-
-<div class="design-desc">
-Editorial premium
-</div>
-
+<div class="design-name">Luxury</div>
+<div class="design-desc">Editorial premium</div>
 </button>
 
 <button class="design" data-design="racing">
-
 <div class="design-preview racing"></div>
-
-<div class="design-name">
-Racing
-</div>
-
-<div class="design-desc">
-Performance speed
-</div>
-
+<div class="design-name">Racing</div>
+<div class="design-desc">Performance speed</div>
 </button>
 
 <button class="design" data-design="carbon">
-
 <div class="design-preview racing"></div>
-
-<div class="design-name">
-Dark Carbon
-</div>
-
-<div class="design-desc">
-Technical texture
-</div>
-
+<div class="design-name">Dark Carbon</div>
+<div class="design-desc">Technical texture</div>
 </button>
 
 <button class="design" data-design="fullbleed">
-
 <div class="design-preview"></div>
-
-<div class="design-name">
-Full Bleed
-</div>
-
-<div class="design-desc">
-Image dominant
-</div>
-
+<div class="design-name">Full Bleed</div>
+<div class="design-desc">Image dominant</div>
 </button>
 
 <button class="design" data-design="editorial">
-
 <div class="design-preview"></div>
-
-<div class="design-name">
-Editorial
-</div>
-
-<div class="design-desc">
-Magazine aesthetic
-</div>
-
+<div class="design-name">Editorial</div>
+<div class="design-desc">Magazine aesthetic</div>
 </button>
 
 <button class="design" data-design="tech">
-
 <div class="design-preview tech"></div>
-
-<div class="design-name">
-Tech
-</div>
-
-<div class="design-desc">
-Digital performance
-</div>
-
+<div class="design-name">Tech</div>
+<div class="design-desc">Digital performance</div>
 </button>
 
 </div>
 
 </section>
 
-<!-- ======================================================
-     EFFECTS
-====================================================== -->
+
+<!-- EFFECTS -->
 
 <section class="section">
 
 <div class="section-head">
-  <strong>Effects</strong>
-  <span>09</span>
+<strong>Effects</strong>
+<span>09</span>
 </div>
 
-<label>
-Overlay Left
-</label>
+<label>Overlay Left</label>
 
 <div class="range-row">
 
 <input
-  id="overlayLeft"
-  type="range"
-  min="0"
-  max="100"
-  value="92"
+id="overlayLeft"
+type="range"
+min="0"
+max="100"
+value="92"
 >
 
-<div
-  class="range-value"
-  id="overlayLeftVal"
->
+<div class="range-value" id="overlayLeftVal">
 92
 </div>
 
 </div>
 
-<label>
-Overlay Right
-</label>
+<label>Overlay Right</label>
 
 <div class="range-row">
 
 <input
-  id="overlayRight"
-  type="range"
-  min="0"
-  max="100"
-  value="30"
+id="overlayRight"
+type="range"
+min="0"
+max="100"
+value="30"
 >
 
-<div
-  class="range-value"
-  id="overlayRightVal"
->
+<div class="range-value" id="overlayRightVal">
 30
 </div>
 
 </div>
 
-<label>
-Pattern
-</label>
+<label>Pattern</label>
 
 <div class="range-row">
 
 <input
-  id="pattern"
-  type="range"
-  min="0"
-  max="50"
-  value="8"
+id="pattern"
+type="range"
+min="0"
+max="50"
+value="8"
 >
 
-<div
-  class="range-value"
-  id="patternVal"
->
+<div class="range-value" id="patternVal">
 8
 </div>
 
@@ -3002,29 +2753,28 @@ Pattern
 
 </section>
 
-<!-- ======================================================
-     ACTIONS
-====================================================== -->
+
+<!-- ACTIONS -->
 
 <div class="actions">
 
 <button
-  id="reset"
-  class="btn btn-dark"
+id="reset"
+class="btn btn-dark"
 >
 RESET
 </button>
 
 <button
-  id="export"
-  class="btn btn-primary"
+id="export"
+class="btn btn-primary"
 >
 EXPORT
 </button>
 
 <button
-  id="random"
-  class="btn btn-dark btn-full"
+id="random"
+class="btn btn-dark btn-full"
 >
 ✦ RANDOM PREMIUM CONCEPT
 </button>
@@ -3032,6 +2782,7 @@ EXPORT
 </div>
 
 </aside>
+
 
 <!-- ======================================================
      STAGE
@@ -3050,22 +2801,22 @@ PREMIUM BANNER STUDIO / LIVE CANVAS
 <div class="preview-tools">
 
 <button
-  class="preview-tool"
-  id="fitBtn"
+class="preview-tool"
+id="fitBtn"
 >
 FIT
 </button>
 
 <button
-  class="preview-tool"
-  id="zoom100Btn"
+class="preview-tool"
+id="zoom100Btn"
 >
 100%
 </button>
 
 <button
-  class="preview-tool"
-  id="fullscreenBtn"
+class="preview-tool"
+id="fullscreenBtn"
 >
 FULL
 </button>
@@ -3084,41 +2835,36 @@ FULL
 
 </header>
 
-<!-- ======================================================
-     PREVIEW
-====================================================== -->
 
 <section
-  class="preview-area"
-  id="previewArea"
+class="preview-area"
+id="previewArea"
 >
 
 <div class="preview-shell">
 
 <div
-  id="canvas"
-  class="canvas design-wave"
+id="canvas"
+class="canvas design-wave"
 >
 
 <div class="base-bg"></div>
 
-<img
-  id="canvasImage"
-  class="canvas-bg"
-  alt=""
-  draggable="false"
->
+<!-- FINAL PHOTO LAYER -->
+<div
+id="photoLayer"
+class="photo-layer"
+></div>
 
 <div class="overlay"></div>
 
 <div class="grid-pattern"></div>
 
-<div class="carbon-pattern"></div>
-
 <div class="glow"></div>
 
-<div class="angular-main"></div>
+<div class="carbon-pattern"></div>
 
+<div class="angular-main"></div>
 <div class="angular-accent"></div>
 
 <div class="split-panel"></div>
@@ -3133,90 +2879,92 @@ FULL
 
 <div class="tech-lines"></div>
 
+
 <!-- WAVE -->
 
 <svg
-  class="wave-svg"
-  viewBox="0 0 1200 400"
-  preserveAspectRatio="none"
+class="wave-svg"
+viewBox="0 0 1200 400"
+preserveAspectRatio="none"
 >
 
 <path
-  class="wave-accent"
-  d="
-  M690,0
-  C830,60 780,145 880,205
-  C980,265 1035,175 1200,225
-  L1200,400
-  L720,400
-  C790,330 760,260 665,205
-  C570,150 600,70 690,0 Z
-  "
+class="wave-accent"
+d="
+M690,0
+C830,60 780,145 880,205
+C980,265 1035,175 1200,225
+L1200,400
+L720,400
+C790,330 760,260 665,205
+C570,150 600,70 690,0 Z
+"
 ></path>
 
 <path
-  class="wave-main"
-  d="
-  M745,0
-  C900,65 835,150 940,215
-  C1040,275 1090,210 1200,255
-  L1200,400
-  L790,400
-  C850,330 820,270 730,215
-  C640,160 650,70 745,0 Z
-  "
+class="wave-main"
+d="
+M745,0
+C900,65 835,150 940,215
+C1040,275 1090,210 1200,255
+L1200,400
+L790,400
+C850,330 820,270 730,215
+C640,160 650,70 745,0 Z
+"
 ></path>
 
 </svg>
+
 
 <!-- BRAND -->
 
 <div class="brand-lock">
 
 <img
-  id="logoPreview"
-  class="brand-logo"
-  alt="Logo"
-  draggable="false"
+id="logoPreview"
+class="brand-logo"
+alt=""
 >
 
 <div
-  id="brandOut"
-  class="brand-title"
+id="brandOut"
+class="brand-title"
 >
 NINE AUTOSERIES
 </div>
 
 <div
-  id="roleOut"
-  class="brand-sub"
+id="roleOut"
+class="brand-sub"
 >
 Official Distributor
 </div>
 
 </div>
 
+
 <!-- COPY -->
 
 <div class="copy">
 
 <div
-  id="kickerOut"
-  class="kicker"
+id="kickerOut"
+class="kicker"
 >
 PREMIUM AUTOMOTIVE
 </div>
 
 <div
-  id="headlineOut"
-  class="headline"
+id="headlineOut"
+class="headline"
 >
 DRIVE YOUR NEXT
 </div>
 
 <div
-  id="subtitleOut"
-  class="subtitle"
+id="subtitleOut"
+class="subtitle"
 >
 Temukan produk automotive terbaik dengan pelayanan profesional.
 </div>
@@ -3224,15 +2972,15 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 <div class="badges">
 
 <span
-  id="badgeOut"
-  class="badge"
+id="badgeOut"
+class="badge"
 >
 PROMO SPESIAL
 </span>
 
 <span
-  id="ctaOut"
-  class="cta"
+id="ctaOut"
+class="cta"
 >
 HUBUNGI KAMI
 </span>
@@ -3241,38 +2989,38 @@ HUBUNGI KAMI
 
 </div>
 
+
 <!-- CONTACT -->
 
 <div class="contact">
 
 <div
-  id="salesOut"
-  class="contact-name"
+id="salesOut"
+class="contact-name"
 >
 IMAM_SALESFR
 </div>
 
 <div
-  id="salesRoleOut"
-  class="contact-role"
+id="salesRoleOut"
+class="contact-role"
 >
 Sales Representative
 </div>
 
 <div
-  id="phoneOut"
-  class="contact-phone"
+id="phoneOut"
+class="contact-phone"
 >
 08xxxxxxxxxx
 </div>
 
 </div>
 
+
 <div class="edge"></div>
 
 <div class="frame"></div>
-
-<div class="noise"></div>
 
 </div>
 
@@ -3284,13 +3032,14 @@ Sales Representative
 
 </div>
 
+
 <!-- ======================================================
      EXPORT MODAL
 ====================================================== -->
 
 <div
-  id="exportModal"
-  class="export-modal"
+id="exportModal"
+class="export-modal"
 >
 
 <div class="export-card">
@@ -3304,8 +3053,8 @@ EXPORT BANNER
 </div>
 
 <div
-  id="exportInfo"
-  class="export-info"
+id="exportInfo"
+class="export-info"
 >
 Ready
 </div>
@@ -3313,19 +3062,20 @@ Ready
 </div>
 
 <button
-  id="closeExport"
-  class="export-close"
+id="closeExport"
+class="export-close"
 >
 ×
 </button>
 
 </div>
 
+
 <div class="export-options">
 
 <button
-  id="exportPNG"
-  class="export-option"
+id="exportPNG"
+class="export-option"
 >
 
 <div class="export-icon png">
@@ -3337,15 +3087,16 @@ PNG HD
 </div>
 
 <div class="export-option-desc">
-Render master dari preview aktif,
-termasuk foto dan logo.
+Master render dari preview aktif.
+Foto background ikut terbawa.
 </div>
 
 </button>
 
+
 <button
-  id="exportPDF"
-  class="export-option"
+id="exportPDF"
+class="export-option"
 >
 
 <div class="export-icon pdf">
@@ -3357,22 +3108,24 @@ PDF PRINT
 </div>
 
 <div class="export-option-desc">
-Menggunakan master bitmap yang
-sama dengan PNG.
+Menggunakan master bitmap yang sama
+dengan PNG.
 </div>
 
 </button>
 
 </div>
 
+
 <div
-  id="exportProgress"
-  class="export-progress"
+id="exportProgress"
+class="export-progress"
 ></div>
 
 </div>
 
 </div>
+
 
 <script>
 
@@ -3381,19 +3134,16 @@ sama dengan PNG.
 ========================================================= */
 
 const $ =
-  id =>
-    document.getElementById(id);
+id => document.getElementById(id);
 
 const canvas =
-  $("canvas");
+$("canvas");
 
 const previewArea =
-  $("previewArea");
+$("previewArea");
 
-
-/* =========================================================
-   IMAGE STATE
-========================================================= */
+const photoLayer =
+$("photoLayer");
 
 let photoDataURL = "";
 
@@ -3401,38 +3151,79 @@ let logoDataURL = "";
 
 
 /* =========================================================
-   FILE → DATA URL
+   FILE READER
 ========================================================= */
 
-function fileToDataURL(file){
+function readImage(file){
 
   return new Promise(
     (resolve,reject) => {
 
+      if(
+        !file ||
+        !file.type ||
+        !file.type.startsWith("image/")
+      ){
+
+        reject(
+          new Error(
+            "File harus berupa gambar."
+          )
+        );
+
+        return;
+
+      }
+
+
       const reader =
         new FileReader();
 
-      reader.onload =
-        () => {
 
-          resolve(
-            String(reader.result)
+      reader.onload = () => {
+
+        const result =
+          String(
+            reader.result
           );
 
-        };
 
-      reader.onerror =
-        () => {
+        if(
+          !result.startsWith(
+            "data:image/"
+          )
+        ){
 
           reject(
             new Error(
-              "File gambar gagal dibaca."
+              "Browser gagal membuat Data URL gambar."
             )
           );
 
-        };
+          return;
 
-      reader.readAsDataURL(file);
+        }
+
+
+        resolve(result);
+
+      };
+
+
+      reader.onerror = () => {
+
+        reject(
+          new Error(
+            "Gagal membaca file gambar."
+          )
+        );
+
+      };
+
+
+      reader.readAsDataURL(
+        file
+      );
 
     }
   );
@@ -3441,29 +3232,173 @@ function fileToDataURL(file){
 
 
 /* =========================================================
-   TEXT BINDINGS
+   PHOTO
+========================================================= */
+
+$("photo")
+.addEventListener(
+  "change",
+  async event => {
+
+    const file =
+      event.target.files?.[0];
+
+    if(!file)
+      return;
+
+    try{
+
+      photoDataURL =
+        await readImage(file);
+
+
+      /*
+        FOTO LANGSUNG MENJADI
+        BACKGROUND IMAGE.
+
+        Tidak memakai <img>.
+        Tidak memakai blob.
+      */
+
+      photoLayer.style.backgroundImage =
+        `url("${photoDataURL}")`;
+
+
+      photoLayer.classList.add(
+        "has-photo"
+      );
+
+
+      /*
+        Force browser paint.
+      */
+
+      void photoLayer.offsetWidth;
+
+
+      console.log(
+        "[PHOTO] loaded:",
+        file.name,
+        file.size,
+        file.type
+      );
+
+
+    }catch(error){
+
+      photoDataURL =
+        "";
+
+      photoLayer.style.backgroundImage =
+        "";
+
+      photoLayer.classList.remove(
+        "has-photo"
+      );
+
+
+      console.error(
+        "[PHOTO ERROR]",
+        error
+      );
+
+
+      alert(
+        "Foto gagal dimuat.\n\n" +
+        error.message
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+$("logo")
+.addEventListener(
+  "change",
+  async event => {
+
+    const file =
+      event.target.files?.[0];
+
+    if(!file)
+      return;
+
+    try{
+
+      logoDataURL =
+        await readImage(file);
+
+
+      const logo =
+        $("logoPreview");
+
+
+      logo.src =
+        logoDataURL;
+
+      logo.style.display =
+        "block";
+
+
+      console.log(
+        "[LOGO] loaded:",
+        file.name
+      );
+
+
+    }catch(error){
+
+      logoDataURL =
+        "";
+
+      $("logoPreview")
+        .removeAttribute(
+          "src"
+        );
+
+      $("logoPreview")
+        .style.display =
+        "none";
+
+
+      console.error(
+        "[LOGO ERROR]",
+        error
+      );
+
+
+      alert(
+        "Logo gagal dimuat.\n\n" +
+        error.message
+      );
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   TEXT
 ========================================================= */
 
 const bindings = {
 
   brandName:"brandOut",
-
   brandRole:"roleOut",
-
   salesName:"salesOut",
-
   salesRole:"salesRoleOut",
-
   phone:"phoneOut",
-
   kicker:"kickerOut",
-
   headline:"headlineOut",
-
   subtitle:"subtitleOut",
-
   badge:"badgeOut",
-
   cta:"ctaOut"
 
 };
@@ -3471,26 +3406,16 @@ const bindings = {
 
 Object.entries(bindings)
 .forEach(
-  ([inputId,outputId]) => {
+  ([input,output]) => {
 
-    const input =
-      $(inputId);
-
-    const output =
-      $(outputId);
-
-    if(
-      !input ||
-      !output
-    )
-      return;
-
-    input.addEventListener(
+    $(input)
+    .addEventListener(
       "input",
       () => {
 
-        output.textContent =
-          input.value;
+        $(output)
+          .textContent =
+          $(input).value;
 
       }
     );
@@ -3508,25 +3433,49 @@ function updateSize(){
   const w =
     Math.max(
       1,
-      Number($("width").value) || 1
+      Number(
+        $("width").value
+      ) || 1
     );
+
 
   const h =
     Math.max(
       1,
-      Number($("height").value) || 1
+      Number(
+        $("height").value
+      ) || 1
     );
 
-  const unit =
-    $("unit").value;
 
   canvas.style.aspectRatio =
     `${w}/${h}`;
 
-  $("sizeText").textContent =
-    `${w} × ${h} ${unit}`;
+
+  $("sizeText")
+    .textContent =
+    `${w} × ${h} ${$("unit").value}`;
 
 }
+
+
+$("width")
+.addEventListener(
+  "input",
+  updateSize
+);
+
+$("height")
+.addEventListener(
+  "input",
+  updateSize
+);
+
+$("unit")
+.addEventListener(
+  "change",
+  updateSize
+);
 
 
 /* =========================================================
@@ -3543,16 +3492,16 @@ document
       () => {
 
         const parts =
-          button
-          .dataset
-          .ratio
+          button.dataset.ratio
           .split("/");
+
 
         $("width").value =
           parts[0];
 
         $("height").value =
           parts[1];
+
 
         document
         .querySelectorAll(".ratio")
@@ -3563,9 +3512,11 @@ document
             )
         );
 
+
         button.classList.add(
           "active"
         );
+
 
         updateSize();
 
@@ -3576,376 +3527,36 @@ document
 );
 
 
-$("width").addEventListener(
-  "input",
-  updateSize
-);
-
-$("height").addEventListener(
-  "input",
-  updateSize
-);
-
-$("unit").addEventListener(
-  "change",
-  updateSize
-);
-
-
-/* =========================================================
-   PHOTO ENGINE
-   IMPORTANT:
-   DATA URL — NOT blob URL
-========================================================= */
-
-$("photo").addEventListener(
-  "change",
-  async event => {
-
-    const file =
-      event
-      .target
-      .files
-      ?.[0];
-
-    if(!file)
-      return;
-
-    try{
-
-      if(
-        !file.type.startsWith(
-          "image/"
-        )
-      ){
-
-        throw new Error(
-          "File yang dipilih bukan gambar."
-        );
-
-      }
-
-
-      /*
-        Simpan bitmap sebagai
-        Data URL.
-
-        Ini portable untuk:
-        preview
-        clone
-        html2canvas
-        PNG
-        PDF
-      */
-
-      photoDataURL =
-        await fileToDataURL(
-          file
-        );
-
-
-      const image =
-        $("canvasImage");
-
-
-      image.src =
-        photoDataURL;
-
-
-      image.style.display =
-        "block";
-
-      image.style.visibility =
-        "visible";
-
-
-      await waitForImage(
-        image
-      );
-
-
-      canvas.dispatchEvent(
-        new Event(
-          "photo-ready"
-        )
-      );
-
-
-    }catch(error){
-
-      console.error(
-        "PHOTO LOAD ERROR:",
-        error
-      );
-
-      photoDataURL =
-        "";
-
-      $("canvasImage")
-        .removeAttribute(
-          "src"
-        );
-
-      alert(
-        "Foto gagal dimuat.\n\n" +
-        error.message
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   LOGO ENGINE
-========================================================= */
-
-$("logo").addEventListener(
-  "change",
-  async event => {
-
-    const file =
-      event
-      .target
-      .files
-      ?.[0];
-
-    if(!file)
-      return;
-
-    try{
-
-      if(
-        !file.type.startsWith(
-          "image/"
-        )
-      ){
-
-        throw new Error(
-          "File logo bukan gambar."
-        );
-
-      }
-
-
-      logoDataURL =
-        await fileToDataURL(
-          file
-        );
-
-
-      const image =
-        $("logoPreview");
-
-
-      image.src =
-        logoDataURL;
-
-      image.style.display =
-        "block";
-
-      image.style.visibility =
-        "visible";
-
-
-      await waitForImage(
-        image
-      );
-
-
-    }catch(error){
-
-      console.error(
-        "LOGO LOAD ERROR:",
-        error
-      );
-
-      logoDataURL =
-        "";
-
-      $("logoPreview")
-        .removeAttribute(
-          "src"
-        );
-
-      $("logoPreview")
-        .style.display =
-        "none";
-
-      alert(
-        "Logo gagal dimuat.\n\n" +
-        error.message
-      );
-
-    }
-
-  }
-);
-
-
-/* =========================================================
-   WAIT FOR IMAGE
-========================================================= */
-
-async function waitForImage(
-  img
-){
-
-  if(
-    !img ||
-    !img.src
-  ){
-
-    return;
-
-  }
-
-
-  /*
-    Wait for browser load.
-  */
-
-  if(!img.complete){
-
-    await new Promise(
-      resolve => {
-
-        let finished =
-          false;
-
-        const finish =
-          () => {
-
-            if(finished)
-              return;
-
-            finished =
-              true;
-
-            resolve();
-
-          };
-
-
-        img.addEventListener(
-          "load",
-          finish,
-          {
-            once:true
-          }
-        );
-
-        img.addEventListener(
-          "error",
-          finish,
-          {
-            once:true
-          }
-        );
-
-
-        setTimeout(
-          finish,
-          15000
-        );
-
-      }
-    );
-
-  }
-
-
-  /*
-    Decode bitmap if supported.
-  */
-
-  if(
-    typeof img.decode ===
-    "function"
-  ){
-
-    try{
-
-      await img.decode();
-
-    }catch(error){
-
-      /*
-        Some Android browsers
-        can reject decode while
-        the image is still usable.
-      */
-
-      console.warn(
-        "Image decode warning:",
-        error
-      );
-
-    }
-
-  }
-
-
-  /*
-    If it has a source but no
-    actual bitmap, export must stop.
-  */
-
-  if(
-    img.src &&
-    (
-      img.naturalWidth <= 0 ||
-      img.naturalHeight <= 0
-    )
-  ){
-
-    throw new Error(
-      "Gambar tidak menghasilkan bitmap yang valid."
-    );
-
-  }
-
-}
-
-
 /* =========================================================
    RANGES
 ========================================================= */
 
-function bindRange(
-  inputId,
+function rangeBind(
+  id,
   variable,
-  outputId,
+  output,
   suffix=""
 ){
 
-  const input =
-    $(inputId);
-
-  const output =
-    $(outputId);
-
-  if(
-    !input ||
-    !output
-  )
-    return;
-
-  input.addEventListener(
+  $(id)
+  .addEventListener(
     "input",
-    () => {
+    event => {
 
       const value =
-        input.value;
+        event.target.value;
+
 
       canvas.style.setProperty(
         variable,
         value
       );
 
-      output.textContent =
-        value + suffix;
+
+      $(output)
+        .textContent =
+        value +
+        suffix;
 
     }
   );
@@ -3953,96 +3564,77 @@ function bindRange(
 }
 
 
-bindRange(
+rangeBind(
   "zoom",
   "--imgZoom",
   "zoomVal",
   "%"
 );
 
-bindRange(
+rangeBind(
   "posX",
   "--imgX",
   "posXVal"
 );
 
-bindRange(
+rangeBind(
   "posY",
   "--imgY",
   "posYVal"
 );
 
+rangeBind(
+  "overlayLeft",
+  "--overlayLeft",
+  "overlayLeftVal"
+);
 
-/* =========================================================
-   EFFECTS
-========================================================= */
+rangeBind(
+  "overlayRight",
+  "--overlayRight",
+  "overlayRightVal"
+);
+
+rangeBind(
+  "pattern",
+  "--patternOpacity",
+  "patternVal"
+);
+
+
+/*
+  Overlay/pattern are percentages
+  but CSS expects decimal opacity.
+*/
 
 $("overlayLeft")
 .addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(
-        event.target.value
-      );
-
+  e =>
     canvas.style.setProperty(
       "--overlayLeft",
-      value / 100
-    );
-
-    $("overlayLeftVal")
-      .textContent =
-      value;
-
-  }
+      Number(e.target.value)/100
+    )
 );
-
 
 $("overlayRight")
 .addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(
-        event.target.value
-      );
-
+  e =>
     canvas.style.setProperty(
       "--overlayRight",
-      value / 100
-    );
-
-    $("overlayRightVal")
-      .textContent =
-      value;
-
-  }
+      Number(e.target.value)/100
+    )
 );
-
 
 $("pattern")
 .addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(
-        event.target.value
-      );
-
+  e =>
     canvas.style.setProperty(
       "--patternOpacity",
-      value / 100
-    );
-
-    $("patternVal")
-      .textContent =
-      value;
-
-  }
+      Number(e.target.value)/100
+    )
 );
 
 
@@ -4053,29 +3645,19 @@ $("pattern")
 const colors = [
 
   ["bgColor","bgHex","--bg"],
-
   ["primary","primaryHex","--primary"],
-
   ["secondary","secondaryHex","--secondary"],
-
   ["accent","accentHex","--accent"],
-
   ["text","textHex","--text"],
-
   ["muted","mutedHex","--muted"],
-
   ["ctaColor","ctaColorHex","--cta"],
-
   ["ctaText","ctaTextHex","--ctaText"],
-
   ["border","borderHex","--border"]
 
 ];
 
 
-function validHex(
-  value
-){
+function validHex(value){
 
   return /^#[0-9A-Fa-f]{6}$/
     .test(value);
@@ -4086,71 +3668,76 @@ function validHex(
 colors.forEach(
   ([pickerId,hexId,variable]) => {
 
-    const picker =
-      $(pickerId);
-
-    const hex =
-      $(hexId);
-
-    picker.addEventListener(
+    $(pickerId)
+    .addEventListener(
       "input",
       () => {
 
-        const color =
-          picker.value
+        const value =
+          $(pickerId)
+          .value
           .toUpperCase();
 
-        hex.value =
-          color;
+
+        $(hexId).value =
+          value;
+
 
         canvas.style.setProperty(
           variable,
-          color
+          value
         );
 
       }
     );
 
 
-    hex.addEventListener(
+    $(hexId)
+    .addEventListener(
       "change",
       () => {
 
-        let color =
-          hex.value
+        let value =
+          $(hexId)
+          .value
           .trim()
           .toUpperCase();
 
+
         if(
-          !color.startsWith("#")
+          !value.startsWith("#")
         ){
 
-          color =
-            "#" + color;
+          value =
+            "#" +
+            value;
 
         }
 
+
         if(
-          !validHex(color)
+          !validHex(value)
         ){
 
-          hex.value =
-            picker.value
-            .toUpperCase();
+          $(hexId).value =
+            $(pickerId).value
+              .toUpperCase();
 
           return;
 
         }
 
-        picker.value =
-          color;
 
-        hex.value =
-          color;
+        $(pickerId).value =
+          value;
+
+        $(hexId).value =
+          value;
+
 
         canvas.style.setProperty(
           variable,
-          color
+          value
         );
 
       }
@@ -4161,74 +3748,53 @@ colors.forEach(
 
 
 /* =========================================================
-   SET COLOR
+   COLOR SETTER
 ========================================================= */
+
+const colorMap = {
+
+  bgColor:"--bg",
+  primary:"--primary",
+  secondary:"--secondary",
+  accent:"--accent",
+  text:"--text",
+  muted:"--muted",
+  ctaColor:"--cta",
+  ctaText:"--ctaText",
+  border:"--border"
+
+};
+
 
 function setColor(
   id,
   value
 ){
 
-  const picker =
-    $(id);
-
-  const hex =
-    $(id + "Hex");
-
   if(
-    !picker ||
-    !hex
+    !$(id) ||
+    !$(id+"Hex")
   )
     return;
 
-  value =
-    String(value)
-    .toUpperCase();
 
-  picker.value =
+  $(id).value =
     value;
 
-  hex.value =
-    value;
+  $(id+"Hex").value =
+    value.toUpperCase();
 
 
-  const map = {
-
-    bgColor:"--bg",
-
-    primary:"--primary",
-
-    secondary:"--secondary",
-
-    accent:"--accent",
-
-    text:"--text",
-
-    muted:"--muted",
-
-    ctaColor:"--cta",
-
-    ctaText:"--ctaText",
-
-    border:"--border"
-
-  };
-
-
-  if(map[id]){
-
-    canvas.style.setProperty(
-      map[id],
-      value
-    );
-
-  }
+  canvas.style.setProperty(
+    colorMap[id],
+    value
+  );
 
 }
 
 
 /* =========================================================
-   BG PALETTE
+   BACKGROUND PALETTE
 ========================================================= */
 
 document
@@ -4335,14 +3901,11 @@ function setDesign(
 ){
 
   designs.forEach(
-    design => {
-
+    design =>
       canvas.classList.remove(
         "design-" +
         design
-      );
-
-    }
+      )
   );
 
 
@@ -4353,19 +3916,14 @@ function setDesign(
 
 
   document
-  .querySelectorAll(
-    ".design"
-  )
+  .querySelectorAll(".design")
   .forEach(
-    button => {
-
+    button =>
       button.classList.toggle(
         "active",
         button.dataset.design ===
         name
-      );
-
-    }
+      )
   );
 
 }
@@ -4378,13 +3936,10 @@ document
 
     button.addEventListener(
       "click",
-      () => {
-
+      () =>
         setDesign(
           button.dataset.design
-        );
-
-      }
+        )
     );
 
   }
@@ -4392,45 +3947,34 @@ document
 
 
 /* =========================================================
-   PREVIEW CONTROLS
+   PREVIEW
 ========================================================= */
 
 $("fitBtn")
 .addEventListener(
   "click",
-  () => {
-
+  () =>
     previewArea.classList.remove(
       "zoom100"
-    );
-
-  }
+    )
 );
-
 
 $("zoom100Btn")
 .addEventListener(
   "click",
-  () => {
-
+  () =>
     previewArea.classList.add(
       "zoom100"
-    );
-
-  }
+    )
 );
-
 
 $("fullscreenBtn")
 .addEventListener(
   "click",
-  () => {
-
+  () =>
     previewArea.classList.toggle(
       "fullscreen"
-    );
-
-  }
+    )
 );
 
 
@@ -4440,77 +3984,21 @@ $("fullscreenBtn")
 
 const randomPalettes = [
 
-  {
-    p:"#8CC63F",
-    s:"#101419",
-    a:"#D9AD55",
-    t:"#FFFFFF",
-    m:"#C4C9D0"
-  },
+  ["#8CC63F","#101419","#D9AD55","#FFFFFF","#C4C9D0"],
 
-  {
-    p:"#D9AD55",
-    s:"#090909",
-    a:"#FFFFFF",
-    t:"#FFFFFF",
-    m:"#CFCFCF"
-  },
+  ["#D9AD55","#090909","#FFFFFF","#FFFFFF","#CFCFCF"],
 
-  {
-    p:"#EF3D3D",
-    s:"#111111",
-    a:"#FFFFFF",
-    t:"#FFFFFF",
-    m:"#CCCCCC"
-  },
+  ["#EF3D3D","#111111","#FFFFFF","#FFFFFF","#CCCCCC"],
 
-  {
-    p:"#277CFF",
-    s:"#07111F",
-    a:"#00D7E9",
-    t:"#FFFFFF",
-    m:"#C7D6E9"
-  },
+  ["#277CFF","#07111F","#00D7E9","#FFFFFF","#C7D6E9"],
 
-  {
-    p:"#A855F7",
-    s:"#100819",
-    a:"#00D7E9",
-    t:"#FFFFFF",
-    m:"#D8C7E8"
-  },
+  ["#A855F7","#100819","#00D7E9","#FFFFFF","#D8C7E8"],
 
-  {
-    p:"#00B878",
-    s:"#06130F",
-    a:"#8CC63F",
-    t:"#FFFFFF",
-    m:"#BEDBD1"
-  },
+  ["#00B878","#06130F","#8CC63F","#FFFFFF","#BEDBD1"],
 
-  {
-    p:"#FF7A18",
-    s:"#17100A",
-    a:"#FFD166",
-    t:"#FFFFFF",
-    m:"#E4C6A8"
-  },
+  ["#FF7A18","#17100A","#FFD166","#FFFFFF","#E4C6A8"],
 
-  {
-    p:"#B77A3B",
-    s:"#160D07",
-    a:"#E8C39E",
-    t:"#FFFFFF",
-    m:"#D0B9A5"
-  },
-
-  {
-    p:"#00A6C7",
-    s:"#06141A",
-    a:"#7DE2FF",
-    t:"#FFFFFF",
-    m:"#BBD8E0"
-  }
+  ["#B77A3B","#160D07","#E8C39E","#FFFFFF","#D0B9A5"]
 
 ];
 
@@ -4520,7 +4008,7 @@ $("random")
   "click",
   () => {
 
-    const palette =
+    const p =
       randomPalettes[
         Math.floor(
           Math.random() *
@@ -4529,53 +4017,22 @@ $("random")
       ];
 
 
-    setColor(
-      "primary",
-      palette.p
-    );
-
-    setColor(
-      "secondary",
-      palette.s
-    );
-
-    setColor(
-      "accent",
-      palette.a
-    );
-
-    setColor(
-      "text",
-      palette.t
-    );
-
-    setColor(
-      "muted",
-      palette.m
-    );
-
-    setColor(
-      "ctaColor",
-      palette.p
-    );
-
-    setColor(
-      "border",
-      palette.p
-    );
+    setColor("primary",p[0]);
+    setColor("secondary",p[1]);
+    setColor("accent",p[2]);
+    setColor("text",p[3]);
+    setColor("muted",p[4]);
+    setColor("ctaColor",p[0]);
+    setColor("border",p[0]);
 
 
-    const design =
+    setDesign(
       designs[
         Math.floor(
           Math.random() *
           designs.length
         )
-      ];
-
-
-    setDesign(
-      design
+      ]
     );
 
   }
@@ -4591,61 +4048,33 @@ $("reset")
   "click",
   () => {
 
-    const defaults = {
+    const values = {
 
-      brandName:
-        "NINE AUTOSERIES",
-
-      brandRole:
-        "Official Distributor",
-
-      salesName:
-        "IMAM_SALESFR",
-
-      salesRole:
-        "Sales Representative",
-
-      phone:
-        "08xxxxxxxxxx",
-
-      kicker:
-        "PREMIUM AUTOMOTIVE",
-
-      headline:
-        "DRIVE YOUR NEXT",
-
+      brandName:"NINE AUTOSERIES",
+      brandRole:"Official Distributor",
+      salesName:"IMAM_SALESFR",
+      salesRole:"Sales Representative",
+      phone:"08xxxxxxxxxx",
+      kicker:"PREMIUM AUTOMOTIVE",
+      headline:"DRIVE YOUR NEXT",
       subtitle:
         "Temukan produk automotive terbaik dengan pelayanan profesional.",
-
-      badge:
-        "PROMO SPESIAL",
-
-      cta:
-        "HUBUNGI KAMI"
+      badge:"PROMO SPESIAL",
+      cta:"HUBUNGI KAMI"
 
     };
 
 
-    Object.entries(
-      defaults
-    )
+    Object.entries(values)
     .forEach(
       ([id,value]) => {
 
-        if($(id))
-          $(id).value =
-            value;
+        $(id).value =
+          value;
 
-        if(
-          bindings[id] &&
-          $(bindings[id])
-        ){
-
-          $(bindings[id])
-            .textContent =
-            value;
-
-        }
+        $(bindings[id])
+          .textContent =
+          value;
 
       }
     );
@@ -4758,35 +4187,26 @@ $("reset")
     );
 
 
-    $("zoomVal")
-      .textContent =
+    $("zoomVal").textContent =
       "100%";
 
-    $("posXVal")
-      .textContent =
+    $("posXVal").textContent =
       "0";
 
-    $("posYVal")
-      .textContent =
+    $("posYVal").textContent =
       "0";
 
-    $("overlayLeftVal")
-      .textContent =
+    $("overlayLeftVal").textContent =
       "92";
 
-    $("overlayRightVal")
-      .textContent =
+    $("overlayRightVal").textContent =
       "30";
 
-    $("patternVal")
-      .textContent =
+    $("patternVal").textContent =
       "8";
 
 
-    setDesign(
-      "wave"
-    );
-
+    setDesign("wave");
 
     updateSize();
 
@@ -4801,64 +4221,37 @@ $("reset")
 const exportModal =
   $("exportModal");
 
-const exportInfo =
-  $("exportInfo");
-
 const exportProgress =
   $("exportProgress");
-
-
-function openExport(){
-
-  const w =
-    Number(
-      $("width").value
-    ) || 300;
-
-  const h =
-    Number(
-      $("height").value
-    ) || 100;
-
-  const unit =
-    $("unit").value;
-
-
-  exportInfo.textContent =
-    `${w} × ${h} ${unit} • MASTER PREVIEW`;
-
-
-  exportProgress.textContent =
-    "";
-
-
-  exportModal.classList.add(
-    "show"
-  );
-
-}
-
-
-function closeExport(){
-
-  exportModal.classList.remove(
-    "show"
-  );
-
-}
 
 
 $("export")
 .addEventListener(
   "click",
-  openExport
+  () => {
+
+    $("exportInfo")
+      .textContent =
+      `${$("width").value} × ${$("height").value} ${$("unit").value} • MASTER EXPORT`;
+
+    exportProgress.textContent =
+      "";
+
+    exportModal.classList.add(
+      "show"
+    );
+
+  }
 );
 
 
 $("closeExport")
 .addEventListener(
   "click",
-  closeExport
+  () =>
+    exportModal.classList.remove(
+      "show"
+    )
 );
 
 
@@ -4872,7 +4265,9 @@ exportModal
       exportModal
     ){
 
-      closeExport();
+      exportModal.classList.remove(
+        "show"
+      );
 
     }
 
@@ -4884,35 +4279,24 @@ exportModal
    EXPORT NAME
 ========================================================= */
 
-function getExportName(){
+function exportName(){
 
-  const output =
-    $("brandOut");
-
-  let name =
-    output
-      ? output.textContent
-      : "premium-banner";
-
-
-  name =
-    String(
-      name ||
-      "premium-banner"
-    )
-    .trim()
-    .replace(
-      /[^\w\-]+/g,
-      "_"
-    )
-    .replace(
-      /^_+|_+$/g,
-      ""
-    );
+  const value =
+    $("brandName")
+      .value
+      .trim();
 
 
   return (
-    name ||
+    value
+      .replace(
+        /[^\w\-]+/g,
+        "_"
+      )
+      .replace(
+        /^_+|_+$/g,
+        ""
+      ) ||
     "premium-banner"
   );
 
@@ -4920,12 +4304,12 @@ function getExportName(){
 
 
 /* =========================================================
-   HD SIZE
+   EXPORT SIZE
 ========================================================= */
 
-function getHDSize(){
+function targetSize(){
 
-  const sourceW =
+  const w =
     Math.max(
       1,
       Number(
@@ -4934,7 +4318,7 @@ function getHDSize(){
     );
 
 
-  const sourceH =
+  const h =
     Math.max(
       1,
       Number(
@@ -4944,76 +4328,32 @@ function getHDSize(){
 
 
   const ratio =
-    sourceW /
-    sourceH;
+    w / h;
 
 
-  /*
-    Maximum bitmap dimension.
-
-    Rasio tetap sama.
-  */
-
-  const MAX =
+  const max =
     4000;
 
 
-  let width;
-  let height;
+  if(
+    ratio >= 1
+  ){
 
+    return {
 
-  if(ratio >= 1){
+      width:max,
 
-    width =
-      MAX;
-
-    height =
-      Math.max(
-        1,
-        Math.round(
-          MAX /
-          ratio
+      height:
+        Math.max(
+          1,
+          Math.round(
+            max / ratio
+          )
         )
-      );
 
-  }else{
-
-    height =
-      MAX;
-
-    width =
-      Math.max(
-        1,
-        Math.round(
-          MAX *
-          ratio
-        )
-      );
+    };
 
   }
-
-
-  return {
-
-    width,
-
-    height,
-
-    ratio
-
-  };
-
-}
-
-
-/* =========================================================
-   PREVIEW RECT
-========================================================= */
-
-function getPreviewRect(){
-
-  const rect =
-    canvas.getBoundingClientRect();
 
 
   return {
@@ -5022,17 +4362,11 @@ function getPreviewRect(){
       Math.max(
         1,
         Math.round(
-          rect.width
+          max * ratio
         )
       ),
 
-    height:
-      Math.max(
-        1,
-        Math.round(
-          rect.height
-        )
-      )
+    height:max
 
   };
 
@@ -5040,208 +4374,32 @@ function getPreviewRect(){
 
 
 /* =========================================================
-   PREPARE IMAGE SOURCES
+   PHOTO EXPORT CHECK
 ========================================================= */
 
-async function prepareExportImages(){
+function verifyPhoto(){
 
-  /*
-    Force current data URLs back
-    into actual DOM images.
+  if(!photoDataURL){
 
-    This prevents old blob URLs
-    from surviving after previous
-    versions or browser state.
-  */
-
-  const image =
-    $("canvasImage");
-
-
-  if(photoDataURL){
-
-    image.src =
-      photoDataURL;
+    return true;
 
   }
-
-
-  const logo =
-    $("logoPreview");
-
-
-  if(logoDataURL){
-
-    logo.src =
-      logoDataURL;
-
-    logo.style.display =
-      "block";
-
-  }
-
-
-  /*
-    Wait until browser has decoded
-    both images.
-  */
-
-  await waitForImage(
-    image
-  );
 
 
   if(
-    logo.style.display !==
-    "none" &&
-    logo.src
+    !photoDataURL.startsWith(
+      "data:image/"
+    )
   ){
 
-    await waitForImage(
-      logo
+    throw new Error(
+      "Data foto tidak valid."
     );
 
   }
 
-}
 
-
-/* =========================================================
-   COPY CSS STATE
-========================================================= */
-
-function copyCanvasState(
-  source,
-  target
-){
-
-  const computed =
-    getComputedStyle(
-      source
-    );
-
-
-  const variables = [
-
-    "--bg",
-    "--primary",
-    "--secondary",
-    "--accent",
-    "--text",
-    "--muted",
-    "--cta",
-    "--ctaText",
-    "--border",
-
-    "--imgZoom",
-    "--imgX",
-    "--imgY",
-
-    "--overlayLeft",
-    "--overlayRight",
-
-    "--patternOpacity"
-
-  ];
-
-
-  variables.forEach(
-    variable => {
-
-      target.style.setProperty(
-        variable,
-        computed.getPropertyValue(
-          variable
-        )
-      );
-
-    }
-  );
-
-
-  /*
-    Exact design class.
-  */
-
-  target.className =
-    source.className;
-
-
-  target.classList.add(
-    "exporting"
-  );
-
-}
-
-
-/* =========================================================
-   INLINE IMAGE SOURCES INTO CLONE
-========================================================= */
-
-function forceCloneImages(
-  clone
-){
-
-  const cloneImage =
-    clone.querySelector(
-      "#canvasImage"
-    );
-
-
-  if(
-    cloneImage &&
-    photoDataURL
-  ){
-
-    cloneImage.src =
-      photoDataURL;
-
-    cloneImage.setAttribute(
-      "src",
-      photoDataURL
-    );
-
-    cloneImage.style.display =
-      "block";
-
-    cloneImage.style.visibility =
-      "visible";
-
-    cloneImage.style.opacity =
-      "1";
-
-  }
-
-
-  const cloneLogo =
-    clone.querySelector(
-      "#logoPreview"
-    );
-
-
-  if(
-    cloneLogo &&
-    logoDataURL
-  ){
-
-    cloneLogo.src =
-      logoDataURL;
-
-    cloneLogo.setAttribute(
-      "src",
-      logoDataURL
-    );
-
-    cloneLogo.style.display =
-      "block";
-
-    cloneLogo.style.visibility =
-      "visible";
-
-    cloneLogo.style.opacity =
-      "1";
-
-  }
+  return true;
 
 }
 
@@ -5252,23 +4410,24 @@ function forceCloneImages(
 
 async function createExportClone(){
 
-  /*
-    Prepare source images FIRST.
-  */
-
-  await prepareExportImages();
+  verifyPhoto();
 
 
   const rect =
-    getPreviewRect();
+    canvas.getBoundingClientRect();
 
 
-  /*
-    Clone only once.
+  if(
+    rect.width <= 0 ||
+    rect.height <= 0
+  ){
 
-    No old wrapper is reused.
-    No removeChild() logic.
-  */
+    throw new Error(
+      "Ukuran preview tidak valid."
+    );
+
+  }
+
 
   const clone =
     canvas.cloneNode(
@@ -5282,11 +4441,19 @@ async function createExportClone(){
     );
 
 
+  /*
+    Wrapper harus berada
+    di layar agar html2canvas
+    menghitung layout normal.
+
+    Tidak pakai z-index negatif.
+  */
+
   wrapper.style.position =
     "fixed";
 
   wrapper.style.left =
-    "-100000px";
+    "0";
 
   wrapper.style.top =
     "0";
@@ -5302,19 +4469,23 @@ async function createExportClone(){
   wrapper.style.overflow =
     "hidden";
 
-  wrapper.style.pointerEvents =
-    "none";
-
   wrapper.style.opacity =
     "1";
 
+  wrapper.style.pointerEvents =
+    "none";
+
   wrapper.style.zIndex =
-    "-999999";
+    "999998";
 
 
   /*
-    Force exact preview dimensions.
+    Background transparan sementara.
   */
+
+  wrapper.style.background =
+    "#000";
+
 
   clone.style.width =
     rect.width +
@@ -5327,17 +4498,14 @@ async function createExportClone(){
   clone.style.maxWidth =
     "none";
 
-  clone.style.minWidth =
-    "0";
-
-  clone.style.minHeight =
-    "0";
-
   clone.style.aspectRatio =
     "auto";
 
   clone.style.position =
     "relative";
+
+  clone.style.margin =
+    "0";
 
   clone.style.left =
     "0";
@@ -5345,26 +4513,117 @@ async function createExportClone(){
   clone.style.top =
     "0";
 
-  clone.style.margin =
-    "0";
 
-  clone.style.transform =
-    "none";
-
-
-  copyCanvasState(
-    canvas,
-    clone
+  clone.classList.add(
+    "exporting"
   );
 
 
   /*
-    MOST IMPORTANT IMAGE FIX.
+    Copy CSS variable state.
   */
 
-  forceCloneImages(
-    clone
+  const computed =
+    getComputedStyle(
+      canvas
+    );
+
+
+  [
+
+    "--bg",
+    "--primary",
+    "--secondary",
+    "--accent",
+    "--text",
+    "--muted",
+    "--cta",
+    "--ctaText",
+    "--border",
+    "--imgZoom",
+    "--imgX",
+    "--imgY",
+    "--overlayLeft",
+    "--overlayRight",
+    "--patternOpacity"
+
+  ].forEach(
+    variable => {
+
+      clone.style.setProperty(
+        variable,
+        computed.getPropertyValue(
+          variable
+        )
+      );
+
+    }
   );
+
+
+  /*
+    ======================================================
+    CRITICAL:
+    Copy PHOTO DATA URL directly
+    into clone's background-image.
+    ======================================================
+  */
+
+  const clonePhoto =
+    clone.querySelector(
+      "#photoLayer"
+    );
+
+
+  if(
+    clonePhoto &&
+    photoDataURL
+  ){
+
+    clonePhoto.style.backgroundImage =
+      `url("${photoDataURL}")`;
+
+    clonePhoto.classList.add(
+      "has-photo"
+    );
+
+    clonePhoto.style.display =
+      "block";
+
+    clonePhoto.style.visibility =
+      "visible";
+
+    clonePhoto.style.opacity =
+      "1";
+
+    clonePhoto.style.zIndex =
+      "1";
+
+  }
+
+
+  /*
+    Logo also stays Data URL.
+  */
+
+  const cloneLogo =
+    clone.querySelector(
+      "#logoPreview"
+    );
+
+
+  if(
+    cloneLogo &&
+    logoDataURL
+  ){
+
+    cloneLogo.src =
+      logoDataURL;
+
+    cloneLogo.style.display =
+      "block";
+
+  }
 
 
   wrapper.appendChild(
@@ -5378,29 +4637,7 @@ async function createExportClone(){
 
 
   /*
-    Wait for clone images.
-  */
-
-  const images =
-    clone.querySelectorAll(
-      "img"
-    );
-
-
-  for(
-    const img
-    of images
-  ){
-
-    await waitForImage(
-      img
-    );
-
-  }
-
-
-  /*
-    Force browser layout.
+    Force browser layout + paint.
   */
 
   void clone.offsetWidth;
@@ -5435,10 +4672,10 @@ async function createExportClone(){
 
 
 /* =========================================================
-   REMOVE EXPORT CLONE SAFELY
+   CLEANUP
 ========================================================= */
 
-function disposeExportClone(
+function cleanupExport(
   data
 ){
 
@@ -5449,36 +4686,15 @@ function disposeExportClone(
     return;
 
 
-  /*
-    No direct removeChild().
-    Use DOM-safe parent check.
-  */
+  if(
+    data.wrapper.parentNode
+  ){
 
-  try{
-
-    if(
-      data.wrapper.parentNode
-    ){
-
-      data.wrapper
-        .parentNode
-        .removeChild(
-          data.wrapper
-        );
-
-    }
-
-  }catch(error){
-
-    /*
-      Cleanup failure must NEVER
-      break the export result.
-    */
-
-    console.warn(
-      "Export cleanup ignored:",
-      error
-    );
+    data.wrapper
+      .parentNode
+      .removeChild(
+        data.wrapper
+      );
 
   }
 
@@ -5497,57 +4713,57 @@ async function renderMaster(){
   ){
 
     throw new Error(
-      "html2canvas belum tersedia. Pastikan koneksi internet aktif."
+      "html2canvas belum tersedia."
     );
 
   }
 
 
-  const hd =
-    getHDSize();
+  verifyPhoto();
 
 
-  let data =
-    null;
+  exportProgress.textContent =
+    photoDataURL
+      ? "Foto siap • membuat master..."
+      : "Membuat master...";
+
+
+  const target =
+    targetSize();
+
+
+  const data =
+    await createExportClone();
 
 
   try{
 
-    exportProgress.textContent =
-      "Menyiapkan foto & logo...";
-
-
-    data =
-      await createExportClone();
-
-
     /*
-      Preview → HD scale.
+      Scale from actual preview
+      to HD target.
     */
 
     const scale =
       Math.max(
         1,
-        Math.min(
-          hd.width /
-          data.width,
+        target.width /
+        data.width,
 
-          hd.height /
-          data.height
-        )
+        target.height /
+        data.height
       );
 
 
     exportProgress.textContent =
-      "Rendering banner HD...";
+      "Rendering master HD...";
 
 
-    let rendered;
+    let result;
 
 
     try{
 
-      rendered =
+      result =
         await html2canvas(
           data.clone,
           {
@@ -5557,21 +4773,6 @@ async function renderMaster(){
 
             height:
               data.height,
-
-            x:0,
-
-            y:0,
-
-            /*
-              Keep preview CSS
-              environment.
-
-              This is important for:
-              vw
-              clamp
-              %
-              positioning
-            */
 
             windowWidth:
               data.width,
@@ -5583,13 +4784,23 @@ async function renderMaster(){
 
             scrollY:0,
 
-            scale,
+            x:0,
+
+            y:0,
+
+            scale:
+
+              Math.min(
+                4,
+                scale
+              ),
+
+            backgroundColor:
+              null,
 
             useCORS:true,
 
             allowTaint:true,
-
-            backgroundColor:null,
 
             imageTimeout:30000,
 
@@ -5604,21 +4815,16 @@ async function renderMaster(){
     }catch(firstError){
 
       console.warn(
-        "Direct HD render failed. Using preview bitmap fallback.",
+        "[EXPORT] HD render failed:",
         firstError
       );
 
 
       exportProgress.textContent =
-        "HD langsung gagal — membuat master fallback...";
+        "Render HD fallback...";
 
 
-      /*
-        Fallback:
-        render exact preview 1x.
-      */
-
-      const previewCanvas =
+      result =
         await html2canvas(
           data.clone,
           {
@@ -5629,27 +4835,20 @@ async function renderMaster(){
             height:
               data.height,
 
-            x:0,
-
-            y:0,
-
             windowWidth:
               data.width,
 
             windowHeight:
               data.height,
 
-            scrollX:0,
-
-            scrollY:0,
-
             scale:1,
+
+            backgroundColor:
+              null,
 
             useCORS:true,
 
             allowTaint:true,
-
-            backgroundColor:null,
 
             imageTimeout:30000,
 
@@ -5660,135 +4859,72 @@ async function renderMaster(){
           }
         );
 
-
-      /*
-        Native high quality upscale.
-      */
-
-      rendered =
-        document.createElement(
-          "canvas"
-        );
+    }
 
 
-      rendered.width =
-        hd.width;
+    /*
+      Normalize to exact HD.
+    */
 
-      rendered.height =
-        hd.height;
-
-
-      const ctx =
-        rendered.getContext(
-          "2d"
-        );
+    const master =
+      document.createElement(
+        "canvas"
+      );
 
 
-      if(!ctx){
+    master.width =
+      target.width;
 
-        throw new Error(
-          "Canvas 2D tidak tersedia pada browser ini."
-        );
-
-      }
+    master.height =
+      target.height;
 
 
-      ctx.imageSmoothingEnabled =
-        true;
+    const ctx =
+      master.getContext(
+        "2d"
+      );
 
-      ctx.imageSmoothingQuality =
-        "high";
 
+    if(!ctx){
 
-      ctx.drawImage(
-        previewCanvas,
-        0,
-        0,
-        previewCanvas.width,
-        previewCanvas.height,
-        0,
-        0,
-        hd.width,
-        hd.height
+      throw new Error(
+        "Canvas 2D tidak tersedia."
       );
 
     }
 
 
-    /*
-      Normalize dimensions.
-    */
+    ctx.imageSmoothingEnabled =
+      true;
 
-    if(
-      rendered.width !== hd.width ||
-      rendered.height !== hd.height
-    ){
-
-      const normalized =
-        document.createElement(
-          "canvas"
-        );
+    ctx.imageSmoothingQuality =
+      "high";
 
 
-      normalized.width =
-        hd.width;
-
-      normalized.height =
-        hd.height;
-
-
-      const ctx =
-        normalized.getContext(
-          "2d"
-        );
-
-
-      if(!ctx){
-
-        throw new Error(
-          "Canvas 2D tidak tersedia."
-        );
-
-      }
-
-
-      ctx.imageSmoothingEnabled =
-        true;
-
-      ctx.imageSmoothingQuality =
-        "high";
-
-
-      ctx.drawImage(
-        rendered,
-        0,
-        0,
-        rendered.width,
-        rendered.height,
-        0,
-        0,
-        hd.width,
-        hd.height
-      );
-
-
-      rendered =
-        normalized;
-
-    }
+    ctx.drawImage(
+      result,
+      0,
+      0,
+      result.width,
+      result.height,
+      0,
+      0,
+      target.width,
+      target.height
+    );
 
 
     /*
-      Final image verification.
+      Final bitmap check.
     */
 
     if(
-      rendered.width <= 0 ||
-      rendered.height <= 0
+      master.width <= 0 ||
+      master.height <= 0
     ){
 
       throw new Error(
-        "Master render menghasilkan ukuran bitmap tidak valid."
+        "Master bitmap kosong."
       );
 
     }
@@ -5796,29 +4932,19 @@ async function renderMaster(){
 
     return {
 
-      canvas:
-        rendered,
+      canvas:master,
 
       width:
-        hd.width,
+        target.width,
 
       height:
-        hd.height
+        target.height
 
     };
 
-
   }finally{
 
-    /*
-      Only cleanup the temporary
-      wrapper.
-
-      Cleanup NEVER touches the
-      real preview canvas.
-    */
-
-    disposeExportClone(
+    cleanupExport(
       data
     );
 
@@ -5828,7 +4954,7 @@ async function renderMaster(){
 
 
 /* =========================================================
-   DOWNLOAD BLOB
+   DOWNLOAD
 ========================================================= */
 
 function downloadBlob(
@@ -5839,7 +4965,7 @@ function downloadBlob(
   if(!blob){
 
     throw new Error(
-      "Browser gagal membuat file."
+      "File hasil export kosong."
     );
 
   }
@@ -5851,81 +4977,53 @@ function downloadBlob(
     );
 
 
-  const link =
+  const a =
     document.createElement(
       "a"
     );
 
 
-  link.href =
+  a.href =
     url;
 
-  link.download =
+  a.download =
     filename;
 
 
-  /*
-    Temporary append only.
-
-    Cleanup is guarded.
-  */
-
   document.body.appendChild(
-    link
+    a
   );
 
 
-  try{
+  a.click();
 
-    link.click();
 
-  }finally{
+  setTimeout(
+    () => {
 
-    setTimeout(
-      () => {
+      if(a.parentNode){
 
-        try{
-
-          if(
-            link.parentNode
-          ){
-
-            link.parentNode
-              .removeChild(
-                link
-              );
-
-          }
-
-        }catch(error){
-
-          console.warn(
-            "Download cleanup ignored:",
-            error
+        a.parentNode
+          .removeChild(
+            a
           );
 
-        }
+      }
 
 
-        try{
+      URL.revokeObjectURL(
+        url
+      );
 
-          URL.revokeObjectURL(
-            url
-          );
-
-        }catch(error){}
-
-      },
-      2500
-    );
-
-  }
+    },
+    1500
+  );
 
 }
 
 
 /* =========================================================
-   PNG EXPORT
+   PNG
 ========================================================= */
 
 $("exportPNG")
@@ -5949,16 +5047,12 @@ $("exportPNG")
         true;
 
 
-      exportProgress.textContent =
-        "Mempersiapkan master render...";
-
-
       const result =
         await renderMaster();
 
 
       exportProgress.textContent =
-        "Menyimpan PNG HD...";
+        "Menyimpan PNG...";
 
 
       const blob =
@@ -5970,9 +5064,7 @@ $("exportPNG")
 
                 if(file){
 
-                  resolve(
-                    file
-                  );
+                  resolve(file);
 
                 }else{
 
@@ -5994,7 +5086,7 @@ $("exportPNG")
 
       downloadBlob(
         blob,
-        `${getExportName()}_HD_${result.width}x${result.height}.png`
+        `${exportName()}_HD_${result.width}x${result.height}.png`
       );
 
 
@@ -6002,22 +5094,16 @@ $("exportPNG")
         `✓ PNG berhasil • ${result.width} × ${result.height}px`;
 
 
-      setTimeout(
-        closeExport,
-        1400
-      );
-
-
     }catch(error){
 
       console.error(
-        "PNG EXPORT ERROR:",
+        "[PNG EXPORT ERROR]",
         error
       );
 
 
       exportProgress.textContent =
-        "✕ PNG export gagal.";
+        "✕ PNG gagal";
 
 
       alert(
@@ -6041,27 +5127,21 @@ $("exportPNG")
 
 
 /* =========================================================
-   PDF PHYSICAL SIZE
+   PDF SIZE
 ========================================================= */
 
-function getPDFSizeMM(){
+function pdfSizeMM(){
 
-  const width =
-    Math.max(
-      1,
-      Number(
-        $("width").value
-      ) || 300
-    );
+  const w =
+    Number(
+      $("width").value
+    ) || 300;
 
 
-  const height =
-    Math.max(
-      1,
-      Number(
-        $("height").value
-      ) || 100
-    );
+  const h =
+    Number(
+      $("height").value
+    ) || 100;
 
 
   const unit =
@@ -6075,89 +5155,62 @@ function getPDFSizeMM(){
   if(unit === "mm"){
 
     mmW =
-      width;
+      w;
 
     mmH =
-      height;
+      h;
 
   }else if(unit === "cm"){
 
     mmW =
-      width *
-      10;
+      w * 10;
 
     mmH =
-      height *
-      10;
+      h * 10;
 
   }else if(unit === "inch"){
 
     mmW =
-      width *
-      25.4;
+      w * 25.4;
 
     mmH =
-      height *
-      25.4;
-
-  }else if(unit === "px"){
-
-    mmW =
-      width *
-      25.4 /
-      96;
-
-    mmH =
-      height *
-      25.4 /
-      96;
+      h * 25.4;
 
   }else{
 
     mmW =
-      width *
-      10;
+      w * 25.4 / 96;
 
     mmH =
-      height *
-      10;
+      h * 25.4 / 96;
 
   }
 
 
   /*
-    Keep physical ratio.
-
-    jsPDF supports large custom
-    pages, but browsers/viewers
-    can have practical limits.
+    Large-format PDF tetap
+    mempertahankan rasio.
   */
 
-  const MAX_MM =
-    5080;
+  const max =
+    5000;
 
 
   const factor =
     Math.min(
       1,
-
-      MAX_MM /
-      mmW,
-
-      MAX_MM /
-      mmH
+      max / mmW,
+      max / mmH
     );
 
 
   return {
 
     width:
-      mmW *
-      factor,
+      mmW * factor,
 
     height:
-      mmH *
-      factor
+      mmH * factor
 
   };
 
@@ -6165,7 +5218,7 @@ function getPDFSizeMM(){
 
 
 /* =========================================================
-   PDF EXPORT
+   PDF
 ========================================================= */
 
 $("exportPDF")
@@ -6195,32 +5248,22 @@ $("exportPDF")
       ){
 
         throw new Error(
-          "Library PDF belum tersedia. Pastikan koneksi internet aktif."
+          "Library PDF belum tersedia."
         );
 
       }
 
-
-      exportProgress.textContent =
-        "Membuat master yang sama dengan PNG...";
-
-
-      /*
-        SAME MASTER.
-        PDF dan PNG tidak punya
-        render composition terpisah.
-      */
 
       const result =
         await renderMaster();
 
 
       exportProgress.textContent =
-        "Membuat PDF PRINT...";
+        "Membuat PDF dari master yang sama...";
 
 
       const size =
-        getPDFSizeMM();
+        pdfSizeMM();
 
 
       const orientation =
@@ -6230,14 +5273,12 @@ $("exportPDF")
           : "portrait";
 
 
-      const jsPDF =
-        window
-        .jspdf
-        .jsPDF;
+      const JsPDF =
+        window.jspdf.jsPDF;
 
 
       const pdf =
-        new jsPDF({
+        new JsPDF({
 
           orientation,
 
@@ -6254,11 +5295,8 @@ $("exportPDF")
 
 
       /*
-        PNG master dimasukkan ke PDF.
-
-        Jadi foto, logo, warna,
-        crop dan layout semuanya
-        berasal dari bitmap yang sama.
+        PNG dan PDF:
+        SATU MASTER BITMAP.
       */
 
       const image =
@@ -6268,67 +5306,51 @@ $("exportPDF")
 
 
       pdf.addImage(
-
         image,
-
         "PNG",
-
         0,
-
         0,
-
         size.width,
-
         size.height,
-
         undefined,
-
         "FAST"
-
       );
 
 
       pdf.setProperties({
 
         title:
-          getExportName(),
+          exportName(),
 
         subject:
-          "Premium Banner Print",
+          "Premium Banner",
 
         author:
-          $("salesOut")
-            ?.textContent ||
+          $("salesName").value ||
           "Premium Banner Studio"
 
       });
 
 
       pdf.save(
-        `${getExportName()}_PRINT.pdf`
+        `${exportName()}_PRINT.pdf`
       );
 
 
       exportProgress.textContent =
-        `✓ PDF berhasil • ${size.width.toFixed(1)} × ${size.height.toFixed(1)} mm`;
-
-
-      setTimeout(
-        closeExport,
-        1400
-      );
+        "✓ PDF berhasil dibuat.";
 
 
     }catch(error){
 
       console.error(
-        "PDF EXPORT ERROR:",
+        "[PDF EXPORT ERROR]",
         error
       );
 
 
       exportProgress.textContent =
-        "✕ PDF export gagal.";
+        "✕ PDF gagal";
 
 
       alert(
@@ -6352,7 +5374,7 @@ $("exportPDF")
 
 
 /* =========================================================
-   STARTUP
+   START
 ========================================================= */
 
 updateSize();
@@ -6394,15 +5416,15 @@ canvas.style.setProperty(
 
 
 console.log(
-  "Premium Banner Studio — CLEAN BUILD"
+  "PREMIUM BANNER STUDIO — FINAL PHOTO PIPELINE READY"
 );
 
 console.log(
-  "Export: Preview → Master Bitmap → PNG / PDF"
+  "PHOTO: File → DataURL → background layer → master bitmap"
 );
 
 console.log(
-  "Image pipeline: File → DataURL → Preview → Export"
+  "EXPORT: Preview → Master → PNG / PDF"
 );
 
 </script>
