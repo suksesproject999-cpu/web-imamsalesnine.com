@@ -1,39 +1,56 @@
-```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#080a0d">
 <title>Premium Banner Studio</title>
 
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 
 <style>
+/* =========================================================
+   UI VARIABLES
+========================================================= */
 :root{
   --ui-bg:#07090c;
-  --ui-panel:#0e1217;
-  --ui-panel2:#151a21;
-  --ui-line:#28303a;
+  --ui-panel:#0d1116;
+  --ui-panel-2:#151a20;
+  --ui-panel-3:#1b2128;
+  --ui-line:#29313a;
   --ui-text:#f5f7fa;
-  --ui-muted:#89929e;
+  --ui-muted:#89929d;
 
   --bg:#090b0f;
-  --primary:#8cc63f;
+  --primary:#8CC63F;
   --secondary:#101419;
-  --accent:#d9ad55;
-  --text:#ffffff;
-  --muted:#c4c9d0;
-  --cta:#8cc63f;
+  --accent:#D9AD55;
+  --text:#FFFFFF;
+  --muted:#C4C9D0;
+  --cta:#8CC63F;
   --ctaText:#101010;
-  --border:#8cc63f;
+  --border:#8CC63F;
+
+  --img-zoom:100;
+  --img-x:0;
+  --img-y:0;
+  --overlay-left:.92;
+  --overlay-right:.30;
+  --pattern-opacity:.08;
 }
 
+/* =========================================================
+   RESET
+========================================================= */
 *{
   box-sizing:border-box;
 }
 
-html,body{
+html,
+body{
   margin:0;
+  padding:0;
+  width:100%;
   min-height:100%;
   background:var(--ui-bg);
   color:var(--ui-text);
@@ -47,7 +64,14 @@ html,body{
     sans-serif;
 }
 
-button,input,select,textarea{
+body{
+  overflow-x:hidden;
+}
+
+button,
+input,
+select,
+textarea{
   font:inherit;
 }
 
@@ -55,7 +79,15 @@ button{
   cursor:pointer;
 }
 
+img{
+  max-width:100%;
+}
+
+/* =========================================================
+   APP
+========================================================= */
 .app{
+  width:100%;
   min-height:100vh;
   display:grid;
   grid-template-columns:390px minmax(0,1fr);
@@ -64,14 +96,21 @@ button{
 /* =========================================================
    EDITOR
 ========================================================= */
-
 .editor{
+  width:390px;
   height:100vh;
-  overflow:auto;
-  background:
-    linear-gradient(180deg,#0d1116,#080b0f);
-  border-right:1px solid var(--ui-line);
+  position:sticky;
+  top:0;
+  overflow-y:auto;
+  overflow-x:hidden;
   padding:20px;
+  background:
+    linear-gradient(
+      180deg,
+      #0d1116 0%,
+      #080b0f 100%
+    );
+  border-right:1px solid var(--ui-line);
 }
 
 .editor::-webkit-scrollbar{
@@ -79,11 +118,18 @@ button{
 }
 
 .editor::-webkit-scrollbar-thumb{
-  background:#29313b;
-  border-radius:99px;
+  background:#303944;
+  border-radius:20px;
 }
 
-.logo-ui{
+.editor::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+/* =========================================================
+   UI BRAND
+========================================================= */
+.ui-brand{
   display:flex;
   align-items:center;
   gap:12px;
@@ -91,50 +137,60 @@ button{
   border-bottom:1px solid var(--ui-line);
 }
 
-.logo-ui-mark{
+.ui-brand-mark{
   width:44px;
   height:44px;
-  border-radius:14px;
-  background:
-    linear-gradient(135deg,var(--primary),#d9ff9e);
-  color:#101010;
+  flex:0 0 44px;
+  border-radius:13px;
   display:grid;
   place-items:center;
+  background:
+    linear-gradient(
+      135deg,
+      var(--primary),
+      #dfffaa
+    );
+  color:#111;
   font-weight:1000;
+  font-size:18px;
   box-shadow:
     0 10px 30px rgba(140,198,63,.18);
 }
 
-.logo-ui-title{
-  font-size:14px;
+.ui-brand-title{
+  font-size:13px;
   font-weight:950;
-  letter-spacing:1.2px;
+  letter-spacing:1.3px;
 }
 
-.logo-ui-sub{
+.ui-brand-sub{
+  margin-top:3px;
   color:var(--primary);
   font-size:9px;
-  font-weight:750;
-  letter-spacing:1.8px;
-  margin-top:3px;
+  font-weight:800;
+  letter-spacing:1.6px;
 }
 
+/* =========================================================
+   SECTIONS
+========================================================= */
 .section{
   margin-top:23px;
 }
 
 .section-head{
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
   margin-bottom:9px;
 }
 
 .section-head strong{
-  color:#dbe0e6;
+  color:#dfe4e9;
   font-size:10px;
-  text-transform:uppercase;
+  font-weight:900;
   letter-spacing:1.6px;
+  text-transform:uppercase;
 }
 
 .section-head span{
@@ -142,12 +198,15 @@ button{
   font-size:9px;
 }
 
+/* =========================================================
+   FORM
+========================================================= */
 label{
   display:block;
+  margin:9px 0 5px;
   color:#b8c0c9;
   font-size:10px;
   font-weight:700;
-  margin:9px 0 5px;
 }
 
 input,
@@ -155,12 +214,19 @@ select,
 textarea{
   width:100%;
   border:1px solid var(--ui-line);
+  border-radius:9px;
   outline:none;
+  padding:10px 11px;
   background:#151a20;
   color:#fff;
-  border-radius:9px;
-  padding:10px 11px;
-  transition:.2s;
+  transition:
+    border-color .18s,
+    box-shadow .18s;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:#606a75;
 }
 
 input:focus,
@@ -172,7 +238,7 @@ textarea:focus{
 }
 
 textarea{
-  min-height:65px;
+  min-height:68px;
   resize:vertical;
 }
 
@@ -188,19 +254,23 @@ textarea{
   gap:7px;
 }
 
+/* =========================================================
+   FILE INPUT
+========================================================= */
 .file{
-  border:1px dashed #414a55;
-  border-radius:10px;
   padding:12px;
   text-align:center;
-  color:#87909b;
+  border:1px dashed #424b56;
+  border-radius:10px;
+  color:#89929d;
   cursor:pointer;
-  transition:.2s;
+  transition:.18s;
 }
 
 .file:hover{
-  border-color:var(--primary);
   color:#fff;
+  border-color:var(--primary);
+  background:rgba(140,198,63,.035);
 }
 
 .file input{
@@ -208,35 +278,34 @@ textarea{
 }
 
 /* =========================================================
-   RATIO PRESETS
+   RATIO
 ========================================================= */
-
 .ratio-grid{
   display:grid;
-  grid-template-columns:repeat(4,1fr);
+  grid-template-columns:repeat(3,1fr);
   gap:6px;
 }
 
 .ratio{
   border:1px solid var(--ui-line);
-  background:#151a20;
-  color:#aeb5be;
   border-radius:8px;
   padding:9px 4px;
+  background:#151a20;
+  color:#9fa8b2;
   font-size:9px;
+  font-weight:750;
 }
 
 .ratio:hover,
 .ratio.active{
-  border-color:var(--primary);
   color:#fff;
+  border-color:var(--primary);
   background:#182018;
 }
 
 /* =========================================================
    PALETTE
 ========================================================= */
-
 .palette-grid{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -244,54 +313,59 @@ textarea{
 }
 
 .color-chip{
-  height:36px;
-  border-radius:8px;
-  border:1px solid rgba(255,255,255,.1);
-  position:relative;
+  height:38px;
   overflow:hidden;
+  position:relative;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:8px;
   cursor:pointer;
+  transition:.15s;
 }
 
 .color-chip:hover{
   transform:translateY(-1px);
+  border-color:rgba(255,255,255,.4);
 }
 
 .color-chip span{
   position:absolute;
-  inset:auto 0 0;
-  padding:3px;
+  left:0;
+  right:0;
+  bottom:0;
+  padding:3px 2px;
   text-align:center;
-  background:rgba(0,0,0,.45);
+  background:rgba(0,0,0,.5);
   color:#fff;
-  font-size:7px;
+  font-size:6px;
+  font-weight:800;
+  letter-spacing:.4px;
 }
 
 /* =========================================================
    COLOR FIELD
 ========================================================= */
-
 .color-field{
   display:grid;
-  grid-template-columns:48px 1fr;
+  grid-template-columns:48px minmax(0,1fr);
   gap:7px;
-  align-items:center;
 }
 
-.color-field input[type=color]{
+.color-field input[type="color"]{
+  width:48px;
   height:40px;
   padding:3px;
   cursor:pointer;
 }
 
-.color-field input[type=text]{
+.color-field input[type="text"]{
+  min-width:0;
   font-size:11px;
   text-transform:uppercase;
 }
 
 /* =========================================================
-   DESIGN CARDS
+   DESIGN GRID
 ========================================================= */
-
 .design-grid{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -299,79 +373,109 @@ textarea{
 }
 
 .design{
-  min-height:70px;
-  border:1px solid var(--ui-line);
-  background:#151a20;
-  border-radius:10px;
-  color:#aeb6c0;
+  min-height:76px;
   padding:7px;
   text-align:left;
-  transition:.2s;
+  border:1px solid var(--ui-line);
+  border-radius:10px;
+  background:#151a20;
+  color:#aeb6c0;
+  transition:.18s;
 }
 
 .design:hover{
-  border-color:#65707c;
+  border-color:#5d6874;
   transform:translateY(-1px);
 }
 
 .design.active{
   border-color:var(--primary);
-  background:
-    linear-gradient(145deg,#182018,#12161b);
+  background:#182018;
   color:#fff;
   box-shadow:
-    0 0 0 1px rgba(140,198,63,.18);
+    0 0 0 1px rgba(140,198,63,.15);
 }
 
 .design-preview{
-  height:28px;
-  border-radius:5px;
+  position:relative;
+  height:29px;
   margin-bottom:7px;
   overflow:hidden;
+  border-radius:5px;
   background:
-    linear-gradient(135deg,#222,#555);
-  position:relative;
+    linear-gradient(
+      135deg,
+      #1c2229,
+      #505863
+    );
 }
 
 .design-preview.wave::after{
   content:"";
   position:absolute;
+  top:-50%;
   right:-10%;
-  top:-40%;
   width:65%;
-  height:180%;
-  background:#8cc63f;
+  height:190%;
   border-radius:50%;
+  background:#8CC63F;
+}
+
+.design-preview.double::before{
+  content:"";
+  position:absolute;
+  top:-50%;
+  right:-5%;
+  width:65%;
+  height:190%;
+  border-radius:50%;
+  background:#d9ad55;
+}
+
+.design-preview.double::after{
+  content:"";
+  position:absolute;
+  top:-45%;
+  right:3%;
+  width:58%;
+  height:180%;
+  border-radius:50%;
+  background:#8CC63F;
 }
 
 .design-preview.angular::after{
   content:"";
   position:absolute;
-  right:0;
-  top:0;
-  border-left:35px solid transparent;
-  border-top:28px solid #8cc63f;
+  inset:0 0 0 50%;
+  background:#8CC63F;
+  clip-path:
+    polygon(
+      25% 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
 }
 
 .design-preview.split{
   background:
-    linear-gradient(90deg,#222 0 48%,#8cc63f 48% 51%,#ddd 51%);
+    linear-gradient(
+      90deg,
+      #252a31 0 47%,
+      #8CC63F 47% 51%,
+      #dfe4e9 51%
+    );
 }
 
 .design-preview.circle::after{
   content:"";
   position:absolute;
+  width:24px;
+  height:24px;
+  top:2px;
   right:8px;
-  top:4px;
-  width:20px;
-  height:20px;
   border-radius:50%;
-  background:#8cc63f;
-}
-
-.design-preview.glass{
-  background:
-    linear-gradient(135deg,#111,#39414d);
+  background:#8CC63F;
 }
 
 .design-preview.glass::after{
@@ -379,19 +483,19 @@ textarea{
   position:absolute;
   left:20%;
   top:4px;
-  width:45%;
+  width:50%;
   height:20px;
-  border-radius:7px;
-  background:rgba(255,255,255,.22);
   border:1px solid rgba(255,255,255,.35);
+  border-radius:6px;
+  background:rgba(255,255,255,.18);
 }
 
 .design-preview.racing{
   background:
     repeating-linear-gradient(
       -20deg,
-      #171717 0 7px,
-      #282828 7px 10px
+      #171717 0 6px,
+      #2b2b2b 6px 9px
     );
 }
 
@@ -403,49 +507,77 @@ textarea{
   width:45%;
   height:100%;
   background:#ef3d3d;
-  clip-path:polygon(25% 0,100% 0,75% 100%,0 100%);
+  clip-path:
+    polygon(
+      25% 0,
+      100% 0,
+      75% 100%,
+      0 100%
+    );
+}
+
+.design-preview.tech{
+  background:#0b1721;
+}
+
+.design-preview.tech::before,
+.design-preview.tech::after{
+  content:"";
+  position:absolute;
+  width:100%;
+  height:1px;
+  background:#00d7e9;
+  transform:rotate(-22deg);
+}
+
+.design-preview.tech::before{
+  top:10px;
+}
+
+.design-preview.tech::after{
+  top:19px;
+  opacity:.45;
 }
 
 .design-name{
   font-size:9px;
-  font-weight:800;
+  font-weight:850;
 }
 
 .design-desc{
-  font-size:7px;
-  color:#69737e;
   margin-top:2px;
+  color:#69737e;
+  font-size:7px;
 }
 
 /* =========================================================
-   EFFECT CONTROLS
+   RANGES
 ========================================================= */
-
 .range-row{
   display:grid;
-  grid-template-columns:1fr 45px;
-  gap:8px;
+  grid-template-columns:minmax(0,1fr) 47px;
   align-items:center;
+  gap:8px;
 }
 
-input[type=range]{
+input[type="range"]{
+  width:100%;
   padding:0;
   accent-color:var(--primary);
 }
 
 .range-value{
-  text-align:center;
+  padding:7px 2px;
   border:1px solid var(--ui-line);
   border-radius:7px;
-  padding:7px 2px;
+  text-align:center;
   color:#b9c0c8;
   font-size:9px;
 }
 
 /* =========================================================
-   BUTTONS
+   ACTIONS
 ========================================================= */
-
 .actions{
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -454,11 +586,11 @@ input[type=range]{
 }
 
 .btn{
+  padding:12px;
   border:0;
   border-radius:10px;
-  padding:12px;
   font-weight:900;
-  transition:.2s;
+  transition:.18s;
 }
 
 .btn:hover{
@@ -466,99 +598,152 @@ input[type=range]{
 }
 
 .btn-dark{
-  background:#20262e;
   color:#fff;
+  background:#20262e;
   border:1px solid #303842;
 }
 
 .btn-primary{
-  background:var(--primary);
   color:#101010;
+  background:var(--primary);
 }
 
 .btn-full{
-  grid-column:1/-1;
+  grid-column:1 / -1;
 }
 
 /* =========================================================
    STAGE
 ========================================================= */
-
 .stage{
   min-width:0;
-  height:100vh;
+  min-height:100vh;
   display:flex;
   flex-direction:column;
   background:
     radial-gradient(
-      circle at 50% 35%,
-      #1c232d 0,
+      circle at 50% 30%,
+      #1c232c 0,
       #0b0f14 45%,
       #07090c 100%
     );
 }
 
 .stagebar{
-  height:68px;
-  flex-shrink:0;
-  border-bottom:1px solid var(--ui-line);
+  min-height:68px;
+  flex:0 0 68px;
+  padding:0 24px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 24px;
+  border-bottom:1px solid var(--ui-line);
 }
 
-.stagebar-left{
+.stage-left{
   color:#858e99;
   font-size:10px;
   letter-spacing:1.4px;
 }
 
-.stagebar-right{
+.stage-right{
   display:flex;
   align-items:center;
-  gap:12px;
+  gap:14px;
+  color:#d9dde2;
+  font-size:11px;
 }
 
 .live{
   color:var(--primary);
-  font-size:10px;
-  font-weight:850;
+  font-weight:900;
 }
 
+.preview-tools{
+  display:flex;
+  gap:5px;
+}
+
+.preview-tool{
+  padding:6px 8px;
+  border:1px solid var(--ui-line);
+  border-radius:7px;
+  background:#151a20;
+  color:#aeb6c0;
+  font-size:8px;
+}
+
+.preview-tool:hover{
+  color:#fff;
+  border-color:var(--primary);
+}
+
+/* =========================================================
+   PREVIEW AREA
+========================================================= */
 .preview-area{
   flex:1;
   min-height:0;
   overflow:auto;
+  padding:40px;
   display:flex;
-  justify-content:center;
   align-items:center;
-  padding:45px;
+  justify-content:center;
+}
+
+.preview-area.fullscreen{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  padding:30px;
+  background:#05070a;
 }
 
 .preview-shell{
   width:min(1250px,100%);
+  max-width:1250px;
+  margin:auto;
+  transition:.2s;
 }
 
+.preview-area.fit .preview-shell{
+  width:min(1250px,100%);
+}
+
+.preview-area.zoom100 .preview-shell{
+  width:1000px;
+  max-width:none;
+}
+
+/* =========================================================
+   CANVAS
+========================================================= */
 .canvas{
   width:100%;
-  aspect-ratio:3/1;
+  max-width:100%;
+  aspect-ratio:3 / 1;
   position:relative;
   overflow:hidden;
   isolation:isolate;
   background:var(--bg);
   color:var(--text);
   box-shadow:
-    0 35px 100px rgba(0,0,0,.58);
+    0 35px 100px rgba(0,0,0,.6);
 }
+
+/*
+  Important:
+  Jangan pakai min-width.
+  Ini membuat mobile tetap responsif.
+*/
 
 .canvas-bg{
   position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
   z-index:-8;
+  inset:-1%;
+  width:102%;
+  height:102%;
+  max-width:none;
+  object-fit:cover;
   transform:
     translate(
       calc(var(--img-x) * 1%),
@@ -573,7 +758,7 @@ input[type=range]{
 .base-bg{
   position:absolute;
   inset:0;
-  z-index:-9;
+  z-index:-10;
   background:var(--bg);
 }
 
@@ -584,52 +769,59 @@ input[type=range]{
   background:
     linear-gradient(
       90deg,
-      rgba(0,0,0,var(--overlay-left)),
-      rgba(0,0,0,var(--overlay-right))
+      rgba(0,0,0,var(--overlay-left)) 0%,
+      rgba(0,0,0,.55) 42%,
+      rgba(0,0,0,var(--overlay-right)) 100%
     );
-}
-
-.noise{
-  position:absolute;
-  inset:0;
-  z-index:30;
-  pointer-events:none;
-  opacity:.045;
-  background-image:
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
 }
 
 .grid-pattern{
   position:absolute;
   inset:0;
   z-index:-5;
+  pointer-events:none;
   opacity:var(--pattern-opacity);
   background-image:
     linear-gradient(
-      rgba(255,255,255,.06) 1px,
+      rgba(255,255,255,.07) 1px,
       transparent 1px
     ),
     linear-gradient(
       90deg,
-      rgba(255,255,255,.06) 1px,
+      rgba(255,255,255,.07) 1px,
       transparent 1px
     );
-  background-size:40px 40px;
+  background-size:42px 42px;
+  -webkit-mask-image:
+    linear-gradient(
+      to bottom,
+      #000,
+      transparent
+    );
   mask-image:
     linear-gradient(
       to bottom,
-      black,
+      #000,
       transparent
     );
 }
 
-/* =========================================================
-   BRAND
-========================================================= */
+.noise{
+  position:absolute;
+  inset:0;
+  z-index:50;
+  pointer-events:none;
+  opacity:.035;
+  background-image:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
 
+/* =========================================================
+   BRAND ON CANVAS
+========================================================= */
 .brand-lock{
   position:absolute;
-  z-index:10;
+  z-index:12;
   top:7%;
   right:5%;
   text-align:right;
@@ -638,76 +830,78 @@ input[type=range]{
 .brand-logo{
   display:none;
   width:clamp(50px,8vw,120px);
-  max-height:60px;
+  height:auto;
+  max-height:65px;
   object-fit:contain;
   margin:0 0 8px auto;
 }
 
 .brand-title{
-  font-size:clamp(11px,1.7vw,27px);
+  color:var(--text);
+  font-size:clamp(11px,1.7vw,28px);
   font-weight:950;
   letter-spacing:2px;
   text-transform:uppercase;
 }
 
 .brand-sub{
-  color:var(--primary);
-  font-size:clamp(6px,.7vw,11px);
-  font-weight:800;
-  letter-spacing:1.8px;
   margin-top:5px;
+  color:var(--primary);
+  font-size:clamp(6px,.72vw,11px);
+  font-weight:850;
+  letter-spacing:1.8px;
 }
 
 /* =========================================================
-   CONTENT
+   COPY
 ========================================================= */
-
 .copy{
   position:absolute;
-  z-index:10;
+  z-index:12;
   left:7%;
   top:50%;
-  transform:translateY(-50%);
   width:53%;
+  transform:translateY(-50%);
 }
 
 .kicker{
+  margin-bottom:11px;
   color:var(--primary);
   font-size:clamp(7px,.9vw,13px);
   font-weight:950;
   letter-spacing:3px;
   text-transform:uppercase;
-  margin-bottom:11px;
 }
 
 .headline{
+  color:var(--text);
   font-size:clamp(24px,4.6vw,74px);
   line-height:.9;
   font-weight:1000;
   letter-spacing:-3px;
   text-transform:uppercase;
-  max-width:900px;
+  overflow-wrap:anywhere;
 }
 
 .subtitle{
+  max-width:580px;
+  margin-top:15px;
   color:var(--muted);
   font-size:clamp(7px,1vw,15px);
-  line-height:1.55;
-  max-width:570px;
-  margin-top:15px;
+  line-height:1.5;
+  white-space:pre-line;
 }
 
 .badges{
   display:flex;
   align-items:center;
-  gap:7px;
   flex-wrap:wrap;
+  gap:7px;
   margin-top:19px;
 }
 
 .badge{
   display:inline-flex;
-  align-items:center;
   padding:8px 12px;
   border:1px solid var(--primary);
   color:var(--primary);
@@ -724,100 +918,87 @@ input[type=range]{
   color:var(--ctaText);
   font-size:clamp(6px,.7vw,11px);
   font-weight:950;
-  letter-spacing:.5px;
   text-transform:uppercase;
 }
 
 /* =========================================================
    CONTACT
 ========================================================= */
-
 .contact{
   position:absolute;
-  z-index:10;
+  z-index:12;
   right:5%;
   bottom:7%;
   text-align:right;
 }
 
 .contact-name{
+  color:var(--text);
   font-size:clamp(8px,1.2vw,18px);
   font-weight:950;
 }
 
 .contact-role{
+  margin-top:3px;
   color:var(--muted);
   font-size:clamp(6px,.7vw,11px);
-  margin-top:3px;
 }
 
 .contact-phone{
+  margin-top:4px;
   color:var(--primary);
   font-size:clamp(6px,.7vw,11px);
   font-weight:850;
-  margin-top:4px;
 }
 
 /* =========================================================
-   COMMON DECOR
+   DECOR
 ========================================================= */
-
 .edge{
   position:absolute;
-  z-index:9;
+  z-index:11;
   left:0;
   bottom:0;
-  width:35%;
+  width:34%;
   height:4px;
   background:var(--primary);
+}
+
+.frame{
+  position:absolute;
+  z-index:10;
+  inset:13px;
+  pointer-events:none;
+  border:1px solid rgba(255,255,255,.12);
 }
 
 .glow{
   position:absolute;
   z-index:-4;
-  width:45%;
-  height:80%;
   right:-8%;
   top:-15%;
+  width:50%;
+  height:90%;
   border-radius:50%;
   background:
     radial-gradient(
       circle,
-      color-mix(in srgb,var(--primary) 38%,transparent),
+      rgba(140,198,63,.28),
       transparent 68%
     );
   filter:blur(20px);
 }
 
-.frame{
-  position:absolute;
-  inset:12px;
-  z-index:8;
-  pointer-events:none;
-  border:1px solid color-mix(
-    in srgb,
-    var(--border) 35%,
-    transparent
-  );
-}
-
 /* =========================================================
-   DESIGN: WAVE
+   WAVE SVG
 ========================================================= */
-
-.design-wave .wave-svg,
-.design-doublewave .wave-svg,
-.design-split .wave-svg{
-  display:block;
-}
-
 .wave-svg{
   display:none;
   position:absolute;
   inset:0;
+  z-index:-2;
   width:100%;
   height:100%;
-  z-index:-2;
   pointer-events:none;
 }
 
@@ -827,58 +1008,40 @@ input[type=range]{
 
 .wave-accent{
   fill:var(--primary);
-  opacity:.95;
+}
+
+.design-wave .wave-svg,
+.design-doublewave .wave-svg{
+  display:block;
 }
 
 .design-wave .copy{
   width:45%;
 }
 
-.design-wave .brand-lock{
-  right:4%;
-}
-
-.design-wave .edge{
-  width:24%;
-}
-
-/* =========================================================
-   DOUBLE WAVE
-========================================================= */
-
 .design-doublewave .copy{
-  left:6%;
-  width:48%;
-}
-
-.design-doublewave .wave-main{
-  fill:var(--secondary);
-}
-
-.design-doublewave .wave-accent{
-  fill:var(--primary);
-}
-
-.design-doublewave .headline{
-  letter-spacing:-2px;
+  width:47%;
 }
 
 /* =========================================================
    ANGULAR
 ========================================================= */
-
-.angular-shape{
+.angular-main,
+.angular-accent{
   display:none;
   position:absolute;
-  z-index:-3;
-  right:0;
+  z-index:-2;
   top:0;
-  width:52%;
   height:100%;
+}
+
+.angular-main{
+  right:0;
+  width:53%;
   background:var(--secondary);
   clip-path:
     polygon(
-      20% 0,
+      21% 0,
       100% 0,
       100% 100%,
       0 100%
@@ -886,43 +1049,37 @@ input[type=range]{
 }
 
 .angular-accent{
-  display:none;
-  position:absolute;
-  z-index:-2;
-  right:42%;
-  top:0;
+  right:44%;
   width:8%;
-  height:100%;
   background:var(--primary);
   clip-path:
     polygon(
-      45% 0,
+      42% 0,
       100% 0,
-      55% 100%,
+      57% 100%,
       0 100%
     );
 }
 
-.design-angular .angular-shape,
+.design-angular .angular-main,
 .design-angular .angular-accent{
   display:block;
 }
 
 .design-angular .copy{
-  width:48%;
+  width:49%;
 }
 
 /* =========================================================
    SPLIT
 ========================================================= */
-
 .split-panel{
   display:none;
   position:absolute;
   z-index:-2;
   right:0;
   top:0;
-  width:48%;
+  width:49%;
   height:100%;
   background:var(--secondary);
 }
@@ -932,26 +1089,21 @@ input[type=range]{
 }
 
 .design-split .copy{
-  width:47%;
-}
-
-.design-split .brand-lock{
-  right:4%;
+  width:46%;
 }
 
 /* =========================================================
    CIRCLE
 ========================================================= */
-
 .circle-panel{
   display:none;
   position:absolute;
   z-index:-3;
   right:6%;
   top:50%;
-  transform:translateY(-50%);
-  width:48%;
+  width:47%;
   aspect-ratio:1;
+  transform:translateY(-50%);
   border-radius:50%;
   background:
     radial-gradient(
@@ -967,33 +1119,28 @@ input[type=range]{
 }
 
 .design-circle .copy{
-  width:49%;
+  width:48%;
 }
 
 /* =========================================================
    GLASS
 ========================================================= */
-
 .glass-panel{
   display:none;
   position:absolute;
-  z-index:3;
+  z-index:4;
   left:5%;
   top:14%;
   width:53%;
   height:72%;
   border-radius:22px;
-  background:
-    linear-gradient(
-      135deg,
-      rgba(255,255,255,.17),
-      rgba(255,255,255,.035)
-    );
-  border:1px solid rgba(255,255,255,.24);
-  backdrop-filter:blur(15px);
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
   box-shadow:
-    inset 0 1px rgba(255,255,255,.18),
-    0 20px 60px rgba(0,0,0,.25);
+    inset 0 1px rgba(255,255,255,.17),
+    0 25px 70px rgba(0,0,0,.25);
 }
 
 .design-glass .glass-panel{
@@ -1002,33 +1149,27 @@ input[type=range]{
 
 .design-glass .copy{
   left:9%;
-  width:45%;
-  z-index:12;
-}
-
-.design-glass .brand-lock{
-  z-index:12;
+  width:44%;
 }
 
 /* =========================================================
    SPOTLIGHT
 ========================================================= */
-
 .spotlight{
   display:none;
   position:absolute;
   z-index:-3;
   right:7%;
   top:50%;
+  width:46%;
+  height:88%;
   transform:translateY(-50%);
-  width:45%;
-  height:85%;
   border-radius:50%;
   background:
     radial-gradient(
       ellipse,
-      rgba(255,255,255,.23) 0,
-      rgba(255,255,255,.06) 35%,
+      rgba(255,255,255,.22) 0,
+      rgba(255,255,255,.06) 34%,
       transparent 70%
     );
   filter:blur(3px);
@@ -1038,21 +1179,16 @@ input[type=range]{
   display:block;
 }
 
-.design-spotlight .copy{
-  width:48%;
-}
-
 /* =========================================================
    LUXURY
 ========================================================= */
-
 .design-luxury .headline{
   font-family:
     Georgia,
     "Times New Roman",
     serif;
   font-weight:700;
-  letter-spacing:-1.5px;
+  letter-spacing:-1px;
   text-transform:none;
 }
 
@@ -1071,23 +1207,22 @@ input[type=range]{
 /* =========================================================
    RACING
 ========================================================= */
-
 .racing-stripe{
   display:none;
   position:absolute;
   z-index:-2;
-  right:3%;
+  right:2%;
   top:-10%;
   width:34%;
   height:120%;
+  opacity:.8;
+  transform:skewX(-15deg);
   background:
     repeating-linear-gradient(
       -17deg,
-      var(--primary) 0 10px,
-      transparent 10px 20px
+      var(--primary) 0 9px,
+      transparent 9px 18px
     );
-  opacity:.8;
-  transform:skewX(-15deg);
 }
 
 .design-racing .racing-stripe{
@@ -1107,13 +1242,12 @@ input[type=range]{
 /* =========================================================
    CARBON
 ========================================================= */
-
 .carbon-pattern{
   display:none;
   position:absolute;
   inset:0;
   z-index:-4;
-  opacity:.28;
+  opacity:.25;
   background:
     repeating-linear-gradient(
       45deg,
@@ -1134,14 +1268,13 @@ input[type=range]{
 /* =========================================================
    FULL BLEED
 ========================================================= */
-
 .design-fullbleed .overlay{
   background:
     linear-gradient(
       90deg,
       rgba(0,0,0,.82),
-      rgba(0,0,0,.16),
-      rgba(0,0,0,.35)
+      rgba(0,0,0,.18),
+      rgba(0,0,0,.36)
     );
 }
 
@@ -1152,47 +1285,49 @@ input[type=range]{
 /* =========================================================
    EDITORIAL
 ========================================================= */
-
 .design-editorial .copy{
-  left:8%;
-  width:58%;
+  width:57%;
 }
 
 .design-editorial .headline{
-  font-family:Georgia,serif;
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
   font-weight:700;
-  text-transform:none;
   letter-spacing:-1px;
-}
-
-.design-editorial .headline::first-letter{
-  color:var(--primary);
+  text-transform:none;
 }
 
 /* =========================================================
    TECH
 ========================================================= */
-
 .tech-lines{
   display:none;
   position:absolute;
   z-index:-1;
   right:0;
   top:0;
-  width:55%;
+  width:56%;
   height:100%;
   background:
     linear-gradient(
       135deg,
-      transparent 0 44%,
-      var(--primary) 44.2% 44.6%,
-      transparent 44.8%
+      transparent 0 43%,
+      var(--primary) 43.2% 43.5%,
+      transparent 43.7%
     ),
     linear-gradient(
       135deg,
-      transparent 0 57%,
-      rgba(255,255,255,.2) 57.2% 57.5%,
-      transparent 57.7%
+      transparent 0 55%,
+      rgba(255,255,255,.2) 55.2% 55.5%,
+      transparent 55.7%
+    ),
+    linear-gradient(
+      135deg,
+      transparent 0 67%,
+      rgba(255,255,255,.1) 67.2% 67.5%,
+      transparent 67.7%
     );
 }
 
@@ -1201,36 +1336,22 @@ input[type=range]{
 }
 
 .design-tech .copy{
-  width:53%;
-}
-
-.design-tech .headline{
-  letter-spacing:-2px;
+  width:52%;
 }
 
 /* =========================================================
-   RESPONSIVE
+   MOBILE / TABLET
 ========================================================= */
-
-@media(max-width:1050px){
-
-  .app{
-    grid-template-columns:340px minmax(0,1fr);
-  }
-
-  .preview-area{
-    padding:25px;
-  }
-
-}
-
-@media(max-width:850px){
+@media(max-width:950px){
 
   .app{
     display:block;
   }
 
   .editor{
+    position:relative;
+    top:auto;
+    width:100%;
     height:auto;
     max-height:none;
     border-right:0;
@@ -1238,32 +1359,109 @@ input[type=range]{
   }
 
   .stage{
-    height:auto;
+    width:100%;
     min-height:80vh;
   }
 
   .preview-area{
+    width:100%;
+    min-width:0;
+    padding:25px 15px 40px;
+    overflow-x:hidden;
+    overflow-y:auto;
     align-items:flex-start;
-    padding:25px 12px;
   }
 
   .preview-shell{
     width:100%;
-    min-width:800px;
+    min-width:0;
+    max-width:100%;
+  }
+
+  .canvas{
+    width:100%;
+    min-width:0;
+    max-width:100%;
   }
 
 }
 
-@media(max-width:550px){
+/* =========================================================
+   SMALL MOBILE
+========================================================= */
+@media(max-width:600px){
 
   .editor{
     padding:15px;
   }
 
-  .preview-shell{
-    min-width:700px;
+  .stagebar{
+    min-height:62px;
+    height:auto;
+    flex:0 0 auto;
+    padding:13px 15px;
+    gap:10px;
   }
 
+  .stage-left{
+    max-width:45%;
+    line-height:1.3;
+  }
+
+  .stage-right{
+    gap:8px;
+  }
+
+  .preview-tools{
+    display:none;
+  }
+
+  .preview-area{
+    padding:18px 10px 35px;
+  }
+
+  .preview-shell{
+    width:100%;
+    min-width:0;
+  }
+
+  .canvas{
+    width:100%;
+  }
+
+  .design-grid{
+    grid-template-columns:1fr 1fr;
+  }
+
+}
+
+/* =========================================================
+   FULLSCREEN
+========================================================= */
+.preview-area.fullscreen .preview-shell{
+  width:min(1500px,100%);
+}
+
+.preview-area.fullscreen .canvas{
+  max-height:calc(100vh - 60px);
+}
+
+/* =========================================================
+   EXPORT-SAFE OVERRIDES
+   html2canvas lebih aman tanpa backdrop/filter tertentu.
+========================================================= */
+.exporting .glass-panel{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  background:rgba(255,255,255,.10) !important;
+}
+
+.exporting .glow{
+  filter:none !important;
+}
+
+.exporting .noise{
+  display:none !important;
 }
 </style>
 </head>
@@ -1275,20 +1473,23 @@ input[type=range]{
 <!-- =======================================================
      EDITOR
 ======================================================= -->
-
 <aside class="editor">
 
-  <div class="logo-ui">
-    <div class="logo-ui-mark">B</div>
+  <div class="ui-brand">
+    <div class="ui-brand-mark">B</div>
     <div>
-      <div class="logo-ui-title">PREMIUM BANNER STUDIO</div>
-      <div class="logo-ui-sub">AUTOMOTIVE • RETAIL • DISTRIBUTOR</div>
+      <div class="ui-brand-title">
+        PREMIUM BANNER STUDIO
+      </div>
+      <div class="ui-brand-sub">
+        AUTOMOTIVE • RETAIL • DISTRIBUTOR
+      </div>
     </div>
   </div>
 
 
   <!-- BRAND -->
-  <div class="section">
+  <section class="section">
 
     <div class="section-head">
       <strong>Brand Identity</strong>
@@ -1296,31 +1497,55 @@ input[type=range]{
     </div>
 
     <label>Nama toko / distributor</label>
-    <input id="brandName" value="NINE AUTOSERIES">
+    <input
+      id="brandName"
+      value="NINE AUTOSERIES"
+      placeholder="Nama toko / distributor"
+    >
 
     <label>Tagline / status</label>
-    <input id="brandRole" value="Official Distributor">
+    <input
+      id="brandRole"
+      value="Official Distributor"
+      placeholder="Official Distributor"
+    >
 
     <label>Nama sales</label>
-    <input id="salesName" value="IMAM_SALESFR">
+    <input
+      id="salesName"
+      value="IMAM_SALESFR"
+      placeholder="Nama sales"
+    >
 
     <label>Jabatan</label>
-    <input id="salesRole" value="Sales Representative">
+    <input
+      id="salesRole"
+      value="Sales Representative"
+      placeholder="Jabatan"
+    >
 
     <label>WhatsApp</label>
-    <input id="phone" value="08xxxxxxxxxx">
+    <input
+      id="phone"
+      value="08xxxxxxxxxx"
+      placeholder="08xxxxxxxxxx"
+    >
 
     <label>Logo</label>
     <label class="file">
-      Upload Logo
-      <input id="logo" type="file" accept="image/*">
+      + Upload Logo
+      <input
+        id="logo"
+        type="file"
+        accept="image/*"
+      >
     </label>
 
-  </div>
+  </section>
 
 
-  <!-- SIZE -->
-  <div class="section">
+  <!-- CANVAS -->
+  <section class="section">
 
     <div class="section-head">
       <strong>Canvas</strong>
@@ -1329,28 +1554,46 @@ input[type=range]{
 
     <div class="ratio-grid">
 
-      <button class="ratio active" data-ratio="3/1">
-        Banner 3:1
+      <button
+        class="ratio active"
+        data-ratio="3/1"
+      >
+        3 : 1
       </button>
 
-      <button class="ratio" data-ratio="4/1">
-        Wide 4:1
+      <button
+        class="ratio"
+        data-ratio="4/1"
+      >
+        4 : 1
       </button>
 
-      <button class="ratio" data-ratio="16/9">
-        16:9
+      <button
+        class="ratio"
+        data-ratio="16/9"
+      >
+        16 : 9
       </button>
 
-      <button class="ratio" data-ratio="1/1">
-        Square
+      <button
+        class="ratio"
+        data-ratio="1/1"
+      >
+        1 : 1
       </button>
 
-      <button class="ratio" data-ratio="4/3">
-        4:3
+      <button
+        class="ratio"
+        data-ratio="4/3"
+      >
+        4 : 3
       </button>
 
-      <button class="ratio" data-ratio="9/16">
-        Story
+      <button
+        class="ratio"
+        data-ratio="9/16"
+      >
+        9 : 16
       </button>
 
     </div>
@@ -1359,12 +1602,22 @@ input[type=range]{
 
       <div>
         <label>Width</label>
-        <input id="width" type="number" value="300">
+        <input
+          id="width"
+          type="number"
+          value="300"
+          min="1"
+        >
       </div>
 
       <div>
         <label>Height</label>
-        <input id="height" type="number" value="100">
+        <input
+          id="height"
+          type="number"
+          value="100"
+          min="1"
+        >
       </div>
 
       <div>
@@ -1379,11 +1632,11 @@ input[type=range]{
 
     </div>
 
-  </div>
+  </section>
 
 
   <!-- CONTENT -->
-  <div class="section">
+  <section class="section">
 
     <div class="section-head">
       <strong>Content</strong>
@@ -1391,426 +1644,668 @@ input[type=range]{
     </div>
 
     <label>Kicker</label>
-    <input id="kicker" value="PREMIUM AUTOMOTIVE">
+    <input
+      id="kicker"
+      value="PREMIUM AUTOMOTIVE"
+    >
 
     <label>Headline</label>
     <textarea id="headline">DRIVE YOUR NEXT</textarea>
 
     <label>Subheadline</label>
-    <textarea id="subtitle">
-Temukan produk automotive terbaik dengan pelayanan profesional.
-    </textarea>
+    <textarea id="subtitle">Temukan produk automotive terbaik dengan pelayanan profesional.</textarea>
 
     <div class="row2">
 
       <div>
-        <label>Badge / Promo</label>
-        <input id="badge" value="PROMO SPESIAL">
+        <label>Promo / Badge</label>
+        <input
+          id="badge"
+          value="PROMO SPESIAL"
+        >
       </div>
 
       <div>
         <label>CTA</label>
-        <input id="cta" value="HUBUNGI KAMI">
+        <input
+          id="cta"
+          value="HUBUNGI KAMI"
+        >
       </div>
 
     </div>
 
-  </div>
+  </section>
 
 
-  <!-- IMAGE -->
-  <div class="section">
+  <!-- VISUAL -->
+  <section class="section">
 
     <div class="section-head">
       <strong>Visual</strong>
       <span>04</span>
     </div>
 
-    <label>Background / Foto kendaraan</label>
+    <label>Foto background / kendaraan</label>
 
     <label class="file">
-      Upload Foto
-      <input id="photo" type="file" accept="image/*">
+      + Upload Foto
+      <input
+        id="photo"
+        type="file"
+        accept="image/*"
+      >
     </label>
 
-    <label>Image Zoom</label>
+    <label>Zoom Foto</label>
 
     <div class="range-row">
-      <input id="zoom" type="range" min="100" max="180" value="100">
-      <div class="range-value" id="zoomVal">100%</div>
+      <input
+        id="zoom"
+        type="range"
+        min="100"
+        max="180"
+        value="100"
+      >
+      <div
+        class="range-value"
+        id="zoomVal"
+      >
+        100%
+      </div>
     </div>
 
-    <label>Image Position X</label>
+    <label>Posisi X</label>
 
     <div class="range-row">
-      <input id="posX" type="range" min="-30" max="30" value="0">
-      <div class="range-value" id="posXVal">0</div>
+      <input
+        id="posX"
+        type="range"
+        min="-30"
+        max="30"
+        value="0"
+      >
+      <div
+        class="range-value"
+        id="posXVal"
+      >
+        0
+      </div>
     </div>
 
-    <label>Image Position Y</label>
+    <label>Posisi Y</label>
 
     <div class="range-row">
-      <input id="posY" type="range" min="-30" max="30" value="0">
-      <div class="range-value" id="posYVal">0</div>
+      <input
+        id="posY"
+        type="range"
+        min="-30"
+        max="30"
+        value="0"
+      >
+      <div
+        class="range-value"
+        id="posYVal"
+      >
+        0
+      </div>
     </div>
 
-  </div>
+  </section>
 
 
   <!-- BACKGROUND -->
-  <div class="section">
+  <section class="section">
 
     <div class="section-head">
-      <strong>Background</strong>
+      <strong>Background Color</strong>
       <span>05</span>
     </div>
 
-    <label>Background color</label>
-
     <div class="color-field">
-      <input id="bgColor" type="color" value="#090b0f">
-      <input id="bgHex" value="#090B0F">
+
+      <input
+        id="bgColor"
+        type="color"
+        value="#090B0F"
+      >
+
+      <input
+        id="bgHex"
+        value="#090B0F"
+      >
+
     </div>
 
-    <label>Background palette</label>
+    <label>Palette Background</label>
 
     <div class="palette-grid">
 
-      <div class="color-chip" data-target="bgColor" data-color="#050505" style="background:#050505"><span>BLACK</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#111827" style="background:#111827"><span>NAVY</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#1c1c1c" style="background:#1c1c1c"><span>GRAPHITE</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#292524" style="background:#292524"><span>CHARCOAL</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#ffffff" style="background:#fff"><span style="color:#111">WHITE</span></div>
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#050505"
+        style="background:#050505"
+      ><span>BLACK</span></div>
 
-      <div class="color-chip" data-target="bgColor" data-color="#0f172a" style="background:#0f172a"><span>NAVY</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#172554" style="background:#172554"><span>ROYAL</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#3f0d0d" style="background:#3f0d0d"><span>BURGUNDY</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#431407" style="background:#431407"><span>BROWN</span></div>
-      <div class="color-chip" data-target="bgColor" data-color="#052e16" style="background:#052e16"><span>GREEN</span></div>
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#111827"
+        style="background:#111827"
+      ><span>NAVY</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#1C1C1C"
+        style="background:#1C1C1C"
+      ><span>GRAPHITE</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#292524"
+        style="background:#292524"
+      ><span>CHARCOAL</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#FFFFFF"
+        style="background:#FFFFFF"
+      ><span style="color:#111">WHITE</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#172554"
+        style="background:#172554"
+      ><span>ROYAL</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#3F0D0D"
+        style="background:#3F0D0D"
+      ><span>BURGUNDY</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#431407"
+        style="background:#431407"
+      ><span>BROWN</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#052E16"
+        style="background:#052E16"
+      ><span>GREEN</span></div>
+
+      <div
+        class="color-chip"
+        data-target="bgColor"
+        data-color="#0F172A"
+        style="background:#0F172A"
+      ><span>SLATE</span></div>
 
     </div>
 
-  </div>
+  </section>
 
 
-  <!-- COLOR SYSTEM -->
-  <div class="section">
+  <!-- ELEMENT COLORS -->
+  <section class="section">
 
     <div class="section-head">
-      <strong>Design Color System</strong>
+      <strong>Element Colors</strong>
       <span>06</span>
     </div>
 
-    <label>Primary</label>
+    <label>Primary / Main Accent</label>
 
     <div class="color-field">
-      <input id="primary" type="color" value="#8CC63F">
-      <input id="primaryHex" value="#8CC63F">
+      <input
+        id="primary"
+        type="color"
+        value="#8CC63F"
+      >
+      <input
+        id="primaryHex"
+        value="#8CC63F"
+      >
     </div>
 
-    <label>Secondary</label>
+    <label>Secondary / Panel</label>
 
     <div class="color-field">
-      <input id="secondary" type="color" value="#101419">
-      <input id="secondaryHex" value="#101419">
+      <input
+        id="secondary"
+        type="color"
+        value="#101419"
+      >
+      <input
+        id="secondaryHex"
+        value="#101419"
+      >
     </div>
 
-    <label>Accent</label>
+    <label>Accent / Highlight</label>
 
     <div class="color-field">
-      <input id="accent" type="color" value="#D9AD55">
-      <input id="accentHex" value="#D9AD55">
+      <input
+        id="accent"
+        type="color"
+        value="#D9AD55"
+      >
+      <input
+        id="accentHex"
+        value="#D9AD55"
+      >
     </div>
 
-    <label>Headline / Text</label>
+    <label>Headline / Main Text</label>
 
     <div class="color-field">
-      <input id="text" type="color" value="#FFFFFF">
-      <input id="textHex" value="#FFFFFF">
+      <input
+        id="text"
+        type="color"
+        value="#FFFFFF"
+      >
+      <input
+        id="textHex"
+        value="#FFFFFF"
+      >
     </div>
 
     <label>Secondary Text</label>
 
     <div class="color-field">
-      <input id="muted" type="color" value="#C4C9D0">
-      <input id="mutedHex" value="#C4C9D0">
+      <input
+        id="muted"
+        type="color"
+        value="#C4C9D0"
+      >
+      <input
+        id="mutedHex"
+        value="#C4C9D0"
+      >
     </div>
 
     <label>CTA Background</label>
 
     <div class="color-field">
-      <input id="ctaColor" type="color" value="#8CC63F">
-      <input id="ctaColorHex" value="#8CC63F">
+      <input
+        id="ctaColor"
+        type="color"
+        value="#8CC63F"
+      >
+      <input
+        id="ctaColorHex"
+        value="#8CC63F"
+      >
     </div>
 
     <label>CTA Text</label>
 
     <div class="color-field">
-      <input id="ctaText" type="color" value="#101010">
-      <input id="ctaTextHex" value="#101010">
+      <input
+        id="ctaText"
+        type="color"
+        value="#101010"
+      >
+      <input
+        id="ctaTextHex"
+        value="#101010"
+      >
     </div>
 
     <label>Border / Line</label>
 
     <div class="color-field">
-      <input id="border" type="color" value="#8CC63F">
-      <input id="borderHex" value="#8CC63F">
+      <input
+        id="border"
+        type="color"
+        value="#8CC63F"
+      >
+      <input
+        id="borderHex"
+        value="#8CC63F"
+      >
     </div>
 
-  </div>
+  </section>
 
 
-  <!-- QUICK PALETTES -->
-  <div class="section">
+  <!-- QUICK PALETTE -->
+  <section class="section">
 
     <div class="section-head">
       <strong>Quick Palette</strong>
-      <span>08</span>
+      <span>07</span>
     </div>
 
     <div class="palette-grid">
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#8CC63F"
         data-s="#101419"
         data-a="#D9AD55"
         data-t="#FFFFFF"
         data-m="#C4C9D0"
-        style="background:linear-gradient(135deg,#8CC63F,#101419)">
-        <span>NINE</span>
-      </div>
+        style="background:linear-gradient(135deg,#8CC63F,#101419)"
+      ><span>NINE</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#D9AD55"
-        data-s="#0A0A0A"
+        data-s="#090909"
         data-a="#FFFFFF"
         data-t="#FFFFFF"
-        data-m="#D4D4D4"
-        style="background:linear-gradient(135deg,#D9AD55,#050505)">
-        <span>LUXURY</span>
-      </div>
+        data-m="#CFCFCF"
+        style="background:linear-gradient(135deg,#D9AD55,#050505)"
+      ><span>LUXURY</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#EF3D3D"
         data-s="#111111"
         data-a="#FFFFFF"
         data-t="#FFFFFF"
-        data-m="#C7C7C7"
-        style="background:linear-gradient(135deg,#EF3D3D,#111)">
-        <span>RACING</span>
-      </div>
+        data-m="#CCCCCC"
+        style="background:linear-gradient(135deg,#EF3D3D,#111111)"
+      ><span>RACING</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#277CFF"
-        data-s="#08111F"
+        data-s="#07111F"
         data-a="#00D7E9"
         data-t="#FFFFFF"
-        data-m="#C4D3E8"
-        style="background:linear-gradient(135deg,#277CFF,#08111F)">
-        <span>TECH</span>
-      </div>
+        data-m="#C7D6E9"
+        style="background:linear-gradient(135deg,#277CFF,#07111F)"
+      ><span>TECH</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#A855F7"
         data-s="#100819"
         data-a="#00D7E9"
         data-t="#FFFFFF"
-        data-m="#D7C6E8"
-        style="background:linear-gradient(135deg,#A855F7,#100819)">
-        <span>NEON</span>
-      </div>
+        data-m="#D8C7E8"
+        style="background:linear-gradient(135deg,#A855F7,#100819)"
+      ><span>NEON</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#00B878"
         data-s="#06130F"
         data-a="#8CC63F"
         data-t="#FFFFFF"
-        data-m="#B8D7CD"
-        style="background:linear-gradient(135deg,#00B878,#06130F)">
-        <span>EMERALD</span>
-      </div>
+        data-m="#BEDBD1"
+        style="background:linear-gradient(135deg,#00B878,#06130F)"
+      ><span>EMERALD</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#FF7A18"
         data-s="#17100A"
         data-a="#FFD166"
         data-t="#FFFFFF"
         data-m="#E4C6A8"
-        style="background:linear-gradient(135deg,#FF7A18,#17100A)">
-        <span>ORANGE</span>
-      </div>
+        style="background:linear-gradient(135deg,#FF7A18,#17100A)"
+      ><span>ORANGE</span></div>
 
-      <div class="color-chip quick-palette"
-        data-p="#C7CCD3"
-        data-s="#181B20"
-        data-a="#FFFFFF"
-        data-t="#FFFFFF"
-        data-m="#B9BEC5"
-        style="background:linear-gradient(135deg,#C7CCD3,#181B20)">
-        <span>TITANIUM</span>
-      </div>
-
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
         data-p="#B77A3B"
         data-s="#160D07"
         data-a="#E8C39E"
         data-t="#FFFFFF"
         data-m="#D0B9A5"
-        style="background:linear-gradient(135deg,#B77A3B,#160D07)">
-        <span>BRONZE</span>
-      </div>
+        style="background:linear-gradient(135deg,#B77A3B,#160D07)"
+      ><span>BRONZE</span></div>
 
-      <div class="color-chip quick-palette"
+      <div
+        class="color-chip quick-palette"
+        data-p="#C7CCD3"
+        data-s="#181B20"
+        data-a="#FFFFFF"
+        data-t="#FFFFFF"
+        data-m="#B9BEC5"
+        style="background:linear-gradient(135deg,#C7CCD3,#181B20)"
+      ><span>TITANIUM</span></div>
+
+      <div
+        class="color-chip quick-palette"
         data-p="#111111"
         data-s="#FFFFFF"
         data-a="#8CC63F"
         data-t="#111111"
         data-m="#555555"
-        style="background:linear-gradient(135deg,#111,#fff)">
-        <span style="color:#111">MONO</span>
-      </div>
+        style="background:linear-gradient(135deg,#111111,#FFFFFF)"
+      ><span style="color:#111">MONO</span></div>
 
     </div>
 
-  </div>
+  </section>
 
 
-  <!-- DESIGN -->
-  <div class="section">
+  <!-- DESIGNS -->
+  <section class="section">
 
     <div class="section-head">
       <strong>Premium Composition</strong>
-      <span>09</span>
+      <span>08</span>
     </div>
 
     <div class="design-grid">
 
-      <button class="design active" data-design="wave">
+      <button
+        class="design active"
+        data-design="wave"
+      >
         <div class="design-preview wave"></div>
         <div class="design-name">Premium Wave</div>
         <div class="design-desc">Organic curved split</div>
       </button>
 
-      <button class="design" data-design="doublewave">
-        <div class="design-preview wave"></div>
+      <button
+        class="design"
+        data-design="doublewave"
+      >
+        <div class="design-preview double"></div>
         <div class="design-name">Double Wave</div>
         <div class="design-desc">Layered premium curve</div>
       </button>
 
-      <button class="design" data-design="angular">
+      <button
+        class="design"
+        data-design="angular"
+      >
         <div class="design-preview angular"></div>
         <div class="design-name">Angular</div>
         <div class="design-desc">Sharp automotive cut</div>
       </button>
 
-      <button class="design" data-design="split">
+      <button
+        class="design"
+        data-design="split"
+      >
         <div class="design-preview split"></div>
         <div class="design-name">Split</div>
-        <div class="design-desc">Balanced two-panel</div>
+        <div class="design-desc">Balanced two panel</div>
       </button>
 
-      <button class="design" data-design="circle">
+      <button
+        class="design"
+        data-design="circle"
+      >
         <div class="design-preview circle"></div>
-        <div class="design-name">Circle</div>
-        <div class="design-desc">Hero focal composition</div>
+        <div class="design-name">Circle Hero</div>
+        <div class="design-desc">Focal composition</div>
       </button>
 
-      <button class="design" data-design="glass">
+      <button
+        class="design"
+        data-design="glass"
+      >
         <div class="design-preview glass"></div>
         <div class="design-name">Glass</div>
-        <div class="design-desc">Premium glass panel</div>
+        <div class="design-desc">Luxury glass panel</div>
       </button>
 
-      <button class="design" data-design="spotlight">
+      <button
+        class="design"
+        data-design="spotlight"
+      >
         <div class="design-preview circle"></div>
         <div class="design-name">Spotlight</div>
         <div class="design-desc">Product illumination</div>
       </button>
 
-      <button class="design" data-design="luxury">
+      <button
+        class="design"
+        data-design="luxury"
+      >
         <div class="design-preview"></div>
         <div class="design-name">Luxury</div>
-        <div class="design-desc">Elegant editorial</div>
+        <div class="design-desc">Editorial premium</div>
       </button>
 
-      <button class="design" data-design="racing">
+      <button
+        class="design"
+        data-design="racing"
+      >
         <div class="design-preview racing"></div>
         <div class="design-name">Racing</div>
         <div class="design-desc">Performance speed</div>
       </button>
 
-      <button class="design" data-design="carbon">
+      <button
+        class="design"
+        data-design="carbon"
+      >
         <div class="design-preview racing"></div>
-        <div class="design-name">Carbon</div>
-        <div class="design-desc">Dark technical</div>
+        <div class="design-name">Dark Carbon</div>
+        <div class="design-desc">Technical texture</div>
       </button>
 
-      <button class="design" data-design="fullbleed">
+      <button
+        class="design"
+        data-design="fullbleed"
+      >
         <div class="design-preview"></div>
         <div class="design-name">Full Bleed</div>
         <div class="design-desc">Image dominant</div>
       </button>
 
-      <button class="design" data-design="editorial">
+      <button
+        class="design"
+        data-design="editorial"
+      >
         <div class="design-preview"></div>
         <div class="design-name">Editorial</div>
         <div class="design-desc">Magazine aesthetic</div>
       </button>
 
-      <button class="design" data-design="tech">
-        <div class="design-preview angular"></div>
+      <button
+        class="design"
+        data-design="tech"
+      >
+        <div class="design-preview tech"></div>
         <div class="design-name">Tech</div>
         <div class="design-desc">Digital performance</div>
       </button>
 
     </div>
 
-  </div>
+  </section>
 
 
-  <!-- EFFECT -->
-  <div class="section">
+  <!-- EFFECTS -->
+  <section class="section">
 
     <div class="section-head">
       <strong>Effects</strong>
-      <span>10</span>
+      <span>09</span>
     </div>
 
     <label>Overlay Left</label>
 
     <div class="range-row">
-      <input id="overlayLeft" type="range" min="0" max="100" value="92">
-      <div class="range-value" id="overlayLeftVal">92</div>
+      <input
+        id="overlayLeft"
+        type="range"
+        min="0"
+        max="100"
+        value="92"
+      >
+      <div
+        class="range-value"
+        id="overlayLeftVal"
+      >92</div>
     </div>
 
     <label>Overlay Right</label>
 
     <div class="range-row">
-      <input id="overlayRight" type="range" min="0" max="100" value="30">
-      <div class="range-value" id="overlayRightVal">30</div>
+      <input
+        id="overlayRight"
+        type="range"
+        min="0"
+        max="100"
+        value="30"
+      >
+      <div
+        class="range-value"
+        id="overlayRightVal"
+      >30</div>
     </div>
 
     <label>Pattern</label>
 
     <div class="range-row">
-      <input id="pattern" type="range" min="0" max="50" value="10">
-      <div class="range-value" id="patternVal">10</div>
+      <input
+        id="pattern"
+        type="range"
+        min="0"
+        max="50"
+        value="8"
+      >
+      <div
+        class="range-value"
+        id="patternVal"
+      >8</div>
     </div>
 
-  </div>
+  </section>
 
 
+  <!-- ACTIONS -->
   <div class="actions">
 
-    <button class="btn btn-dark" id="reset">
+    <button
+      id="reset"
+      class="btn btn-dark"
+    >
       RESET
     </button>
 
-    <button class="btn btn-primary" id="export">
+    <button
+      id="export"
+      class="btn btn-primary"
+    >
       EXPORT PNG
     </button>
 
-    <button class="btn btn-dark btn-full" id="random">
+    <button
+      id="random"
+      class="btn btn-dark btn-full"
+    >
       ✦ RANDOM PREMIUM CONCEPT
     </button>
 
@@ -1822,38 +2317,62 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 <!-- =======================================================
      STAGE
 ======================================================= -->
-
 <main class="stage">
 
   <header class="stagebar">
 
-    <div class="stagebar-left">
+    <div class="stage-left">
       PREMIUM BANNER STUDIO / LIVE CANVAS
     </div>
 
-    <div class="stagebar-right">
+    <div class="stage-right">
+
+      <div class="preview-tools">
+
+        <button
+          class="preview-tool"
+          id="fitBtn"
+        >
+          FIT
+        </button>
+
+        <button
+          class="preview-tool"
+          id="zoom100Btn"
+        >
+          100%
+        </button>
+
+        <button
+          class="preview-tool"
+          id="fullscreenBtn"
+        >
+          FULL
+        </button>
+
+      </div>
+
       <span class="live">● LIVE</span>
-      <span id="sizeText">300 × 100 cm</span>
+
+      <span id="sizeText">
+        300 × 100 cm
+      </span>
+
     </div>
 
   </header>
 
 
-  <section class="preview-area">
+  <section
+    class="preview-area fit"
+    id="previewArea"
+  >
 
     <div class="preview-shell">
 
       <div
         id="canvas"
         class="canvas design-wave"
-        style="
-          --img-zoom:100;
-          --img-x:0;
-          --img-y:0;
-          --overlay-left:.92;
-          --overlay-right:.30;
-          --pattern-opacity:.10;
-        "
       >
 
         <div class="base-bg"></div>
@@ -1872,18 +2391,23 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 
         <div class="glow"></div>
 
-        <div class="angular-shape"></div>
+        <div class="angular-main"></div>
         <div class="angular-accent"></div>
+
         <div class="split-panel"></div>
+
         <div class="circle-panel"></div>
+
         <div class="spotlight"></div>
+
         <div class="glass-panel"></div>
+
         <div class="racing-stripe"></div>
+
         <div class="tech-lines"></div>
 
 
-        <!-- WAVE SVG -->
-
+        <!-- WAVE -->
         <svg
           class="wave-svg"
           viewBox="0 0 1200 400"
@@ -1921,7 +2445,6 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 
 
         <!-- BRAND -->
-
         <div class="brand-lock">
 
           <img
@@ -1948,7 +2471,6 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 
 
         <!-- COPY -->
-
         <div class="copy">
 
           <div
@@ -1994,7 +2516,6 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 
 
         <!-- CONTACT -->
-
         <div class="contact">
 
           <div
@@ -2039,14 +2560,13 @@ Temukan produk automotive terbaik dengan pelayanan profesional.
 
 
 <script>
-
 /* =========================================================
-   HELPERS
+   HELPER
 ========================================================= */
-
 const $ = id => document.getElementById(id);
 
 const canvas = $("canvas");
+const previewArea = $("previewArea");
 
 const designs = [
   "wave",
@@ -2075,9 +2595,8 @@ const ratios = {
 
 
 /* =========================================================
-   TEXT BINDING
+   TEXT BINDINGS
 ========================================================= */
-
 const bindings = {
   brandName:"brandOut",
   brandRole:"roleOut",
@@ -2091,21 +2610,24 @@ const bindings = {
   cta:"ctaOut"
 };
 
-Object.entries(bindings).forEach(([input,output])=>{
+Object.entries(bindings).forEach(
+  ([input,output]) => {
 
-  $(input).addEventListener("input",()=>{
+    $(input).addEventListener(
+      "input",
+      () => {
+        $(output).textContent =
+          $(input).value;
+      }
+    );
 
-    $(output).textContent = $(input).value;
-
-  });
-
-});
+  }
+);
 
 
 /* =========================================================
    SIZE
 ========================================================= */
-
 function updateSize(){
 
   const w =
@@ -2142,69 +2664,71 @@ $("unit").addEventListener(
 
 
 /* =========================================================
-   RATIO
+   RATIO PRESETS
 ========================================================= */
-
 document.querySelectorAll(".ratio")
-.forEach(button=>{
+.forEach(button => {
 
-  button.addEventListener("click",()=>{
+  button.addEventListener(
+    "click",
+    () => {
 
-    const ratio =
-      button.dataset.ratio;
+      const ratio =
+        button.dataset.ratio;
 
-    const value =
-      ratios[ratio];
+      const values =
+        ratios[ratio];
 
-    if(!value) return;
+      if(!values) return;
 
-    $("width").value =
-      value[0];
+      $("width").value =
+        values[0];
 
-    $("height").value =
-      value[1];
+      $("height").value =
+        values[1];
 
-    updateSize();
+      updateSize();
 
-    document.querySelectorAll(".ratio")
-    .forEach(x=>
-      x.classList.remove("active")
-    );
+      document.querySelectorAll(".ratio")
+      .forEach(x =>
+        x.classList.remove("active")
+      );
 
-    button.classList.add("active");
+      button.classList.add("active");
 
-  });
+    }
+  );
 
 });
 
 
 /* =========================================================
-   IMAGE
+   IMAGE UPLOAD
 ========================================================= */
-
 $("photo").addEventListener(
   "change",
-  event=>{
+  event => {
 
     const file =
       event.target.files[0];
 
     if(!file) return;
 
-    $("canvasImage").src =
+    const url =
       URL.createObjectURL(file);
+
+    $("canvasImage").src = url;
 
   }
 );
 
 
 /* =========================================================
-   LOGO
+   LOGO UPLOAD
 ========================================================= */
-
 $("logo").addEventListener(
   "change",
-  event=>{
+  event => {
 
     const file =
       event.target.files[0];
@@ -2225,25 +2749,24 @@ $("logo").addEventListener(
 
 
 /* =========================================================
-   IMAGE CONTROLS
+   IMAGE RANGE
 ========================================================= */
-
-function rangeBinding(
+function bindRange(
   input,
-  cssVariable,
+  cssVar,
   output,
   suffix=""
 ){
 
   $(input).addEventListener(
     "input",
-    event=>{
+    event => {
 
       const value =
         event.target.value;
 
       canvas.style.setProperty(
-        cssVariable,
+        cssVar,
         value
       );
 
@@ -2255,20 +2778,20 @@ function rangeBinding(
 
 }
 
-rangeBinding(
+bindRange(
   "zoom",
   "--img-zoom",
   "zoomVal",
   "%"
 );
 
-rangeBinding(
+bindRange(
   "posX",
   "--img-x",
   "posXVal"
 );
 
-rangeBinding(
+bindRange(
   "posY",
   "--img-y",
   "posYVal"
@@ -2276,80 +2799,66 @@ rangeBinding(
 
 
 /* =========================================================
-   EFFECTS
+   EFFECT RANGE
 ========================================================= */
-
-rangeBinding(
-  "overlayLeft",
-  "--overlay-left",
-  "overlayLeftVal",
-  "%"
-);
-
-rangeBinding(
-  "overlayRight",
-  "--overlay-right",
-  "overlayRightVal",
-  "%"
-);
-
-$("overlayLeft")
-.addEventListener(
+$("overlayLeft").addEventListener(
   "input",
-  e=>{
+  event => {
+
+    const value =
+      Number(event.target.value);
+
     canvas.style.setProperty(
       "--overlay-left",
-      Number(e.target.value)/100
+      value / 100
     );
+
+    $("overlayLeftVal").textContent =
+      value;
+
   }
 );
 
-$("overlayRight")
-.addEventListener(
+$("overlayRight").addEventListener(
   "input",
-  e=>{
+  event => {
+
+    const value =
+      Number(event.target.value);
+
     canvas.style.setProperty(
       "--overlay-right",
-      Number(e.target.value)/100
+      value / 100
     );
+
+    $("overlayRightVal").textContent =
+      value;
+
   }
 );
 
-rangeBinding(
-  "pattern",
-  "--pattern-opacity",
-  "patternVal",
-  "%"
-);
-
-$("pattern")
-.addEventListener(
+$("pattern").addEventListener(
   "input",
-  e=>{
+  event => {
+
+    const value =
+      Number(event.target.value);
+
     canvas.style.setProperty(
       "--pattern-opacity",
-      Number(e.target.value)/100
+      value / 100
     );
+
+    $("patternVal").textContent =
+      value;
+
   }
 );
 
 
 /* =========================================================
-   COLOR ENGINE
+   HEX VALIDATION
 ========================================================= */
-
-const colorFields = [
-  ["bgColor","bgHex","--bg"],
-  ["primary","primaryHex","--primary"],
-  ["secondary","secondaryHex","--secondary"],
-  ["accent","accentHex","--accent"],
-  ["text","textHex","--text"],
-  ["muted","mutedHex","--muted"],
-  ["ctaColor","ctaColorHex","--cta"],
-  ["ctaText","ctaTextHex","--ctaText"],
-  ["border","borderHex","--border"]
-];
-
 function validHex(value){
 
   return /^#[0-9A-Fa-f]{6}$/.test(
@@ -2358,52 +2867,85 @@ function validHex(value){
 
 }
 
+
+/* =========================================================
+   COLOR ENGINE
+========================================================= */
+const colorFields = [
+
+  ["bgColor","bgHex","--bg"],
+
+  ["primary","primaryHex","--primary"],
+
+  ["secondary","secondaryHex","--secondary"],
+
+  ["accent","accentHex","--accent"],
+
+  ["text","textHex","--text"],
+
+  ["muted","mutedHex","--muted"],
+
+  ["ctaColor","ctaColorHex","--cta"],
+
+  ["ctaText","ctaTextHex","--ctaText"],
+
+  ["border","borderHex","--border"]
+
+];
+
 colorFields.forEach(
-  ([picker,text,variable])=>{
+  ([pickerId,hexId,cssVar]) => {
 
-    $(picker).addEventListener(
+    $(pickerId).addEventListener(
       "input",
-      ()=>{
+      event => {
 
-        const value =
-          $(picker).value;
+        const color =
+          event.target.value;
 
-        $(text).value =
-          value.toUpperCase();
+        $(hexId).value =
+          color.toUpperCase();
 
         canvas.style.setProperty(
-          variable,
-          value
+          cssVar,
+          color
         );
 
       }
     );
 
-    $(text).addEventListener(
+    $(hexId).addEventListener(
       "change",
-      ()=>{
+      event => {
 
-        let value =
-          $(text).value.trim();
+        let color =
+          event.target.value
+          .trim();
 
-        if(!value.startsWith("#"))
-          value = "#" + value;
+        if(!color.startsWith("#")){
+          color =
+            "#" + color;
+        }
 
-        if(!validHex(value))
+        if(!validHex(color)){
+          event.target.value =
+            $(pickerId).value
+            .toUpperCase();
           return;
+        }
 
-        value =
-          value.toUpperCase();
+        color =
+          color.toUpperCase();
 
-        $(text).value =
-          value;
+        $(pickerId).value =
+          color;
 
-        $(picker).value =
-          value;
+        event.target.value =
+          color;
 
         canvas.style.setProperty(
-          variable,
-          value
+          cssVar,
+          color
         );
 
       }
@@ -2414,17 +2956,16 @@ colorFields.forEach(
 
 
 /* =========================================================
-   BACKGROUND COLOR
+   BACKGROUND PALETTE
 ========================================================= */
-
 document.querySelectorAll(
   '[data-target="bgColor"]'
 )
-.forEach(chip=>{
+.forEach(chip => {
 
   chip.addEventListener(
     "click",
-    ()=>{
+    () => {
 
       const color =
         chip.dataset.color;
@@ -2447,17 +2988,43 @@ document.querySelectorAll(
 
 
 /* =========================================================
-   QUICK PALETTE
+   QUICK PALETTES
 ========================================================= */
+function setColor(
+  field,
+  color
+){
+
+  const picker =
+    $(field);
+
+  const hex =
+    $(field + "Hex");
+
+  if(!picker || !hex)
+    return;
+
+  picker.value =
+    color;
+
+  hex.value =
+    color.toUpperCase();
+
+  canvas.style.setProperty(
+    "--" + field,
+    color
+  );
+
+}
 
 document.querySelectorAll(
   ".quick-palette"
 )
-.forEach(palette=>{
+.forEach(palette => {
 
   palette.addEventListener(
     "click",
-    ()=>{
+    () => {
 
       setColor(
         "primary",
@@ -2499,52 +3066,30 @@ document.querySelectorAll(
 
 });
 
-function setColor(name,color){
-
-  const picker =
-    $(name);
-
-  const text =
-    $(name+"Hex");
-
-  if(!picker || !text)
-    return;
-
-  picker.value =
-    color;
-
-  text.value =
-    color.toUpperCase();
-
-  canvas.style.setProperty(
-    "--"+name,
-    color
-  );
-
-}
-
 
 /* =========================================================
    DESIGN ENGINE
 ========================================================= */
-
 function setDesign(name){
 
   designs.forEach(
-    design=>{
+    design => {
+
       canvas.classList.remove(
-        "design-"+design
+        "design-" + design
       );
+
     }
   );
 
   canvas.classList.add(
-    "design-"+name
+    "design-" + name
   );
 
   document.querySelectorAll(
     ".design"
-  ).forEach(button=>{
+  )
+  .forEach(button => {
 
     button.classList.toggle(
       "active",
@@ -2558,11 +3103,11 @@ function setDesign(name){
 document.querySelectorAll(
   ".design"
 )
-.forEach(button=>{
+.forEach(button => {
 
   button.addEventListener(
     "click",
-    ()=>{
+    () => {
 
       setDesign(
         button.dataset.design
@@ -2575,10 +3120,55 @@ document.querySelectorAll(
 
 
 /* =========================================================
-   RANDOM PREMIUM
+   PREVIEW MODES
 ========================================================= */
+$("fitBtn").addEventListener(
+  "click",
+  () => {
 
-const palettes = [
+    previewArea.classList.remove(
+      "zoom100"
+    );
+
+    previewArea.classList.add(
+      "fit"
+    );
+
+  }
+);
+
+$("zoom100Btn").addEventListener(
+  "click",
+  () => {
+
+    previewArea.classList.remove(
+      "fit"
+    );
+
+    previewArea.classList.add(
+      "zoom100"
+    );
+
+  }
+);
+
+$("fullscreenBtn").addEventListener(
+  "click",
+  () => {
+
+    previewArea.classList.toggle(
+      "fullscreen"
+    );
+
+  }
+);
+
+
+/* =========================================================
+   RANDOM CONCEPT
+========================================================= */
+const randomPalettes = [
+
   {
     p:"#8CC63F",
     s:"#101419",
@@ -2586,6 +3176,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#C4C9D0"
   },
+
   {
     p:"#D9AD55",
     s:"#090909",
@@ -2593,6 +3184,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#CFCFCF"
   },
+
   {
     p:"#EF3D3D",
     s:"#111111",
@@ -2600,6 +3192,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#CCCCCC"
   },
+
   {
     p:"#277CFF",
     s:"#07111F",
@@ -2607,6 +3200,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#C7D6E9"
   },
+
   {
     p:"#A855F7",
     s:"#100819",
@@ -2614,6 +3208,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#D8C7E8"
   },
+
   {
     p:"#00B878",
     s:"#06130F",
@@ -2621,6 +3216,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#BEDBD1"
   },
+
   {
     p:"#FF7A18",
     s:"#17100A",
@@ -2628,6 +3224,7 @@ const palettes = [
     t:"#FFFFFF",
     m:"#E4C6A8"
   },
+
   {
     p:"#B77A3B",
     s:"#160D07",
@@ -2635,17 +3232,18 @@ const palettes = [
     t:"#FFFFFF",
     m:"#D0B9A5"
   }
+
 ];
 
 $("random").addEventListener(
   "click",
-  ()=>{
+  () => {
 
     const palette =
-      palettes[
+      randomPalettes[
         Math.floor(
           Math.random() *
-          palettes.length
+          randomPalettes.length
         )
       ];
 
@@ -2684,7 +3282,7 @@ $("random").addEventListener(
       palette.p
     );
 
-    const design =
+    const randomDesign =
       designs[
         Math.floor(
           Math.random() *
@@ -2692,7 +3290,9 @@ $("random").addEventListener(
         )
       ];
 
-    setDesign(design);
+    setDesign(
+      randomDesign
+    );
 
   }
 );
@@ -2701,10 +3301,9 @@ $("random").addEventListener(
 /* =========================================================
    RESET
 ========================================================= */
-
 $("reset").addEventListener(
   "click",
-  ()=>{
+  () => {
 
     $("brandName").value =
       "NINE AUTOSERIES";
@@ -2738,9 +3337,11 @@ $("reset").addEventListener(
 
     Object.entries(bindings)
     .forEach(
-      ([input,output])=>{
+      ([input,output]) => {
+
         $(output).textContent =
           $(input).value;
+
       }
     );
 
@@ -2817,6 +3418,39 @@ $("reset").addEventListener(
     $("posYVal").textContent =
       "0";
 
+    $("overlayLeft").value =
+      92;
+
+    $("overlayRight").value =
+      30;
+
+    $("pattern").value =
+      8;
+
+    canvas.style.setProperty(
+      "--overlay-left",
+      .92
+    );
+
+    canvas.style.setProperty(
+      "--overlay-right",
+      .30
+    );
+
+    canvas.style.setProperty(
+      "--pattern-opacity",
+      .08
+    );
+
+    $("overlayLeftVal").textContent =
+      "92";
+
+    $("overlayRightVal").textContent =
+      "30";
+
+    $("patternVal").textContent =
+      "8";
+
     setDesign("wave");
 
     updateSize();
@@ -2826,15 +3460,54 @@ $("reset").addEventListener(
 
 
 /* =========================================================
+   IMAGE LOADED CHECK
+========================================================= */
+function waitForImage(image){
+
+  return new Promise(
+    resolve => {
+
+      if(
+        !image ||
+        !image.src ||
+        image.complete
+      ){
+        resolve();
+        return;
+      }
+
+      image.onload = () => resolve();
+      image.onerror = () => resolve();
+
+      setTimeout(
+        resolve,
+        5000
+      );
+
+    }
+  );
+
+}
+
+
+/* =========================================================
    EXPORT
 ========================================================= */
-
 $("export").addEventListener(
   "click",
-  async()=>{
+  async () => {
 
     const button =
       $("export");
+
+    const originalWidth =
+      canvas.style.width;
+
+    const originalHeight =
+      canvas.style.height;
+
+    const originalAspect =
+      canvas.style.aspectRatio;
 
     button.disabled =
       true;
@@ -2844,138 +3517,321 @@ $("export").addEventListener(
 
     try{
 
-      const ratioW =
-        Number($("width").value) || 300;
-
-      const ratioH =
-        Number($("height").value) || 100;
-
       /*
-        Render HD berdasarkan rasio,
-        bukan ukuran preview.
+        Pastikan library tersedia.
       */
+      if(
+        typeof html2canvas ===
+        "undefined"
+      ){
 
-      const targetWidth = 2400;
+        await new Promise(
+          (resolve,reject) => {
 
-      const targetHeight =
-        Math.round(
-          targetWidth *
-          ratioH /
-          ratioW
+            const script =
+              document.createElement(
+                "script"
+              );
+
+            script.src =
+              "https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js";
+
+            script.onload =
+              resolve;
+
+            script.onerror =
+              reject;
+
+            document.head.appendChild(
+              script
+            );
+
+          }
         );
 
-      const oldWidth =
-        canvas.style.width;
+      }
 
-      const oldAspect =
-        canvas.style.aspectRatio;
+      if(
+        typeof html2canvas ===
+        "undefined"
+      ){
+        throw new Error(
+          "html2canvas tidak tersedia."
+        );
+      }
+
 
       /*
-        html2canvas menangkap elemen aktual.
-        Lebar diperbesar sementara untuk
-        menghasilkan PNG lebih tajam.
+        Ambil ukuran rasio.
+        Kita batasi output agar browser HP
+        tidak kehabisan memory.
       */
+      const sourceW =
+        Number($("width").value) || 300;
 
-      const rect =
-        canvas.getBoundingClientRect();
+      const sourceH =
+        Number($("height").value) || 100;
 
-      const originalWidth =
-        rect.width;
+      const MAX_SIDE =
+        3000;
 
-      const originalHeight =
-        rect.height;
+      let outputW =
+        MAX_SIDE;
 
+      let outputH =
+        Math.round(
+          outputW *
+          sourceH /
+          sourceW
+        );
+
+      /*
+        Jangan biarkan sisi lain
+        melewati 3000px.
+      */
+      if(outputH > MAX_SIDE){
+
+        outputH =
+          MAX_SIDE;
+
+        outputW =
+          Math.round(
+            outputH *
+            sourceW /
+            sourceH
+          );
+
+      }
+
+      /*
+        Untuk banner yang sangat ekstrem,
+        minimum tetap aman.
+      */
+      outputW =
+        Math.max(
+          300,
+          outputW
+        );
+
+      outputH =
+        Math.max(
+          100,
+          outputH
+        );
+
+
+      /*
+        Pastikan image lokal selesai.
+      */
+      await waitForImage(
+        $("canvasImage")
+      );
+
+      await waitForImage(
+        $("logoPreview")
+      );
+
+
+      /*
+        Export-safe mode.
+        Mengurangi fitur CSS yang kadang
+        tidak bisa dirender html2canvas.
+      */
+      canvas.classList.add(
+        "exporting"
+      );
+
+
+      /*
+        Render pada ukuran target.
+      */
       canvas.style.width =
-        targetWidth + "px";
+        outputW + "px";
 
       canvas.style.height =
-        targetHeight + "px";
+        outputH + "px";
 
       canvas.style.aspectRatio =
         "auto";
 
+
+      /*
+        Beri browser dua frame.
+      */
       await new Promise(
         resolve =>
           requestAnimationFrame(
-            ()=>requestAnimationFrame(resolve)
+            () =>
+              requestAnimationFrame(
+                resolve
+              )
           )
       );
 
-      const image =
+
+      /*
+        Render.
+      */
+      const result =
         await html2canvas(
           canvas,
           {
+            width:outputW,
+            height:outputH,
+
             scale:1,
-            useCORS:true,
-            allowTaint:false,
+
             backgroundColor:null,
-            logging:false
+
+            useCORS:true,
+
+            allowTaint:true,
+
+            imageTimeout:15000,
+
+            logging:false,
+
+            foreignObjectRendering:false,
+
+            removeContainer:true
           }
         );
 
-      canvas.style.width =
-        oldWidth;
-
-      canvas.style.height =
-        "";
-
-      canvas.style.aspectRatio =
-        oldAspect;
 
       /*
-        Nama file dari branding.
+        Nama file.
       */
-
       let filename =
-        $("brandName").value
+        (
+          $("brandName").value ||
+          "premium-banner"
+        )
         .trim()
         .replace(
-          /[^a-zA-Z0-9_-]+/g,
+          /[^\w\-]+/g,
           "_"
         );
 
-      if(!filename)
-        filename = "premium_banner";
+      if(!filename){
+        filename =
+          "premium-banner";
+      }
+
+
+      /*
+        blob lebih stabil daripada
+        langsung toDataURL pada HP.
+      */
+      const blob =
+        await new Promise(
+          (resolve,reject) => {
+
+            result.toBlob(
+              blob => {
+
+                if(blob){
+                  resolve(blob);
+                }else{
+                  reject(
+                    new Error(
+                      "Gagal membuat PNG blob."
+                    )
+                  );
+                }
+
+              },
+              "image/png",
+              1
+            );
+
+          }
+        );
+
+
+      const url =
+        URL.createObjectURL(
+          blob
+        );
 
       const link =
         document.createElement("a");
+
+      link.href =
+        url;
 
       link.download =
         filename +
         "_banner.png";
 
-      link.href =
-        image.toDataURL(
-          "image/png",
-          1
-        );
+      document.body.appendChild(
+        link
+      );
 
       link.click();
 
-    }catch(error){
+      link.remove();
 
-      console.error(error);
 
-      alert(
-        "Export gagal. Pastikan gambar berasal dari upload lokal dan gunakan Chrome/Edge terbaru."
+      setTimeout(
+        () => {
+          URL.revokeObjectURL(
+            url
+          );
+        },
+        2000
       );
 
+
+    }catch(error){
+
+      console.error(
+        "EXPORT ERROR:",
+        error
+      );
+
+      alert(
+        "Export gagal.\n\n" +
+        "Kalau menggunakan foto/logo, pastikan file sudah selesai di-upload. " +
+        "Coba tekan Export sekali lagi."
+      );
+
+
+    }finally{
+
+      /*
+        Ini penting:
+        preview SELALU dikembalikan
+        walaupun export gagal.
+      */
+
+      canvas.classList.remove(
+        "exporting"
+      );
+
+      canvas.style.width =
+        originalWidth;
+
+      canvas.style.height =
+        originalHeight;
+
+      canvas.style.aspectRatio =
+        originalAspect;
+
+      button.disabled =
+        false;
+
+      button.textContent =
+        "EXPORT PNG";
+
     }
-
-    button.disabled =
-      false;
-
-    button.textContent =
-      "EXPORT PNG";
 
   }
 );
 
 
 /* =========================================================
-   INIT
+   INITIALIZE
 ========================================================= */
-
 updateSize();
 
 setDesign("wave");
@@ -2984,4 +3840,3 @@ setDesign("wave");
 
 </body>
 </html>
-```
