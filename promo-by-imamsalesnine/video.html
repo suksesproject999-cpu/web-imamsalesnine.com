@@ -1,0 +1,6801 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+      content="width=device-width,initial-scale=1,viewport-fit=cover">
+
+<title>LARAS Video Studio</title>
+
+<style>
+
+/* ============================================================
+   LARAS VIDEO STUDIO
+   FINAL RESPONSIVE EDITOR
+============================================================ */
+
+:root{
+  --bg:#030503;
+  --panel:#080d09;
+  --panel2:#0d140e;
+  --line:rgba(255,255,255,.085);
+  --line2:rgba(255,255,255,.045);
+
+  --text:#f5f8f4;
+  --muted:#707a71;
+
+  --lime:#8cc63f;
+  --lime2:#b9f36b;
+
+  --orange:#ff7612;
+  --blue:#2998e8;
+  --purple:#8d6aff;
+  --red:#ff5757;
+
+  --shadow:
+    0 25px 80px rgba(0,0,0,.55);
+
+  --font:
+    Inter,
+    Manrope,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+
+html,
+body{
+  margin:0;
+  width:100%;
+  height:100%;
+
+  overflow:hidden;
+
+  color:var(--text);
+
+  background:
+    radial-gradient(
+      circle at 15% -10%,
+      rgba(140,198,63,.10),
+      transparent 30%
+    ),
+    #030503;
+
+  font-family:var(--font);
+
+  -webkit-font-smoothing:antialiased;
+}
+
+
+body{
+  overscroll-behavior:none;
+}
+
+
+button,
+input,
+select{
+  font:inherit;
+}
+
+
+button{
+  cursor:pointer;
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+button:disabled{
+  opacity:.45;
+  cursor:not-allowed;
+}
+
+
+img{
+  display:block;
+  max-width:100%;
+}
+
+
+/* ============================================================
+   APP
+============================================================ */
+
+.app{
+  width:100%;
+  height:100dvh;
+
+  display:grid;
+
+  grid-template-rows:
+    68px
+    minmax(0,1fr)
+    245px;
+
+  overflow:hidden;
+}
+
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+
+.topbar{
+  position:relative;
+  z-index:1000;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  padding:
+    9px 18px;
+
+  background:
+    rgba(5,8,5,.96);
+
+  border-bottom:
+    1px solid var(--line);
+
+  backdrop-filter:
+    blur(22px);
+}
+
+
+.logo{
+  display:flex;
+  align-items:center;
+
+  gap:11px;
+
+  min-width:190px;
+}
+
+
+.logo-mark{
+  width:40px;
+  height:40px;
+
+  flex:0 0 40px;
+
+  display:grid;
+  place-items:center;
+
+  border-radius:12px;
+
+  color:#071006;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--lime),
+      var(--lime2)
+    );
+
+  font-size:18px;
+  font-weight:1000;
+
+  box-shadow:
+    0 0 32px
+    rgba(140,198,63,.18);
+}
+
+
+.logo-text strong{
+  display:block;
+
+  font-size:15px;
+  font-weight:1000;
+
+  letter-spacing:-.5px;
+}
+
+
+.logo-text span{
+  display:block;
+
+  margin-top:2px;
+
+  color:var(--lime);
+
+  font-size:7px;
+  font-weight:950;
+
+  letter-spacing:1.7px;
+
+  text-transform:uppercase;
+}
+
+
+.top-actions{
+  display:flex;
+  align-items:center;
+
+  gap:6px;
+}
+
+
+.btn{
+  height:39px;
+
+  padding:
+    0 13px;
+
+  color:#dce4dc;
+
+  background:#080d09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:10px;
+
+  font-size:8px;
+  font-weight:950;
+}
+
+
+.btn:hover{
+  border-color:
+    rgba(140,198,63,.35);
+}
+
+
+.btn.orange{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      135deg,
+      #6d2b08,
+      #a94309
+    );
+
+  border-color:
+    rgba(255,118,18,.45);
+}
+
+
+/* ============================================================
+   WORKSPACE
+============================================================ */
+
+.workspace{
+  min-height:0;
+
+  display:grid;
+
+  grid-template-columns:
+    270px
+    minmax(0,1fr)
+    275px;
+
+  overflow:hidden;
+}
+
+
+/* ============================================================
+   SIDEBARS
+============================================================ */
+
+.sidebar{
+  min-width:0;
+
+  overflow:auto;
+
+  background:
+    linear-gradient(
+      180deg,
+      #080d09,
+      #050805
+    );
+
+  border-right:
+    1px solid var(--line);
+
+  scrollbar-width:thin;
+}
+
+
+.sidebar.right{
+  border-right:0;
+
+  border-left:
+    1px solid var(--line);
+}
+
+
+.sidebar::-webkit-scrollbar{
+  width:4px;
+}
+
+
+.sidebar::-webkit-scrollbar-thumb{
+  background:#182018;
+}
+
+
+.sidebar-head{
+  padding:
+    18px 16px 10px;
+}
+
+
+.eyebrow{
+  color:var(--lime);
+
+  font-size:7px;
+  font-weight:1000;
+
+  letter-spacing:1.7px;
+
+  text-transform:uppercase;
+}
+
+
+.headline{
+  margin-top:7px;
+
+  font-size:15px;
+  font-weight:1000;
+}
+
+
+.subline{
+  margin-top:6px;
+
+  color:var(--muted);
+
+  font-size:8px;
+
+  line-height:1.45;
+}
+
+
+/* ============================================================
+   TEMPLATE GRID
+============================================================ */
+
+.template-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:8px;
+
+  padding:
+    7px 12px 18px;
+}
+
+
+.template-card{
+  min-width:0;
+
+  padding:0;
+
+  overflow:hidden;
+
+  color:#fff;
+
+  text-align:left;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:13px;
+}
+
+
+.template-card.active{
+  border-color:
+    rgba(140,198,63,.85);
+
+  box-shadow:
+    0 0 0 1px
+    rgba(140,198,63,.12),
+    0 12px 30px
+    rgba(140,198,63,.06);
+}
+
+
+.template-preview{
+  position:relative;
+
+  height:86px;
+
+  display:grid;
+  place-items:center;
+
+  background:
+    radial-gradient(
+      circle at 30% 20%,
+      var(--tc2),
+      transparent 50%
+    ),
+    linear-gradient(
+      135deg,
+      #101610,
+      var(--tc1)
+    );
+}
+
+
+.template-icon{
+  font-size:25px;
+
+  filter:
+    drop-shadow(
+      0 5px 15px
+      rgba(0,0,0,.5)
+    );
+}
+
+
+.template-duration{
+  position:absolute;
+
+  right:7px;
+  bottom:6px;
+
+  padding:
+    4px 6px;
+
+  color:#fff;
+
+  background:
+    rgba(0,0,0,.5);
+
+  border-radius:6px;
+
+  font-size:6px;
+  font-weight:950;
+}
+
+
+.template-info{
+  padding:9px;
+}
+
+
+.template-name{
+  font-size:8px;
+  font-weight:950;
+}
+
+
+.template-desc{
+  margin-top:4px;
+
+  color:#697269;
+
+  font-size:6px;
+
+  line-height:1.35;
+}
+
+
+/* ============================================================
+   STAGE
+============================================================ */
+
+.stage{
+  min-width:0;
+  min-height:0;
+
+  display:flex;
+
+  flex-direction:column;
+
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      rgba(140,198,63,.045),
+      transparent 42%
+    ),
+    #020402;
+
+  overflow:hidden;
+}
+
+
+.stage-top{
+  flex:0 0 auto;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  gap:14px;
+
+  padding:
+    14px 16px 11px;
+}
+
+
+.project-name strong{
+  display:block;
+
+  font-size:14px;
+  font-weight:1000;
+}
+
+
+.project-name span{
+  display:block;
+
+  margin-top:4px;
+
+  color:#6d766e;
+
+  font-size:7px;
+}
+
+
+.ratio-group{
+  display:flex;
+
+  gap:5px;
+}
+
+
+.ratio-btn{
+  min-width:70px;
+
+  height:34px;
+
+  padding:
+    0 12px;
+
+  color:#737d74;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:7px;
+  font-weight:950;
+}
+
+
+.ratio-btn.active{
+  color:#071006;
+
+  background:var(--lime);
+
+  border-color:var(--lime);
+}
+
+
+/* ============================================================
+   VIDEO AREA
+============================================================ */
+
+.video-frame{
+  flex:1 1 auto;
+
+  min-height:0;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:
+    6px 18px 15px;
+
+  overflow:hidden;
+}
+
+
+.video-canvas{
+  position:relative;
+
+  overflow:hidden;
+
+  flex:0 0 auto;
+
+  background:#020402;
+
+  border:
+    1px solid
+    rgba(255,255,255,.12);
+
+  box-shadow:
+    0 30px 90px
+    rgba(0,0,0,.65);
+
+  --accent:var(--lime);
+}
+
+
+/* ratio */
+
+.r916{
+  width:min(360px,76%);
+  aspect-ratio:9/16;
+}
+
+
+.r45{
+  width:min(520px,78%);
+  aspect-ratio:4/5;
+}
+
+
+.r169{
+  width:min(920px,94%);
+  aspect-ratio:16/9;
+}
+
+
+/* ============================================================
+   CANVAS
+============================================================ */
+
+.canvas-background{
+  position:absolute;
+  inset:0;
+
+  background:
+    radial-gradient(
+      circle at 72% 20%,
+      color-mix(
+        in srgb,
+        var(--accent) 13%,
+        transparent
+      ),
+      transparent 40%
+    ),
+    linear-gradient(
+      135deg,
+      #020302,
+      #0a0f0a
+    );
+}
+
+
+.canvas-light{
+  position:absolute;
+
+  width:140%;
+  height:35%;
+
+  left:-20%;
+  top:-5%;
+
+  background:
+    linear-gradient(
+      115deg,
+      transparent,
+      rgba(255,255,255,.07),
+      transparent
+    );
+
+  transform:rotate(-7deg);
+
+  opacity:.7;
+}
+
+
+.canvas-product{
+  position:absolute;
+
+  z-index:5;
+
+  width:72%;
+  height:55%;
+
+  left:50%;
+  top:43%;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:center;
+
+  transform:
+    translate(-50%,-50%);
+
+  transform-origin:center;
+}
+
+
+.canvas-product img{
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+
+  filter:
+    drop-shadow(
+      0 25px 30px
+      rgba(0,0,0,.48)
+    );
+}
+
+
+.product-shadow{
+  position:absolute;
+
+  z-index:-1;
+
+  left:15%;
+  right:15%;
+  bottom:7%;
+
+  height:12%;
+
+  border-radius:50%;
+
+  background:
+    rgba(0,0,0,.65);
+
+  filter:blur(15px);
+}
+
+
+/* ============================================================
+   VIDEO CONTENT
+============================================================ */
+
+.canvas-content{
+  position:absolute;
+  inset:0;
+
+  z-index:30;
+
+  pointer-events:none;
+}
+
+
+.video-kicker{
+  position:absolute;
+
+  left:8%;
+  top:7%;
+
+  color:var(--accent);
+
+  font-size:
+    clamp(7px,1vw,12px);
+
+  line-height:1;
+
+  font-weight:1000;
+
+  letter-spacing:2px;
+
+  text-transform:uppercase;
+
+  opacity:0;
+}
+
+
+.video-title{
+  position:absolute;
+
+  left:8%;
+  right:8%;
+
+  top:12%;
+
+  color:#fff;
+
+  font-size:
+    clamp(22px,4vw,55px);
+
+  line-height:.98;
+
+  font-weight:1000;
+
+  letter-spacing:-1.8px;
+
+  opacity:0;
+}
+
+
+.video-price-label{
+  position:absolute;
+
+  left:8%;
+  bottom:22%;
+
+  color:#747d75;
+
+  font-size:
+    clamp(6px,1vw,9px);
+
+  font-weight:900;
+
+  letter-spacing:1.7px;
+
+  text-transform:uppercase;
+
+  opacity:0;
+}
+
+
+.video-price{
+  position:absolute;
+
+  left:8%;
+  bottom:14%;
+
+  color:#fff;
+
+  font-size:
+    clamp(22px,4vw,52px);
+
+  line-height:1;
+
+  font-weight:1000;
+
+  letter-spacing:-1.5px;
+
+  opacity:0;
+}
+
+
+.video-cta{
+  position:absolute;
+
+  right:7%;
+  bottom:8%;
+
+  color:var(--accent);
+
+  font-size:
+    clamp(7px,1.2vw,13px);
+
+  font-weight:1000;
+
+  letter-spacing:1px;
+
+  text-transform:uppercase;
+
+  opacity:0;
+}
+
+
+.video-sale{
+  position:absolute;
+
+  right:7%;
+  top:7%;
+
+  padding:
+    7px 9px;
+
+  color:#071006;
+
+  background:var(--accent);
+
+  border-radius:999px;
+
+  font-size:
+    clamp(6px,1vw,10px);
+
+  font-weight:1000;
+
+  letter-spacing:.8px;
+
+  text-transform:uppercase;
+
+  opacity:0;
+}
+
+
+/* ============================================================
+   ANIMATION
+============================================================ */
+
+.video-canvas.playing
+.video-kicker{
+  animation:
+    kickerIn 8s both;
+}
+
+
+.video-canvas.playing
+.video-title{
+  animation:
+    titleIn 8s both;
+}
+
+
+.video-canvas.playing
+.canvas-product{
+  animation:
+    productCinema 8s both;
+}
+
+
+.video-canvas.playing
+.video-price-label{
+  animation:
+    priceLabelIn 8s both;
+}
+
+
+.video-canvas.playing
+.video-price{
+  animation:
+    priceIn 8s both;
+}
+
+
+.video-canvas.playing
+.video-cta{
+  animation:
+    ctaIn 8s both;
+}
+
+
+.video-canvas.playing
+.video-sale{
+  animation:
+    saleIn 8s both;
+}
+
+
+@keyframes kickerIn{
+  0%,8%{
+    opacity:0;
+    transform:translateY(12px);
+  }
+
+  14%,88%{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+
+@keyframes titleIn{
+  0%,12%{
+    opacity:0;
+    transform:
+      translateY(22px)
+      scale(.96);
+  }
+
+  20%,84%{
+    opacity:1;
+    transform:
+      translateY(0)
+      scale(1);
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+
+@keyframes productCinema{
+  0%{
+    opacity:0;
+    transform:
+      translate(-50%,-50%)
+      scale(.78);
+  }
+
+  12%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(.91);
+  }
+
+  35%{
+    transform:
+      translate(-50%,-50%)
+      scale(1);
+  }
+
+  68%{
+    transform:
+      translate(-50%,-50%)
+      scale(1.055);
+  }
+
+  100%{
+    opacity:1;
+    transform:
+      translate(-50%,-50%)
+      scale(1.075);
+  }
+}
+
+
+@keyframes priceLabelIn{
+  0%,34%{opacity:0}
+  42%,85%{opacity:1}
+  100%{opacity:0}
+}
+
+
+@keyframes priceIn{
+  0%,38%{
+    opacity:0;
+    transform:translateY(14px);
+  }
+
+  46%,84%{
+    opacity:1;
+    transform:translateY(0);
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+
+@keyframes ctaIn{
+  0%,55%{
+    opacity:0;
+    transform:translateX(20px);
+  }
+
+  63%,88%{
+    opacity:1;
+    transform:translateX(0);
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+
+@keyframes saleIn{
+  0%,18%{
+    opacity:0;
+    transform:scale(.65);
+  }
+
+  25%,85%{
+    opacity:1;
+    transform:scale(1);
+  }
+
+  100%{
+    opacity:0;
+  }
+}
+
+
+/* ============================================================
+   INSPECTOR
+============================================================ */
+
+.inspector{
+  padding:
+    4px 14px 20px;
+}
+
+
+.inspector-section{
+  padding:
+    13px 0;
+
+  border-bottom:
+    1px solid var(--line2);
+}
+
+
+.inspector-title{
+  color:#818b82;
+
+  font-size:7px;
+  font-weight:950;
+
+  letter-spacing:1.5px;
+
+  text-transform:uppercase;
+}
+
+
+.product-select{
+  margin-top:8px;
+
+  width:100%;
+  height:39px;
+
+  padding:
+    0 10px;
+
+  color:#fff;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  outline:none;
+
+  font-size:8px;
+}
+
+
+.control-row{
+  margin-top:9px;
+
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  gap:10px;
+}
+
+
+.control-row label{
+  color:#9ba49b;
+
+  font-size:8px;
+}
+
+
+.control-value{
+  color:var(--lime);
+
+  font-size:8px;
+  font-weight:950;
+}
+
+
+.range{
+  width:100%;
+
+  margin-top:8px;
+
+  accent-color:var(--lime);
+}
+
+
+.effect-grid{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:6px;
+
+  margin-top:9px;
+}
+
+
+.effect-btn{
+  min-height:38px;
+
+  color:#929c93;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:7px;
+  font-weight:900;
+}
+
+
+.effect-btn.active{
+  color:#071006;
+
+  background:var(--lime);
+
+  border-color:var(--lime);
+}
+
+
+/* ============================================================
+   TIMELINE
+============================================================ */
+
+.timeline{
+  min-width:0;
+  min-height:0;
+
+  background:#070a08;
+
+  border-top:
+    1px solid var(--line);
+
+  overflow:hidden;
+
+  position:relative;
+
+  z-index:500;
+}
+
+
+.timeline-head{
+  height:50px;
+
+  display:flex;
+  align-items:center;
+
+  gap:8px;
+
+  padding:
+    0 14px;
+
+  border-bottom:
+    1px solid var(--line2);
+}
+
+
+.play-btn{
+  width:34px;
+  height:34px;
+
+  display:grid;
+  place-items:center;
+
+  flex:0 0 34px;
+
+  border-radius:9px;
+
+  color:#071006;
+
+  background:var(--lime);
+
+  border:0;
+
+  font-weight:1000;
+}
+
+
+.timeline-time{
+  color:#cbd3cb;
+
+  font-size:8px;
+
+  font-variant-numeric:
+    tabular-nums;
+}
+
+
+.timeline-tools{
+  display:flex;
+
+  gap:5px;
+
+  margin-left:auto;
+}
+
+
+.timeline-tool{
+  height:30px;
+
+  padding:
+    0 9px;
+
+  color:#828c83;
+
+  background:#090d0a;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:7px;
+
+  font-size:7px;
+  font-weight:900;
+}
+
+
+.timeline-body{
+  position:relative;
+
+  height:195px;
+
+  overflow:auto;
+
+  scrollbar-width:thin;
+}
+
+
+.ruler{
+  position:absolute;
+
+  left:120px;
+  top:0;
+  right:0;
+
+  height:30px;
+
+  border-bottom:
+    1px solid var(--line2);
+}
+
+
+.ruler-mark{
+  position:absolute;
+
+  top:0;
+
+  height:30px;
+
+  padding-top:7px;
+
+  color:#596259;
+
+  font-size:6px;
+
+  border-left:
+    1px solid var(--line2);
+}
+
+
+.track-area{
+  position:absolute;
+
+  left:0;
+  right:0;
+
+  top:30px;
+  bottom:0;
+}
+
+
+.track{
+  position:relative;
+
+  height:40px;
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.035);
+}
+
+
+.track-name{
+  position:absolute;
+
+  left:0;
+  top:0;
+  bottom:0;
+
+  width:120px;
+
+  display:flex;
+  align-items:center;
+
+  padding-left:14px;
+
+  color:#7d877e;
+
+  background:#080c09;
+
+  border-right:
+    1px solid var(--line2);
+
+  font-size:7px;
+  font-weight:900;
+
+  z-index:3;
+}
+
+
+.track-content{
+  position:absolute;
+
+  left:120px;
+  right:0;
+
+  top:0;
+  bottom:0;
+}
+
+
+.clip{
+  position:absolute;
+
+  top:5px;
+  bottom:5px;
+
+  display:flex;
+
+  align-items:center;
+
+  padding:
+    0 10px;
+
+  overflow:hidden;
+
+  white-space:nowrap;
+
+  color:#071006;
+
+  border-radius:9px;
+
+  font-size:7px;
+  font-weight:1000;
+}
+
+
+.clip.green{
+  background:
+    linear-gradient(
+      90deg,
+      #80bd35,
+      #9cd94d
+    );
+}
+
+
+.clip.orange{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ff7612,
+      #d75406
+    );
+}
+
+
+.clip.blue{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      90deg,
+      #2998e8,
+      #1d73b5
+    );
+}
+
+
+.clip.red{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      90deg,
+      #ff5757,
+      #b92f2f
+    );
+}
+
+
+.clip.purple{
+  color:#fff;
+
+  background:
+    linear-gradient(
+      90deg,
+      #8d6aff,
+      #704de0
+    );
+}
+
+
+.playhead{
+  position:absolute;
+
+  top:0;
+  bottom:0;
+
+  width:2px;
+
+  background:#fff;
+
+  box-shadow:
+    0 0 15px
+    rgba(255,255,255,.8);
+
+  pointer-events:none;
+
+  z-index:20;
+}
+
+
+/* ============================================================
+   MODAL
+============================================================ */
+
+.modal{
+  position:fixed;
+
+  inset:0;
+
+  z-index:7000;
+
+  display:none;
+
+  align-items:center;
+  justify-content:center;
+
+  padding:20px;
+
+  background:
+    rgba(0,0,0,.72);
+
+  backdrop-filter:
+    blur(8px);
+}
+
+
+.modal.open{
+  display:flex;
+}
+
+
+.modal-box{
+  width:
+    min(
+      720px,
+      100%
+    );
+
+  max-height:90vh;
+
+  overflow:auto;
+
+  padding:20px;
+
+  background:#090e0a;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:20px;
+
+  box-shadow:var(--shadow);
+}
+
+
+.modal-head{
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+}
+
+
+.modal-title{
+  font-size:18px;
+  font-weight:1000;
+}
+
+
+.close{
+  width:34px;
+  height:34px;
+
+  border-radius:9px;
+
+  color:#fff;
+
+  background:#101510;
+
+  border:
+    1px solid var(--line);
+
+  font-size:20px;
+}
+
+
+.product-list{
+  display:grid;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:7px;
+
+  margin-top:14px;
+}
+
+
+.product-option{
+  display:flex;
+
+  align-items:center;
+
+  gap:9px;
+
+  min-width:0;
+
+  padding:9px;
+
+  color:#fff;
+
+  background:#080c09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:10px;
+
+  text-align:left;
+}
+
+
+.product-option:hover{
+  border-color:
+    rgba(140,198,63,.45);
+}
+
+
+.product-thumb{
+  width:48px;
+  height:40px;
+
+  flex:0 0 48px;
+
+  display:grid;
+  place-items:center;
+
+  overflow:hidden;
+
+  border-radius:7px;
+
+  background:#050705;
+}
+
+
+.product-thumb img{
+  width:100%;
+  height:100%;
+
+  object-fit:contain;
+}
+
+
+.product-option-name{
+  display:block;
+
+  min-width:0;
+
+  font-size:8px;
+  font-weight:900;
+
+  white-space:nowrap;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+
+.product-option-price{
+  display:block;
+
+  margin-top:3px;
+
+  color:var(--lime);
+
+  font-size:7px;
+}
+
+
+/* ============================================================
+   TOAST
+============================================================ */
+
+.toast{
+  position:fixed;
+
+  z-index:9000;
+
+  left:50%;
+
+  bottom:265px;
+
+  transform:
+    translate(-50%,15px);
+
+  opacity:0;
+
+  pointer-events:none;
+
+  padding:
+    10px 15px;
+
+  color:#071006;
+
+  background:var(--lime);
+
+  border-radius:999px;
+
+  font-size:8px;
+  font-weight:950;
+
+  transition:.2s;
+}
+
+
+.toast.show{
+  opacity:1;
+
+  transform:
+    translate(-50%,0);
+}
+
+
+/* ============================================================
+   MOBILE SHEET
+============================================================ */
+
+.mobile-overlay{
+  position:fixed;
+
+  inset:0;
+
+  z-index:4000;
+
+  background:
+    rgba(0,0,0,.62);
+
+  backdrop-filter:
+    blur(5px);
+
+  opacity:0;
+
+  visibility:hidden;
+
+  pointer-events:none;
+
+  transition:.22s ease;
+}
+
+
+.mobile-overlay.open{
+  opacity:1;
+
+  visibility:visible;
+
+  pointer-events:auto;
+}
+
+
+.mobile-sheet{
+  position:fixed;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  z-index:4500;
+
+  max-height:
+    min(
+      78dvh,
+      650px
+    );
+
+  padding:
+    10px 12px
+    calc(
+      78px +
+      env(safe-area-inset-bottom)
+    );
+
+  overflow:auto;
+
+  background:
+    linear-gradient(
+      180deg,
+      #0d130e,
+      #070a08
+    );
+
+  border:
+    1px solid
+    rgba(255,255,255,.09);
+
+  border-bottom:0;
+
+  border-radius:
+    22px 22px 0 0;
+
+  box-shadow:
+    0 -30px 90px
+    rgba(0,0,0,.75);
+
+  transform:
+    translateY(110%);
+
+  transition:
+    transform
+    .3s
+    cubic-bezier(.2,.8,.2,1);
+}
+
+
+.mobile-sheet.open{
+  transform:
+    translateY(0);
+}
+
+
+.sheet-handle{
+  width:42px;
+  height:4px;
+
+  margin:
+    0 auto 12px;
+
+  border-radius:999px;
+
+  background:
+    rgba(255,255,255,.17);
+}
+
+
+.sheet-head{
+  display:flex;
+
+  align-items:center;
+  justify-content:space-between;
+
+  margin-bottom:12px;
+}
+
+
+.sheet-head strong{
+  font-size:15px;
+  font-weight:1000;
+}
+
+
+.sheet-close{
+  width:31px;
+  height:31px;
+
+  color:#fff;
+
+  background:#101510;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:9px;
+
+  font-size:18px;
+}
+
+
+.sheet-grid{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:7px;
+}
+
+
+.sheet-card{
+  min-height:72px;
+
+  display:flex;
+
+  flex-direction:column;
+
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+
+  color:#89938a;
+
+  background:#080d09;
+
+  border:
+    1px solid var(--line);
+
+  border-radius:12px;
+
+  font-size:6px;
+  font-weight:950;
+}
+
+
+.sheet-card .icon{
+  font-size:18px;
+
+  color:var(--lime);
+}
+
+
+.sheet-card:active{
+  transform:scale(.97);
+}
+
+
+/* ============================================================
+   MOBILE NAV
+============================================================ */
+
+.mobile-nav{
+  display:none;
+}
+
+
+/* ============================================================
+   MOBILE EDITOR
+============================================================ */
+
+@media(max-width:760px){
+
+  .app{
+
+    grid-template-rows:
+      58px
+      minmax(0,1fr)
+      198px;
+
+  }
+
+
+  /* ---------------- TOP ---------------- */
+
+  .topbar{
+
+    height:58px;
+
+    padding:
+      7px 9px;
+
+    gap:6px;
+
+  }
+
+
+  .logo{
+
+    min-width:0;
+
+  }
+
+
+  .logo-mark{
+
+    width:39px;
+    height:39px;
+
+    flex-basis:39px;
+
+  }
+
+
+  .logo-text{
+
+    display:none;
+
+  }
+
+
+  .top-actions{
+
+    margin-left:auto;
+
+  }
+
+
+  .top-actions .btn{
+
+    height:36px;
+
+    padding:
+      0 9px;
+
+    font-size:7px;
+
+  }
+
+
+  #resetBtn{
+
+    display:none;
+
+  }
+
+
+  /* ---------------- WORKSPACE ---------------- */
+
+  .workspace{
+
+    display:block;
+
+    position:relative;
+
+    min-height:0;
+
+    overflow:hidden;
+
+  }
+
+
+  .sidebar{
+
+    display:none;
+
+  }
+
+
+  .stage{
+
+    width:100%;
+    height:100%;
+
+    min-height:0;
+
+    overflow:hidden;
+
+  }
+
+
+  .stage-top{
+
+    height:44px;
+
+    padding:
+      7px 10px 5px;
+
+  }
+
+
+  .project-name strong{
+
+    font-size:11px;
+
+  }
+
+
+  .project-name span{
+
+    font-size:6px;
+
+  }
+
+
+  .ratio-group{
+
+    gap:4px;
+
+  }
+
+
+  .ratio-btn{
+
+    min-width:48px;
+
+    height:30px;
+
+    padding:
+      0 7px;
+
+    font-size:6px;
+
+  }
+
+
+  /* ---------------- PREVIEW ---------------- */
+
+  .video-frame{
+
+    min-height:0;
+
+    padding:
+      4px 8px 8px;
+
+  }
+
+
+  .r916{
+
+    width:
+      min(
+        43vw,
+        340px
+      );
+
+    max-height:
+      calc(
+        100dvh -
+        300px
+      );
+
+  }
+
+
+  .r45{
+
+    width:
+      min(
+        68vw,
+        470px
+      );
+
+  }
+
+
+  .r169{
+
+    width:
+      calc(
+        100vw - 20px
+      );
+
+  }
+
+
+  .video-title{
+
+    font-size:
+      clamp(
+        19px,
+        6vw,
+        34px
+      );
+
+  }
+
+
+  .video-price{
+
+    font-size:
+      clamp(
+        19px,
+        6vw,
+        34px
+      );
+
+  }
+
+
+  /* ---------------- TIMELINE ---------------- */
+
+  .timeline{
+
+    height:198px;
+
+    min-height:198px;
+
+  }
+
+
+  .timeline-head{
+
+    height:45px;
+
+    padding:
+      0 8px;
+
+    gap:5px;
+
+    overflow-x:auto;
+
+    scrollbar-width:none;
+
+  }
+
+
+  .timeline-head::-webkit-scrollbar{
+
+    display:none;
+
+  }
+
+
+  .play-btn{
+
+    width:32px;
+    height:32px;
+
+    flex-basis:32px;
+
+  }
+
+
+  .timeline-time{
+
+    min-width:72px;
+
+    font-size:7px;
+
+  }
+
+
+  .timeline-tool{
+
+    height:30px;
+
+    padding:
+      0 8px;
+
+    flex:0 0 auto;
+
+    font-size:6px;
+
+  }
+
+
+  .timeline-body{
+
+    height:153px;
+
+    overflow-x:auto;
+
+  }
+
+
+  /* IMPORTANT:
+     timeline desktop width is preserved horizontally,
+     but labels are reduced for mobile. */
+
+  .ruler{
+
+    left:78px;
+
+  }
+
+
+  .track-name{
+
+    width:78px;
+
+    padding-left:9px;
+
+    font-size:6px;
+
+  }
+
+
+  .track-content{
+
+    left:78px;
+
+  }
+
+
+  .clip{
+
+    padding:
+      0 7px;
+
+    font-size:6px;
+
+  }
+
+
+  /* ---------------- MOBILE NAV ---------------- */
+
+  .mobile-nav{
+
+    position:fixed;
+
+    left:0;
+    right:0;
+    bottom:0;
+
+    z-index:5000;
+
+    height:
+      calc(
+        70px +
+        env(safe-area-inset-bottom)
+      );
+
+    padding:
+      4px 5px
+      env(safe-area-inset-bottom);
+
+    display:grid;
+
+    grid-template-columns:
+      repeat(6,1fr);
+
+    gap:2px;
+
+    background:
+      rgba(6,9,7,.98);
+
+    border-top:
+      1px solid var(--line);
+
+    box-shadow:
+      0 -15px 45px
+      rgba(0,0,0,.55);
+
+    backdrop-filter:
+      blur(20px);
+
+  }
+
+
+  .mobile-nav button{
+
+    min-width:0;
+
+    display:flex;
+
+    flex-direction:column;
+
+    align-items:center;
+    justify-content:center;
+
+    gap:4px;
+
+    color:#727c73;
+
+    background:transparent;
+
+    border:0;
+
+    border-radius:10px;
+
+    font-size:5px;
+    font-weight:1000;
+
+  }
+
+
+  .mobile-nav .nav-icon{
+
+    width:27px;
+    height:27px;
+
+    display:grid;
+    place-items:center;
+
+    color:#9ba49b;
+
+    background:#0b100c;
+
+    border:
+      1px solid var(--line);
+
+    border-radius:8px;
+
+    font-size:12px;
+
+  }
+
+
+  .mobile-nav button.active{
+
+    color:var(--lime);
+
+  }
+
+
+  .mobile-nav button.active
+  .nav-icon{
+
+    color:#071006;
+
+    background:
+      linear-gradient(
+        135deg,
+        var(--lime),
+        var(--lime2)
+      );
+
+    border-color:var(--lime);
+
+  }
+
+
+  /* ---------------- SHEET ---------------- */
+
+  .sheet-grid{
+
+    grid-template-columns:
+      repeat(3,1fr);
+
+  }
+
+
+  /* ---------------- MODAL ---------------- */
+
+  .modal{
+
+    align-items:flex-end;
+
+    padding:0;
+
+  }
+
+
+  .modal-box{
+
+    width:100%;
+
+    max-height:86dvh;
+
+    padding:
+      15px 12px
+      calc(
+        15px +
+        env(safe-area-inset-bottom)
+      );
+
+    border-radius:
+      22px 22px 0 0;
+
+  }
+
+
+  .product-list{
+
+    grid-template-columns:
+      1fr;
+
+    max-height:
+      66dvh;
+
+    overflow:auto;
+
+  }
+
+
+  .toast{
+
+    bottom:
+      calc(
+        76px +
+        env(safe-area-inset-bottom)
+      );
+
+  }
+
+}
+
+
+/* ============================================================
+   SMALL PHONE
+============================================================ */
+
+@media(max-width:420px){
+
+  .app{
+
+    grid-template-rows:
+      56px
+      minmax(0,1fr)
+      194px;
+
+  }
+
+
+  .topbar{
+
+    height:56px;
+
+  }
+
+
+  .top-actions .btn{
+
+    height:35px;
+
+    padding:
+      0 8px;
+
+  }
+
+
+  .stage-top{
+
+    height:42px;
+
+  }
+
+
+  .ratio-btn{
+
+    min-width:43px;
+
+    height:28px;
+
+  }
+
+
+  .r916{
+
+    width:
+      min(
+        46vw,
+        310px
+      );
+
+  }
+
+
+  .timeline{
+
+    height:194px;
+
+    min-height:194px;
+
+  }
+
+
+  .timeline-body{
+
+    height:149px;
+
+  }
+
+
+  .mobile-nav{
+
+    height:
+      calc(
+        68px +
+        env(safe-area-inset-bottom)
+      );
+
+  }
+
+
+  .mobile-nav .nav-icon{
+
+    width:25px;
+    height:25px;
+
+  }
+
+
+  .mobile-nav button{
+
+    font-size:4.5px;
+
+  }
+
+}
+
+
+/* ============================================================
+   DESKTOP ONLY
+============================================================ */
+
+@media(min-width:761px) and (max-width:1100px){
+
+  .workspace{
+
+    grid-template-columns:
+      220px
+      minmax(0,1fr)
+      235px;
+
+  }
+
+  .logo-text{
+
+    display:none;
+
+  }
+
+}
+
+
+/* ============================================================
+   ULTRA WIDE
+============================================================ */
+
+@media(min-width:1600px){
+
+  .workspace{
+
+    grid-template-columns:
+      310px
+      minmax(0,1fr)
+      320px;
+
+  }
+
+  .r916{
+
+    width:390px;
+
+  }
+
+}
+
+</style>
+</head>
+
+
+<body>
+
+
+<div class="app">
+
+
+<!-- ==========================================================
+     TOPBAR
+=========================================================== -->
+
+<header class="topbar">
+
+  <div class="logo">
+
+    <div class="logo-mark">
+      L
+    </div>
+
+    <div class="logo-text">
+
+      <strong>
+        LARAS VIDEO STUDIO
+      </strong>
+
+      <span>
+        Professional Product Video Editor
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <div class="top-actions">
+
+    <button
+      class="btn"
+      id="productBtn"
+    >
+      PRODUCT
+    </button>
+
+    <button
+      class="btn"
+      id="resetBtn"
+    >
+      RESET
+    </button>
+
+    <button
+      class="btn orange"
+      id="exportBtn"
+    >
+      EXPORT VIDEO
+    </button>
+
+  </div>
+
+</header>
+
+
+<!-- ==========================================================
+     WORKSPACE
+=========================================================== -->
+
+<main class="workspace">
+
+
+<!-- ========================================================
+     TEMPLATE LIBRARY
+========================================================= -->
+
+<aside class="sidebar">
+
+  <div class="sidebar-head">
+
+    <div class="eyebrow">
+      EDITOR
+    </div>
+
+    <div class="headline">
+      Creative Library
+    </div>
+
+    <div class="subline">
+      Template, media, text, audio dan effects.
+    </div>
+
+  </div>
+
+
+  <div
+    class="template-grid"
+    id="templateGrid"
+  ></div>
+
+</aside>
+
+
+<!-- ========================================================
+     CENTER
+========================================================= -->
+
+<section class="stage">
+
+
+  <div class="stage-top">
+
+    <div class="project-name">
+
+      <strong id="currentTemplateName">
+        Cinematic Luxury
+      </strong>
+
+      <span id="currentTemplateDesc">
+        Premium slow reveal dengan light sweep.
+      </span>
+
+    </div>
+
+
+    <div class="ratio-group">
+
+      <button
+        class="ratio-btn active"
+        data-ratio="9:16"
+      >
+        9:16
+      </button>
+
+      <button
+        class="ratio-btn"
+        data-ratio="4:5"
+      >
+        4:5
+      </button>
+
+      <button
+        class="ratio-btn"
+        data-ratio="16:9"
+      >
+        16:9
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="video-frame">
+
+
+    <div
+      class="video-canvas r916"
+      id="videoCanvas"
+    >
+
+
+      <div
+        class="canvas-background"
+        id="canvasBackground"
+      ></div>
+
+
+      <div
+        class="canvas-light"
+        id="canvasLight"
+      ></div>
+
+
+      <div
+        class="canvas-product"
+        id="canvasProduct"
+      >
+
+        <img
+          id="productImage"
+          alt=""
+        >
+
+        <div
+          class="product-shadow"
+        ></div>
+
+      </div>
+
+
+      <div class="canvas-content">
+
+        <div
+          class="video-kicker"
+          id="videoKicker"
+        >
+          LIMITED PROMO
+        </div>
+
+
+        <div
+          class="video-title"
+          id="videoTitle"
+        >
+          LUXIMOS Z2
+        </div>
+
+
+        <div
+          class="video-price-label"
+          id="videoPriceLabel"
+        >
+          SPECIAL PRICE
+        </div>
+
+
+        <div
+          class="video-price"
+          id="videoPrice"
+        >
+          Rp 157.950
+        </div>
+
+
+        <div
+          class="video-cta"
+          id="videoCta"
+        >
+          ORDER NOW
+        </div>
+
+
+        <div
+          class="video-sale"
+          id="videoSale"
+        >
+          PROMO TERBATAS
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- ========================================================
+     INSPECTOR
+========================================================= -->
+
+<aside class="sidebar right">
+
+  <div class="sidebar-head">
+
+    <div class="eyebrow">
+      INSPECTOR
+    </div>
+
+    <div class="headline">
+      Video Controls
+    </div>
+
+  </div>
+
+
+  <div class="inspector">
+
+
+    <div class="inspector-section">
+
+      <div class="inspector-title">
+        PRODUCT
+      </div>
+
+      <select
+        class="product-select"
+        id="productSelect"
+      >
+
+        <option value="">
+          Loading products...
+        </option>
+
+      </select>
+
+    </div>
+
+
+    <div class="inspector-section">
+
+      <div class="inspector-title">
+        DURATION
+      </div>
+
+      <div class="control-row">
+
+        <label>
+          Seconds
+        </label>
+
+        <span
+          class="control-value"
+          id="durationValue"
+        >
+          8s
+        </span>
+
+      </div>
+
+      <input
+        class="range"
+        id="durationRange"
+        type="range"
+        min="4"
+        max="15"
+        step=".5"
+        value="8"
+      >
+
+    </div>
+
+
+    <div class="inspector-section">
+
+      <div class="inspector-title">
+        SPEED
+      </div>
+
+      <div class="control-row">
+
+        <label>
+          Animation
+        </label>
+
+        <span
+          class="control-value"
+          id="speedValue"
+        >
+          1.0x
+        </span>
+
+      </div>
+
+      <input
+        class="range"
+        id="speedRange"
+        type="range"
+        min=".5"
+        max="2"
+        step=".1"
+        value="1"
+      >
+
+    </div>
+
+
+    <div class="inspector-section">
+
+      <div class="inspector-title">
+        MOTION
+      </div>
+
+      <div class="effect-grid">
+
+        <button
+          class="effect-btn active"
+          data-effect="cinematic"
+        >
+          CINEMATIC
+        </button>
+
+        <button
+          class="effect-btn"
+          data-effect="punch"
+        >
+          PUNCH
+        </button>
+
+        <button
+          class="effect-btn"
+          data-effect="slide"
+        >
+          SLIDE
+        </button>
+
+        <button
+          class="effect-btn"
+          data-effect="minimal"
+        >
+          MINIMAL
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <div class="inspector-section">
+
+      <div class="inspector-title">
+        ACCENT
+      </div>
+
+      <div class="effect-grid">
+
+        <button
+          class="effect-btn active"
+          data-accent="#8cc63f"
+        >
+          LIME
+        </button>
+
+        <button
+          class="effect-btn"
+          data-accent="#ff7612"
+        >
+          ORANGE
+        </button>
+
+        <button
+          class="effect-btn"
+          data-accent="#2998e8"
+        >
+          BLUE
+        </button>
+
+        <button
+          class="effect-btn"
+          data-accent="#ff5757"
+        >
+          RED
+        </button>
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+</aside>
+
+
+</main>
+
+
+<!-- ==========================================================
+     TIMELINE
+=========================================================== -->
+
+<section class="timeline">
+
+
+  <div class="timeline-head">
+
+
+    <button
+      class="play-btn"
+      id="playBtn"
+    >
+      ▶
+    </button>
+
+
+    <span
+      class="timeline-time"
+      id="timelineTime"
+    >
+      00:00 / 00:08
+    </span>
+
+
+    <button
+      class="timeline-tool"
+      id="restartBtn"
+    >
+      RESTART
+    </button>
+
+
+    <button
+      class="timeline-tool"
+      id="previewBtn"
+    >
+      PREVIEW
+    </button>
+
+
+    <div class="timeline-tools">
+
+      <button
+        class="timeline-tool"
+        id="saveBtn"
+      >
+        SAVE
+      </button>
+
+      <button
+        class="timeline-tool"
+        id="loadBtn"
+      >
+        LOAD
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div
+    class="timeline-body"
+    id="timelineBody"
+  >
+
+    <div
+      class="ruler"
+      id="ruler"
+    ></div>
+
+
+    <div class="track-area">
+
+
+      <div class="track">
+
+        <div class="track-name">
+          PRODUCT
+        </div>
+
+        <div
+          class="track-content"
+          id="productTrack"
+        ></div>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-name">
+          TITLE
+        </div>
+
+        <div
+          class="track-content"
+          id="titleTrack"
+        ></div>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-name">
+          PRICE
+        </div>
+
+        <div
+          class="track-content"
+          id="priceTrack"
+        ></div>
+
+      </div>
+
+
+      <div class="track">
+
+        <div class="track-name">
+          CTA
+        </div>
+
+        <div
+          class="track-content"
+          id="ctaTrack"
+        ></div>
+
+      </div>
+
+
+    </div>
+
+
+    <div
+      class="playhead"
+      id="playhead"
+    ></div>
+
+  </div>
+
+</section>
+
+
+</div>
+
+
+<!-- ==========================================================
+     MOBILE OVERLAY
+=========================================================== -->
+
+<div
+  class="mobile-overlay"
+  id="mobileOverlay"
+></div>
+
+
+<!-- ==========================================================
+     MOBILE SHEET
+=========================================================== -->
+
+<section
+  class="mobile-sheet"
+  id="mobileSheet"
+>
+
+  <div class="sheet-handle"></div>
+
+
+  <div class="sheet-head">
+
+    <strong id="sheetTitle">
+      Editor Tools
+    </strong>
+
+    <button
+      class="sheet-close"
+      id="sheetClose"
+    >
+      ×
+    </button>
+
+  </div>
+
+
+  <div
+    class="sheet-grid"
+    id="sheetGrid"
+  ></div>
+
+</section>
+
+
+<!-- ==========================================================
+     MOBILE NAV
+=========================================================== -->
+
+<nav class="mobile-nav">
+
+
+  <button
+    data-mobile="templates"
+    class="active"
+  >
+
+    <span class="nav-icon">
+      ✦
+    </span>
+
+    TEMPLATE
+
+  </button>
+
+
+  <button
+    data-mobile="product"
+  >
+
+    <span class="nav-icon">
+      ▣
+    </span>
+
+    PRODUCT
+
+  </button>
+
+
+  <button
+    data-mobile="text"
+  >
+
+    <span class="nav-icon">
+      T
+    </span>
+
+    TEXT
+
+  </button>
+
+
+  <button
+    data-mobile="audio"
+  >
+
+    <span class="nav-icon">
+      ♫
+    </span>
+
+    AUDIO
+
+  </button>
+
+
+  <button
+    data-mobile="effects"
+  >
+
+    <span class="nav-icon">
+      ✨
+    </span>
+
+    EFFECT
+
+  </button>
+
+
+  <button
+    data-mobile="more"
+  >
+
+    <span class="nav-icon">
+      ⋯
+    </span>
+
+    MORE
+
+  </button>
+
+
+</nav>
+
+
+<!-- ==========================================================
+     PRODUCT MODAL
+=========================================================== -->
+
+<div
+  class="modal"
+  id="productModal"
+>
+
+  <div class="modal-box">
+
+
+    <div class="modal-head">
+
+      <div class="modal-title">
+        Choose Product
+      </div>
+
+      <button
+        class="close"
+        id="closeProductModal"
+      >
+        ×
+      </button>
+
+    </div>
+
+
+    <div
+      class="product-list"
+      id="productList"
+    ></div>
+
+
+  </div>
+
+</div>
+
+
+<div
+  class="toast"
+  id="toast"
+></div>
+
+
+<script>
+
+/* ============================================================
+   LARAS VIDEO ENGINE
+============================================================ */
+
+const CONFIG = {
+
+  JSON:"produk.json",
+
+  IMAGE_FOLDER:"images/produk/",
+
+  DEFAULT_DURATION:8,
+
+  FPS:30
+
+};
+
+
+const state = {
+
+  products:[],
+
+  product:null,
+
+  ratio:"9:16",
+
+  duration:8,
+
+  speed:1,
+
+  currentTime:0,
+
+  playing:false,
+
+  animationFrame:null,
+
+  selectedTemplate:"cinematic",
+
+  effect:"cinematic",
+
+  accent:"#8cc63f"
+
+};
+
+
+/* ============================================================
+   TEMPLATES
+============================================================ */
+
+const VIDEO_TEMPLATES=[
+
+  {
+    id:"cinematic",
+    name:"Cinematic Luxury",
+    desc:"Premium slow reveal dengan light sweep.",
+    duration:8,
+    color:"#8cc63f",
+    color2:"#c8f77c",
+    icon:"✦",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:8,
+        color:"green"
+      },
+      {
+        name:"TITLE",
+        start:.8,
+        end:5.8,
+        color:"green"
+      },
+      {
+        name:"PRICE",
+        start:3.2,
+        end:7,
+        color:"orange"
+      },
+      {
+        name:"CTA",
+        start:5,
+        end:8,
+        color:"blue"
+      }
+    ]
+  },
+
+
+  {
+    id:"hardSell",
+    name:"Hard Sell",
+    desc:"Fast punch, harga muncul agresif.",
+    duration:7,
+    color:"#ff7612",
+    color2:"#ffb25f",
+    icon:"⚡",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:7,
+        color:"orange"
+      },
+      {
+        name:"TITLE",
+        start:.3,
+        end:3.8,
+        color:"orange"
+      },
+      {
+        name:"PRICE",
+        start:2.2,
+        end:5.8,
+        color:"red"
+      },
+      {
+        name:"CTA",
+        start:4.5,
+        end:7,
+        color:"blue"
+      }
+    ]
+  },
+
+
+  {
+    id:"productPunch",
+    name:"Product Punch",
+    desc:"Product hero dengan zoom punch.",
+    duration:6,
+    color:"#2998e8",
+    color2:"#78c8ff",
+    icon:"◆",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:6,
+        color:"blue"
+      },
+      {
+        name:"TITLE",
+        start:.8,
+        end:3.2,
+        color:"green"
+      },
+      {
+        name:"PRICE",
+        start:2.8,
+        end:5.2,
+        color:"orange"
+      },
+      {
+        name:"CTA",
+        start:4.2,
+        end:6,
+        color:"purple"
+      }
+    ]
+  },
+
+
+  {
+    id:"flashSale",
+    name:"Flash Sale",
+    desc:"Tempo cepat dengan urgency tinggi.",
+    duration:7,
+    color:"#ff5757",
+    color2:"#ff8b8b",
+    icon:"🔥",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:7,
+        color:"red"
+      },
+      {
+        name:"TITLE",
+        start:.4,
+        end:3,
+        color:"red"
+      },
+      {
+        name:"PRICE",
+        start:1.8,
+        end:5.2,
+        color:"orange"
+      },
+      {
+        name:"CTA",
+        start:4.2,
+        end:7,
+        color:"green"
+      }
+    ]
+  },
+
+
+  {
+    id:"minimal",
+    name:"Minimal Pro",
+    desc:"Clean commercial dengan motion lembut.",
+    duration:10,
+    color:"#d5d9d3",
+    color2:"#ffffff",
+    icon:"○",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:10,
+        color:"green"
+      },
+      {
+        name:"TITLE",
+        start:2,
+        end:7,
+        color:"green"
+      },
+      {
+        name:"PRICE",
+        start:5,
+        end:9,
+        color:"orange"
+      },
+      {
+        name:"CTA",
+        start:7,
+        end:10,
+        color:"blue"
+      }
+    ]
+  },
+
+
+  {
+    id:"beat",
+    name:"Beat Flash",
+    desc:"Perubahan visual mengikuti beat.",
+    duration:8,
+    color:"#8d6aff",
+    color2:"#c0aaff",
+    icon:"♪",
+    tracks:[
+      {
+        name:"PRODUCT",
+        start:0,
+        end:8,
+        color:"purple"
+      },
+      {
+        name:"TITLE",
+        start:1,
+        end:4,
+        color:"purple"
+      },
+      {
+        name:"PRICE",
+        start:3.5,
+        end:6.5,
+        color:"orange"
+      },
+      {
+        name:"CTA",
+        start:5.5,
+        end:8,
+        color:"green"
+      }
+    ]
+  }
+
+];
+
+
+/* ============================================================
+   DOM
+============================================================ */
+
+const $=id=>
+  document.getElementById(id);
+
+
+const videoCanvas=
+  $("videoCanvas");
+
+
+const productImage=
+  $("productImage");
+
+
+const videoKicker=
+  $("videoKicker");
+
+
+const videoTitle=
+  $("videoTitle");
+
+
+const videoPrice=
+  $("videoPrice");
+
+
+const videoPriceLabel=
+  $("videoPriceLabel");
+
+
+const videoCta=
+  $("videoCta");
+
+
+const videoSale=
+  $("videoSale");
+
+
+const productSelect=
+  $("productSelect");
+
+
+const durationRange=
+  $("durationRange");
+
+
+const durationValue=
+  $("durationValue");
+
+
+const speedRange=
+  $("speedRange");
+
+
+const speedValue=
+  $("speedValue");
+
+
+const playBtn=
+  $("playBtn");
+
+
+const restartBtn=
+  $("restartBtn");
+
+
+const timelineTime=
+  $("timelineTime");
+
+
+const playhead=
+  $("playhead");
+
+
+const toast=
+  $("toast");
+
+
+/* ============================================================
+   HELPERS
+============================================================ */
+
+function escapeHTML(value){
+
+  return String(value??"")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+
+}
+
+
+function formatRupiah(value){
+
+  const n=
+    Number(
+      String(value??0)
+        .replace(/[^\d]/g,"")
+    );
+
+  if(
+    !Number.isFinite(n)||
+    n<=0
+  ){
+
+    return "Rp 0";
+
+  }
+
+  return "Rp "+
+    n.toLocaleString("id-ID");
+
+}
+
+
+function formatTime(seconds){
+
+  const s=
+    Math.max(
+      0,
+      Number(seconds)||0
+    );
+
+  const mm=
+    Math.floor(s/60);
+
+
+  const ss=
+    Math.floor(s%60)
+      .toString()
+      .padStart(2,"0");
+
+
+  return(
+    mm.toString().padStart(2,"0")
+    +":"+
+    ss
+  );
+
+}
+
+
+function showToast(message){
+
+  toast.textContent=
+    message;
+
+  toast.classList.add(
+    "show"
+  );
+
+  clearTimeout(
+    showToast.timer
+  );
+
+  showToast.timer=
+    setTimeout(
+      ()=>{
+        toast.classList.remove(
+          "show"
+        );
+      },
+      2200
+    );
+
+}
+
+
+/* ============================================================
+   PRODUCTS
+============================================================ */
+
+function normalizeProduct(
+  raw,
+  index
+){
+
+  const p=raw||{};
+
+
+  const id=
+    p.id??
+    p.sku??
+    `product-${index+1}`;
+
+
+  const name=
+    p.name??
+    p.nama??
+    p.title??
+    `Product ${index+1}`;
+
+
+  const brand=
+    p.brand??
+    p.merk??
+    p.brands??
+    "LUXIMOS";
+
+
+  const price=
+    p.price??
+    p.harga??
+    p.sale_price??
+    0;
+
+
+  const oldPrice=
+    p.oldPrice??
+    p.old_price??
+    p.harga_lama??
+    p.originalPrice??
+    0;
+
+
+  let image=
+    p.image??
+    p.img??
+    p.photo??
+    p.foto??
+    p.src??
+    "";
+
+
+  if(
+    image&&
+    !image.startsWith("http")&&
+    !image.startsWith("/")&&
+    !image.startsWith("data:")
+  ){
+
+    if(
+      !image.startsWith("images/")
+    ){
+
+      image=
+        CONFIG.IMAGE_FOLDER+
+        image;
+
+    }
+
+  }
+
+
+  return{
+    ...p,
+    id,
+    name,
+    brand,
+    price,
+    oldPrice,
+    image
+  };
+
+}
+
+
+async function loadProducts(){
+
+  try{
+
+    const response=
+      await fetch(
+        CONFIG.JSON,
+        {
+          cache:"no-store"
+        }
+      );
+
+
+    if(!response.ok){
+
+      throw new Error(
+        `HTTP ${response.status}`
+      );
+
+    }
+
+
+    const data=
+      await response.json();
+
+
+    let list=[];
+
+
+    if(
+      Array.isArray(data)
+    ){
+
+      list=data;
+
+    }
+    else if(
+      Array.isArray(data.products)
+    ){
+
+      list=data.products;
+
+    }
+    else if(
+      Array.isArray(data.produk)
+    ){
+
+      list=data.produk;
+
+    }
+    else if(
+      Array.isArray(data.data)
+    ){
+
+      list=data.data;
+
+    }
+
+
+    state.products=
+      list.map(
+        normalizeProduct
+      );
+
+
+    renderProductSelect();
+
+    renderProductModal();
+
+
+    if(
+      state.products.length
+    ){
+
+      state.product=
+        state.products[0];
+
+      productSelect.value=
+        state.product.id;
+
+      applyProduct();
+
+    }
+    else{
+
+      showToast(
+        "produk.json tidak berisi produk."
+      );
+
+    }
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    showToast(
+      "Gagal membaca produk.json"
+    );
+
+
+    productSelect.innerHTML=`
+      <option value="">
+        produk.json tidak ditemukan
+      </option>
+    `;
+
+  }
+
+}
+
+
+function renderProductSelect(){
+
+  productSelect.innerHTML=
+    state.products
+      .map(
+        p=>`
+          <option value="${escapeHTML(p.id)}">
+            ${escapeHTML(p.name)}
+          </option>
+        `
+      )
+      .join("");
+
+}
+
+
+function renderProductModal(){
+
+  $("productList").innerHTML=
+    state.products
+      .map(
+        p=>`
+
+          <button
+            class="product-option"
+            data-product-id="${escapeHTML(p.id)}"
+          >
+
+            <span class="product-thumb">
+
+              ${
+                p.image
+                ?
+                `
+                  <img
+                    src="${escapeHTML(p.image)}"
+                    alt=""
+                  >
+                `
+                :
+                ""
+              }
+
+            </span>
+
+            <span>
+
+              <span class="product-option-name">
+                ${escapeHTML(p.name)}
+              </span>
+
+              <span class="product-option-price">
+                ${formatRupiah(p.price)}
+              </span>
+
+            </span>
+
+          </button>
+
+        `
+      )
+      .join("");
+
+
+  document
+    .querySelectorAll(
+      ".product-option"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+
+            selectProduct(
+              btn.dataset.productId
+            );
+
+
+            $("productModal")
+              .classList
+              .remove("open");
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function selectProduct(id){
+
+  const product=
+    state.products.find(
+      p=>
+        String(p.id)===
+        String(id)
+    );
+
+
+  if(!product)
+    return;
+
+
+  state.product=
+    product;
+
+
+  productSelect.value=
+    product.id;
+
+
+  applyProduct();
+
+
+  showToast(
+    `Product: ${product.name}`
+  );
+
+}
+
+
+function applyProduct(){
+
+  const p=
+    state.product;
+
+
+  if(!p)
+    return;
+
+
+  productImage.src=
+    p.image||"";
+
+
+  productImage.alt=
+    p.name;
+
+
+  videoKicker.textContent=
+    p.brand||
+    "LIMITED PROMO";
+
+
+  videoTitle.textContent=
+    p.name;
+
+
+  videoPriceLabel.textContent=
+    p.oldPrice
+      ? "SPECIAL PRICE"
+      : "STARTING FROM";
+
+
+  videoPrice.textContent=
+    formatRupiah(
+      p.price
+    );
+
+
+  videoCta.textContent=
+    "ORDER NOW";
+
+
+  videoSale.textContent=
+    "PROMO TERBATAS";
+
+
+  resetPreview();
+
+}
+
+
+/* ============================================================
+   TEMPLATES
+============================================================ */
+
+function getTemplate(){
+
+  return(
+    VIDEO_TEMPLATES.find(
+      t=>
+        t.id===
+        state.selectedTemplate
+    )||
+    VIDEO_TEMPLATES[0]
+  );
+
+}
+
+
+function renderTemplates(){
+
+  const grid=
+    $("templateGrid");
+
+
+  grid.innerHTML=
+    VIDEO_TEMPLATES
+      .map(
+        t=>`
+
+          <button
+            class="
+              template-card
+              ${t.id===state.selectedTemplate?"active":""}
+            "
+            data-template="${t.id}"
+          >
+
+            <div
+              class="template-preview"
+              style="
+                --tc1:${t.color};
+                --tc2:${t.color2};
+              "
+            >
+
+              <div class="template-icon">
+                ${t.icon}
+              </div>
+
+              <div class="template-duration">
+                ${t.duration}s
+              </div>
+
+            </div>
+
+            <div class="template-info">
+
+              <div class="template-name">
+                ${escapeHTML(t.name)}
+              </div>
+
+              <div class="template-desc">
+                ${escapeHTML(t.desc)}
+              </div>
+
+            </div>
+
+          </button>
+
+        `
+      )
+      .join("");
+
+
+  grid
+    .querySelectorAll(
+      ".template-card"
+    )
+    .forEach(
+      card=>{
+
+        card.addEventListener(
+          "click",
+          ()=>{
+
+            selectTemplate(
+              card.dataset.template
+            );
+
+            closeMobileSheet();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function selectTemplate(id){
+
+  const template=
+    VIDEO_TEMPLATES.find(
+      t=>t.id===id
+    );
+
+
+  if(!template)
+    return;
+
+
+  state.selectedTemplate=
+    id;
+
+
+  state.duration=
+    template.duration;
+
+
+  durationRange.value=
+    template.duration;
+
+
+  durationValue.textContent=
+    `${template.duration}s`;
+
+
+  $("currentTemplateName")
+    .textContent=
+      template.name;
+
+
+  $("currentTemplateDesc")
+    .textContent=
+      template.desc;
+
+
+  videoCanvas.style.setProperty(
+    "--accent",
+    state.accent
+  );
+
+
+  renderTemplates();
+
+  renderTimeline();
+
+  resetPreview();
+
+
+  showToast(
+    `Template: ${template.name}`
+  );
+
+}
+
+
+/* ============================================================
+   RATIO
+============================================================ */
+
+document
+  .querySelectorAll(
+    ".ratio-btn"
+  )
+  .forEach(
+    btn=>{
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          state.ratio=
+            btn.dataset.ratio;
+
+
+          document
+            .querySelectorAll(
+              ".ratio-btn"
+            )
+            .forEach(
+              b=>
+                b.classList.toggle(
+                  "active",
+                  b===btn
+                )
+            );
+
+
+          videoCanvas.className=
+            `video-canvas ${
+              state.ratio==="9:16"
+                ?"r916"
+                :state.ratio==="4:5"
+                  ?"r45"
+                  :"r169"
+            }`;
+
+
+          videoCanvas.style.setProperty(
+            "--accent",
+            state.accent
+          );
+
+
+          resetPreview();
+
+
+          showToast(
+            `Ratio ${state.ratio}`
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   DURATION
+============================================================ */
+
+durationRange.addEventListener(
+  "input",
+  ()=>{
+
+    state.duration=
+      Number(
+        durationRange.value
+      );
+
+
+    durationValue.textContent=
+      `${state.duration}s`;
+
+
+    renderTimeline();
+
+    resetPreview(false);
+
+  }
+);
+
+
+/* ============================================================
+   SPEED
+============================================================ */
+
+speedRange.addEventListener(
+  "input",
+  ()=>{
+
+    state.speed=
+      Number(
+        speedRange.value
+      );
+
+
+    speedValue.textContent=
+      `${state.speed.toFixed(1)}x`;
+
+
+    resetPreview(false);
+
+  }
+);
+
+
+/* ============================================================
+   ACCENT
+============================================================ */
+
+document
+  .querySelectorAll(
+    "[data-accent]"
+  )
+  .forEach(
+    btn=>{
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          state.accent=
+            btn.dataset.accent;
+
+
+          videoCanvas.style.setProperty(
+            "--accent",
+            state.accent
+          );
+
+
+          document
+            .querySelectorAll(
+              "[data-accent]"
+            )
+            .forEach(
+              b=>
+                b.classList.toggle(
+                  "active",
+                  b===btn
+                )
+            );
+
+        }
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   EFFECT
+============================================================ */
+
+document
+  .querySelectorAll(
+    "[data-effect]"
+  )
+  .forEach(
+    btn=>{
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          state.effect=
+            btn.dataset.effect;
+
+
+          document
+            .querySelectorAll(
+              "[data-effect]"
+            )
+            .forEach(
+              b=>
+                b.classList.toggle(
+                  "active",
+                  b===btn
+                )
+            );
+
+
+          videoCanvas.style.setProperty(
+            "--effect",
+            state.effect
+          );
+
+
+          resetPreview(false);
+
+        }
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   TIMELINE
+============================================================ */
+
+function renderTimeline(){
+
+  const template=
+    getTemplate();
+
+
+  const ruler=
+    $("ruler");
+
+
+  const duration=
+    state.duration;
+
+
+  ruler.innerHTML="";
+
+
+  for(
+    let i=0;
+    i<=duration;
+    i++
+  ){
+
+    const mark=
+      document.createElement(
+        "div"
+      );
+
+
+    mark.className=
+      "ruler-mark";
+
+
+    mark.style.left=
+      `${(i/duration)*100}%`;
+
+
+    mark.textContent=
+      `${i}s`;
+
+
+    ruler.appendChild(
+      mark
+    );
+
+  }
+
+
+  const tracks=[
+
+    [
+      $("productTrack"),
+      template.tracks[0]
+    ],
+
+    [
+      $("titleTrack"),
+      template.tracks[1]
+    ],
+
+    [
+      $("priceTrack"),
+      template.tracks[2]
+    ],
+
+    [
+      $("ctaTrack"),
+      template.tracks[3]
+    ]
+
+  ];
+
+
+  tracks.forEach(
+    ([container,clip])=>{
+
+      container.innerHTML="";
+
+
+      if(!clip)
+        return;
+
+
+      const el=
+        document.createElement(
+          "div"
+        );
+
+
+      el.className=
+        `clip ${clip.color||""}`;
+
+
+      const start=
+        clip.start;
+
+
+      const end=
+        Math.min(
+          clip.end,
+          duration
+        );
+
+
+      const width=
+        Math.max(
+          1,
+          end-start
+        );
+
+
+      el.style.left=
+        `${(start/duration)*100}%`;
+
+
+      el.style.width=
+        `${(width/duration)*100}%`;
+
+
+      el.textContent=
+        clip.name||
+        (
+          container===
+          $("productTrack")
+            ?"PRODUCT REVEAL"
+            :
+          container===
+          $("titleTrack")
+            ?"TITLE"
+            :
+          container===
+          $("priceTrack")
+            ?"PRICE REVEAL"
+            :
+          "CTA"
+        );
+
+
+      container.appendChild(
+        el
+      );
+
+    }
+  );
+
+
+  updatePlayhead();
+
+}
+
+
+function updatePlayhead(){
+
+  const body=
+    $("timelineBody");
+
+
+  const rulerWidth=
+    body.clientWidth-
+    (
+      window.innerWidth<=760
+        ?78
+        :120
+    );
+
+
+  const offset=
+    window.innerWidth<=760
+      ?78
+      :120;
+
+
+  const left=
+    offset+
+    (
+      state.currentTime/
+      Math.max(
+        .01,
+        state.duration
+      )
+    )*
+    rulerWidth;
+
+
+  playhead.style.left=
+    `${left}px`;
+
+
+  timelineTime.textContent=
+    `${formatTime(state.currentTime)} / ${formatTime(state.duration)}`;
+
+}
+
+
+/* ============================================================
+   PREVIEW
+============================================================ */
+
+function resetPreview(
+  autoPlay=true
+){
+
+  stopPlayback();
+
+
+  state.currentTime=0;
+
+
+  videoCanvas.classList.remove(
+    "playing"
+  );
+
+
+  void videoCanvas.offsetWidth;
+
+
+  if(autoPlay){
+
+    startPlayback();
+
+  }
+
+
+  updatePlayhead();
+
+}
+
+
+function startPlayback(){
+
+  if(state.playing)
+    return;
+
+
+  state.playing=true;
+
+
+  playBtn.textContent=
+    "❚❚";
+
+
+  videoCanvas.classList.add(
+    "playing"
+  );
+
+
+  const startedAt=
+    performance.now()-
+    (
+      state.currentTime/
+      state.speed
+    )*
+    1000;
+
+
+  function frame(now){
+
+    if(!state.playing)
+      return;
+
+
+    state.currentTime=
+      (
+        now-
+        startedAt
+      )/
+      1000*
+      state.speed;
+
+
+    if(
+      state.currentTime>=
+      state.duration
+    ){
+
+      state.currentTime=
+        state.duration;
+
+
+      updatePlayhead();
+
+      stopPlayback();
+
+      return;
+
+    }
+
+
+    updatePlayhead();
+
+
+    state.animationFrame=
+      requestAnimationFrame(
+        frame
+      );
+
+  }
+
+
+  state.animationFrame=
+    requestAnimationFrame(
+      frame
+    );
+
+}
+
+
+function stopPlayback(){
+
+  state.playing=false;
+
+
+  playBtn.textContent=
+    "▶";
+
+
+  if(
+    state.animationFrame
+  ){
+
+    cancelAnimationFrame(
+      state.animationFrame
+    );
+
+
+    state.animationFrame=
+      null;
+
+  }
+
+}
+
+
+function togglePlayback(){
+
+  if(state.playing){
+
+    stopPlayback();
+
+  }
+  else{
+
+    if(
+      state.currentTime>=
+      state.duration
+    ){
+
+      state.currentTime=0;
+
+      videoCanvas.classList.remove(
+        "playing"
+      );
+
+      void videoCanvas.offsetWidth;
+
+      videoCanvas.classList.add(
+        "playing"
+      );
+
+    }
+
+
+    startPlayback();
+
+  }
+
+}
+
+
+playBtn.addEventListener(
+  "click",
+  togglePlayback
+);
+
+
+restartBtn.addEventListener(
+  "click",
+  ()=>{
+    resetPreview(true);
+  }
+);
+
+
+$("previewBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      resetPreview(true);
+    }
+  );
+
+
+/* ============================================================
+   PRODUCT MODAL
+============================================================ */
+
+$("productBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+      $("productModal")
+        .classList.add("open");
+    }
+  );
+
+
+$("closeProductModal")
+  .addEventListener(
+    "click",
+    ()=>{
+      $("productModal")
+        .classList.remove("open");
+    }
+  );
+
+
+$("productModal")
+  .addEventListener(
+    "click",
+    e=>{
+
+      if(
+        e.target===
+        $("productModal")
+      ){
+
+        $("productModal")
+          .classList.remove("open");
+
+      }
+
+    }
+  );
+
+
+productSelect.addEventListener(
+  "change",
+  ()=>{
+    selectProduct(
+      productSelect.value
+    );
+  }
+);
+
+
+/* ============================================================
+   RESET
+============================================================ */
+
+$("resetBtn")
+  .addEventListener(
+    "click",
+    ()=>{
+
+      state.duration=8;
+
+      state.speed=1;
+
+      state.currentTime=0;
+
+      state.effect=
+        "cinematic";
+
+      state.accent=
+        "#8cc63f";
+
+
+      durationRange.value=8;
+
+      speedRange.value=1;
+
+
+      durationValue.textContent=
+        "8s";
+
+
+      speedValue.textContent=
+        "1.0x";
+
+
+      document
+        .querySelectorAll(
+          "[data-effect]"
+        )
+        .forEach(
+          (b,i)=>
+            b.classList.toggle(
+              "active",
+              i===0
+            )
+        );
+
+
+      document
+        .querySelectorAll(
+          "[data-accent]"
+        )
+        .forEach(
+          (b,i)=>
+            b.classList.toggle(
+              "active",
+              i===0
+            )
+        );
+
+
+      selectTemplate(
+        "cinematic"
+      );
+
+
+      showToast(
+        "Editor di-reset."
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   SAVE
+============================================================ */
+
+function getProjectData(){
+
+  return{
+
+    version:"2.0",
+
+    type:
+      "LARAS_VIDEO_PROJECT",
+
+    savedAt:
+      new Date().toISOString(),
+
+    ratio:
+      state.ratio,
+
+    duration:
+      state.duration,
+
+    speed:
+      state.speed,
+
+    effect:
+      state.effect,
+
+    accent:
+      state.accent,
+
+    template:
+      state.selectedTemplate,
+
+    productId:
+      state.product?.id??
+      null
+
+  };
+
+}
+
+
+$("saveBtn")
+  .addEventListener(
+    "click",
+    saveProject
+  );
+
+
+function saveProject(){
+
+  localStorage.setItem(
+    "laras_video_project",
+    JSON.stringify(
+      getProjectData()
+    )
+  );
+
+
+  showToast(
+    "Project tersimpan ✓"
+  );
+
+}
+
+
+/* ============================================================
+   LOAD
+============================================================ */
+
+$("loadBtn")
+  .addEventListener(
+    "click",
+    loadProject
+  );
+
+
+function loadProject(){
+
+  try{
+
+    const raw=
+      localStorage.getItem(
+        "laras_video_project"
+      );
+
+
+    if(!raw){
+
+      showToast(
+        "Belum ada project."
+      );
+
+      return;
+
+    }
+
+
+    const data=
+      JSON.parse(raw);
+
+
+    if(data.ratio){
+
+      state.ratio=
+        data.ratio;
+
+
+      document
+        .querySelectorAll(
+          ".ratio-btn"
+        )
+        .forEach(
+          b=>
+            b.classList.toggle(
+              "active",
+              b.dataset.ratio===
+              state.ratio
+            )
+        );
+
+
+      videoCanvas.className=
+        `video-canvas ${
+          state.ratio==="9:16"
+            ?"r916"
+            :state.ratio==="4:5"
+              ?"r45"
+              :"r169"
+        }`;
+
+    }
+
+
+    if(data.duration){
+
+      state.duration=
+        Number(
+          data.duration
+        );
+
+
+      durationRange.value=
+        state.duration;
+
+
+      durationValue.textContent=
+        `${state.duration}s`;
+
+    }
+
+
+    if(data.speed){
+
+      state.speed=
+        Number(
+          data.speed
+        );
+
+
+      speedRange.value=
+        state.speed;
+
+
+      speedValue.textContent=
+        `${state.speed.toFixed(1)}x`;
+
+    }
+
+
+    if(data.effect){
+
+      state.effect=
+        data.effect;
+
+    }
+
+
+    if(data.accent){
+
+      state.accent=
+        data.accent;
+
+
+      videoCanvas.style.setProperty(
+        "--accent",
+        state.accent
+      );
+
+    }
+
+
+    if(data.template){
+
+      state.selectedTemplate=
+        data.template;
+
+    }
+
+
+    if(
+      data.productId!==null&&
+      data.productId!==undefined
+    ){
+
+      const p=
+        state.products.find(
+          x=>
+            String(x.id)===
+            String(data.productId)
+        );
+
+
+      if(p){
+
+        state.product=
+          p;
+
+        productSelect.value=
+          p.id;
+
+      }
+
+    }
+
+
+    renderTemplates();
+
+    renderTimeline();
+
+    applyProduct();
+
+
+    showToast(
+      "Project berhasil dimuat ✓"
+    );
+
+  }
+  catch(error){
+
+    console.error(error);
+
+    showToast(
+      "Project rusak atau tidak valid."
+    );
+
+  }
+
+}
+
+
+/* ============================================================
+   EXPORT VIDEO
+============================================================ */
+
+async function exportVideo(){
+
+  if(
+    !window.MediaRecorder
+  ){
+
+    showToast(
+      "Browser tidak mendukung video export."
+    );
+
+    return;
+
+  }
+
+
+  const stream=
+    videoCanvas.captureStream(
+      CONFIG.FPS
+    );
+
+
+  let mime="";
+
+
+  const candidates=[
+
+    "video/webm;codecs=vp9",
+
+    "video/webm;codecs=vp8",
+
+    "video/webm"
+
+  ];
+
+
+  for(
+    const candidate
+    of candidates
+  ){
+
+    if(
+      MediaRecorder.isTypeSupported(
+        candidate
+      )
+    ){
+
+      mime=
+        candidate;
+
+      break;
+
+    }
+
+  }
+
+
+  if(!mime){
+
+    showToast(
+      "Codec WebM tidak tersedia."
+    );
+
+    return;
+
+  }
+
+
+  const chunks=[];
+
+
+  const recorder=
+    new MediaRecorder(
+      stream,
+      {
+        mimeType:mime,
+        videoBitsPerSecond:8000000
+      }
+    );
+
+
+  recorder.ondataavailable=
+    event=>{
+
+      if(
+        event.data&&
+        event.data.size
+      ){
+
+        chunks.push(
+          event.data
+        );
+
+      }
+
+    };
+
+
+  recorder.onstop=
+    ()=>{
+
+      const blob=
+        new Blob(
+          chunks,
+          {
+            type:mime
+          }
+        );
+
+
+      const url=
+        URL.createObjectURL(
+          blob
+        );
+
+
+      const a=
+        document.createElement(
+          "a"
+        );
+
+
+      const safeName=
+        (
+          state.product?.name||
+          "laras-video"
+        )
+        .replace(
+          /[^a-z0-9]+/gi,
+          "-"
+        )
+        .replace(
+          /^-+|-+$/g,
+          ""
+        );
+
+
+      a.href=
+        url;
+
+
+      a.download=
+        `${safeName}-${state.selectedTemplate}.webm`;
+
+
+      document.body.appendChild(
+        a
+      );
+
+
+      a.click();
+
+
+      a.remove();
+
+
+      setTimeout(
+        ()=>{
+          URL.revokeObjectURL(
+            url
+          );
+        },
+        1000
+      );
+
+
+      showToast(
+        "Video berhasil dibuat ✓"
+      );
+
+    };
+
+
+  state.currentTime=0;
+
+
+  videoCanvas.classList.remove(
+    "playing"
+  );
+
+
+  void videoCanvas.offsetWidth;
+
+
+  videoCanvas.classList.add(
+    "playing"
+  );
+
+
+  recorder.start(100);
+
+
+  const started=
+    performance.now();
+
+
+  function captureFrame(now){
+
+    const elapsed=
+      (
+        now-
+        started
+      )/
+      1000;
+
+
+    state.currentTime=
+      Math.min(
+        elapsed*
+        state.speed,
+        state.duration
+      );
+
+
+    updatePlayhead();
+
+
+    if(
+      state.currentTime>=
+      state.duration
+    ){
+
+      setTimeout(
+        ()=>{
+
+          recorder.stop();
+
+          state.currentTime=
+            state.duration;
+
+          updatePlayhead();
+
+          stopPlayback();
+
+        },
+        120
+      );
+
+
+      return;
+
+    }
+
+
+    requestAnimationFrame(
+      captureFrame
+    );
+
+  }
+
+
+  requestAnimationFrame(
+    captureFrame
+  );
+
+
+  showToast(
+    "Merekam video..."
+  );
+
+}
+
+
+$("exportBtn")
+  .addEventListener(
+    "click",
+    exportVideo
+  );
+
+
+/* ============================================================
+   TIMELINE SEEK
+============================================================ */
+
+$("timelineBody")
+  .addEventListener(
+    "click",
+    e=>{
+
+      if(
+        e.target.closest(
+          ".clip"
+        )
+      ){
+
+        return;
+
+      }
+
+
+      const rect=
+        $("timelineBody")
+          .getBoundingClientRect();
+
+
+      const offset=
+        window.innerWidth<=760
+          ?78
+          :120;
+
+
+      const x=
+        e.clientX-
+        rect.left-
+        offset;
+
+
+      const width=
+        rect.width-
+        offset;
+
+
+      if(width<=0)
+        return;
+
+
+      const ratio=
+        Math.max(
+          0,
+          Math.min(
+            1,
+            x/width
+          )
+        );
+
+
+      state.currentTime=
+        ratio*
+        state.duration;
+
+
+      updatePlayhead();
+
+    }
+  );
+
+
+/* ============================================================
+   KEYBOARD
+============================================================ */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    if(
+      e.target.matches(
+        "input,select,textarea"
+      )
+    ){
+
+      return;
+
+    }
+
+
+    if(
+      e.code==="Space"
+    ){
+
+      e.preventDefault();
+
+      togglePlayback();
+
+    }
+
+
+    if(
+      e.code==="Home"
+    ){
+
+      state.currentTime=0;
+
+      updatePlayhead();
+
+    }
+
+
+    if(
+      e.code==="ArrowRight"
+    ){
+
+      state.currentTime=
+        Math.min(
+          state.duration,
+          state.currentTime+.25
+        );
+
+      updatePlayhead();
+
+    }
+
+
+    if(
+      e.code==="ArrowLeft"
+    ){
+
+      state.currentTime=
+        Math.max(
+          0,
+          state.currentTime-.25
+        );
+
+      updatePlayhead();
+
+    }
+
+  }
+);
+
+
+/* ============================================================
+   MOBILE SHEET SYSTEM
+============================================================ */
+
+const mobileSheet=
+  $("mobileSheet");
+
+
+const mobileOverlay=
+  $("mobileOverlay");
+
+
+const sheetGrid=
+  $("sheetGrid");
+
+
+const sheetTitle=
+  $("sheetTitle");
+
+
+function closeMobileSheet(){
+
+  mobileSheet
+    .classList
+    .remove("open");
+
+
+  mobileOverlay
+    .classList
+    .remove("open");
+
+}
+
+
+function openMobileSheet(
+  title,
+  items
+){
+
+  sheetTitle.textContent=
+    title;
+
+
+  sheetGrid.innerHTML=
+    items
+      .map(
+        item=>`
+
+          <button
+            class="sheet-card"
+            data-sheet-action="${item.action}"
+          >
+
+            <span class="icon">
+              ${item.icon}
+            </span>
+
+            ${item.label}
+
+          </button>
+
+        `
+      )
+      .join("");
+
+
+  mobileSheet
+    .classList
+    .add("open");
+
+
+  mobileOverlay
+    .classList
+    .add("open");
+
+
+  sheetGrid
+    .querySelectorAll(
+      "[data-sheet-action]"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+            handleMobileAction(
+              btn.dataset.sheetAction
+            );
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function handleMobileAction(
+  action
+){
+
+  switch(action){
+
+    case "templates":
+
+      closeMobileSheet();
+
+      /*
+       * Mobile template library:
+       * temporarily display desktop library
+       * as a sheet-like panel.
+       */
+
+      openTemplateSheet();
+
+      break;
+
+
+    case "product":
+
+      closeMobileSheet();
+
+      $("productModal")
+        .classList
+        .add("open");
+
+      break;
+
+
+    case "inspector":
+
+      closeMobileSheet();
+
+      openInspectorSheet();
+
+      break;
+
+
+    case "effects":
+
+      closeMobileSheet();
+
+      openEffectsSheet();
+
+      break;
+
+
+    case "save":
+
+      saveProject();
+
+      closeMobileSheet();
+
+      break;
+
+
+    case "load":
+
+      loadProject();
+
+      closeMobileSheet();
+
+      break;
+
+
+    case "reset":
+
+      $("resetBtn").click();
+
+      closeMobileSheet();
+
+      break;
+
+
+    case "export":
+
+      $("exportBtn").click();
+
+      closeMobileSheet();
+
+      break;
+
+
+    case "more":
+
+      openMobileSheet(
+        "More Tools",
+        [
+
+          {
+            icon:"⚙",
+            label:"INSPECTOR",
+            action:"inspector"
+          },
+
+          {
+            icon:"✨",
+            label:"EFFECTS",
+            action:"effects"
+          },
+
+          {
+            icon:"💾",
+            label:"SAVE",
+            action:"save"
+          },
+
+          {
+            icon:"↥",
+            label:"LOAD",
+            action:"load"
+          },
+
+          {
+            icon:"↻",
+            label:"RESET",
+            action:"reset"
+          },
+
+          {
+            icon:"⇩",
+            label:"EXPORT",
+            action:"export"
+          }
+
+        ]
+      );
+
+      break;
+
+  }
+
+}
+
+
+function openTemplateSheet(){
+
+  sheetTitle.textContent=
+    "Templates";
+
+
+  sheetGrid.innerHTML=
+    VIDEO_TEMPLATES
+      .map(
+        t=>`
+
+          <button
+            class="sheet-card"
+            data-template-mobile="${t.id}"
+            style="
+              border-color:
+                ${
+                  t.id===
+                  state.selectedTemplate
+                  ?
+                  "var(--lime)"
+                  :
+                  "var(--line)"
+                };
+            "
+          >
+
+            <span
+              class="icon"
+              style="color:${t.color}"
+            >
+              ${t.icon}
+            </span>
+
+            ${escapeHTML(t.name)}
+
+          </button>
+
+        `
+      )
+      .join("");
+
+
+  mobileSheet
+    .classList
+    .add("open");
+
+
+  mobileOverlay
+    .classList
+    .add("open");
+
+
+  sheetGrid
+    .querySelectorAll(
+      "[data-template-mobile]"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+
+            selectTemplate(
+              btn.dataset.templateMobile
+            );
+
+            closeMobileSheet();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function openInspectorSheet(){
+
+  sheetTitle.textContent=
+    "Inspector";
+
+
+  sheetGrid.innerHTML=`
+
+    <div
+      style="
+        grid-column:1/-1;
+        padding:4px;
+      "
+    >
+
+      <div
+        class="inspector"
+        style="padding:0"
+      >
+
+        <div class="inspector-section">
+
+          <div class="inspector-title">
+            PRODUCT
+          </div>
+
+          <select
+            class="product-select"
+            id="mobileProductSelect"
+          >
+            ${
+              state.products
+                .map(
+                  p=>`
+                    <option
+                      value="${escapeHTML(p.id)}"
+                      ${
+                        state.product&&
+                        String(state.product.id)===
+                        String(p.id)
+                        ?
+                        "selected"
+                        :
+                        ""
+                      }
+                    >
+                      ${escapeHTML(p.name)}
+                    </option>
+                  `
+                )
+                .join("")
+            }
+          </select>
+
+        </div>
+
+
+        <div class="inspector-section">
+
+          <div class="inspector-title">
+            DURATION
+          </div>
+
+          <div class="control-row">
+
+            <label>
+              Seconds
+            </label>
+
+            <span class="control-value">
+              ${state.duration}s
+            </span>
+
+          </div>
+
+          <input
+            class="range"
+            id="mobileDuration"
+            type="range"
+            min="4"
+            max="15"
+            step=".5"
+            value="${state.duration}"
+          >
+
+        </div>
+
+
+        <div class="inspector-section">
+
+          <div class="inspector-title">
+            SPEED
+          </div>
+
+          <div class="control-row">
+
+            <label>
+              Animation
+            </label>
+
+            <span class="control-value">
+              ${state.speed.toFixed(1)}x
+            </span>
+
+          </div>
+
+          <input
+            class="range"
+            id="mobileSpeed"
+            type="range"
+            min=".5"
+            max="2"
+            step=".1"
+            value="${state.speed}"
+          >
+
+        </div>
+
+
+        <div class="inspector-section">
+
+          <div class="inspector-title">
+            MOTION
+          </div>
+
+          <div class="effect-grid">
+
+            ${[
+              "cinematic",
+              "punch",
+              "slide",
+              "minimal"
+            ]
+            .map(
+              effect=>`
+                <button
+                  class="
+                    effect-btn
+                    ${
+                      state.effect===
+                      effect
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  data-mobile-effect="${effect}"
+                >
+                  ${effect.toUpperCase()}
+                </button>
+              `
+            )
+            .join("")}
+
+          </div>
+
+        </div>
+
+
+        <div class="inspector-section">
+
+          <div class="inspector-title">
+            ACCENT
+          </div>
+
+          <div class="effect-grid">
+
+            ${[
+              ["#8cc63f","LIME"],
+              ["#ff7612","ORANGE"],
+              ["#2998e8","BLUE"],
+              ["#ff5757","RED"]
+            ]
+            .map(
+              color=>`
+                <button
+                  class="
+                    effect-btn
+                    ${
+                      state.accent===
+                      color[0]
+                      ?
+                      "active"
+                      :
+                      ""
+                    }
+                  "
+                  data-mobile-accent="${color[0]}"
+                >
+                  ${color[1]}
+                </button>
+              `
+            )
+            .join("")}
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  mobileSheet
+    .classList
+    .add("open");
+
+
+  mobileOverlay
+    .classList
+    .add("open");
+
+
+  const mp=
+    $("mobileProductSelect");
+
+
+  if(mp){
+
+    mp.addEventListener(
+      "change",
+      ()=>{
+        selectProduct(
+          mp.value
+        );
+      }
+    );
+
+  }
+
+
+  const md=
+    $("mobileDuration");
+
+
+  if(md){
+
+    md.addEventListener(
+      "input",
+      ()=>{
+        state.duration=
+          Number(md.value);
+
+        durationRange.value=
+          state.duration;
+
+        durationValue.textContent=
+          `${state.duration}s`;
+
+        renderTimeline();
+
+        resetPreview(false);
+
+        openInspectorSheet();
+
+      }
+    );
+
+  }
+
+
+  const ms=
+    $("mobileSpeed");
+
+
+  if(ms){
+
+    ms.addEventListener(
+      "input",
+      ()=>{
+        state.speed=
+          Number(ms.value);
+
+        speedRange.value=
+          state.speed;
+
+        speedValue.textContent=
+          `${state.speed.toFixed(1)}x`;
+
+        resetPreview(false);
+
+        openInspectorSheet();
+
+      }
+    );
+
+  }
+
+
+  sheetGrid
+    .querySelectorAll(
+      "[data-mobile-effect]"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+
+            state.effect=
+              btn.dataset.mobileEffect;
+
+
+            document
+              .querySelectorAll(
+                "[data-effect]"
+              )
+              .forEach(
+                b=>
+                  b.classList.toggle(
+                    "active",
+                    b.dataset.effect===
+                    state.effect
+                  )
+              );
+
+
+            resetPreview(false);
+
+            openInspectorSheet();
+
+          }
+        );
+
+      }
+    );
+
+
+  sheetGrid
+    .querySelectorAll(
+      "[data-mobile-accent]"
+    )
+    .forEach(
+      btn=>{
+
+        btn.addEventListener(
+          "click",
+          ()=>{
+
+            state.accent=
+              btn.dataset.mobileAccent;
+
+
+            videoCanvas.style.setProperty(
+              "--accent",
+              state.accent
+            );
+
+
+            openInspectorSheet();
+
+          }
+        );
+
+      }
+    );
+
+}
+
+
+function openEffectsSheet(){
+
+  openMobileSheet(
+    "Effects & Motion",
+    [
+
+      {
+        icon:"✦",
+        label:"CINEMATIC",
+        action:"effects"
+      },
+
+      {
+        icon:"⚡",
+        label:"PUNCH",
+        action:"effects"
+      },
+
+      {
+        icon:"➜",
+        label:"SLIDE",
+        action:"effects"
+      },
+
+      {
+        icon:"○",
+        label:"MINIMAL",
+        action:"effects"
+      },
+
+      {
+        icon:"🎨",
+        label:"ACCENT",
+        action:"inspector"
+      },
+
+      {
+        icon:"◐",
+        label:"INSPECTOR",
+        action:"inspector"
+      }
+
+    ]
+  );
+
+}
+
+
+$("sheetClose")
+  .addEventListener(
+    "click",
+    closeMobileSheet
+  );
+
+
+mobileOverlay
+  .addEventListener(
+    "click",
+    closeMobileSheet
+  );
+
+
+/* ============================================================
+   MOBILE NAV
+============================================================ */
+
+document
+  .querySelectorAll(
+    "[data-mobile]"
+  )
+  .forEach(
+    btn=>{
+
+      btn.addEventListener(
+        "click",
+        ()=>{
+
+          document
+            .querySelectorAll(
+              "[data-mobile]"
+            )
+            .forEach(
+              b=>
+                b.classList.toggle(
+                  "active",
+                  b===btn
+                )
+            );
+
+
+          const action=
+            btn.dataset.mobile;
+
+
+          if(
+            action==="templates"
+          ){
+
+            openTemplateSheet();
+
+          }
+          else if(
+            action==="product"
+          ){
+
+            $("productModal")
+              .classList
+              .add("open");
+
+          }
+          else if(
+            action==="text"
+          ){
+
+            openMobileSheet(
+              "Text Tools",
+              [
+
+                {
+                  icon:"T",
+                  label:"HEADLINE",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"₽",
+                  label:"PRICE",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"↗",
+                  label:"CTA",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"Aa",
+                  label:"TYPOGRAPHY",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"↔",
+                  label:"POSITION",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"✦",
+                  label:"ANIMATION",
+                  action:"effects"
+                }
+
+              ]
+            );
+
+          }
+          else if(
+            action==="audio"
+          ){
+
+            openMobileSheet(
+              "Audio",
+              [
+
+                {
+                  icon:"♫",
+                  label:"MUSIC",
+                  action:"more"
+                },
+
+                {
+                  icon:"＋",
+                  label:"ADD AUDIO",
+                  action:"more"
+                },
+
+                {
+                  icon:"◉",
+                  label:"VOLUME",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"↗",
+                  label:"FADE",
+                  action:"effects"
+                },
+
+                {
+                  icon:"◫",
+                  label:"TIMING",
+                  action:"inspector"
+                },
+
+                {
+                  icon:"⚙",
+                  label:"AUDIO TOOLS",
+                  action:"more"
+                }
+
+              ]
+            );
+
+          }
+          else if(
+            action==="effects"
+          ){
+
+            openEffectsSheet();
+
+          }
+          else if(
+            action==="more"
+          ){
+
+            handleMobileAction(
+              "more"
+            );
+
+          }
+
+        }
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   SWIPE SHEET DOWN
+============================================================ */
+
+let touchStartY=null;
+
+
+document.addEventListener(
+  "touchstart",
+  e=>{
+
+    if(
+      !e.touches.length
+    )
+      return;
+
+
+    touchStartY=
+      e.touches[0].clientY;
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+document.addEventListener(
+  "touchend",
+  e=>{
+
+    if(
+      touchStartY===null
+    )
+      return;
+
+
+    const endY=
+      e.changedTouches[0].clientY;
+
+
+    if(
+      endY-
+      touchStartY>
+      80
+    ){
+
+      closeMobileSheet();
+
+    }
+
+
+    touchStartY=null;
+
+  },
+  {
+    passive:true
+  }
+);
+
+
+/* ============================================================
+   RESIZE
+============================================================ */
+
+window.addEventListener(
+  "resize",
+  ()=>{
+    updatePlayhead();
+  }
+);
+
+
+/* ============================================================
+   INIT
+============================================================ */
+
+function init(){
+
+  renderTemplates();
+
+  selectTemplate(
+    "cinematic"
+  );
+
+  renderTimeline();
+
+  loadProducts();
+
+  videoCanvas.style.setProperty(
+    "--accent",
+    state.accent
+  );
+
+  resetPreview(false);
+
+}
+
+
+init();
+
+</script>
+
+</body>
+</html>
