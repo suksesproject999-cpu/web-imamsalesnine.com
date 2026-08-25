@@ -1,0 +1,2987 @@
+```html
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Premium Banner Studio</title>
+
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+:root{
+  --ui-bg:#07090c;
+  --ui-panel:#0e1217;
+  --ui-panel2:#151a21;
+  --ui-line:#28303a;
+  --ui-text:#f5f7fa;
+  --ui-muted:#89929e;
+
+  --bg:#090b0f;
+  --primary:#8cc63f;
+  --secondary:#101419;
+  --accent:#d9ad55;
+  --text:#ffffff;
+  --muted:#c4c9d0;
+  --cta:#8cc63f;
+  --ctaText:#101010;
+  --border:#8cc63f;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+html,body{
+  margin:0;
+  min-height:100%;
+  background:var(--ui-bg);
+  color:var(--ui-text);
+  font-family:
+    Inter,
+    Poppins,
+    system-ui,
+    -apple-system,
+    BlinkMacSystemFont,
+    "Segoe UI",
+    sans-serif;
+}
+
+button,input,select,textarea{
+  font:inherit;
+}
+
+button{
+  cursor:pointer;
+}
+
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:390px minmax(0,1fr);
+}
+
+/* =========================================================
+   EDITOR
+========================================================= */
+
+.editor{
+  height:100vh;
+  overflow:auto;
+  background:
+    linear-gradient(180deg,#0d1116,#080b0f);
+  border-right:1px solid var(--ui-line);
+  padding:20px;
+}
+
+.editor::-webkit-scrollbar{
+  width:7px;
+}
+
+.editor::-webkit-scrollbar-thumb{
+  background:#29313b;
+  border-radius:99px;
+}
+
+.logo-ui{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding-bottom:18px;
+  border-bottom:1px solid var(--ui-line);
+}
+
+.logo-ui-mark{
+  width:44px;
+  height:44px;
+  border-radius:14px;
+  background:
+    linear-gradient(135deg,var(--primary),#d9ff9e);
+  color:#101010;
+  display:grid;
+  place-items:center;
+  font-weight:1000;
+  box-shadow:
+    0 10px 30px rgba(140,198,63,.18);
+}
+
+.logo-ui-title{
+  font-size:14px;
+  font-weight:950;
+  letter-spacing:1.2px;
+}
+
+.logo-ui-sub{
+  color:var(--primary);
+  font-size:9px;
+  font-weight:750;
+  letter-spacing:1.8px;
+  margin-top:3px;
+}
+
+.section{
+  margin-top:23px;
+}
+
+.section-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:9px;
+}
+
+.section-head strong{
+  color:#dbe0e6;
+  font-size:10px;
+  text-transform:uppercase;
+  letter-spacing:1.6px;
+}
+
+.section-head span{
+  color:#5f6975;
+  font-size:9px;
+}
+
+label{
+  display:block;
+  color:#b8c0c9;
+  font-size:10px;
+  font-weight:700;
+  margin:9px 0 5px;
+}
+
+input,
+select,
+textarea{
+  width:100%;
+  border:1px solid var(--ui-line);
+  outline:none;
+  background:#151a20;
+  color:#fff;
+  border-radius:9px;
+  padding:10px 11px;
+  transition:.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus{
+  border-color:var(--primary);
+  box-shadow:
+    0 0 0 3px rgba(140,198,63,.11);
+}
+
+textarea{
+  min-height:65px;
+  resize:vertical;
+}
+
+.row2{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+}
+
+.row3{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:7px;
+}
+
+.file{
+  border:1px dashed #414a55;
+  border-radius:10px;
+  padding:12px;
+  text-align:center;
+  color:#87909b;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.file:hover{
+  border-color:var(--primary);
+  color:#fff;
+}
+
+.file input{
+  display:none;
+}
+
+/* =========================================================
+   RATIO PRESETS
+========================================================= */
+
+.ratio-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:6px;
+}
+
+.ratio{
+  border:1px solid var(--ui-line);
+  background:#151a20;
+  color:#aeb5be;
+  border-radius:8px;
+  padding:9px 4px;
+  font-size:9px;
+}
+
+.ratio:hover,
+.ratio.active{
+  border-color:var(--primary);
+  color:#fff;
+  background:#182018;
+}
+
+/* =========================================================
+   PALETTE
+========================================================= */
+
+.palette-grid{
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:6px;
+}
+
+.color-chip{
+  height:36px;
+  border-radius:8px;
+  border:1px solid rgba(255,255,255,.1);
+  position:relative;
+  overflow:hidden;
+  cursor:pointer;
+}
+
+.color-chip:hover{
+  transform:translateY(-1px);
+}
+
+.color-chip span{
+  position:absolute;
+  inset:auto 0 0;
+  padding:3px;
+  text-align:center;
+  background:rgba(0,0,0,.45);
+  color:#fff;
+  font-size:7px;
+}
+
+/* =========================================================
+   COLOR FIELD
+========================================================= */
+
+.color-field{
+  display:grid;
+  grid-template-columns:48px 1fr;
+  gap:7px;
+  align-items:center;
+}
+
+.color-field input[type=color]{
+  height:40px;
+  padding:3px;
+  cursor:pointer;
+}
+
+.color-field input[type=text]{
+  font-size:11px;
+  text-transform:uppercase;
+}
+
+/* =========================================================
+   DESIGN CARDS
+========================================================= */
+
+.design-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:7px;
+}
+
+.design{
+  min-height:70px;
+  border:1px solid var(--ui-line);
+  background:#151a20;
+  border-radius:10px;
+  color:#aeb6c0;
+  padding:7px;
+  text-align:left;
+  transition:.2s;
+}
+
+.design:hover{
+  border-color:#65707c;
+  transform:translateY(-1px);
+}
+
+.design.active{
+  border-color:var(--primary);
+  background:
+    linear-gradient(145deg,#182018,#12161b);
+  color:#fff;
+  box-shadow:
+    0 0 0 1px rgba(140,198,63,.18);
+}
+
+.design-preview{
+  height:28px;
+  border-radius:5px;
+  margin-bottom:7px;
+  overflow:hidden;
+  background:
+    linear-gradient(135deg,#222,#555);
+  position:relative;
+}
+
+.design-preview.wave::after{
+  content:"";
+  position:absolute;
+  right:-10%;
+  top:-40%;
+  width:65%;
+  height:180%;
+  background:#8cc63f;
+  border-radius:50%;
+}
+
+.design-preview.angular::after{
+  content:"";
+  position:absolute;
+  right:0;
+  top:0;
+  border-left:35px solid transparent;
+  border-top:28px solid #8cc63f;
+}
+
+.design-preview.split{
+  background:
+    linear-gradient(90deg,#222 0 48%,#8cc63f 48% 51%,#ddd 51%);
+}
+
+.design-preview.circle::after{
+  content:"";
+  position:absolute;
+  right:8px;
+  top:4px;
+  width:20px;
+  height:20px;
+  border-radius:50%;
+  background:#8cc63f;
+}
+
+.design-preview.glass{
+  background:
+    linear-gradient(135deg,#111,#39414d);
+}
+
+.design-preview.glass::after{
+  content:"";
+  position:absolute;
+  left:20%;
+  top:4px;
+  width:45%;
+  height:20px;
+  border-radius:7px;
+  background:rgba(255,255,255,.22);
+  border:1px solid rgba(255,255,255,.35);
+}
+
+.design-preview.racing{
+  background:
+    repeating-linear-gradient(
+      -20deg,
+      #171717 0 7px,
+      #282828 7px 10px
+    );
+}
+
+.design-preview.racing::after{
+  content:"";
+  position:absolute;
+  right:0;
+  top:0;
+  width:45%;
+  height:100%;
+  background:#ef3d3d;
+  clip-path:polygon(25% 0,100% 0,75% 100%,0 100%);
+}
+
+.design-name{
+  font-size:9px;
+  font-weight:800;
+}
+
+.design-desc{
+  font-size:7px;
+  color:#69737e;
+  margin-top:2px;
+}
+
+/* =========================================================
+   EFFECT CONTROLS
+========================================================= */
+
+.range-row{
+  display:grid;
+  grid-template-columns:1fr 45px;
+  gap:8px;
+  align-items:center;
+}
+
+input[type=range]{
+  padding:0;
+  accent-color:var(--primary);
+}
+
+.range-value{
+  text-align:center;
+  border:1px solid var(--ui-line);
+  border-radius:7px;
+  padding:7px 2px;
+  color:#b9c0c8;
+  font-size:9px;
+}
+
+/* =========================================================
+   BUTTONS
+========================================================= */
+
+.actions{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:24px;
+}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:12px;
+  font-weight:900;
+  transition:.2s;
+}
+
+.btn:hover{
+  transform:translateY(-1px);
+}
+
+.btn-dark{
+  background:#20262e;
+  color:#fff;
+  border:1px solid #303842;
+}
+
+.btn-primary{
+  background:var(--primary);
+  color:#101010;
+}
+
+.btn-full{
+  grid-column:1/-1;
+}
+
+/* =========================================================
+   STAGE
+========================================================= */
+
+.stage{
+  min-width:0;
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  background:
+    radial-gradient(
+      circle at 50% 35%,
+      #1c232d 0,
+      #0b0f14 45%,
+      #07090c 100%
+    );
+}
+
+.stagebar{
+  height:68px;
+  flex-shrink:0;
+  border-bottom:1px solid var(--ui-line);
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 24px;
+}
+
+.stagebar-left{
+  color:#858e99;
+  font-size:10px;
+  letter-spacing:1.4px;
+}
+
+.stagebar-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.live{
+  color:var(--primary);
+  font-size:10px;
+  font-weight:850;
+}
+
+.preview-area{
+  flex:1;
+  min-height:0;
+  overflow:auto;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:45px;
+}
+
+.preview-shell{
+  width:min(1250px,100%);
+}
+
+.canvas{
+  width:100%;
+  aspect-ratio:3/1;
+  position:relative;
+  overflow:hidden;
+  isolation:isolate;
+  background:var(--bg);
+  color:var(--text);
+  box-shadow:
+    0 35px 100px rgba(0,0,0,.58);
+}
+
+.canvas-bg{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:-8;
+  transform:
+    translate(
+      calc(var(--img-x) * 1%),
+      calc(var(--img-y) * 1%)
+    )
+    scale(
+      calc(var(--img-zoom) / 100)
+    );
+  transform-origin:center;
+}
+
+.base-bg{
+  position:absolute;
+  inset:0;
+  z-index:-9;
+  background:var(--bg);
+}
+
+.overlay{
+  position:absolute;
+  inset:0;
+  z-index:-7;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,var(--overlay-left)),
+      rgba(0,0,0,var(--overlay-right))
+    );
+}
+
+.noise{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  pointer-events:none;
+  opacity:.045;
+  background-image:
+    url("data:image/svg+xml,%3Csvg viewBox='0 0 180 180' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.8'/%3E%3C/svg%3E");
+}
+
+.grid-pattern{
+  position:absolute;
+  inset:0;
+  z-index:-5;
+  opacity:var(--pattern-opacity);
+  background-image:
+    linear-gradient(
+      rgba(255,255,255,.06) 1px,
+      transparent 1px
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,255,255,.06) 1px,
+      transparent 1px
+    );
+  background-size:40px 40px;
+  mask-image:
+    linear-gradient(
+      to bottom,
+      black,
+      transparent
+    );
+}
+
+/* =========================================================
+   BRAND
+========================================================= */
+
+.brand-lock{
+  position:absolute;
+  z-index:10;
+  top:7%;
+  right:5%;
+  text-align:right;
+}
+
+.brand-logo{
+  display:none;
+  width:clamp(50px,8vw,120px);
+  max-height:60px;
+  object-fit:contain;
+  margin:0 0 8px auto;
+}
+
+.brand-title{
+  font-size:clamp(11px,1.7vw,27px);
+  font-weight:950;
+  letter-spacing:2px;
+  text-transform:uppercase;
+}
+
+.brand-sub{
+  color:var(--primary);
+  font-size:clamp(6px,.7vw,11px);
+  font-weight:800;
+  letter-spacing:1.8px;
+  margin-top:5px;
+}
+
+/* =========================================================
+   CONTENT
+========================================================= */
+
+.copy{
+  position:absolute;
+  z-index:10;
+  left:7%;
+  top:50%;
+  transform:translateY(-50%);
+  width:53%;
+}
+
+.kicker{
+  color:var(--primary);
+  font-size:clamp(7px,.9vw,13px);
+  font-weight:950;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  margin-bottom:11px;
+}
+
+.headline{
+  font-size:clamp(24px,4.6vw,74px);
+  line-height:.9;
+  font-weight:1000;
+  letter-spacing:-3px;
+  text-transform:uppercase;
+  max-width:900px;
+}
+
+.subtitle{
+  color:var(--muted);
+  font-size:clamp(7px,1vw,15px);
+  line-height:1.55;
+  max-width:570px;
+  margin-top:15px;
+}
+
+.badges{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  margin-top:19px;
+}
+
+.badge{
+  display:inline-flex;
+  align-items:center;
+  padding:8px 12px;
+  border:1px solid var(--primary);
+  color:var(--primary);
+  font-size:clamp(6px,.7vw,11px);
+  font-weight:900;
+  letter-spacing:1px;
+  text-transform:uppercase;
+}
+
+.cta{
+  display:inline-flex;
+  padding:8px 12px;
+  background:var(--cta);
+  color:var(--ctaText);
+  font-size:clamp(6px,.7vw,11px);
+  font-weight:950;
+  letter-spacing:.5px;
+  text-transform:uppercase;
+}
+
+/* =========================================================
+   CONTACT
+========================================================= */
+
+.contact{
+  position:absolute;
+  z-index:10;
+  right:5%;
+  bottom:7%;
+  text-align:right;
+}
+
+.contact-name{
+  font-size:clamp(8px,1.2vw,18px);
+  font-weight:950;
+}
+
+.contact-role{
+  color:var(--muted);
+  font-size:clamp(6px,.7vw,11px);
+  margin-top:3px;
+}
+
+.contact-phone{
+  color:var(--primary);
+  font-size:clamp(6px,.7vw,11px);
+  font-weight:850;
+  margin-top:4px;
+}
+
+/* =========================================================
+   COMMON DECOR
+========================================================= */
+
+.edge{
+  position:absolute;
+  z-index:9;
+  left:0;
+  bottom:0;
+  width:35%;
+  height:4px;
+  background:var(--primary);
+}
+
+.glow{
+  position:absolute;
+  z-index:-4;
+  width:45%;
+  height:80%;
+  right:-8%;
+  top:-15%;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      color-mix(in srgb,var(--primary) 38%,transparent),
+      transparent 68%
+    );
+  filter:blur(20px);
+}
+
+.frame{
+  position:absolute;
+  inset:12px;
+  z-index:8;
+  pointer-events:none;
+  border:1px solid color-mix(
+    in srgb,
+    var(--border) 35%,
+    transparent
+  );
+}
+
+/* =========================================================
+   DESIGN: WAVE
+========================================================= */
+
+.design-wave .wave-svg,
+.design-doublewave .wave-svg,
+.design-split .wave-svg{
+  display:block;
+}
+
+.wave-svg{
+  display:none;
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  z-index:-2;
+  pointer-events:none;
+}
+
+.wave-main{
+  fill:var(--secondary);
+}
+
+.wave-accent{
+  fill:var(--primary);
+  opacity:.95;
+}
+
+.design-wave .copy{
+  width:45%;
+}
+
+.design-wave .brand-lock{
+  right:4%;
+}
+
+.design-wave .edge{
+  width:24%;
+}
+
+/* =========================================================
+   DOUBLE WAVE
+========================================================= */
+
+.design-doublewave .copy{
+  left:6%;
+  width:48%;
+}
+
+.design-doublewave .wave-main{
+  fill:var(--secondary);
+}
+
+.design-doublewave .wave-accent{
+  fill:var(--primary);
+}
+
+.design-doublewave .headline{
+  letter-spacing:-2px;
+}
+
+/* =========================================================
+   ANGULAR
+========================================================= */
+
+.angular-shape{
+  display:none;
+  position:absolute;
+  z-index:-3;
+  right:0;
+  top:0;
+  width:52%;
+  height:100%;
+  background:var(--secondary);
+  clip-path:
+    polygon(
+      20% 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
+}
+
+.angular-accent{
+  display:none;
+  position:absolute;
+  z-index:-2;
+  right:42%;
+  top:0;
+  width:8%;
+  height:100%;
+  background:var(--primary);
+  clip-path:
+    polygon(
+      45% 0,
+      100% 0,
+      55% 100%,
+      0 100%
+    );
+}
+
+.design-angular .angular-shape,
+.design-angular .angular-accent{
+  display:block;
+}
+
+.design-angular .copy{
+  width:48%;
+}
+
+/* =========================================================
+   SPLIT
+========================================================= */
+
+.split-panel{
+  display:none;
+  position:absolute;
+  z-index:-2;
+  right:0;
+  top:0;
+  width:48%;
+  height:100%;
+  background:var(--secondary);
+}
+
+.design-split .split-panel{
+  display:block;
+}
+
+.design-split .copy{
+  width:47%;
+}
+
+.design-split .brand-lock{
+  right:4%;
+}
+
+/* =========================================================
+   CIRCLE
+========================================================= */
+
+.circle-panel{
+  display:none;
+  position:absolute;
+  z-index:-3;
+  right:6%;
+  top:50%;
+  transform:translateY(-50%);
+  width:48%;
+  aspect-ratio:1;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      circle,
+      var(--secondary) 0 58%,
+      var(--primary) 59% 61%,
+      transparent 62%
+    );
+}
+
+.design-circle .circle-panel{
+  display:block;
+}
+
+.design-circle .copy{
+  width:49%;
+}
+
+/* =========================================================
+   GLASS
+========================================================= */
+
+.glass-panel{
+  display:none;
+  position:absolute;
+  z-index:3;
+  left:5%;
+  top:14%;
+  width:53%;
+  height:72%;
+  border-radius:22px;
+  background:
+    linear-gradient(
+      135deg,
+      rgba(255,255,255,.17),
+      rgba(255,255,255,.035)
+    );
+  border:1px solid rgba(255,255,255,.24);
+  backdrop-filter:blur(15px);
+  box-shadow:
+    inset 0 1px rgba(255,255,255,.18),
+    0 20px 60px rgba(0,0,0,.25);
+}
+
+.design-glass .glass-panel{
+  display:block;
+}
+
+.design-glass .copy{
+  left:9%;
+  width:45%;
+  z-index:12;
+}
+
+.design-glass .brand-lock{
+  z-index:12;
+}
+
+/* =========================================================
+   SPOTLIGHT
+========================================================= */
+
+.spotlight{
+  display:none;
+  position:absolute;
+  z-index:-3;
+  right:7%;
+  top:50%;
+  transform:translateY(-50%);
+  width:45%;
+  height:85%;
+  border-radius:50%;
+  background:
+    radial-gradient(
+      ellipse,
+      rgba(255,255,255,.23) 0,
+      rgba(255,255,255,.06) 35%,
+      transparent 70%
+    );
+  filter:blur(3px);
+}
+
+.design-spotlight .spotlight{
+  display:block;
+}
+
+.design-spotlight .copy{
+  width:48%;
+}
+
+/* =========================================================
+   LUXURY
+========================================================= */
+
+.design-luxury .headline{
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-weight:700;
+  letter-spacing:-1.5px;
+  text-transform:none;
+}
+
+.design-luxury .kicker{
+  letter-spacing:4px;
+}
+
+.design-luxury .edge{
+  height:2px;
+}
+
+.design-luxury .frame{
+  inset:15px;
+}
+
+/* =========================================================
+   RACING
+========================================================= */
+
+.racing-stripe{
+  display:none;
+  position:absolute;
+  z-index:-2;
+  right:3%;
+  top:-10%;
+  width:34%;
+  height:120%;
+  background:
+    repeating-linear-gradient(
+      -17deg,
+      var(--primary) 0 10px,
+      transparent 10px 20px
+    );
+  opacity:.8;
+  transform:skewX(-15deg);
+}
+
+.design-racing .racing-stripe{
+  display:block;
+}
+
+.design-racing .headline{
+  font-style:italic;
+  transform:skewX(-5deg);
+  letter-spacing:-4px;
+}
+
+.design-racing .copy{
+  width:58%;
+}
+
+/* =========================================================
+   CARBON
+========================================================= */
+
+.carbon-pattern{
+  display:none;
+  position:absolute;
+  inset:0;
+  z-index:-4;
+  opacity:.28;
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,.055) 0 2px,
+      transparent 2px 9px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      rgba(255,255,255,.035) 0 2px,
+      transparent 2px 9px
+    );
+}
+
+.design-carbon .carbon-pattern{
+  display:block;
+}
+
+/* =========================================================
+   FULL BLEED
+========================================================= */
+
+.design-fullbleed .overlay{
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0,0,0,.82),
+      rgba(0,0,0,.16),
+      rgba(0,0,0,.35)
+    );
+}
+
+.design-fullbleed .copy{
+  width:62%;
+}
+
+/* =========================================================
+   EDITORIAL
+========================================================= */
+
+.design-editorial .copy{
+  left:8%;
+  width:58%;
+}
+
+.design-editorial .headline{
+  font-family:Georgia,serif;
+  font-weight:700;
+  text-transform:none;
+  letter-spacing:-1px;
+}
+
+.design-editorial .headline::first-letter{
+  color:var(--primary);
+}
+
+/* =========================================================
+   TECH
+========================================================= */
+
+.tech-lines{
+  display:none;
+  position:absolute;
+  z-index:-1;
+  right:0;
+  top:0;
+  width:55%;
+  height:100%;
+  background:
+    linear-gradient(
+      135deg,
+      transparent 0 44%,
+      var(--primary) 44.2% 44.6%,
+      transparent 44.8%
+    ),
+    linear-gradient(
+      135deg,
+      transparent 0 57%,
+      rgba(255,255,255,.2) 57.2% 57.5%,
+      transparent 57.7%
+    );
+}
+
+.design-tech .tech-lines{
+  display:block;
+}
+
+.design-tech .copy{
+  width:53%;
+}
+
+.design-tech .headline{
+  letter-spacing:-2px;
+}
+
+/* =========================================================
+   RESPONSIVE
+========================================================= */
+
+@media(max-width:1050px){
+
+  .app{
+    grid-template-columns:340px minmax(0,1fr);
+  }
+
+  .preview-area{
+    padding:25px;
+  }
+
+}
+
+@media(max-width:850px){
+
+  .app{
+    display:block;
+  }
+
+  .editor{
+    height:auto;
+    max-height:none;
+    border-right:0;
+    border-bottom:1px solid var(--ui-line);
+  }
+
+  .stage{
+    height:auto;
+    min-height:80vh;
+  }
+
+  .preview-area{
+    align-items:flex-start;
+    padding:25px 12px;
+  }
+
+  .preview-shell{
+    width:100%;
+    min-width:800px;
+  }
+
+}
+
+@media(max-width:550px){
+
+  .editor{
+    padding:15px;
+  }
+
+  .preview-shell{
+    min-width:700px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<!-- =======================================================
+     EDITOR
+======================================================= -->
+
+<aside class="editor">
+
+  <div class="logo-ui">
+    <div class="logo-ui-mark">B</div>
+    <div>
+      <div class="logo-ui-title">PREMIUM BANNER STUDIO</div>
+      <div class="logo-ui-sub">AUTOMOTIVE • RETAIL • DISTRIBUTOR</div>
+    </div>
+  </div>
+
+
+  <!-- BRAND -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Brand Identity</strong>
+      <span>01</span>
+    </div>
+
+    <label>Nama toko / distributor</label>
+    <input id="brandName" value="NINE AUTOSERIES">
+
+    <label>Tagline / status</label>
+    <input id="brandRole" value="Official Distributor">
+
+    <label>Nama sales</label>
+    <input id="salesName" value="IMAM_SALESFR">
+
+    <label>Jabatan</label>
+    <input id="salesRole" value="Sales Representative">
+
+    <label>WhatsApp</label>
+    <input id="phone" value="08xxxxxxxxxx">
+
+    <label>Logo</label>
+    <label class="file">
+      Upload Logo
+      <input id="logo" type="file" accept="image/*">
+    </label>
+
+  </div>
+
+
+  <!-- SIZE -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Canvas</strong>
+      <span>02</span>
+    </div>
+
+    <div class="ratio-grid">
+
+      <button class="ratio active" data-ratio="3/1">
+        Banner 3:1
+      </button>
+
+      <button class="ratio" data-ratio="4/1">
+        Wide 4:1
+      </button>
+
+      <button class="ratio" data-ratio="16/9">
+        16:9
+      </button>
+
+      <button class="ratio" data-ratio="1/1">
+        Square
+      </button>
+
+      <button class="ratio" data-ratio="4/3">
+        4:3
+      </button>
+
+      <button class="ratio" data-ratio="9/16">
+        Story
+      </button>
+
+    </div>
+
+    <div class="row3">
+
+      <div>
+        <label>Width</label>
+        <input id="width" type="number" value="300">
+      </div>
+
+      <div>
+        <label>Height</label>
+        <input id="height" type="number" value="100">
+      </div>
+
+      <div>
+        <label>Unit</label>
+        <select id="unit">
+          <option>cm</option>
+          <option>mm</option>
+          <option>px</option>
+          <option>inch</option>
+        </select>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- CONTENT -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Content</strong>
+      <span>03</span>
+    </div>
+
+    <label>Kicker</label>
+    <input id="kicker" value="PREMIUM AUTOMOTIVE">
+
+    <label>Headline</label>
+    <textarea id="headline">DRIVE YOUR NEXT</textarea>
+
+    <label>Subheadline</label>
+    <textarea id="subtitle">
+Temukan produk automotive terbaik dengan pelayanan profesional.
+    </textarea>
+
+    <div class="row2">
+
+      <div>
+        <label>Badge / Promo</label>
+        <input id="badge" value="PROMO SPESIAL">
+      </div>
+
+      <div>
+        <label>CTA</label>
+        <input id="cta" value="HUBUNGI KAMI">
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- IMAGE -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Visual</strong>
+      <span>04</span>
+    </div>
+
+    <label>Background / Foto kendaraan</label>
+
+    <label class="file">
+      Upload Foto
+      <input id="photo" type="file" accept="image/*">
+    </label>
+
+    <label>Image Zoom</label>
+
+    <div class="range-row">
+      <input id="zoom" type="range" min="100" max="180" value="100">
+      <div class="range-value" id="zoomVal">100%</div>
+    </div>
+
+    <label>Image Position X</label>
+
+    <div class="range-row">
+      <input id="posX" type="range" min="-30" max="30" value="0">
+      <div class="range-value" id="posXVal">0</div>
+    </div>
+
+    <label>Image Position Y</label>
+
+    <div class="range-row">
+      <input id="posY" type="range" min="-30" max="30" value="0">
+      <div class="range-value" id="posYVal">0</div>
+    </div>
+
+  </div>
+
+
+  <!-- BACKGROUND -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Background</strong>
+      <span>05</span>
+    </div>
+
+    <label>Background color</label>
+
+    <div class="color-field">
+      <input id="bgColor" type="color" value="#090b0f">
+      <input id="bgHex" value="#090B0F">
+    </div>
+
+    <label>Background palette</label>
+
+    <div class="palette-grid">
+
+      <div class="color-chip" data-target="bgColor" data-color="#050505" style="background:#050505"><span>BLACK</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#111827" style="background:#111827"><span>NAVY</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#1c1c1c" style="background:#1c1c1c"><span>GRAPHITE</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#292524" style="background:#292524"><span>CHARCOAL</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#ffffff" style="background:#fff"><span style="color:#111">WHITE</span></div>
+
+      <div class="color-chip" data-target="bgColor" data-color="#0f172a" style="background:#0f172a"><span>NAVY</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#172554" style="background:#172554"><span>ROYAL</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#3f0d0d" style="background:#3f0d0d"><span>BURGUNDY</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#431407" style="background:#431407"><span>BROWN</span></div>
+      <div class="color-chip" data-target="bgColor" data-color="#052e16" style="background:#052e16"><span>GREEN</span></div>
+
+    </div>
+
+  </div>
+
+
+  <!-- COLOR SYSTEM -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Design Color System</strong>
+      <span>06</span>
+    </div>
+
+    <label>Primary</label>
+
+    <div class="color-field">
+      <input id="primary" type="color" value="#8CC63F">
+      <input id="primaryHex" value="#8CC63F">
+    </div>
+
+    <label>Secondary</label>
+
+    <div class="color-field">
+      <input id="secondary" type="color" value="#101419">
+      <input id="secondaryHex" value="#101419">
+    </div>
+
+    <label>Accent</label>
+
+    <div class="color-field">
+      <input id="accent" type="color" value="#D9AD55">
+      <input id="accentHex" value="#D9AD55">
+    </div>
+
+    <label>Headline / Text</label>
+
+    <div class="color-field">
+      <input id="text" type="color" value="#FFFFFF">
+      <input id="textHex" value="#FFFFFF">
+    </div>
+
+    <label>Secondary Text</label>
+
+    <div class="color-field">
+      <input id="muted" type="color" value="#C4C9D0">
+      <input id="mutedHex" value="#C4C9D0">
+    </div>
+
+    <label>CTA Background</label>
+
+    <div class="color-field">
+      <input id="ctaColor" type="color" value="#8CC63F">
+      <input id="ctaColorHex" value="#8CC63F">
+    </div>
+
+    <label>CTA Text</label>
+
+    <div class="color-field">
+      <input id="ctaText" type="color" value="#101010">
+      <input id="ctaTextHex" value="#101010">
+    </div>
+
+    <label>Border / Line</label>
+
+    <div class="color-field">
+      <input id="border" type="color" value="#8CC63F">
+      <input id="borderHex" value="#8CC63F">
+    </div>
+
+  </div>
+
+
+  <!-- QUICK PALETTES -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Quick Palette</strong>
+      <span>08</span>
+    </div>
+
+    <div class="palette-grid">
+
+      <div class="color-chip quick-palette"
+        data-p="#8CC63F"
+        data-s="#101419"
+        data-a="#D9AD55"
+        data-t="#FFFFFF"
+        data-m="#C4C9D0"
+        style="background:linear-gradient(135deg,#8CC63F,#101419)">
+        <span>NINE</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#D9AD55"
+        data-s="#0A0A0A"
+        data-a="#FFFFFF"
+        data-t="#FFFFFF"
+        data-m="#D4D4D4"
+        style="background:linear-gradient(135deg,#D9AD55,#050505)">
+        <span>LUXURY</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#EF3D3D"
+        data-s="#111111"
+        data-a="#FFFFFF"
+        data-t="#FFFFFF"
+        data-m="#C7C7C7"
+        style="background:linear-gradient(135deg,#EF3D3D,#111)">
+        <span>RACING</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#277CFF"
+        data-s="#08111F"
+        data-a="#00D7E9"
+        data-t="#FFFFFF"
+        data-m="#C4D3E8"
+        style="background:linear-gradient(135deg,#277CFF,#08111F)">
+        <span>TECH</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#A855F7"
+        data-s="#100819"
+        data-a="#00D7E9"
+        data-t="#FFFFFF"
+        data-m="#D7C6E8"
+        style="background:linear-gradient(135deg,#A855F7,#100819)">
+        <span>NEON</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#00B878"
+        data-s="#06130F"
+        data-a="#8CC63F"
+        data-t="#FFFFFF"
+        data-m="#B8D7CD"
+        style="background:linear-gradient(135deg,#00B878,#06130F)">
+        <span>EMERALD</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#FF7A18"
+        data-s="#17100A"
+        data-a="#FFD166"
+        data-t="#FFFFFF"
+        data-m="#E4C6A8"
+        style="background:linear-gradient(135deg,#FF7A18,#17100A)">
+        <span>ORANGE</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#C7CCD3"
+        data-s="#181B20"
+        data-a="#FFFFFF"
+        data-t="#FFFFFF"
+        data-m="#B9BEC5"
+        style="background:linear-gradient(135deg,#C7CCD3,#181B20)">
+        <span>TITANIUM</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#B77A3B"
+        data-s="#160D07"
+        data-a="#E8C39E"
+        data-t="#FFFFFF"
+        data-m="#D0B9A5"
+        style="background:linear-gradient(135deg,#B77A3B,#160D07)">
+        <span>BRONZE</span>
+      </div>
+
+      <div class="color-chip quick-palette"
+        data-p="#111111"
+        data-s="#FFFFFF"
+        data-a="#8CC63F"
+        data-t="#111111"
+        data-m="#555555"
+        style="background:linear-gradient(135deg,#111,#fff)">
+        <span style="color:#111">MONO</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- DESIGN -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Premium Composition</strong>
+      <span>09</span>
+    </div>
+
+    <div class="design-grid">
+
+      <button class="design active" data-design="wave">
+        <div class="design-preview wave"></div>
+        <div class="design-name">Premium Wave</div>
+        <div class="design-desc">Organic curved split</div>
+      </button>
+
+      <button class="design" data-design="doublewave">
+        <div class="design-preview wave"></div>
+        <div class="design-name">Double Wave</div>
+        <div class="design-desc">Layered premium curve</div>
+      </button>
+
+      <button class="design" data-design="angular">
+        <div class="design-preview angular"></div>
+        <div class="design-name">Angular</div>
+        <div class="design-desc">Sharp automotive cut</div>
+      </button>
+
+      <button class="design" data-design="split">
+        <div class="design-preview split"></div>
+        <div class="design-name">Split</div>
+        <div class="design-desc">Balanced two-panel</div>
+      </button>
+
+      <button class="design" data-design="circle">
+        <div class="design-preview circle"></div>
+        <div class="design-name">Circle</div>
+        <div class="design-desc">Hero focal composition</div>
+      </button>
+
+      <button class="design" data-design="glass">
+        <div class="design-preview glass"></div>
+        <div class="design-name">Glass</div>
+        <div class="design-desc">Premium glass panel</div>
+      </button>
+
+      <button class="design" data-design="spotlight">
+        <div class="design-preview circle"></div>
+        <div class="design-name">Spotlight</div>
+        <div class="design-desc">Product illumination</div>
+      </button>
+
+      <button class="design" data-design="luxury">
+        <div class="design-preview"></div>
+        <div class="design-name">Luxury</div>
+        <div class="design-desc">Elegant editorial</div>
+      </button>
+
+      <button class="design" data-design="racing">
+        <div class="design-preview racing"></div>
+        <div class="design-name">Racing</div>
+        <div class="design-desc">Performance speed</div>
+      </button>
+
+      <button class="design" data-design="carbon">
+        <div class="design-preview racing"></div>
+        <div class="design-name">Carbon</div>
+        <div class="design-desc">Dark technical</div>
+      </button>
+
+      <button class="design" data-design="fullbleed">
+        <div class="design-preview"></div>
+        <div class="design-name">Full Bleed</div>
+        <div class="design-desc">Image dominant</div>
+      </button>
+
+      <button class="design" data-design="editorial">
+        <div class="design-preview"></div>
+        <div class="design-name">Editorial</div>
+        <div class="design-desc">Magazine aesthetic</div>
+      </button>
+
+      <button class="design" data-design="tech">
+        <div class="design-preview angular"></div>
+        <div class="design-name">Tech</div>
+        <div class="design-desc">Digital performance</div>
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <!-- EFFECT -->
+  <div class="section">
+
+    <div class="section-head">
+      <strong>Effects</strong>
+      <span>10</span>
+    </div>
+
+    <label>Overlay Left</label>
+
+    <div class="range-row">
+      <input id="overlayLeft" type="range" min="0" max="100" value="92">
+      <div class="range-value" id="overlayLeftVal">92</div>
+    </div>
+
+    <label>Overlay Right</label>
+
+    <div class="range-row">
+      <input id="overlayRight" type="range" min="0" max="100" value="30">
+      <div class="range-value" id="overlayRightVal">30</div>
+    </div>
+
+    <label>Pattern</label>
+
+    <div class="range-row">
+      <input id="pattern" type="range" min="0" max="50" value="10">
+      <div class="range-value" id="patternVal">10</div>
+    </div>
+
+  </div>
+
+
+  <div class="actions">
+
+    <button class="btn btn-dark" id="reset">
+      RESET
+    </button>
+
+    <button class="btn btn-primary" id="export">
+      EXPORT PNG
+    </button>
+
+    <button class="btn btn-dark btn-full" id="random">
+      ✦ RANDOM PREMIUM CONCEPT
+    </button>
+
+  </div>
+
+</aside>
+
+
+<!-- =======================================================
+     STAGE
+======================================================= -->
+
+<main class="stage">
+
+  <header class="stagebar">
+
+    <div class="stagebar-left">
+      PREMIUM BANNER STUDIO / LIVE CANVAS
+    </div>
+
+    <div class="stagebar-right">
+      <span class="live">● LIVE</span>
+      <span id="sizeText">300 × 100 cm</span>
+    </div>
+
+  </header>
+
+
+  <section class="preview-area">
+
+    <div class="preview-shell">
+
+      <div
+        id="canvas"
+        class="canvas design-wave"
+        style="
+          --img-zoom:100;
+          --img-x:0;
+          --img-y:0;
+          --overlay-left:.92;
+          --overlay-right:.30;
+          --pattern-opacity:.10;
+        "
+      >
+
+        <div class="base-bg"></div>
+
+        <img
+          id="canvasImage"
+          class="canvas-bg"
+          alt=""
+        >
+
+        <div class="overlay"></div>
+
+        <div class="grid-pattern"></div>
+
+        <div class="carbon-pattern"></div>
+
+        <div class="glow"></div>
+
+        <div class="angular-shape"></div>
+        <div class="angular-accent"></div>
+        <div class="split-panel"></div>
+        <div class="circle-panel"></div>
+        <div class="spotlight"></div>
+        <div class="glass-panel"></div>
+        <div class="racing-stripe"></div>
+        <div class="tech-lines"></div>
+
+
+        <!-- WAVE SVG -->
+
+        <svg
+          class="wave-svg"
+          viewBox="0 0 1200 400"
+          preserveAspectRatio="none"
+          aria-hidden="true"
+        >
+
+          <path
+            class="wave-accent"
+            d="
+              M690,0
+              C830,60 780,145 880,205
+              C980,265 1035,175 1200,225
+              L1200,400
+              L720,400
+              C790,330 760,260 665,205
+              C570,150 600,70 690,0 Z
+            "
+          />
+
+          <path
+            class="wave-main"
+            d="
+              M745,0
+              C900,65 835,150 940,215
+              C1040,275 1090,210 1200,255
+              L1200,400
+              L790,400
+              C850,330 820,270 730,215
+              C640,160 650,70 745,0 Z
+            "
+          />
+
+        </svg>
+
+
+        <!-- BRAND -->
+
+        <div class="brand-lock">
+
+          <img
+            id="logoPreview"
+            class="brand-logo"
+            alt="Logo"
+          >
+
+          <div
+            id="brandOut"
+            class="brand-title"
+          >
+            NINE AUTOSERIES
+          </div>
+
+          <div
+            id="roleOut"
+            class="brand-sub"
+          >
+            Official Distributor
+          </div>
+
+        </div>
+
+
+        <!-- COPY -->
+
+        <div class="copy">
+
+          <div
+            id="kickerOut"
+            class="kicker"
+          >
+            PREMIUM AUTOMOTIVE
+          </div>
+
+          <div
+            id="headlineOut"
+            class="headline"
+          >
+            DRIVE YOUR NEXT
+          </div>
+
+          <div
+            id="subtitleOut"
+            class="subtitle"
+          >
+            Temukan produk automotive terbaik dengan pelayanan profesional.
+          </div>
+
+          <div class="badges">
+
+            <span
+              id="badgeOut"
+              class="badge"
+            >
+              PROMO SPESIAL
+            </span>
+
+            <span
+              id="ctaOut"
+              class="cta"
+            >
+              HUBUNGI KAMI
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <!-- CONTACT -->
+
+        <div class="contact">
+
+          <div
+            id="salesOut"
+            class="contact-name"
+          >
+            IMAM_SALESFR
+          </div>
+
+          <div
+            id="salesRoleOut"
+            class="contact-role"
+          >
+            Sales Representative
+          </div>
+
+          <div
+            id="phoneOut"
+            class="contact-phone"
+          >
+            08xxxxxxxxxx
+          </div>
+
+        </div>
+
+
+        <div class="edge"></div>
+
+        <div class="frame"></div>
+
+        <div class="noise"></div>
+
+      </div>
+
+    </div>
+
+  </section>
+
+</main>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   HELPERS
+========================================================= */
+
+const $ = id => document.getElementById(id);
+
+const canvas = $("canvas");
+
+const designs = [
+  "wave",
+  "doublewave",
+  "angular",
+  "split",
+  "circle",
+  "glass",
+  "spotlight",
+  "luxury",
+  "racing",
+  "carbon",
+  "fullbleed",
+  "editorial",
+  "tech"
+];
+
+const ratios = {
+  "3/1":[300,100],
+  "4/1":[400,100],
+  "16/9":[16,9],
+  "1/1":[1,1],
+  "4/3":[4,3],
+  "9/16":[9,16]
+};
+
+
+/* =========================================================
+   TEXT BINDING
+========================================================= */
+
+const bindings = {
+  brandName:"brandOut",
+  brandRole:"roleOut",
+  salesName:"salesOut",
+  salesRole:"salesRoleOut",
+  phone:"phoneOut",
+  kicker:"kickerOut",
+  headline:"headlineOut",
+  subtitle:"subtitleOut",
+  badge:"badgeOut",
+  cta:"ctaOut"
+};
+
+Object.entries(bindings).forEach(([input,output])=>{
+
+  $(input).addEventListener("input",()=>{
+
+    $(output).textContent = $(input).value;
+
+  });
+
+});
+
+
+/* =========================================================
+   SIZE
+========================================================= */
+
+function updateSize(){
+
+  const w =
+    Number($("width").value) || 1;
+
+  const h =
+    Number($("height").value) || 1;
+
+  const unit =
+    $("unit").value;
+
+  canvas.style.aspectRatio =
+    `${w}/${h}`;
+
+  $("sizeText").textContent =
+    `${w} × ${h} ${unit}`;
+
+}
+
+$("width").addEventListener(
+  "input",
+  updateSize
+);
+
+$("height").addEventListener(
+  "input",
+  updateSize
+);
+
+$("unit").addEventListener(
+  "change",
+  updateSize
+);
+
+
+/* =========================================================
+   RATIO
+========================================================= */
+
+document.querySelectorAll(".ratio")
+.forEach(button=>{
+
+  button.addEventListener("click",()=>{
+
+    const ratio =
+      button.dataset.ratio;
+
+    const value =
+      ratios[ratio];
+
+    if(!value) return;
+
+    $("width").value =
+      value[0];
+
+    $("height").value =
+      value[1];
+
+    updateSize();
+
+    document.querySelectorAll(".ratio")
+    .forEach(x=>
+      x.classList.remove("active")
+    );
+
+    button.classList.add("active");
+
+  });
+
+});
+
+
+/* =========================================================
+   IMAGE
+========================================================= */
+
+$("photo").addEventListener(
+  "change",
+  event=>{
+
+    const file =
+      event.target.files[0];
+
+    if(!file) return;
+
+    $("canvasImage").src =
+      URL.createObjectURL(file);
+
+  }
+);
+
+
+/* =========================================================
+   LOGO
+========================================================= */
+
+$("logo").addEventListener(
+  "change",
+  event=>{
+
+    const file =
+      event.target.files[0];
+
+    if(!file) return;
+
+    const image =
+      $("logoPreview");
+
+    image.src =
+      URL.createObjectURL(file);
+
+    image.style.display =
+      "block";
+
+  }
+);
+
+
+/* =========================================================
+   IMAGE CONTROLS
+========================================================= */
+
+function rangeBinding(
+  input,
+  cssVariable,
+  output,
+  suffix=""
+){
+
+  $(input).addEventListener(
+    "input",
+    event=>{
+
+      const value =
+        event.target.value;
+
+      canvas.style.setProperty(
+        cssVariable,
+        value
+      );
+
+      $(output).textContent =
+        value + suffix;
+
+    }
+  );
+
+}
+
+rangeBinding(
+  "zoom",
+  "--img-zoom",
+  "zoomVal",
+  "%"
+);
+
+rangeBinding(
+  "posX",
+  "--img-x",
+  "posXVal"
+);
+
+rangeBinding(
+  "posY",
+  "--img-y",
+  "posYVal"
+);
+
+
+/* =========================================================
+   EFFECTS
+========================================================= */
+
+rangeBinding(
+  "overlayLeft",
+  "--overlay-left",
+  "overlayLeftVal",
+  "%"
+);
+
+rangeBinding(
+  "overlayRight",
+  "--overlay-right",
+  "overlayRightVal",
+  "%"
+);
+
+$("overlayLeft")
+.addEventListener(
+  "input",
+  e=>{
+    canvas.style.setProperty(
+      "--overlay-left",
+      Number(e.target.value)/100
+    );
+  }
+);
+
+$("overlayRight")
+.addEventListener(
+  "input",
+  e=>{
+    canvas.style.setProperty(
+      "--overlay-right",
+      Number(e.target.value)/100
+    );
+  }
+);
+
+rangeBinding(
+  "pattern",
+  "--pattern-opacity",
+  "patternVal",
+  "%"
+);
+
+$("pattern")
+.addEventListener(
+  "input",
+  e=>{
+    canvas.style.setProperty(
+      "--pattern-opacity",
+      Number(e.target.value)/100
+    );
+  }
+);
+
+
+/* =========================================================
+   COLOR ENGINE
+========================================================= */
+
+const colorFields = [
+  ["bgColor","bgHex","--bg"],
+  ["primary","primaryHex","--primary"],
+  ["secondary","secondaryHex","--secondary"],
+  ["accent","accentHex","--accent"],
+  ["text","textHex","--text"],
+  ["muted","mutedHex","--muted"],
+  ["ctaColor","ctaColorHex","--cta"],
+  ["ctaText","ctaTextHex","--ctaText"],
+  ["border","borderHex","--border"]
+];
+
+function validHex(value){
+
+  return /^#[0-9A-Fa-f]{6}$/.test(
+    value
+  );
+
+}
+
+colorFields.forEach(
+  ([picker,text,variable])=>{
+
+    $(picker).addEventListener(
+      "input",
+      ()=>{
+
+        const value =
+          $(picker).value;
+
+        $(text).value =
+          value.toUpperCase();
+
+        canvas.style.setProperty(
+          variable,
+          value
+        );
+
+      }
+    );
+
+    $(text).addEventListener(
+      "change",
+      ()=>{
+
+        let value =
+          $(text).value.trim();
+
+        if(!value.startsWith("#"))
+          value = "#" + value;
+
+        if(!validHex(value))
+          return;
+
+        value =
+          value.toUpperCase();
+
+        $(text).value =
+          value;
+
+        $(picker).value =
+          value;
+
+        canvas.style.setProperty(
+          variable,
+          value
+        );
+
+      }
+    );
+
+  }
+);
+
+
+/* =========================================================
+   BACKGROUND COLOR
+========================================================= */
+
+document.querySelectorAll(
+  '[data-target="bgColor"]'
+)
+.forEach(chip=>{
+
+  chip.addEventListener(
+    "click",
+    ()=>{
+
+      const color =
+        chip.dataset.color;
+
+      $("bgColor").value =
+        color;
+
+      $("bgHex").value =
+        color.toUpperCase();
+
+      canvas.style.setProperty(
+        "--bg",
+        color
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   QUICK PALETTE
+========================================================= */
+
+document.querySelectorAll(
+  ".quick-palette"
+)
+.forEach(palette=>{
+
+  palette.addEventListener(
+    "click",
+    ()=>{
+
+      setColor(
+        "primary",
+        palette.dataset.p
+      );
+
+      setColor(
+        "secondary",
+        palette.dataset.s
+      );
+
+      setColor(
+        "accent",
+        palette.dataset.a
+      );
+
+      setColor(
+        "text",
+        palette.dataset.t
+      );
+
+      setColor(
+        "muted",
+        palette.dataset.m
+      );
+
+      setColor(
+        "ctaColor",
+        palette.dataset.p
+      );
+
+      setColor(
+        "border",
+        palette.dataset.p
+      );
+
+    }
+  );
+
+});
+
+function setColor(name,color){
+
+  const picker =
+    $(name);
+
+  const text =
+    $(name+"Hex");
+
+  if(!picker || !text)
+    return;
+
+  picker.value =
+    color;
+
+  text.value =
+    color.toUpperCase();
+
+  canvas.style.setProperty(
+    "--"+name,
+    color
+  );
+
+}
+
+
+/* =========================================================
+   DESIGN ENGINE
+========================================================= */
+
+function setDesign(name){
+
+  designs.forEach(
+    design=>{
+      canvas.classList.remove(
+        "design-"+design
+      );
+    }
+  );
+
+  canvas.classList.add(
+    "design-"+name
+  );
+
+  document.querySelectorAll(
+    ".design"
+  ).forEach(button=>{
+
+    button.classList.toggle(
+      "active",
+      button.dataset.design === name
+    );
+
+  });
+
+}
+
+document.querySelectorAll(
+  ".design"
+)
+.forEach(button=>{
+
+  button.addEventListener(
+    "click",
+    ()=>{
+
+      setDesign(
+        button.dataset.design
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   RANDOM PREMIUM
+========================================================= */
+
+const palettes = [
+  {
+    p:"#8CC63F",
+    s:"#101419",
+    a:"#D9AD55",
+    t:"#FFFFFF",
+    m:"#C4C9D0"
+  },
+  {
+    p:"#D9AD55",
+    s:"#090909",
+    a:"#FFFFFF",
+    t:"#FFFFFF",
+    m:"#CFCFCF"
+  },
+  {
+    p:"#EF3D3D",
+    s:"#111111",
+    a:"#FFFFFF",
+    t:"#FFFFFF",
+    m:"#CCCCCC"
+  },
+  {
+    p:"#277CFF",
+    s:"#07111F",
+    a:"#00D7E9",
+    t:"#FFFFFF",
+    m:"#C7D6E9"
+  },
+  {
+    p:"#A855F7",
+    s:"#100819",
+    a:"#00D7E9",
+    t:"#FFFFFF",
+    m:"#D8C7E8"
+  },
+  {
+    p:"#00B878",
+    s:"#06130F",
+    a:"#8CC63F",
+    t:"#FFFFFF",
+    m:"#BEDBD1"
+  },
+  {
+    p:"#FF7A18",
+    s:"#17100A",
+    a:"#FFD166",
+    t:"#FFFFFF",
+    m:"#E4C6A8"
+  },
+  {
+    p:"#B77A3B",
+    s:"#160D07",
+    a:"#E8C39E",
+    t:"#FFFFFF",
+    m:"#D0B9A5"
+  }
+];
+
+$("random").addEventListener(
+  "click",
+  ()=>{
+
+    const palette =
+      palettes[
+        Math.floor(
+          Math.random() *
+          palettes.length
+        )
+      ];
+
+    setColor(
+      "primary",
+      palette.p
+    );
+
+    setColor(
+      "secondary",
+      palette.s
+    );
+
+    setColor(
+      "accent",
+      palette.a
+    );
+
+    setColor(
+      "text",
+      palette.t
+    );
+
+    setColor(
+      "muted",
+      palette.m
+    );
+
+    setColor(
+      "ctaColor",
+      palette.p
+    );
+
+    setColor(
+      "border",
+      palette.p
+    );
+
+    const design =
+      designs[
+        Math.floor(
+          Math.random() *
+          designs.length
+        )
+      ];
+
+    setDesign(design);
+
+  }
+);
+
+
+/* =========================================================
+   RESET
+========================================================= */
+
+$("reset").addEventListener(
+  "click",
+  ()=>{
+
+    $("brandName").value =
+      "NINE AUTOSERIES";
+
+    $("brandRole").value =
+      "Official Distributor";
+
+    $("salesName").value =
+      "IMAM_SALESFR";
+
+    $("salesRole").value =
+      "Sales Representative";
+
+    $("phone").value =
+      "08xxxxxxxxxx";
+
+    $("kicker").value =
+      "PREMIUM AUTOMOTIVE";
+
+    $("headline").value =
+      "DRIVE YOUR NEXT";
+
+    $("subtitle").value =
+      "Temukan produk automotive terbaik dengan pelayanan profesional.";
+
+    $("badge").value =
+      "PROMO SPESIAL";
+
+    $("cta").value =
+      "HUBUNGI KAMI";
+
+    Object.entries(bindings)
+    .forEach(
+      ([input,output])=>{
+        $(output).textContent =
+          $(input).value;
+      }
+    );
+
+    setColor(
+      "bgColor",
+      "#090B0F"
+    );
+
+    setColor(
+      "primary",
+      "#8CC63F"
+    );
+
+    setColor(
+      "secondary",
+      "#101419"
+    );
+
+    setColor(
+      "accent",
+      "#D9AD55"
+    );
+
+    setColor(
+      "text",
+      "#FFFFFF"
+    );
+
+    setColor(
+      "muted",
+      "#C4C9D0"
+    );
+
+    setColor(
+      "ctaColor",
+      "#8CC63F"
+    );
+
+    setColor(
+      "ctaText",
+      "#101010"
+    );
+
+    setColor(
+      "border",
+      "#8CC63F"
+    );
+
+    $("zoom").value = 100;
+    $("posX").value = 0;
+    $("posY").value = 0;
+
+    canvas.style.setProperty(
+      "--img-zoom",
+      100
+    );
+
+    canvas.style.setProperty(
+      "--img-x",
+      0
+    );
+
+    canvas.style.setProperty(
+      "--img-y",
+      0
+    );
+
+    $("zoomVal").textContent =
+      "100%";
+
+    $("posXVal").textContent =
+      "0";
+
+    $("posYVal").textContent =
+      "0";
+
+    setDesign("wave");
+
+    updateSize();
+
+  }
+);
+
+
+/* =========================================================
+   EXPORT
+========================================================= */
+
+$("export").addEventListener(
+  "click",
+  async()=>{
+
+    const button =
+      $("export");
+
+    button.disabled =
+      true;
+
+    button.textContent =
+      "RENDERING...";
+
+    try{
+
+      const ratioW =
+        Number($("width").value) || 300;
+
+      const ratioH =
+        Number($("height").value) || 100;
+
+      /*
+        Render HD berdasarkan rasio,
+        bukan ukuran preview.
+      */
+
+      const targetWidth = 2400;
+
+      const targetHeight =
+        Math.round(
+          targetWidth *
+          ratioH /
+          ratioW
+        );
+
+      const oldWidth =
+        canvas.style.width;
+
+      const oldAspect =
+        canvas.style.aspectRatio;
+
+      /*
+        html2canvas menangkap elemen aktual.
+        Lebar diperbesar sementara untuk
+        menghasilkan PNG lebih tajam.
+      */
+
+      const rect =
+        canvas.getBoundingClientRect();
+
+      const originalWidth =
+        rect.width;
+
+      const originalHeight =
+        rect.height;
+
+      canvas.style.width =
+        targetWidth + "px";
+
+      canvas.style.height =
+        targetHeight + "px";
+
+      canvas.style.aspectRatio =
+        "auto";
+
+      await new Promise(
+        resolve =>
+          requestAnimationFrame(
+            ()=>requestAnimationFrame(resolve)
+          )
+      );
+
+      const image =
+        await html2canvas(
+          canvas,
+          {
+            scale:1,
+            useCORS:true,
+            allowTaint:false,
+            backgroundColor:null,
+            logging:false
+          }
+        );
+
+      canvas.style.width =
+        oldWidth;
+
+      canvas.style.height =
+        "";
+
+      canvas.style.aspectRatio =
+        oldAspect;
+
+      /*
+        Nama file dari branding.
+      */
+
+      let filename =
+        $("brandName").value
+        .trim()
+        .replace(
+          /[^a-zA-Z0-9_-]+/g,
+          "_"
+        );
+
+      if(!filename)
+        filename = "premium_banner";
+
+      const link =
+        document.createElement("a");
+
+      link.download =
+        filename +
+        "_banner.png";
+
+      link.href =
+        image.toDataURL(
+          "image/png",
+          1
+        );
+
+      link.click();
+
+    }catch(error){
+
+      console.error(error);
+
+      alert(
+        "Export gagal. Pastikan gambar berasal dari upload lokal dan gunakan Chrome/Edge terbaru."
+      );
+
+    }
+
+    button.disabled =
+      false;
+
+    button.textContent =
+      "EXPORT PNG";
+
+  }
+);
+
+
+/* =========================================================
+   INIT
+========================================================= */
+
+updateSize();
+
+setDesign("wave");
+
+</script>
+
+</body>
+</html>
+```
