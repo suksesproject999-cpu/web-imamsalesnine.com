@@ -1,3 +1,4 @@
+```html
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -51,6 +52,7 @@ button{
   width:100%;
   height:100%;
   transition:transform .9s cubic-bezier(.77,0,.18,1);
+  will-change:transform;
 }
 
 .scene{
@@ -72,6 +74,7 @@ button{
     linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px);
   background-size:42px 42px;
   mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);
+  -webkit-mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);
 }
 
 .glow{
@@ -229,18 +232,17 @@ button{
 }
 
 .brand-name{
-  color:var(--lime);
-  font-size:9px;
+  color:#fff;
+  font-size:2rem;
   font-weight:800;
-  letter-spacing:2px;
+  line-height:1;
 }
 
 .brand-sub{
-  display:block;
-  color:#555e5a;
-  font-size:6px;
-  letter-spacing:1px;
-  margin-top:3px;
+  color:var(--lime);
+  margin-top:4px;
+  font-size:.92rem;
+  font-weight:600;
 }
 
 .counter{
@@ -545,6 +547,13 @@ button:active{
   border-color:rgba(255,255,255,.1);
 }
 
+.export-note{
+  margin-top:12px;
+  color:#4e5752;
+  font-size:8px;
+  line-height:1.5;
+}
+
 @media(min-width:701px){
   #app{
     width:390px;
@@ -570,7 +579,7 @@ button:active{
 
 <div id="app">
 
-  <div class="viewport">
+  <div class="viewport" id="viewport">
 
     <div class="stage" id="stage">
 
@@ -580,9 +589,13 @@ button:active{
         <div class="grid"></div>
         <div class="glow lime g1"></div>
         <div class="glow gold g2"></div>
+
         <div class="stars">
-          <i class="star"></i><i class="star"></i><i class="star"></i>
-          <i class="star"></i><i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
         </div>
 
         <div class="crescent"></div>
@@ -777,8 +790,10 @@ button:active{
         <div class="glow gold g2"></div>
 
         <div class="stars">
-          <i class="star"></i><i class="star"></i>
-          <i class="star"></i><i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
+          <i class="star"></i>
         </div>
 
         <div class="top">
@@ -862,6 +877,10 @@ button:active{
         <i id="exportProgress"></i>
       </div>
 
+      <div class="export-note">
+        Preview sedang direkam langsung dari tampilan yang sama.
+      </div>
+
       <button
         class="export-cancel"
         id="cancelBtn">
@@ -875,6 +894,15 @@ button:active{
 </div>
 
 
+<!--
+  html2canvas dipakai untuk mengambil tampilan DOM preview.
+  Jadi export tidak lagi memakai renderer Canvas kedua.
+-->
+<script
+  src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js">
+</script>
+
+
 <script>
 
 /* =========================================================
@@ -883,6 +911,26 @@ button:active{
 
 const DURATION = 5200;
 const SCENE_COUNT = 5;
+const FPS = 30;
+
+/*
+ * Export scale.
+ *
+ * Preview dirender sesuai ukuran DOM yang benar-benar tampil.
+ * Canvas export kemudian diperbesar menggunakan scale ini.
+ */
+const EXPORT_SCALE = 2;
+
+
+/* =========================================================
+   DOM
+   ========================================================= */
+
+const app =
+  document.getElementById("app");
+
+const viewport =
+  document.getElementById("viewport");
 
 const stage =
   document.getElementById("stage");
@@ -909,16 +957,21 @@ const cancelBtn =
   document.getElementById("cancelBtn");
 
 
+/* =========================================================
+   STATE
+   ========================================================= */
+
 let current = 0;
 let timer = null;
-let progressTimer = null;
 let exporting = false;
 let recorder = null;
 let chunks = [];
+let exportRAF = null;
+let exportStart = 0;
 
 
 /* =========================================================
-   SLIDE
+   PREVIEW NAVIGATION
    ========================================================= */
 
 function goTo(index){
@@ -975,12 +1028,6 @@ function goTo(index){
 
 }
 
-goTo(0);
-
-
-/* =========================================================
-   AUTO SLIDE
-   ========================================================= */
 
 function restart(){
 
@@ -999,6 +1046,9 @@ function restart(){
 }
 
 
+goTo(0);
+
+
 /* =========================================================
    TOUCH
    ========================================================= */
@@ -1009,6 +1059,8 @@ let startX = 0;
 document.addEventListener(
   "touchstart",
   e=>{
+
+    if(exporting) return;
 
     const t =
       e.changedTouches[0];
@@ -1081,16 +1133,22 @@ document.addEventListener(
   "keydown",
   e=>{
 
-    if(e.key==="ArrowDown" ||
-       e.key==="ArrowRight"){
+    if(exporting) return;
+
+    if(
+      e.key === "ArrowDown" ||
+      e.key === "ArrowRight"
+    ){
 
       goTo(current + 1);
       restart();
 
     }
 
-    if(e.key==="ArrowUp" ||
-       e.key==="ArrowLeft"){
+    if(
+      e.key === "ArrowUp" ||
+      e.key === "ArrowLeft"
+    ){
 
       goTo(current - 1);
       restart();
@@ -1102,53 +1160,174 @@ document.addEventListener(
 
 
 /* =========================================================
-   CANVAS RENDERER
+   EXPORT HELPERS
    ========================================================= */
 
-/*
-   Export dilakukan dari Canvas sehingga hasil
-   benar-benar menjadi video, bukan HTML.
-*/
+function sleep(ms){
 
-function drawScene(
-  ctx,
-  sceneIndex,
+  return new Promise(
+    resolve =>
+      setTimeout(resolve,ms)
+  );
+
+}
+
+
+function nextFrame(){
+
+  return new Promise(
+    resolve =>
+      requestAnimationFrame(
+        ()=>requestAnimationFrame(resolve)
+      )
+  );
+
+}
+
+
+/*
+ * Freeze / resume animations.
+ *
+ * html2canvas menangkap kondisi DOM yang sedang tampil.
+ * Untuk menjaga frame konsisten, semua CSS animation
+ * dipause selama capture.
+ */
+
+function pauseVisualAnimations(){
+
+  document.documentElement.classList.add(
+    "export-freeze"
+  );
+
+}
+
+
+function resumeVisualAnimations(){
+
+  document.documentElement.classList.remove(
+    "export-freeze"
+  );
+
+}
+
+
+/* =========================================================
+   EXPORT CSS
+   ========================================================= */
+
+const exportStyle =
+  document.createElement("style");
+
+exportStyle.id =
+  "export-runtime-style";
+
+exportStyle.textContent = `
+  .export-freeze *,
+  .export-freeze *::before,
+  .export-freeze *::after{
+    animation-play-state:paused!important;
+  }
+
+  .export-freeze .stage{
+    transition:none!important;
+  }
+
+  .export-capture-hidden{
+    visibility:hidden!important;
+  }
+`;
+
+document.head.appendChild(
+  exportStyle
+);
+
+
+/* =========================================================
+   CAPTURE CURRENT PREVIEW
+   ========================================================= */
+
+async function capturePreview(){
+
+  if(
+    typeof html2canvas !==
+    "function"
+  ){
+
+    throw new Error(
+      "HTML2CANVAS_NOT_LOADED"
+    );
+
+  }
+
+
+  /*
+   * Capture viewport.
+   *
+   * Yang direkam adalah area preview,
+   * bukan tombol download / panel export.
+   */
+
+  const rect =
+    viewport.getBoundingClientRect();
+
+
+  const canvas =
+    await html2canvas(
+      viewport,
+      {
+        backgroundColor:"#020303",
+        scale:EXPORT_SCALE,
+
+        width:
+          Math.round(rect.width),
+
+        height:
+          Math.round(rect.height),
+
+        x:0,
+        y:0,
+
+        useCORS:true,
+        allowTaint:false,
+
+        logging:false,
+
+        imageTimeout:15000,
+
+        removeContainer:true,
+
+        foreignObjectRendering:false
+      }
+    );
+
+
+  return canvas;
+
+}
+
+
+/* =========================================================
+   COPY CAPTURE INTO VIDEO CANVAS
+   ========================================================= */
+
+function drawCapturedFrame(
+  targetCtx,
+  capturedCanvas,
   width,
-  height,
-  time
+  height
 ){
 
-  const progress =
-    (time % DURATION) /
-    DURATION;
-
-
-  /*
-   * BACKGROUND
-   */
-
-  const gradient =
-    ctx.createLinearGradient(
-      0,
-      0,
-      0,
-      height
-    );
-
-  gradient.addColorStop(
+  targetCtx.clearRect(
     0,
-    "#080b0c"
+    0,
+    width,
+    height
   );
 
-  gradient.addColorStop(
-    1,
-    "#050707"
-  );
+  targetCtx.fillStyle =
+    "#020303";
 
-  ctx.fillStyle =
-    gradient;
-
-  ctx.fillRect(
+  targetCtx.fillRect(
     0,
     0,
     width,
@@ -1157,546 +1336,276 @@ function drawScene(
 
 
   /*
-   * AMBIENT GLOW
+   * Preview aspect ratio dipertahankan.
    */
 
-  const glow =
-    ctx.createRadialGradient(
-      width*.5,
-      height*.38,
-      0,
-      width*.5,
-      height*.38,
-      width*.65
-    );
+  const sourceRatio =
+    capturedCanvas.width /
+    capturedCanvas.height;
 
-  glow.addColorStop(
-    0,
-    "rgba(140,198,63,.09)"
+  const targetRatio =
+    width / height;
+
+
+  let drawWidth =
+    width;
+
+  let drawHeight =
+    height;
+
+  let dx = 0;
+  let dy = 0;
+
+
+  if(sourceRatio > targetRatio){
+
+    drawWidth =
+      width;
+
+    drawHeight =
+      width /
+      sourceRatio;
+
+    dy =
+      (height-drawHeight)/2;
+
+  }else{
+
+    drawHeight =
+      height;
+
+    drawWidth =
+      height *
+      sourceRatio;
+
+    dx =
+      (width-drawWidth)/2;
+
+  }
+
+
+  targetCtx.drawImage(
+    capturedCanvas,
+    dx,
+    dy,
+    drawWidth,
+    drawHeight
   );
 
-  glow.addColorStop(
-    1,
-    "rgba(140,198,63,0)"
-  );
+}
 
-  ctx.fillStyle =
-    glow;
 
-  ctx.fillRect(
-    0,
-    0,
-    width,
-    height
-  );
+/* =========================================================
+   CREATE VIDEO CANVAS
+   ========================================================= */
+
+function createVideoCanvas(){
+
+  const rect =
+    viewport.getBoundingClientRect();
 
 
   /*
-   * GRID
+   * Gunakan rasio preview aktual.
+   *
+   * Ini penting:
+   * video tidak dipaksa ke ukuran 1080x1920
+   * kalau preview-nya punya rasio berbeda.
    */
 
-  ctx.strokeStyle =
-    "rgba(255,255,255,.025)";
+  const previewWidth =
+    Math.max(
+      1,
+      Math.round(rect.width)
+    );
 
-  ctx.lineWidth = 1;
-
-  const grid = 60;
-
-  for(
-    let x=0;
-    x<width;
-    x+=grid
-  ){
-
-    ctx.beginPath();
-    ctx.moveTo(x,0);
-    ctx.lineTo(x,height);
-    ctx.stroke();
-
-  }
-
-  for(
-    let y=0;
-    y<height;
-    y+=grid
-  ){
-
-    ctx.beginPath();
-    ctx.moveTo(0,y);
-    ctx.lineTo(width,y);
-    ctx.stroke();
-
-  }
+  const previewHeight =
+    Math.max(
+      1,
+      Math.round(rect.height)
+    );
 
 
   /*
-   * PARTICLES
+   * Target minimum width 720,
+   * lalu dibulatkan ke kelipatan 2
+   * agar aman untuk encoder.
    */
 
-  for(
-    let i=0;
-    i<35;
-    i++
-  ){
-
-    const x =
-      (
-        Math.sin(i*91.7) *
-        .5 + .5
-      ) * width;
-
-    const base =
-      (
-        Math.sin(i*17.31) *
-        .5 + .5
-      ) * height;
-
-    const y =
-      (
-        base +
-        (progress * 180)
-      ) % height;
-
-    ctx.fillStyle =
-      i%2
-        ? "rgba(214,181,106,.35)"
-        : "rgba(140,198,63,.3)";
-
-    ctx.beginPath();
-
-    ctx.arc(
-      x,
-      y,
-      1.5,
-      0,
-      Math.PI*2
+  let width =
+    Math.max(
+      720,
+      previewWidth * EXPORT_SCALE
     );
 
-    ctx.fill();
+  width =
+    Math.round(width / 2) * 2;
 
-  }
+
+  let height =
+    width *
+    previewHeight /
+    previewWidth;
+
+  height =
+    Math.round(height / 2) * 2;
 
 
   /*
-   * TEXT HELPERS
+   * Batas agar canvas tidak terlalu besar
+   * pada device mobile.
    */
 
-  function centerText(
-    text,
-    y,
-    size,
-    color,
-    weight="700"
-  ){
+  const MAX_DIMENSION =
+    2160;
 
-    ctx.textAlign =
-      "center";
 
-    ctx.textBaseline =
-      "middle";
+  if(height > MAX_DIMENSION){
 
-    ctx.font =
-      `${weight} ${size}px Segoe UI,Arial`;
+    const ratio =
+      MAX_DIMENSION / height;
 
-    ctx.fillStyle =
-      color;
+    width =
+      Math.round(
+        (width * ratio) / 2
+      ) * 2;
 
-    ctx.fillText(
-      text,
-      width/2,
-      y
-    );
+    height =
+      Math.round(
+        (height * ratio) / 2
+      ) * 2;
 
   }
 
 
-  function wrapped(
-    text,
-    y,
-    maxWidth,
-    lineHeight,
-    size,
-    color
+  const canvas =
+    document.createElement(
+      "canvas"
+    );
+
+  canvas.width =
+    width;
+
+  canvas.height =
+    height;
+
+
+  return canvas;
+
+}
+
+
+/* =========================================================
+   PICK MIME
+   ========================================================= */
+
+function getSupportedMime(){
+
+  const types = [
+
+    "video/webm;codecs=vp9",
+
+    "video/webm;codecs=vp8",
+
+    "video/webm"
+
+  ];
+
+
+  for(
+    const type of types
   ){
 
-    ctx.textAlign =
-      "center";
-
-    ctx.textBaseline =
-      "top";
-
-    ctx.font =
-      `500 ${size}px Segoe UI,Arial`;
-
-    ctx.fillStyle =
-      color;
-
-    const words =
-      text.split(" ");
-
-    let line="";
-    let yy=y;
-
-    for(
-      const word of words
+    if(
+      MediaRecorder.isTypeSupported(
+        type
+      )
     ){
 
-      const test =
-        line
-          ? line+" "+word
-          : word;
-
-      if(
-        ctx.measureText(test).width >
-        maxWidth
-      ){
-
-        ctx.fillText(
-          line,
-          width/2,
-          yy
-        );
-
-        line=word;
-        yy+=lineHeight;
-
-      }else{
-
-        line=test;
-
-      }
+      return type;
 
     }
 
-    if(line){
+  }
 
-      ctx.fillText(
-        line,
-        width/2,
-        yy
+
+  return "";
+
+}
+
+
+/* =========================================================
+   DOWNLOAD BLOB
+   ========================================================= */
+
+function downloadBlob(
+  blob,
+  filename
+){
+
+  const url =
+    URL.createObjectURL(
+      blob
+    );
+
+
+  const a =
+    document.createElement(
+      "a"
+    );
+
+  a.href =
+    url;
+
+  a.download =
+    filename;
+
+  a.rel =
+    "noopener";
+
+  a.style.display =
+    "none";
+
+
+  document.body.appendChild(a);
+
+  a.click();
+
+  a.remove();
+
+
+  setTimeout(
+    ()=>{
+      URL.revokeObjectURL(
+        url
       );
+    },
+    5000
+  );
 
+}
+
+
+/* =========================================================
+   STOP RECORDER SAFELY
+   ========================================================= */
+
+function stopRecorder(){
+
+  if(
+    recorder &&
+    recorder.state ===
+    "recording"
+  ){
+
+    try{
+      recorder.stop();
+    }catch(error){
+      console.warn(
+        "Recorder stop:",
+        error
+      );
     }
-
-  }
-
-
-  /*
-   * TOP BRAND
-   */
-
-  ctx.fillStyle =
-    "#8cc63f";
-
-  ctx.fillRect(
-    70,
-    105,
-    5,
-    65
-  );
-
-  ctx.textAlign =
-    "left";
-
-  ctx.textBaseline =
-    "top";
-
-  ctx.font =
-    "800 22px Segoe UI,Arial";
-
-  ctx.fillStyle =
-    "#8cc63f";
-
-  ctx.fillText(
-    "IMAM SALES NINE",
-    95,
-    105
-  );
-
-  ctx.font =
-    "500 11px Segoe UI,Arial";
-
-  ctx.fillStyle =
-    "#555e5a";
-
-  ctx.fillText(
-    "A CINEMATIC MAULID EXPERIENCE",
-    95,
-    136
-  );
-
-
-  /*
-   * SCENES
-   */
-
-  if(sceneIndex===0){
-
-    centerText(
-      "BULAN PENUH CINTA",
-      570,
-      20,
-      "#d6b56a",
-      "700"
-    );
-
-    centerText(
-      "MAULID",
-      700,
-      92,
-      "#ffffff",
-      "900"
-    );
-
-    centerText(
-      "NABI",
-      790,
-      92,
-      "#8cc63f",
-      "900"
-    );
-
-    centerText(
-      "MUHAMMAD ﷺ",
-      885,
-      70,
-      "#d6b56a",
-      "900"
-    );
-
-    wrapped(
-      "Selamat menyambut Bulan Maulid Nabi Muhammad SAW. Mari memperbanyak shalawat, menumbuhkan cinta kepada Rasulullah ﷺ, dan menghadirkan akhlak beliau dalam setiap langkah kehidupan.",
-      1030,
-      850,
-      40,
-      22,
-      "#929a96"
-    );
-
-  }
-
-
-  if(sceneIndex===1){
-
-    centerText(
-      "BUKAN SEKADAR PERINGATAN",
-      520,
-      20,
-      "#d6b56a",
-      "700"
-    );
-
-    wrapped(
-      "Bulan Maulid adalah momentum untuk kembali menumbuhkan cinta kepada Rasulullah ﷺ.",
-      680,
-      850,
-      65,
-      42,
-      "#e5e8e5"
-    );
-
-    wrapped(
-      "Bukan hanya mengenang kelahiran beliau, tetapi menghadirkan keteladanan, kasih sayang, kesabaran, kejujuran, dan akhlak mulia.",
-      930,
-      820,
-      38,
-      21,
-      "#777f7b"
-    );
-
-  }
-
-
-  if(sceneIndex===2){
-
-    centerText(
-      "SHALAWAT FOR THE BELOVED",
-      460,
-      19,
-      "#d6b56a",
-      "700"
-    );
-
-    centerText(
-      "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ",
-      610,
-      42,
-      "#f1eee5",
-      "600"
-    );
-
-    centerText(
-      "PERBANYAK",
-      790,
-      70,
-      "#ffffff",
-      "900"
-    );
-
-    centerText(
-      "SHALAWAT.",
-      860,
-      70,
-      "#8cc63f",
-      "900"
-    );
-
-    wrapped(
-      "Semoga lisan kita selalu basah dengan shalawat, hati dipenuhi cinta, dan langkah senantiasa diarahkan kepada kebaikan.",
-      990,
-      800,
-      38,
-      20,
-      "#858d89"
-    );
-
-  }
-
-
-  if(sceneIndex===3){
-
-    centerText(
-      "TELADAN RASULULLAH ﷺ",
-      420,
-      20,
-      "#d6b56a",
-      "700"
-    );
-
-    centerText(
-      "HIDUPKAN",
-      550,
-      68,
-      "#ffffff",
-      "900"
-    );
-
-    centerText(
-      "NILAINYA.",
-      620,
-      68,
-      "#8cc63f",
-      "900"
-    );
-
-    const vals = [
-      ["JUJUR","Menjaga kejujuran dalam ucapan dan pekerjaan."],
-      ["RAHMAH","Menghadirkan kasih sayang dan kelembutan."],
-      ["AMANAH","Menjalankan tanggung jawab dengan sungguh-sungguh."]
-    ];
-
-    vals.forEach(
-      (v,i)=>{
-
-        const y =
-          780+i*170;
-
-        ctx.fillStyle =
-          "rgba(255,255,255,.025)";
-
-        ctx.fillRect(
-          100,
-          y,
-          880,
-          130
-        );
-
-        ctx.fillStyle =
-          "#d6b56a";
-
-        ctx.fillRect(
-          100,
-          y,
-          4,
-          130
-        );
-
-        ctx.textAlign =
-          "left";
-
-        ctx.textBaseline =
-          "top";
-
-        ctx.font =
-          "800 27px Segoe UI,Arial";
-
-        ctx.fillStyle =
-          "#ffffff";
-
-        ctx.fillText(
-          v[0],
-          130,
-          y+25
-        );
-
-        ctx.font =
-          "500 17px Segoe UI,Arial";
-
-        ctx.fillStyle =
-          "#68716d";
-
-        ctx.fillText(
-          v[1],
-          130,
-          y+68
-        );
-
-      }
-    );
-
-  }
-
-
-  if(sceneIndex===4){
-
-    centerText(
-      "✦  ✧  ✦",
-      500,
-      30,
-      "#d6b56a",
-      "500"
-    );
-
-    centerText(
-      "SELAMAT",
-      630,
-      66,
-      "#ffffff",
-      "900"
-    );
-
-    centerText(
-      "BULAN MAULID",
-      705,
-      66,
-      "#8cc63f",
-      "900"
-    );
-
-    centerText(
-      "NABI MUHAMMAD ﷺ",
-      780,
-      54,
-      "#d6b56a",
-      "900"
-    );
-
-    wrapped(
-      "Semoga momentum Maulid Nabi Muhammad SAW membawa keberkahan, ketenangan, dan semakin mendekatkan hati kita kepada Allah SWT serta Rasulullah ﷺ.",
-      930,
-      820,
-      38,
-      20,
-      "#808984"
-    );
-
-    centerText(
-      "FROM IMAM SALES NINE • WITH LOVE",
-      1250,
-      15,
-      "#8cc63f",
-      "700"
-    );
 
   }
 
@@ -1712,43 +1621,80 @@ async function exportVideo(){
   if(exporting)
     return;
 
+
+  /*
+   * Check MediaRecorder.
+   */
+
+  if(
+    !window.MediaRecorder
+  ){
+
+    alert(
+      "Browser ini tidak mendukung video export."
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Check html2canvas.
+   */
+
+  if(
+    typeof html2canvas !==
+    "function"
+  ){
+
+    alert(
+      "Renderer export belum siap. Pastikan koneksi internet aktif."
+    );
+
+    return;
+
+  }
+
+
   exporting = true;
 
   clearTimeout(timer);
 
-  exportPanel.classList.add("show");
 
-  exportStatus.textContent =
-    "Menyiapkan renderer...";
+  exportPanel.classList.add(
+    "show"
+  );
+
 
   exportProgress.style.width =
     "0%";
 
 
-  const width =
-    1080;
-
-  const height =
-    1920;
-
-  const fps =
-    30;
+  exportStatus.textContent =
+    "Menyiapkan preview renderer...";
 
 
-  const canvas =
-    document.createElement(
-      "canvas"
-    );
+  /*
+   * Kembalikan preview ke scene pertama.
+   */
 
-  canvas.width =
-    width;
+  goTo(0);
 
-  canvas.height =
-    height;
+  await nextFrame();
+
+
+  /*
+   * Buat canvas video dengan rasio
+   * yang sama dengan preview.
+   */
+
+  const videoCanvas =
+    createVideoCanvas();
 
 
   const ctx =
-    canvas.getContext(
+    videoCanvas.getContext(
       "2d",
       {
         alpha:false
@@ -1756,48 +1702,41 @@ async function exportVideo(){
     );
 
 
+  ctx.imageSmoothingEnabled =
+    true;
+
+  ctx.imageSmoothingQuality =
+    "high";
+
+
   /*
-   * MediaRecorder support
+   * MediaRecorder.
    */
 
-  if(
-    !window.MediaRecorder
-  ){
-
-    exportStatus.textContent =
-      "Browser tidak mendukung video export.";
-
-    exporting=false;
-
-    return;
-
-  }
-
-
   const stream =
-    canvas.captureStream(
-      fps
+    videoCanvas.captureStream(
+      FPS
     );
 
 
-  let mime =
-    "video/webm;codecs=vp9";
+  const mime =
+    getSupportedMime();
 
-  if(
-    !MediaRecorder.isTypeSupported(mime)
-  ){
 
-    mime =
-      "video/webm;codecs=vp8";
+  if(!mime){
 
-  }
+    exportStatus.textContent =
+      "Format video tidak didukung browser.";
 
-  if(
-    !MediaRecorder.isTypeSupported(mime)
-  ){
+    exporting=false;
 
-    mime =
-      "video/webm";
+    exportPanel.classList.remove(
+      "show"
+    );
+
+    restart();
+
+    return;
 
   }
 
@@ -1812,132 +1751,114 @@ async function exportVideo(){
         stream,
         {
           mimeType:mime,
-          videoBitsPerSecond:
-            8000000
+          videoBitsPerSecond:12000000
         }
       );
 
   }catch(error){
 
+    console.error(error);
+
     exportStatus.textContent =
-      "Video encoder tidak tersedia.";
+      "Gagal membuat video encoder.";
 
     exporting=false;
+
+    exportPanel.classList.remove(
+      "show"
+    );
+
+    restart();
 
     return;
 
   }
 
 
-  recorder.ondataavailable =
-    event=>{
+  /*
+   * Promise recorder.
+   */
 
-      if(
-        event.data &&
-        event.data.size
-      ){
+  const recordingFinished =
+    new Promise(
+      resolve=>{
 
-        chunks.push(
-          event.data
-        );
+        recorder.ondataavailable =
+          event=>{
+
+            if(
+              event.data &&
+              event.data.size > 0
+            ){
+
+              chunks.push(
+                event.data
+              );
+
+            }
+
+          };
+
+
+        recorder.onerror =
+          event=>{
+
+            console.error(
+              "MediaRecorder:",
+              event.error
+            );
+
+          };
+
+
+        recorder.onstop =
+          ()=>{
+
+            resolve();
+
+          };
 
       }
-
-    };
-
-
-  recorder.onstop =
-    ()=>{
-
-      const blob =
-        new Blob(
-          chunks,
-          {
-            type:mime
-          }
-        );
+    );
 
 
-      const url =
-        URL.createObjectURL(
-          blob
-        );
+  recorder.start(250);
 
 
-      const a =
-        document.createElement(
-          "a"
-        );
+  /*
+   * =======================================================
+   * EXPORT LOOP
+   * =======================================================
+   *
+   * Setiap frame:
+   *
+   * 1. Tentukan scene berdasarkan waktu.
+   * 2. Set preview ke scene tersebut.
+   * 3. Tunggu browser merender DOM.
+   * 4. Capture DOM preview.
+   * 5. Masukkan hasil capture ke video canvas.
+   *
+   * Jadi sumber visual export adalah preview yang sama.
+   */
 
-      a.href =
-        url;
-
-      a.download =
-        "Maulid-Nabi-Muhammad-SAW.webm";
-
-      document.body.appendChild(a);
-
-      a.click();
-
-      a.remove();
-
-
-      setTimeout(
-        ()=>{
-          URL.revokeObjectURL(url);
-        },
-        3000
-      );
-
-
-      exportStatus.textContent =
-        "Video selesai. Download dimulai.";
-
-      exportProgress.style.width =
-        "100%";
-
-
-      setTimeout(
-        ()=>{
-          exportPanel.classList.remove(
-            "show"
-          );
-
-          exporting=false;
-
-          goTo(0);
-
-        },
-        1400
-      );
-
-    };
-
-
-  recorder.start(
-    250
-  );
-
-
-  const total =
+  const totalDuration =
     DURATION *
     SCENE_COUNT;
 
-  const start =
+
+  exportStart =
     performance.now();
 
 
-  function renderFrame(now){
+  let lastScene =
+    -1;
+
+
+  async function renderExportFrame(){
 
     if(!exporting){
 
-      if(
-        recorder.state === "recording"
-      ){
-
-        recorder.stop();
-
-      }
+      stopRecorder();
 
       return;
 
@@ -1945,12 +1866,40 @@ async function exportVideo(){
 
 
     const elapsed =
-      now - start;
+      performance.now() -
+      exportStart;
 
+
+    /*
+     * Selesai.
+     */
+
+    if(
+      elapsed >=
+      totalDuration
+    ){
+
+      exportProgress.style.width =
+        "100%";
+
+      exportStatus.textContent =
+        "Menyelesaikan video...";
+
+
+      stopRecorder();
+
+      return;
+
+    }
+
+
+    /*
+     * Scene aktif.
+     */
 
     const sceneIndex =
       Math.min(
-        SCENE_COUNT-1,
+        SCENE_COUNT - 1,
         Math.floor(
           elapsed /
           DURATION
@@ -1958,79 +1907,244 @@ async function exportVideo(){
       );
 
 
-    const localTime =
-      elapsed %
-      DURATION;
-
-
-    drawScene(
-      ctx,
-      sceneIndex,
-      width,
-      height,
-      localTime
-    );
-
-
-    const percent =
-      Math.min(
-        100,
-        (elapsed/total)*100
-      );
-
-
-    exportProgress.style.width =
-      percent+"%";
-
-
-    exportStatus.textContent =
-      `Rendering scene ${sceneIndex+1}/${SCENE_COUNT} • ${Math.round(percent)}%`;
-
+    /*
+     * Saat pindah scene,
+     * set stage langsung tanpa transition.
+     */
 
     if(
-      elapsed <
-      total
+      sceneIndex !==
+      lastScene
     ){
 
-      requestAnimationFrame(
-        renderFrame
+      current =
+        sceneIndex;
+
+      stage.style.transition =
+        "none";
+
+      stage.style.transform =
+        `translateY(-${sceneIndex * 100}%)`;
+
+
+      bars.forEach(
+        (bar,i)=>{
+
+          bar.style.transition =
+            "none";
+
+          bar.style.width =
+            i < sceneIndex
+              ? "100%"
+              : "0";
+
+        }
       );
 
-    }else{
 
-      drawScene(
+      lastScene =
+        sceneIndex;
+
+
+      await nextFrame();
+
+    }
+
+
+    /*
+     * Capture DOM preview.
+     */
+
+    try{
+
+      const captured =
+        await capturePreview();
+
+
+      drawCapturedFrame(
         ctx,
-        SCENE_COUNT-1,
-        width,
-        height,
-        DURATION-1
+        captured,
+        videoCanvas.width,
+        videoCanvas.height
+      );
+
+
+    }catch(error){
+
+      console.error(
+        "Frame capture failed:",
+        error
       );
 
 
       exportStatus.textContent =
-        "Menyelesaikan video...";
+        "Gagal menangkap preview.";
 
+      exporting=false;
 
-      setTimeout(
-        ()=>{
-          if(
-            recorder.state ===
-            "recording"
-          ){
-            recorder.stop();
-          }
-        },
-        300
-      );
+      stopRecorder();
+
+      return;
 
     }
+
+
+    /*
+     * Progress.
+     */
+
+    const percent =
+      Math.min(
+        100,
+        (elapsed /
+          totalDuration) *
+          100
+      );
+
+
+    exportProgress.style.width =
+      percent + "%";
+
+
+    exportStatus.textContent =
+      `Merekam preview • Scene ${sceneIndex+1}/${SCENE_COUNT} • ${Math.round(percent)}%`;
+
+
+    /*
+     * Next frame.
+     */
+
+    exportRAF =
+      requestAnimationFrame(
+        renderExportFrame
+      );
 
   }
 
 
-  requestAnimationFrame(
-    renderFrame
+  /*
+   * Jalankan renderer.
+   */
+
+  renderExportFrame();
+
+
+  /*
+   * Tunggu recorder selesai.
+   */
+
+  await recordingFinished;
+
+
+  /*
+   * Kalau dibatalkan, jangan download.
+   */
+
+  if(!exporting){
+
+    stream.getTracks().forEach(
+      track=>track.stop()
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Gabungkan chunks.
+   */
+
+  const blob =
+    new Blob(
+      chunks,
+      {
+        type:mime
+      }
+    );
+
+
+  if(
+    !blob ||
+    blob.size === 0
+  ){
+
+    exportStatus.textContent =
+      "File video kosong.";
+
+    exporting=false;
+
+    stream.getTracks().forEach(
+      track=>track.stop()
+    );
+
+    return;
+
+  }
+
+
+  /*
+   * Filename.
+   */
+
+  const extension =
+    mime.includes("webm")
+      ? "webm"
+      : "webm";
+
+
+  const filename =
+    `Maulid-Nabi-Muhammad-SAW.${extension}`;
+
+
+  exportStatus.textContent =
+    "Video selesai. Memulai download...";
+
+
+  exportProgress.style.width =
+    "100%";
+
+
+  downloadBlob(
+    blob,
+    filename
   );
+
+
+  /*
+   * Cleanup.
+   */
+
+  stream.getTracks().forEach(
+    track=>track.stop()
+  );
+
+
+  await sleep(1200);
+
+
+  exportPanel.classList.remove(
+    "show"
+  );
+
+
+  exporting=false;
+
+  recorder=null;
+
+  chunks=[];
+
+
+  /*
+   * Kembalikan preview ke kondisi normal.
+   */
+
+  stage.style.transition =
+    "transform .9s cubic-bezier(.77,0,.18,1)";
+
+  goTo(0);
+
+  restart();
 
 }
 
@@ -2062,21 +2176,45 @@ cancelBtn.addEventListener(
     if(!exporting)
       return;
 
+
     exporting=false;
 
-    if(
-      recorder &&
-      recorder.state ===
-      "recording"
-    ){
 
-      recorder.stop();
+    if(exportRAF){
+
+      cancelAnimationFrame(
+        exportRAF
+      );
+
+      exportRAF=null;
 
     }
+
+
+    stopRecorder();
+
 
     exportPanel.classList.remove(
       "show"
     );
+
+
+    exportStatus.textContent =
+      "Export dibatalkan.";
+
+
+    exportProgress.style.width =
+      "0%";
+
+
+    recorder=null;
+
+    chunks=[];
+
+
+    stage.style.transition =
+      "transform .9s cubic-bezier(.77,0,.18,1)";
+
 
     goTo(0);
 
@@ -2085,7 +2223,29 @@ cancelBtn.addEventListener(
   }
 );
 
+
+/* =========================================================
+   PREVENT EXPORT PANEL FROM TRIGGERING SLIDES
+   ========================================================= */
+
+exportPanel.addEventListener(
+  "touchstart",
+  e=>{
+    e.stopPropagation();
+  },
+  {passive:true}
+);
+
+exportPanel.addEventListener(
+  "touchend",
+  e=>{
+    e.stopPropagation();
+  },
+  {passive:true}
+);
+
 </script>
 
 </body>
 </html>
+```
