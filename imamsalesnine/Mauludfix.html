@@ -229,15 +229,15 @@ button{
 }
 
 .brand-name{
-  color:var(--lime);
-  font-size:9px;
+  color:#fff;
+  font-size:22px;
   font-weight:800;
-  letter-spacing:2px;
+  letter-spacing:1px;
 }
 
 .brand-sub{
   display:block;
-  color:#555e5a;
+  color:var(--lime);
   font-size:6px;
   letter-spacing:1px;
   margin-top:3px;
@@ -1408,7 +1408,7 @@ function drawScene(
     "#8cc63f";
 
   ctx.fillText(
-    "IMAM SALES NINE",
+    "Imam_salesfr",
     95,
     105
   );
@@ -1420,7 +1420,7 @@ function drawScene(
     "#555e5a";
 
   ctx.fillText(
-    "A CINEMATIC MAULID EXPERIENCE",
+    "Sales representative • nine autoseries",
     95,
     136
   );
@@ -1704,8 +1704,22 @@ function drawScene(
 
 
 /* =========================================================
-   VIDEO EXPORT — RELIABLE MOBILE EXPORT
+   VIDEO EXPORT — CAPTURE THE ACTUAL PREVIEW
    ========================================================= */
+
+/*
+  Prinsip utama:
+  PREVIEW = DOM/CSS
+  DOWNLOAD = frame dari DOM/CSS yang sama
+
+  Tidak ada drawScene() kedua.
+  Tidak ada layout versi canvas yang berbeda.
+
+  Browser mobile biasanya tidak menyediakan API screenshot DOM
+  secara langsung. Karena itu kita membuat mirror preview di canvas
+  memakai SVG foreignObject, tetapi dengan ukuran viewport yang sama
+  dan semua CSS dokumen ikut disertakan.
+*/
 
 async function exportVideo(){
 
@@ -1715,35 +1729,40 @@ async function exportVideo(){
   clearTimeout(timer);
 
   exportPanel.classList.add("show");
-  exportStatus.textContent = "Menyiapkan video...";
+  exportStatus.textContent = "Menyiapkan preview...";
   exportProgress.style.width = "0%";
 
-  const width = 1080;
-  const height = 1920;
+  const exportWidth = 1080;
+  const exportHeight = 1920;
   const fps = 30;
 
-  if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){
+  if(
+    !window.MediaRecorder ||
+    !HTMLCanvasElement.prototype.captureStream
+  ){
     exportStatus.textContent =
-      "Browser ini tidak mendukung export video.";
+      "Browser tidak mendukung export video.";
     exporting = false;
     return;
   }
 
+  /*
+    Ukuran mirror mengikuti rasio preview.
+    Preview desktop dibatasi 390x844; mobile mengikuti layar.
+    Untuk video kita pakai 1080x1920 dengan rasio yang sama.
+  */
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
+  canvas.width = exportWidth;
+  canvas.height = exportHeight;
 
   const ctx = canvas.getContext("2d",{alpha:false});
-  const stream = canvas.captureStream(fps);
 
   let mime = "";
-  const types = [
+  for(const type of [
     "video/webm;codecs=vp9",
     "video/webm;codecs=vp8",
     "video/webm"
-  ];
-
-  for(const type of types){
+  ]){
     if(MediaRecorder.isTypeSupported(type)){
       mime = type;
       break;
@@ -1753,29 +1772,35 @@ async function exportVideo(){
   if(!mime){
     exportStatus.textContent =
       "Format video tidak didukung browser.";
-    stream.getTracks().forEach(t=>t.stop());
     exporting = false;
     return;
   }
 
+  let stream;
+
   try{
+    stream = canvas.captureStream(fps);
+
     recorder = new MediaRecorder(stream,{
       mimeType:mime,
-      videoBitsPerSecond:10000000
+      videoBitsPerSecond:12000000
     });
+
   }catch(error){
+
     exportStatus.textContent =
       "Gagal membuat video recorder.";
-    stream.getTracks().forEach(t=>t.stop());
+
+    stream?.getTracks().forEach(t=>t.stop());
     exporting = false;
     return;
   }
 
   chunks = [];
 
-  recorder.ondataavailable = e=>{
-    if(e.data && e.data.size > 0)
-      chunks.push(e.data);
+  recorder.ondataavailable = event=>{
+    if(event.data && event.data.size)
+      chunks.push(event.data);
   };
 
   recorder.onerror = ()=>{
@@ -1795,11 +1820,6 @@ async function exportVideo(){
 
     const url = URL.createObjectURL(blob);
 
-    /*
-      Mobile browser lebih konsisten bila download dilakukan
-      langsung dari object URL dengan anchor yang dipicu setelah
-      recorder selesai.
-    */
     const a = document.createElement("a");
     a.href = url;
     a.download = "Maulid-Nabi-Muhammad-SAW.webm";
@@ -1817,318 +1837,268 @@ async function exportVideo(){
 
     exportProgress.style.width = "100%";
     exportStatus.textContent =
-      "Video selesai. File sedang disimpan...";
+      "Video selesai. Download dimulai.";
 
     setTimeout(()=>{
       exportPanel.classList.remove("show");
       exporting = false;
       goTo(0);
-    },1800);
+    },1400);
   };
 
   /*
-    Render scene yang sama dengan preview.
-    Bedanya hanya ukurannya: preview menggunakan viewport,
-    export menggunakan canvas 1080x1920.
+    Ambil CSS yang benar-benar dipakai halaman.
   */
-  function drawPreviewEquivalent(sceneIndex,localTime){
+  function getAllCSS(){
 
-    ctx.clearRect(0,0,width,height);
+    return [...document.styleSheets].map(sheet=>{
 
-    /* Background yang sama */
-    const bg = ctx.createLinearGradient(0,0,0,height);
-    bg.addColorStop(0,"#080b0c");
-    bg.addColorStop(1,"#050707");
-    ctx.fillStyle = bg;
-    ctx.fillRect(0,0,width,height);
+      try{
+        return [...sheet.cssRules]
+          .map(rule=>rule.cssText)
+          .join("\n");
 
-    /* Glow utama yang sama */
-    const glow = ctx.createRadialGradient(
-      width*.5,height*.38,0,
-      width*.5,height*.38,width*.65
-    );
-    glow.addColorStop(0,"rgba(140,198,63,.09)");
-    glow.addColorStop(1,"rgba(140,198,63,0)");
-    ctx.fillStyle = glow;
-    ctx.fillRect(0,0,width,height);
+      }catch(error){
 
-    /* Grid yang mendekati preview CSS */
-    ctx.strokeStyle = "rgba(255,255,255,.035)";
-    ctx.lineWidth = 1;
-    const grid = 42;
-
-    for(let x=0;x<width;x+=grid){
-      ctx.beginPath();
-      ctx.moveTo(x,0);
-      ctx.lineTo(x,height);
-      ctx.stroke();
-    }
-
-    for(let y=0;y<height;y+=grid){
-      ctx.beginPath();
-      ctx.moveTo(0,y);
-      ctx.lineTo(width,y);
-      ctx.stroke();
-    }
-
-    /* Stars */
-    const pulse = .5 + .5*Math.sin(localTime/900);
-
-    for(let i=0;i<5;i++){
-      const sx = [0.13,0.78,0.88,0.18,0.66][i]*width;
-      const sy = [0.20,0.17,0.53,0.75,0.83][i]*height;
-      const alpha = .15 + .65*pulse;
-
-      ctx.fillStyle =
-        `rgba(214,181,106,${alpha})`;
-
-      ctx.beginPath();
-      ctx.arc(sx,sy,1.5,0,Math.PI*2);
-      ctx.fill();
-    }
-
-    /* Helpers dengan ukuran proporsional terhadap 1080x1920 */
-    function centerText(text,y,size,color,weight="700"){
-      ctx.textAlign="center";
-      ctx.textBaseline="middle";
-      ctx.font=`${weight} ${size}px Segoe UI,Arial,sans-serif`;
-      ctx.fillStyle=color;
-      ctx.fillText(text,width/2,y);
-    }
-
-    function wrapped(text,y,maxWidth,lineHeight,size,color){
-      ctx.textAlign="center";
-      ctx.textBaseline="top";
-      ctx.font=`500 ${size}px Segoe UI,Arial,sans-serif`;
-      ctx.fillStyle=color;
-
-      const words=text.split(" ");
-      let line="";
-      let yy=y;
-
-      for(const word of words){
-        const test=line ? line+" "+word : word;
-
-        if(ctx.measureText(test).width > maxWidth){
-          if(line) ctx.fillText(line,width/2,yy);
-          line=word;
-          yy+=lineHeight;
-        }else{
-          line=test;
-        }
+        return "";
       }
 
-      if(line) ctx.fillText(line,width/2,yy);
-    }
+    }).join("\n");
+  }
 
-    /* Brand */
-    ctx.fillStyle="#8cc63f";
-    ctx.fillRect(70,105,5,65);
+  /*
+    Buat clone scene aktual.
+    Tidak menggambar ulang teks/layout.
+    Semua element, class, inline style, dan CSS berasal dari preview.
+  */
+  function makePreviewMirror(sceneIndex){
 
-    ctx.textAlign="left";
-    ctx.textBaseline="top";
-    ctx.font="800 22px Segoe UI,Arial";
-    ctx.fillStyle="#8cc63f";
-    ctx.fillText("IMAM SALES NINE",95,105);
+    const root = document.createElement("div");
 
-    ctx.font="500 11px Segoe UI,Arial";
-    ctx.fillStyle="#555e5a";
-    ctx.fillText(
-      "A CINEMATIC MAULID EXPERIENCE",
-      95,136
+    root.style.cssText = `
+      position:absolute;
+      left:0;
+      top:0;
+      width:${exportWidth}px;
+      height:${exportHeight}px;
+      overflow:hidden;
+      background:#020303;
+    `;
+
+    const stageClone = document.createElement("div");
+
+    stageClone.className = "stage";
+
+    stageClone.style.cssText = `
+      width:${exportWidth}px!important;
+      height:${exportHeight * SCENE_COUNT}px!important;
+      transition:none!important;
+      transform:translateY(-${sceneIndex*exportHeight}px)!important;
+    `;
+
+    scenes.forEach((originalScene,index)=>{
+
+      const scene = originalScene.cloneNode(true);
+
+      scene.style.cssText += `
+        width:${exportWidth}px!important;
+        height:${exportHeight}px!important;
+        min-height:${exportHeight}px!important;
+        transition:none!important;
+      `;
+
+      /*
+        Preview hanya menampilkan satu viewport.
+        Stage tetap berisi seluruh scene seperti preview asli.
+      */
+      stageClone.appendChild(scene);
+    });
+
+    root.appendChild(stageClone);
+
+    return root;
+  }
+
+  /*
+    Serialize DOM preview -> SVG -> Image -> recording canvas.
+    Ini mempertahankan HTML/CSS preview, bukan renderer baru.
+  */
+  async function capturePreviewFrame(sceneIndex){
+
+    const root = makePreviewMirror(sceneIndex);
+    const css = getAllCSS();
+
+    /*
+      Freeze animation pada frame export agar tidak ada animasi
+      terpisah yang mengubah hasil secara acak.
+      Transform slide tetap berasal dari stage preview.
+    */
+    const freezeCSS = `
+      *, *::before, *::after{
+        animation:none!important;
+        transition:none!important;
+      }
+    `;
+
+    const serialized =
+      new XMLSerializer().serializeToString(root);
+
+    const svg = `
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="${exportWidth}"
+        height="${exportHeight}"
+        viewBox="0 0 ${exportWidth} ${exportHeight}">
+
+        <foreignObject
+          x="0"
+          y="0"
+          width="${exportWidth}"
+          height="${exportHeight}">
+
+          <div
+            xmlns="http://www.w3.org/1999/xhtml"
+            style="
+              width:${exportWidth}px;
+              height:${exportHeight}px;
+              overflow:hidden;
+              background:#020303;
+            ">
+
+            <style>
+              ${css}
+              ${freezeCSS}
+            </style>
+
+            ${serialized}
+
+          </div>
+
+        </foreignObject>
+
+      </svg>
+    `;
+
+    const blob = new Blob(
+      [svg],
+      {type:"image/svg+xml;charset=utf-8"}
     );
 
-    if(sceneIndex===0){
+    const url = URL.createObjectURL(blob);
 
-      centerText(
-        "BULAN PENUH CINTA",
-        570,20,"#d6b56a","700"
-      );
+    try{
 
-      centerText(
-        "MAULID",
-        700,92,"#ffffff","900"
-      );
+      const image = new Image();
 
-      centerText(
-        "NABI",
-        790,92,"#8cc63f","900"
-      );
+      await new Promise((resolve,reject)=>{
 
-      centerText(
-        "MUHAMMAD ﷺ",
-        885,70,"#d6b56a","900"
-      );
+        image.onload = resolve;
+        image.onerror = reject;
 
-      wrapped(
-        "Selamat menyambut Bulan Maulid Nabi Muhammad SAW. Mari memperbanyak shalawat, menumbuhkan cinta kepada Rasulullah ﷺ, dan menghadirkan akhlak beliau dalam setiap langkah kehidupan.",
-        1030,850,40,22,"#929a96"
-      );
-
-    }else if(sceneIndex===1){
-
-      centerText(
-        "BUKAN SEKADAR PERINGATAN",
-        520,20,"#d6b56a","700"
-      );
-
-      wrapped(
-        "Bulan Maulid adalah momentum untuk kembali menumbuhkan cinta kepada Rasulullah ﷺ.",
-        680,850,65,42,"#e5e8e5"
-      );
-
-      wrapped(
-        "Bukan hanya mengenang kelahiran beliau, tetapi menghadirkan keteladanan, kasih sayang, kesabaran, kejujuran, dan akhlak mulia.",
-        930,820,38,21,"#777f7b"
-      );
-
-    }else if(sceneIndex===2){
-
-      centerText(
-        "SHALAWAT FOR THE BELOVED",
-        460,19,"#d6b56a","700"
-      );
-
-      centerText(
-        "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ",
-        610,42,"#f1eee5","600"
-      );
-
-      centerText(
-        "PERBANYAK",
-        790,70,"#ffffff","900"
-      );
-
-      centerText(
-        "SHALAWAT.",
-        860,70,"#8cc63f","900"
-      );
-
-      wrapped(
-        "Semoga lisan kita selalu basah dengan shalawat, hati dipenuhi cinta, dan langkah senantiasa diarahkan kepada kebaikan.",
-        990,800,38,20,"#858d89"
-      );
-
-    }else if(sceneIndex===3){
-
-      centerText(
-        "TELADAN RASULULLAH ﷺ",
-        420,20,"#d6b56a","700"
-      );
-
-      centerText(
-        "HIDUPKAN",
-        550,68,"#ffffff","900"
-      );
-
-      centerText(
-        "NILAINYA.",
-        620,68,"#8cc63f","900"
-      );
-
-      const vals=[
-        ["JUJUR","Menjaga kejujuran dalam ucapan dan pekerjaan."],
-        ["RAHMAH","Menghadirkan kasih sayang dan kelembutan."],
-        ["AMANAH","Menjalankan tanggung jawab dengan sungguh-sungguh."]
-      ];
-
-      vals.forEach((v,i)=>{
-        const y=780+i*170;
-
-        ctx.fillStyle="rgba(255,255,255,.025)";
-        ctx.fillRect(100,y,880,130);
-
-        ctx.fillStyle="#d6b56a";
-        ctx.fillRect(100,y,4,130);
-
-        ctx.textAlign="left";
-        ctx.textBaseline="top";
-        ctx.font="800 27px Segoe UI,Arial";
-        ctx.fillStyle="#ffffff";
-        ctx.fillText(v[0],130,y+25);
-
-        ctx.font="500 17px Segoe UI,Arial";
-        ctx.fillStyle="#68716d";
-        ctx.fillText(v[1],130,y+68);
+        image.src = url;
       });
 
-    }else{
-
-      centerText(
-        "✦  ✧  ✦",
-        500,30,"#d6b56a","500"
+      ctx.clearRect(
+        0,
+        0,
+        exportWidth,
+        exportHeight
       );
 
-      centerText(
-        "SELAMAT",
-        630,66,"#ffffff","900"
+      ctx.drawImage(
+        image,
+        0,
+        0,
+        exportWidth,
+        exportHeight
       );
 
-      centerText(
-        "BULAN MAULID",
-        705,66,"#8cc63f","900"
-      );
+    }finally{
 
-      centerText(
-        "NABI MUHAMMAD ﷺ",
-        780,54,"#d6b56a","900"
-      );
-
-      wrapped(
-        "Semoga momentum Maulid Nabi Muhammad SAW membawa keberkahan, ketenangan, dan semakin mendekatkan hati kita kepada Allah SWT serta Rasulullah ﷺ.",
-        930,820,38,20,"#808984"
-      );
-
-      centerText(
-        "FROM IMAM SALES NINE • WITH LOVE",
-        1250,15,"#8cc63f","700"
-      );
+      URL.revokeObjectURL(url);
     }
   }
 
+  /*
+    Preview timeline = export timeline.
+    5 scene x 5200ms = 26 detik.
+  */
   recorder.start(250);
 
-  const total = DURATION * SCENE_COUNT;
-  const started = performance.now();
+  const totalDuration =
+    DURATION * SCENE_COUNT;
 
-  function render(now){
+  const started =
+    performance.now();
+
+  let rendering = false;
+
+  async function render(){
 
     if(!exporting){
-      if(recorder.state==="recording") recorder.stop();
+
+      if(recorder.state==="recording")
+        recorder.stop();
+
       return;
     }
 
-    const elapsed = now-started;
+    if(rendering) return;
 
-    const sceneIndex=Math.min(
-      SCENE_COUNT-1,
-      Math.floor(elapsed/DURATION)
-    );
+    rendering = true;
 
-    const localTime=elapsed%DURATION;
+    const elapsed =
+      performance.now() - started;
 
-    drawPreviewEquivalent(sceneIndex,localTime);
+    const sceneIndex =
+      Math.min(
+        SCENE_COUNT-1,
+        Math.floor(elapsed / DURATION)
+      );
 
-    const percent=Math.min(100,elapsed/total*100);
-    exportProgress.style.width=percent+"%";
+    await capturePreviewFrame(sceneIndex);
+
+    const percent =
+      Math.min(
+        100,
+        (elapsed / totalDuration) * 100
+      );
+
+    exportProgress.style.width =
+      percent + "%";
 
     exportStatus.textContent =
       `Rendering scene ${sceneIndex+1}/${SCENE_COUNT} • ${Math.round(percent)}%`;
 
-    if(elapsed<total){
+    rendering = false;
+
+    if(elapsed < totalDuration){
+
       requestAnimationFrame(render);
+
     }else{
 
-      drawPreviewEquivalent(
-        SCENE_COUNT-1,
-        DURATION-1
+      /*
+        Pastikan frame terakhir adalah scene terakhir,
+        sama seperti preview saat mencapai halaman kelima.
+      */
+      await capturePreviewFrame(
+        SCENE_COUNT-1
       );
 
-      exportStatus.textContent="Menyelesaikan video...";
+      exportStatus.textContent =
+        "Menyelesaikan video...";
 
       setTimeout(()=>{
-        if(recorder.state==="recording")
+
+        if(
+          recorder &&
+          recorder.state==="recording"
+        ){
           recorder.stop();
+        }
+
       },500);
     }
   }
