@@ -1,0 +1,2192 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#050707">
+<title>Maulid Nabi Muhammad ﷺ — Imam Sales Nine</title>
+
+<style>
+:root{
+  --bg:#050707;
+  --lime:#8cc63f;
+  --gold:#d6b56a;
+  --white:#fff;
+  --muted:#8c9590;
+}
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
+}
+
+html,body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  background:#020303;
+  color:#fff;
+  font-family:Segoe UI,Arial,sans-serif;
+}
+
+button{
+  font:inherit;
+}
+
+#app{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+}
+
+.viewport{
+  position:absolute;
+  inset:0;
+  overflow:hidden;
+}
+
+.stage{
+  width:100%;
+  height:100%;
+  transition:transform .9s cubic-bezier(.77,0,.18,1);
+}
+
+.scene{
+  position:relative;
+  width:100%;
+  height:100svh;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 50% 38%,rgba(140,198,63,.07),transparent 38%),
+    linear-gradient(180deg,#080b0c,#050707);
+}
+
+.grid{
+  position:absolute;
+  inset:0;
+  opacity:.035;
+  background:
+    linear-gradient(rgba(255,255,255,.3) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.3) 1px,transparent 1px);
+  background-size:42px 42px;
+  mask-image:linear-gradient(transparent,#000 20%,#000 80%,transparent);
+}
+
+.glow{
+  position:absolute;
+  width:75vw;
+  height:75vw;
+  max-width:500px;
+  max-height:500px;
+  border-radius:50%;
+  filter:blur(100px);
+  pointer-events:none;
+}
+
+.glow.lime{
+  background:rgba(140,198,63,.09);
+}
+
+.glow.gold{
+  background:rgba(214,181,106,.055);
+}
+
+.g1{
+  left:-28%;
+  top:8%;
+  animation:float1 8s ease-in-out infinite alternate;
+}
+
+.g2{
+  right:-30%;
+  bottom:5%;
+  animation:float2 10s ease-in-out infinite alternate;
+}
+
+@keyframes float1{
+  to{transform:translate(28vw,12vh) scale(1.15)}
+}
+
+@keyframes float2{
+  to{transform:translate(-25vw,-10vh) scale(1.15)}
+}
+
+.stars{
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+}
+
+.star{
+  position:absolute;
+  width:2px;
+  height:2px;
+  border-radius:50%;
+  background:var(--gold);
+  box-shadow:0 0 12px var(--gold);
+  animation:pulse 3s ease-in-out infinite alternate;
+}
+
+.star:nth-child(1){left:13%;top:20%}
+.star:nth-child(2){left:78%;top:17%;animation-delay:-1s}
+.star:nth-child(3){left:88%;top:53%;animation-delay:-2s}
+.star:nth-child(4){left:18%;top:75%;animation-delay:-.5s}
+.star:nth-child(5){left:66%;top:83%;animation-delay:-1.5s}
+
+@keyframes pulse{
+  from{opacity:.15;transform:scale(.7)}
+  to{opacity:.8;transform:scale(1.5)}
+}
+
+.crescent{
+  position:absolute;
+  width:170px;
+  height:170px;
+  right:-38px;
+  top:10%;
+  border:1px solid rgba(214,181,106,.25);
+  border-radius:50%;
+  box-shadow:0 0 70px rgba(214,181,106,.08);
+  animation:crescent 7s ease-in-out infinite alternate;
+}
+
+.crescent:after{
+  content:"";
+  position:absolute;
+  width:150px;
+  height:150px;
+  left:-25px;
+  top:-12px;
+  border-radius:50%;
+  background:#070909;
+}
+
+@keyframes crescent{
+  to{transform:translateY(15px) rotate(6deg)}
+}
+
+.ring{
+  position:absolute;
+  width:125vw;
+  height:125vw;
+  max-width:650px;
+  max-height:650px;
+  right:-70%;
+  top:48%;
+  transform:translateY(-50%);
+  border:1px solid rgba(214,181,106,.07);
+  border-radius:50%;
+}
+
+.ring:before{
+  content:"";
+  position:absolute;
+  inset:30px;
+  border:1px dashed rgba(140,198,63,.07);
+  border-radius:50%;
+}
+
+.arabic{
+  position:absolute;
+  right:-20px;
+  top:42%;
+  color:rgba(214,181,106,.085);
+  font-family:serif;
+  font-size:150px;
+  z-index:1;
+  pointer-events:none;
+  animation:arabic 8s ease-in-out infinite alternate;
+}
+
+@keyframes arabic{
+  to{transform:translateY(14px)}
+}
+
+.top{
+  position:absolute;
+  z-index:20;
+  top:18px;
+  left:18px;
+  right:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.brand{
+  display:flex;
+  align-items:center;
+  gap:9px;
+}
+
+.brand-line{
+  width:3px;
+  height:38px;
+  background:linear-gradient(var(--gold),var(--lime));
+  box-shadow:0 0 16px rgba(140,198,63,.35);
+}
+
+.brand-name{
+  color:var(--lime);
+  font-size:9px;
+  font-weight:800;
+  letter-spacing:2px;
+}
+
+.brand-sub{
+  display:block;
+  color:#555e5a;
+  font-size:6px;
+  letter-spacing:1px;
+  margin-top:3px;
+}
+
+.counter{
+  color:#59615e;
+  font-size:7px;
+  letter-spacing:2px;
+}
+
+.progress{
+  position:absolute;
+  z-index:50;
+  top:7px;
+  left:14px;
+  right:14px;
+  display:flex;
+  gap:4px;
+}
+
+.bar{
+  flex:1;
+  height:2px;
+  background:rgba(255,255,255,.12);
+  overflow:hidden;
+  border-radius:10px;
+}
+
+.bar i{
+  display:block;
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,var(--lime),var(--gold));
+}
+
+.content{
+  position:relative;
+  z-index:10;
+  height:100%;
+  padding:80px 27px 70px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+
+.center{
+  align-items:center;
+  text-align:center;
+}
+
+.kicker{
+  color:var(--gold);
+  font-size:8px;
+  font-weight:700;
+  letter-spacing:4px;
+  margin-bottom:18px;
+}
+
+.title{
+  font-size:clamp(50px,15vw,78px);
+  line-height:.84;
+  letter-spacing:-5px;
+  font-weight:950;
+}
+
+.white{color:#fff}
+.lime{
+  color:var(--lime);
+  text-shadow:0 0 35px rgba(140,198,63,.17);
+}
+.gold{
+  color:var(--gold);
+  text-shadow:0 0 35px rgba(214,181,106,.14);
+}
+
+.copy{
+  max-width:335px;
+  margin-top:24px;
+  color:var(--muted);
+  font-size:13px;
+  line-height:1.8;
+}
+
+.copy strong{
+  color:#fff;
+}
+
+.badge{
+  display:inline-flex;
+  gap:8px;
+  margin-top:22px;
+  padding:9px 12px;
+  border:1px solid rgba(214,181,106,.2);
+  background:rgba(214,181,106,.035);
+  color:#858d89;
+  font-size:7px;
+  letter-spacing:2px;
+}
+
+.badge strong{
+  color:var(--gold);
+}
+
+.quote{
+  max-width:340px;
+  color:#d9ddd9;
+  font-size:clamp(22px,6vw,30px);
+  line-height:1.35;
+  font-weight:600;
+}
+
+.quote span{
+  color:var(--lime);
+}
+
+.sub{
+  max-width:330px;
+  margin-top:25px;
+  color:#777f7b;
+  font-size:12px;
+  line-height:1.8;
+}
+
+.shalawat-label{
+  color:var(--gold);
+  font-size:8px;
+  letter-spacing:4px;
+  margin-bottom:25px;
+}
+
+.shalawat-arabic{
+  color:#f1eee5;
+  font-family:serif;
+  font-size:clamp(27px,8vw,40px);
+  line-height:1.7;
+  margin-bottom:25px;
+}
+
+.shalawat-title{
+  font-size:clamp(42px,12vw,64px);
+  line-height:.88;
+  letter-spacing:-4px;
+  font-weight:950;
+}
+
+.shalawat-title span{
+  color:var(--lime);
+}
+
+.values{
+  width:100%;
+  max-width:350px;
+  display:grid;
+  gap:8px;
+  margin-top:22px;
+}
+
+.value{
+  position:relative;
+  padding:15px;
+  text-align:left;
+  border:1px solid rgba(255,255,255,.07);
+  background:rgba(255,255,255,.015);
+}
+
+.value:before{
+  content:"";
+  position:absolute;
+  left:0;
+  top:0;
+  bottom:0;
+  width:2px;
+  background:linear-gradient(var(--gold),var(--lime));
+}
+
+.value h3{
+  font-size:14px;
+  margin-bottom:5px;
+}
+
+.value p{
+  color:#68716d;
+  font-size:10px;
+  line-height:1.55;
+}
+
+.final-title{
+  font-size:clamp(39px,11vw,58px);
+  line-height:.92;
+  letter-spacing:-3px;
+  font-weight:950;
+}
+
+.final-title span{
+  color:var(--lime);
+}
+
+.final-copy{
+  max-width:330px;
+  margin-top:24px;
+  color:#808984;
+  font-size:12px;
+  line-height:1.85;
+}
+
+.final-brand{
+  margin-top:35px;
+  color:#4f5753;
+  font-size:7px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+}
+
+.final-brand strong{
+  color:var(--lime);
+}
+
+.bottom{
+  position:absolute;
+  z-index:100;
+  left:18px;
+  right:18px;
+  bottom:15px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.hint{
+  color:#414945;
+  font-size:6px;
+  letter-spacing:2px;
+}
+
+button{
+  border:1px solid rgba(140,198,63,.3);
+  background:rgba(5,7,7,.82);
+  color:var(--lime);
+  padding:10px 13px;
+  border-radius:999px;
+  font-size:7px;
+  letter-spacing:1.5px;
+  cursor:pointer;
+  backdrop-filter:blur(10px);
+}
+
+button:active{
+  transform:scale(.95);
+}
+
+.export-panel{
+  position:absolute;
+  z-index:200;
+  inset:0;
+  display:none;
+  align-items:center;
+  justify-content:center;
+  background:rgba(2,4,4,.86);
+  backdrop-filter:blur(12px);
+}
+
+.export-panel.show{
+  display:flex;
+}
+
+.export-box{
+  width:80%;
+  max-width:330px;
+  padding:25px;
+  border:1px solid rgba(214,181,106,.2);
+  background:#090d0e;
+  text-align:center;
+}
+
+.export-title{
+  color:#fff;
+  font-size:18px;
+  font-weight:800;
+}
+
+.export-status{
+  margin-top:9px;
+  color:#727b76;
+  font-size:10px;
+}
+
+.export-progress{
+  width:100%;
+  height:3px;
+  margin-top:20px;
+  background:#202522;
+}
+
+.export-progress i{
+  display:block;
+  width:0;
+  height:100%;
+  background:linear-gradient(90deg,var(--lime),var(--gold));
+}
+
+.export-cancel{
+  margin-top:18px;
+  color:#777;
+  border-color:rgba(255,255,255,.1);
+}
+
+@media(min-width:701px){
+  #app{
+    width:390px;
+    height:min(844px,100vh);
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    border-radius:20px;
+    box-shadow:0 30px 100px rgba(0,0,0,.7);
+  }
+}
+
+@media(prefers-reduced-motion:reduce){
+  *{
+    animation:none!important;
+    transition:none!important;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div id="app">
+
+  <div class="viewport">
+
+    <div class="stage" id="stage">
+
+      <!-- 01 -->
+      <section class="scene">
+
+        <div class="grid"></div>
+        <div class="glow lime g1"></div>
+        <div class="glow gold g2"></div>
+        <div class="stars">
+          <i class="star"></i><i class="star"></i><i class="star"></i>
+          <i class="star"></i><i class="star"></i>
+        </div>
+
+        <div class="crescent"></div>
+        <div class="ring"></div>
+        <div class="arabic">ﷺ</div>
+
+        <div class="top">
+          <div class="brand">
+            <div class="brand-line"></div>
+            <div>
+              <div class="brand-name">Imam_salesfr</div>
+              <span class="brand-sub">Sales representative • nine autoseries</span>
+            </div>
+          </div>
+          <div class="counter">01 / 05</div>
+        </div>
+
+        <div class="content">
+
+          <div class="kicker">BULAN PENUH CINTA</div>
+
+          <h1 class="title">
+            <span class="white">MAULID</span><br>
+            <span class="lime">NABI</span><br>
+            <span class="gold">MUHAMMAD ﷺ</span>
+          </h1>
+
+          <div class="badge">
+            <strong>RABIUL AWAL</strong>
+            <span>•</span>
+            <span>BULAN MAULID</span>
+          </div>
+
+          <p class="copy">
+            <strong>Selamat menyambut Bulan Maulid Nabi Muhammad SAW.</strong>
+            <br><br>
+            Mari memperbanyak shalawat, menumbuhkan cinta kepada Rasulullah ﷺ,
+            dan menghadirkan akhlak beliau dalam setiap langkah kehidupan.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- 02 -->
+      <section class="scene">
+
+        <div class="grid"></div>
+        <div class="glow gold g1"></div>
+
+        <div class="top">
+          <div class="brand">
+            <div class="brand-line"></div>
+            <div class="brand-name">MOMENTUM OF LOVE</div>
+          </div>
+          <div class="counter">02 / 05</div>
+        </div>
+
+        <div class="content center">
+
+          <div class="kicker">
+            BUKAN SEKADAR PERINGATAN
+          </div>
+
+          <div class="quote">
+            Bulan Maulid adalah momentum untuk kembali
+            menumbuhkan <span>cinta</span> kepada Rasulullah ﷺ.
+          </div>
+
+          <p class="sub">
+            Bukan hanya mengenang kelahiran beliau,
+            tetapi menghadirkan keteladanan, kasih sayang,
+            kesabaran, kejujuran, dan akhlak mulia
+            dalam kehidupan kita.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- 03 -->
+      <section class="scene">
+
+        <div class="grid"></div>
+        <div class="glow gold g2"></div>
+        <div class="arabic">ﷺ</div>
+
+        <div class="top">
+          <div class="brand">
+            <div class="brand-line"></div>
+            <div class="brand-name">SHALAWAT</div>
+          </div>
+          <div class="counter">03 / 05</div>
+        </div>
+
+        <div class="content center">
+
+          <div class="shalawat-label">
+            SHALAWAT FOR THE BELOVED
+          </div>
+
+          <div class="shalawat-arabic">
+            اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ
+          </div>
+
+          <h2 class="shalawat-title">
+            PERBANYAK<br>
+            <span>SHALAWAT.</span>
+          </h2>
+
+          <p class="sub">
+            Semoga lisan kita selalu basah dengan shalawat,
+            hati dipenuhi cinta, dan langkah senantiasa
+            diarahkan kepada kebaikan.
+            <br><br>
+            <em>
+              Allahumma shalli 'ala Sayyidina Muhammad
+              wa 'ala ali Sayyidina Muhammad.
+            </em>
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- 04 -->
+      <section class="scene">
+
+        <div class="grid"></div>
+        <div class="glow lime g1"></div>
+
+        <div class="top">
+          <div class="brand">
+            <div class="brand-line"></div>
+            <div class="brand-name">TELADAN RASULULLAH ﷺ</div>
+          </div>
+          <div class="counter">04 / 05</div>
+        </div>
+
+        <div class="content center">
+
+          <div class="kicker">
+            HADIRKAN AKHLAKNYA
+          </div>
+
+          <h2 class="title" style="font-size:48px">
+            HIDUPKAN<br>
+            <span class="lime">NILAINYA.</span>
+          </h2>
+
+          <div class="values">
+
+            <div class="value">
+              <h3>Jujur</h3>
+              <p>
+                Menjaga kejujuran dalam ucapan,
+                pekerjaan, dan hubungan dengan sesama.
+              </p>
+            </div>
+
+            <div class="value">
+              <h3>Rahmah</h3>
+              <p>
+                Menghadirkan kasih sayang,
+                kepedulian, dan kelembutan.
+              </p>
+            </div>
+
+            <div class="value">
+              <h3>Amanah</h3>
+              <p>
+                Menjalankan tanggung jawab
+                dengan sungguh-sungguh.
+              </p>
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- 05 -->
+      <section class="scene">
+
+        <div class="grid"></div>
+        <div class="glow lime g1"></div>
+        <div class="glow gold g2"></div>
+
+        <div class="stars">
+          <i class="star"></i><i class="star"></i>
+          <i class="star"></i><i class="star"></i>
+        </div>
+
+        <div class="top">
+          <div class="brand">
+            <div class="brand-line"></div>
+            <div class="brand-name">IMAM SALES NINE</div>
+          </div>
+          <div class="counter">05 / 05</div>
+        </div>
+
+        <div class="content center">
+
+          <div style="color:var(--gold);font-size:20px;letter-spacing:10px;margin-bottom:22px">
+            ✦ ✧ ✦
+          </div>
+
+          <h2 class="final-title">
+            SELAMAT<br>
+            <span>BULAN MAULID</span><br>
+            NABI MUHAMMAD ﷺ
+          </h2>
+
+          <p class="final-copy">
+            Semoga momentum Maulid Nabi Muhammad SAW
+            membawa keberkahan, ketenangan,
+            dan semakin mendekatkan hati kita
+            kepada Allah SWT serta Rasulullah ﷺ.
+            <br><br>
+            Semoga kita mampu meneladani akhlak beliau,
+            memperbanyak shalawat, memperkuat persaudaraan,
+            dan terus menjadi pribadi yang bermanfaat.
+          </p>
+
+          <div class="final-brand">
+            FROM <strong>IMAM SALES NINE</strong> • WITH LOVE
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+  </div>
+
+
+  <div class="progress">
+    <div class="bar"><i></i></div>
+    <div class="bar"><i></i></div>
+    <div class="bar"><i></i></div>
+    <div class="bar"><i></i></div>
+    <div class="bar"><i></i></div>
+  </div>
+
+
+  <div class="bottom">
+
+    <span class="hint">
+      TAP / SWIPE
+    </span>
+
+    <button id="exportBtn">
+      DOWNLOAD VIDEO
+    </button>
+
+  </div>
+
+
+  <div class="export-panel" id="exportPanel">
+
+    <div class="export-box">
+
+      <div class="export-title">
+        EXPORT VIDEO
+      </div>
+
+      <div class="export-status" id="exportStatus">
+        Menyiapkan video...
+      </div>
+
+      <div class="export-progress">
+        <i id="exportProgress"></i>
+      </div>
+
+      <button
+        class="export-cancel"
+        id="cancelBtn">
+        BATAL
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   CONFIG
+   ========================================================= */
+
+const DURATION = 5200;
+const SCENE_COUNT = 5;
+
+const stage =
+  document.getElementById("stage");
+
+const scenes =
+  [...document.querySelectorAll(".scene")];
+
+const bars =
+  [...document.querySelectorAll(".bar i")];
+
+const exportBtn =
+  document.getElementById("exportBtn");
+
+const exportPanel =
+  document.getElementById("exportPanel");
+
+const exportStatus =
+  document.getElementById("exportStatus");
+
+const exportProgress =
+  document.getElementById("exportProgress");
+
+const cancelBtn =
+  document.getElementById("cancelBtn");
+
+
+let current = 0;
+let timer = null;
+let progressTimer = null;
+let exporting = false;
+let recorder = null;
+let chunks = [];
+
+
+/* =========================================================
+   SLIDE
+   ========================================================= */
+
+function goTo(index){
+
+  current =
+    (index + SCENE_COUNT) %
+    SCENE_COUNT;
+
+  stage.style.transform =
+    `translateY(-${current * 100}%)`;
+
+  bars.forEach(
+    (bar,i)=>{
+
+      bar.style.transition =
+        "none";
+
+      bar.style.width =
+        i < current
+          ? "100%"
+          : "0";
+
+    }
+  );
+
+  requestAnimationFrame(
+    ()=>{
+
+      const bar =
+        bars[current];
+
+      if(!bar) return;
+
+      bar.style.transition =
+        `width ${DURATION}ms linear`;
+
+      bar.style.width =
+        "100%";
+
+    }
+  );
+
+  clearTimeout(timer);
+
+  if(!exporting){
+
+    timer =
+      setTimeout(
+        ()=>goTo(current + 1),
+        DURATION
+      );
+
+  }
+
+}
+
+goTo(0);
+
+
+/* =========================================================
+   AUTO SLIDE
+   ========================================================= */
+
+function restart(){
+
+  clearTimeout(timer);
+
+  if(!exporting){
+
+    timer =
+      setTimeout(
+        ()=>goTo(current + 1),
+        DURATION
+      );
+
+  }
+
+}
+
+
+/* =========================================================
+   TOUCH
+   ========================================================= */
+
+let startY = 0;
+let startX = 0;
+
+document.addEventListener(
+  "touchstart",
+  e=>{
+
+    const t =
+      e.changedTouches[0];
+
+    startX =
+      t.clientX;
+
+    startY =
+      t.clientY;
+
+  },
+  {passive:true}
+);
+
+
+document.addEventListener(
+  "touchend",
+  e=>{
+
+    if(exporting) return;
+
+    const t =
+      e.changedTouches[0];
+
+    const dx =
+      t.clientX - startX;
+
+    const dy =
+      t.clientY - startY;
+
+    if(
+      Math.abs(dy) > 40 &&
+      Math.abs(dy) > Math.abs(dx)
+    ){
+
+      if(dy < 0)
+        goTo(current + 1);
+      else
+        goTo(current - 1);
+
+      restart();
+
+    }else if(
+      Math.abs(dx) < 25 &&
+      Math.abs(dy) < 25
+    ){
+
+      if(
+        t.clientX <
+        window.innerWidth / 2
+      )
+        goTo(current - 1);
+      else
+        goTo(current + 1);
+
+      restart();
+
+    }
+
+  },
+  {passive:true}
+);
+
+
+/* =========================================================
+   KEYBOARD
+   ========================================================= */
+
+document.addEventListener(
+  "keydown",
+  e=>{
+
+    if(e.key==="ArrowDown" ||
+       e.key==="ArrowRight"){
+
+      goTo(current + 1);
+      restart();
+
+    }
+
+    if(e.key==="ArrowUp" ||
+       e.key==="ArrowLeft"){
+
+      goTo(current - 1);
+      restart();
+
+    }
+
+  }
+);
+
+
+/* =========================================================
+   CANVAS RENDERER
+   ========================================================= */
+
+/*
+   Export dilakukan dari Canvas sehingga hasil
+   benar-benar menjadi video, bukan HTML.
+*/
+
+function drawScene(
+  ctx,
+  sceneIndex,
+  width,
+  height,
+  time
+){
+
+  const progress =
+    (time % DURATION) /
+    DURATION;
+
+
+  /*
+   * BACKGROUND
+   */
+
+  const gradient =
+    ctx.createLinearGradient(
+      0,
+      0,
+      0,
+      height
+    );
+
+  gradient.addColorStop(
+    0,
+    "#080b0c"
+  );
+
+  gradient.addColorStop(
+    1,
+    "#050707"
+  );
+
+  ctx.fillStyle =
+    gradient;
+
+  ctx.fillRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  /*
+   * AMBIENT GLOW
+   */
+
+  const glow =
+    ctx.createRadialGradient(
+      width*.5,
+      height*.38,
+      0,
+      width*.5,
+      height*.38,
+      width*.65
+    );
+
+  glow.addColorStop(
+    0,
+    "rgba(140,198,63,.09)"
+  );
+
+  glow.addColorStop(
+    1,
+    "rgba(140,198,63,0)"
+  );
+
+  ctx.fillStyle =
+    glow;
+
+  ctx.fillRect(
+    0,
+    0,
+    width,
+    height
+  );
+
+
+  /*
+   * GRID
+   */
+
+  ctx.strokeStyle =
+    "rgba(255,255,255,.025)";
+
+  ctx.lineWidth = 1;
+
+  const grid = 60;
+
+  for(
+    let x=0;
+    x<width;
+    x+=grid
+  ){
+
+    ctx.beginPath();
+    ctx.moveTo(x,0);
+    ctx.lineTo(x,height);
+    ctx.stroke();
+
+  }
+
+  for(
+    let y=0;
+    y<height;
+    y+=grid
+  ){
+
+    ctx.beginPath();
+    ctx.moveTo(0,y);
+    ctx.lineTo(width,y);
+    ctx.stroke();
+
+  }
+
+
+  /*
+   * PARTICLES
+   */
+
+  for(
+    let i=0;
+    i<35;
+    i++
+  ){
+
+    const x =
+      (
+        Math.sin(i*91.7) *
+        .5 + .5
+      ) * width;
+
+    const base =
+      (
+        Math.sin(i*17.31) *
+        .5 + .5
+      ) * height;
+
+    const y =
+      (
+        base +
+        (progress * 180)
+      ) % height;
+
+    ctx.fillStyle =
+      i%2
+        ? "rgba(214,181,106,.35)"
+        : "rgba(140,198,63,.3)";
+
+    ctx.beginPath();
+
+    ctx.arc(
+      x,
+      y,
+      1.5,
+      0,
+      Math.PI*2
+    );
+
+    ctx.fill();
+
+  }
+
+
+  /*
+   * TEXT HELPERS
+   */
+
+  function centerText(
+    text,
+    y,
+    size,
+    color,
+    weight="700"
+  ){
+
+    ctx.textAlign =
+      "center";
+
+    ctx.textBaseline =
+      "middle";
+
+    ctx.font =
+      `${weight} ${size}px Segoe UI,Arial`;
+
+    ctx.fillStyle =
+      color;
+
+    ctx.fillText(
+      text,
+      width/2,
+      y
+    );
+
+  }
+
+
+  function wrapped(
+    text,
+    y,
+    maxWidth,
+    lineHeight,
+    size,
+    color
+  ){
+
+    ctx.textAlign =
+      "center";
+
+    ctx.textBaseline =
+      "top";
+
+    ctx.font =
+      `500 ${size}px Segoe UI,Arial`;
+
+    ctx.fillStyle =
+      color;
+
+    const words =
+      text.split(" ");
+
+    let line="";
+    let yy=y;
+
+    for(
+      const word of words
+    ){
+
+      const test =
+        line
+          ? line+" "+word
+          : word;
+
+      if(
+        ctx.measureText(test).width >
+        maxWidth
+      ){
+
+        ctx.fillText(
+          line,
+          width/2,
+          yy
+        );
+
+        line=word;
+        yy+=lineHeight;
+
+      }else{
+
+        line=test;
+
+      }
+
+    }
+
+    if(line){
+
+      ctx.fillText(
+        line,
+        width/2,
+        yy
+      );
+
+    }
+
+  }
+
+
+  /*
+   * TOP BRAND
+   */
+
+  ctx.fillStyle =
+    "#8cc63f";
+
+  ctx.fillRect(
+    70,
+    105,
+    5,
+    65
+  );
+
+  ctx.textAlign =
+    "left";
+
+  ctx.textBaseline =
+    "top";
+
+  ctx.font =
+    "800 22px Segoe UI,Arial";
+
+  ctx.fillStyle =
+    "#8cc63f";
+
+  ctx.fillText(
+    "IMAM SALES NINE",
+    95,
+    105
+  );
+
+  ctx.font =
+    "500 11px Segoe UI,Arial";
+
+  ctx.fillStyle =
+    "#555e5a";
+
+  ctx.fillText(
+    "A CINEMATIC MAULID EXPERIENCE",
+    95,
+    136
+  );
+
+
+  /*
+   * SCENES
+   */
+
+  if(sceneIndex===0){
+
+    centerText(
+      "BULAN PENUH CINTA",
+      570,
+      20,
+      "#d6b56a",
+      "700"
+    );
+
+    centerText(
+      "MAULID",
+      700,
+      92,
+      "#ffffff",
+      "900"
+    );
+
+    centerText(
+      "NABI",
+      790,
+      92,
+      "#8cc63f",
+      "900"
+    );
+
+    centerText(
+      "MUHAMMAD ﷺ",
+      885,
+      70,
+      "#d6b56a",
+      "900"
+    );
+
+    wrapped(
+      "Selamat menyambut Bulan Maulid Nabi Muhammad SAW. Mari memperbanyak shalawat, menumbuhkan cinta kepada Rasulullah ﷺ, dan menghadirkan akhlak beliau dalam setiap langkah kehidupan.",
+      1030,
+      850,
+      40,
+      22,
+      "#929a96"
+    );
+
+  }
+
+
+  if(sceneIndex===1){
+
+    centerText(
+      "BUKAN SEKADAR PERINGATAN",
+      520,
+      20,
+      "#d6b56a",
+      "700"
+    );
+
+    wrapped(
+      "Bulan Maulid adalah momentum untuk kembali menumbuhkan cinta kepada Rasulullah ﷺ.",
+      680,
+      850,
+      65,
+      42,
+      "#e5e8e5"
+    );
+
+    wrapped(
+      "Bukan hanya mengenang kelahiran beliau, tetapi menghadirkan keteladanan, kasih sayang, kesabaran, kejujuran, dan akhlak mulia.",
+      930,
+      820,
+      38,
+      21,
+      "#777f7b"
+    );
+
+  }
+
+
+  if(sceneIndex===2){
+
+    centerText(
+      "SHALAWAT FOR THE BELOVED",
+      460,
+      19,
+      "#d6b56a",
+      "700"
+    );
+
+    centerText(
+      "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ",
+      610,
+      42,
+      "#f1eee5",
+      "600"
+    );
+
+    centerText(
+      "PERBANYAK",
+      790,
+      70,
+      "#ffffff",
+      "900"
+    );
+
+    centerText(
+      "SHALAWAT.",
+      860,
+      70,
+      "#8cc63f",
+      "900"
+    );
+
+    wrapped(
+      "Semoga lisan kita selalu basah dengan shalawat, hati dipenuhi cinta, dan langkah senantiasa diarahkan kepada kebaikan.",
+      990,
+      800,
+      38,
+      20,
+      "#858d89"
+    );
+
+  }
+
+
+  if(sceneIndex===3){
+
+    centerText(
+      "TELADAN RASULULLAH ﷺ",
+      420,
+      20,
+      "#d6b56a",
+      "700"
+    );
+
+    centerText(
+      "HIDUPKAN",
+      550,
+      68,
+      "#ffffff",
+      "900"
+    );
+
+    centerText(
+      "NILAINYA.",
+      620,
+      68,
+      "#8cc63f",
+      "900"
+    );
+
+    const vals = [
+      ["JUJUR","Menjaga kejujuran dalam ucapan dan pekerjaan."],
+      ["RAHMAH","Menghadirkan kasih sayang dan kelembutan."],
+      ["AMANAH","Menjalankan tanggung jawab dengan sungguh-sungguh."]
+    ];
+
+    vals.forEach(
+      (v,i)=>{
+
+        const y =
+          780+i*170;
+
+        ctx.fillStyle =
+          "rgba(255,255,255,.025)";
+
+        ctx.fillRect(
+          100,
+          y,
+          880,
+          130
+        );
+
+        ctx.fillStyle =
+          "#d6b56a";
+
+        ctx.fillRect(
+          100,
+          y,
+          4,
+          130
+        );
+
+        ctx.textAlign =
+          "left";
+
+        ctx.textBaseline =
+          "top";
+
+        ctx.font =
+          "800 27px Segoe UI,Arial";
+
+        ctx.fillStyle =
+          "#ffffff";
+
+        ctx.fillText(
+          v[0],
+          130,
+          y+25
+        );
+
+        ctx.font =
+          "500 17px Segoe UI,Arial";
+
+        ctx.fillStyle =
+          "#68716d";
+
+        ctx.fillText(
+          v[1],
+          130,
+          y+68
+        );
+
+      }
+    );
+
+  }
+
+
+  if(sceneIndex===4){
+
+    centerText(
+      "✦  ✧  ✦",
+      500,
+      30,
+      "#d6b56a",
+      "500"
+    );
+
+    centerText(
+      "SELAMAT",
+      630,
+      66,
+      "#ffffff",
+      "900"
+    );
+
+    centerText(
+      "BULAN MAULID",
+      705,
+      66,
+      "#8cc63f",
+      "900"
+    );
+
+    centerText(
+      "NABI MUHAMMAD ﷺ",
+      780,
+      54,
+      "#d6b56a",
+      "900"
+    );
+
+    wrapped(
+      "Semoga momentum Maulid Nabi Muhammad SAW membawa keberkahan, ketenangan, dan semakin mendekatkan hati kita kepada Allah SWT serta Rasulullah ﷺ.",
+      930,
+      820,
+      38,
+      20,
+      "#808984"
+    );
+
+    centerText(
+      "FROM IMAM SALES NINE • WITH LOVE",
+      1250,
+      15,
+      "#8cc63f",
+      "700"
+    );
+
+  }
+
+}
+
+
+/* =========================================================
+   VIDEO EXPORT — RELIABLE MOBILE EXPORT
+   ========================================================= */
+
+async function exportVideo(){
+
+  if(exporting) return;
+
+  exporting = true;
+  clearTimeout(timer);
+
+  exportPanel.classList.add("show");
+  exportStatus.textContent = "Menyiapkan video...";
+  exportProgress.style.width = "0%";
+
+  const width = 1080;
+  const height = 1920;
+  const fps = 30;
+
+  if(!window.MediaRecorder || !HTMLCanvasElement.prototype.captureStream){
+    exportStatus.textContent =
+      "Browser ini tidak mendukung export video.";
+    exporting = false;
+    return;
+  }
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+
+  const ctx = canvas.getContext("2d",{alpha:false});
+  const stream = canvas.captureStream(fps);
+
+  let mime = "";
+  const types = [
+    "video/webm;codecs=vp9",
+    "video/webm;codecs=vp8",
+    "video/webm"
+  ];
+
+  for(const type of types){
+    if(MediaRecorder.isTypeSupported(type)){
+      mime = type;
+      break;
+    }
+  }
+
+  if(!mime){
+    exportStatus.textContent =
+      "Format video tidak didukung browser.";
+    stream.getTracks().forEach(t=>t.stop());
+    exporting = false;
+    return;
+  }
+
+  try{
+    recorder = new MediaRecorder(stream,{
+      mimeType:mime,
+      videoBitsPerSecond:10000000
+    });
+  }catch(error){
+    exportStatus.textContent =
+      "Gagal membuat video recorder.";
+    stream.getTracks().forEach(t=>t.stop());
+    exporting = false;
+    return;
+  }
+
+  chunks = [];
+
+  recorder.ondataavailable = e=>{
+    if(e.data && e.data.size > 0)
+      chunks.push(e.data);
+  };
+
+  recorder.onerror = ()=>{
+    exportStatus.textContent = "Export video gagal.";
+  };
+
+  recorder.onstop = ()=>{
+
+    const blob = new Blob(chunks,{type:mime});
+
+    if(!blob.size){
+      exportStatus.textContent = "File video kosong.";
+      stream.getTracks().forEach(t=>t.stop());
+      exporting = false;
+      return;
+    }
+
+    const url = URL.createObjectURL(blob);
+
+    /*
+      Mobile browser lebih konsisten bila download dilakukan
+      langsung dari object URL dengan anchor yang dipicu setelah
+      recorder selesai.
+    */
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Maulid-Nabi-Muhammad-SAW.webm";
+    a.rel = "noopener";
+    a.style.display = "none";
+
+    document.body.appendChild(a);
+    a.click();
+
+    setTimeout(()=>{
+      a.remove();
+      URL.revokeObjectURL(url);
+      stream.getTracks().forEach(t=>t.stop());
+    },5000);
+
+    exportProgress.style.width = "100%";
+    exportStatus.textContent =
+      "Video selesai. File sedang disimpan...";
+
+    setTimeout(()=>{
+      exportPanel.classList.remove("show");
+      exporting = false;
+      goTo(0);
+    },1800);
+  };
+
+  /*
+    Render scene yang sama dengan preview.
+    Bedanya hanya ukurannya: preview menggunakan viewport,
+    export menggunakan canvas 1080x1920.
+  */
+  function drawPreviewEquivalent(sceneIndex,localTime){
+
+    ctx.clearRect(0,0,width,height);
+
+    /* Background yang sama */
+    const bg = ctx.createLinearGradient(0,0,0,height);
+    bg.addColorStop(0,"#080b0c");
+    bg.addColorStop(1,"#050707");
+    ctx.fillStyle = bg;
+    ctx.fillRect(0,0,width,height);
+
+    /* Glow utama yang sama */
+    const glow = ctx.createRadialGradient(
+      width*.5,height*.38,0,
+      width*.5,height*.38,width*.65
+    );
+    glow.addColorStop(0,"rgba(140,198,63,.09)");
+    glow.addColorStop(1,"rgba(140,198,63,0)");
+    ctx.fillStyle = glow;
+    ctx.fillRect(0,0,width,height);
+
+    /* Grid yang mendekati preview CSS */
+    ctx.strokeStyle = "rgba(255,255,255,.035)";
+    ctx.lineWidth = 1;
+    const grid = 42;
+
+    for(let x=0;x<width;x+=grid){
+      ctx.beginPath();
+      ctx.moveTo(x,0);
+      ctx.lineTo(x,height);
+      ctx.stroke();
+    }
+
+    for(let y=0;y<height;y+=grid){
+      ctx.beginPath();
+      ctx.moveTo(0,y);
+      ctx.lineTo(width,y);
+      ctx.stroke();
+    }
+
+    /* Stars */
+    const pulse = .5 + .5*Math.sin(localTime/900);
+
+    for(let i=0;i<5;i++){
+      const sx = [0.13,0.78,0.88,0.18,0.66][i]*width;
+      const sy = [0.20,0.17,0.53,0.75,0.83][i]*height;
+      const alpha = .15 + .65*pulse;
+
+      ctx.fillStyle =
+        `rgba(214,181,106,${alpha})`;
+
+      ctx.beginPath();
+      ctx.arc(sx,sy,1.5,0,Math.PI*2);
+      ctx.fill();
+    }
+
+    /* Helpers dengan ukuran proporsional terhadap 1080x1920 */
+    function centerText(text,y,size,color,weight="700"){
+      ctx.textAlign="center";
+      ctx.textBaseline="middle";
+      ctx.font=`${weight} ${size}px Segoe UI,Arial,sans-serif`;
+      ctx.fillStyle=color;
+      ctx.fillText(text,width/2,y);
+    }
+
+    function wrapped(text,y,maxWidth,lineHeight,size,color){
+      ctx.textAlign="center";
+      ctx.textBaseline="top";
+      ctx.font=`500 ${size}px Segoe UI,Arial,sans-serif`;
+      ctx.fillStyle=color;
+
+      const words=text.split(" ");
+      let line="";
+      let yy=y;
+
+      for(const word of words){
+        const test=line ? line+" "+word : word;
+
+        if(ctx.measureText(test).width > maxWidth){
+          if(line) ctx.fillText(line,width/2,yy);
+          line=word;
+          yy+=lineHeight;
+        }else{
+          line=test;
+        }
+      }
+
+      if(line) ctx.fillText(line,width/2,yy);
+    }
+
+    /* Brand */
+    ctx.fillStyle="#8cc63f";
+    ctx.fillRect(70,105,5,65);
+
+    ctx.textAlign="left";
+    ctx.textBaseline="top";
+    ctx.font="800 22px Segoe UI,Arial";
+    ctx.fillStyle="#8cc63f";
+    ctx.fillText("IMAM SALES NINE",95,105);
+
+    ctx.font="500 11px Segoe UI,Arial";
+    ctx.fillStyle="#555e5a";
+    ctx.fillText(
+      "A CINEMATIC MAULID EXPERIENCE",
+      95,136
+    );
+
+    if(sceneIndex===0){
+
+      centerText(
+        "BULAN PENUH CINTA",
+        570,20,"#d6b56a","700"
+      );
+
+      centerText(
+        "MAULID",
+        700,92,"#ffffff","900"
+      );
+
+      centerText(
+        "NABI",
+        790,92,"#8cc63f","900"
+      );
+
+      centerText(
+        "MUHAMMAD ﷺ",
+        885,70,"#d6b56a","900"
+      );
+
+      wrapped(
+        "Selamat menyambut Bulan Maulid Nabi Muhammad SAW. Mari memperbanyak shalawat, menumbuhkan cinta kepada Rasulullah ﷺ, dan menghadirkan akhlak beliau dalam setiap langkah kehidupan.",
+        1030,850,40,22,"#929a96"
+      );
+
+    }else if(sceneIndex===1){
+
+      centerText(
+        "BUKAN SEKADAR PERINGATAN",
+        520,20,"#d6b56a","700"
+      );
+
+      wrapped(
+        "Bulan Maulid adalah momentum untuk kembali menumbuhkan cinta kepada Rasulullah ﷺ.",
+        680,850,65,42,"#e5e8e5"
+      );
+
+      wrapped(
+        "Bukan hanya mengenang kelahiran beliau, tetapi menghadirkan keteladanan, kasih sayang, kesabaran, kejujuran, dan akhlak mulia.",
+        930,820,38,21,"#777f7b"
+      );
+
+    }else if(sceneIndex===2){
+
+      centerText(
+        "SHALAWAT FOR THE BELOVED",
+        460,19,"#d6b56a","700"
+      );
+
+      centerText(
+        "اللَّهُمَّ صَلِّ عَلَىٰ مُحَمَّدٍ",
+        610,42,"#f1eee5","600"
+      );
+
+      centerText(
+        "PERBANYAK",
+        790,70,"#ffffff","900"
+      );
+
+      centerText(
+        "SHALAWAT.",
+        860,70,"#8cc63f","900"
+      );
+
+      wrapped(
+        "Semoga lisan kita selalu basah dengan shalawat, hati dipenuhi cinta, dan langkah senantiasa diarahkan kepada kebaikan.",
+        990,800,38,20,"#858d89"
+      );
+
+    }else if(sceneIndex===3){
+
+      centerText(
+        "TELADAN RASULULLAH ﷺ",
+        420,20,"#d6b56a","700"
+      );
+
+      centerText(
+        "HIDUPKAN",
+        550,68,"#ffffff","900"
+      );
+
+      centerText(
+        "NILAINYA.",
+        620,68,"#8cc63f","900"
+      );
+
+      const vals=[
+        ["JUJUR","Menjaga kejujuran dalam ucapan dan pekerjaan."],
+        ["RAHMAH","Menghadirkan kasih sayang dan kelembutan."],
+        ["AMANAH","Menjalankan tanggung jawab dengan sungguh-sungguh."]
+      ];
+
+      vals.forEach((v,i)=>{
+        const y=780+i*170;
+
+        ctx.fillStyle="rgba(255,255,255,.025)";
+        ctx.fillRect(100,y,880,130);
+
+        ctx.fillStyle="#d6b56a";
+        ctx.fillRect(100,y,4,130);
+
+        ctx.textAlign="left";
+        ctx.textBaseline="top";
+        ctx.font="800 27px Segoe UI,Arial";
+        ctx.fillStyle="#ffffff";
+        ctx.fillText(v[0],130,y+25);
+
+        ctx.font="500 17px Segoe UI,Arial";
+        ctx.fillStyle="#68716d";
+        ctx.fillText(v[1],130,y+68);
+      });
+
+    }else{
+
+      centerText(
+        "✦  ✧  ✦",
+        500,30,"#d6b56a","500"
+      );
+
+      centerText(
+        "SELAMAT",
+        630,66,"#ffffff","900"
+      );
+
+      centerText(
+        "BULAN MAULID",
+        705,66,"#8cc63f","900"
+      );
+
+      centerText(
+        "NABI MUHAMMAD ﷺ",
+        780,54,"#d6b56a","900"
+      );
+
+      wrapped(
+        "Semoga momentum Maulid Nabi Muhammad SAW membawa keberkahan, ketenangan, dan semakin mendekatkan hati kita kepada Allah SWT serta Rasulullah ﷺ.",
+        930,820,38,20,"#808984"
+      );
+
+      centerText(
+        "FROM IMAM SALES NINE • WITH LOVE",
+        1250,15,"#8cc63f","700"
+      );
+    }
+  }
+
+  recorder.start(250);
+
+  const total = DURATION * SCENE_COUNT;
+  const started = performance.now();
+
+  function render(now){
+
+    if(!exporting){
+      if(recorder.state==="recording") recorder.stop();
+      return;
+    }
+
+    const elapsed = now-started;
+
+    const sceneIndex=Math.min(
+      SCENE_COUNT-1,
+      Math.floor(elapsed/DURATION)
+    );
+
+    const localTime=elapsed%DURATION;
+
+    drawPreviewEquivalent(sceneIndex,localTime);
+
+    const percent=Math.min(100,elapsed/total*100);
+    exportProgress.style.width=percent+"%";
+
+    exportStatus.textContent =
+      `Rendering scene ${sceneIndex+1}/${SCENE_COUNT} • ${Math.round(percent)}%`;
+
+    if(elapsed<total){
+      requestAnimationFrame(render);
+    }else{
+
+      drawPreviewEquivalent(
+        SCENE_COUNT-1,
+        DURATION-1
+      );
+
+      exportStatus.textContent="Menyelesaikan video...";
+
+      setTimeout(()=>{
+        if(recorder.state==="recording")
+          recorder.stop();
+      },500);
+    }
+  }
+
+  requestAnimationFrame(render);
+}
+
+/* =========================================================
+   EXPORT BUTTON
+   ========================================================= */
+
+exportBtn.addEventListener(
+  "click",
+  e=>{
+
+    e.stopPropagation();
+
+    exportVideo();
+
+  }
+);
+
+
+/* =========================================================
+   CANCEL
+   ========================================================= */
+
+cancelBtn.addEventListener(
+  "click",
+  ()=>{
+
+    if(!exporting)
+      return;
+
+    exporting=false;
+
+    if(
+      recorder &&
+      recorder.state ===
+      "recording"
+    ){
+
+      recorder.stop();
+
+    }
+
+    exportPanel.classList.remove(
+      "show"
+    );
+
+    goTo(0);
+
+    restart();
+
+  }
+);
+
+</script>
+
+</body>
+</html>
