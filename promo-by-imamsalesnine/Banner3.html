@@ -10,6 +10,14 @@
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
+
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+>
+
+  
+
 <style>
 :root{
   --ui-bg:#07090c;
@@ -1956,6 +1964,341 @@ input[type="range"]{
 
 }
 
+
+
+
+/* ======================================================
+   SOCIAL & MARKETPLACE — ADDON ONLY
+   Tidak mengubah engine banner/export yang sudah stabil.
+====================================================== */
+
+.social-banner{
+  position:absolute;
+
+  z-index:22;
+
+  left:7%;
+  bottom:7%;
+
+  display:none;
+
+  align-items:center;
+  flex-wrap:wrap;
+
+  gap:7px;
+
+  max-width:58%;
+
+  pointer-events:none;
+}
+
+.social-banner.has-items{
+  display:flex;
+}
+
+.social-banner-item{
+  display:inline-flex;
+
+  align-items:center;
+  gap:6px;
+
+  min-height:25px;
+
+  padding:5px 8px;
+
+  border:
+    1px solid
+    rgba(255,255,255,.18);
+
+  border-radius:7px;
+
+  background:
+    rgba(0,0,0,.30);
+
+  color:
+    var(--text);
+
+  font-size:
+    clamp(
+      6px,
+      .65vw,
+      10px
+    );
+
+  font-weight:850;
+
+  line-height:1;
+
+  white-space:nowrap;
+
+  box-shadow:
+    0 5px 18px
+    rgba(0,0,0,.18);
+}
+
+.social-banner-icon{
+  width:14px;
+  height:14px;
+
+  display:grid;
+  place-items:center;
+
+  flex:0 0 14px;
+
+  color:
+    var(--primary);
+
+  font-size:13px;
+}
+
+.social-banner-icon svg{
+  width:14px;
+  height:14px;
+
+  display:block;
+
+  fill:currentColor;
+}
+
+.social-banner-label{
+  max-width:130px;
+
+  overflow:hidden;
+
+  text-overflow:ellipsis;
+}
+
+.social-banner-item.whatsapp
+.social-banner-icon{
+  color:#25D366;
+}
+
+.social-banner-item.instagram
+.social-banner-icon{
+  color:#E4405F;
+}
+
+.social-banner-item.tiktok
+.social-banner-icon{
+  color:#ffffff;
+}
+
+.social-banner-item.shopee
+.social-banner-icon{
+  color:#EE4D2D;
+}
+
+.social-banner-item.tokopedia
+.social-banner-icon{
+  color:#42B549;
+}
+
+
+/* ======================================================
+   SOCIAL EDITOR
+====================================================== */
+
+.social-editor-card{
+  display:flex;
+
+  flex-direction:column;
+
+  gap:8px;
+}
+
+.social-option{
+  padding:10px;
+
+  border:
+    1px solid
+    var(--ui-line);
+
+  border-radius:10px;
+
+  background:#151a20;
+}
+
+.social-option.active{
+  border-color:
+    var(--primary);
+
+  background:
+    rgba(140,198,63,.06);
+}
+
+.social-option-top{
+  display:flex;
+
+  align-items:center;
+
+  gap:8px;
+}
+
+.social-check{
+  width:17px;
+  height:17px;
+
+  margin:0;
+
+  flex:0 0 17px;
+
+  accent-color:
+    var(--primary);
+}
+
+.social-option-brand{
+  display:flex;
+
+  align-items:center;
+
+  gap:7px;
+
+  color:#fff;
+
+  font-size:10px;
+
+  font-weight:900;
+}
+
+.social-option-brand i{
+  width:18px;
+
+  text-align:center;
+
+  color:
+    var(--primary);
+}
+
+.social-url{
+  display:none;
+
+  margin-top:8px;
+}
+
+.social-option.active .social-url{
+  display:block;
+}
+
+.social-url input{
+  margin:0;
+
+  font-size:9px;
+}
+
+.social-editor-note{
+  margin-top:5px;
+
+  color:#69737e;
+
+  font-size:8px;
+
+  line-height:1.5;
+}
+
+
+/* ======================================================
+   SOCIAL POSITION
+====================================================== */
+
+.social-position{
+  display:grid;
+
+  grid-template-columns:
+    repeat(3,1fr);
+
+  gap:6px;
+
+  margin-top:8px;
+}
+
+.social-pos-btn{
+  padding:8px 4px;
+
+  border:
+    1px solid
+    var(--ui-line);
+
+  border-radius:7px;
+
+  background:#151a20;
+
+  color:#8d97a2;
+
+  font-size:8px;
+
+  font-weight:850;
+}
+
+.social-pos-btn.active{
+  color:#fff;
+
+  border-color:
+    var(--primary);
+
+  background:
+    rgba(140,198,63,.08);
+}
+
+
+/* ======================================================
+   EXPORT SAFE
+====================================================== */
+
+.exporting .social-banner{
+  display:flex !important;
+
+  visibility:visible !important;
+
+  opacity:1 !important;
+
+  z-index:22 !important;
+}
+
+
+/* ======================================================
+   RESPONSIVE
+====================================================== */
+
+@media(max-width:600px){
+
+  .social-banner{
+    left:5%;
+
+    bottom:5%;
+
+    max-width:90%;
+
+    gap:5px;
+  }
+
+  .social-banner-item{
+    padding:4px 6px;
+
+    font-size:7px;
+  }
+
+  .social-banner-icon{
+    width:12px;
+    height:12px;
+
+    flex-basis:12px;
+  }
+
+  .social-banner-icon svg{
+    width:12px;
+    height:12px;
+  }
+
+}
+
+
+
+
+
+
+
+  
+
 </style>
 </head>
 
@@ -2277,6 +2620,275 @@ id="posYVal"
 </section>
 
 
+
+<!-- ====================================================
+     SOCIAL & MARKETPLACE
+===================================================== -->
+
+<section class="section">
+
+  <div class="section-head">
+
+    <strong>
+      Social & Marketplace
+    </strong>
+
+    <span>05</span>
+
+  </div>
+
+
+  <div class="social-editor-card">
+
+
+    <!-- WHATSAPP -->
+
+    <div
+      class="social-option"
+      data-social-option="whatsapp"
+    >
+
+      <div class="social-option-top">
+
+        <input
+          type="checkbox"
+          class="social-check"
+          id="socialWhatsapp"
+          data-social="whatsapp"
+        >
+
+        <div class="social-option-brand">
+
+          <i class="fa-brands fa-whatsapp"></i>
+
+          WhatsApp
+
+        </div>
+
+      </div>
+
+
+      <div class="social-url">
+
+        <input
+          id="urlWhatsapp"
+          type="url"
+          placeholder="https://wa.me/628xxxxxxxxxx"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- INSTAGRAM -->
+
+    <div
+      class="social-option"
+      data-social-option="instagram"
+    >
+
+      <div class="social-option-top">
+
+        <input
+          type="checkbox"
+          class="social-check"
+          id="socialInstagram"
+          data-social="instagram"
+        >
+
+        <div class="social-option-brand">
+
+          <i class="fa-brands fa-instagram"></i>
+
+          Instagram
+
+        </div>
+
+      </div>
+
+
+      <div class="social-url">
+
+        <input
+          id="urlInstagram"
+          type="url"
+          placeholder="https://instagram.com/nama_toko"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- TIKTOK -->
+
+    <div
+      class="social-option"
+      data-social-option="tiktok"
+    >
+
+      <div class="social-option-top">
+
+        <input
+          type="checkbox"
+          class="social-check"
+          id="socialTiktok"
+          data-social="tiktok"
+        >
+
+        <div class="social-option-brand">
+
+          <i class="fa-brands fa-tiktok"></i>
+
+          TikTok
+
+        </div>
+
+      </div>
+
+
+      <div class="social-url">
+
+        <input
+          id="urlTiktok"
+          type="url"
+          placeholder="https://tiktok.com/@nama_toko"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- SHOPEE -->
+
+    <div
+      class="social-option"
+      data-social-option="shopee"
+    >
+
+      <div class="social-option-top">
+
+        <input
+          type="checkbox"
+          class="social-check"
+          id="socialShopee"
+          data-social="shopee"
+        >
+
+        <div class="social-option-brand">
+
+          <i class="fa-solid fa-bag-shopping"></i>
+
+          Shopee
+
+        </div>
+
+      </div>
+
+
+      <div class="social-url">
+
+        <input
+          id="urlShopee"
+          type="url"
+          placeholder="https://shopee.co.id/nama_toko"
+        >
+
+      </div>
+
+    </div>
+
+
+    <!-- TOKOPEDIA -->
+
+    <div
+      class="social-option"
+      data-social-option="tokopedia"
+    >
+
+      <div class="social-option-top">
+
+        <input
+          type="checkbox"
+          class="social-check"
+          id="socialTokopedia"
+          data-social="tokopedia"
+        >
+
+        <div class="social-option-brand">
+
+          <i class="fa-solid fa-store"></i>
+
+          Tokopedia
+
+        </div>
+
+      </div>
+
+
+      <div class="social-url">
+
+        <input
+          id="urlTokopedia"
+          type="url"
+          placeholder="https://tokopedia.com/nama_toko"
+        >
+
+      </div>
+
+    </div>
+
+
+  </div>
+
+
+  <div class="social-editor-note">
+
+    Centang platform yang ingin ditampilkan.
+    URL kosong = icon otomatis disembunyikan.
+
+  </div>
+
+
+  <label>
+    Posisi Social Bar
+  </label>
+
+
+  <div class="social-position">
+
+    <button
+      type="button"
+      class="social-pos-btn active"
+      data-social-position="left"
+    >
+      KIRI
+    </button>
+
+    <button
+      type="button"
+      class="social-pos-btn"
+      data-social-position="center"
+    >
+      TENGAH
+    </button>
+
+    <button
+      type="button"
+      class="social-pos-btn"
+      data-social-position="right"
+    >
+      KANAN
+    </button>
+
+  </div>
+
+</section>
+
+
+  
 <!-- BACKGROUND -->
 
 <section class="section">
@@ -3016,6 +3628,21 @@ class="contact-phone"
 </div>
 
 </div>
+
+
+
+
+<!-- ==================================================
+     SOCIAL / MARKETPLACE BAR
+=================================================== -->
+
+<div
+  id="socialBanner"
+  class="social-banner"
+  aria-hidden="true"
+></div>
+
+  
 
 
 <div class="edge"></div>
@@ -5426,6 +6053,818 @@ console.log(
 console.log(
   "EXPORT: Preview → Master → PNG / PDF"
 );
+
+
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   SOCIAL & MARKETPLACE ADDON
+   =========================================================
+
+   IMPORTANT:
+   Tidak menyentuh render/export engine lama.
+
+   Social bar adalah elemen canvas biasa,
+   sehingga otomatis ikut:
+   Preview
+      ↓
+   Clone
+      ↓
+   html2canvas
+      ↓
+   PNG / PDF
+========================================================= */
+
+
+/* =========================================================
+   SOCIAL CONFIG
+========================================================= */
+
+const SOCIAL_CONFIG = {
+
+  whatsapp: {
+
+    checkbox:
+      "socialWhatsapp",
+
+    input:
+      "urlWhatsapp",
+
+    label:
+      "WhatsApp",
+
+    icon:
+      '<i class="fa-brands fa-whatsapp"></i>',
+
+    className:
+      "whatsapp"
+
+  },
+
+
+  instagram: {
+
+    checkbox:
+      "socialInstagram",
+
+    input:
+      "urlInstagram",
+
+    label:
+      "Instagram",
+
+    icon:
+      '<i class="fa-brands fa-instagram"></i>',
+
+    className:
+      "instagram"
+
+  },
+
+
+  tiktok: {
+
+    checkbox:
+      "socialTiktok",
+
+    input:
+      "urlTiktok",
+
+    label:
+      "TikTok",
+
+    icon:
+      '<i class="fa-brands fa-tiktok"></i>',
+
+    className:
+      "tiktok"
+
+  },
+
+
+  shopee: {
+
+    checkbox:
+      "socialShopee",
+
+    input:
+      "urlShopee",
+
+    label:
+      "Shopee",
+
+    icon:
+      `
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M7.2 8.1
+             C7.2 5.3 9.2 3 12 3
+             C14.8 3 16.8 5.3 16.8 8.1
+             H19
+             C19.6 8.1 20 8.6 20 9.2
+             L19 20
+             C18.9 20.6 18.4 21 17.8 21
+             H6.2
+             C5.6 21 5.1 20.6 5 20
+             L4 9.2
+             C4 8.6 4.4 8.1 5 8.1
+             H7.2 Z
+             M9.2 8.1
+             H14.8
+             C14.8 6.4 13.6 5 12 5
+             C10.4 5 9.2 6.4 9.2 8.1 Z"
+        />
+      </svg>
+      `,
+
+    className:
+      "shopee"
+
+  },
+
+
+  tokopedia: {
+
+    checkbox:
+      "socialTokopedia",
+
+    input:
+      "urlTokopedia",
+
+    label:
+      "Tokopedia",
+
+    icon:
+      `
+      <svg
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <path
+          d="M5 8.5
+             C5 5.5 7.7 3 12 3
+             C16.3 3 19 5.5 19 8.5
+             V17
+             C19 19.2 17.2 21 15 21
+             H9
+             C6.8 21 5 19.2 5 17
+             V8.5 Z
+
+             M7 9
+             H17
+             V16.5
+             C17 18 16 19 14.5 19
+             H9.5
+             C8 19 7 18 7 16.5
+             V9 Z
+
+             M9 12
+             H15
+             V14
+             H9
+             Z"
+        />
+      </svg>
+      `,
+
+    className:
+      "tokopedia"
+
+  }
+
+};
+
+
+/* =========================================================
+   URL HELPERS
+========================================================= */
+
+function cleanSocialURL(
+  value
+){
+
+  return String(
+    value || ""
+  ).trim();
+
+}
+
+
+function getSocialDisplay(
+  platform,
+  url
+){
+
+  const value =
+    cleanSocialURL(url);
+
+
+  if(!value)
+    return "";
+
+
+  try{
+
+    const parsed =
+      new URL(
+        value
+      );
+
+
+    /*
+      Jangan tampilkan URL panjang.
+      Banner cukup username / slug.
+    */
+
+    let path =
+      parsed.pathname
+      .replace(
+        /^\/+/,
+        ""
+      )
+      .replace(
+        /\/+$/,
+        ""
+      );
+
+
+    if(
+      platform ===
+      "tiktok"
+    ){
+
+      path =
+        path.replace(
+          /^@/,
+          "@"
+        );
+
+    }
+
+
+    if(
+      platform ===
+      "instagram"
+    ){
+
+      path =
+        path.split("/")[0];
+
+      if(
+        path &&
+        !path.startsWith("@")
+      ){
+
+        path =
+          "@" +
+          path;
+
+      }
+
+    }
+
+
+    if(
+      platform ===
+      "whatsapp"
+    ){
+
+      const phone =
+        path.replace(
+          /\D/g,
+          ""
+        );
+
+
+      return phone
+        ? phone
+        : "WhatsApp";
+
+    }
+
+
+    if(
+      !path
+    ){
+
+      return parsed.hostname
+        .replace(
+          /^www\./,
+          ""
+        );
+
+    }
+
+
+    return path;
+
+  }catch(error){
+
+    /*
+      URL belum sempurna.
+
+      Tetap tampilkan isi pendek
+      supaya LIVE preview tetap responsif.
+    */
+
+    return value
+      .replace(
+        /^https?:\/\//i,
+        ""
+      )
+      .replace(
+        /^www\./i,
+        ""
+      )
+      .slice(
+        0,
+        28
+      );
+
+  }
+
+}
+
+
+/* =========================================================
+   BUILD SOCIAL BAR
+========================================================= */
+
+function renderSocialBanner(){
+
+  const box =
+    document.getElementById(
+      "socialBanner"
+    );
+
+
+  if(!box)
+    return;
+
+
+  const fragment =
+    document.createDocumentFragment();
+
+
+  let count =
+    0;
+
+
+  Object.entries(
+    SOCIAL_CONFIG
+  )
+  .forEach(
+    ([platform,config]) => {
+
+      const checkbox =
+        document.getElementById(
+          config.checkbox
+        );
+
+
+      const input =
+        document.getElementById(
+          config.input
+        );
+
+
+      if(
+        !checkbox ||
+        !input
+      )
+        return;
+
+
+      const enabled =
+        checkbox.checked;
+
+
+      const url =
+        cleanSocialURL(
+          input.value
+        );
+
+
+      if(
+        !enabled ||
+        !url
+      ){
+
+        return;
+
+      }
+
+
+      const display =
+        getSocialDisplay(
+          platform,
+          url
+        );
+
+
+      if(!display)
+        return;
+
+
+      const item =
+        document.createElement(
+          "div"
+        );
+
+
+      item.className =
+        `social-banner-item ${config.className}`;
+
+
+      const icon =
+        document.createElement(
+          "span"
+        );
+
+
+      icon.className =
+        "social-banner-icon";
+
+
+      icon.innerHTML =
+        config.icon;
+
+
+      const label =
+        document.createElement(
+          "span"
+        );
+
+
+      label.className =
+        "social-banner-label";
+
+
+      label.textContent =
+        display;
+
+
+      item.appendChild(
+        icon
+      );
+
+
+      item.appendChild(
+        label
+      );
+
+
+      fragment.appendChild(
+        item
+      );
+
+
+      count++;
+
+    }
+  );
+
+
+  box.innerHTML =
+    "";
+
+
+  box.appendChild(
+    fragment
+  );
+
+
+  box.classList.toggle(
+    "has-items",
+    count > 0
+  );
+
+
+  box.setAttribute(
+    "aria-hidden",
+    count
+      ? "false"
+      : "true"
+  );
+
+}
+
+
+/* =========================================================
+   SOCIAL POSITION
+========================================================= */
+
+function setSocialPosition(
+  position
+){
+
+  const box =
+    document.getElementById(
+      "socialBanner"
+    );
+
+
+  if(!box)
+    return;
+
+
+  /*
+    Reset positioning.
+  */
+
+  box.style.left =
+    "";
+
+  box.style.right =
+    "";
+
+  box.style.transform =
+    "";
+
+
+  if(
+    position ===
+    "center"
+  ){
+
+    box.style.left =
+      "50%";
+
+    box.style.transform =
+      "translateX(-50%)";
+
+  }
+
+
+  else if(
+    position ===
+    "right"
+  ){
+
+    box.style.left =
+      "auto";
+
+    box.style.right =
+      "5%";
+
+  }
+
+
+  else{
+
+    /*
+      LEFT
+    */
+
+    box.style.left =
+      "7%";
+
+  }
+
+
+  document
+    .querySelectorAll(
+      ".social-pos-btn"
+    )
+    .forEach(
+      button => {
+
+        button.classList.toggle(
+          "active",
+          button.dataset.socialPosition ===
+          position
+        );
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   BIND CHECKBOXES
+========================================================= */
+
+Object.entries(
+  SOCIAL_CONFIG
+)
+.forEach(
+  ([platform,config]) => {
+
+    const checkbox =
+      document.getElementById(
+        config.checkbox
+      );
+
+
+    const input =
+      document.getElementById(
+        config.input
+      );
+
+
+    const option =
+      document.querySelector(
+        `[data-social-option="${platform}"]`
+      );
+
+
+    if(
+      !checkbox ||
+      !input
+    )
+      return;
+
+
+    function refresh(){
+
+      if(option){
+
+        option.classList.toggle(
+          "active",
+          checkbox.checked
+        );
+
+      }
+
+
+      renderSocialBanner();
+
+    }
+
+
+    checkbox.addEventListener(
+      "change",
+      refresh
+    );
+
+
+    input.addEventListener(
+      "input",
+      renderSocialBanner
+    );
+
+
+    refresh();
+
+  }
+);
+
+
+/* =========================================================
+   POSITION BUTTONS
+========================================================= */
+
+document
+  .querySelectorAll(
+    ".social-pos-btn"
+  )
+  .forEach(
+    button => {
+
+      button.addEventListener(
+        "click",
+        () => {
+
+          setSocialPosition(
+            button.dataset.socialPosition
+          );
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   DEFAULT
+========================================================= */
+
+setSocialPosition(
+  "left"
+);
+
+
+/* =========================================================
+   RESET SUPPORT
+========================================================= */
+
+const originalResetButton =
+  document.getElementById(
+    "reset"
+  );
+
+
+if(
+  originalResetButton
+){
+
+  originalResetButton
+    .addEventListener(
+      "click",
+      () => {
+
+        Object.entries(
+          SOCIAL_CONFIG
+        )
+        .forEach(
+          ([platform,config]) => {
+
+            const checkbox =
+              document.getElementById(
+                config.checkbox
+              );
+
+
+            const input =
+              document.getElementById(
+                config.input
+              );
+
+
+            if(checkbox)
+              checkbox.checked =
+                false;
+
+
+            if(input)
+              input.value =
+                "";
+
+
+            const option =
+              document.querySelector(
+                `[data-social-option="${platform}"]`
+              );
+
+
+            if(option){
+
+              option.classList.remove(
+                "active"
+              );
+
+            }
+
+          }
+        );
+
+
+        setSocialPosition(
+          "left"
+        );
+
+
+        renderSocialBanner();
+
+      }
+    );
+
+}
+
+
+/* =========================================================
+   SAFETY:
+   Re-render sebelum export jika export dipanggil
+   setelah perubahan terakhir.
+========================================================= */
+
+document
+  .getElementById(
+    "export"
+  )
+  ?.addEventListener(
+    "click",
+    () => {
+
+      renderSocialBanner();
+
+    },
+    true
+  );
+
+
+console.log(
+  "[SOCIAL] Optional social/marketplace layer ready."
+);
+
+
+
+
+
+
+  
 
 </script>
 
