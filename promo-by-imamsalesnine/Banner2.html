@@ -1,76 +1,46 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-
 <meta charset="UTF-8">
-
-<meta
-  name="viewport"
-  content="width=device-width,initial-scale=1,viewport-fit=cover"
->
-
-<meta
-  name="theme-color"
-  content="#07090c"
->
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#07090c">
 
 <title>Premium Banner Studio</title>
 
-<!-- ======================================================
-     EXTERNAL LIBRARIES
-====================================================== -->
-
 <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
-
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
-
 
 <style>
 
-/* ======================================================
-   ROOT
-====================================================== */
+/* =========================================================
+   CORE
+========================================================= */
 
 :root{
-
   --ui-bg:#07090c;
   --ui-panel:#0d1116;
   --ui-panel2:#151a20;
-  --ui-panel3:#1b2128;
-
   --ui-line:#29313a;
-
   --ui-text:#f5f7fa;
   --ui-muted:#89929d;
 
   --bg:#090b0f;
-
   --primary:#8CC63F;
   --secondary:#101419;
   --accent:#D9AD55;
-
   --text:#FFFFFF;
   --muted:#C4C9D0;
-
   --cta:#8CC63F;
   --ctaText:#101010;
-
   --border:#8CC63F;
 
   --imgZoom:100;
   --imgX:0;
   --imgY:0;
-
   --overlayLeft:.92;
   --overlayRight:.30;
-
   --patternOpacity:.08;
 }
-
-
-/* ======================================================
-   GLOBAL
-====================================================== */
 
 *{
   box-sizing:border-box;
@@ -78,16 +48,11 @@
 
 html,
 body{
-
+  margin:0;
   width:100%;
   min-height:100%;
-
-  margin:0;
-  padding:0;
-
   background:var(--ui-bg);
   color:var(--ui-text);
-
   font-family:
     Inter,
     Poppins,
@@ -96,7 +61,6 @@ body{
     BlinkMacSystemFont,
     "Segoe UI",
     sans-serif;
-
 }
 
 body{
@@ -118,53 +82,35 @@ img{
   max-width:100%;
 }
 
-
-/* ======================================================
+/* =========================================================
    APP
-====================================================== */
+========================================================= */
 
 .app{
-
   width:100%;
   min-height:100vh;
-
   display:grid;
-
-  grid-template-columns:
-    390px
-    minmax(0,1fr);
-
+  grid-template-columns:390px minmax(0,1fr);
 }
 
-
-/* ======================================================
+/* =========================================================
    EDITOR
-====================================================== */
+========================================================= */
 
 .editor{
-
   width:390px;
   height:100vh;
-
   position:sticky;
   top:0;
-
-  overflow-y:auto;
-  overflow-x:hidden;
-
+  overflow:auto;
   padding:20px;
-
   background:
     linear-gradient(
       180deg,
-      #0d1116 0%,
-      #080b0f 100%
+      #0d1116,
+      #080b0f
     );
-
-  border-right:
-    1px solid
-    var(--ui-line);
-
+  border-right:1px solid var(--ui-line);
 }
 
 .editor::-webkit-scrollbar{
@@ -172,547 +118,319 @@ img{
 }
 
 .editor::-webkit-scrollbar-thumb{
-
   background:#303944;
   border-radius:20px;
-
 }
 
-.editor::-webkit-scrollbar-track{
-  background:transparent;
-}
-
-
-/* ======================================================
+/* =========================================================
    BRAND UI
-====================================================== */
+========================================================= */
 
 .ui-brand{
-
   display:flex;
   align-items:center;
   gap:12px;
-
   padding-bottom:18px;
-
-  border-bottom:
-    1px solid
-    var(--ui-line);
-
+  border-bottom:1px solid var(--ui-line);
 }
 
 .ui-brand-mark{
-
   width:44px;
   height:44px;
-
   flex:0 0 44px;
-
   display:grid;
   place-items:center;
-
   border-radius:13px;
-
   background:
     linear-gradient(
       135deg,
       var(--primary),
       #dfffaa
     );
-
   color:#111;
-
-  font-size:18px;
   font-weight:1000;
-
+  font-size:18px;
   box-shadow:
     0 10px 30px
     rgba(140,198,63,.18);
-
 }
 
 .ui-brand-title{
-
   font-size:13px;
   font-weight:950;
   letter-spacing:1.3px;
-
 }
 
 .ui-brand-sub{
-
   margin-top:3px;
-
   color:var(--primary);
-
   font-size:9px;
   font-weight:800;
   letter-spacing:1.6px;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    SECTIONS
-====================================================== */
+========================================================= */
 
 .section{
   margin-top:23px;
 }
 
 .section-head{
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
   margin-bottom:9px;
-
 }
 
 .section-head strong{
-
   color:#dfe4e9;
-
   font-size:10px;
   font-weight:900;
   letter-spacing:1.6px;
-
   text-transform:uppercase;
-
 }
 
 .section-head span{
-
   color:#5f6975;
-
   font-size:9px;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    FORM
-====================================================== */
+========================================================= */
 
 label{
-
   display:block;
-
   margin:9px 0 5px;
-
   color:#b8c0c9;
-
   font-size:10px;
   font-weight:700;
-
 }
 
 input,
 select,
 textarea{
-
   width:100%;
-
-  border:
-    1px solid
-    var(--ui-line);
-
+  border:1px solid var(--ui-line);
   border-radius:9px;
-
   outline:none;
-
   padding:10px 11px;
-
   background:#151a20;
   color:#fff;
-
-  transition:
-    border-color .18s,
-    box-shadow .18s;
-
-}
-
-input::placeholder,
-textarea::placeholder{
-  color:#606a75;
+  transition:.18s;
 }
 
 input:focus,
 select:focus,
 textarea:focus{
-
   border-color:var(--primary);
-
   box-shadow:
     0 0 0 3px
     rgba(140,198,63,.11);
-
 }
 
 textarea{
-
   min-height:68px;
   resize:vertical;
-
 }
 
 .row2{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns:1fr 1fr;
   gap:8px;
-
 }
 
 .row3{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr 1fr;
-
+  grid-template-columns:1fr 1fr 1fr;
   gap:7px;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    FILE
-====================================================== */
+========================================================= */
 
 .file{
-
+  display:block;
   padding:12px;
-
   text-align:center;
-
-  border:
-    1px dashed
-    #424b56;
-
+  border:1px dashed #424b56;
   border-radius:10px;
-
   color:#89929d;
-
   cursor:pointer;
-
-  transition:.18s;
-
 }
 
 .file:hover{
-
   color:#fff;
-
-  border-color:
-    var(--primary);
-
-  background:
-    rgba(140,198,63,.035);
-
+  border-color:var(--primary);
 }
 
 .file input{
   display:none;
 }
 
-
-/* ======================================================
+/* =========================================================
    RATIO
-====================================================== */
+========================================================= */
 
 .ratio-grid{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(3,1fr);
-
+  grid-template-columns:repeat(3,1fr);
   gap:6px;
-
 }
 
 .ratio{
-
-  border:
-    1px solid
-    var(--ui-line);
-
-  border-radius:8px;
-
   padding:9px 4px;
-
+  border:1px solid var(--ui-line);
+  border-radius:8px;
   background:#151a20;
   color:#9fa8b2;
-
   font-size:9px;
   font-weight:750;
-
 }
 
-.ratio:hover,
-.ratio.active{
-
+.ratio.active,
+.ratio:hover{
   color:#fff;
-
-  border-color:
-    var(--primary);
-
+  border-color:var(--primary);
   background:#182018;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    COLOR
-====================================================== */
+========================================================= */
 
 .palette-grid{
-
   display:grid;
-
-  grid-template-columns:
-    repeat(5,1fr);
-
+  grid-template-columns:repeat(5,1fr);
   gap:6px;
-
 }
 
 .color-chip{
-
   height:38px;
-
   position:relative;
-
   overflow:hidden;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
+  border:1px solid rgba(255,255,255,.12);
   border-radius:8px;
-
   cursor:pointer;
-
-  transition:.15s;
-
 }
 
 .color-chip:hover{
-
-  transform:
-    translateY(-1px);
-
-  border-color:
-    rgba(255,255,255,.4);
-
+  transform:translateY(-1px);
+  border-color:rgba(255,255,255,.45);
 }
 
 .color-chip span{
-
   position:absolute;
-
   left:0;
   right:0;
   bottom:0;
-
   padding:3px 2px;
-
   text-align:center;
-
-  background:
-    rgba(0,0,0,.5);
-
+  background:rgba(0,0,0,.5);
   color:#fff;
-
   font-size:6px;
   font-weight:800;
-  letter-spacing:.4px;
-
 }
 
 .color-field{
-
   display:grid;
-
-  grid-template-columns:
-    48px
-    minmax(0,1fr);
-
+  grid-template-columns:48px minmax(0,1fr);
   gap:7px;
-
 }
 
 .color-field input[type="color"]{
-
   width:48px;
   height:40px;
-
   padding:3px;
-
-  cursor:pointer;
-
 }
 
-.color-field input[type="text"]{
-
-  min-width:0;
-
-  font-size:11px;
-
-  text-transform:uppercase;
-
-}
-
-
-/* ======================================================
+/* =========================================================
    DESIGN
-====================================================== */
+========================================================= */
 
 .design-grid{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns:1fr 1fr;
   gap:7px;
-
 }
 
 .design{
-
   min-height:76px;
-
   padding:7px;
-
   text-align:left;
-
-  border:
-    1px solid
-    var(--ui-line);
-
+  border:1px solid var(--ui-line);
   border-radius:10px;
-
   background:#151a20;
   color:#aeb6c0;
-
   transition:.18s;
-
 }
 
 .design:hover{
-
   border-color:#5d6874;
-
-  transform:
-    translateY(-1px);
-
+  transform:translateY(-1px);
 }
 
 .design.active{
-
-  border-color:
-    var(--primary);
-
+  border-color:var(--primary);
   background:#182018;
   color:#fff;
-
-  box-shadow:
-    0 0 0 1px
-    rgba(140,198,63,.15);
-
 }
 
 .design-preview{
-
   position:relative;
-
   height:29px;
-
   margin-bottom:7px;
-
   overflow:hidden;
-
   border-radius:5px;
-
   background:
     linear-gradient(
       135deg,
       #1c2229,
       #505863
     );
-
 }
 
 .design-preview.wave::after{
-
   content:"";
-
   position:absolute;
-
   top:-50%;
   right:-10%;
-
   width:65%;
   height:190%;
-
   border-radius:50%;
-
   background:#8CC63F;
-
 }
 
 .design-preview.double::before{
-
   content:"";
-
   position:absolute;
-
   top:-50%;
   right:-5%;
-
   width:65%;
   height:190%;
-
   border-radius:50%;
-
   background:#D9AD55;
-
 }
 
 .design-preview.double::after{
-
   content:"";
-
   position:absolute;
-
   top:-45%;
   right:3%;
-
   width:58%;
   height:180%;
-
   border-radius:50%;
-
   background:#8CC63F;
-
 }
 
 .design-preview.angular::after{
-
   content:"";
-
   position:absolute;
-
   inset:0 0 0 50%;
-
   background:#8CC63F;
-
   clip-path:
     polygon(
       25% 0,
@@ -720,11 +438,9 @@ textarea{
       100% 100%,
       0 100%
     );
-
 }
 
 .design-preview.split{
-
   background:
     linear-gradient(
       90deg,
@@ -732,75 +448,48 @@ textarea{
       #8CC63F 47% 51%,
       #dfe4e9 51%
     );
-
 }
 
 .design-preview.circle::after{
-
   content:"";
-
   position:absolute;
-
   width:24px;
   height:24px;
-
   top:2px;
   right:8px;
-
   border-radius:50%;
-
   background:#8CC63F;
-
 }
 
 .design-preview.glass::after{
-
   content:"";
-
   position:absolute;
-
   left:20%;
   top:4px;
-
   width:50%;
   height:20px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.35);
-
+  border:1px solid rgba(255,255,255,.35);
   border-radius:6px;
-
-  background:
-    rgba(255,255,255,.18);
-
+  background:rgba(255,255,255,.18);
 }
 
 .design-preview.racing{
-
   background:
     repeating-linear-gradient(
       -20deg,
       #171717 0 6px,
       #2b2b2b 6px 9px
     );
-
 }
 
 .design-preview.racing::after{
-
   content:"";
-
   position:absolute;
-
   right:0;
   top:0;
-
   width:45%;
   height:100%;
-
   background:#ef3d3d;
-
   clip-path:
     polygon(
       25% 0,
@@ -808,187 +497,108 @@ textarea{
       75% 100%,
       0 100%
     );
-
 }
 
 .design-preview.tech{
   background:#0b1721;
 }
 
-.design-preview.tech::before,
 .design-preview.tech::after{
-
   content:"";
-
   position:absolute;
-
-  width:100%;
-  height:1px;
-
-  background:#00d7e9;
-
-  transform:
-    rotate(-22deg);
-
-}
-
-.design-preview.tech::before{
-  top:10px;
-}
-
-.design-preview.tech::after{
-
-  top:19px;
-
-  opacity:.45;
-
+  inset:0;
+  background:
+    repeating-linear-gradient(
+      -25deg,
+      transparent 0 7px,
+      rgba(0,215,233,.5) 8px,
+      transparent 9px 16px
+    );
 }
 
 .design-name{
-
   font-size:9px;
   font-weight:850;
-
 }
 
 .design-desc{
-
   margin-top:2px;
-
   color:#69737e;
-
   font-size:7px;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    RANGES
-====================================================== */
+========================================================= */
 
 .range-row{
-
   display:grid;
-
-  grid-template-columns:
-    minmax(0,1fr)
-    47px;
-
+  grid-template-columns:minmax(0,1fr) 47px;
   align-items:center;
-
   gap:8px;
-
 }
 
 input[type="range"]{
-
-  width:100%;
-
   padding:0;
-
-  accent-color:
-    var(--primary);
-
+  accent-color:var(--primary);
 }
 
 .range-value{
-
   padding:7px 2px;
-
-  border:
-    1px solid
-    var(--ui-line);
-
+  border:1px solid var(--ui-line);
   border-radius:7px;
-
   text-align:center;
-
   color:#b9c0c8;
-
   font-size:9px;
-
 }
 
-
-/* ======================================================
-   BUTTONS
-====================================================== */
+/* =========================================================
+   ACTIONS
+========================================================= */
 
 .actions{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns:1fr 1fr;
   gap:8px;
-
   margin-top:24px;
-
 }
 
 .btn{
-
   padding:12px;
-
   border:0;
-
   border-radius:10px;
-
   font-weight:900;
-
-  transition:.18s;
-
-}
-
-.btn:hover{
-  transform:translateY(-1px);
-}
-
-.btn:disabled{
-  opacity:.45;
-  cursor:wait;
-  transform:none;
 }
 
 .btn-dark{
-
   color:#fff;
-
   background:#20262e;
-
-  border:
-    1px solid
-    #303842;
-
+  border:1px solid #303842;
 }
 
 .btn-primary{
-
   color:#101010;
-
-  background:
-    var(--primary);
-
+  background:var(--primary);
 }
 
 .btn-full{
-  grid-column:1 / -1;
+  grid-column:1/-1;
 }
 
+.btn:disabled{
+  opacity:.5;
+  cursor:wait;
+}
 
-/* ======================================================
+/* =========================================================
    STAGE
-====================================================== */
+========================================================= */
 
 .stage{
-
   min-width:0;
   min-height:100vh;
-
   display:flex;
   flex-direction:column;
-
   background:
     radial-gradient(
       circle at 50% 30%,
@@ -996,206 +606,126 @@ input[type="range"]{
       #0b0f14 45%,
       #07090c 100%
     );
-
 }
 
 .stagebar{
-
   min-height:68px;
   flex:0 0 68px;
-
   padding:0 24px;
-
   display:flex;
   align-items:center;
   justify-content:space-between;
-
-  border-bottom:
-    1px solid
-    var(--ui-line);
-
+  border-bottom:1px solid var(--ui-line);
 }
 
 .stage-left{
-
   color:#858e99;
-
   font-size:10px;
-
   letter-spacing:1.4px;
-
 }
 
 .stage-right{
-
   display:flex;
-
   align-items:center;
-
   gap:14px;
-
   color:#d9dde2;
-
   font-size:11px;
-
 }
 
 .live{
-
   color:var(--primary);
-
   font-weight:900;
-
 }
 
 .preview-tools{
-
   display:flex;
-
   gap:5px;
-
 }
 
 .preview-tool{
-
   padding:6px 8px;
-
-  border:
-    1px solid
-    var(--ui-line);
-
+  border:1px solid var(--ui-line);
   border-radius:7px;
-
   background:#151a20;
   color:#aeb6c0;
-
   font-size:8px;
-
 }
 
 .preview-tool:hover{
-
   color:#fff;
-
-  border-color:
-    var(--primary);
-
+  border-color:var(--primary);
 }
 
-
-/* ======================================================
+/* =========================================================
    PREVIEW
-====================================================== */
+========================================================= */
 
 .preview-area{
-
   flex:1;
   min-height:0;
-
   overflow:auto;
-
   padding:40px;
-
   display:flex;
-
   align-items:center;
   justify-content:center;
-
 }
 
 .preview-area.fullscreen{
-
   position:fixed;
-
   inset:0;
-
   z-index:9999;
-
   padding:30px;
-
   background:#05070a;
-
 }
 
 .preview-shell{
-
   width:min(1250px,100%);
-
   max-width:1250px;
-
   margin:auto;
-
 }
 
 .preview-area.zoom100 .preview-shell{
-
   width:1000px;
-
   max-width:none;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    CANVAS
-====================================================== */
+========================================================= */
 
 .canvas{
-
   width:100%;
-
   max-width:100%;
-
-  aspect-ratio:3 / 1;
-
+  aspect-ratio:3/1;
   position:relative;
-
   overflow:hidden;
-
   isolation:isolate;
-
   background:var(--bg);
-
   color:var(--text);
-
   box-shadow:
     0 35px 100px
     rgba(0,0,0,.6);
-
 }
 
-
-/* ======================================================
+/* =========================================================
    BACKGROUND
-====================================================== */
+========================================================= */
 
 .base-bg{
-
   position:absolute;
-
   inset:0;
-
   z-index:-10;
-
   background:var(--bg);
-
 }
 
 .canvas-bg{
-
   position:absolute;
-
-  z-index:-8;
-
   inset:-1%;
-
+  z-index:-8;
   width:102%;
   height:102%;
-
   max-width:none;
-
   object-fit:cover;
-
   transform:
     translate(
       calc(var(--imgX) * 1%),
@@ -1204,19 +734,13 @@ input[type="range"]{
     scale(
       calc(var(--imgZoom) / 100)
     );
-
   transform-origin:center;
-
 }
 
 .overlay{
-
   position:absolute;
-
   inset:0;
-
   z-index:-7;
-
   background:
     linear-gradient(
       90deg,
@@ -1224,390 +748,234 @@ input[type="range"]{
       rgba(0,0,0,.55) 42%,
       rgba(0,0,0,var(--overlayRight)) 100%
     );
-
 }
 
 .grid-pattern{
-
   position:absolute;
-
   inset:0;
-
   z-index:-5;
-
   pointer-events:none;
-
   opacity:var(--patternOpacity);
-
   background-image:
-
     linear-gradient(
       rgba(255,255,255,.07) 1px,
       transparent 1px
     ),
-
     linear-gradient(
       90deg,
       rgba(255,255,255,.07) 1px,
       transparent 1px
     );
-
   background-size:42px 42px;
-
 }
 
-.noise{
-
-  position:absolute;
-
-  inset:0;
-
-  z-index:50;
-
-  pointer-events:none;
-
-  opacity:.035;
-
-  background-image:
-    url(
-      "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"
-    );
-
-}
-
-
-/* ======================================================
-   DECOR
-====================================================== */
+/* NO color-mix HERE.
+   html2canvas-safe. */
 
 .glow{
-
   position:absolute;
-
   z-index:-4;
-
   right:-8%;
   top:-15%;
-
   width:50%;
   height:90%;
-
   border-radius:50%;
-
   background:
     radial-gradient(
       circle,
-      color-mix(
-        in srgb,
-        var(--primary) 28%,
-        transparent
-      ),
+      var(--primary) 0%,
       transparent 68%
     );
-
+  opacity:.28;
   filter:blur(20px);
-
+  pointer-events:none;
 }
 
+/* =========================================================
+   DECOR
+========================================================= */
+
 .edge{
-
   position:absolute;
-
   z-index:11;
-
   left:0;
   bottom:0;
-
   width:34%;
   height:4px;
-
   background:var(--primary);
-
 }
 
 .frame{
-
   position:absolute;
-
   z-index:10;
-
   inset:13px;
-
   pointer-events:none;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
+  border:1px solid rgba(255,255,255,.12);
 }
 
+.noise{
+  position:absolute;
+  inset:0;
+  z-index:50;
+  pointer-events:none;
+  opacity:.025;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(255,255,255,.03) 0 1px,
+      transparent 1px 3px
+    );
+}
 
-/* ======================================================
+/* =========================================================
    BRAND
-====================================================== */
+========================================================= */
 
 .brand-lock{
-
   position:absolute;
-
   z-index:12;
-
   top:7%;
   right:5%;
-
   text-align:right;
-
 }
 
 .brand-logo{
-
   display:none;
-
   width:clamp(50px,8vw,120px);
-
-  height:auto;
-
   max-height:65px;
-
   object-fit:contain;
-
   margin:0 0 8px auto;
-
 }
 
 .brand-title{
-
   color:var(--text);
-
-  font-size:
-    clamp(11px,1.7vw,28px);
-
+  font-size:clamp(11px,1.7vw,28px);
   font-weight:950;
-
   letter-spacing:2px;
-
   text-transform:uppercase;
-
 }
 
 .brand-sub{
-
   margin-top:5px;
-
   color:var(--primary);
-
-  font-size:
-    clamp(6px,.72vw,11px);
-
+  font-size:clamp(6px,.72vw,11px);
   font-weight:850;
-
   letter-spacing:1.8px;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    COPY
-====================================================== */
+========================================================= */
 
 .copy{
-
   position:absolute;
-
   z-index:12;
-
   left:7%;
   top:50%;
-
   width:53%;
-
-  transform:
-    translateY(-50%);
-
+  transform:translateY(-50%);
 }
 
 .kicker{
-
   margin-bottom:11px;
-
   color:var(--primary);
-
-  font-size:
-    clamp(7px,.9vw,13px);
-
+  font-size:clamp(7px,.9vw,13px);
   font-weight:950;
-
   letter-spacing:3px;
-
   text-transform:uppercase;
-
 }
 
 .headline{
-
   color:var(--text);
-
-  font-size:
-    clamp(24px,4.6vw,74px);
-
+  font-size:clamp(24px,4.6vw,74px);
   line-height:.9;
-
   font-weight:1000;
-
   letter-spacing:-3px;
-
   text-transform:uppercase;
-
   overflow-wrap:anywhere;
-
 }
 
 .subtitle{
-
   max-width:580px;
-
   margin-top:15px;
-
   color:var(--muted);
-
-  font-size:
-    clamp(7px,1vw,15px);
-
+  font-size:clamp(7px,1vw,15px);
   line-height:1.5;
-
   white-space:pre-line;
-
 }
 
 .badges{
-
   display:flex;
-
   align-items:center;
-
   flex-wrap:wrap;
-
   gap:7px;
-
   margin-top:19px;
-
 }
 
 .badge{
-
   display:inline-flex;
-
   padding:8px 12px;
-
-  border:
-    1px solid
-    var(--border);
-
+  border:1px solid var(--border);
   color:var(--primary);
-
-  font-size:
-    clamp(6px,.7vw,11px);
-
+  font-size:clamp(6px,.7vw,11px);
   font-weight:900;
-
   letter-spacing:1px;
-
   text-transform:uppercase;
-
 }
 
 .cta{
-
   display:inline-flex;
-
   padding:8px 12px;
-
   background:var(--cta);
-
   color:var(--ctaText);
-
-  font-size:
-    clamp(6px,.7vw,11px);
-
+  font-size:clamp(6px,.7vw,11px);
   font-weight:950;
-
   text-transform:uppercase;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    CONTACT
-====================================================== */
+========================================================= */
 
 .contact{
-
   position:absolute;
-
   z-index:12;
-
   right:5%;
   bottom:7%;
-
   text-align:right;
-
 }
 
 .contact-name{
-
   color:var(--text);
-
-  font-size:
-    clamp(8px,1.2vw,18px);
-
+  font-size:clamp(8px,1.2vw,18px);
   font-weight:950;
-
 }
 
 .contact-role{
-
   margin-top:3px;
-
   color:var(--muted);
-
-  font-size:
-    clamp(6px,.7vw,11px);
-
+  font-size:clamp(6px,.7vw,11px);
 }
 
 .contact-phone{
-
   margin-top:4px;
-
   color:var(--primary);
-
-  font-size:
-    clamp(6px,.7vw,11px);
-
+  font-size:clamp(6px,.7vw,11px);
   font-weight:850;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    WAVE
-====================================================== */
+========================================================= */
 
 .wave-svg{
-
   display:none;
-
   position:absolute;
-
   inset:0;
-
   z-index:-2;
-
   width:100%;
   height:100%;
-
   pointer-events:none;
-
 }
 
 .wave-main{
@@ -1631,34 +999,23 @@ input[type="range"]{
   width:47%;
 }
 
-
-/* ======================================================
+/* =========================================================
    ANGULAR
-====================================================== */
+========================================================= */
 
 .angular-main,
 .angular-accent{
-
   display:none;
-
   position:absolute;
-
   z-index:-2;
-
   top:0;
-
   height:100%;
-
 }
 
 .angular-main{
-
   right:0;
-
   width:53%;
-
   background:var(--secondary);
-
   clip-path:
     polygon(
       21% 0,
@@ -1666,17 +1023,12 @@ input[type="range"]{
       100% 100%,
       0 100%
     );
-
 }
 
 .angular-accent{
-
   right:44%;
-
   width:8%;
-
   background:var(--primary);
-
   clip-path:
     polygon(
       42% 0,
@@ -1684,7 +1036,6 @@ input[type="range"]{
       57% 100%,
       0 100%
     );
-
 }
 
 .design-angular .angular-main,
@@ -1696,27 +1047,19 @@ input[type="range"]{
   width:49%;
 }
 
-
-/* ======================================================
+/* =========================================================
    SPLIT
-====================================================== */
+========================================================= */
 
 .split-panel{
-
   display:none;
-
   position:absolute;
-
   z-index:-2;
-
   right:0;
   top:0;
-
   width:49%;
   height:100%;
-
   background:var(--secondary);
-
 }
 
 .design-split .split-panel{
@@ -1727,31 +1070,20 @@ input[type="range"]{
   width:46%;
 }
 
-
-/* ======================================================
+/* =========================================================
    CIRCLE
-====================================================== */
+========================================================= */
 
 .circle-panel{
-
   display:none;
-
   position:absolute;
-
   z-index:-3;
-
   right:6%;
   top:50%;
-
   width:47%;
-
   aspect-ratio:1;
-
-  transform:
-    translateY(-50%);
-
+  transform:translateY(-50%);
   border-radius:50%;
-
   background:
     radial-gradient(
       circle,
@@ -1759,58 +1091,30 @@ input[type="range"]{
       var(--primary) 59% 61%,
       transparent 62%
     );
-
 }
 
 .design-circle .circle-panel{
   display:block;
 }
 
-.design-circle .copy{
-  width:48%;
-}
-
-
-/* ======================================================
+/* =========================================================
    GLASS
-====================================================== */
+========================================================= */
 
 .glass-panel{
-
   display:none;
-
   position:absolute;
-
   z-index:4;
-
   left:5%;
   top:14%;
-
   width:53%;
   height:72%;
-
   border-radius:22px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.25);
-
-  background:
-    rgba(255,255,255,.08);
-
-  backdrop-filter:
-    blur(12px);
-
-  -webkit-backdrop-filter:
-    blur(12px);
-
+  border:1px solid rgba(255,255,255,.25);
+  background:rgba(255,255,255,.08);
   box-shadow:
-    inset 0 1px
-    rgba(255,255,255,.17),
-
-    0 25px 70px
-    rgba(0,0,0,.25);
-
+    inset 0 1px rgba(255,255,255,.17),
+    0 25px 70px rgba(0,0,0,.25);
 }
 
 .design-glass .glass-panel{
@@ -1818,113 +1122,75 @@ input[type="range"]{
 }
 
 .design-glass .copy{
-
   left:9%;
   width:44%;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    SPOTLIGHT
-====================================================== */
+========================================================= */
 
 .spotlight{
-
   display:none;
-
   position:absolute;
-
   z-index:-3;
-
   right:7%;
   top:50%;
-
   width:46%;
   height:88%;
-
-  transform:
-    translateY(-50%);
-
+  transform:translateY(-50%);
   border-radius:50%;
-
   background:
     radial-gradient(
       ellipse,
-      rgba(255,255,255,.22) 0,
+      rgba(255,255,255,.22),
       rgba(255,255,255,.06) 34%,
       transparent 70%
     );
-
 }
 
 .design-spotlight .spotlight{
   display:block;
 }
 
-
-/* ======================================================
+/* =========================================================
    LUXURY
-====================================================== */
+========================================================= */
 
 .design-luxury .headline{
-
   font-family:
     Georgia,
     "Times New Roman",
     serif;
-
   font-weight:700;
-
   letter-spacing:-1px;
-
   text-transform:none;
-
 }
 
 .design-luxury .kicker{
   letter-spacing:4px;
 }
 
-.design-luxury .edge{
-  height:2px;
-}
-
-.design-luxury .frame{
-  inset:15px;
-}
-
-
-/* ======================================================
+/* =========================================================
    RACING
-====================================================== */
+========================================================= */
 
 .racing-stripe{
-
   display:none;
-
   position:absolute;
-
   z-index:-2;
-
   right:2%;
   top:-10%;
-
   width:34%;
   height:120%;
-
   opacity:.8;
-
-  transform:
-    skewX(-15deg);
-
+  transform:skewX(-15deg);
   background:
     repeating-linear-gradient(
       -17deg,
       var(--primary) 0 9px,
       transparent 9px 18px
     );
-
 }
 
 .design-racing .racing-stripe{
@@ -1932,64 +1198,46 @@ input[type="range"]{
 }
 
 .design-racing .headline{
-
   font-style:italic;
-
-  transform:
-    skewX(-5deg);
-
-  letter-spacing:-4px;
-
+  transform:skewX(-5deg);
 }
 
 .design-racing .copy{
   width:58%;
 }
 
-
-/* ======================================================
+/* =========================================================
    CARBON
-====================================================== */
+========================================================= */
 
 .carbon-pattern{
-
   display:none;
-
   position:absolute;
-
   inset:0;
-
   z-index:-4;
-
   opacity:.25;
-
   background:
-
     repeating-linear-gradient(
       45deg,
       rgba(255,255,255,.055) 0 2px,
       transparent 2px 9px
     ),
-
     repeating-linear-gradient(
       -45deg,
       rgba(255,255,255,.035) 0 2px,
       transparent 2px 9px
     );
-
 }
 
 .design-carbon .carbon-pattern{
   display:block;
 }
 
-
-/* ======================================================
+/* =========================================================
    FULL BLEED
-====================================================== */
+========================================================= */
 
 .design-fullbleed .overlay{
-
   background:
     linear-gradient(
       90deg,
@@ -1997,79 +1245,61 @@ input[type="range"]{
       rgba(0,0,0,.18),
       rgba(0,0,0,.36)
     );
-
 }
 
 .design-fullbleed .copy{
   width:62%;
 }
 
-
-/* ======================================================
+/* =========================================================
    EDITORIAL
-====================================================== */
+========================================================= */
+
+.design-editorial .headline{
+  font-family:
+    Georgia,
+    "Times New Roman",
+    serif;
+  font-weight:700;
+  letter-spacing:-1px;
+  text-transform:none;
+}
 
 .design-editorial .copy{
   width:57%;
 }
 
-.design-editorial .headline{
-
-  font-family:
-    Georgia,
-    "Times New Roman",
-    serif;
-
-  font-weight:700;
-
-  letter-spacing:-1px;
-
-  text-transform:none;
-
-}
-
-
-/* ======================================================
+/* =========================================================
    TECH
-====================================================== */
+========================================================= */
 
 .tech-lines{
-
   display:none;
-
   position:absolute;
-
   z-index:-1;
-
   right:0;
   top:0;
-
   width:56%;
   height:100%;
-
   background:
-
     linear-gradient(
       135deg,
       transparent 0 43%,
       var(--primary) 43.2% 43.5%,
       transparent 43.7%
     ),
-
     linear-gradient(
       135deg,
       transparent 0 55%,
       rgba(255,255,255,.2) 55.2% 55.5%,
       transparent 55.7%
     ),
-
     linear-gradient(
       135deg,
       transparent 0 67%,
       rgba(255,255,255,.1) 67.2% 67.5%,
       transparent 67.7%
     );
-
 }
 
 .design-tech .tech-lines{
@@ -2080,87 +1310,44 @@ input[type="range"]{
   width:52%;
 }
 
-
-/* ======================================================
-   EXPORT STATE
-====================================================== */
+/* =========================================================
+   EXPORT-SAFE
+========================================================= */
 
 .exporting{
-
   box-shadow:none !important;
-
-}
-
-.exporting .glass-panel{
-
-  backdrop-filter:none !important;
-
-  -webkit-backdrop-filter:none !important;
-
-  background:
-    rgba(255,255,255,.10) !important;
-
 }
 
 .exporting .glow{
   filter:none !important;
+  opacity:.22 !important;
+}
+
+.exporting .glass-panel{
+  backdrop-filter:none !important;
+  -webkit-backdrop-filter:none !important;
+  background:rgba(255,255,255,.09) !important;
 }
 
 .exporting .noise{
   display:none !important;
 }
 
-
-/*
-  IMPORTANT:
-
-  Tidak ada width 4000px di sini.
-
-  Export stage akan memakai ukuran
-  CSS preview yang sebenarnya.
-*/
-
-.exporting.canvas{
-
-  width:100% !important;
-  height:100% !important;
-
-  max-width:none !important;
-  min-width:0 !important;
-
-  aspect-ratio:auto !important;
-
-}
-
-
-/* ======================================================
-   EXPORT MODAL
-====================================================== */
+/* =========================================================
+   MODAL
+========================================================= */
 
 .export-modal{
-
   position:fixed;
-
   inset:0;
-
   z-index:999999;
-
   display:none;
-
   align-items:center;
   justify-content:center;
-
   padding:20px;
-
-  background:
-    rgba(0,0,0,.78);
-
-  backdrop-filter:
-    blur(12px);
-
-  -webkit-backdrop-filter:
-    blur(12px);
-
+  background:rgba(0,0,0,.78);
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
 }
 
 .export-modal.show{
@@ -2168,218 +1355,125 @@ input[type="range"]{
 }
 
 .export-card{
-
   width:min(520px,100%);
-
   padding:22px;
-
-  border:
-    1px solid
-    rgba(255,255,255,.12);
-
+  border:1px solid rgba(255,255,255,.12);
   border-radius:20px;
-
   background:
     linear-gradient(
       180deg,
       #171c22,
       #0d1116
     );
-
   box-shadow:
     0 35px 100px
     rgba(0,0,0,.65);
-
 }
 
 .export-head{
-
   display:flex;
-
   align-items:center;
   justify-content:space-between;
-
   gap:15px;
-
   padding-bottom:18px;
-
-  border-bottom:
-    1px solid
-    var(--ui-line);
-
+  border-bottom:1px solid var(--ui-line);
 }
 
 .export-title{
-
   font-size:15px;
-
   font-weight:1000;
-
   letter-spacing:1.5px;
-
 }
 
 .export-info{
-
   margin-top:5px;
-
   color:#818b96;
-
   font-size:9px;
-
 }
 
 .export-close{
-
   width:34px;
   height:34px;
-
-  border:
-    1px solid
-    #303842;
-
+  border:1px solid #303842;
   border-radius:9px;
-
   background:#151a20;
-
   color:#fff;
-
   font-size:22px;
-
-  line-height:1;
-
 }
 
 .export-options{
-
   display:grid;
-
-  grid-template-columns:
-    1fr 1fr;
-
+  grid-template-columns:1fr 1fr;
   gap:10px;
-
   margin-top:18px;
-
 }
 
 .export-option{
-
   min-width:0;
-
   padding:16px;
-
   text-align:left;
-
-  border:
-    1px solid
-    #303842;
-
+  border:1px solid #303842;
   border-radius:14px;
-
   background:#11161c;
-
   color:#fff;
-
   transition:.18s;
-
 }
 
 .export-option:hover{
-
-  transform:
-    translateY(-2px);
-
-  border-color:
-    var(--primary);
-
-  background:#151c17;
-
+  transform:translateY(-2px);
+  border-color:var(--primary);
 }
 
 .export-option:disabled{
-
   opacity:.45;
-
   cursor:wait;
-
-  transform:none;
-
 }
 
 .export-icon{
-
   width:48px;
   height:48px;
-
   display:grid;
   place-items:center;
-
   margin-bottom:13px;
-
   border-radius:11px;
-
   font-size:11px;
   font-weight:1000;
-
 }
 
 .export-icon.png{
-
   color:#101010;
-
   background:var(--primary);
-
 }
 
 .export-icon.pdf{
-
   color:#fff;
-
   background:#d93434;
-
 }
 
 .export-option-title{
-
   font-size:12px;
-
   font-weight:950;
-
 }
 
 .export-option-desc{
-
   margin-top:5px;
-
   color:#77818c;
-
   font-size:9px;
-
   line-height:1.5;
-
 }
 
 .export-progress{
-
-  min-height:17px;
-
+  min-height:18px;
   margin-top:15px;
-
   color:var(--primary);
-
   text-align:center;
-
   font-size:9px;
-
   font-weight:800;
-
 }
 
-
-/* ======================================================
+/* =========================================================
    RESPONSIVE
-====================================================== */
+========================================================= */
 
 @media(max-width:950px){
 
@@ -2388,67 +1482,27 @@ input[type="range"]{
   }
 
   .editor{
-
     position:relative;
-
-    top:auto;
-
     width:100%;
     height:auto;
-
-    max-height:none;
-
     border-right:0;
-
-    border-bottom:
-      1px solid
-      var(--ui-line);
-
+    border-bottom:1px solid var(--ui-line);
   }
 
   .stage{
-
-    width:100%;
-
     min-height:80vh;
-
   }
 
   .preview-area{
-
-    width:100%;
-    min-width:0;
-
-    padding:
-      25px
-      15px
-      40px;
-
-    overflow-x:hidden;
-    overflow-y:auto;
-
     align-items:flex-start;
-
+    padding:25px 15px 40px;
   }
 
   .preview-shell{
-
     width:100%;
-    min-width:0;
-    max-width:100%;
-
-  }
-
-  .canvas{
-
-    width:100%;
-    min-width:0;
-    max-width:100%;
-
   }
 
 }
-
 
 @media(max-width:600px){
 
@@ -2457,30 +1511,14 @@ input[type="range"]{
   }
 
   .stagebar{
-
     min-height:62px;
-    height:auto;
-
-    flex:0 0 auto;
-
-    padding:
-      13px
-      15px;
-
+    padding:13px 15px;
     gap:10px;
-
   }
 
   .stage-left{
-
     max-width:45%;
-
     line-height:1.3;
-
-  }
-
-  .stage-right{
-    gap:8px;
   }
 
   .preview-tools{
@@ -2488,27 +1526,10 @@ input[type="range"]{
   }
 
   .preview-area{
-
-    padding:
-      18px
-      10px
-      35px;
-
-  }
-
-  .preview-shell{
-
-    width:100%;
-    min-width:0;
-
-  }
-
-  .canvas{
-    width:100%;
+    padding:18px 10px 35px;
   }
 
 }
-
 
 @media(max-width:520px){
 
@@ -2521,12 +1542,9 @@ input[type="range"]{
 </style>
 </head>
 
-
 <body>
 
-
 <div class="app">
-
 
 <!-- ======================================================
      EDITOR
@@ -2534,981 +1552,639 @@ input[type="range"]{
 
 <aside class="editor">
 
+<div class="ui-brand">
 
-  <div class="ui-brand">
+  <div class="ui-brand-mark">B</div>
 
-    <div class="ui-brand-mark">
-      B
+  <div>
+    <div class="ui-brand-title">
+      PREMIUM BANNER STUDIO
     </div>
 
-    <div>
-
-      <div class="ui-brand-title">
-        PREMIUM BANNER STUDIO
-      </div>
-
-      <div class="ui-brand-sub">
-        AUTOMOTIVE • RETAIL • DISTRIBUTOR
-      </div>
-
+    <div class="ui-brand-sub">
+      AUTOMOTIVE • RETAIL • DISTRIBUTOR
     </div>
-
   </div>
-
-
-<!-- ======================================================
-     BRAND
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Brand Identity</strong>
-    <span>01</span>
-  </div>
-
-
-  <label>Nama toko / distributor</label>
-
-  <input
-    id="brandName"
-    value="NINE AUTOSERIES"
-    placeholder="Nama toko / distributor"
-  >
-
-
-  <label>Tagline / status</label>
-
-  <input
-    id="brandRole"
-    value="Official Distributor"
-    placeholder="Official Distributor"
-  >
-
-
-  <label>Nama sales</label>
-
-  <input
-    id="salesName"
-    value="IMAM_SALESFR"
-    placeholder="Nama sales"
-  >
-
-
-  <label>Jabatan</label>
-
-  <input
-    id="salesRole"
-    value="Sales Representative"
-    placeholder="Sales Representative"
-  >
-
-
-  <label>WhatsApp</label>
-
-  <input
-    id="phone"
-    value="08xxxxxxxxxx"
-    placeholder="08xxxxxxxxxx"
-  >
-
-
-  <label>Logo</label>
-
-  <label class="file">
-
-    + Upload Logo
-
-    <input
-      id="logo"
-      type="file"
-      accept="image/*"
-    >
-
-  </label>
-
-</section>
-
-
-<!-- ======================================================
-     CANVAS
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Canvas</strong>
-    <span>02</span>
-  </div>
-
-
-  <div class="ratio-grid">
-
-    <button class="ratio active" data-ratio="3/1">3 : 1</button>
-
-    <button class="ratio" data-ratio="4/1">4 : 1</button>
-
-    <button class="ratio" data-ratio="10/1">10 : 1</button>
-
-    <button class="ratio" data-ratio="16/9">16 : 9</button>
-
-    <button class="ratio" data-ratio="1/1">1 : 1</button>
-
-    <button class="ratio" data-ratio="4/3">4 : 3</button>
-
-    <button class="ratio" data-ratio="9/16">9 : 16</button>
-
-  </div>
-
-
-  <div class="row3">
-
-    <div>
-
-      <label>Width</label>
-
-      <input
-        id="width"
-        type="number"
-        value="300"
-        min="1"
-      >
-
-    </div>
-
-
-    <div>
-
-      <label>Height</label>
-
-      <input
-        id="height"
-        type="number"
-        value="100"
-        min="1"
-      >
-
-    </div>
-
-
-    <div>
-
-      <label>Unit</label>
-
-      <select id="unit">
-
-        <option value="cm">cm</option>
-
-        <option value="mm">mm</option>
-
-        <option value="px">px</option>
-
-        <option value="inch">inch</option>
-
-      </select>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     CONTENT
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Content</strong>
-    <span>03</span>
-  </div>
-
-
-  <label>Kicker</label>
-
-  <input
-    id="kicker"
-    value="PREMIUM AUTOMOTIVE"
-  >
-
-
-  <label>Headline</label>
-
-  <textarea id="headline">DRIVE YOUR NEXT</textarea>
-
-
-  <label>Subheadline</label>
-
-  <textarea id="subtitle">Temukan produk automotive terbaik dengan pelayanan profesional.</textarea>
-
-
-  <div class="row2">
-
-    <div>
-
-      <label>Promo / Badge</label>
-
-      <input
-        id="badge"
-        value="PROMO SPESIAL"
-      >
-
-    </div>
-
-
-    <div>
-
-      <label>CTA</label>
-
-      <input
-        id="cta"
-        value="HUBUNGI KAMI"
-      >
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     VISUAL
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Visual</strong>
-    <span>04</span>
-  </div>
-
-
-  <label>Foto background / kendaraan</label>
-
-  <label class="file">
-
-    + Upload Foto
-
-    <input
-      id="photo"
-      type="file"
-      accept="image/*"
-    >
-
-  </label>
-
-
-  <label>Zoom Foto</label>
-
-  <div class="range-row">
-
-    <input
-      id="zoom"
-      type="range"
-      min="100"
-      max="180"
-      value="100"
-    >
-
-    <div class="range-value" id="zoomVal">
-      100%
-    </div>
-
-  </div>
-
-
-  <label>Posisi X</label>
-
-  <div class="range-row">
-
-    <input
-      id="posX"
-      type="range"
-      min="-30"
-      max="30"
-      value="0"
-    >
-
-    <div class="range-value" id="posXVal">
-      0
-    </div>
-
-  </div>
-
-
-  <label>Posisi Y</label>
-
-  <div class="range-row">
-
-    <input
-      id="posY"
-      type="range"
-      min="-30"
-      max="30"
-      value="0"
-    >
-
-    <div class="range-value" id="posYVal">
-      0
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     BACKGROUND COLOR
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Background Color</strong>
-    <span>05</span>
-  </div>
-
-
-  <div class="color-field">
-
-    <input
-      id="bgColor"
-      type="color"
-      value="#090B0F"
-    >
-
-    <input
-      id="bgHex"
-      value="#090B0F"
-    >
-
-  </div>
-
-
-  <label>Palette Background</label>
-
-
-  <div class="palette-grid">
-
-    <div class="color-chip" data-bg="#050505" style="background:#050505">
-      <span>BLACK</span>
-    </div>
-
-    <div class="color-chip" data-bg="#111827" style="background:#111827">
-      <span>NAVY</span>
-    </div>
-
-    <div class="color-chip" data-bg="#1C1C1C" style="background:#1C1C1C">
-      <span>GRAPHITE</span>
-    </div>
-
-    <div class="color-chip" data-bg="#292524" style="background:#292524">
-      <span>CHARCOAL</span>
-    </div>
-
-    <div class="color-chip" data-bg="#FFFFFF" style="background:#FFFFFF">
-      <span style="color:#111">WHITE</span>
-    </div>
-
-    <div class="color-chip" data-bg="#172554" style="background:#172554">
-      <span>ROYAL</span>
-    </div>
-
-    <div class="color-chip" data-bg="#3F0D0D" style="background:#3F0D0D">
-      <span>BURGUNDY</span>
-    </div>
-
-    <div class="color-chip" data-bg="#431407" style="background:#431407">
-      <span>BROWN</span>
-    </div>
-
-    <div class="color-chip" data-bg="#052E16" style="background:#052E16">
-      <span>GREEN</span>
-    </div>
-
-    <div class="color-chip" data-bg="#0F172A" style="background:#0F172A">
-      <span>SLATE</span>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     ELEMENT COLORS
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Element Colors</strong>
-    <span>06</span>
-  </div>
-
-
-  <label>Primary / Main Accent</label>
-
-  <div class="color-field">
-
-    <input id="primary" type="color" value="#8CC63F">
-    <input id="primaryHex" value="#8CC63F">
-
-  </div>
-
-
-  <label>Secondary / Panel</label>
-
-  <div class="color-field">
-
-    <input id="secondary" type="color" value="#101419">
-    <input id="secondaryHex" value="#101419">
-
-  </div>
-
-
-  <label>Accent / Highlight</label>
-
-  <div class="color-field">
-
-    <input id="accent" type="color" value="#D9AD55">
-    <input id="accentHex" value="#D9AD55">
-
-  </div>
-
-
-  <label>Headline / Main Text</label>
-
-  <div class="color-field">
-
-    <input id="text" type="color" value="#FFFFFF">
-    <input id="textHex" value="#FFFFFF">
-
-  </div>
-
-
-  <label>Secondary Text</label>
-
-  <div class="color-field">
-
-    <input id="muted" type="color" value="#C4C9D0">
-    <input id="mutedHex" value="#C4C9D0">
-
-  </div>
-
-
-  <label>CTA Background</label>
-
-  <div class="color-field">
-
-    <input id="ctaColor" type="color" value="#8CC63F">
-    <input id="ctaColorHex" value="#8CC63F">
-
-  </div>
-
-
-  <label>CTA Text</label>
-
-  <div class="color-field">
-
-    <input id="ctaText" type="color" value="#101010">
-    <input id="ctaTextHex" value="#101010">
-
-  </div>
-
-
-  <label>Border / Line</label>
-
-  <div class="color-field">
-
-    <input id="border" type="color" value="#8CC63F">
-    <input id="borderHex" value="#8CC63F">
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     QUICK PALETTE
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Quick Palette</strong>
-    <span>07</span>
-  </div>
-
-
-  <div class="palette-grid">
-
-    <div
-      class="color-chip quick"
-      data-p="#8CC63F"
-      data-s="#101419"
-      data-a="#D9AD55"
-      data-t="#FFFFFF"
-      data-m="#C4C9D0"
-      style="background:linear-gradient(135deg,#8CC63F,#101419)"
-    >
-      <span>NINE</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#D9AD55"
-      data-s="#090909"
-      data-a="#FFFFFF"
-      data-t="#FFFFFF"
-      data-m="#CFCFCF"
-      style="background:linear-gradient(135deg,#D9AD55,#050505)"
-    >
-      <span>LUXURY</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#EF3D3D"
-      data-s="#111111"
-      data-a="#FFFFFF"
-      data-t="#FFFFFF"
-      data-m="#CCCCCC"
-      style="background:linear-gradient(135deg,#EF3D3D,#111111)"
-    >
-      <span>RACING</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#277CFF"
-      data-s="#07111F"
-      data-a="#00D7E9"
-      data-t="#FFFFFF"
-      data-m="#C7D6E9"
-      style="background:linear-gradient(135deg,#277CFF,#07111F)"
-    >
-      <span>TECH</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#A855F7"
-      data-s="#100819"
-      data-a="#00D7E9"
-      data-t="#FFFFFF"
-      data-m="#D8C7E8"
-      style="background:linear-gradient(135deg,#A855F7,#100819)"
-    >
-      <span>NEON</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#00B878"
-      data-s="#06130F"
-      data-a="#8CC63F"
-      data-t="#FFFFFF"
-      data-m="#BEDBD1"
-      style="background:linear-gradient(135deg,#00B878,#06130F)"
-    >
-      <span>EMERALD</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#FF7A18"
-      data-s="#17100A"
-      data-a="#FFD166"
-      data-t="#FFFFFF"
-      data-m="#E4C6A8"
-      style="background:linear-gradient(135deg,#FF7A18,#17100A)"
-    >
-      <span>ORANGE</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#B77A3B"
-      data-s="#160D07"
-      data-a="#E8C39E"
-      data-t="#FFFFFF"
-      data-m="#D0B9A5"
-      style="background:linear-gradient(135deg,#B77A3B,#160D07)"
-    >
-      <span>BRONZE</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#C7CCD3"
-      data-s="#181B20"
-      data-a="#FFFFFF"
-      data-t="#FFFFFF"
-      data-m="#B9BEC5"
-      style="background:linear-gradient(135deg,#C7CCD3,#181B20)"
-    >
-      <span>TITANIUM</span>
-    </div>
-
-
-    <div
-      class="color-chip quick"
-      data-p="#111111"
-      data-s="#FFFFFF"
-      data-a="#8CC63F"
-      data-t="#111111"
-      data-m="#555555"
-      style="background:linear-gradient(135deg,#111111,#FFFFFF)"
-    >
-      <span style="color:#111">MONO</span>
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     DESIGNS
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Premium Composition</strong>
-    <span>08</span>
-  </div>
-
-
-  <div class="design-grid">
-
-
-    <button class="design active" data-design="wave">
-
-      <div class="design-preview wave"></div>
-
-      <div class="design-name">
-        Premium Wave
-      </div>
-
-      <div class="design-desc">
-        Organic curved split
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="doublewave">
-
-      <div class="design-preview double"></div>
-
-      <div class="design-name">
-        Double Wave
-      </div>
-
-      <div class="design-desc">
-        Layered premium curve
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="angular">
-
-      <div class="design-preview angular"></div>
-
-      <div class="design-name">
-        Angular
-      </div>
-
-      <div class="design-desc">
-        Sharp automotive cut
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="split">
-
-      <div class="design-preview split"></div>
-
-      <div class="design-name">
-        Split
-      </div>
-
-      <div class="design-desc">
-        Balanced two panel
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="circle">
-
-      <div class="design-preview circle"></div>
-
-      <div class="design-name">
-        Circle Hero
-      </div>
-
-      <div class="design-desc">
-        Focal composition
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="glass">
-
-      <div class="design-preview glass"></div>
-
-      <div class="design-name">
-        Glass
-      </div>
-
-      <div class="design-desc">
-        Luxury glass panel
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="spotlight">
-
-      <div class="design-preview circle"></div>
-
-      <div class="design-name">
-        Spotlight
-      </div>
-
-      <div class="design-desc">
-        Product illumination
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="luxury">
-
-      <div class="design-preview"></div>
-
-      <div class="design-name">
-        Luxury
-      </div>
-
-      <div class="design-desc">
-        Editorial premium
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="racing">
-
-      <div class="design-preview racing"></div>
-
-      <div class="design-name">
-        Racing
-      </div>
-
-      <div class="design-desc">
-        Performance speed
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="carbon">
-
-      <div class="design-preview racing"></div>
-
-      <div class="design-name">
-        Dark Carbon
-      </div>
-
-      <div class="design-desc">
-        Technical texture
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="fullbleed">
-
-      <div class="design-preview"></div>
-
-      <div class="design-name">
-        Full Bleed
-      </div>
-
-      <div class="design-desc">
-        Image dominant
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="editorial">
-
-      <div class="design-preview"></div>
-
-      <div class="design-name">
-        Editorial
-      </div>
-
-      <div class="design-desc">
-        Magazine aesthetic
-      </div>
-
-    </button>
-
-
-    <button class="design" data-design="tech">
-
-      <div class="design-preview tech"></div>
-
-      <div class="design-name">
-        Tech
-      </div>
-
-      <div class="design-desc">
-        Digital performance
-      </div>
-
-    </button>
-
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     EFFECTS
-====================================================== -->
-
-<section class="section">
-
-  <div class="section-head">
-    <strong>Effects</strong>
-    <span>09</span>
-  </div>
-
-
-  <label>Overlay Left</label>
-
-  <div class="range-row">
-
-    <input
-      id="overlayLeft"
-      type="range"
-      min="0"
-      max="100"
-      value="92"
-    >
-
-    <div
-      class="range-value"
-      id="overlayLeftVal"
-    >
-      92
-    </div>
-
-  </div>
-
-
-  <label>Overlay Right</label>
-
-  <div class="range-row">
-
-    <input
-      id="overlayRight"
-      type="range"
-      min="0"
-      max="100"
-      value="30"
-    >
-
-    <div
-      class="range-value"
-      id="overlayRightVal"
-    >
-      30
-    </div>
-
-  </div>
-
-
-  <label>Pattern</label>
-
-  <div class="range-row">
-
-    <input
-      id="pattern"
-      type="range"
-      min="0"
-      max="50"
-      value="8"
-    >
-
-    <div
-      class="range-value"
-      id="patternVal"
-    >
-      8
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ======================================================
-     ACTIONS
-====================================================== -->
-
-<div class="actions">
-
-  <button
-    id="reset"
-    class="btn btn-dark"
-  >
-    RESET
-  </button>
-
-
-  <button
-    id="export"
-    class="btn btn-primary"
-  >
-    EXPORT
-  </button>
-
-
-  <button
-    id="random"
-    class="btn btn-dark btn-full"
-  >
-    ✦ RANDOM PREMIUM CONCEPT
-  </button>
 
 </div>
 
+<!-- BRAND -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Brand Identity</strong>
+  <span>01</span>
+</div>
+
+<label>Nama toko / distributor</label>
+
+<input
+  id="brandName"
+  value="NINE AUTOSERIES"
+  placeholder="Nama toko / distributor"
+>
+
+<label>Tagline / status</label>
+
+<input
+  id="brandRole"
+  value="Official Distributor"
+  placeholder="Official Distributor"
+>
+
+<label>Nama sales</label>
+
+<input
+  id="salesName"
+  value="IMAM_SALESFR"
+  placeholder="Nama sales"
+>
+
+<label>Jabatan</label>
+
+<input
+  id="salesRole"
+  value="Sales Representative"
+  placeholder="Sales Representative"
+>
+
+<label>WhatsApp</label>
+
+<input
+  id="phone"
+  value="08xxxxxxxxxx"
+  placeholder="08xxxxxxxxxx"
+>
+
+<label>Logo</label>
+
+<label class="file">
+  + Upload Logo
+  <input
+    id="logo"
+    type="file"
+    accept="image/*"
+  >
+</label>
+
+</section>
+
+<!-- CANVAS -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Canvas</strong>
+  <span>02</span>
+</div>
+
+<div class="ratio-grid">
+
+<button class="ratio active" data-ratio="3/1">3 : 1</button>
+<button class="ratio" data-ratio="4/1">4 : 1</button>
+<button class="ratio" data-ratio="10/1">10 : 1</button>
+<button class="ratio" data-ratio="16/9">16 : 9</button>
+<button class="ratio" data-ratio="1/1">1 : 1</button>
+<button class="ratio" data-ratio="4/3">4 : 3</button>
+<button class="ratio" data-ratio="9/16">9 : 16</button>
+
+</div>
+
+<div class="row3">
+
+<div>
+<label>Width</label>
+<input id="width" type="number" value="300" min="1">
+</div>
+
+<div>
+<label>Height</label>
+<input id="height" type="number" value="100" min="1">
+</div>
+
+<div>
+<label>Unit</label>
+
+<select id="unit">
+<option value="cm">cm</option>
+<option value="mm">mm</option>
+<option value="px">px</option>
+<option value="inch">inch</option>
+</select>
+
+</div>
+
+</div>
+
+</section>
+
+<!-- CONTENT -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Content</strong>
+  <span>03</span>
+</div>
+
+<label>Kicker</label>
+
+<input
+  id="kicker"
+  value="PREMIUM AUTOMOTIVE"
+>
+
+<label>Headline</label>
+
+<textarea id="headline">DRIVE YOUR NEXT</textarea>
+
+<label>Subheadline</label>
+
+<textarea id="subtitle">Temukan produk automotive terbaik dengan pelayanan profesional.</textarea>
+
+<div class="row2">
+
+<div>
+<label>Promo / Badge</label>
+<input id="badge" value="PROMO SPESIAL">
+</div>
+
+<div>
+<label>CTA</label>
+<input id="cta" value="HUBUNGI KAMI">
+</div>
+
+</div>
+
+</section>
+
+<!-- VISUAL -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Visual</strong>
+  <span>04</span>
+</div>
+
+<label>Foto background / kendaraan</label>
+
+<label class="file">
+  + Upload Foto
+  <input
+    id="photo"
+    type="file"
+    accept="image/*"
+  >
+</label>
+
+<label>Zoom Foto</label>
+
+<div class="range-row">
+
+<input
+  id="zoom"
+  type="range"
+  min="100"
+  max="180"
+  value="100"
+>
+
+<div class="range-value" id="zoomVal">100%</div>
+
+</div>
+
+<label>Posisi X</label>
+
+<div class="range-row">
+
+<input
+  id="posX"
+  type="range"
+  min="-30"
+  max="30"
+  value="0"
+>
+
+<div class="range-value" id="posXVal">0</div>
+
+</div>
+
+<label>Posisi Y</label>
+
+<div class="range-row">
+
+<input
+  id="posY"
+  type="range"
+  min="-30"
+  max="30"
+  value="0"
+>
+
+<div class="range-value" id="posYVal">0</div>
+
+</div>
+
+</section>
+
+<!-- BACKGROUND -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Background Color</strong>
+  <span>05</span>
+</div>
+
+<div class="color-field">
+
+<input
+  id="bgColor"
+  type="color"
+  value="#090B0F"
+>
+
+<input
+  id="bgHex"
+  value="#090B0F"
+>
+
+</div>
+
+<label>Palette Background</label>
+
+<div class="palette-grid">
+
+<div class="color-chip" data-bg="#050505" style="background:#050505">
+<span>BLACK</span>
+</div>
+
+<div class="color-chip" data-bg="#111827" style="background:#111827">
+<span>NAVY</span>
+</div>
+
+<div class="color-chip" data-bg="#1C1C1C" style="background:#1C1C1C">
+<span>GRAPHITE</span>
+</div>
+
+<div class="color-chip" data-bg="#292524" style="background:#292524">
+<span>CHARCOAL</span>
+</div>
+
+<div class="color-chip" data-bg="#FFFFFF" style="background:#FFFFFF">
+<span style="color:#111">WHITE</span>
+</div>
+
+<div class="color-chip" data-bg="#172554" style="background:#172554">
+<span>ROYAL</span>
+</div>
+
+<div class="color-chip" data-bg="#3F0D0D" style="background:#3F0D0D">
+<span>BURGUNDY</span>
+</div>
+
+<div class="color-chip" data-bg="#431407" style="background:#431407">
+<span>BROWN</span>
+</div>
+
+<div class="color-chip" data-bg="#052E16" style="background:#052E16">
+<span>GREEN</span>
+</div>
+
+<div class="color-chip" data-bg="#0F172A" style="background:#0F172A">
+<span>SLATE</span>
+</div>
+
+</div>
+
+</section>
+
+<!-- ELEMENT COLORS -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Element Colors</strong>
+  <span>06</span>
+</div>
+
+<label>Primary / Main Accent</label>
+
+<div class="color-field">
+<input id="primary" type="color" value="#8CC63F">
+<input id="primaryHex" value="#8CC63F">
+</div>
+
+<label>Secondary / Panel</label>
+
+<div class="color-field">
+<input id="secondary" type="color" value="#101419">
+<input id="secondaryHex" value="#101419">
+</div>
+
+<label>Accent / Highlight</label>
+
+<div class="color-field">
+<input id="accent" type="color" value="#D9AD55">
+<input id="accentHex" value="#D9AD55">
+</div>
+
+<label>Headline / Main Text</label>
+
+<div class="color-field">
+<input id="text" type="color" value="#FFFFFF">
+<input id="textHex" value="#FFFFFF">
+</div>
+
+<label>Secondary Text</label>
+
+<div class="color-field">
+<input id="muted" type="color" value="#C4C9D0">
+<input id="mutedHex" value="#C4C9D0">
+</div>
+
+<label>CTA Background</label>
+
+<div class="color-field">
+<input id="ctaColor" type="color" value="#8CC63F">
+<input id="ctaColorHex" value="#8CC63F">
+</div>
+
+<label>CTA Text</label>
+
+<div class="color-field">
+<input id="ctaText" type="color" value="#101010">
+<input id="ctaTextHex" value="#101010">
+</div>
+
+<label>Border / Line</label>
+
+<div class="color-field">
+<input id="border" type="color" value="#8CC63F">
+<input id="borderHex" value="#8CC63F">
+</div>
+
+</section>
+
+<!-- QUICK PALETTE -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Quick Palette</strong>
+  <span>07</span>
+</div>
+
+<div class="palette-grid">
+
+<div class="color-chip quick"
+data-p="#8CC63F"
+data-s="#101419"
+data-a="#D9AD55"
+data-t="#FFFFFF"
+data-m="#C4C9D0"
+style="background:linear-gradient(135deg,#8CC63F,#101419)">
+<span>NINE</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#D9AD55"
+data-s="#090909"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#CFCFCF"
+style="background:linear-gradient(135deg,#D9AD55,#090909)">
+<span>LUXURY</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#EF3D3D"
+data-s="#111111"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#CCCCCC"
+style="background:linear-gradient(135deg,#EF3D3D,#111111)">
+<span>RACING</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#277CFF"
+data-s="#07111F"
+data-a="#00D7E9"
+data-t="#FFFFFF"
+data-m="#C7D6E9"
+style="background:linear-gradient(135deg,#277CFF,#07111F)">
+<span>TECH</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#A855F7"
+data-s="#100819"
+data-a="#00D7E9"
+data-t="#FFFFFF"
+data-m="#D8C7E8"
+style="background:linear-gradient(135deg,#A855F7,#100819)">
+<span>NEON</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#00B878"
+data-s="#06130F"
+data-a="#8CC63F"
+data-t="#FFFFFF"
+data-m="#BEDBD1"
+style="background:linear-gradient(135deg,#00B878,#06130F)">
+<span>EMERALD</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#FF7A18"
+data-s="#17100A"
+data-a="#FFD166"
+data-t="#FFFFFF"
+data-m="#E4C6A8"
+style="background:linear-gradient(135deg,#FF7A18,#17100A)">
+<span>ORANGE</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#B77A3B"
+data-s="#160D07"
+data-a="#E8C39E"
+data-t="#FFFFFF"
+data-m="#D0B9A5"
+style="background:linear-gradient(135deg,#B77A3B,#160D07)">
+<span>BRONZE</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#C7CCD3"
+data-s="#181B20"
+data-a="#FFFFFF"
+data-t="#FFFFFF"
+data-m="#B9BEC5"
+style="background:linear-gradient(135deg,#C7CCD3,#181B20)">
+<span>TITANIUM</span>
+</div>
+
+<div class="color-chip quick"
+data-p="#111111"
+data-s="#FFFFFF"
+data-a="#8CC63F"
+data-t="#111111"
+data-m="#555555"
+style="background:linear-gradient(135deg,#111111,#FFFFFF)">
+<span style="color:#111">MONO</span>
+</div>
+
+</div>
+
+</section>
+
+<!-- DESIGNS -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Premium Composition</strong>
+  <span>08</span>
+</div>
+
+<div class="design-grid">
+
+<button class="design active" data-design="wave">
+<div class="design-preview wave"></div>
+<div class="design-name">Premium Wave</div>
+<div class="design-desc">Organic curved split</div>
+</button>
+
+<button class="design" data-design="doublewave">
+<div class="design-preview double"></div>
+<div class="design-name">Double Wave</div>
+<div class="design-desc">Layered premium curve</div>
+</button>
+
+<button class="design" data-design="angular">
+<div class="design-preview angular"></div>
+<div class="design-name">Angular</div>
+<div class="design-desc">Sharp automotive cut</div>
+</button>
+
+<button class="design" data-design="split">
+<div class="design-preview split"></div>
+<div class="design-name">Split</div>
+<div class="design-desc">Balanced two panel</div>
+</button>
+
+<button class="design" data-design="circle">
+<div class="design-preview circle"></div>
+<div class="design-name">Circle Hero</div>
+<div class="design-desc">Focal composition</div>
+</button>
+
+<button class="design" data-design="glass">
+<div class="design-preview glass"></div>
+<div class="design-name">Glass</div>
+<div class="design-desc">Luxury glass panel</div>
+</button>
+
+<button class="design" data-design="spotlight">
+<div class="design-preview circle"></div>
+<div class="design-name">Spotlight</div>
+<div class="design-desc">Product illumination</div>
+</button>
+
+<button class="design" data-design="luxury">
+<div class="design-preview"></div>
+<div class="design-name">Luxury</div>
+<div class="design-desc">Editorial premium</div>
+</button>
+
+<button class="design" data-design="racing">
+<div class="design-preview racing"></div>
+<div class="design-name">Racing</div>
+<div class="design-desc">Performance speed</div>
+</button>
+
+<button class="design" data-design="carbon">
+<div class="design-preview racing"></div>
+<div class="design-name">Dark Carbon</div>
+<div class="design-desc">Technical texture</div>
+</button>
+
+<button class="design" data-design="fullbleed">
+<div class="design-preview"></div>
+<div class="design-name">Full Bleed</div>
+<div class="design-desc">Image dominant</div>
+</button>
+
+<button class="design" data-design="editorial">
+<div class="design-preview"></div>
+<div class="design-name">Editorial</div>
+<div class="design-desc">Magazine aesthetic</div>
+</button>
+
+<button class="design" data-design="tech">
+<div class="design-preview tech"></div>
+<div class="design-name">Tech</div>
+<div class="design-desc">Digital performance</div>
+</button>
+
+</div>
+
+</section>
+
+<!-- EFFECTS -->
+
+<section class="section">
+
+<div class="section-head">
+  <strong>Effects</strong>
+  <span>09</span>
+</div>
+
+<label>Overlay Left</label>
+
+<div class="range-row">
+<input id="overlayLeft" type="range" min="0" max="100" value="92">
+<div class="range-value" id="overlayLeftVal">92</div>
+</div>
+
+<label>Overlay Right</label>
+
+<div class="range-row">
+<input id="overlayRight" type="range" min="0" max="100" value="30">
+<div class="range-value" id="overlayRightVal">30</div>
+</div>
+
+<label>Pattern</label>
+
+<div class="range-row">
+<input id="pattern" type="range" min="0" max="50" value="8">
+<div class="range-value" id="patternVal">8</div>
+</div>
+
+</section>
+
+<div class="actions">
+
+<button id="reset" class="btn btn-dark">
+RESET
+</button>
+
+<button id="export" class="btn btn-primary">
+EXPORT
+</button>
+
+<button id="random" class="btn btn-dark btn-full">
+✦ RANDOM PREMIUM CONCEPT
+</button>
+
+</div>
 
 </aside>
-
 
 <!-- ======================================================
      STAGE
@@ -3516,86 +2192,49 @@ input[type="range"]{
 
 <main class="stage">
 
-
 <header class="stagebar">
 
-  <div class="stage-left">
-    PREMIUM BANNER STUDIO / LIVE CANVAS
-  </div>
+<div class="stage-left">
+PREMIUM BANNER STUDIO / LIVE CANVAS
+</div>
 
+<div class="stage-right">
 
-  <div class="stage-right">
+<div class="preview-tools">
 
-    <div class="preview-tools">
+<button class="preview-tool" id="fitBtn">
+FIT
+</button>
 
-      <button
-        class="preview-tool"
-        id="fitBtn"
-      >
-        FIT
-      </button>
+<button class="preview-tool" id="zoom100Btn">
+100%
+</button>
 
+<button class="preview-tool" id="fullscreenBtn">
+FULL
+</button>
 
-      <button
-        class="preview-tool"
-        id="zoom100Btn"
-      >
-        100%
-      </button>
+</div>
 
+<span class="live">● LIVE</span>
 
-      <button
-        class="preview-tool"
-        id="fullscreenBtn"
-      >
-        FULL
-      </button>
+<span id="sizeText">
+300 × 100 cm
+</span>
 
-    </div>
-
-
-    <span class="live">
-      ● LIVE
-    </span>
-
-
-    <span id="sizeText">
-      300 × 100 cm
-    </span>
-
-  </div>
+</div>
 
 </header>
 
-
-<!-- ======================================================
-     PREVIEW
-====================================================== -->
-
-<section
-  class="preview-area"
-  id="previewArea"
->
-
+<section class="preview-area" id="previewArea">
 
 <div class="preview-shell">
 
-
-<div
-  id="canvas"
-  class="canvas design-wave"
->
-
+<div id="canvas" class="canvas design-wave">
 
 <div class="base-bg"></div>
 
-
-<img
-  id="canvasImage"
-  class="canvas-bg"
-  alt=""
->
-
+<img id="canvasImage" class="canvas-bg" alt="">
 
 <div class="overlay"></div>
 
@@ -3605,192 +2244,116 @@ input[type="range"]{
 
 <div class="glow"></div>
 
-
 <div class="angular-main"></div>
-
 <div class="angular-accent"></div>
-
 
 <div class="split-panel"></div>
 
-
 <div class="circle-panel"></div>
-
 
 <div class="spotlight"></div>
 
-
 <div class="glass-panel"></div>
-
 
 <div class="racing-stripe"></div>
 
-
 <div class="tech-lines"></div>
 
-
-<!-- ======================================================
-     WAVE
-====================================================== -->
-
 <svg
-  class="wave-svg"
-  viewBox="0 0 1200 400"
-  preserveAspectRatio="none"
+class="wave-svg"
+viewBox="0 0 1200 400"
+preserveAspectRatio="none"
 >
 
 <path
-  class="wave-accent"
-  d="
-    M690,0
-    C830,60 780,145 880,205
-    C980,265 1035,175 1200,225
-    L1200,400
-    L720,400
-    C790,330 760,260 665,205
-    C570,150 600,70 690,0 Z
-  "
-></path>
-
+class="wave-accent"
+d="
+M690,0
+C830,60 780,145 880,205
+C980,265 1035,175 1200,225
+L1200,400
+L720,400
+C790,330 760,260 665,205
+C570,150 600,70 690,0 Z
+">
+</path>
 
 <path
-  class="wave-main"
-  d="
-    M745,0
-    C900,65 835,150 940,215
-    C1040,275 1090,210 1200,255
-    L1200,400
-    L790,400
-    C850,330 820,270 730,215
-    C640,160 650,70 745,0 Z
-  "
-></path>
+class="wave-main"
+d="
+M745,0
+C900,65 835,150 940,215
+C1040,275 1090,210 1200,255
+L1200,400
+L790,400
+C850,330 820,270 730,215
+C640,160 650,70 745,0 Z
+">
+</path>
 
 </svg>
 
-
-<!-- ======================================================
-     BRAND
-====================================================== -->
-
 <div class="brand-lock">
 
-
 <img
-  id="logoPreview"
-  class="brand-logo"
-  alt="Logo"
+id="logoPreview"
+class="brand-logo"
+alt="Logo"
 >
 
-
-<div
-  id="brandOut"
-  class="brand-title"
->
-  NINE AUTOSERIES
+<div id="brandOut" class="brand-title">
+NINE AUTOSERIES
 </div>
 
-
-<div
-  id="roleOut"
-  class="brand-sub"
->
-  Official Distributor
+<div id="roleOut" class="brand-sub">
+Official Distributor
 </div>
 
-
 </div>
-
-
-<!-- ======================================================
-     COPY
-====================================================== -->
 
 <div class="copy">
 
-
-<div
-  id="kickerOut"
-  class="kicker"
->
-  PREMIUM AUTOMOTIVE
+<div id="kickerOut" class="kicker">
+PREMIUM AUTOMOTIVE
 </div>
 
-
-<div
-  id="headlineOut"
-  class="headline"
->
-  DRIVE YOUR NEXT
+<div id="headlineOut" class="headline">
+DRIVE YOUR NEXT
 </div>
 
-
-<div
-  id="subtitleOut"
-  class="subtitle"
->
-  Temukan produk automotive terbaik dengan pelayanan profesional.
+<div id="subtitleOut" class="subtitle">
+Temukan produk automotive terbaik dengan pelayanan profesional.
 </div>
-
 
 <div class="badges">
 
-
-<span
-  id="badgeOut"
-  class="badge"
->
-  PROMO SPESIAL
+<span id="badgeOut" class="badge">
+PROMO SPESIAL
 </span>
 
-
-<span
-  id="ctaOut"
-  class="cta"
->
-  HUBUNGI KAMI
+<span id="ctaOut" class="cta">
+HUBUNGI KAMI
 </span>
-
 
 </div>
 
-
 </div>
-
-
-<!-- ======================================================
-     CONTACT
-====================================================== -->
 
 <div class="contact">
 
-
-<div
-  id="salesOut"
-  class="contact-name"
->
-  IMAM_SALESFR
+<div id="salesOut" class="contact-name">
+IMAM_SALESFR
 </div>
 
-
-<div
-  id="salesRoleOut"
-  class="contact-role"
->
-  Sales Representative
+<div id="salesRoleOut" class="contact-role">
+Sales Representative
 </div>
 
-
-<div
-  id="phoneOut"
-  class="contact-phone"
->
-  08xxxxxxxxxx
+<div id="phoneOut" class="contact-phone">
+08xxxxxxxxxx
 </div>
 
-
 </div>
-
 
 <div class="edge"></div>
 
@@ -3798,158 +2361,109 @@ input[type="range"]{
 
 <div class="noise"></div>
 
-
 </div>
 
-
 </div>
-
 
 </section>
-
 
 </main>
 
 </div>
 
-
 <!-- ======================================================
      EXPORT MODAL
 ====================================================== -->
 
-<div
-  id="exportModal"
-  class="export-modal"
->
-
+<div id="exportModal" class="export-modal">
 
 <div class="export-card">
 
-
 <div class="export-head">
-
 
 <div>
 
 <div class="export-title">
-  EXPORT BANNER
+EXPORT BANNER
 </div>
 
-
-<div
-  id="exportInfo"
-  class="export-info"
->
-  Preparing...
+<div id="exportInfo" class="export-info">
+Ready
 </div>
-
 
 </div>
 
-
-<button
-  id="closeExport"
-  class="export-close"
->
-  ×
+<button id="closeExport" class="export-close">
+×
 </button>
 
-
 </div>
-
 
 <div class="export-options">
 
-
-<button
-  id="exportPNG"
-  class="export-option"
->
-
+<button id="exportPNG" class="export-option">
 
 <div class="export-icon png">
-  PNG
+PNG
 </div>
-
 
 <div class="export-option-title">
-  PNG HD
+PNG HD
 </div>
-
 
 <div class="export-option-desc">
-  Resolusi tinggi untuk digital,
-  upload, WhatsApp dan sosial media.
+Render langsung dari preview aktif,
+tanpa mengubah layout.
 </div>
-
 
 </button>
 
-
-<button
-  id="exportPDF"
-  class="export-option"
->
-
+<button id="exportPDF" class="export-option">
 
 <div class="export-icon pdf">
-  PDF
+PDF
 </div>
-
 
 <div class="export-option-title">
-  PDF PRINT
+PDF PRINT
 </div>
-
 
 <div class="export-option-desc">
-  Ukuran sesuai canvas untuk
-  percetakan dan produksi banner.
+Menggunakan master bitmap yang sama
+dengan PNG untuk hasil konsisten.
 </div>
-
 
 </button>
 
+</div>
+
+<div id="exportProgress" class="export-progress"></div>
 
 </div>
 
-
-<div
-  id="exportProgress"
-  class="export-progress"
-></div>
-
-
 </div>
-
-
-</div>
-
 
 <script>
 
-/* ======================================================
-   BASIC HELPERS
-====================================================== */
+/* =========================================================
+   DOM HELPER
+========================================================= */
 
 const $ = id =>
   document.getElementById(id);
 
-
 const canvas =
   $("canvas");
-
 
 const previewArea =
   $("previewArea");
 
 
-/* ======================================================
-   DESIGN LIST
-====================================================== */
+/* =========================================================
+   DESIGNS
+========================================================= */
 
 const designs = [
-
   "wave",
   "doublewave",
   "angular",
@@ -3963,45 +2477,43 @@ const designs = [
   "fullbleed",
   "editorial",
   "tech"
-
 ];
 
 
-/* ======================================================
+/* =========================================================
    TEXT BINDINGS
-====================================================== */
+========================================================= */
 
 const bindings = {
-
   brandName:"brandOut",
   brandRole:"roleOut",
-
   salesName:"salesOut",
   salesRole:"salesRoleOut",
-
   phone:"phoneOut",
-
   kicker:"kickerOut",
   headline:"headlineOut",
-
   subtitle:"subtitleOut",
-
   badge:"badgeOut",
   cta:"ctaOut"
-
 };
-
 
 Object.entries(bindings).forEach(
   ([inputId,outputId]) => {
 
-    $(inputId).addEventListener(
+    const input =
+      $(inputId);
+
+    const output =
+      $(outputId);
+
+    if(!input || !output)
+      return;
+
+    input.addEventListener(
       "input",
       () => {
-
-        $(outputId).textContent =
-          $(inputId).value;
-
+        output.textContent =
+          input.value;
       }
     );
 
@@ -4009,9 +2521,9 @@ Object.entries(bindings).forEach(
 );
 
 
-/* ======================================================
+/* =========================================================
    SIZE
-====================================================== */
+========================================================= */
 
 function updateSize(){
 
@@ -4021,26 +2533,59 @@ function updateSize(){
       Number($("width").value) || 1
     );
 
-
   const h =
     Math.max(
       1,
       Number($("height").value) || 1
     );
 
-
   const unit =
     $("unit").value;
 
-
   canvas.style.aspectRatio =
     `${w}/${h}`;
-
 
   $("sizeText").textContent =
     `${w} × ${h} ${unit}`;
 
 }
+
+
+/* =========================================================
+   RATIO
+========================================================= */
+
+document
+.querySelectorAll(".ratio")
+.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    () => {
+
+      const parts =
+        button.dataset.ratio.split("/");
+
+      $("width").value =
+        parts[0];
+
+      $("height").value =
+        parts[1];
+
+      document
+      .querySelectorAll(".ratio")
+      .forEach(x =>
+        x.classList.remove("active")
+      );
+
+      button.classList.add("active");
+
+      updateSize();
+
+    }
+  );
+
+});
 
 
 $("width").addEventListener(
@@ -4059,62 +2604,9 @@ $("unit").addEventListener(
 );
 
 
-/* ======================================================
-   RATIO
-====================================================== */
-
-document.querySelectorAll(
-  ".ratio"
-).forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        const ratio =
-          button.dataset.ratio;
-
-
-        const parts =
-          ratio.split("/");
-
-
-        $("width").value =
-          parts[0];
-
-
-        $("height").value =
-          parts[1];
-
-
-        document
-          .querySelectorAll(".ratio")
-          .forEach(
-            item =>
-              item.classList.remove(
-                "active"
-              )
-          );
-
-
-        button.classList.add(
-          "active"
-        );
-
-
-        updateSize();
-
-      }
-    );
-
-  }
-);
-
-
-/* ======================================================
-   IMAGE UPLOAD
-====================================================== */
+/* =========================================================
+   FILES
+========================================================= */
 
 let photoURL = null;
 let logoURL = null;
@@ -4125,22 +2617,17 @@ $("photo").addEventListener(
   event => {
 
     const file =
-      event.target.files?.[0];
-
+      event.target.files &&
+      event.target.files[0];
 
     if(!file)
       return;
 
-
     if(photoURL)
-      URL.revokeObjectURL(
-        photoURL
-      );
-
+      URL.revokeObjectURL(photoURL);
 
     photoURL =
       URL.createObjectURL(file);
-
 
     $("canvasImage").src =
       photoURL;
@@ -4154,26 +2641,20 @@ $("logo").addEventListener(
   event => {
 
     const file =
-      event.target.files?.[0];
-
+      event.target.files &&
+      event.target.files[0];
 
     if(!file)
       return;
 
-
     if(logoURL)
-      URL.revokeObjectURL(
-        logoURL
-      );
-
+      URL.revokeObjectURL(logoURL);
 
     logoURL =
       URL.createObjectURL(file);
 
-
     $("logoPreview").src =
       logoURL;
-
 
     $("logoPreview").style.display =
       "block";
@@ -4182,32 +2663,39 @@ $("logo").addEventListener(
 );
 
 
-/* ======================================================
+/* =========================================================
    RANGES
-====================================================== */
+========================================================= */
 
 function bindRange(
   inputId,
-  cssVariable,
+  variable,
   outputId,
   suffix=""
 ){
 
-  $(inputId).addEventListener(
+  const input =
+    $(inputId);
+
+  const output =
+    $(outputId);
+
+  if(!input || !output)
+    return;
+
+  input.addEventListener(
     "input",
-    event => {
+    () => {
 
       const value =
-        event.target.value;
-
+        input.value;
 
       canvas.style.setProperty(
-        cssVariable,
+        variable,
         value
       );
 
-
-      $(outputId).textContent =
+      output.textContent =
         value + suffix;
 
     }
@@ -4223,13 +2711,11 @@ bindRange(
   "%"
 );
 
-
 bindRange(
   "posX",
   "--imgX",
   "posXVal"
 );
-
 
 bindRange(
   "posY",
@@ -4238,124 +2724,107 @@ bindRange(
 );
 
 
-/* ======================================================
-   EFFECTS
-====================================================== */
+bindRange(
+  "overlayLeft",
+  "--overlayLeft",
+  "overlayLeftVal"
+);
+
+bindRange(
+  "overlayRight",
+  "--overlayRight",
+  "overlayRightVal"
+);
+
+bindRange(
+  "pattern",
+  "--patternOpacity",
+  "patternVal"
+);
+
+
+/* Fix range opacity values */
 
 $("overlayLeft").addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(event.target.value);
-
+  () => {
 
     canvas.style.setProperty(
       "--overlayLeft",
-      value / 100
+      Number($("overlayLeft").value) / 100
     );
-
-
-    $("overlayLeftVal").textContent =
-      value;
 
   }
 );
-
 
 $("overlayRight").addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(event.target.value);
-
+  () => {
 
     canvas.style.setProperty(
       "--overlayRight",
-      value / 100
+      Number($("overlayRight").value) / 100
     );
-
-
-    $("overlayRightVal").textContent =
-      value;
 
   }
 );
-
 
 $("pattern").addEventListener(
   "input",
-  event => {
-
-    const value =
-      Number(event.target.value);
-
+  () => {
 
     canvas.style.setProperty(
       "--patternOpacity",
-      value / 100
+      Number($("pattern").value) / 100
     );
-
-
-    $("patternVal").textContent =
-      value;
 
   }
 );
 
 
-/* ======================================================
-   COLOR ENGINE
-====================================================== */
+/* =========================================================
+   COLORS
+========================================================= */
 
-const colors = [
-
+const colorBindings = [
   ["bgColor","bgHex","--bg"],
-
   ["primary","primaryHex","--primary"],
-
   ["secondary","secondaryHex","--secondary"],
-
   ["accent","accentHex","--accent"],
-
   ["text","textHex","--text"],
-
   ["muted","mutedHex","--muted"],
-
   ["ctaColor","ctaColorHex","--cta"],
-
   ["ctaText","ctaTextHex","--ctaText"],
-
   ["border","borderHex","--border"]
-
 ];
 
 
-function isHex(value){
-
-  return /^#[0-9A-Fa-f]{6}$/
-    .test(value);
-
+function validHex(value){
+  return /^#[0-9A-Fa-f]{6}$/.test(value);
 }
 
 
-colors.forEach(
+colorBindings.forEach(
   ([pickerId,hexId,variable]) => {
 
+    const picker =
+      $(pickerId);
 
-    $(pickerId).addEventListener(
+    const hex =
+      $(hexId);
+
+    if(!picker || !hex)
+      return;
+
+    picker.addEventListener(
       "input",
-      event => {
+      () => {
 
         const value =
-          event.target.value
-          .toUpperCase();
+          picker.value.toUpperCase();
 
-
-        $(hexId).value =
+        hex.value =
           value;
-
 
         canvas.style.setProperty(
           variable,
@@ -4365,40 +2834,30 @@ colors.forEach(
       }
     );
 
-
-    $(hexId).addEventListener(
+    hex.addEventListener(
       "change",
-      event => {
+      () => {
 
         let value =
-          event.target.value
-            .trim()
-            .toUpperCase();
-
+          hex.value.trim().toUpperCase();
 
         if(!value.startsWith("#"))
           value = "#" + value;
 
+        if(!validHex(value)){
 
-        if(!isHex(value)){
-
-          event.target.value =
-            $(pickerId)
-              .value
-              .toUpperCase();
+          hex.value =
+            picker.value.toUpperCase();
 
           return;
 
         }
 
-
-        $(pickerId).value =
+        picker.value =
           value;
 
-
-        event.target.value =
+        hex.value =
           value;
-
 
         canvas.style.setProperty(
           variable,
@@ -4412,78 +2871,34 @@ colors.forEach(
 );
 
 
-/* ======================================================
-   BACKGROUND PALETTE
-====================================================== */
-
-document.querySelectorAll(
-  "[data-bg]"
-).forEach(
-  chip => {
-
-    chip.addEventListener(
-      "click",
-      () => {
-
-        const color =
-          chip.dataset.bg
-            .toUpperCase();
-
-
-        $("bgColor").value =
-          color;
-
-        $("bgHex").value =
-          color;
-
-
-        canvas.style.setProperty(
-          "--bg",
-          color
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* ======================================================
-   QUICK PALETTE
-====================================================== */
+/* =========================================================
+   SET COLOR
+========================================================= */
 
 function setColor(
   id,
-  color
+  value
 ){
 
   const picker =
     $(id);
 
-
   const hex =
     $(id + "Hex");
-
 
   if(!picker || !hex)
     return;
 
-
-  const value =
-    color.toUpperCase();
-
+  value =
+    String(value).toUpperCase();
 
   picker.value =
     value;
 
-
   hex.value =
     value;
 
-
   const map = {
-
     bgColor:"--bg",
     primary:"--primary",
     secondary:"--secondary",
@@ -4493,72 +2908,99 @@ function setColor(
     ctaColor:"--cta",
     ctaText:"--ctaText",
     border:"--border"
-
   };
 
+  if(map[id]){
 
-  canvas.style.setProperty(
-    map[id],
-    value
-  );
+    canvas.style.setProperty(
+      map[id],
+      value
+    );
+
+  }
 
 }
 
 
-document.querySelectorAll(
-  ".quick"
-).forEach(
-  palette => {
+/* =========================================================
+   BG PALETTE
+========================================================= */
 
-    palette.addEventListener(
-      "click",
-      () => {
+document
+.querySelectorAll("[data-bg]")
+.forEach(chip => {
 
-        setColor(
-          "primary",
-          palette.dataset.p
-        );
+  chip.addEventListener(
+    "click",
+    () => {
 
-        setColor(
-          "secondary",
-          palette.dataset.s
-        );
+      setColor(
+        "bgColor",
+        chip.dataset.bg
+      );
 
-        setColor(
-          "accent",
-          palette.dataset.a
-        );
+    }
+  );
 
-        setColor(
-          "text",
-          palette.dataset.t
-        );
-
-        setColor(
-          "muted",
-          palette.dataset.m
-        );
-
-        setColor(
-          "ctaColor",
-          palette.dataset.p
-        );
-
-        setColor(
-          "border",
-          palette.dataset.p
-        );
-
-      }
-    );
-
-  }
-);
+});
 
 
-/* ======================================================
-   DESIGN ENGINE
-====================================================== */
+/* =========================================================
+   QUICK PALETTE
+========================================================= */
+
+document
+.querySelectorAll(".quick")
+.forEach(chip => {
+
+  chip.addEventListener(
+    "click",
+    () => {
+
+      setColor(
+        "primary",
+        chip.dataset.p
+      );
+
+      setColor(
+        "secondary",
+        chip.dataset.s
+      );
+
+      setColor(
+        "accent",
+        chip.dataset.a
+      );
+
+      setColor(
+        "text",
+        chip.dataset.t
+      );
+
+      setColor(
+        "muted",
+        chip.dataset.m
+      );
+
+      setColor(
+        "ctaColor",
+        chip.dataset.p
+      );
+
+      setColor(
+        "border",
+        chip.dataset.p
+      );
+
+    }
+  );
+
+});
+
+
+/* =========================================================
+   DESIGN
+========================================================= */
 
 function setDesign(name){
 
@@ -4572,51 +3014,45 @@ function setDesign(name){
     }
   );
 
-
   canvas.classList.add(
     "design-" + name
   );
 
+  document
+  .querySelectorAll(".design")
+  .forEach(button => {
 
-  document.querySelectorAll(
-    ".design"
-  ).forEach(
-    button => {
+    button.classList.toggle(
+      "active",
+      button.dataset.design === name
+    );
 
-      button.classList.toggle(
-        "active",
-        button.dataset.design === name
+  });
+
+}
+
+
+document
+.querySelectorAll(".design")
+.forEach(button => {
+
+  button.addEventListener(
+    "click",
+    () => {
+
+      setDesign(
+        button.dataset.design
       );
 
     }
   );
 
-}
+});
 
 
-document.querySelectorAll(
-  ".design"
-).forEach(
-  button => {
-
-    button.addEventListener(
-      "click",
-      () => {
-
-        setDesign(
-          button.dataset.design
-        );
-
-      }
-    );
-
-  }
-);
-
-
-/* ======================================================
+/* =========================================================
    PREVIEW CONTROLS
-====================================================== */
+========================================================= */
 
 $("fitBtn").addEventListener(
   "click",
@@ -4654,9 +3090,9 @@ $("fullscreenBtn").addEventListener(
 );
 
 
-/* ======================================================
-   RANDOM PALETTES
-====================================================== */
+/* =========================================================
+   RANDOM
+========================================================= */
 
 const randomPalettes = [
 
@@ -4747,42 +3183,13 @@ $("random").addEventListener(
         )
       ];
 
-
-    setColor(
-      "primary",
-      palette.p
-    );
-
-    setColor(
-      "secondary",
-      palette.s
-    );
-
-    setColor(
-      "accent",
-      palette.a
-    );
-
-    setColor(
-      "text",
-      palette.t
-    );
-
-    setColor(
-      "muted",
-      palette.m
-    );
-
-    setColor(
-      "ctaColor",
-      palette.p
-    );
-
-    setColor(
-      "border",
-      palette.p
-    );
-
+    setColor("primary",palette.p);
+    setColor("secondary",palette.s);
+    setColor("accent",palette.a);
+    setColor("text",palette.t);
+    setColor("muted",palette.m);
+    setColor("ctaColor",palette.p);
+    setColor("border",palette.p);
 
     const design =
       designs[
@@ -4792,222 +3199,111 @@ $("random").addEventListener(
         )
       ];
 
-
     setDesign(design);
 
   }
 );
 
 
-/* ======================================================
+/* =========================================================
    RESET
-====================================================== */
+========================================================= */
 
-function resetStudio(){
+$("reset").addEventListener(
+  "click",
+  () => {
 
-  $("brandName").value =
-    "NINE AUTOSERIES";
+    const defaults = {
 
-  $("brandRole").value =
-    "Official Distributor";
+      brandName:"NINE AUTOSERIES",
+      brandRole:"Official Distributor",
+      salesName:"IMAM_SALESFR",
+      salesRole:"Sales Representative",
+      phone:"08xxxxxxxxxx",
 
-  $("salesName").value =
-    "IMAM_SALESFR";
+      kicker:"PREMIUM AUTOMOTIVE",
+      headline:"DRIVE YOUR NEXT",
+      subtitle:
+        "Temukan produk automotive terbaik dengan pelayanan profesional.",
+      badge:"PROMO SPESIAL",
+      cta:"HUBUNGI KAMI"
 
-  $("salesRole").value =
-    "Sales Representative";
+    };
 
-  $("phone").value =
-    "08xxxxxxxxxx";
-
-
-  $("kicker").value =
-    "PREMIUM AUTOMOTIVE";
-
-  $("headline").value =
-    "DRIVE YOUR NEXT";
-
-  $("subtitle").value =
-    "Temukan produk automotive terbaik dengan pelayanan profesional.";
-
-  $("badge").value =
-    "PROMO SPESIAL";
-
-  $("cta").value =
-    "HUBUNGI KAMI";
-
-
-  Object.entries(bindings)
+    Object.entries(defaults)
     .forEach(
-      ([inputId,outputId]) => {
+      ([id,value]) => {
 
-        $(outputId).textContent =
-          $(inputId).value;
+        if($(id))
+          $(id).value =
+            value;
+
+        if(bindings[id] && $(bindings[id]))
+          $(bindings[id]).textContent =
+            value;
 
       }
     );
 
+    setColor("bgColor","#090B0F");
+    setColor("primary","#8CC63F");
+    setColor("secondary","#101419");
+    setColor("accent","#D9AD55");
+    setColor("text","#FFFFFF");
+    setColor("muted","#C4C9D0");
+    setColor("ctaColor","#8CC63F");
+    setColor("ctaText","#101010");
+    setColor("border","#8CC63F");
 
-  $("width").value =
-    300;
+    $("width").value = 300;
+    $("height").value = 100;
+    $("unit").value = "cm";
 
-  $("height").value =
-    100;
+    $("zoom").value = 100;
+    $("posX").value = 0;
+    $("posY").value = 0;
 
-  $("unit").value =
-    "cm";
+    $("overlayLeft").value = 92;
+    $("overlayRight").value = 30;
+    $("pattern").value = 8;
 
+    canvas.style.setProperty("--imgZoom",100);
+    canvas.style.setProperty("--imgX",0);
+    canvas.style.setProperty("--imgY",0);
+    canvas.style.setProperty("--overlayLeft",.92);
+    canvas.style.setProperty("--overlayRight",.30);
+    canvas.style.setProperty("--patternOpacity",.08);
 
-  document
+    $("zoomVal").textContent = "100%";
+    $("posXVal").textContent = "0";
+    $("posYVal").textContent = "0";
+    $("overlayLeftVal").textContent = "92";
+    $("overlayRightVal").textContent = "30";
+    $("patternVal").textContent = "8";
+
+    document
     .querySelectorAll(".ratio")
-    .forEach(
-      x =>
-        x.classList.remove("active")
+    .forEach(x =>
+      x.classList.remove("active")
     );
 
-
-  document
+    document
     .querySelector(
       '.ratio[data-ratio="3/1"]'
     )
     ?.classList.add("active");
 
+    setDesign("wave");
 
-  $("zoom").value =
-    100;
+    updateSize();
 
-  $("posX").value =
-    0;
-
-  $("posY").value =
-    0;
-
-
-  canvas.style.setProperty(
-    "--imgZoom",
-    100
-  );
-
-  canvas.style.setProperty(
-    "--imgX",
-    0
-  );
-
-  canvas.style.setProperty(
-    "--imgY",
-    0
-  );
-
-
-  $("zoomVal").textContent =
-    "100%";
-
-  $("posXVal").textContent =
-    "0";
-
-  $("posYVal").textContent =
-    "0";
-
-
-  $("overlayLeft").value =
-    92;
-
-  $("overlayRight").value =
-    30;
-
-  $("pattern").value =
-    8;
-
-
-  canvas.style.setProperty(
-    "--overlayLeft",
-    .92
-  );
-
-  canvas.style.setProperty(
-    "--overlayRight",
-    .30
-  );
-
-  canvas.style.setProperty(
-    "--patternOpacity",
-    .08
-  );
-
-
-  $("overlayLeftVal").textContent =
-    "92";
-
-  $("overlayRightVal").textContent =
-    "30";
-
-  $("patternVal").textContent =
-    "8";
-
-
-  setColor(
-    "bgColor",
-    "#090B0F"
-  );
-
-  setColor(
-    "primary",
-    "#8CC63F"
-  );
-
-  setColor(
-    "secondary",
-    "#101419"
-  );
-
-  setColor(
-    "accent",
-    "#D9AD55"
-  );
-
-  setColor(
-    "text",
-    "#FFFFFF"
-  );
-
-  setColor(
-    "muted",
-    "#C4C9D0"
-  );
-
-  setColor(
-    "ctaColor",
-    "#8CC63F"
-  );
-
-  setColor(
-    "ctaText",
-    "#101010"
-  );
-
-  setColor(
-    "border",
-    "#8CC63F"
-  );
-
-
-  setDesign("wave");
-
-
-  updateSize();
-
-}
-
-
-$("reset").addEventListener(
-  "click",
-  resetStudio
+  }
 );
 
 
-/* ======================================================
-   EXPORT UI
-====================================================== */
+/* =========================================================
+   EXPORT MODAL
+========================================================= */
 
 const exportModal =
   $("exportModal");
@@ -5021,23 +3317,20 @@ const exportProgress =
 
 function openExport(){
 
-  const w =
+  const width =
     Number($("width").value) || 300;
 
-  const h =
+  const height =
     Number($("height").value) || 100;
 
   const unit =
     $("unit").value;
 
-
   exportInfo.textContent =
-    `${w} × ${h} ${unit} • preview exact`;
-
+    `${width} × ${height} ${unit} • MASTER PREVIEW`;
 
   exportProgress.textContent =
     "";
-
 
   exportModal.classList.add(
     "show"
@@ -5060,12 +3353,10 @@ $("export").addEventListener(
   openExport
 );
 
-
 $("closeExport").addEventListener(
   "click",
   closeExport
 );
-
 
 exportModal.addEventListener(
   "click",
@@ -5083,394 +3374,11 @@ exportModal.addEventListener(
 );
 
 
-/* ======================================================
-   WAIT FOR IMAGE
-====================================================== */
-
-function waitImage(img){
-
-  return new Promise(
-    resolve => {
-
-      if(
-        !img ||
-        !img.src
-      ){
-
-        resolve();
-        return;
-
-      }
-
-
-      if(img.complete){
-
-        resolve();
-        return;
-
-      }
-
-
-      const done =
-        () => resolve();
-
-
-      img.addEventListener(
-        "load",
-        done,
-        {once:true}
-      );
-
-      img.addEventListener(
-        "error",
-        done,
-        {once:true}
-      );
-
-
-      setTimeout(
-        resolve,
-        15000
-      );
-
-    }
-  );
-
-}
-
-
-/* ======================================================
-   PREVIEW DIMENSIONS
-====================================================== */
-
-function getPreviewSize(){
-
-  const rect =
-    canvas.getBoundingClientRect();
-
-
-  return {
-
-    width:
-      Math.max(
-        1,
-        Math.round(rect.width)
-      ),
-
-    height:
-      Math.max(
-        1,
-        Math.round(rect.height)
-      )
-
-  };
-
-}
-
-
-/* ======================================================
-   SAFE CLEANUP
-======================================================
-
-   IMPORTANT:
-
-   Tidak menggunakan:
-   node.remove()
-   parent.removeChild(node)
-
-   Kita hanya detach dengan cara aman
-   apabila memang masih punya parent.
-====================================================== */
-
-function cleanupExportStage(stage){
-
-  try{
-
-    if(
-      stage &&
-      stage.parentNode
-    ){
-
-      stage.parentNode.innerHTML =
-        "";
-
-    }
-
-  }catch(error){
-
-    console.warn(
-      "Export cleanup skipped:",
-      error
-    );
-
-  }
-
-}
-
-
-/* ======================================================
-   CREATE EXPORT STAGE
-====================================================== */
-
-async function createExportStage(){
-
-  const size =
-    getPreviewSize();
-
-
-  /*
-    Wrapper berada jauh di luar viewport,
-    tetapi TETAP visible untuk html2canvas.
-
-    Tidak menggunakan opacity:0.
-  */
-
-  const stage =
-    document.createElement(
-      "div"
-    );
-
-
-  stage.setAttribute(
-    "data-export-stage",
-    "true"
-  );
-
-
-  stage.style.position =
-    "fixed";
-
-  stage.style.left =
-    "-10000px";
-
-  stage.style.top =
-    "0";
-
-  stage.style.width =
-    size.width + "px";
-
-  stage.style.height =
-    size.height + "px";
-
-  stage.style.overflow =
-    "hidden";
-
-  stage.style.pointerEvents =
-    "none";
-
-  stage.style.zIndex =
-    "2147483000";
-
-  stage.style.background =
-    "transparent";
-
-
-  const clone =
-    canvas.cloneNode(true);
-
-
-  clone.removeAttribute(
-    "id"
-  );
-
-
-  clone.style.width =
-    size.width + "px";
-
-  clone.style.height =
-    size.height + "px";
-
-  clone.style.maxWidth =
-    "none";
-
-  clone.style.minWidth =
-    "0";
-
-  clone.style.position =
-    "relative";
-
-  clone.style.left =
-    "0";
-
-  clone.style.top =
-    "0";
-
-  clone.style.margin =
-    "0";
-
-  clone.style.transform =
-    "none";
-
-  clone.classList.add(
-    "exporting"
-  );
-
-
-  /*
-    Copy computed CSS custom properties.
-  */
-
-  const computed =
-    getComputedStyle(canvas);
-
-
-  const vars = [
-
-    "--bg",
-    "--primary",
-    "--secondary",
-    "--accent",
-
-    "--text",
-    "--muted",
-
-    "--cta",
-    "--ctaText",
-    "--border",
-
-    "--imgZoom",
-    "--imgX",
-    "--imgY",
-
-    "--overlayLeft",
-    "--overlayRight",
-
-    "--patternOpacity"
-
-  ];
-
-
-  vars.forEach(
-    variable => {
-
-      clone.style.setProperty(
-        variable,
-        computed.getPropertyValue(
-          variable
-        )
-      );
-
-    }
-  );
-
-
-  /*
-    Copy exact inline state yang penting.
-  */
-
-  const cloneImage =
-    clone.querySelector(
-      "#canvasImage"
-    );
-
-
-  const sourceImage =
-    $("canvasImage");
-
-
-  if(
-    cloneImage &&
-    sourceImage
-  ){
-
-    cloneImage.src =
-      sourceImage.src;
-
-  }
-
-
-  const cloneLogo =
-    clone.querySelector(
-      "#logoPreview"
-    );
-
-
-  const sourceLogo =
-    $("logoPreview");
-
-
-  if(
-    cloneLogo &&
-    sourceLogo
-  ){
-
-    cloneLogo.src =
-      sourceLogo.src;
-
-    cloneLogo.style.display =
-      sourceLogo.style.display;
-
-  }
-
-
-  stage.appendChild(
-    clone
-  );
-
-
-  document.body.appendChild(
-    stage
-  );
-
-
-  /*
-    Wait until images are ready.
-  */
-
-  const images =
-    stage.querySelectorAll(
-      "img"
-    );
-
-
-  await Promise.all(
-    [...images].map(
-      waitImage
-    )
-  );
-
-
-  /*
-    Force browser layout.
-  */
-
-  void clone.offsetWidth;
-
-  void clone.getBoundingClientRect();
-
-
-  await new Promise(
-    resolve =>
-      requestAnimationFrame(
-        () =>
-          requestAnimationFrame(
-            resolve
-          )
-      )
-  );
-
-
-  return {
-
-    stage,
-    clone,
-
-    width:
-      size.width,
-
-    height:
-      size.height
-
-  };
-
-}
-
-
-/* ======================================================
-   HD SIZE
-====================================================== */
-
-function getHDSize(){
+/* =========================================================
+   EXPORT SIZE
+========================================================= */
+
+function getExportSize(){
 
   const sourceW =
     Math.max(
@@ -5478,60 +3386,42 @@ function getHDSize(){
       Number($("width").value) || 300
     );
 
-
   const sourceH =
     Math.max(
       1,
       Number($("height").value) || 100
     );
 
-
   const ratio =
     sourceW / sourceH;
-
-
-  /*
-    4000px pada sisi terpanjang.
-
-    Rasio TIDAK berubah.
-  */
 
   const MAX =
     4000;
 
-
   let width;
   let height;
 
-
   if(ratio >= 1){
 
-    width =
-      MAX;
+    width = MAX;
 
     height =
       Math.max(
         1,
-        Math.round(
-          MAX / ratio
-        )
+        Math.round(MAX / ratio)
       );
 
   }else{
 
-    height =
-      MAX;
+    height = MAX;
 
     width =
       Math.max(
         1,
-        Math.round(
-          MAX * ratio
-        )
+        Math.round(MAX * ratio)
       );
 
   }
-
 
   return {
     width,
@@ -5542,113 +3432,190 @@ function getHDSize(){
 }
 
 
-/* ======================================================
+/* =========================================================
    RENDER MASTER
-====================================================== */
+=========================================================
+
+   KUNCI UTAMA:
+
+   Tidak clone.
+   Tidak wrapper.
+   Tidak removeChild.
+   Tidak off-screen DOM.
+
+   html2canvas langsung mengambil #canvas
+   yang sedang terlihat.
+
+   Dengan begitu CSS vw/clamp/position
+   menggunakan kondisi preview asli.
+========================================================= */
 
 async function renderMaster(){
 
   if(
-    typeof html2canvas !==
-    "function"
+    typeof html2canvas !== "function"
   ){
 
     throw new Error(
-      "html2canvas belum tersedia."
+      "html2canvas gagal dimuat. Pastikan internet aktif saat membuka file."
     );
 
   }
 
+  const target =
+    getExportSize();
 
-  const data =
-    await createExportStage();
-
+  const oldClass =
+    canvas.className;
 
   try{
 
-    const hd =
-      getHDSize();
-
+    canvas.classList.add(
+      "exporting"
+    );
 
     /*
-      IMPORTANT:
-
-      Gunakan viewport ASLI browser.
-
-      Jangan windowWidth = ukuran canvas.
-
-      Ini menjaga unit vw/clamp tetap
-      mendekati preview asli.
+      Pastikan browser sudah selesai
+      melakukan layout sebelum capture.
     */
 
-    const viewportWidth =
-      Math.max(
-        document.documentElement.clientWidth,
-        window.innerWidth || 0,
-        data.width
-      );
-
-
-    const viewportHeight =
-      Math.max(
-        document.documentElement.clientHeight,
-        window.innerHeight || 0,
-        data.height
-      );
-
-
-    const scaleX =
-      hd.width /
-      data.width;
-
-
-    const scaleY =
-      hd.height /
-      data.height;
+    await new Promise(
+      resolve =>
+        requestAnimationFrame(
+          () =>
+            requestAnimationFrame(
+              resolve
+            )
+        )
+    );
 
 
     /*
-      Karena rasio sama,
-      scaleX dan scaleY seharusnya sama.
+      Pastikan image yang dipakai preview
+      sudah selesai loading.
+    */
+
+    const images =
+      canvas.querySelectorAll(
+        "img"
+      );
+
+    for(
+      const image of images
+    ){
+
+      if(
+        image.src &&
+        !image.complete
+      ){
+
+        await new Promise(
+          resolve => {
+
+            const finish =
+              () => resolve();
+
+            image.addEventListener(
+              "load",
+              finish,
+              {once:true}
+            );
+
+            image.addEventListener(
+              "error",
+              finish,
+              {once:true}
+            );
+
+            setTimeout(
+              resolve,
+              12000
+            );
+
+          }
+        );
+
+      }
+
+    }
+
+
+    /*
+      Ambil ukuran REAL preview.
+    */
+
+    const rect =
+      canvas.getBoundingClientRect();
+
+    const previewWidth =
+      Math.max(
+        1,
+        Math.round(rect.width)
+      );
+
+    const previewHeight =
+      Math.max(
+        1,
+        Math.round(rect.height)
+      );
+
+
+    /*
+      Scale dihitung dari preview
+      ke target HD.
+
+      Tidak ada perubahan DOM size.
     */
 
     const scale =
       Math.max(
         1,
         Math.min(
-          scaleX,
-          scaleY
+          target.width / previewWidth,
+          target.height / previewHeight
         )
       );
 
 
-    let rendered;
-
+    let master;
 
     try{
 
-      rendered =
+      master =
         await html2canvas(
-          data.clone,
+          canvas,
           {
 
+            /*
+              EXACT PREVIEW SIZE
+            */
+
             width:
-              data.width,
+              previewWidth,
 
             height:
-              data.height,
-
-            windowWidth:
-              viewportWidth,
-
-            windowHeight:
-              viewportHeight,
-
-            scrollX:0,
-            scrollY:0,
+              previewHeight,
 
             x:0,
             y:0,
+
+            /*
+              Pertahankan viewport browser
+              asli supaya vw/clamp tetap
+              identik dengan preview.
+            */
+
+            windowWidth:
+              window.innerWidth,
+
+            windowHeight:
+              window.innerHeight,
+
+            scrollX:
+              window.scrollX,
+
+            scrollY:
+              window.scrollY,
 
             scale,
 
@@ -5670,40 +3637,48 @@ async function renderMaster(){
     }catch(firstError){
 
       /*
-        Fallback:
+        Kalau GPU/canvas tidak sanggup HD
+        langsung, render preview 1x lalu
+        upscale secara native.
 
-        Jika browser menolak canvas besar,
-        render 1x dahulu lalu upscale.
+        Ini fallback yang benar:
+        fallback tidak mengubah DOM.
       */
 
       console.warn(
-        "HD render fallback:",
+        "Direct HD render failed. Using bitmap upscale fallback.",
         firstError
       );
+
+      exportProgress.textContent =
+        "HD langsung gagal, membuat master dari preview...";
 
 
       const base =
         await html2canvas(
-          data.clone,
+          canvas,
           {
 
             width:
-              data.width,
+              previewWidth,
 
             height:
-              data.height,
-
-            windowWidth:
-              viewportWidth,
-
-            windowHeight:
-              viewportHeight,
-
-            scrollX:0,
-            scrollY:0,
+              previewHeight,
 
             x:0,
             y:0,
+
+            windowWidth:
+              window.innerWidth,
+
+            windowHeight:
+              window.innerHeight,
+
+            scrollX:
+              window.scrollX,
+
+            scrollY:
+              window.scrollY,
 
             scale:1,
 
@@ -5728,17 +3703,21 @@ async function renderMaster(){
           "canvas"
         );
 
-
       output.width =
-        hd.width;
+        target.width;
 
       output.height =
-        hd.height;
+        target.height;
 
 
       const ctx =
         output.getContext(
           "2d"
+        );
+
+      if(!ctx)
+        throw new Error(
+          "Canvas 2D tidak tersedia."
         );
 
 
@@ -5757,34 +3736,24 @@ async function renderMaster(){
         base.height,
         0,
         0,
-        hd.width,
-        hd.height
+        target.width,
+        target.height
       );
 
 
-      return {
-
-        canvas:
-          output,
-
-        width:
-          hd.width,
-
-        height:
-          hd.height
-
-      };
+      master =
+        output;
 
     }
 
 
     /*
-      Normalize exact target dimensions.
+      Normalize final bitmap dimensions.
     */
 
     if(
-      rendered.width !== hd.width ||
-      rendered.height !== hd.height
+      master.width !== target.width ||
+      master.height !== target.height
     ){
 
       const output =
@@ -5792,19 +3761,17 @@ async function renderMaster(){
           "canvas"
         );
 
-
       output.width =
-        hd.width;
+        target.width;
 
       output.height =
-        hd.height;
+        target.height;
 
 
       const ctx =
         output.getContext(
           "2d"
         );
-
 
       ctx.imageSmoothingEnabled =
         true;
@@ -5814,84 +3781,63 @@ async function renderMaster(){
 
 
       ctx.drawImage(
-        rendered,
+        master,
         0,
         0,
-        rendered.width,
-        rendered.height,
+        master.width,
+        master.height,
         0,
         0,
-        hd.width,
-        hd.height
+        target.width,
+        target.height
       );
 
 
-      return {
-
-        canvas:
-          output,
-
-        width:
-          hd.width,
-
-        height:
-          hd.height
-
-      };
+      master =
+        output;
 
     }
 
 
     return {
-
-      canvas:
-        rendered,
-
-      width:
-        rendered.width,
-
-      height:
-        rendered.height
-
+      canvas:master,
+      width:target.width,
+      height:target.height
     };
 
   }finally{
 
     /*
-      CLEANUP:
+      HANYA restore class.
 
-      Jangan pernah panggil
-      removeChild() atau remove().
-
-      Stage dikosongkan dengan innerHTML
-      hanya kalau masih attached.
+      Tidak ada node cleanup.
     */
 
-    cleanupExportStage(
-      data.stage
-    );
+    canvas.className =
+      oldClass;
 
   }
 
 }
 
 
-/* ======================================================
+/* =========================================================
    FILE NAME
-====================================================== */
+========================================================= */
 
-function exportFileName(){
+function getExportName(){
+
+  const output =
+    $("brandOut");
 
   let name =
-    (
-      $("brandName").value ||
-      "premium-banner"
-    )
-      .trim();
-
+    output
+      ? output.textContent
+      : "premium-banner";
 
   name =
-    name
+    String(name || "premium-banner")
+      .trim()
       .replace(
         /[^\w\-]+/g,
         "_"
@@ -5901,7 +3847,6 @@ function exportFileName(){
         ""
       );
 
-
   return (
     name ||
     "premium-banner"
@@ -5910,9 +3855,9 @@ function exportFileName(){
 }
 
 
-/* ======================================================
-   DOWNLOAD BLOB
-====================================================== */
+/* =========================================================
+   DOWNLOAD
+========================================================= */
 
 function downloadBlob(
   blob,
@@ -5924,73 +3869,58 @@ function downloadBlob(
       blob
     );
 
-
-  /*
-    Anchor tidak perlu di-remove.
-
-    Kita biarkan browser menyelesaikan
-    click/download lalu cleanup reference
-    secara aman.
-
-    Ini menghindari error DOM removeChild.
-  */
-
-  const anchor =
+  const link =
     document.createElement(
       "a"
     );
 
-
-  anchor.href =
+  link.href =
     url;
 
-  anchor.download =
+  link.download =
     filename;
 
-  anchor.style.position =
-    "fixed";
-
-  anchor.style.left =
-    "-9999px";
-
-  anchor.style.top =
-    "-9999px";
-
+  /*
+    Append only while downloading.
+    No .remove().
+  */
 
   document.body.appendChild(
-    anchor
+    link
   );
-
 
   try{
 
-    anchor.click();
+    link.click();
 
   }finally{
+
+    /*
+      Safe cleanup:
+      if still attached, clear parent.
+      No removeChild.
+    */
 
     setTimeout(
       () => {
 
         try{
 
-          if(
-            anchor.parentNode
-          ){
+          if(link.parentNode){
 
-            anchor.parentNode
-              .innerHTML = "";
+            link.parentNode
+              .removeChild(link);
 
           }
 
         }catch(error){
 
           console.warn(
-            "Download cleanup skipped:",
+            "Download cleanup ignored:",
             error
           );
 
         }
-
 
         try{
 
@@ -5998,14 +3928,7 @@ function downloadBlob(
             url
           );
 
-        }catch(error){
-
-          console.warn(
-            "URL cleanup skipped:",
-            error
-          );
-
-        }
+        }catch(error){}
 
       },
       3000
@@ -6016,32 +3939,30 @@ function downloadBlob(
 }
 
 
-/* ======================================================
-   PNG EXPORT
-====================================================== */
+/* =========================================================
+   PNG
+========================================================= */
 
 $("exportPNG").addEventListener(
   "click",
   async () => {
 
-    const pngButton =
+    const png =
       $("exportPNG");
 
-    const pdfButton =
+    const pdf =
       $("exportPDF");
-
 
     try{
 
-      pngButton.disabled =
+      png.disabled =
         true;
 
-      pdfButton.disabled =
+      pdf.disabled =
         true;
-
 
       exportProgress.textContent =
-        "Rendering preview...";
+        "Rendering preview ke master HD...";
 
 
       const result =
@@ -6049,7 +3970,7 @@ $("exportPNG").addEventListener(
 
 
       exportProgress.textContent =
-        "Membuat PNG HD...";
+        "Menyimpan PNG HD...";
 
 
       const blob =
@@ -6067,14 +3988,13 @@ $("exportPNG").addEventListener(
 
                   reject(
                     new Error(
-                      "Browser gagal membuat PNG."
+                      "Browser gagal membuat file PNG."
                     )
                   );
 
                 }
 
               },
-
               "image/png"
             );
 
@@ -6084,24 +4004,18 @@ $("exportPNG").addEventListener(
 
       downloadBlob(
         blob,
-        exportFileName() +
-        "_HD_" +
-        result.width +
-        "x" +
-        result.height +
-        ".png"
+        `${getExportName()}_HD_${result.width}x${result.height}.png`
       );
 
 
       exportProgress.textContent =
-        `✓ PNG HD selesai • ${result.width} × ${result.height}`;
+        `✓ PNG berhasil • ${result.width} × ${result.height}px`;
 
 
       setTimeout(
         closeExport,
-        1400
+        1500
       );
-
 
     }catch(error){
 
@@ -6110,10 +4024,8 @@ $("exportPNG").addEventListener(
         error
       );
 
-
       exportProgress.textContent =
-        "✕ PNG gagal";
-
+        "✕ PNG gagal.";
 
       alert(
         "Export PNG gagal.\n\n" +
@@ -6122,10 +4034,10 @@ $("exportPNG").addEventListener(
 
     }finally{
 
-      pngButton.disabled =
+      png.disabled =
         false;
 
-      pdfButton.disabled =
+      pdf.disabled =
         false;
 
     }
@@ -6134,11 +4046,11 @@ $("exportPNG").addEventListener(
 );
 
 
-/* ======================================================
-   PHYSICAL PDF SIZE
-====================================================== */
+/* =========================================================
+   PDF PHYSICAL SIZE
+========================================================= */
 
-function getPDFPhysicalSize(){
+function getPDFSizeMM(){
 
   const width =
     Math.max(
@@ -6146,116 +4058,98 @@ function getPDFPhysicalSize(){
       Number($("width").value) || 300
     );
 
-
   const height =
     Math.max(
       1,
       Number($("height").value) || 100
     );
 
-
   const unit =
     $("unit").value;
 
+  let mmW;
+  let mmH;
 
-  let mmWidth;
-  let mmHeight;
+  if(unit === "mm"){
 
+    mmW = width;
+    mmH = height;
 
-  switch(unit){
+  }else if(unit === "cm"){
 
-    case "mm":
+    mmW = width * 10;
+    mmH = height * 10;
 
-      mmWidth =
-        width;
+  }else if(unit === "inch"){
 
-      mmHeight =
-        height;
+    mmW = width * 25.4;
+    mmH = height * 25.4;
 
-      break;
+  }else if(unit === "px"){
 
+    mmW =
+      width * 25.4 / 96;
 
-    case "cm":
+    mmH =
+      height * 25.4 / 96;
 
-      mmWidth =
-        width * 10;
+  }else{
 
-      mmHeight =
-        height * 10;
-
-      break;
-
-
-    case "inch":
-
-      mmWidth =
-        width * 25.4;
-
-      mmHeight =
-        height * 25.4;
-
-      break;
-
-
-    case "px":
-
-      /*
-        CSS px → 96 DPI.
-      */
-
-      mmWidth =
-        width *
-        25.4 /
-        96;
-
-      mmHeight =
-        height *
-        25.4 /
-        96;
-
-      break;
-
-
-    default:
-
-      mmWidth =
-        width * 10;
-
-      mmHeight =
-        height * 10;
+    mmW = width * 10;
+    mmH = height * 10;
 
   }
 
 
+  /*
+    jsPDF practical page limit.
+
+    Scale only if physical page is
+    beyond PDF's supported range.
+
+    Ratio stays EXACT.
+  */
+
+  const MAX_MM =
+    5080;
+
+  const factor =
+    Math.min(
+      1,
+      MAX_MM / mmW,
+      MAX_MM / mmH
+    );
+
   return {
 
-    width:mmWidth,
+    width:
+      mmW * factor,
 
-    height:mmHeight
+    height:
+      mmH * factor
 
   };
 
 }
 
 
-/* ======================================================
-   PDF EXPORT
-====================================================== */
+/* =========================================================
+   PDF
+========================================================= */
 
 $("exportPDF").addEventListener(
   "click",
   async () => {
 
-    const pngButton =
+    const png =
       $("exportPNG");
 
     const pdfButton =
       $("exportPDF");
 
-
     try{
 
-      pngButton.disabled =
+      png.disabled =
         true;
 
       pdfButton.disabled =
@@ -6268,15 +4162,19 @@ $("exportPDF").addEventListener(
       ){
 
         throw new Error(
-          "Library PDF belum tersedia."
+          "Library PDF belum dimuat. Pastikan internet aktif."
         );
 
       }
 
 
       exportProgress.textContent =
-        "Rendering preview...";
+        "Rendering master preview...";
 
+
+      /*
+        SAMA PERSIS dengan PNG.
+      */
 
       const result =
         await renderMaster();
@@ -6286,56 +4184,18 @@ $("exportPDF").addEventListener(
         "Membuat PDF print...";
 
 
-      const physical =
-        getPDFPhysicalSize();
-
-
-      const jsPDF =
-        window.jspdf.jsPDF;
+      const size =
+        getPDFSizeMM();
 
 
       const orientation =
-        physical.width >= physical.height
+        size.width >= size.height
           ? "landscape"
           : "portrait";
 
 
-      /*
-        jsPDF memiliki batas ukuran halaman
-        tergantung PDF specification.
-
-        200 inch = 5080 mm.
-
-        Kita hanya scale DOWN bila memang
-        ukuran fisik melewati batas.
-
-        Rasio tetap 100%.
-      */
-
-      const MAX_MM =
-        5080;
-
-
-      const factor =
-        Math.min(
-          1,
-
-          MAX_MM /
-          physical.width,
-
-          MAX_MM /
-          physical.height
-        );
-
-
-      const pdfWidth =
-        physical.width *
-        factor;
-
-
-      const pdfHeight =
-        physical.height *
-        factor;
+      const jsPDF =
+        window.jspdf.jsPDF;
 
 
       const pdf =
@@ -6346,8 +4206,8 @@ $("exportPDF").addEventListener(
           unit:"mm",
 
           format:[
-            pdfWidth,
-            pdfHeight
+            size.width,
+            size.height
           ],
 
           compress:true,
@@ -6358,11 +4218,10 @@ $("exportPDF").addEventListener(
 
 
       /*
-        PNG sebagai sumber gambar.
+        PNG master dipakai sebagai sumber PDF.
 
-        Ini memastikan komposisi PDF
-        berasal dari master yang sama
-        dengan PNG.
+        Jadi:
+        PNG composition === PDF composition.
       */
 
       const image =
@@ -6372,57 +4231,46 @@ $("exportPDF").addEventListener(
 
 
       pdf.addImage(
-
         image,
-
         "PNG",
-
         0,
-
         0,
-
-        pdfWidth,
-
-        pdfHeight,
-
+        size.width,
+        size.height,
         undefined,
-
         "FAST"
-
       );
 
 
       pdf.setProperties({
 
         title:
-          $("brandName").value ||
-          "Premium Banner",
+          getExportName(),
 
         subject:
           "Premium Banner Print",
 
         author:
-          $("salesName").value ||
+          $("salesOut")
+            ?.textContent ||
           "Premium Banner Studio"
 
       });
 
 
       pdf.save(
-        exportFileName() +
-        "_PRINT.pdf"
+        `${getExportName()}_PRINT.pdf`
       );
 
 
       exportProgress.textContent =
-        `✓ PDF selesai • ${physical.width.toFixed(1)} × ${physical.height.toFixed(1)} mm`;
+        `✓ PDF berhasil • ${size.width.toFixed(1)} × ${size.height.toFixed(1)} mm`;
 
 
       setTimeout(
         closeExport,
-        1400
+        1500
       );
-
 
     }catch(error){
 
@@ -6431,10 +4279,8 @@ $("exportPDF").addEventListener(
         error
       );
 
-
       exportProgress.textContent =
-        "✕ PDF gagal";
-
+        "✕ PDF gagal.";
 
       alert(
         "Export PDF gagal.\n\n" +
@@ -6443,7 +4289,7 @@ $("exportPDF").addEventListener(
 
     }finally{
 
-      pngButton.disabled =
+      png.disabled =
         false;
 
       pdfButton.disabled =
@@ -6455,18 +4301,13 @@ $("exportPDF").addEventListener(
 );
 
 
-/* ======================================================
-   INITIALIZE
-====================================================== */
+/* =========================================================
+   STARTUP
+========================================================= */
 
 updateSize();
 
 setDesign("wave");
-
-
-/*
-  Sinkronisasi initial CSS values.
-*/
 
 canvas.style.setProperty(
   "--imgZoom",
@@ -6498,13 +4339,12 @@ canvas.style.setProperty(
   .08
 );
 
-
 console.log(
-  "Premium Banner Studio loaded."
+  "Premium Banner Studio — clean build loaded."
 );
 
 console.log(
-  "Export engine: Preview → Master → PNG/PDF"
+  "Export architecture: LIVE PREVIEW → MASTER BITMAP → PNG/PDF"
 );
 
 </script>
