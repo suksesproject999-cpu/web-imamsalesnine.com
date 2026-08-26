@@ -5176,13 +5176,25 @@ function verifyPhoto(){
 
 
 /* =========================================================
-   CREATE EXPORT CLONE
-========================================================= */
+   CREATE EXPORT CLONE — FINAL
+   ========================================================= */
 
 async function createExportClone(){
 
+  /*
+    -------------------------------------------------------
+    1. VALIDASI FOTO
+    -------------------------------------------------------
+  */
+
   verifyPhoto();
 
+
+  /*
+    -------------------------------------------------------
+    2. AMBIL UKURAN PREVIEW ASLI
+    -------------------------------------------------------
+  */
 
   const rect =
     canvas.getBoundingClientRect();
@@ -5200,11 +5212,30 @@ async function createExportClone(){
   }
 
 
+  /*
+    -------------------------------------------------------
+    3. CLONE CANVAS
+    -------------------------------------------------------
+  */
+
   const clone =
     canvas.cloneNode(
       true
     );
 
+
+  /*
+    -------------------------------------------------------
+    4. WRAPPER EXPORT
+    -------------------------------------------------------
+
+    Ditaruh jauh di luar viewport supaya
+    clone tidak muncul sebagai banner kedua
+    saat proses export.
+
+    html2canvas tetap bisa membaca layout clone.
+    -------------------------------------------------------
+  */
 
   const wrapper =
     document.createElement(
@@ -5212,19 +5243,11 @@ async function createExportClone(){
     );
 
 
-  /*
-    Wrapper harus berada
-    di layar agar html2canvas
-    menghitung layout normal.
-
-    Tidak pakai z-index negatif.
-  */
-
   wrapper.style.position =
     "fixed";
 
   wrapper.style.left =
-    "0";
+    "-100000px";
 
   wrapper.style.top =
     "0";
@@ -5247,16 +5270,22 @@ async function createExportClone(){
     "none";
 
   wrapper.style.zIndex =
-    "999998";
+    "1";
 
 
   /*
-    Background transparan sementara.
+    Background wrapper hanya sebagai fallback.
   */
 
   wrapper.style.background =
     "#000";
 
+
+  /*
+    -------------------------------------------------------
+    5. UKURAN CLONE HARUS SAMA DENGAN PREVIEW
+    -------------------------------------------------------
+  */
 
   clone.style.width =
     rect.width +
@@ -5268,6 +5297,12 @@ async function createExportClone(){
 
   clone.style.maxWidth =
     "none";
+
+  clone.style.minWidth =
+    "0";
+
+  clone.style.minHeight =
+    "0";
 
   clone.style.aspectRatio =
     "auto";
@@ -5285,13 +5320,20 @@ async function createExportClone(){
     "0";
 
 
+  /*
+    Mode export tetap aktif supaya CSS export
+    yang memang sudah ada di Banner3 tetap berjalan.
+  */
+
   clone.classList.add(
     "exporting"
   );
 
 
   /*
-    Copy CSS variable state.
+    -------------------------------------------------------
+    6. COPY SEMUA CSS VARIABLE DARI PREVIEW
+    -------------------------------------------------------
   */
 
   const computed =
@@ -5311,21 +5353,27 @@ async function createExportClone(){
     "--cta",
     "--ctaText",
     "--border",
+
     "--imgZoom",
     "--imgX",
     "--imgY",
+
     "--overlayLeft",
     "--overlayRight",
+
     "--patternOpacity"
 
   ].forEach(
     variable => {
 
       clone.style.setProperty(
+
         variable,
+
         computed.getPropertyValue(
           variable
         )
+
       );
 
     }
@@ -5333,11 +5381,19 @@ async function createExportClone(){
 
 
   /*
-    ======================================================
-    CRITICAL:
-    Copy PHOTO DATA URL directly
-    into clone's background-image.
-    ======================================================
+    =======================================================
+    7. FOTO EXPORT — NATIVE IMAGE
+    =======================================================
+
+    PREVIEW:
+      .photo-layer → background-image
+
+    EXPORT:
+      .photo-layer → <img>
+
+    Jadi browser/html2canvas membaca bitmap asli
+    sebagai image element, bukan CSS background.
+    =======================================================
   */
 
   const clonePhoto =
@@ -5351,12 +5407,22 @@ async function createExportClone(){
     photoDataURL
   ){
 
+    /*
+      Jangan biarkan background-image lama
+      ikut dirender bersamaan.
+    */
+
     clonePhoto.style.backgroundImage =
-      `url("${photoDataURL}")`;
+      "none";
+
+    clonePhoto.style.background =
+      "transparent";
+
 
     clonePhoto.classList.add(
       "has-photo"
     );
+
 
     clonePhoto.style.display =
       "block";
@@ -5367,14 +5433,254 @@ async function createExportClone(){
     clonePhoto.style.opacity =
       "1";
 
+    clonePhoto.style.filter =
+      "none";
+
+    clonePhoto.style.mixBlendMode =
+      "normal";
+
     clonePhoto.style.zIndex =
       "1";
+
+
+    /*
+      -----------------------------------------------------
+      BUAT IMAGE ELEMENT ASLI
+      -----------------------------------------------------
+    */
+
+    const exportImage =
+      document.createElement(
+        "img"
+      );
+
+
+    exportImage.src =
+      photoDataURL;
+
+
+    exportImage.alt =
+      "";
+
+
+    exportImage.decoding =
+      "sync";
+
+
+    exportImage.draggable =
+      false;
+
+
+    /*
+      -----------------------------------------------------
+      POSISI IMAGE
+
+      Menyamai area foto asli:
+
+        inset:-1%
+        width:102%
+        height:102%
+        object-fit:cover
+        object-position:center
+      -----------------------------------------------------
+    */
+
+    exportImage.style.position =
+      "absolute";
+
+    exportImage.style.left =
+      "-1%";
+
+    exportImage.style.top =
+      "-1%";
+
+    exportImage.style.width =
+      "102%";
+
+    exportImage.style.height =
+      "102%";
+
+    exportImage.style.maxWidth =
+      "none";
+
+    exportImage.style.maxHeight =
+      "none";
+
+    exportImage.style.objectFit =
+      "cover";
+
+    exportImage.style.objectPosition =
+      "center center";
+
+
+    /*
+      -----------------------------------------------------
+      SAMA DENGAN PREVIEW
+      -----------------------------------------------------
+    */
+
+    exportImage.style.display =
+      "block";
+
+    exportImage.style.visibility =
+      "visible";
+
+    exportImage.style.opacity =
+      "1";
+
+    exportImage.style.filter =
+      "none";
+
+    exportImage.style.mixBlendMode =
+      "normal";
+
+    exportImage.style.pointerEvents =
+      "none";
+
+
+    /*
+      -----------------------------------------------------
+      ZOOM + POSITION FOTO
+
+      Mengikuti CSS variable Banner3.
+      -----------------------------------------------------
+    */
+
+    exportImage.style.transform =
+      `
+        translate(
+          calc(var(--imgX) * 1%),
+          calc(var(--imgY) * 1%)
+        )
+        scale(
+          calc(var(--imgZoom) / 100)
+        )
+      `;
+
+
+    exportImage.style.transformOrigin =
+      "center center";
+
+
+    /*
+      -----------------------------------------------------
+      MASUKKAN IMAGE KE PHOTO LAYER
+      -----------------------------------------------------
+    */
+
+    clonePhoto.appendChild(
+      exportImage
+    );
+
+
+    /*
+      -----------------------------------------------------
+      TUNGGU IMAGE SELESAI LOAD
+      -----------------------------------------------------
+    */
+
+    if(
+      !exportImage.complete
+    ){
+
+      await new Promise(
+        resolve => {
+
+          let finished =
+            false;
+
+
+          const done =
+            () => {
+
+              if(
+                finished
+              ){
+
+                return;
+
+              }
+
+
+              finished =
+                true;
+
+
+              resolve();
+
+            };
+
+
+          exportImage.addEventListener(
+            "load",
+            done,
+            {
+              once:true
+            }
+          );
+
+
+          exportImage.addEventListener(
+            "error",
+            done,
+            {
+              once:true
+            }
+          );
+
+
+          /*
+            Safety timeout.
+          */
+
+          setTimeout(
+            done,
+            15000
+          );
+
+        }
+      );
+
+    }
+
+
+    /*
+      -----------------------------------------------------
+      DECODE BITMAP
+
+      Kalau browser mendukung decode(),
+      tunggu sampai bitmap benar-benar siap
+      sebelum html2canvas dijalankan.
+      -----------------------------------------------------
+    */
+
+    if(
+      typeof exportImage.decode ===
+      "function"
+    ){
+
+      try{
+
+        await exportImage.decode();
+
+      }catch(error){
+
+        console.warn(
+          "[EXPORT PHOTO] decode warning:",
+          error
+        );
+
+      }
+
+    }
 
   }
 
 
   /*
-    Logo also stays Data URL.
+    =======================================================
+    8. LOGO
+    =======================================================
   */
 
   const cloneLogo =
@@ -5394,8 +5700,86 @@ async function createExportClone(){
     cloneLogo.style.display =
       "block";
 
+    cloneLogo.style.visibility =
+      "visible";
+
+
+    /*
+      Pastikan logo selesai dimuat.
+    */
+
+    if(
+      !cloneLogo.complete
+    ){
+
+      await new Promise(
+        resolve => {
+
+          const done =
+            () => {
+
+              resolve();
+
+            };
+
+
+          cloneLogo.addEventListener(
+            "load",
+            done,
+            {
+              once:true
+            }
+          );
+
+
+          cloneLogo.addEventListener(
+            "error",
+            done,
+            {
+              once:true
+            }
+          );
+
+
+          setTimeout(
+            done,
+            10000
+          );
+
+        }
+      );
+
+    }
+
+
+    if(
+      typeof cloneLogo.decode ===
+      "function"
+    ){
+
+      try{
+
+        await cloneLogo.decode();
+
+      }catch(error){
+
+        console.warn(
+          "[EXPORT LOGO] decode warning:",
+          error
+        );
+
+      }
+
+    }
+
   }
 
+
+  /*
+    =======================================================
+    9. MASUKKAN CLONE KE WRAPPER
+    =======================================================
+  */
 
   wrapper.appendChild(
     clone
@@ -5408,11 +5792,18 @@ async function createExportClone(){
 
 
   /*
-    Force browser layout + paint.
+    =======================================================
+    10. FORCE LAYOUT
+    =======================================================
   */
 
   void clone.offsetWidth;
 
+
+  /*
+    Tunggu browser melakukan layout + paint.
+    =======================================================
+  */
 
   await new Promise(
     resolve =>
@@ -5424,6 +5815,12 @@ async function createExportClone(){
       )
   );
 
+
+  /*
+    =======================================================
+    11. RETURN EXPORT DATA
+    =======================================================
+  */
 
   return {
 
@@ -5440,7 +5837,6 @@ async function createExportClone(){
   };
 
 }
-
 
 /* =========================================================
    CLEANUP
@@ -5472,442 +5868,18 @@ function cleanupExport(
 }
 
 
+
+
+
+
+
+
+
+
+	
 /* =========================================================
-   RENDER MASTER
-========================================================= */
-/* =========================================================
-   RENDER MASTER — FINAL HD PHOTO PRESERVATION
-========================================================= */
-
-/* =========================================================
-   DIRECT PHOTO MASTER
-   FINAL PHOTO-QUALITY PIPELINE
-========================================================= */
-
-async function drawPhotoDirectToMaster(
-  master,
-  sourceWidth,
-  sourceHeight
-){
-
-  if(
-    !photoDataURL
-  ){
-
-    return;
-
-  }
-
-
-  /*
-    -------------------------------------------------------
-    LOAD ORIGINAL DATA URL
-    -------------------------------------------------------
-  */
-
-  const image =
-    new Image();
-
-
-  image.decoding =
-    "async";
-
-
-  image.src =
-    photoDataURL;
-
-
-  if(
-    !image.complete
-  ){
-
-    await new Promise(
-      (resolve,reject) => {
-
-        image.onload =
-          resolve;
-
-        image.onerror =
-          () =>
-            reject(
-              new Error(
-                "Foto gagal dimuat untuk master export."
-              )
-            );
-
-      }
-    );
-
-  }
-
-
-  if(
-    typeof image.decode ===
-    "function"
-  ){
-
-    try{
-
-      await image.decode();
-
-    }catch(error){
-
-      console.warn(
-        "[PHOTO MASTER] decode warning:",
-        error
-      );
-
-    }
-
-  }
-
-
-  if(
-    !image.naturalWidth ||
-    !image.naturalHeight
-  ){
-
-    throw new Error(
-      "Ukuran foto asli tidak valid."
-    );
-
-  }
-
-
-  /*
-    -------------------------------------------------------
-    MASTER CONTEXT
-    -------------------------------------------------------
-  */
-
-  const ctx =
-    master.getContext(
-      "2d"
-    );
-
-
-  if(!ctx){
-
-    throw new Error(
-      "Canvas 2D tidak tersedia."
-    );
-
-  }
-
-
-  /*
-    -------------------------------------------------------
-    COPY CURRENT PHOTO SETTINGS
-
-    Nilainya berasal dari CSS variable yang memang
-    dipakai .photo-layer di Banner3.
-    -------------------------------------------------------
-  */
-
-  const zoom =
-    parseFloat(
-      getComputedStyle(
-        canvas
-      ).getPropertyValue(
-        "--imgZoom"
-      )
-    ) || 100;
-
-
-  const posX =
-    parseFloat(
-      getComputedStyle(
-        canvas
-      ).getPropertyValue(
-        "--imgX"
-      )
-    ) || 0;
-
-
-  const posY =
-    parseFloat(
-      getComputedStyle(
-        canvas
-      ).getPropertyValue(
-        "--imgY"
-      )
-    ) || 0;
-
-
-  /*
-    -------------------------------------------------------
-    PHOTO LAYER
-
-    CSS asli:
-
-      inset:-1%
-      width:102%
-      height:102%
-      background-size:cover
-      background-position:center
-
-    Jadi kita reproduksi komposisi tersebut
-    langsung di master canvas.
-    -------------------------------------------------------
-  */
-
-  const layerWidth =
-    sourceWidth *
-    1.02;
-
-
-  const layerHeight =
-    sourceHeight *
-    1.02;
-
-
-  const layerLeft =
-    sourceWidth *
-    -0.01;
-
-
-  const layerTop =
-    sourceHeight *
-    -0.01;
-
-
-  /*
-    Background-size: cover
-    -------------------------------------------------------
-  */
-
-  const imageScale =
-    Math.max(
-
-      layerWidth /
-      image.naturalWidth,
-
-      layerHeight /
-      image.naturalHeight
-
-    );
-
-
-  const imageWidth =
-    image.naturalWidth *
-    imageScale;
-
-
-  const imageHeight =
-    image.naturalHeight *
-    imageScale;
-
-
-  const imageLeft =
-    layerLeft +
-    (
-      layerWidth -
-      imageWidth
-    ) / 2;
-
-
-  const imageTop =
-    layerTop +
-    (
-      layerHeight -
-      imageHeight
-    ) / 2;
-
-
-  /*
-    -------------------------------------------------------
-    EXPORT SCALE
-
-    sourceWidth/sourceHeight = ukuran preview clone.
-    master = ukuran HD final.
-    -------------------------------------------------------
-  */
-
-  const sx =
-    master.width /
-    sourceWidth;
-
-
-  const sy =
-    master.height /
-    sourceHeight;
-
-
-  /*
-    Rasio normal seharusnya sama.
-    Gunakan X sebagai basis.
-  */
-
-  const exportScale =
-    sx;
-
-
-  /*
-    -------------------------------------------------------
-    CSS TRANSFORM
-
-      translate(
-        imgX%,
-        imgY%
-      )
-      scale(
-        imgZoom/100
-      )
-
-    transform-origin:center
-    -------------------------------------------------------
-  */
-
-  const centerX =
-    sourceWidth / 2;
-
-
-  const centerY =
-    sourceHeight / 2;
-
-
-  const translateX =
-    layerWidth *
-    posX /
-    100;
-
-
-  const translateY =
-    layerHeight *
-    posY /
-    100;
-
-
-  const scale =
-    zoom /
-    100;
-
-
-  /*
-    -------------------------------------------------------
-    CLIP
-
-    Sama seperti .canvas:
-    overflow:hidden.
-    -------------------------------------------------------
-  */
-
-  ctx.save();
-
-
-  ctx.beginPath();
-
-  ctx.rect(
-    0,
-    0,
-    master.width,
-    master.height
-  );
-
-  ctx.clip();
-
-
-  /*
-    -------------------------------------------------------
-    Transform ke koordinat MASTER.
-    -------------------------------------------------------
-  */
-
-  ctx.translate(
-    centerX *
-    exportScale,
-
-    centerY *
-    exportScale
-  );
-
-
-  /*
-    CSS transform order:
-    translate(...) scale(...)
-
-    Matrix akhirnya:
-      T(center)
-      T(translation)
-      S(scale)
-      T(-center)
-    -------------------------------------------------------
-  */
-
-  ctx.translate(
-    translateX *
-    exportScale,
-
-    translateY *
-    exportScale
-  );
-
-
-  ctx.scale(
-    scale,
-    scale
-  );
-
-
-  ctx.translate(
-    -centerX *
-    exportScale,
-
-    -centerY *
-    exportScale
-  );
-
-
-  /*
-    -------------------------------------------------------
-    DRAW ORIGINAL PHOTO
-
-    Ini satu-satunya tempat foto masuk ke master.
-
-    Tidak melalui html2canvas.
-    Tidak melalui preview bitmap.
-    Tidak di-upscale dari hasil html2canvas.
-    -------------------------------------------------------
-  */
-
-  ctx.imageSmoothingEnabled =
-    true;
-
-  ctx.imageSmoothingQuality =
-    "high";
-
-
-  ctx.drawImage(
-
-    image,
-
-    imageLeft *
-      exportScale,
-
-    imageTop *
-      exportScale,
-
-    imageWidth *
-      exportScale,
-
-    imageHeight *
-      exportScale
-
-  );
-
-
-  ctx.restore();
-
-}
-
-
-
-
-
-
-	/* =========================================================
    RENDER MASTER — FINAL
-   PHOTO DIRECT + DESIGN RENDER
+   NATIVE IMAGE EXPORT PIPELINE
 ========================================================= */
 
 async function renderMaster(){
@@ -5939,188 +5911,13 @@ async function renderMaster(){
 
     exportProgress.textContent =
       photoDataURL
-        ? "Foto asli • membuat master HD..."
-        : "Membuat master HD...";
+        ? "Foto asli • menyiapkan master HD..."
+        : "Menyiapkan master HD...";
 
 
     /*
       -----------------------------------------------------
-      MASTER FINAL
-      -----------------------------------------------------
-    */
-
-    const master =
-      document.createElement(
-        "canvas"
-      );
-
-
-    master.width =
-      target.width;
-
-    master.height =
-      target.height;
-
-
-    const masterCtx =
-      master.getContext(
-        "2d"
-      );
-
-
-    if(!masterCtx){
-
-      throw new Error(
-        "Canvas 2D tidak tersedia."
-      );
-
-    }
-
-
-    /*
-      -----------------------------------------------------
-      BACKGROUND
-
-      Ambil warna --bg dari canvas asli.
-      -----------------------------------------------------
-    */
-
-    const computed =
-      getComputedStyle(
-        canvas
-      );
-
-
-    const bg =
-      computed
-        .getPropertyValue(
-          "--bg"
-        )
-        .trim();
-
-
-    masterCtx.fillStyle =
-      bg ||
-      "#090B0F";
-
-
-    masterCtx.fillRect(
-      0,
-      0,
-      master.width,
-      master.height
-    );
-
-
-    /*
-      -----------------------------------------------------
-      FOTO LANGSUNG KE MASTER
-
-      Foto TIDAK ikut html2canvas.
-      -----------------------------------------------------
-    */
-
-    if(photoDataURL){
-
-      await drawPhotoDirectToMaster(
-
-        master,
-
-        data.width,
-
-        data.height
-
-      );
-
-    }
-
-
-    /*
-      -----------------------------------------------------
-      MATIKAN FOTO PADA CLONE
-
-      html2canvas sekarang hanya mengerjakan:
-      overlay + pattern + wave + glass + text +
-      social + logo + seluruh desain.
-
-      Jadi foto tidak pernah diraster kedua kali.
-      -----------------------------------------------------
-    */
-
-    const clonePhoto =
-      data.clone.querySelector(
-        "#photoLayer"
-      );
-
-
-    if(clonePhoto){
-
-      clonePhoto.style.display =
-        "none";
-
-      clonePhoto.style.visibility =
-        "hidden";
-
-    }
-
-
-    /*
-      -----------------------------------------------------
-      TRANSPARENT DESIGN CLONE
-
-      Background canvas dan base-bg dibuat transparan
-      supaya tidak menutup foto master.
-      -----------------------------------------------------
-    */
-
-    data.clone.style.background =
-      "transparent";
-
-
-    data.clone.style.backgroundColor =
-      "transparent";
-
-
-    const cloneBase =
-      data.clone.querySelector(
-        ".base-bg"
-      );
-
-
-    if(cloneBase){
-
-      cloneBase.style.background =
-        "transparent";
-
-      cloneBase.style.backgroundColor =
-        "transparent";
-
-    }
-
-
-    /*
-      Pastikan layout final sudah dihitung.
-    */
-
-    void data.clone.offsetWidth;
-
-
-    await new Promise(
-      resolve =>
-        requestAnimationFrame(
-          () =>
-            requestAnimationFrame(
-              resolve
-            )
-        )
-    );
-
-
-    /*
-      -----------------------------------------------------
-      DESIGN SCALE
-
-      Render desain langsung pada ukuran HD.
+      SCALE LANGSUNG KE MASTER
       -----------------------------------------------------
     */
 
@@ -6134,7 +5931,7 @@ async function renderMaster(){
       data.height;
 
 
-    const requestedScale =
+    const scale =
       Math.max(
         1,
         Math.min(
@@ -6145,15 +5942,15 @@ async function renderMaster(){
 
 
     exportProgress.textContent =
-      `Rendering design ${target.width} × ${target.height}px...`;
+      `Rendering ${target.width} × ${target.height}px...`;
 
 
-    let designCanvas;
+    let result;
 
 
     try{
 
-      designCanvas =
+      result =
         await html2canvas(
           data.clone,
           {
@@ -6178,24 +5975,38 @@ async function renderMaster(){
 
             scrollY:0,
 
+            /*
+              Tidak lagi dibatasi 4x.
+            */
+
             scale:
-              requestedScale,
+              scale,
+
+            /*
+              Background transparan supaya
+              compositing preview tetap sama.
+            */
 
             backgroundColor:
               null,
 
-            useCORS:true,
+            useCORS:
+              true,
 
-            allowTaint:true,
+            allowTaint:
+              true,
 
             imageTimeout:
               30000,
 
-            logging:false,
+            logging:
+              false,
 
-            foreignObjectRendering:false,
+            foreignObjectRendering:
+              false,
 
-            removeContainer:true
+            removeContainer:
+              true
 
           }
         );
@@ -6203,31 +6014,18 @@ async function renderMaster(){
 
     }catch(error){
 
-      /*
-        --------------------------------------------------
-        SAFE FALLBACK
-
-        Foto tetap sudah berada pada MASTER HD.
-        Jadi kalau html2canvas harus turun resolusi,
-        hanya elemen desain yang turun resolusi.
-        Foto tetap tajam.
-        --------------------------------------------------
-      */
-
       console.warn(
-        "[DESIGN RENDER] HD fallback:",
+        "[EXPORT] HD render fallback:",
         error
       );
 
 
-      const fallbackScale =
-        Math.min(
-          3,
-          requestedScale
-        );
+      /*
+        Fallback hanya kalau GPU/browser
+        tidak sanggup resolusi penuh.
+      */
 
-
-      designCanvas =
+      result =
         await html2canvas(
           data.clone,
           {
@@ -6252,18 +6050,15 @@ async function renderMaster(){
 
             scrollY:0,
 
-            scale:
-              fallbackScale,
+            scale:1,
 
-            backgroundColor:
-              null,
+            backgroundColor:null,
 
             useCORS:true,
 
             allowTaint:true,
 
-            imageTimeout:
-              30000,
+            imageTimeout:30000,
 
             logging:false,
 
@@ -6279,48 +6074,85 @@ async function renderMaster(){
 
     /*
       -----------------------------------------------------
-      COMPOSITE DESIGN KE MASTER
+      NORMALISASI MASTER
+      -----------------------------------------------------
 
-      Normal alpha compositing.
+      Kalau hasil sudah persis target,
+      LANGSUNG gunakan.
+
+      Tidak ada resize kedua.
       -----------------------------------------------------
     */
 
-    masterCtx.globalCompositeOperation =
-      "source-over";
+    let master;
 
-
-    masterCtx.imageSmoothingEnabled =
-      true;
-
-
-    masterCtx.imageSmoothingQuality =
-      "high";
-
-
-    masterCtx.drawImage(
-
-      designCanvas,
-
-      0,
-      0,
-      designCanvas.width,
-      designCanvas.height,
-
-      0,
-      0,
-      master.width,
-      master.height
-
-    );
-
-
-    /*
-      -----------------------------------------------------
-      VALIDASI
-      -----------------------------------------------------
-    */
 
     if(
+      result.width ===
+      target.width &&
+
+      result.height ===
+      target.height
+    ){
+
+      master =
+        result;
+
+    }else{
+
+      master =
+        document.createElement(
+          "canvas"
+        );
+
+
+      master.width =
+        target.width;
+
+      master.height =
+        target.height;
+
+
+      const ctx =
+        master.getContext(
+          "2d"
+        );
+
+
+      if(!ctx){
+
+        throw new Error(
+          "Canvas 2D tidak tersedia."
+        );
+
+      }
+
+
+      ctx.imageSmoothingEnabled =
+        true;
+
+
+      ctx.imageSmoothingQuality =
+        "high";
+
+
+      ctx.drawImage(
+        result,
+        0,
+        0,
+        result.width,
+        result.height,
+        0,
+        0,
+        target.width,
+        target.height
+      );
+
+    }
+
+
+    if(
+      !master ||
       master.width <= 0 ||
       master.height <= 0
     ){
@@ -6352,18 +6184,13 @@ async function renderMaster(){
 
   }finally{
 
-    /*
-      CLEANUP ASLI BANNER3.
-      Jangan safeRemoveNode().
-    */
-
     cleanupExport(
       data
     );
 
   }
 
-	}
+							}
 
         
 
