@@ -5175,24 +5175,53 @@ function verifyPhoto(){
 }
 
 
+
+/* =========================================================
+   CLEANUP
+========================================================= */
+
+function cleanupExport(
+  data
+){
+
+  if(
+    !data ||
+    !data.wrapper
+  )
+    return;
+
+
+  if(
+    data.wrapper.parentNode
+  ){
+
+    data.wrapper
+      .parentNode
+      .removeChild(
+        data.wrapper
+      );
+
+  }
+
+}
+
+
+
+
+
 /* =========================================================
    CREATE EXPORT CLONE — FINAL
-   ========================================================= */
+   NATIVE PHOTO + PREVIEW-EXACT CROP
+========================================================= */
 
 async function createExportClone(){
-
-  /*
-    -------------------------------------------------------
-    1. VALIDASI FOTO
-    -------------------------------------------------------
-  */
 
   verifyPhoto();
 
 
   /*
     -------------------------------------------------------
-    2. AMBIL UKURAN PREVIEW ASLI
+    1. UKURAN CANVAS PREVIEW
     -------------------------------------------------------
   */
 
@@ -5214,7 +5243,7 @@ async function createExportClone(){
 
   /*
     -------------------------------------------------------
-    3. CLONE CANVAS
+    2. CLONE CANVAS
     -------------------------------------------------------
   */
 
@@ -5226,14 +5255,11 @@ async function createExportClone(){
 
   /*
     -------------------------------------------------------
-    4. WRAPPER EXPORT
+    3. WRAPPER EXPORT
     -------------------------------------------------------
 
-    Ditaruh jauh di luar viewport supaya
-    clone tidak muncul sebagai banner kedua
-    saat proses export.
-
-    html2canvas tetap bisa membaca layout clone.
+    Clone tetap berada di DOM agar browser menghitung
+    layout normal, tetapi tidak terlihat di layar.
     -------------------------------------------------------
   */
 
@@ -5272,18 +5298,13 @@ async function createExportClone(){
   wrapper.style.zIndex =
     "1";
 
-
-  /*
-    Background wrapper hanya sebagai fallback.
-  */
-
   wrapper.style.background =
     "#000";
 
 
   /*
     -------------------------------------------------------
-    5. UKURAN CLONE HARUS SAMA DENGAN PREVIEW
+    4. UKURAN CLONE HARUS PERSIS PREVIEW
     -------------------------------------------------------
   */
 
@@ -5320,11 +5341,6 @@ async function createExportClone(){
     "0";
 
 
-  /*
-    Mode export tetap aktif supaya CSS export
-    yang memang sudah ada di Banner3 tetap berjalan.
-  */
-
   clone.classList.add(
     "exporting"
   );
@@ -5332,7 +5348,11 @@ async function createExportClone(){
 
   /*
     -------------------------------------------------------
-    6. COPY SEMUA CSS VARIABLE DARI PREVIEW
+    5. COPY CSS VARIABLES
+    -------------------------------------------------------
+
+    Ini penting supaya zoom, X/Y, overlay, warna,
+    pattern, dll identik dengan preview.
     -------------------------------------------------------
   */
 
@@ -5360,7 +5380,6 @@ async function createExportClone(){
 
     "--overlayLeft",
     "--overlayRight",
-
     "--patternOpacity"
 
   ].forEach(
@@ -5382,17 +5401,34 @@ async function createExportClone(){
 
   /*
     =======================================================
-    7. FOTO EXPORT — NATIVE IMAGE
+    6. FOTO EXPORT
     =======================================================
 
-    PREVIEW:
-      .photo-layer → background-image
+    PREVIEW ASLI:
+
+      .photo-layer
+          ↓
+      background-size: cover
+          ↓
+      background-position: center
+          ↓
+      transform:
+        translate(imgX,imgY)
+        scale(imgZoom)
 
     EXPORT:
-      .photo-layer → <img>
 
-    Jadi browser/html2canvas membaca bitmap asli
-    sebagai image element, bukan CSS background.
+      .photo-layer
+          ↓
+      native <img>
+          ↓
+      ukuran COVER dihitung manual
+          ↓
+      posisi CENTER
+          ↓
+      TRANSFORM TETAP DI PHOTO LAYER
+
+    Jadi geometri foto tetap sama dengan preview.
     =======================================================
   */
 
@@ -5408,12 +5444,16 @@ async function createExportClone(){
   ){
 
     /*
-      Jangan biarkan background-image lama
-      ikut dirender bersamaan.
+      -----------------------------------------------------
+      MATIKAN BACKGROUND IMAGE CSS PADA CLONE
+      -----------------------------------------------------
     */
 
     clonePhoto.style.backgroundImage =
       "none";
+
+    clonePhoto.style.backgroundColor =
+      "transparent";
 
     clonePhoto.style.background =
       "transparent";
@@ -5445,142 +5485,37 @@ async function createExportClone(){
 
     /*
       -----------------------------------------------------
-      BUAT IMAGE ELEMENT ASLI
+      LOAD FOTO ASLI
       -----------------------------------------------------
     */
 
-    const exportImage =
-      document.createElement(
-        "img"
-      );
+    const image =
+      new Image();
 
 
-    exportImage.src =
+    image.src =
       photoDataURL;
 
 
-    exportImage.alt =
+    image.alt =
       "";
 
 
-    exportImage.decoding =
+    image.decoding =
       "sync";
 
 
-    exportImage.draggable =
+    image.draggable =
       false;
 
 
     /*
-      -----------------------------------------------------
-      POSISI IMAGE
-
-      Menyamai area foto asli:
-
-        inset:-1%
-        width:102%
-        height:102%
-        object-fit:cover
-        object-position:center
-      -----------------------------------------------------
-    */
-
-    exportImage.style.position =
-      "absolute";
-
-    exportImage.style.left =
-      "-1%";
-
-    exportImage.style.top =
-      "-1%";
-
-    exportImage.style.width =
-      "102%";
-
-    exportImage.style.height =
-      "102%";
-
-    exportImage.style.maxWidth =
-      "none";
-
-    exportImage.style.maxHeight =
-      "none";
-
-    exportImage.style.objectFit =
-      "cover";
-
-    exportImage.style.objectPosition =
-      "center center";
-
-
-    /*
-      -----------------------------------------------------
-      SAMA DENGAN PREVIEW
-      -----------------------------------------------------
-    */
-
-    exportImage.style.display =
-      "block";
-
-    exportImage.style.visibility =
-      "visible";
-
-    exportImage.style.opacity =
-      "1";
-
-    exportImage.style.filter =
-      "none";
-
-    exportImage.style.mixBlendMode =
-      "normal";
-
-    exportImage.style.pointerEvents =
-      "none";
-
-
-    /*
-      -----------------------------------------------------
-      ZOOM + POSITION FOTO
-
-      Mengikuti CSS variable Banner3.
-      -----------------------------------------------------
-    */
-
-    exportImage.style.transform =
-      `
-        translate(
-          calc(var(--imgX) * 1%),
-          calc(var(--imgY) * 1%)
-        )
-        scale(
-          calc(var(--imgZoom) / 100)
-        )
-      `;
-
-
-    exportImage.style.transformOrigin =
-      "center center";
-
-
-    /*
-      -----------------------------------------------------
-      MASUKKAN IMAGE KE PHOTO LAYER
-      -----------------------------------------------------
-    */
-
-    clonePhoto.appendChild(
-      exportImage
-    );
-
-
-    /*
-      -----------------------------------------------------
-      TUNGGU IMAGE SELESAI LOAD
-      -----------------------------------------------------
+      Tunggu bitmap selesai dimuat.
     */
 
     if(
-      !exportImage.complete
+      !image.complete ||
+      !image.naturalWidth
     ){
 
       await new Promise(
@@ -5611,7 +5546,7 @@ async function createExportClone(){
             };
 
 
-          exportImage.addEventListener(
+          image.addEventListener(
             "load",
             done,
             {
@@ -5620,7 +5555,7 @@ async function createExportClone(){
           );
 
 
-          exportImage.addEventListener(
+          image.addEventListener(
             "error",
             done,
             {
@@ -5628,10 +5563,6 @@ async function createExportClone(){
             }
           );
 
-
-          /*
-            Safety timeout.
-          */
 
           setTimeout(
             done,
@@ -5645,23 +5576,17 @@ async function createExportClone(){
 
 
     /*
-      -----------------------------------------------------
-      DECODE BITMAP
-
-      Kalau browser mendukung decode(),
-      tunggu sampai bitmap benar-benar siap
-      sebelum html2canvas dijalankan.
-      -----------------------------------------------------
+      Decode bitmap kalau browser mendukung.
     */
 
     if(
-      typeof exportImage.decode ===
+      typeof image.decode ===
       "function"
     ){
 
       try{
 
-        await exportImage.decode();
+        await image.decode();
 
       }catch(error){
 
@@ -5674,12 +5599,286 @@ async function createExportClone(){
 
     }
 
+
+    if(
+      !image.naturalWidth ||
+      !image.naturalHeight
+    ){
+
+      throw new Error(
+        "Foto export tidak memiliki ukuran bitmap valid."
+      );
+
+    }
+
+
+    /*
+      =====================================================
+      7. REPRODUKSI EXACT background-size:cover
+      =====================================================
+
+      Ukuran PHOTO LAYER:
+
+        inset:-1%
+        width:102%
+        height:102%
+
+      Ini persis CSS asli Banner3.
+      =====================================================
+    */
+
+    const layerWidth =
+      rect.width *
+      1.02;
+
+
+    const layerHeight =
+      rect.height *
+      1.02;
+
+
+    /*
+      Aspect ratio foto asli.
+    */
+
+    const imageRatio =
+      image.naturalWidth /
+      image.naturalHeight;
+
+
+    const layerRatio =
+      layerWidth /
+      layerHeight;
+
+
+    let imageWidth;
+    let imageHeight;
+
+
+    /*
+      background-size: cover
+
+      Jika foto lebih lebar:
+        tinggi mengikuti layer,
+        lebar diperbesar.
+
+      Jika foto lebih tinggi:
+        lebar mengikuti layer,
+        tinggi diperbesar.
+    */
+
+    if(
+      imageRatio >
+      layerRatio
+    ){
+
+      imageHeight =
+        layerHeight;
+
+      imageWidth =
+        imageHeight *
+        imageRatio;
+
+    }else{
+
+      imageWidth =
+        layerWidth;
+
+      imageHeight =
+        imageWidth /
+        imageRatio;
+
+    }
+
+
+    /*
+      -----------------------------------------------------
+      8. CENTER POSITION
+
+      Sama dengan:
+
+        background-position:center;
+      -----------------------------------------------------
+    */
+
+    const imageLeft =
+      (
+        layerWidth -
+        imageWidth
+      ) / 2;
+
+
+    const imageTop =
+      (
+        layerHeight -
+        imageHeight
+      ) / 2;
+
+
+    /*
+      -----------------------------------------------------
+      9. NATIVE IMAGE GEOMETRY
+      -----------------------------------------------------
+    */
+
+    image.style.position =
+      "absolute";
+
+    image.style.left =
+      imageLeft +
+      "px";
+
+    image.style.top =
+      imageTop +
+      "px";
+
+    image.style.width =
+      imageWidth +
+      "px";
+
+    image.style.height =
+      imageHeight +
+      "px";
+
+
+    image.style.maxWidth =
+      "none";
+
+    image.style.maxHeight =
+      "none";
+
+
+    image.style.display =
+      "block";
+
+    image.style.visibility =
+      "visible";
+
+    image.style.opacity =
+      "1";
+
+
+    image.style.margin =
+      "0";
+
+    image.style.padding =
+      "0";
+
+
+    image.style.border =
+      "0";
+
+
+    image.style.objectFit =
+      "fill";
+
+
+    image.style.objectPosition =
+      "center";
+
+
+    image.style.filter =
+      "none";
+
+
+    image.style.mixBlendMode =
+      "normal";
+
+
+    image.style.pointerEvents =
+      "none";
+
+
+    /*
+      =====================================================
+      SANGAT PENTING:
+
+      JANGAN kasih transform ke image.
+
+      Transform tetap berada di:
+
+          .photo-layer
+
+      karena preview asli memang begitu.
+      =====================================================
+    */
+
+    image.style.transform =
+      "none";
+
+
+    image.style.transformOrigin =
+      "initial";
+
+
+    /*
+      -----------------------------------------------------
+      MASUKKAN IMAGE KE PHOTO LAYER
+      -----------------------------------------------------
+    */
+
+    clonePhoto.appendChild(
+      image
+    );
+
+
+    /*
+      -----------------------------------------------------
+      10. FORCE PHOTO LAYER GEOMETRY
+      -----------------------------------------------------
+
+      Jangan mengubah transform bawaan clonePhoto.
+
+      CSS asli Banner3:
+        translate(imgX,imgY)
+        scale(imgZoom)
+      -----------------------------------------------------
+    */
+
+    clonePhoto.style.inset =
+      "-1%";
+
+    clonePhoto.style.width =
+      "102%";
+
+    clonePhoto.style.height =
+      "102%";
+
+    clonePhoto.style.backgroundSize =
+      "cover";
+
+    clonePhoto.style.backgroundPosition =
+      "center";
+
+    clonePhoto.style.backgroundRepeat =
+      "no-repeat";
+
+    clonePhoto.style.transformOrigin =
+      "center";
+
+
+    /*
+      Pastikan transform asli tetap berasal
+      dari CSS variable Banner3.
+    */
+
+    clonePhoto.style.transform =
+      `
+        translate(
+          calc(var(--imgX) * 1%),
+          calc(var(--imgY) * 1%)
+        )
+        scale(
+          calc(var(--imgZoom) / 100)
+        )
+      `;
+
   }
 
 
   /*
     =======================================================
-    8. LOGO
+    11. LOGO
     =======================================================
   */
 
@@ -5703,10 +5902,6 @@ async function createExportClone(){
     cloneLogo.style.visibility =
       "visible";
 
-
-    /*
-      Pastikan logo selesai dimuat.
-    */
 
     if(
       !cloneLogo.complete
@@ -5777,7 +5972,7 @@ async function createExportClone(){
 
   /*
     =======================================================
-    9. MASUKKAN CLONE KE WRAPPER
+    12. MASUKKAN CLONE KE DOM
     =======================================================
   */
 
@@ -5792,17 +5987,14 @@ async function createExportClone(){
 
 
   /*
-    =======================================================
-    10. FORCE LAYOUT
-    =======================================================
+    Force layout.
   */
 
   void clone.offsetWidth;
 
 
   /*
-    Tunggu browser melakukan layout + paint.
-    =======================================================
+    Tunggu browser menyelesaikan layout + paint.
   */
 
   await new Promise(
@@ -5818,7 +6010,12 @@ async function createExportClone(){
 
   /*
     =======================================================
-    11. RETURN EXPORT DATA
+    13. RETURN CONTRACT
+    =======================================================
+
+    Sama dengan createExportClone asli,
+    jadi renderMaster() dan cleanupExport()
+    tidak perlu diubah.
     =======================================================
   */
 
@@ -5836,42 +6033,7 @@ async function createExportClone(){
 
   };
 
-}
-
-/* =========================================================
-   CLEANUP
-========================================================= */
-
-function cleanupExport(
-  data
-){
-
-  if(
-    !data ||
-    !data.wrapper
-  )
-    return;
-
-
-  if(
-    data.wrapper.parentNode
-  ){
-
-    data.wrapper
-      .parentNode
-      .removeChild(
-        data.wrapper
-      );
-
-  }
-
-}
-
-
-
-
-
-
+		}
 
 
 
