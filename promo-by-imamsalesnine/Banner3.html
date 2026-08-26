@@ -5475,8 +5475,17 @@ function cleanupExport(
 /* =========================================================
    RENDER MASTER
 ========================================================= */
+/* =========================================================
+   RENDER MASTER — FINAL HD PHOTO PRESERVATION
+========================================================= */
 
 async function renderMaster(){
+
+  /*
+    -------------------------------------------------------
+    VALIDASI ENGINE
+    -------------------------------------------------------
+  */
 
   if(
     typeof html2canvas !==
@@ -5490,18 +5499,46 @@ async function renderMaster(){
   }
 
 
+  /*
+    -------------------------------------------------------
+    VALIDASI FOTO
+    -------------------------------------------------------
+  */
+
   verifyPhoto();
 
 
   exportProgress.textContent =
     photoDataURL
-      ? "Foto siap • membuat master..."
-      : "Membuat master...";
+      ? "Foto siap • menyiapkan master HD..."
+      : "Menyiapkan master HD...";
 
+
+  /*
+    -------------------------------------------------------
+    TARGET FINAL
+
+    targetSize() sudah merupakan fungsi asli
+    Banner3.html.
+
+    Jangan membuat getHDSize baru.
+    -------------------------------------------------------
+  */
 
   const target =
     targetSize();
 
+
+  /*
+    -------------------------------------------------------
+    BUAT CLONE
+
+    createExportClone() tetap memakai arsitektur
+    Banner3 yang sekarang.
+
+    JANGAN diubah.
+    -------------------------------------------------------
+  */
 
   const data =
     await createExportClone();
@@ -5510,74 +5547,213 @@ async function renderMaster(){
   try{
 
     /*
-      Scale from actual preview
-      to HD target.
+      -----------------------------------------------------
+      UKURAN SOURCE PREVIEW
+      -----------------------------------------------------
     */
 
-    const scale =
+    const sourceWidth =
       Math.max(
         1,
-        target.width /
-        data.width,
+        Math.round(
+          data.width
+        )
+      );
 
-        target.height /
-        data.height
+
+    const sourceHeight =
+      Math.max(
+        1,
+        Math.round(
+          data.height
+        )
+      );
+
+
+    /*
+      -----------------------------------------------------
+      HITUNG SCALE SEBENARNYA
+
+      INI PERUBAHAN UTAMA.
+
+      Sebelumnya:
+          Math.min(4, scale)
+
+      Akibatnya:
+          preview kecil
+              ↓
+          render kecil
+              ↓
+          upscale ke 4000
+              ↓
+          foto soft
+
+      Sekarang:
+          preview
+              ↓
+          langsung render pada ukuran MASTER
+
+      Jadi foto tidak diraster kecil lalu dibesarkan.
+      -----------------------------------------------------
+    */
+
+    const scaleX =
+      target.width /
+      sourceWidth;
+
+
+    const scaleY =
+      target.height /
+      sourceHeight;
+
+
+    /*
+      Rasio canvas seharusnya sama.
+
+      Gunakan scale terkecil supaya tidak distorsi.
+    */
+
+    const requestedScale =
+      Math.max(
+        1,
+        Math.min(
+          scaleX,
+          scaleY
+        )
+      );
+
+
+    /*
+      -----------------------------------------------------
+      TARGET PIXEL ACTUAL
+
+      Hindari floating-point ukuran canvas.
+      -----------------------------------------------------
+    */
+
+    const renderWidth =
+      Math.max(
+        1,
+        Math.round(
+          sourceWidth *
+          requestedScale
+        )
+      );
+
+
+    const renderHeight =
+      Math.max(
+        1,
+        Math.round(
+          sourceHeight *
+          requestedScale
+        )
       );
 
 
     exportProgress.textContent =
-      "Rendering master HD...";
+      `Rendering ${renderWidth} × ${renderHeight}px...`;
 
 
-    let result;
+    /*
+      -----------------------------------------------------
+      RENDER LANGSUNG KE RESOLUSI MASTER
+      -----------------------------------------------------
+    */
+
+    let rendered;
 
 
     try{
 
-      result =
+      rendered =
         await html2canvas(
           data.clone,
           {
 
+            /*
+              CSS layout tetap memakai ukuran
+              preview asli.
+
+              Jadi posisi text, social,
+              wave, logo, dll tidak berubah.
+            */
+
             width:
-              data.width,
+              sourceWidth,
 
             height:
-              data.height,
+              sourceHeight,
+
 
             windowWidth:
-              data.width,
+              sourceWidth,
 
             windowHeight:
-              data.height,
+              sourceHeight,
 
-            scrollX:0,
-
-            scrollY:0,
 
             x:0,
 
             y:0,
 
+
+            scrollX:0,
+
+            scrollY:0,
+
+
+            /*
+              =================================================
+              KUNCI UTAMA:
+
+              JANGAN BATASI SCALE KE 4.
+
+              Foto langsung diraster pada resolusi
+              master yang dibutuhkan.
+              =================================================
+            */
+
             scale:
+              requestedScale,
 
-              Math.min(
-                4,
-                scale
-              ),
 
-            backgroundColor:
-              null,
+            /*
+              Foto menggunakan Data URL lokal.
+            */
 
             useCORS:true,
 
             allowTaint:true,
 
-            imageTimeout:30000,
 
-            logging:false,
+            /*
+              Transparansi desain tetap dipertahankan.
+            */
 
-            foreignObjectRendering:false
+            backgroundColor:
+              null,
+
+
+            imageTimeout:
+              30000,
+
+
+            logging:
+              false,
+
+
+            /*
+              DOM/CSS biasa lebih stabil
+              dengan renderer standar.
+            */
+
+            foreignObjectRendering:
+              false,
+
+
+            removeContainer:
+              true
 
           }
         );
@@ -5585,47 +5761,79 @@ async function renderMaster(){
 
     }catch(firstError){
 
+      /*
+        ---------------------------------------------------
+        FALLBACK AMAN
+
+        Kalau browser tidak mampu membuat canvas
+        pada resolusi penuh karena batas GPU/memory,
+        kita render pada scale yang lebih konservatif.
+
+        Ini hanya fallback — bukan jalur normal.
+        ---------------------------------------------------
+      */
+
       console.warn(
-        "[EXPORT] HD render failed:",
+        "[EXPORT] Full HD render failed, using safe fallback:",
         firstError
       );
 
 
       exportProgress.textContent =
-        "Render HD fallback...";
+        "HD memory fallback...";
 
 
-      result =
+      const fallbackScale =
+        Math.max(
+          1,
+          Math.min(
+            3,
+            requestedScale
+          )
+        );
+
+
+      rendered =
         await html2canvas(
           data.clone,
           {
 
             width:
-              data.width,
+              sourceWidth,
 
             height:
-              data.height,
+              sourceHeight,
 
             windowWidth:
-              data.width,
+              sourceWidth,
 
             windowHeight:
-              data.height,
+              sourceHeight,
 
-            scale:1,
+            x:0,
 
-            backgroundColor:
-              null,
+            y:0,
+
+            scrollX:0,
+
+            scrollY:0,
+
+            scale:
+              fallbackScale,
 
             useCORS:true,
 
             allowTaint:true,
 
+            backgroundColor:null,
+
             imageTimeout:30000,
 
             logging:false,
 
-            foreignObjectRendering:false
+            foreignObjectRendering:false,
+
+            removeContainer:true
 
           }
         );
@@ -5634,62 +5842,106 @@ async function renderMaster(){
 
 
     /*
-      Normalize to exact HD.
+      -----------------------------------------------------
+      MASTER CANVAS
+
+      Kalau html2canvas sudah menghasilkan ukuran
+      persis target, langsung gunakan.
+
+      TIDAK ADA RESIZE KEDUA.
+
+      Ini penting untuk mempertahankan ketajaman foto.
+      -----------------------------------------------------
     */
 
-    const master =
-      document.createElement(
-        "canvas"
-      );
+    let master;
 
 
-    master.width =
-      target.width;
+    if(
+      rendered.width ===
+      target.width &&
 
-    master.height =
-      target.height;
+      rendered.height ===
+      target.height
+    ){
+
+      master =
+        rendered;
+
+    }else{
+
+      /*
+        --------------------------------------------------
+        Hanya fallback normalization jika browser
+        melakukan pembulatan ukuran.
+
+        Ini BUKAN jalur normal.
+        --------------------------------------------------
+      */
+
+      master =
+        document.createElement(
+          "canvas"
+        );
 
 
-    const ctx =
-      master.getContext(
-        "2d"
-      );
+      master.width =
+        target.width;
+
+      master.height =
+        target.height;
 
 
-    if(!ctx){
+      const ctx =
+        master.getContext(
+          "2d"
+        );
 
-      throw new Error(
-        "Canvas 2D tidak tersedia."
+
+      if(!ctx){
+
+        throw new Error(
+          "Canvas 2D tidak tersedia."
+        );
+
+      }
+
+
+      ctx.imageSmoothingEnabled =
+        true;
+
+
+      ctx.imageSmoothingQuality =
+        "high";
+
+
+      ctx.drawImage(
+
+        rendered,
+
+        0,
+        0,
+        rendered.width,
+        rendered.height,
+
+        0,
+        0,
+        target.width,
+        target.height
+
       );
 
     }
 
 
-    ctx.imageSmoothingEnabled =
-      true;
-
-    ctx.imageSmoothingQuality =
-      "high";
-
-
-    ctx.drawImage(
-      result,
-      0,
-      0,
-      result.width,
-      result.height,
-      0,
-      0,
-      target.width,
-      target.height
-    );
-
-
     /*
-      Final bitmap check.
+      -----------------------------------------------------
+      VALIDASI MASTER
+      -----------------------------------------------------
     */
 
     if(
+      !master ||
       master.width <= 0 ||
       master.height <= 0
     ){
@@ -5701,19 +5953,39 @@ async function renderMaster(){
     }
 
 
+    /*
+      -----------------------------------------------------
+      RETURN MASTER
+
+      PNG + PDF mengambil canvas yang sama.
+      -----------------------------------------------------
+    */
+
     return {
 
-      canvas:master,
+      canvas:
+        master,
 
       width:
-        target.width,
+        master.width,
 
       height:
-        target.height
+        master.height
 
     };
 
+
   }finally{
+
+    /*
+      -----------------------------------------------------
+      CLEANUP
+
+      Tetap gunakan helper ASLI Banner3.
+
+      JANGAN safeRemoveNode().
+      -----------------------------------------------------
+    */
 
     cleanupExport(
       data
@@ -5721,8 +5993,7 @@ async function renderMaster(){
 
   }
 
-}
-
+						}
 
 /* =========================================================
    DOWNLOAD
