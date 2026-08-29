@@ -1927,6 +1927,108 @@ font-size:12px;
 
 
 
+/* =================================
+   SIDEBAR TOOLTIP / BADGE
+================================= */
+
+.sidebar-btn{
+  position:relative;
+}
+
+/* badge dari attribute title */
+.sidebar-btn::after{
+  content:attr(title);
+
+  position:absolute;
+
+  left:calc(100% + 10px);
+  top:50%;
+
+  transform:
+    translateY(-50%)
+    translateX(-5px);
+
+  background:#fff8d8;
+  color:#3f3a20;
+
+  border:1px solid #e4d88f;
+
+  padding:7px 12px;
+
+  border-radius:6px;
+
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:500;
+
+  line-height:1;
+
+  white-space:nowrap;
+
+  box-shadow:
+    0 4px 14px rgba(0,0,0,.15);
+
+  opacity:0;
+  visibility:hidden;
+
+  pointer-events:none;
+
+  z-index:99999;
+
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+}
+
+
+/* segitiga */
+
+.sidebar-btn::before{
+  content:"";
+
+  position:absolute;
+
+  left:calc(100% + 4px);
+  top:50%;
+
+  transform:translateY(-50%);
+
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  border-right:6px solid #e4d88f;
+
+  opacity:0;
+  visibility:hidden;
+
+  z-index:99999;
+
+  transition:
+    opacity .18s ease;
+}
+
+
+/* hover */
+
+.sidebar-btn:hover::after{
+  opacity:1;
+  visibility:visible;
+
+  transform:
+    translateY(-50%)
+    translateX(0);
+}
+
+.sidebar-btn:hover::before{
+  opacity:1;
+  visibility:visible;
+}
+
+
+
+	
+
+
+
 </style>
 
 
@@ -2067,7 +2169,7 @@ Checkin
 </div>
 
 </div>
-```
+
 
 
     <main class="main-wrapper">
