@@ -14,7 +14,7 @@
     --navy-dark: #081c4f;
 
     --primary: #1976d2;
-    --success: #4caf50;
+    --success: #8CC63F;
     --danger: #f44336;
 
     --bg: #eceff3;
@@ -167,7 +167,7 @@
 
     .btn {
       padding: 10px 16px;
-      background: #25D366;
+      background: #8CC63F;
       border: none;
       color: white;
       border-radius: 10px;
@@ -257,7 +257,7 @@ background:#fff;
 
       text-align: left;
 
-      color: #16a34a;
+      color: #8CC63F;
 
       word-break: break-word;
 
@@ -924,7 +924,7 @@ margin-top:15px;
 
     .ready-card {
 
-      border-left: 4px solid #4caf50;
+      border-left: 4px solid #8CC63F;
 
     }
 
@@ -942,7 +942,7 @@ margin-top:15px;
 
     .row-ready td {
 
-      border-left: 4px solid #4caf50;
+      border-left: 4px solid #8CC63F;
 
     }
 
@@ -1121,7 +1121,7 @@ margin-top:15px;
 
     .grand-total-box span {
 
-      color: #16a34a;
+      color: #8CC63F;
 
     }
 
@@ -1143,28 +1143,146 @@ margin-top:15px;
       cursor: pointer;
       gap: 8px;
     }
+    
+    
+    
+    
+    .btn i.fa-spinner { animation: spinRefresh 1s linear infinite; } @keyframes spinRefresh { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    
+    
+    /* =========================================
+   SIDEBAR TOOLTIP BADGE
+========================================= */
+
+.sidebar-btn{
+    position:relative;
+}
+
+/* BADGE */
+
+.sidebar-btn::after{
+
+    content:attr(title);
+
+    position:absolute;
+
+    left:calc(100% + 10px);
+    top:50%;
+
+    transform:
+        translateY(-50%)
+        translateX(-5px);
+
+    padding:8px 12px;
+
+    background:#fff8d8;
+    color:#3f3a20;
+
+    border:1px solid #e4d88f;
+
+    border-radius:7px;
+
+    font-family:Arial,sans-serif;
+    font-size:12px;
+    font-weight:500;
+
+    line-height:1;
+
+    white-space:nowrap;
+
+    box-shadow:
+        0 5px 15px rgba(0,0,0,.16);
+
+    opacity:0;
+    visibility:hidden;
+
+    pointer-events:none;
+
+    z-index:99999;
+
+    transition:
+        opacity .18s ease,
+        transform .18s ease;
+}
+
+
+/* SEGITIGA */
+
+.sidebar-btn::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:calc(100% + 4px);
+    top:50%;
+
+    transform:translateY(-50%);
+
+    border-top:6px solid transparent;
+    border-bottom:6px solid transparent;
+    border-right:6px solid #e4d88f;
+
+    opacity:0;
+    visibility:hidden;
+
+    z-index:99999;
+
+    transition:opacity .18s ease;
+}
+
+
+/* HOVER */
+
+.sidebar-btn:hover::after{
+
+    opacity:1;
+    visibility:visible;
+
+    transform:
+        translateY(-50%)
+        translateX(0);
+}
+
+.sidebar-btn:hover::before{
+
+    opacity:1;
+    visibility:visible;
+}
+    
+    
 
   </style>
+  
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" >
+  
+  
+  
 </head>
 
 <body>
 
   <div class="vip-layout">
 
-    <aside class="sidebar">
+    
+<aside class="sidebar">
 
-      <button
-    class="sidebar-btn"
-    onclick="location.href='/vip/bikermart'">
-    🏠
-</button>
+    <button
+        class="sidebar-btn"
+        onclick="location.href='/vip/bikermart'"
+        title="Dashboard">
+        <i class="fa-solid fa-house"></i>
+    </button>
 
-      <button
-        class="sidebar-btn active">
-        📦
-      </button>
+    <button
+        class="sidebar-btn active"
+        title="History Dokumen">
+        <i class="fa-solid fa-box-open"></i>
+    </button>
 
-    </aside>
+</aside>
+
 
     <main class="main-wrapper">
 
@@ -1768,18 +1886,21 @@ Tidak ada dokumen
         </td>
 
         <td>
-        <button
-        class="btn-delete-item"
-        onclick="
-        event.stopPropagation();
-        requestDeleteItem(
-        '${itemId}',
-        '${invoiceId}'
-        )
-        "
-        >
-        🗑
-        </button>
+        
+<button
+    class="btn-delete-item"
+    onclick="
+    event.stopPropagation();
+    requestDeleteItem(
+    '${itemId}',
+    '${invoiceId}'
+    )
+    "
+>
+    <i class="fa-solid fa-trash-can"></i>
+</button>
+
+
 
         </td>
 
@@ -1811,11 +1932,14 @@ Tidak ada dokumen
       text-align:center;
       ">
 
-      <div class="brand-title">
+      
+<div class="brand-title">
 
-      📄 Detail Dokumen
+    <i class="fa-solid fa-file-lines"></i> Detail Dokumen
 
-      </div>
+</div>
+
+
 
       <div class="erp-doc-info">
 
@@ -1879,35 +2003,38 @@ Tidak ada dokumen
 
       <div class="invoice-footer">
 
-      <div class="invoice-action">
+      
+<div class="invoice-action">
 
-      <button class="btn"
-      onclick="window.print()">
-      🖨️ Print
-      </button>
+    <button class="btn"
+    onclick="window.print()">
+        <i class="fa-solid fa-print"></i> Print
+    </button>
 
-      <button class="btn"
-      onclick="downloadInvoice()">
-      📥 Download
-      </button>
+    <button class="btn"
+    onclick="downloadInvoice()">
+        <i class="fa-solid fa-download"></i> Download
+    </button>
 
-      <button class="btn"
-      onclick="closeInvoice()">
-      ❌ Tutup
-      </button>
+    <button class="btn"
+    onclick="closeInvoice()">
+        <i class="fa-solid fa-xmark"></i> Tutup
+    </button>
 
-      <button
-      class="btn btn-delete-doc"
-      onclick="
-      requestDeleteInvoice(
-      '${invoiceId}'
-      )
-      "
-      >
-      🗑 Request Hapus
-      </button>
+    <button
+        class="btn btn-delete-doc"
+        onclick="
+        requestDeleteInvoice(
+        '${invoiceId}'
+        )
+        "
+    >
+        <i class="fa-solid fa-trash-can"></i> Request Hapus
+    </button>
 
-      </div>
+</div>
+
+
 
       <div class="erp-total-box">
 
@@ -2416,9 +2543,8 @@ mode:["css","legacy"]
 
     btn.classList.add("loading");
 
-    btn.innerText =
-    "⏳ Refreshing...";
-
+    btn.innerHTML = '<i class="fa-solid fa-spinner"></i> Refreshing...';
+    
     try {
 
       await loadData();
@@ -2437,8 +2563,11 @@ mode:["css","legacy"]
         "loading"
       );
 
-      btn.innerText =
-      "🔄 Refresh";
+      
+btn.innerHTML =
+    '<i class="fa-solid fa-rotate"></i> Refresh';
+
+
 
     }, 1000);
 
