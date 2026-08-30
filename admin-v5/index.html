@@ -2840,6 +2840,815 @@ textarea:focus-visible{
 
 
 
+/* =========================================================
+   IMAM SALES — BRAND HEADER & FOOTER
+   FINAL UI LAYER
+   Tidak mengubah JS / fungsi / event existing
+   ========================================================= */
+
+:root{
+  --brand-lime:#8CC63F;
+  --brand-lime-light:#A6E34B;
+
+  --brand-dark:#0b1015;
+  --brand-dark-2:#11161c;
+
+  --brand-text:#f8fafc;
+  --brand-muted:#94a3b8;
+
+  --brand-header-height:88px;
+  --brand-footer-height:56px;
+}
+
+
+/* =========================================================
+   BODY
+   ========================================================= */
+
+html,
+body{
+  margin:0;
+  padding:0;
+
+  min-height:100%;
+
+  background:#f4f7fb;
+}
+
+
+/* =========================================================
+   TOP BRAND HEADER
+   ========================================================= */
+
+.site-brand-header{
+
+  position:fixed;
+
+  top:0;
+  left:0;
+  right:0;
+
+  width:100%;
+
+  height:var(--brand-header-height);
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+
+  padding:
+    0 22px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #090d12 0%,
+      #11161c 55%,
+      #0c1116 100%
+    );
+
+  border-bottom:
+    1px solid
+    rgba(255,255,255,.08);
+
+  box-shadow:
+    0 5px 20px
+    rgba(0,0,0,.20);
+
+  z-index:20000;
+
+  box-sizing:border-box;
+}
+
+
+/* =========================================================
+   BRAND LEFT
+   ========================================================= */
+
+.site-brand-left{
+
+  height:100%;
+
+  display:flex;
+  align-items:center;
+
+  gap:12px;
+
+  min-width:0;
+}
+
+
+/* GREEN ACCENT */
+
+.site-brand-accent{
+
+  width:6px;
+  height:46px;
+
+  flex:none;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--brand-lime-light),
+      var(--brand-lime)
+    );
+
+  border-radius:1px;
+
+  box-shadow:
+    0 0 12px
+    rgba(140,198,63,.25);
+}
+
+
+/* TEXT */
+
+.site-brand-text{
+
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+
+  justify-content:center;
+}
+
+
+/* BRAND NAME */
+
+.site-brand-name{
+
+  color:#ffffff;
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  font-size:30px;
+
+  font-weight:800;
+
+  line-height:1;
+
+  letter-spacing:-.8px;
+
+  white-space:nowrap;
+}
+
+
+/* SUBTITLE */
+
+.site-brand-subtitle{
+
+  margin-top:6px;
+
+  color:var(--brand-lime);
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  font-size:15px;
+
+  font-weight:700;
+
+  line-height:1.1;
+
+  white-space:nowrap;
+}
+
+.site-brand-subtitle span{
+
+  margin:
+    0 4px;
+
+  color:#64748b;
+}
+
+
+/* =========================================================
+   HAMBURGER
+   ========================================================= */
+
+.site-brand-menu{
+
+  width:62px;
+  height:62px;
+
+  flex:none;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:20px;
+
+  background:
+    rgba(255,255,255,.07);
+
+  border:
+    1px solid
+    rgba(255,255,255,.04);
+
+  color:#ffffff;
+
+  font-size:32px;
+
+  box-shadow:
+    inset 0 1px 0
+    rgba(255,255,255,.04);
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    color .2s ease;
+}
+
+.site-brand-menu:hover{
+
+  background:
+    rgba(140,198,63,.12);
+
+  color:var(--brand-lime-light);
+
+  transform:translateY(-1px);
+}
+
+.site-brand-menu i{
+
+  line-height:1;
+
+  color:inherit;
+}
+
+
+/* =========================================================
+   LAYOUT OFFSET
+   Header fixed → konten tidak tertutup
+   ========================================================= */
+
+.erp-layout{
+
+  min-height:
+    calc(
+      100vh
+      - var(--brand-header-height)
+    );
+
+  padding-top:
+    var(--brand-header-height);
+
+  padding-bottom:
+    var(--brand-footer-height);
+
+  box-sizing:border-box;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.erp-sidebar{
+
+  min-height:
+    calc(
+      100vh
+      - var(--brand-header-height)
+      - var(--brand-footer-height)
+    );
+
+  position:relative;
+
+  z-index:1000;
+}
+
+
+/* =========================================================
+   MAIN CONTENT
+   ========================================================= */
+
+.erp-main{
+
+  min-height:
+    calc(
+      100vh
+      - var(--brand-header-height)
+      - var(--brand-footer-height)
+    );
+
+  padding-bottom:
+    30px;
+}
+
+
+/* =========================================================
+   BOTTOM BRAND FOOTER
+   ========================================================= */
+
+.site-brand-footer{
+
+  position:fixed;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  width:100%;
+
+  height:var(--brand-footer-height);
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:7px;
+
+  padding:
+    0 16px;
+
+  box-sizing:border-box;
+
+  background:
+    linear-gradient(
+      135deg,
+      #111827 0%,
+      #172033 55%,
+      #111827 100%
+    );
+
+  border-top:
+    1px solid
+    rgba(140,198,63,.18);
+
+  box-shadow:
+    0 -5px 20px
+    rgba(0,0,0,.10);
+
+  color:#94a3b8;
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif;
+
+  font-size:12px;
+
+  font-weight:500;
+
+  z-index:19999;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+}
+
+
+/* FOOTER BRAND */
+
+.footer-brand-main{
+
+  color:#ffffff;
+
+  font-weight:700;
+}
+
+
+/* ROLE */
+
+.footer-brand-role{
+
+  color:var(--brand-lime);
+
+  font-weight:700;
+}
+
+
+/* COMPANY */
+
+.footer-brand-company{
+
+  color:var(--brand-lime);
+
+  font-weight:800;
+}
+
+
+/* SEPARATOR */
+
+.footer-brand-separator{
+
+  color:#64748b;
+
+  font-weight:700;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:600px){
+
+  :root{
+
+    --brand-header-height:92px;
+    --brand-footer-height:54px;
+
+  }
+
+
+  .site-brand-header{
+
+    height:var(--brand-header-height);
+
+    padding:
+      0 15px;
+  }
+
+
+  .site-brand-accent{
+
+    width:6px;
+    height:40px;
+  }
+
+
+  .site-brand-name{
+
+    font-size:28px;
+
+    letter-spacing:-.7px;
+  }
+
+
+  .site-brand-subtitle{
+
+    font-size:14px;
+
+    margin-top:6px;
+  }
+
+
+  .site-brand-menu{
+
+    width:58px;
+    height:58px;
+
+    border-radius:20px;
+
+    font-size:30px;
+  }
+
+
+  .erp-layout{
+
+    padding-top:
+      var(--brand-header-height);
+
+    padding-bottom:
+      var(--brand-footer-height);
+  }
+
+
+  .erp-sidebar{
+
+    min-height:
+      calc(
+        100vh
+        - var(--brand-header-height)
+        - var(--brand-footer-height)
+      );
+  }
+
+
+  .erp-main{
+
+    min-height:
+      calc(
+        100vh
+        - var(--brand-header-height)
+        - var(--brand-footer-height)
+      );
+
+    padding-bottom:25px;
+  }
+
+
+  .site-brand-footer{
+
+    height:var(--brand-footer-height);
+
+    padding:
+      0 8px;
+
+    gap:5px;
+
+    font-size:10px;
+  }
+
+}
+
+
+/* =========================================================
+   SMALL PHONE
+   ========================================================= */
+
+@media(max-width:380px){
+
+  .site-brand-header{
+
+    padding:
+      0 11px;
+  }
+
+
+  .site-brand-accent{
+
+    width:5px;
+    height:38px;
+  }
+
+
+  .site-brand-name{
+
+    font-size:23px;
+  }
+
+
+  .site-brand-subtitle{
+
+    font-size:11px;
+
+    margin-top:5px;
+  }
+
+
+  .site-brand-menu{
+
+    width:52px;
+    height:52px;
+
+    border-radius:17px;
+
+    font-size:27px;
+  }
+
+
+  .site-brand-footer{
+
+    font-size:9px;
+
+    gap:4px;
+  }
+
+}
+
+
+
+
+
+
+
+
+
+/* =========================================================
+   TOP RIGHT MENU + LOGOUT DROPDOWN
+   ========================================================= */
+
+.site-brand-menu-wrap{
+  position:relative;
+  display:flex;
+  align-items:center;
+}
+
+
+/* HAMBURGER BUTTON */
+
+.site-brand-menu{
+  position:relative;
+  width:62px;
+  height:62px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border-radius:20px;
+
+  background:rgba(255,255,255,.07);
+
+  border:1px solid rgba(255,255,255,.04);
+
+  color:#fff;
+
+  font-size:32px;
+
+  cursor:pointer;
+
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,.04);
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    color .2s ease;
+}
+
+.site-brand-menu:hover{
+  background:rgba(140,198,63,.12);
+  color:var(--brand-lime-light);
+  transform:translateY(-1px);
+}
+
+.site-brand-menu i{
+  line-height:1;
+
+  transition:
+    transform .22s ease,
+    opacity .18s ease;
+}
+
+
+/* OPEN STATE */
+
+.site-brand-menu.is-open{
+  background:rgba(140,198,63,.14);
+  color:var(--brand-lime-light);
+}
+
+.site-brand-menu.is-open i{
+  transform:rotate(90deg);
+}
+
+
+/* DROPDOWN */
+
+.site-menu-dropdown{
+  position:absolute;
+
+  top:calc(100% + 10px);
+  right:0;
+
+  width:190px;
+
+  padding:7px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #171e27,
+      #0f151c
+    );
+
+  border:
+    1px solid rgba(255,255,255,.09);
+
+  border-radius:12px;
+
+  box-shadow:
+    0 14px 35px rgba(0,0,0,.28);
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  transform:
+    translateY(-8px)
+    scale(.97);
+
+  transform-origin:top right;
+
+  transition:
+    opacity .18s ease,
+    visibility .18s ease,
+    transform .18s ease;
+
+  z-index:30000;
+}
+
+
+/* DROPDOWN OPEN */
+
+.site-menu-dropdown.is-open{
+  opacity:1;
+  visibility:visible;
+  pointer-events:auto;
+
+  transform:
+    translateY(0)
+    scale(1);
+}
+
+
+/* LOGOUT */
+
+.site-menu-logout{
+  width:100%;
+  min-height:44px;
+
+  display:flex;
+  align-items:center;
+
+  gap:10px;
+
+  padding:0 12px;
+
+  border:0;
+  border-radius:8px;
+
+  background:transparent;
+
+  color:#f8fafc;
+
+  font-size:12px;
+  font-weight:700;
+
+  text-align:left;
+
+  cursor:pointer;
+
+  transition:
+    background .18s ease,
+    color .18s ease;
+}
+
+.site-menu-logout i{
+  width:18px;
+
+  color:#ef4444;
+
+  font-size:14px;
+}
+
+.site-menu-logout:hover{
+  background:rgba(239,68,68,.12);
+  color:#fff;
+}
+
+.site-menu-logout:hover i{
+  color:#ff6b6b;
+}
+
+
+/* SIDEBAR LOGOUT SUDAH DIPINDAH */
+
+.erp-sidebar-bottom{
+  display:none !important;
+}
+
+
+/* MOBILE */
+
+@media(max-width:600px){
+
+  .site-brand-menu{
+    width:58px;
+    height:58px;
+
+    border-radius:20px;
+
+    font-size:30px;
+  }
+
+  .site-menu-dropdown{
+    top:calc(100% + 8px);
+    right:0;
+
+    width:175px;
+  }
+
+}
+
+@media(max-width:380px){
+
+  .site-brand-menu{
+    width:52px;
+    height:52px;
+
+    border-radius:17px;
+
+    font-size:27px;
+  }
+
+  .site-menu-dropdown{
+    width:165px;
+  }
+
+}
+
+
+
+
+
+
+
+
 
 
 	
@@ -2886,6 +3695,65 @@ textarea:focus-visible{
 </head>
 
 <body>
+
+
+<!-- =====================================================
+     TOP BRAND HEADER
+     ===================================================== -->
+
+<header class="site-brand-header">
+
+  <div class="site-brand-left">
+    <div class="site-brand-accent"></div>
+
+    <div class="site-brand-text">
+      <div class="site-brand-name">
+        Imam_salesfr
+      </div>
+
+      <div class="site-brand-subtitle">
+        Sales Representative
+        <span>•</span>
+        nine autoseries
+      </div>
+    </div>
+  </div>
+
+  <div class="site-brand-menu-wrap">
+
+    <button
+      type="button"
+      class="site-brand-menu"
+      id="site-menu-toggle"
+      aria-label="Open menu"
+      aria-expanded="false">
+
+      <i class="fa-solid fa-bars"></i>
+
+    </button>
+
+    <div
+      class="site-menu-dropdown"
+      id="site-menu-dropdown">
+
+      <button
+        type="button"
+        class="site-menu-logout"
+        onclick="logoutAdmin()">
+
+        <i class="fa-solid fa-right-from-bracket"></i>
+
+        <span>Logout</span>
+
+      </button>
+
+    </div>
+
+  </div>
+
+</header>
+
+	
   
   <div class="erp-layout">
 
@@ -2936,17 +3804,7 @@ textarea:focus-visible{
 
   </div>
 
-  <!-- LOGOUT -->
-  <div class="erp-sidebar-bottom">
-
-    <button
-      class="menu-btn logout-btn"
-      title="Logout"
-      onclick="logoutAdmin()">
-      <i class="fa-solid fa-right-from-bracket"></i>
-    </button>
-
-  </div>
+  
 
 </div>
 
@@ -2963,7 +3821,7 @@ textarea:focus-visible{
   <div class="header">
     <h1>
       <i class="fa-solid fa-gauge-high"></i>
-      IMAM SALES | VVIP
+      ADMIN | VIP
     </h1>
 
     <div id="live-clock">Loading...</div>
@@ -6005,27 +6863,135 @@ async function logoutAdmin(){
 
 
 
+
+
+/* =========================================================
+   TOP RIGHT MENU
+   ========================================================= */
+
+document.addEventListener("DOMContentLoaded", () => {
+
+  const menuToggle =
+    document.getElementById("site-menu-toggle");
+
+  const menuDropdown =
+    document.getElementById("site-menu-dropdown");
+
+  if(!menuToggle || !menuDropdown) return;
+
+
+  menuToggle.addEventListener("click", (event) => {
+
+    event.stopPropagation();
+
+    const isOpen =
+      menuDropdown.classList.toggle("is-open");
+
+    menuToggle.classList.toggle(
+      "is-open",
+      isOpen
+    );
+
+    menuToggle.setAttribute(
+      "aria-expanded",
+      isOpen ? "true" : "false"
+    );
+
+    const icon =
+      menuToggle.querySelector("i");
+
+    if(icon){
+
+      icon.classList.toggle(
+        "fa-bars",
+        !isOpen
+      );
+
+      icon.classList.toggle(
+        "fa-xmark",
+        isOpen
+      );
+
+    }
+
+  });
+
+
+  document.addEventListener("click", (event) => {
+
+    if(
+      !menuToggle.contains(event.target) &&
+      !menuDropdown.contains(event.target)
+    ){
+
+      menuDropdown.classList.remove("is-open");
+
+      menuToggle.classList.remove("is-open");
+
+      menuToggle.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+
+      const icon =
+        menuToggle.querySelector("i");
+
+      if(icon){
+
+        icon.classList.remove("fa-xmark");
+
+        icon.classList.add("fa-bars");
+
+      }
+
+    }
+
+  });
+
+});
+
+
+
+
+
+
+
+	
+
+
 </script>
 
 
 
 
 
-<div class="footer">
-  <span class="footer-brand">
-    <i class="fa-solid fa-copyright"></i>
-    2026 Imam_salesfr
-  </span>
+<!-- =====================================================
+     BOTTOM BRAND FOOTER
+     ===================================================== -->
 
-  <span class="footer-divider">•</span>
+<footer class="site-brand-footer">
 
-  <span class="footer-company">
+  <div class="footer-brand-main">
+    Imam_salesfr
+  </div>
+
+  <div class="footer-brand-separator">
+    •
+  </div>
+
+  <div class="footer-brand-role">
+    Sales Representative
+  </div>
+
+  <div class="footer-brand-separator">
+    •
+  </div>
+
+  <div class="footer-brand-company">
     nine autoseries
-  </span>
-</div>
+  </div>
 
-</div>
-</div>
+</footer>
 
 </body>
 </html>
