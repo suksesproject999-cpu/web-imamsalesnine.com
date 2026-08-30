@@ -6,1161 +6,2701 @@
 <title>Admin-V5 Dashboard</title>
 <link rel="stylesheet" href="/admin-v5/style.css">
 
+<link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
 
 
 <style>
-.status-btn .btn{
 
-  opacity:0.4;
 
-  transition:0.2s;
-}
-
-.status-text{
-  margin-top:6px;
-  font-size:12px;
-  font-weight:bold;
-}
-
-.status-text.pending{ color:red; }
-.status-text.proses{ color:orange; }
-.status-text.ready{ color:limegreen; }
-
-/* 🔥 TAMBAH DI DALAM <style> */
-
-.vip-wrapper{
-
-  position:relative;
-
-  left:auto;
-
-  top:auto;
-
-  width:100%;
-
-  background:#fff;
-
-  border:1px solid #d0d0d0;
-
-  border-radius:4px;
-
-  padding:12px;
-
-  box-shadow:none;
-
-}
-
-.vip-title{
-
-  font-size:14px;
-
-  font-weight:600;
-
-  color:#444;
-
-  margin-bottom:10px;
-
-  border-bottom:2px solid #e54770;
-
-  padding-bottom:6px;
-}
-
-.vip-search{
-
-width:100%;
-
-height:30px;
-
-padding:0 10px;
-
-background:white;
-
-border:1px solid #ccc;
-
-color:#333;
-
-font-size:12px;
-
-margin-bottom:10px;
-}
-
-.vip-grid{
-
-  display:grid;
-
-  gap:18px;
-}
-
-.vip-card{
-
-background:#dff2d8;
-
-border:1px solid #a6d4a1;
-
-border-left:none;
-
-border-radius:4px;
-
-padding:10px;
-}
-
-.vip-name{
-
-font-size:13px;
-
-font-weight:600;
-
-color:#444;
-
-margin-bottom:10px;
-}
-
-.vip-btn-wrap{
-
-  display:flex;
-
-  gap:12px;
-
-  flex-wrap:wrap;
-}
-
-.vip-btn{
-
-  border:none;
-
-  padding:13px 18px;
-
-  border-radius:14px;
-
-  color:white;
-
-  font-weight:bold;
-
-  cursor:pointer;
-}
-
-.vip-dashboard{
-
-  background:#22c55e;
-}
-
-.vip-history{
-
-  background:#3b82f6;
-}
-
-.vip-status{
-
-  margin-top:14px;
-
-  font-size:13px;
-
-  opacity:.7;
-}
-
-@media(max-width:600px){
-
-  .vip-name{
-    font-size:20px;
-  }
-
-  .vip-btn{
-    width:100%;
-  }
-
-}
-
-/* =====================================
-🤖 IMAMGPT SCOPED UI
-NO COLLISION VERSION
-===================================== */
-
-.imam-ai-container{
-
-background:#ffffff;
-
-border:1px solid #d0d0d0;
-
-border-radius:4px;
-
-box-shadow:none;
-
-margin:8px;
-}
-
-/* HEADER */
-
-.imam-ai-header{
-
-height:35px;
-
-padding:0 10px;
-
-display:flex;
-
-align-items:center;
-
-background:#5f7793;
-
-color:white;
-
-font-size:12px;
-
-font-weight:600;
-}
-
-/* CHAT AREA */
-
-#imam-chat-box{
-
-  height:340px;
-
-  overflow-y:auto;
-
-  padding:20px;
-
-  scroll-behavior:smooth;
-
-}
-
-/* USER */
-
-.imam-user-msg{
-
-  background:
-  linear-gradient(
-    135deg,
-    #2563eb,
-    #1d4ed8
-  );
-
-  color:white;
-
-  padding:14px 18px;
-
-  border-radius:20px;
-
-  margin:14px 0;
-
-  margin-left:auto;
-
-  width:fit-content;
-
-  max-width:82%;
-
-  line-height:1.7;
-
-  font-size:14px;
-
-  box-shadow:
-  0 6px 18px rgba(37,99,235,.35);
-
-  word-break:break-word;
-
-}
-
-/* AI */
-
-.imam-ai-msg{
-
-  background:
-  rgba(30,41,59,.95);
-
-  color:white;
-
-  padding:14px 18px;
-
-  border-radius:20px;
-
-  margin:14px 0;
-
-  width:fit-content;
-
-  max-width:82%;
-
-  line-height:1.7;
-
-  font-size:14px;
-
-  border:
-  1px solid rgba(255,255,255,.04);
-
-  box-shadow:
-  0 6px 18px rgba(0,0,0,.25);
-
-  word-break:break-word;
-
-}
-
-/* IMAGE */
-
-.imam-ai-msg img{
-
-  width:100%;
-
-  margin-top:14px;
-
-  border-radius:4px;
-
-  display:block;
-
-}
-
-/* INPUT */
-
-.imam-chat-input-wrap{
-
-  display:flex;
-
-  align-items:flex-end;
-
-  gap:12px;
-
-  padding:18px;
-
-  background:
-  rgba(17,24,39,.96);
-
-}
-
-/* TEXTAREA */
-#imam-ai-input{
-
-  flex:1;
-
-  min-height:60px;
-
-  max-height:180px;
-
-  overflow-y:auto;
-
-  border:none;
-
-  outline:none;
-
-  border-radius:18px;
-
-  padding:14px 16px;
-
-  background:
-  rgba(30,41,59,.95);
-
-  color:white;
-
-  resize:none;
-
-  font-size:14px;
-
-  line-height:1.5;
-
-  box-sizing:border-box;
-
-}
-
-/* BUTTON */
-
-.imam-chat-input-wrap button{
-
-  width:62px;
-
-  height:62px;
-
-  border:none;
-
-  border-radius:18px;
-
-  background:
-  linear-gradient(
-    135deg,
-    #22c55e,
-    #16a34a
-  );
-
-  color:white;
-
-  font-size:24px;
-
-  cursor:pointer;
-
-  flex-shrink:0;
-
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-  .imam-ai-container{
-
-    border-radius:24px;
-
-  }
-
-  .imam-ai-header{
-
-    font-size:20px;
-
-  }
-
-  #imam-chat-box{
-
-    height:300px;
-
-  }
-
-}
-
-/* =========================
-TYPING ANIMATION
-========================= */
-
-.typing{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:6px;
-
-}
-
-.typing span{
-
-  width:8px;
-
-  height:8px;
-
-  border-radius:50%;
-
-  background:white;
-
-  opacity:.5;
-
-  animation:bounce 1s infinite;
-
-}
-
-.typing span:nth-child(2){
-
-  animation-delay:.2s;
-
-}
-
-.typing span:nth-child(3){
-
-  animation-delay:.4s;
-
-}
-
-@keyframes bounce{
-
-  0%,100%{
-
-    transform:translateY(0);
-
-    opacity:.3;
-
-  }
-
-  50%{
-
-    transform:translateY(-4px);
-
-    opacity:1;
-
-  }
-
-}
-
-.ai-action{
-
-  display:flex;
-
-  gap:10px;
-
-  margin-top:14px;
-
-}
-
-.copy-btn,
-.download-btn{
-
-  border:none;
-
-  background:#1e293b;
-
-  color:white;
-
-  padding:10px 14px;
-
-  border-radius:12px;
-
-  cursor:pointer;
-
-  font-size:13px;
-
-  transition:.2s;
-
-}
-
-.copy-btn:hover,
-.download-btn:hover{
-
-  transform:translateY(-2px);
-
-  background:#334155;
-
-}
-
-.image-upload-wrap{
-
-  display:flex;
-
-  align-items:center;
-
-  gap:10px;
-
-  margin-bottom:12px;
-
-}
-
-.image-upload-wrap input{
-
-  color:white;
-
-  font-size:13px;
-
-}
-
-.upload-btn{
-
-  width:58px;
-
-  height:58px;
-
-  border-radius:16px;
-
-  display:flex;
-
-  align-items:center;
-
-  justify-content:center;
-
-  background:
-  rgba(255,255,255,.08);
-
-  cursor:pointer;
-
-  font-size:24px;
-
-  flex-shrink:0;
-
-}
-
-#preview-box{
-
-  padding:
-  12px 18px 0 18px;
-
-}
-
-#preview-box img{
-
-  width:90px;
-
-  border-radius:14px;
-
-  margin-top:8px;
-
-  display:block;
-
-  box-shadow:
-  0 6px 20px rgba(0,0,0,.25);
-
-}
-
-.preview-card{
 
-  display:flex;
+/* =========================================================
+   IMAM SALES ADMIN — FINAL VISUAL POLISH
+   UI ONLY — NO JS / FUNCTION / DATA MODIFICATION
+   ========================================================= */
 
-  align-items:center;
+:root{
+  --admin-bg:#f4f7fb;
+  --admin-surface:#ffffff;
+  --admin-surface-soft:#f8fafc;
+  --admin-border:#e2e8f0;
+  --admin-border-dark:#cbd5e1;
 
-  gap:12px;
+  --admin-text:#172033;
+  --admin-text-soft:#64748b;
+  --admin-text-muted:#94a3b8;
 
-  background:
-  rgba(255,255,255,.05);
+  --admin-blue:#153d7a;
+  --admin-blue-dark:#0b2d61;
+  --admin-blue-soft:#eff6ff;
 
-  padding:10px;
+  --admin-pink:#e54770;
+  --admin-pink-dark:#d63861;
 
-  border-radius:16px;
+  --admin-lime:#8CC63F;
+  --admin-lime-light:#a6e34b;
+  --admin-lime-soft:rgba(140,198,63,.12);
 
-  width:fit-content;
+  --admin-red:#ef4444;
+  --admin-yellow:#f59e0b;
+  --admin-green:#16a34a;
 
-}
-
-.preview-card img{
-
-  width:70px;
-
-  height:70px;
-
-  object-fit:cover;
-
-  border-radius:12px;
-
-}
-
-/* =====================================
-📚 FINAL ADMIN INVOICE UI
-===================================== */
-
-.invoice-group{
-
-background:transparent;
-
-border:1px solid #d0d0d0;
-
-border-radius:4px;
-
-box-shadow:none;
-
-padding:0;
-
-margin-bottom:8px;
-
-}
-
-/* HEADER */
-.invoice-header{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:flex-start;
-
-  gap:14px;
-
-  background:#f7f7f7;
-
-  padding:10px;
-
-  border-bottom:1px solid #ddd;
-
-}
-
-/* LEFT */
-.invoice-header-left{
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:4px;
-
-}
-
-/* INVOICE */
-
-.invoice-title{
-
-font-size:13px;
-
-font-weight:600;
-
-color:#333;
-
-}
-
-/* INFO */
-
-.invoice-info{
-
-  display:flex;
-
-  flex-direction:column;
-
-  gap:2px;
-
-}
-
-.invoice-info .vip-name{
-
-color:#333;
-
-font-size:12px;
-
-font-weight:600;
-
-}
-
-.invoice-info .vip-date{
-
-  color:#94a3b8;
-
-  font-size:13px;
-
-  margin-top:2px;
-
-  display:block;
-
-}
-
-/* TOGGLE */
-
-.collapse-btn{
-
-width:28px;
-
-height:28px;
-
-font-size:12px;
-
-border-radius:3px;
-
-}
-
-.collapse-btn:hover{
-
-  background:#334155;
-  
-  transform:translateY(-2px);
-
-}
-
-/* SUMMARY */
-
-.invoice-summary{
-
-  display:flex;
-
-  gap:12px;
-
-  margin-top:20px;
-
-  flex-wrap:wrap;
-
-}
-
-.summary-box{
-
-background:#f0f0f0;
-
-border:1px solid #ddd;
-
-border-radius:3px;
-
-padding:5px 8px;
-
-font-size:11px;
-
-}
-
-.summary-ready{
-
-  color:#22c55e;
-
-}
-
-.summary-proses{
-
-  color:#facc15;
-
-}
-
-.summary-pending{
-
-  color:#ef4444;
-
-}
-
-/* CONTENT */
-
-.invoice-content{
-
-  display:none;
-
-  margin-top:18px;
-
-}
-
-/* ITEM */
-
-.invoice-item{
-
-background:white;
-
-border-bottom:1px solid #eee;
-
-border-radius:0;
-
-padding:10px;
-
-margin:0;
-}
-
-/* PRODUCT */
-
-.invoice-order{
-  color:#333;
-  font-size:12px;
-  font-weight:600;
-  line-height:1.5;
-}
-
-/* STATUS */
-
-.status-text.pending{
-
-  color:#ef4444;
-
-}
-
-.status-text.proses{
-
-  color:#facc15;
-
-}
-
-.status-text.ready{
+  --admin-radius:10px;
+  --admin-radius-sm:7px;
 
-  color:#22c55e;
+  --admin-shadow:
+    0 4px 18px rgba(15,23,42,.06);
 
+  --admin-shadow-hover:
+    0 10px 28px rgba(15,23,42,.10);
 }
 
-/* ACTION */
 
-.action-wrapper{
-
-  display:flex;
-
-  justify-content:space-between;
-
-  align-items:flex-end;
-
-  gap:14px;
-
-}
-
-/* STATUS BUTTON */
-
-.status-btn{
-
-  display:flex;
-
-  gap:10px;
-
-}
-
-.status-btn .btn{
-
-width:28px;
-
-height:28px;
-
-font-size:12px;
-
-border-radius:3px;
-
-}
-
-.status-btn .btn:hover{
-
-  transform:translateY(-2px);
-
-}
-
-/* ACTIVE */
-
-.active-red{
-
-  background:#ef4444 !important;
-
-}
-
-.active-yellow{
-
-  background:#facc15 !important;
-
-}
-
-.active-green{
-
-  background:#22c55e !important;
-
-}
-
-/* DELETE */
-
-.delete-side{
-
-  display:flex;
-
-  flex-direction:column;
-
-  align-items:center;
-
-  gap:4px;
-
-}
-
-.delete-label{
-
-  font-size:13px;
-
-  font-weight:900;
-
-  color:#94a3b8;
-
-  letter-spacing:.5px;
-
-}
-
-.delete-btn-admin{
-
-width:28px;
-
-height:28px;
-
-font-size:12px;
-
-border-radius:3px;
-
-}
-
-.delete-btn-admin:hover{
-
-  background:#dc2626;
-
-  transform:translateY(-2px);
-
-}
-
-/* REQUEST DELETE */
-
-.invoice-delete-alert{
-
-  margin-top:14px;
-
-  background:#7f1d1d;
-
-  border-radius:14px;
-
-  padding:14px;
-
-  color:white;
-
-  font-size:13px;
-
-  line-height:1.6;
-
-}
-
-.invoice-delete-action{
-
-  display:flex;
-
-  gap:10px;
-
-  margin-top:12px;
-
-}
-
-.approve-btn{
-
-  background:#16a34a;
-
-  color:white;
-
-  border:none;
-
-  padding:10px 14px;
-
-  border-radius:10px;
-
-  font-weight:700;
-
-}
-
-.reject-btn{
-
-  background:#334155;
-
-  color:white;
-
-  border:none;
-
-  padding:10px 14px;
-
-  border-radius:10px;
-
-  font-weight:700;
-
-}
-
-/* MOBILE */
-
-@media(max-width:768px){
-
-  .invoice-title{
-    font-size:12px;
-  }
-
-  .invoice-info .vip-name{
-    font-size:11px;
-  }
-
-  .summary-box{
-    font-size:10px;
-    padding:3px 6px;
-  }
-
-  .status-btn .btn,
-  .delete-btn-admin{
-    width:28px;
-    height:28px;
-    font-size:12px;
-  }
-
-}
-
-.vip-active-name{
-  color:#ffffff !important;
-  font-size:14px !important;
-  font-weight:700 !important;
-}
-
-.erp-layout{
-display:flex;
-min-height:100vh;
-}
-
-.erp-sidebar{
-width:52px;
-background:linear-gradient(
-180deg,
-#153d7a,
-#0b2d61
-);
-display:flex;
-flex-direction:column;
-align-items:center;
-}
-
-.erp-logo{
-height:50px;
-display:flex;
-align-items:center;
-justify-content:center;
-color:white;
-font-size:20px;
-}
-
-.erp-menu{
-width:100%;
-}
-
-.erp-menu button{
-width:100%;
-height:48px;
-border:none;
-background:none;
-color:white;
-cursor:pointer;
-font-size:18px;
-}
-
-.erp-menu button:hover{
-background:#e64874;
-}
-
-.erp-main{
-flex:1;
-overflow-y:auto;
-overflow-x:hidden;
-background:transparent;
-padding-bottom:80px;
-}
-
-#data{
-padding-bottom:120px;
-}
-
-
-.erp-tabs{
-height:35px;
-display:flex;
-align-items:center;
-background:#ededed;
-border-bottom:1px solid #d0d0d0;
-}
-
-.erp-tab{
-padding:8px 14px;
-font-size:13px;
-border-right:1px solid #cfcfcf;
-}
+/* =========================================================
+   BASE
+   ========================================================= */
 
-.erp-tab.active{
-background:#e54770;
-color:white;
-font-weight:bold;
+html{
+  background:var(--admin-bg);
 }
 
 body{
-
-background:transparent;
-
-font-family:
-Segoe UI,
-Tahoma,
-Arial,
-sans-serif;
-
-font-size:12px;
-
+  margin:0;
+  background:var(--admin-bg);
+  color:var(--admin-text);
+  font-family:
+    "Segoe UI",
+    Inter,
+    Roboto,
+    Arial,
+    sans-serif;
+  font-size:13px;
+  line-height:1.5;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
 }
+
+*,
+*::before,
+*::after{
+  box-sizing:border-box;
+}
+
+button,
+input,
+select,
+textarea{
+  font:inherit;
+}
+
+button{
+  -webkit-tap-highlight-color:transparent;
+}
+
+
+/* =========================================================
+   MAIN LAYOUT
+   ========================================================= */
+
+.erp-layout{
+  display:flex;
+  min-height:100vh;
+  width:100%;
+  background:var(--admin-bg);
+}
+
+.erp-main{
+  flex:1;
+  min-width:0;
+  min-height:100vh;
+  overflow-x:hidden;
+  overflow-y:auto;
+  background:
+    linear-gradient(
+      180deg,
+      #f8fafc 0,
+      var(--admin-bg) 260px
+    );
+  padding-bottom:78px;
+}
+
+
+/* =========================================================
+   SIDEBAR
+   ========================================================= */
+
+.erp-sidebar{
+  width:58px;
+  min-width:58px;
+  min-height:100vh;
+
+  position:relative;
+  z-index:1000;
+
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+
+  background:
+    linear-gradient(
+      180deg,
+      var(--admin-blue) 0%,
+      var(--admin-blue-dark) 100%
+    );
+
+  border-right:1px solid rgba(255,255,255,.08);
+
+  box-shadow:
+    4px 0 18px rgba(11,45,97,.10);
+
+  overflow:visible;
+}
+
+.erp-logo{
+  width:100%;
+  height:58px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  color:#fff;
+  font-size:19px;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.10);
+}
+
+.erp-logo i{
+  transition:
+    transform .25s ease,
+    color .25s ease;
+}
+
+.erp-logo:hover i{
+  color:var(--admin-lime-light);
+  transform:rotate(25deg);
+}
+
+.erp-menu{
+  width:100%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:5px;
+  padding:12px 6px;
+}
+
+.erp-menu .menu-btn,
+.erp-sidebar-bottom .menu-btn{
+  position:relative;
+
+  width:46px;
+  height:46px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  border:1px solid transparent;
+  border-radius:9px;
+
+  background:transparent;
+  color:#fff;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.erp-menu .menu-btn i,
+.erp-sidebar-bottom .menu-btn i{
+  font-size:17px;
+  color:#fff;
+  transition:
+    transform .2s ease,
+    color .2s ease;
+}
+
+.erp-menu .menu-btn:hover{
+  background:rgba(255,255,255,.10);
+  border-color:rgba(255,255,255,.10);
+}
+
+.erp-menu .menu-btn:hover i{
+  transform:scale(1.08);
+}
+
+.erp-menu .menu-btn.active{
+  background:
+    linear-gradient(
+      135deg,
+      var(--admin-pink),
+      var(--admin-pink-dark)
+    );
+
+  border-color:rgba(255,255,255,.12);
+
+  box-shadow:
+    0 5px 14px rgba(229,71,112,.25);
+}
+
+.erp-menu .menu-btn.active::after{
+  content:"";
+
+  position:absolute;
+  left:-7px;
+  top:9px;
+
+  width:3px;
+  height:28px;
+
+  border-radius:0 4px 4px 0;
+
+  background:var(--admin-lime-light);
+}
+
+.erp-sidebar-bottom{
+  margin-top:auto;
+  width:100%;
+  padding:10px 6px 14px;
+}
+
+.logout-btn:hover{
+  background:rgba(239,68,68,.16)!important;
+  border-color:rgba(239,68,68,.25)!important;
+}
+
+.logout-btn:hover i{
+  color:#fff!important;
+}
+
+
+/* =========================================================
+   SIDEBAR TOOLTIP
+   ========================================================= */
+
+.erp-menu .menu-btn::after{
+  content:attr(title);
+
+  position:absolute;
+  left:calc(100% + 12px);
+  top:50%;
+
+  transform:
+    translateY(-50%)
+    translateX(-5px);
+
+  padding:7px 10px;
+
+  background:#fff;
+  color:#334155;
+
+  border:1px solid var(--admin-border);
+
+  border-radius:7px;
+
+  font-size:12px;
+  font-weight:600;
+
+  line-height:1;
+  white-space:nowrap;
+
+  box-shadow:
+    0 8px 22px rgba(15,23,42,.14);
+
+  opacity:0;
+  visibility:hidden;
+  pointer-events:none;
+
+  z-index:99999;
+
+  transition:
+    opacity .18s ease,
+    transform .18s ease,
+    visibility .18s ease;
+}
+
+.erp-menu .menu-btn:hover::after{
+  opacity:1;
+  visibility:visible;
+
+  transform:
+    translateY(-50%)
+    translateX(0);
+}
+
+
+/* =========================================================
+   TOP TABS
+   ========================================================= */
+
+.erp-tabs{
+  height:42px;
+
+  display:flex;
+  align-items:stretch;
+
+  overflow-x:auto;
+  overflow-y:hidden;
+
+  white-space:nowrap;
+
+  background:#fff;
+
+  border-bottom:1px solid var(--admin-border);
+
+  box-shadow:
+    0 1px 4px rgba(15,23,42,.03);
+
+  scrollbar-width:none;
+}
+
+.erp-tabs::-webkit-scrollbar{
+  display:none;
+}
+
+.erp-tab{
+  position:relative;
+
+  display:flex;
+  align-items:center;
+
+  padding:0 17px;
+
+  color:#64748b;
+  background:transparent;
+
+  border-right:1px solid #edf0f4;
+
+  font-size:12px;
+  font-weight:600;
+
+  cursor:pointer;
+
+  transition:
+    color .2s ease,
+    background .2s ease;
+}
+
+.erp-tab:hover{
+  color:var(--admin-pink);
+  background:#fff8fa;
+}
+
+.erp-tab.active{
+  color:#fff;
+  background:var(--admin-pink);
+}
+
+.erp-tab.active::after{
+  content:"";
+
+  position:absolute;
+  left:14px;
+  right:14px;
+  bottom:0;
+
+  height:3px;
+
+  border-radius:3px 3px 0 0;
+
+  background:var(--admin-lime-light);
+}
+
+
+/* =========================================================
+   PAGE HEADER
+   ========================================================= */
+
+.header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+
+  min-height:76px;
+
+  padding:16px 22px;
+
+  background:transparent;
+
+  border-bottom:1px solid rgba(226,232,240,.7);
+}
+
+.header h1{
+  margin:0;
+
+  color:var(--admin-text);
+
+  font-size:20px;
+  font-weight:700;
+  letter-spacing:-.3px;
+
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.header h1 i{
+  color:var(--admin-lime);
+
+  filter:
+    drop-shadow(
+      0 3px 7px
+      rgba(140,198,63,.25)
+    );
+}
+
+#live-clock{
+  white-space:pre-line;
+
+  color:var(--admin-text-soft);
+
+  font-size:11px;
+  font-weight:500;
+
+  line-height:1.45;
+
+  text-align:right;
+}
+
+
+/* =========================================================
+   PAGE / CARD
+   ========================================================= */
 
 .page-section{
   display:none;
+
+  padding:
+    16px 18px 20px;
 }
 
 .page-section.active{
   display:block;
 }
 
-.erp-menu button.active{
-  background:#e54770;
+.card{
+  background:var(--admin-surface);
+
+  border:
+    1px solid var(--admin-border);
+
+  border-radius:var(--admin-radius);
+
+  box-shadow:var(--admin-shadow);
+
+  overflow:hidden;
 }
 
-.erp-menu button{
-  transition:.2s;
+.card > h3{
+  margin:0;
+
+  padding:15px 17px;
+
+  color:var(--admin-text);
+
+  font-size:14px;
+  font-weight:700;
+
+  border-bottom:1px solid var(--admin-border);
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff,
+      #fbfcfe
+    );
 }
 
-.erp-menu button:active{
-  transform:scale(.95);
+.card > h3 i{
+  color:var(--admin-lime);
+  margin-right:7px;
+
+  filter:
+    drop-shadow(
+      0 3px 5px
+      rgba(140,198,63,.20)
+    );
 }
 
-#top-tabs{
 
-  overflow-x:auto;
+/* =========================================================
+   DASHBOARD — ACTIVE USERS
+   ========================================================= */
 
-  white-space:nowrap;
-
+#vip-active-list{
+  background:#0f172a;
 }
 
-#top-tabs .erp-tab{
+#vip-active-title{
+  display:flex;
+  align-items:center;
+  gap:2px;
+}
 
-  flex-shrink:0;
+#vip-active-list > div{
+  min-height:62px;
 
+  padding:10px 14px!important;
+
+  background:
+    linear-gradient(
+      90deg,
+      #0f172a,
+      #111c30
+    )!important;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.055)!important;
+
+  transition:
+    background .2s ease;
+}
+
+#vip-active-list > div:hover{
+  background:#162238!important;
+}
+
+.vip-active-name{
+  color:#fff!important;
+  font-size:13px!important;
+  font-weight:700!important;
+}
+
+
+/* =========================================================
+   INPUTS / SELECTS
+   ========================================================= */
+
+input[type="text"],
+select,
+textarea{
+  border:1px solid var(--admin-border-dark);
+
+  border-radius:7px;
+
+  background:#fff;
+
+  color:var(--admin-text);
+
+  outline:none;
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease,
+    background .2s ease;
+}
+
+input[type="text"]:focus,
+select:focus,
+textarea:focus{
+  border-color:
+    rgba(140,198,63,.85);
+
+  box-shadow:
+    0 0 0 3px
+    rgba(140,198,63,.12);
+
+  background:#fff;
+}
+
+input::placeholder,
+textarea::placeholder{
+  color:#a0aec0;
+}
+
+
+/* =========================================================
+   STOCK
+   ========================================================= */
+
+.stok-card{
+  overflow:hidden;
+}
+
+.stok-card > input[type="text"]{
+  width:100%;
+  height:38px;
+
+  margin:16px 16px 0;
+  width:calc(100% - 32px);
+
+  padding:0 12px;
+
+  font-size:12px;
+}
+
+.stok-card > label{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  margin:
+    12px 16px;
+
+  color:var(--admin-text-soft);
+
+  font-size:12px;
+  font-weight:600;
+}
+
+#stok-list{
+  padding:0 16px 8px;
+}
+
+.stok-item > div{
+  min-height:48px!important;
+
+  padding:7px 4px!important;
+
+  border-bottom:
+    1px solid #edf1f5!important;
+}
+
+.stok-item:hover > div{
+  background:#fafcff;
+}
+
+.stok-item span{
+  font-size:12px!important;
+  font-weight:600;
+}
+
+.stok-footer{
+  display:flex;
+  gap:10px;
+
+  padding:14px 16px;
+
+  border-top:1px solid var(--admin-border);
+
+  background:#f8fafc;
+}
+
+.stok-footer button{
+  min-height:38px;
+
+  padding:0 14px;
+
+  border:1px solid transparent;
+  border-radius:7px;
+
+  font-size:11px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    filter .2s ease;
+}
+
+.stok-footer button:first-child{
+  background:var(--admin-lime);
+  color:#fff;
+
+  box-shadow:
+    0 4px 10px rgba(140,198,63,.20);
+}
+
+.stok-footer button:last-child{
+  background:#fee2e2;
+  color:#b91c1c;
+
+  border-color:#fecaca;
+}
+
+.stok-footer button:hover{
+  transform:translateY(-1px);
+  filter:brightness(.98);
+}
+
+
+/* =========================================================
+   STOCK TOGGLE
+   ========================================================= */
+
+.toggle{
+  width:40px!important;
+  height:22px!important;
+
+  border-radius:20px!important;
+
+  background:#cbd5e1!important;
+
+  transition:
+    background .2s ease;
+}
+
+.toggle.active{
+  background:var(--admin-lime)!important;
+}
+
+.toggle .circle{
+  width:16px!important;
+  height:16px!important;
+
+  margin:3px!important;
+
+  background:#fff;
+
+  border-radius:50%;
+
+  box-shadow:
+    0 2px 5px rgba(0,0,0,.18);
+
+  transition:
+    transform .2s ease;
+}
+
+.toggle .circle.on{
+  transform:translateX(18px);
+}
+
+
+/* =========================================================
+   ORDER CONTROL
+   ========================================================= */
+
+.control{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:8px;
+
+  margin-bottom:12px;
+
+  padding:10px;
+
+  background:#fff;
+
+  border:
+    1px solid var(--admin-border);
+
+  border-radius:9px;
+
+  box-shadow:
+    0 2px 10px rgba(15,23,42,.04);
+}
+
+.control select,
+.control input{
+  height:36px;
+
+  padding:0 10px;
+
+  font-size:11px;
+}
+
+.control select{
+  min-width:115px;
+}
+
+.control #search{
+  flex:1;
+  min-width:160px;
+}
+
+.control button{
+  height:36px;
+
+  padding:0 14px;
+
+  border:none;
+  border-radius:7px;
+
+  background:var(--admin-blue);
+
+  color:#fff;
+
+  font-size:11px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    box-shadow .2s ease;
+}
+
+.control button:hover{
+  background:#194a91;
+
+  transform:translateY(-1px);
+
+  box-shadow:
+    0 5px 12px rgba(21,61,122,.18);
+}
+
+
+/* =========================================================
+   ORDER CARD
+   ========================================================= */
+
+.order-card{
+  overflow:visible;
 }
 
 #data{
-padding-bottom:120px;
+  padding:12px;
+  padding-bottom:30px;
 }
 
+
+/* =========================================================
+   INVOICE
+   ========================================================= */
+
+.invoice-group{
+  margin-bottom:10px;
+
+  overflow:hidden;
+
+  background:#fff;
+
+  border:
+    1px solid var(--admin-border);
+
+  border-radius:9px;
+
+  box-shadow:
+    0 2px 9px rgba(15,23,42,.045);
+
+  transition:
+    border-color .2s ease,
+    box-shadow .2s ease;
+}
+
+.invoice-group:hover{
+  border-color:#d7dee8;
+
+  box-shadow:
+    0 5px 16px rgba(15,23,42,.07);
+}
+
+.invoice-header{
+  min-height:64px;
+
+  padding:11px 13px;
+
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:14px;
+
+  background:
+    linear-gradient(
+      180deg,
+      #ffffff,
+      #f8fafc
+    );
+
+  border-bottom:1px solid var(--admin-border);
+}
+
+.invoice-header-left{
+  min-width:0;
+
+  display:flex;
+  flex-direction:column;
+  gap:5px;
+}
+
+.invoice-title{
+  display:flex;
+  align-items:center;
+
+  color:var(--admin-text);
+
+  font-size:12px;
+  font-weight:800;
+
+  word-break:break-word;
+}
+
+.invoice-title i{
+  flex:none;
+  color:var(--admin-lime);
+  margin-right:6px;
+}
+
+.invoice-info{
+  display:flex;
+  flex-direction:column;
+  gap:2px;
+}
+
+.invoice-info .vip-name{
+  color:#475569;
+  font-size:11px;
+  font-weight:700;
+}
+
+.invoice-info .vip-date{
+  color:#94a3b8;
+  font-size:10px;
+}
+
+.collapse-btn{
+  flex:none;
+
+  width:30px;
+  height:30px;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+
+  padding:0;
+
+  border:
+    1px solid var(--admin-border-dark);
+
+  border-radius:7px;
+
+  background:#fff;
+  color:#64748b;
+
+  cursor:pointer;
+
+  transition:
+    color .2s ease,
+    background .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+.collapse-btn:hover{
+  color:#fff;
+  background:var(--admin-blue);
+  border-color:var(--admin-blue);
+  transform:translateY(-1px);
+}
+
+
+/* =========================================================
+   INVOICE SUMMARY
+   ========================================================= */
+
+.invoice-summary{
+  display:flex;
+  flex-wrap:wrap;
+  gap:7px;
+
+  margin:0;
+
+  padding:10px 12px;
+
+  background:#fbfcfe;
+
+  border-bottom:1px solid #edf1f5;
+}
+
+.summary-box{
+  min-height:29px;
+
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+
+  padding:4px 8px;
+
+  background:#fff;
+
+  border:1px solid var(--admin-border);
+
+  border-radius:6px;
+
+  color:#64748b;
+
+  font-size:10px;
+  font-weight:700;
+}
+
+.summary-box i{
+  font-size:11px!important;
+  color:var(--admin-lime)!important;
+  margin-right:1px!important;
+}
+
+.invoice-summary .summary-ready,
+.invoice-summary .summary-proses,
+.invoice-summary .summary-pending{
+  color:var(--admin-text)!important;
+  font-weight:800;
+}
+
+
+/* =========================================================
+   INVOICE ITEMS
+   ========================================================= */
+
+.invoice-content{
+  margin:0!important;
+  background:#fff;
+}
+
+.invoice-item{
+  position:relative;
+
+  padding:12px!important;
+  margin:0!important;
+
+  background:#fff!important;
+
+  border-bottom:
+    1px solid #edf1f5!important;
+
+  border-radius:0!important;
+}
+
+.invoice-item:last-child{
+  border-bottom:none!important;
+}
+
+.invoice-item:hover{
+  background:#fbfdff!important;
+}
+
+.invoice-order{
+  display:flex;
+  align-items:flex-start;
+  gap:5px;
+
+  color:#334155!important;
+
+  font-size:12px!important;
+  font-weight:650!important;
+
+  line-height:1.5!important;
+
+  word-break:break-word;
+}
+
+.invoice-order i{
+  flex:none;
+  color:var(--admin-lime)!important;
+  margin-top:3px!important;
+  margin-right:1px!important;
+}
+
+.status-text{
+  display:inline-flex;
+  align-items:center;
+  gap:5px;
+
+  margin-top:7px;
+
+  font-size:10px!important;
+  font-weight:800!important;
+  letter-spacing:.25px;
+}
+
+.status-text i{
+  font-size:10px;
+}
+
+.status-text.pending{
+  color:var(--admin-red)!important;
+}
+
+.status-text.proses{
+  color:var(--admin-yellow)!important;
+}
+
+.status-text.ready{
+  color:var(--admin-green)!important;
+}
+
+
+/* =========================================================
+   STATUS ACTION
+   ========================================================= */
+
+.action-wrapper{
+  display:flex!important;
+  align-items:flex-end!important;
+  justify-content:space-between!important;
+  gap:15px!important;
+
+  margin-top:10px;
+}
+
+.status-btn{
+  display:flex!important;
+  gap:6px!important;
+}
+
+.status-btn .btn{
+  width:31px!important;
+  height:31px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+
+  padding:0!important;
+
+  border:
+    1px solid var(--admin-border-dark)!important;
+
+  border-radius:7px!important;
+
+  background:#f8fafc!important;
+
+  color:#94a3b8!important;
+
+  opacity:1!important;
+
+  cursor:pointer;
+
+  transition:
+    transform .18s ease,
+    color .18s ease,
+    background .18s ease,
+    border-color .18s ease,
+    box-shadow .18s ease;
+}
+
+.status-btn .btn:hover{
+  transform:translateY(-1px)!important;
+
+  background:#fff!important;
+
+  box-shadow:
+    0 4px 10px rgba(15,23,42,.10);
+}
+
+.status-btn .btn i{
+  font-size:11px!important;
+}
+
+.status-btn .btn.active-red{
+  background:#fee2e2!important;
+  border-color:#fecaca!important;
+  color:var(--admin-red)!important;
+}
+
+.status-btn .btn.active-yellow{
+  background:#fef3c7!important;
+  border-color:#fde68a!important;
+  color:#d97706!important;
+}
+
+.status-btn .btn.active-green{
+  background:#ecfdf5!important;
+  border-color:#bbf7d0!important;
+  color:var(--admin-green)!important;
+}
+
+
+/* =========================================================
+   DELETE ACTION
+   ========================================================= */
+
+.delete-side{
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  gap:4px!important;
+}
+
+.delete-label{
+  color:#94a3b8!important;
+
+  font-size:9px!important;
+  font-weight:800!important;
+
+  letter-spacing:.7px;
+}
+
+.delete-btn-admin{
+  width:31px!important;
+  height:31px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+
+  padding:0!important;
+
+  border:
+    1px solid #fecaca!important;
+
+  border-radius:7px!important;
+
+  background:#fff!important;
+
+  color:var(--admin-red)!important;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    color .2s ease,
+    border-color .2s ease,
+    transform .2s ease;
+}
+
+.delete-btn-admin i{
+  color:var(--admin-red)!important;
+}
+
+.delete-btn-admin:hover{
+  background:var(--admin-red)!important;
+  border-color:var(--admin-red)!important;
+  color:#fff!important;
+
+  transform:translateY(-1px);
+}
+
+.delete-btn-admin:hover i{
+  color:#fff!important;
+}
+
+
+/* =========================================================
+   DELETE REQUEST ALERT
+   ========================================================= */
+
+.invoice-delete-alert{
+  margin:10px 12px;
+
+  padding:12px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff1f2,
+      #fff7f7
+    )!important;
+
+  border:
+    1px solid #fecdd3!important;
+
+  border-left:
+    4px solid var(--admin-red)!important;
+
+  border-radius:8px!important;
+
+  color:#991b1b!important;
+
+  font-size:11px!important;
+  font-weight:800!important;
+
+  line-height:1.5!important;
+}
+
+.invoice-delete-alert > i{
+  color:var(--admin-red)!important;
+}
+
+.invoice-delete-alert .btn{
+  min-height:31px;
+
+  padding:0 11px;
+
+  border:none;
+  border-radius:6px;
+
+  font-size:10px;
+  font-weight:800;
+
+  cursor:pointer;
+}
+
+.invoice-delete-alert .btn:first-of-type{
+  background:var(--admin-lime);
+  color:#fff;
+}
+
+.invoice-delete-alert .btn:last-of-type{
+  background:#334155;
+  color:#fff;
+}
+
+.invoice-delete-alert .btn:hover{
+  filter:brightness(.96);
+  transform:translateY(-1px);
+}
+
+
+/* =========================================================
+   VIP CONTROL
+   ========================================================= */
+
+.vip-wrapper{
+  width:100%!important;
+
+  padding:16px!important;
+
+  background:#fff!important;
+
+  border:
+    1px solid var(--admin-border)!important;
+
+  border-radius:10px!important;
+
+  box-shadow:var(--admin-shadow)!important;
+}
+
+.vip-title{
+  display:flex;
+  align-items:center;
+
+  margin-bottom:13px!important;
+  padding-bottom:10px!important;
+
+  color:var(--admin-text)!important;
+
+  font-size:14px!important;
+  font-weight:800!important;
+
+  border-bottom:
+    2px solid var(--admin-pink)!important;
+}
+
+.vip-title i{
+  color:#eab308!important;
+  margin-right:7px;
+}
+
+.vip-search{
+  width:100%!important;
+  height:38px!important;
+
+  margin-bottom:14px!important;
+
+  padding:0 11px!important;
+
+  background:#fff!important;
+
+  border:
+    1px solid var(--admin-border-dark)!important;
+
+  border-radius:7px!important;
+
+  color:var(--admin-text)!important;
+
+  font-size:12px!important;
+}
+
+.vip-grid{
+  display:grid!important;
+
+  grid-template-columns:
+    repeat(
+      auto-fill,
+      minmax(250px,1fr)
+    );
+
+  gap:12px!important;
+}
+
+.vip-card{
+  padding:14px!important;
+
+  background:
+    linear-gradient(
+      180deg,
+      #fff,
+      #f8fafc
+    )!important;
+
+  border:
+    1px solid var(--admin-border)!important;
+
+  border-left:
+    3px solid var(--admin-lime)!important;
+
+  border-radius:9px!important;
+
+  box-shadow:
+    0 2px 8px rgba(15,23,42,.035)!important;
+
+  transition:
+    transform .2s ease,
+    box-shadow .2s ease,
+    border-color .2s ease;
+}
+
+.vip-card:hover{
+  transform:translateY(-2px);
+
+  border-color:#cbd5e1!important;
+
+  box-shadow:var(--admin-shadow-hover)!important;
+}
+
+.vip-name{
+  display:flex;
+  align-items:center;
+
+  min-height:20px;
+
+  margin-bottom:12px!important;
+
+  color:var(--admin-text)!important;
+
+  font-size:12px!important;
+  font-weight:800!important;
+
+  line-height:1.4;
+}
+
+.vip-name i{
+  color:#eab308!important;
+  margin-right:6px!important;
+}
+
+.vip-btn-wrap{
+  display:grid!important;
+
+  grid-template-columns:
+    1fr 1fr;
+
+  gap:7px!important;
+}
+
+.vip-btn{
+  min-height:35px;
+
+  padding:0 9px!important;
+
+  border:none!important;
+  border-radius:7px!important;
+
+  color:#fff!important;
+
+  font-size:10px!important;
+  font-weight:800!important;
+
+  cursor:pointer;
+
+  transition:
+    transform .18s ease,
+    filter .18s ease,
+    box-shadow .18s ease;
+}
+
+.vip-btn:hover{
+  transform:translateY(-1px);
+  filter:brightness(.97);
+}
+
+.vip-dashboard{
+  background:var(--admin-lime)!important;
+
+  box-shadow:
+    0 4px 10px
+    rgba(140,198,63,.18);
+}
+
+.vip-history{
+  background:#3b82f6!important;
+
+  box-shadow:
+    0 4px 10px
+    rgba(59,130,246,.14);
+}
+
+.vip-status{
+  display:flex;
+  align-items:center;
+  gap:5px;
+
+  margin-top:11px!important;
+
+  color:#64748b!important;
+
+  font-size:10px!important;
+  font-weight:700!important;
+
+  opacity:1!important;
+}
+
+.vip-status i{
+  color:var(--admin-lime)!important;
+}
+
+
+/* =========================================================
+   IMAM AI
+   ========================================================= */
+
+.imam-ai-container{
+  width:100%;
+
+  margin:0!important;
+
+  overflow:hidden;
+
+  background:#0b1220!important;
+
+  border:
+    1px solid #1e293b!important;
+
+  border-radius:12px!important;
+
+  box-shadow:
+    0 12px 35px rgba(15,23,42,.14)!important;
+}
+
+.imam-ai-header{
+  height:48px!important;
+
+  padding:0 15px!important;
+
+  display:flex!important;
+  align-items:center!important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #172554,
+      #0f172a
+    )!important;
+
+  border-bottom:
+    1px solid rgba(255,255,255,.07);
+
+  color:#fff!important;
+
+  font-size:13px!important;
+  font-weight:700!important;
+}
+
+.imam-ai-header i{
+  color:var(--admin-lime-light)!important;
+
+  margin-right:8px!important;
+
+  filter:
+    drop-shadow(
+      0 0 7px
+      rgba(140,198,63,.35)
+    );
+}
+
+#imam-chat-box{
+  height:440px!important;
+
+  padding:18px!important;
+
+  overflow-y:auto;
+
+  scroll-behavior:smooth;
+
+  background:
+    radial-gradient(
+      circle at top right,
+      rgba(37,99,235,.08),
+      transparent 35%
+    ),
+    #0b1220;
+}
+
+#imam-chat-box::-webkit-scrollbar{
+  width:6px;
+}
+
+#imam-chat-box::-webkit-scrollbar-track{
+  background:transparent;
+}
+
+#imam-chat-box::-webkit-scrollbar-thumb{
+  background:#334155;
+  border-radius:10px;
+}
+
+
+/* USER MESSAGE */
+
+.imam-user-msg{
+  width:fit-content;
+  max-width:min(82%,680px);
+
+  margin:
+    10px 0
+    10px auto!important;
+
+  padding:
+    11px 14px!important;
+
+  background:
+    linear-gradient(
+      135deg,
+      #2563eb,
+      #1d4ed8
+    )!important;
+
+  border:
+    1px solid rgba(255,255,255,.08);
+
+  border-radius:
+    15px
+    15px
+    4px
+    15px!important;
+
+  color:#fff!important;
+
+  font-size:13px!important;
+  line-height:1.65!important;
+
+  box-shadow:
+    0 7px 18px
+    rgba(37,99,235,.20)!important;
+
+  word-break:break-word;
+}
+
+
+/* AI MESSAGE */
+
+.imam-ai-msg{
+  width:fit-content;
+  max-width:min(86%,760px);
+
+  margin:
+    10px auto
+    10px 0!important;
+
+  padding:
+    11px 14px!important;
+
+  background:
+    #182235!important;
+
+  border:
+    1px solid rgba(148,163,184,.10)!important;
+
+  border-radius:
+    15px
+    15px
+    15px
+    4px!important;
+
+  color:#e5e7eb!important;
+
+  font-size:13px!important;
+  line-height:1.65!important;
+
+  box-shadow:
+    0 7px 18px
+    rgba(0,0,0,.15)!important;
+
+  word-break:break-word;
+}
+
+.imam-user-msg img,
+.imam-ai-msg img{
+  max-width:100%;
+  height:auto;
+
+  display:block;
+
+  margin-top:9px!important;
+
+  border-radius:9px!important;
+}
+
+
+/* =========================================================
+   AI MARKDOWN
+   ========================================================= */
+
+.imam-ai-msg p{
+  margin:0 0 8px;
+}
+
+.imam-ai-msg p:last-child{
+  margin-bottom:0;
+}
+
+.imam-ai-msg ul,
+.imam-ai-msg ol{
+  margin:
+    6px 0
+    8px
+    18px;
+  padding:0;
+}
+
+.imam-ai-msg code{
+  padding:2px 5px;
+
+  background:#0f172a;
+
+  border-radius:4px;
+
+  color:#a7f3d0;
+
+  font-size:.9em;
+}
+
+.imam-ai-msg pre{
+  overflow:auto;
+
+  margin:9px 0;
+  padding:10px;
+
+  background:#0a0f1a;
+
+  border:
+    1px solid rgba(255,255,255,.06);
+
+  border-radius:8px;
+}
+
+
+/* =========================================================
+   AI INPUT
+   ========================================================= */
+
+.imam-chat-input-wrap{
+  display:flex!important;
+  align-items:flex-end!important;
+
+  gap:9px!important;
+
+  padding:12px!important;
+
+  background:#111827!important;
+
+  border-top:
+    1px solid rgba(255,255,255,.07);
+}
+
+
+/* Fix both class variants safely */
+
+.imam-image-upload-wrap,
+.image-upload-wrap{
+  display:flex!important;
+  align-items:center!important;
+  margin:0!important;
+}
+
+.upload-btn{
+  width:42px!important;
+  height:42px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+
+  flex:none!important;
+
+  background:#1e293b!important;
+
+  border:
+    1px solid #334155!important;
+
+  border-radius:9px!important;
+
+  color:var(--admin-lime-light)!important;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    border-color .2s ease;
+}
+
+.upload-btn:hover{
+  background:#263449!important;
+  border-color:#475569!important;
+
+  transform:translateY(-1px);
+}
+
+.upload-btn i{
+  color:var(--admin-lime-light)!important;
+  font-size:16px!important;
+}
+
+#imam-ai-input{
+  min-height:42px!important;
+  max-height:170px!important;
+
+  width:100%;
+
+  padding:
+    10px 12px!important;
+
+  background:#1e293b!important;
+
+  border:
+    1px solid #334155!important;
+
+  border-radius:9px!important;
+
+  color:#fff!important;
+
+  font-size:13px!important;
+  line-height:1.5!important;
+
+  resize:none!important;
+}
+
+#imam-ai-input:focus{
+  border-color:
+    rgba(140,198,63,.65)!important;
+
+  box-shadow:
+    0 0 0 3px
+    rgba(140,198,63,.08)!important;
+}
+
+.imam-chat-input-wrap > button{
+  width:42px!important;
+  height:42px!important;
+
+  flex:none!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+
+  padding:0!important;
+
+  border:none!important;
+  border-radius:9px!important;
+
+  background:
+    linear-gradient(
+      135deg,
+      var(--admin-lime),
+      #6da82d
+    )!important;
+
+  color:#fff!important;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 5px 13px
+    rgba(140,198,63,.20);
+
+  transition:
+    transform .2s ease,
+    filter .2s ease,
+    box-shadow .2s ease;
+}
+
+.imam-chat-input-wrap > button:hover{
+  transform:translateY(-1px);
+  filter:brightness(1.04);
+
+  box-shadow:
+    0 7px 16px
+    rgba(140,198,63,.28);
+}
+
+.imam-chat-input-wrap > button i{
+  color:#fff!important;
+  font-size:15px!important;
+}
+
+
+/* =========================================================
+   AI PREVIEW
+   ========================================================= */
+
+#preview-box{
+  padding:
+    10px 12px 0!important;
+
+  background:#111827;
+}
+
+.preview-card{
+  max-width:100%;
+
+  display:flex!important;
+  align-items:center!important;
+  gap:10px!important;
+
+  padding:8px!important;
+
+  background:#1e293b!important;
+
+  border:
+    1px solid #334155!important;
+
+  border-radius:9px!important;
+
+  color:#cbd5e1;
+
+  font-size:11px;
+}
+
+.preview-card img{
+  width:52px!important;
+  height:52px!important;
+
+  flex:none;
+
+  object-fit:cover;
+
+  margin:0!important;
+
+  border-radius:7px!important;
+}
+
+.preview-card button{
+  flex:none;
+}
+
+
+/* =========================================================
+   AI ACTION BUTTON
+   ========================================================= */
+
+.ai-action{
+  display:flex!important;
+  flex-wrap:wrap;
+  gap:6px!important;
+
+  margin-top:10px!important;
+}
+
+.copy-btn,
+.download-btn{
+  min-height:30px;
+
+  padding:0 9px!important;
+
+  border:
+    1px solid #334155!important;
+
+  border-radius:6px!important;
+
+  background:#0f172a!important;
+
+  color:#cbd5e1!important;
+
+  font-size:10px!important;
+  font-weight:700!important;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    transform .2s ease,
+    color .2s ease;
+}
+
+.copy-btn:hover,
+.download-btn:hover{
+  background:#1e293b!important;
+  color:#fff!important;
+
+  transform:translateY(-1px);
+}
+
+
+/* =========================================================
+   TYPING
+   ========================================================= */
+
+.typing{
+  min-height:18px;
+
+  display:flex!important;
+  align-items:center!important;
+  gap:5px!important;
+}
+
+.typing span{
+  width:6px!important;
+  height:6px!important;
+
+  background:#94a3b8!important;
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer{
+  position:fixed!important;
+
+  left:58px!important;
+  right:0!important;
+  bottom:0!important;
+
+  width:auto!important;
+  height:48px!important;
+
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+
+  gap:7px!important;
+
+  padding:0 16px!important;
+
+  background:
+    rgba(15,23,42,.94)!important;
+
+  border-top:
+    1px solid rgba(140,198,63,.16)!important;
+
+  color:#94a3b8!important;
+
+  font-size:11px!important;
+  font-weight:500!important;
+
+  backdrop-filter:blur(12px);
+  -webkit-backdrop-filter:blur(12px);
+
+  z-index:9999!important;
+}
+
+.footer-brand{
+  color:#e2e8f0!important;
+}
+
+.footer-brand i{
+  color:var(--admin-lime)!important;
+}
+
+.footer-divider{
+  color:var(--admin-lime)!important;
+}
+
+.footer-company{
+  color:var(--admin-lime)!important;
+  font-weight:700!important;
+}
+
+
+/* =========================================================
+   FOCUS / ACCESSIBILITY
+   ========================================================= */
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible{
+  outline:
+    2px solid
+    rgba(140,198,63,.55);
+
+  outline-offset:2px;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media(max-width:900px){
+
+  .header{
+    padding:14px 16px;
+  }
+
+  .header h1{
+    font-size:17px;
+  }
+
+  .page-section{
+    padding:
+      13px 12px 18px;
+  }
+
+  .vip-grid{
+    grid-template-columns:
+      repeat(
+        auto-fill,
+        minmax(220px,1fr)
+      );
+  }
+
+  #imam-chat-box{
+    height:390px!important;
+  }
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media(max-width:600px){
+
+  .erp-sidebar{
+    width:52px;
+    min-width:52px;
+  }
+
+  .erp-logo{
+    height:52px;
+  }
+
+  .erp-menu{
+    padding:9px 5px;
+    gap:4px;
+  }
+
+  .erp-menu .menu-btn,
+  .erp-sidebar-bottom .menu-btn{
+    width:42px;
+    height:42px;
+  }
+
+  .erp-menu .menu-btn::after{
+    display:none;
+  }
+
+  .erp-menu .menu-btn.active::after{
+    left:-5px;
+  }
+
+  .erp-main{
+    padding-bottom:68px;
+  }
+
+  .header{
+    min-height:68px;
+
+    align-items:flex-start;
+
+    padding:
+      12px 12px;
+
+    gap:8px;
+  }
+
+  .header h1{
+    font-size:15px;
+    line-height:1.3;
+  }
+
+  #live-clock{
+    font-size:9px;
+    line-height:1.35;
+  }
+
+  .erp-tab{
+    padding:0 12px;
+    font-size:10px;
+  }
+
+  .page-section{
+    padding:
+      10px 8px 14px;
+  }
+
+  .card > h3{
+    padding:12px;
+    font-size:12px;
+  }
+
+  .control{
+    padding:8px;
+
+    display:grid;
+    grid-template-columns:
+      1fr 1fr;
+  }
+
+  .control select,
+  .control input,
+  .control #search,
+  .control button{
+    width:100%;
+    min-width:0;
+  }
+
+  .control #search{
+    grid-column:1 / -1;
+  }
+
+  .control button{
+    grid-column:1 / -1;
+  }
+
+  #data{
+    padding:8px;
+  }
+
+  .invoice-header{
+    padding:10px;
+  }
+
+  .invoice-title{
+    font-size:11px;
+  }
+
+  .invoice-info .vip-name{
+    font-size:10px;
+  }
+
+  .invoice-info .vip-date{
+    font-size:9px;
+  }
+
+  .invoice-summary{
+    padding:8px 10px;
+    gap:5px;
+  }
+
+  .summary-box{
+    font-size:9px;
+    min-height:27px;
+  }
+
+  .invoice-item{
+    padding:10px!important;
+  }
+
+  .invoice-order{
+    font-size:11px!important;
+  }
+
+  .action-wrapper{
+    gap:10px!important;
+  }
+
+  .status-btn{
+    gap:5px!important;
+  }
+
+  .status-btn .btn,
+  .delete-btn-admin{
+    width:30px!important;
+    height:30px!important;
+  }
+
+  .vip-wrapper{
+    padding:11px!important;
+  }
+
+  .vip-grid{
+    grid-template-columns:1fr;
+    gap:9px!important;
+  }
+
+  .vip-card{
+    padding:12px!important;
+  }
+
+  .vip-name{
+    font-size:11px!important;
+  }
+
+  .vip-btn{
+    min-height:34px;
+  }
+
+  .imam-ai-container{
+    border-radius:9px!important;
+  }
+
+  .imam-ai-header{
+    height:44px!important;
+    padding:0 12px!important;
+    font-size:12px!important;
+  }
+
+  #imam-chat-box{
+    height:
+      calc(100vh - 245px)!important;
+
+    min-height:300px;
+    max-height:480px;
+
+    padding:12px!important;
+  }
+
+  .imam-user-msg,
+  .imam-ai-msg{
+    max-width:91%!important;
+
+    padding:
+      9px 11px!important;
+
+    font-size:12px!important;
+  }
+
+  .imam-chat-input-wrap{
+    gap:6px!important;
+    padding:8px!important;
+  }
+
+  .upload-btn,
+  .imam-chat-input-wrap > button{
+    width:40px!important;
+    height:40px!important;
+  }
+
+  #imam-ai-input{
+    min-height:40px!important;
+    font-size:12px!important;
+  }
+
+  .footer{
+    left:52px!important;
+    height:48px!important;
+
+    padding:0 8px!important;
+
+    font-size:9px!important;
+
+    gap:5px!important;
+  }
+}
+
+
+/* =========================================================
+   VERY SMALL PHONE
+   ========================================================= */
+
+@media(max-width:380px){
+
+  .header h1{
+    font-size:13px;
+  }
+
+  #live-clock{
+    font-size:8px;
+  }
+
+  .control{
+    grid-template-columns:1fr;
+  }
+
+  .control #search,
+  .control button{
+    grid-column:auto;
+  }
+
+  .vip-btn-wrap{
+    grid-template-columns:1fr;
+  }
+
+  .footer{
+    font-size:8px!important;
+  }
+}
+
+
+/* =========================================================
+   REDUCE MOTION
+   ========================================================= */
+
+@media(prefers-reduced-motion:reduce){
+
+  *,
+  *::before,
+  *::after{
+    scroll-behavior:auto!important;
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+  }
+}
+
+
+
+
+
+
+
+
+	
+
+  
+
+
+
+
+
+
+
+/* =========================================================
+   SIDEBAR TOOLTIP — FINAL FIX
+   IMPORTANT:
+   ::after = TEXT TOOLTIP
+   ::before = ARROW
+   ACTIVE STATE = NO PSEUDO ELEMENT
+   ========================================================= */
+
+
+/* SIDEBAR */
+
+.erp-sidebar{
+  position:relative !important;
+  z-index:10000 !important;
+  overflow:visible !important;
+}
+
+.erp-menu{
+  position:relative !important;
+  overflow:visible !important;
+}
+
+.erp-menu .menu-btn{
+  position:relative !important;
+  overflow:visible !important;
+  isolation:auto !important;
+}
+
+
+/* =========================================================
+   REMOVE OLD ACTIVE ::AFTER CONFLICT
+   ========================================================= */
+
+.erp-menu .menu-btn.active::after{
+  content:attr(title) !important;
+}
+
+
+/* =========================================================
+   TOOLTIP TEXT
+   ========================================================= */
+
+.erp-menu .menu-btn::after{
+
+  content:attr(title) !important;
+
+  position:absolute !important;
+
+  left:calc(100% + 10px) !important;
+  top:50% !important;
+
+  width:max-content !important;
+  min-width:max-content !important;
+
+  transform:
+    translateY(-50%)
+    translateX(-6px) !important;
+
+  padding:8px 12px !important;
+
+  background:#fff8d8 !important;
+  color:#3f3a20 !important;
+
+  border:1px solid #e4d88f !important;
+  border-radius:7px !important;
+
+  font-family:
+    "Segoe UI",
+    Tahoma,
+    Arial,
+    sans-serif !important;
+
+  font-size:12px !important;
+  font-weight:600 !important;
+
+  line-height:1.2 !important;
+
+  white-space:nowrap !important;
+
+  box-shadow:
+    0 5px 16px
+    rgba(0,0,0,.18) !important;
+
+  opacity:0 !important;
+  visibility:hidden !important;
+
+  pointer-events:none !important;
+
+  z-index:999999 !important;
+
+  transition:
+    opacity .18s ease,
+    transform .18s ease,
+    visibility .18s ease !important;
+}
+
+
+/* =========================================================
+   TOOLTIP ARROW
+   ========================================================= */
+
+.erp-menu .menu-btn::before{
+
+  content:"" !important;
+
+  position:absolute !important;
+
+  left:calc(100% + 4px) !important;
+  top:50% !important;
+
+  width:0 !important;
+  height:0 !important;
+
+  transform:
+    translateY(-50%) !important;
+
+  border-top:
+    6px solid transparent !important;
+
+  border-bottom:
+    6px solid transparent !important;
+
+  border-right:
+    6px solid #e4d88f !important;
+
+  opacity:0 !important;
+  visibility:hidden !important;
+
+  pointer-events:none !important;
+
+  z-index:999999 !important;
+
+  transition:
+    opacity .18s ease,
+    visibility .18s ease !important;
+}
+
+
+/* =========================================================
+   HOVER — SHOW TITLE
+   ========================================================= */
+
+.erp-menu .menu-btn:hover::after{
+
+  opacity:1 !important;
+  visibility:visible !important;
+
+  transform:
+    translateY(-50%)
+    translateX(0) !important;
+}
+
+.erp-menu .menu-btn:hover::before{
+
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+
+/* =========================================================
+   ACTIVE BUTTON
+   Tidak lagi memakai ::after
+   supaya tooltip tetap aman.
+   ========================================================= */
+
+.erp-menu .menu-btn.active{
+
+  background:
+    linear-gradient(
+      135deg,
+      #e54770,
+      #d93661
+    ) !important;
+
+  border-radius:9px !important;
+
+  box-shadow:
+    0 5px 14px
+    rgba(229,71,112,.28) !important;
+}
+
+
+/* =========================================================
+   ACTIVE + HOVER
+   Tooltip tetap muncul normal
+   ========================================================= */
+
+.erp-menu .menu-btn.active:hover::after{
+
+  opacity:1 !important;
+  visibility:visible !important;
+
+  transform:
+    translateY(-50%)
+    translateX(0) !important;
+}
+
+.erp-menu .menu-btn.active:hover::before{
+
+  opacity:1 !important;
+  visibility:visible !important;
+}
+
+
+/* =========================================================
+   MOBILE
+   Tooltip tetap aktif
+   ========================================================= */
+
+@media(max-width:600px){
+
+  .erp-menu .menu-btn::after{
+    display:block !important;
+  }
+
+  .erp-menu .menu-btn::before{
+    display:block !important;
+  }
+
+}
+
+
+
+
+
+
+
+
+	
+
 </style>
+
+
+
+
+  
+
+  
+  
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+  
+
+  
+  
+
+
+  
+      
+
+
+
+    
+
 
 </head>
 
@@ -1168,66 +2708,101 @@ padding-bottom:120px;
   
   <div class="erp-layout">
 
+		
+
 <div class="erp-sidebar">
 
-<div class="erp-logo">
-⚙
-</div>
+  <div class="erp-logo" title="Admin Panel">
+    <i class="fa-solid fa-gear"></i>
+  </div>
 
-<div class="erp-menu">
+  <div class="erp-menu">
 
-<button class="menu-btn active"
-onclick="showPage('page-dashboard',this)">
-🏠
-</button>
+    <button
+      class="menu-btn active"
+      title="Dashboard"
+      onclick="showPage('page-dashboard',this)">
+      <i class="fa-solid fa-house"></i>
+    </button>
 
-<button class="menu-btn"
-onclick="showPage('page-stok',this)">
-📦
-</button>
+    <button
+      class="menu-btn"
+      title="Manajemen Stok"
+      onclick="showPage('page-stok',this)">
+      <i class="fa-solid fa-boxes-stacked"></i>
+    </button>
 
-<button class="menu-btn"
-onclick="showPage('page-order',this)">
-🛒
-</button>
+    <button
+      class="menu-btn"
+      title="Pesanan"
+      onclick="showPage('page-order',this)">
+      <i class="fa-solid fa-cart-shopping"></i>
+    </button>
 
-<button class="menu-btn"
-onclick="showPage('page-vip',this)">
-👤
-</button>
+    <button
+      class="menu-btn"
+      title="Distributor VIP"
+      onclick="showPage('page-vip',this)">
+      <i class="fa-solid fa-users"></i>
+    </button>
 
-<button class="menu-btn"
-onclick="showPage('page-ai',this)">
-🤖
-</button>
+    <button
+      class="menu-btn"
+      title="Imam AI"
+      onclick="showPage('page-ai',this)">
+      <i class="fa-solid fa-robot"></i>
+    </button>
 
-</div>
+  </div>
 
-</div>
+  <!-- LOGOUT -->
+  <div class="erp-sidebar-bottom">
 
-<div class="erp-main">
-  
-<div class="erp-tabs" id="top-tabs"></div>
-
-<div class="header">
-  <h1>📊 IMAM SALES | VVIP</h1>
-  <div id="live-clock">Loading...</div>
-</div>
-
-<!-- DASHBOARD -->
-<div id="page-dashboard" class="page-section active">
-
-  <div class="card">
-
-    <h3 id="vip-active-title">
-      👥 Pengguna Aktif
-    </h3>
-
-    <div id="vip-active-list"></div>
+    <button
+      class="menu-btn logout-btn"
+      title="Logout"
+      onclick="logoutAdmin()">
+      <i class="fa-solid fa-right-from-bracket"></i>
+    </button>
 
   </div>
 
 </div>
+
+
+
+
+
+
+		
+<div class="erp-main">
+  
+  <div class="erp-tabs" id="top-tabs"></div>
+
+  <div class="header">
+    <h1>
+      <i class="fa-solid fa-gauge-high"></i>
+      IMAM SALES | VVIP
+    </h1>
+
+    <div id="live-clock">Loading...</div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="page-dashboard" class="page-section active">
+
+    <div class="card">
+
+      <h3 id="vip-active-title">
+        <i class="fa-solid fa-users"></i>
+        Pengguna Aktif
+      </h3>
+
+      <div id="vip-active-list"></div>
+
+    </div>
+
+	</div>
 
 
 <!-- STOK -->
@@ -1235,10 +2810,14 @@ onclick="showPage('page-ai',this)">
 
   <div class="card stok-card">
 
-    <h3>📦 Kontrol Stok Produk</h3>
+    <h3>
+      <i class="fa-solid fa-boxes-stacked"></i>
+      Kontrol Stok Produk
+    </h3>
 
-    <input type="text"
-      placeholder="🔍 Cari produk..."
+    <input
+      type="text"
+      placeholder="Cari produk..."
       onkeyup="searchProduk(this.value)">
 
     <br><br>
@@ -1251,13 +2830,17 @@ onclick="showPage('page-ai',this)">
     <div id="stok-list"></div>
 
     <div class="stok-footer">
+
       <button onclick="bulkUpdate('tersedia')">
-        🟢 SET TERSEDIA
+        <i class="fa-solid fa-circle-check"></i>
+        SET TERSEDIA
       </button>
 
       <button onclick="bulkUpdate('kosong')">
-        🔴 SET KOSONG
+        <i class="fa-solid fa-circle-xmark"></i>
+        SET KOSONG
       </button>
+
     </div>
 
   </div>
@@ -1271,7 +2854,7 @@ onclick="showPage('page-ai',this)">
   <div class="control">
 
     <select id="filterBulan" onchange="loadData()">
-      <option value="">📅 Bulan Ini</option>
+      <option value="">Bulan Ini</option>
       <option value="1">Januari</option>
       <option value="2">Februari</option>
       <option value="3">Maret</option>
@@ -1292,27 +2875,37 @@ onclick="showPage('page-ai',this)">
 
     <select id="filterStatus" onchange="saveFilter()">
       <option value="all">Semua Status</option>
-      <option value="pending">🔴 Pending</option>
-      <option value="proses">🟡 Proses</option>
-      <option value="ready">🟢 Ready</option>
+      <option value="pending">
+        Pending
+      </option>
+      <option value="proses">
+        Proses
+      </option>
+      <option value="ready">
+        Ready
+      </option>
     </select>
 
     <input
       type="text"
       id="search"
-      placeholder="🔍 Cari produk..."
-      onkeyup="saveFilter()"
+      placeholder="Cari produk..."
+      onkeyup="saveFilter"
     >
 
     <button onclick="refreshOrder()">
-      🔄 REFRESH
+      <i class="fa-solid fa-rotate"></i>
+      REFRESH
     </button>
 
   </div>
 
   <div class="card order-card">
 
-    <h3>📊 Data Order</h3>
+    <h3>
+      <i class="fa-solid fa-chart-column"></i>
+      Data Order
+    </h3>
 
     <div id="data" class="content"></div>
 
@@ -1335,47 +2928,54 @@ onclick="showPage('page-ai',this)">
   <div class="imam-ai-container">
 
     <div class="imam-ai-header">
-      🤖 ImamGPT Assistant
+      <i class="fa-solid fa-robot"></i>
+      Imam AI
     </div>
 
     <div id="imam-chat-box"></div>
 
-  <!-- 🔥 PREVIEW AREA -->
-  <div id="preview-box"></div>
+    <!-- 🔥 PREVIEW AREA -->
+    <div id="preview-box"></div>
 
-  <!-- INPUT AREA -->
-  <div class="imam-chat-input-wrap">
+    <!-- INPUT AREA -->
+    <div class="imam-chat-input-wrap">
 
-    <div class="imam-image-upload-wrap">
+      <div class="imam-image-upload-wrap">
 
-      <label
-        for="image-upload"
-        class="upload-btn"
+        <label
+          for="image-upload"
+          class="upload-btn"
+          title="Upload Gambar"
+        >
+          <i class="fa-solid fa-image"></i>
+        </label>
+
+        <input
+          type="file"
+          id="image-upload"
+          accept="image/*"
+          hidden=""
+        >
+
+      </div>
+
+      <textarea
+        id="imam-ai-input"
+        placeholder="Tanya Imam AI..."
+      ></textarea>
+
+      <button
+        onclick="tanyaAI()"
+        title="Kirim Pesan"
       >
-        🖼️
-      </label>
-
-      <input
-        type="file"
-        id="image-upload"
-        accept="image/*"
-        hidden=""
-      >
+        <i class="fa-solid fa-paper-plane"></i>
+      </button>
 
     </div>
 
-    <textarea
-      id="imam-ai-input"
-      placeholder="Tanya ImamGPT..."
-    ></textarea>
-
-    <button onclick="tanyaAI()">
-      🚀
-    </button>
-
   </div>
 
- </div>
+</div>
  
  <script src="/js/auth.js"></script>
 
@@ -1530,16 +3130,16 @@ async function updateStatus(row,status){
       "status-text " + status;
 
       if(status==="pending"){
-        txt.innerText="🔴 PENDING";
-      }
+  txt.innerHTML='<i class="fa-solid fa-circle-exclamation"></i> PENDING';
+}
 
-      else if(status==="proses"){
-        txt.innerText="🟡 PROSES";
-      }
+else if(status==="proses"){
+  txt.innerHTML='<i class="fa-solid fa-spinner status-icon-spin"></i> PROSES';
+}
 
-      else if(status==="ready"){
-        txt.innerText="🟢 READY";
-      }
+else if(status==="ready"){
+  txt.innerHTML='<i class="fa-solid fa-circle-check"></i> READY';
+}
       
       const invoiceCard =
 card.closest(".invoice-group");
@@ -1564,21 +3164,24 @@ invoiceCard.querySelector(
 ).innerHTML = `
 
 <div class="summary-box">
-  🟢 READY
+  <i class="fa-solid fa-circle-check"></i>
+  READY
   <span class="summary-ready">
     ${ready}
   </span>
 </div>
 
 <div class="summary-box">
-  🟡 PROSES
+  <i class="fa-solid fa-spinner"></i>
+  PROSES
   <span class="summary-proses">
     ${proses}
   </span>
 </div>
 
 <div class="summary-box">
-  🔴 PENDING
+  <i class="fa-solid fa-circle-exclamation"></i>
+  PENDING
   <span class="summary-pending">
     ${pending}
   </span>
@@ -2068,7 +3671,7 @@ items.some(x =>
 
       if(item.status === "ready"){
 
-        warna = "#22c55e";
+        warna = "#8CC63F;";
         label = "READY";
         ready++;
 
@@ -2098,8 +3701,9 @@ data-row="${item.rowIndex}"
 >
 
         <div class="invoice-order">
-          📦 ${item.order}
-        </div>
+  <i class="fa-solid fa-box"></i>
+  ${item.order}
+</div>
 
         <div
         class="status-text ${item.status}"
@@ -2113,49 +3717,49 @@ data-row="${item.rowIndex}"
   <div class="status-btn">
 
     <button
-    class="btn ${
-    item.status==="pending"
-    ? "active-red"
-    : ""
-    }"
-    onclick="
-    updateStatus(
-      '${item.rowIndex}',
-      'pending'
-    )"
-    >
-    🔴
-    </button>
+  class="btn ${
+  item.status==="pending"
+  ? "active-red"
+  : ""
+  }"
+  onclick="
+  updateStatus(
+    '${item.rowIndex}',
+    'pending'
+  )"
+>
+  <i class="fa-solid fa-circle-exclamation"></i>
+</button>
 
-    <button
-    class="btn ${
-    item.status==="proses"
-    ? "active-yellow"
-    : ""
-    }"
-    onclick="
-    updateStatus(
-      '${item.rowIndex}',
-      'proses'
-    )"
-    >
-    🟡
-    </button>
+<button
+  class="btn ${
+  item.status==="proses"
+  ? "active-yellow"
+  : ""
+  }"
+  onclick="
+  updateStatus(
+    '${item.rowIndex}',
+    'proses'
+  )"
+>
+  <i class="fa-solid fa-spinner"></i>
+</button>
 
-    <button
-    class="btn ${
-    item.status==="ready"
-    ? "active-green"
-    : ""
-    }"
-    onclick="
-    updateStatus(
-      '${item.rowIndex}',
-      'ready'
-    )"
-    >
-    🟢
-    </button>
+<button
+  class="btn ${
+  item.status==="ready"
+  ? "active-green"
+  : ""
+  }"
+  onclick="
+  updateStatus(
+    '${item.rowIndex}',
+    'ready'
+  )"
+>
+  <i class="fa-solid fa-circle-check"></i>
+</button>
 
   </div>
 
@@ -2166,15 +3770,15 @@ data-row="${item.rowIndex}"
   </div>
 
   <button
-class="delete-btn-admin"
-onclick="
-handleDeleteItem(
-'${item.rowIndex}',
-${item.request_delete_invoice === true}
-)
-"
+  class="delete-btn-admin"
+  onclick="
+  handleDeleteItem(
+  '${item.rowIndex}',
+  ${item.request_delete_invoice === true}
+  )
+  "
 >
-🗑️
+  <i class="fa-solid fa-trash-can"></i>
 </button>
 
 </div>
@@ -2244,17 +3848,20 @@ invoice;
   <div class="invoice-header-left">
 
     <div class="invoice-title">
-      🧾 ${invoice}
+      <i class="fa-solid fa-file-invoice"></i>
+      ${invoice}
     </div>
 
     <div class="invoice-info">
 
       <div class="vip-name">
-        👤 ${first.nama}
+        <i class="fa-solid fa-user"></i>
+        ${first.nama}
       </div>
 
       <div class="vip-date">
-        🕒 ${
+        <i class="fa-solid fa-clock"></i>
+        ${
           first.waktu
           ?
           first.waktu.toDate().toLocaleString(
@@ -2291,31 +3898,36 @@ ${
 `
 <div class="invoice-delete-alert">
 
-  🚨 VIP REQUEST DELETE INVOICE
+  <i class="fa-solid fa-triangle-exclamation"></i>
+  VIP REQUEST DELETE INVOICE
 
   <br><br>
 
   <button
-  class="btn"
-  onclick="
-    approveDeleteInvoice(
-      '${invoice}'
-    )
-  "
->
-  ✅ TERIMA
-</button>
+    class="btn"
+    onclick="
+      approveDeleteInvoice(
+        '${invoice}'
+      )
+    "
+  >
+    <i class="fa-solid fa-circle-check"></i>
+    TERIMA
+  </button>
 
-<button
-  class="btn"
-  onclick="
-    rejectDeleteInvoice(
-      '${invoice}'
-    )
-  "
->
-  ❌ TOLAK
-</button>
+  <button
+    class="btn"
+    onclick="
+      rejectDeleteInvoice(
+        '${invoice}'
+      )
+    "
+  >
+    <i class="fa-solid fa-circle-xmark"></i>
+    TOLAK
+  </button>
+
+</div>
 
   
 </div>
@@ -2329,21 +3941,24 @@ ${
 <div class="invoice-summary">
 
   <div class="summary-box">
-    🟢 READY
+    <i class="fa-solid fa-circle-check"></i>
+    READY
     <span class="summary-ready">
       ${ready}
     </span>
   </div>
 
   <div class="summary-box">
-    🟡 PROSES
+    <i class="fa-solid fa-spinner"></i>
+    PROSES
     <span class="summary-proses">
       ${proses}
     </span>
   </div>
 
   <div class="summary-box">
-    🔴 PENDING
+    <i class="fa-solid fa-circle-exclamation"></i>
+    PENDING
     <span class="summary-pending">
       ${pending}
     </span>
@@ -2656,10 +4271,10 @@ document.querySelector(
     ? "red"
     : "limegreen";
 
-    let icon =
+let icon =
     item.kosong
-    ? "🔴"
-    : "🟢";
+    ? '<i class="fa-solid fa-circle-xmark"></i>'
+    : '<i class="fa-solid fa-circle-check"></i>';
 
     let div =
     document.createElement("div");
@@ -2927,21 +4542,22 @@ function renderVIPControl(){
 
   <div class="vip-wrapper">
 
-    <div class="vip-title">
+  <div class="vip-title">
 
-      👑 VIP CONTROL PANEL
+    <i class="fa-solid fa-crown"></i>
+    VIP CONTROL PANEL
 
-    </div>
+  </div>
 
-    <input
-      type="text"
-      class="vip-search"
-      id="vipSearch"
-      placeholder="🔍 Cari VIP..."
-      onkeyup="filterVIP()"
-    >
+  <input
+    type="text"
+    class="vip-search"
+    id="vipSearch"
+    placeholder="🔍 Cari VIP..."
+    onkeyup="filterVIP()"
+  >
 
-    <div class="vip-grid">
+  <div class="vip-grid">
 
   `;
 
@@ -2950,52 +4566,56 @@ function renderVIPControl(){
     html += `
 
     <div
-    class="vip-card"
-    data-vip="${vip.toLowerCase()}">
+  class="vip-card"
+  data-vip="${vip.toLowerCase()}">
 
-      <div class="vip-name">
+  <div class="vip-name">
 
-        👑 ${vip}
+    <i class="fa-solid fa-crown"></i>
+    ${vip}
 
-      </div>
+  </div>
 
-      <div class="vip-btn-wrap">
+  <div class="vip-btn-wrap">
 
-        <button
-        class="
-        vip-btn
-        vip-dashboard
-        "
-        onclick="
-        bukaDashboard('${vip}')
-        ">
+    <button
+    class="
+    vip-btn
+    vip-dashboard
+    "
+    onclick="
+    bukaDashboard('${vip}')
+    ">
 
-          🚀 Dashboard
+      <i class="fa-solid fa-gauge-high"></i>
+      Dashboard
 
-        </button>
+    </button>
 
-        <button
-        class="
-        vip-btn
-        vip-history
-        "
-        onclick="
-        bukaHistory('${vip}')
-        ">
+    <button
+    class="
+    vip-btn
+    vip-history
+    "
+    onclick="
+    bukaHistory('${vip}')
+    ">
 
-          📦 History
+      <i class="fa-solid fa-box-archive"></i>
+      History
 
-        </button>
+    </button>
 
-      </div>
+  </div>
 
-      <div class="vip-status">
+  <div class="vip-status">
 
-        🟢 VIP ACTIVE
+    <i class="fa-solid fa-circle-check"></i>
+    VIP ACTIVE
 
-      </div>
+  </div>
 
-    </div>
+</div>
 
     `;
 
@@ -4081,25 +5701,21 @@ function logout(){
 
 </script>
 
-<div style="padding:20px;text-align:center;">
-    <button onclick="logout()" style="
-        padding:12px 30px;
-        background:#dc2626;
-        color:#fff;
-        border:none;
-        border-radius:8px;
-        cursor:pointer;
-        font-size:16px;
-        font-weight:bold;
-    ">
-        🚪 Logout
-    </button>
-</div>
+
 
 
 
 <div class="footer">
-©2026 Imam Salesfr • Nine Autoseries
+  <span class="footer-brand">
+    <i class="fa-solid fa-copyright"></i>
+    2026 Imam_salesfr
+  </span>
+
+  <span class="footer-divider">•</span>
+
+  <span class="footer-company">
+    nine autoseries
+  </span>
 </div>
 
 </div>
