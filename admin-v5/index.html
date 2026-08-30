@@ -2717,6 +2717,132 @@ textarea:focus-visible{
 }
 
 
+
+
+
+
+
+
+
+/* =========================================================
+   VIP REQUEST DELETE — FINAL
+   ========================================================= */
+
+.vip-request-delete{
+  margin-top:10px;
+
+  padding:9px 11px;
+
+  background:
+    linear-gradient(
+      135deg,
+      #fff1f2,
+      #fee2e2
+    );
+
+  border:
+    1px solid #fecaca;
+
+  border-left:
+    4px solid #ef4444;
+
+  border-radius:9px;
+
+  box-shadow:
+    0 3px 10px
+    rgba(239,68,68,.08);
+}
+
+.vip-request-delete-title{
+  display:flex;
+  align-items:center;
+  gap:7px;
+
+  color:#b91c1c;
+
+  font-size:11px;
+  font-weight:800;
+
+  letter-spacing:.2px;
+}
+
+.vip-request-delete-title i{
+  color:#ef4444;
+
+  font-size:14px;
+
+  filter:
+    drop-shadow(
+      0 2px 4px
+      rgba(239,68,68,.20)
+    );
+}
+
+
+/* TOLAK REQUEST */
+
+.vip-reject-request-btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+
+  gap:6px;
+
+  min-height:32px;
+
+  margin-top:8px;
+  padding:0 11px;
+
+  border:
+    1px solid #475569;
+
+  border-radius:7px;
+
+  background:#334155;
+
+  color:#fff;
+
+  font-size:10px;
+  font-weight:700;
+
+  cursor:pointer;
+
+  transition:
+    background .2s ease,
+    border-color .2s ease,
+    transform .18s ease,
+    box-shadow .18s ease;
+}
+
+.vip-reject-request-btn i{
+  color:#fff;
+
+  font-size:11px;
+}
+
+.vip-reject-request-btn:hover{
+  background:#1e293b;
+
+  border-color:#1e293b;
+
+  transform:translateY(-1px);
+
+  box-shadow:
+    0 4px 10px
+    rgba(15,23,42,.14);
+}
+
+.vip-reject-request-btn:active{
+  transform:translateY(0);
+}
+
+
+
+
+
+
+
+	
 	
 
 </style>
@@ -3847,45 +3973,43 @@ data-row="${item.rowIndex}"
 </div>
 
         ${
-          item.request_delete
-          ?
+  item.request_delete
+  ?
 
-          `
-          <div style="
-          background:#ef4444;
-          padding:8px;
-          border-radius:10px;
-          margin-top:10px;
-          font-size:12px;
-          font-weight:bold;
-          ">
+  `
+  <div class="vip-request-delete">
 
-          ⚠️ VIP REQUEST DELETE
+    <div class="vip-request-delete-title">
 
-          </div>
+      <i class="fa-solid fa-triangle-exclamation"></i>
 
-          <button
-          onclick="
-          cancelDelete(
-            '${item.rowIndex}'
-          )"
-          style="
-          background:#334155;
-          color:white;
-          margin-top:8px;
-          "
-          >
+      <span>VIP REQUEST DELETE</span>
 
-          ❌ Tolak Request
+    </div>
 
-          </button>
-          `
+  </div>
 
-          :
+  <button
+    class="vip-reject-request-btn"
+    onclick="
+      cancelDelete(
+        '${item.rowIndex}'
+      )
+    "
+  >
 
-          ""
+    <i class="fa-solid fa-circle-xmark"></i>
 
-        }
+    <span>Tolak Request</span>
+
+  </button>
+  `
+
+  :
+
+  ""
+
+}
 
       </div>
 
@@ -4229,56 +4353,64 @@ border-bottom:1px solid rgba(255,255,255,.05);
 ">
 
   <div style="
-  display:flex;
-  align-items:center;
-  gap:10px;
+    display:flex;
+    align-items:center;
+    gap:10px;
   ">
 
     <div style="
-width:42px;
-height:42px;
-border-radius:50%;
-background:#e5e7eb;
-display:flex;
-align-items:center;
-justify-content:center;
-color:#9ca3af;
-font-size:22px;
-position:relative;
-">
+      width:42px;
+      height:42px;
+      border-radius:50%;
+      background:#e5e7eb;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      color:#9ca3af;
+      font-size:19px;
+      position:relative;
+    ">
 
-👤
+      <i class="fa-solid fa-user"></i>
 
-<div style="
-position:absolute;
-bottom:0;
-right:0;
-width:10px;
-height:10px;
-background:${
-  online
-  ? '#22c55e'
-  : '#9ca3af'
-};
-border-radius:50%;
-border:2px solid white;
-">
-</div>
+      <div style="
+        position:absolute;
+        bottom:0;
+        right:0;
+        width:10px;
+        height:10px;
+        background:${
+          online
+          ? '#22c55e'
+          : '#9ca3af'
+        };
+        border-radius:50%;
+        border:2px solid #0f172a;
+      ">
+      </div>
 
-</div>
+    </div>
 
     <div>
 
       <div class="vip-active-name">
-  ${item.nama}
-</div>
+        ${item.nama}
+      </div>
 
       <div style="
-      font-size:12px;
-      color:#cbd5e1;
-      margin-top:2px;
+        font-size:12px;
+        color:#cbd5e1;
+        margin-top:2px;
       ">
-        🕒 ${jamAktif}
+        <i
+          class="fa-regular fa-clock"
+          style="
+            margin-right:4px;
+            color:#94a3b8;
+          "
+        ></i>
+
+        ${jamAktif}
       </div>
 
     </div>
@@ -4286,8 +4418,8 @@ border:2px solid white;
   </div>
 
   <div style="
-  font-size:12px;
-  color:#cbd5e1;
+    font-size:12px;
+    color:#cbd5e1;
   ">
     ${status}
   </div>
@@ -5600,17 +5732,18 @@ await db
 
 function refreshOrder(){
 
-  const btn = event.target;
+  const btn =
+    event.currentTarget || event.target;
 
-  btn.innerText =
-  "⏳ REFRESHING...";
+  btn.innerHTML =
+    '<i class="fa-solid fa-spinner fa-spin"></i> REFRESHING...';
 
   loadData();
 
   setTimeout(()=>{
 
-    btn.innerText =
-    "🔄 REFRESH";
+    btn.innerHTML =
+      '<i class="fa-solid fa-rotate"></i> REFRESH';
 
   },1000);
 
