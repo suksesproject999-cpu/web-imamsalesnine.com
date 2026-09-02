@@ -8030,7 +8030,7 @@ function infoProdukForm(){
               cursor:pointer;
             "
           >
-            👁 PREVIEW
+            PREVIEW
           </button>
 
 
@@ -8049,7 +8049,7 @@ function infoProdukForm(){
               cursor:pointer;
             "
           >
-            📲 KIRIM KE VIP
+            KIRIM KE VIP
           </button>
 
         </div>
@@ -8084,13 +8084,40 @@ function infoProdukForm(){
 	}
 
 
-/* =========================================================
-   DYNAMIC TYPE
-   ========================================================= */
+
+
+
+
+
+
+
+
 
 /* =========================================================
-   DYNAMIC TYPE — FINAL
-   Template deskripsi otomatis + harga sesuai jenis
+   FORMAT HARGA INFO PRODUK
+   Admin ketik 100000 → Rp 100.000
+   ========================================================= */
+
+window.formatInfoHarga = function(value){
+
+  const angka = String(value || "")
+    .replace(/[^\d]/g, "");
+
+  if(!angka){
+    return "";
+  }
+
+  return "Rp " + Number(angka).toLocaleString("id-ID");
+};
+
+
+
+	
+
+
+/* =========================================================
+   INFO PRODUK — TYPE CHANGE FINAL
+   Produk Baru / Promo / Diskon
    ========================================================= */
 
 window.infoProdukTypeChange = function(){
@@ -8114,6 +8141,7 @@ window.infoProdukTypeChange = function(){
 
     wrap.innerHTML = `
 
+      <!-- JUDUL -->
       <label class="info-field-label">
         Judul
       </label>
@@ -8125,6 +8153,7 @@ window.infoProdukTypeChange = function(){
       >
 
 
+      <!-- DESKRIPSI -->
       <label class="info-field-label">
         Deskripsi
       </label>
@@ -8138,6 +8167,7 @@ Silakan cek dan lakukan pemesanan melalui aplikasi VIP.
 Stok terbatas, segera lakukan pemesanan sebelum kehabisan.</textarea>
 
 
+      <!-- HARGA -->
       <label class="info-field-label">
         Harga
       </label>
@@ -8145,7 +8175,12 @@ Stok terbatas, segera lakukan pemesanan sebelum kehabisan.</textarea>
       <input
         id="info-harga"
         class="info-field"
-        placeholder="Rp 25.000"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value = formatInfoHarga(this.value);
+        "
       >
 
     `;
@@ -8162,6 +8197,7 @@ Stok terbatas, segera lakukan pemesanan sebelum kehabisan.</textarea>
 
     wrap.innerHTML = `
 
+      <!-- JUDUL PROMO -->
       <label class="info-field-label">
         Judul Promo
       </label>
@@ -8169,10 +8205,11 @@ Stok terbatas, segera lakukan pemesanan sebelum kehabisan.</textarea>
       <input
         id="info-judul"
         class="info-field"
-        placeholder="Promo Spesial"
+        placeholder="Promo September"
       >
 
 
+      <!-- DESKRIPSI -->
       <label class="info-field-label">
         Deskripsi
       </label>
@@ -8182,11 +8219,13 @@ Stok terbatas, segera lakukan pemesanan sebelum kehabisan.</textarea>
         class="info-textarea"
       >🔥 Dapatkan harga spesial selama periode promo berlangsung.
 
+Harga spesial berlaku selama periode promo.
 Stok terbatas dan promo dapat berakhir sewaktu-waktu.
 
 Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
 
 
+      <!-- PERIODE -->
       <label class="info-field-label">
         Periode
       </label>
@@ -8198,6 +8237,7 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
       >
 
 
+      <!-- HARGA NORMAL -->
       <label class="info-field-label">
         Harga Normal
       </label>
@@ -8205,10 +8245,16 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
       <input
         id="info-harga-normal"
         class="info-field"
-        placeholder="Rp 100.000"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value = formatInfoHarga(this.value);
+        "
       >
 
 
+      <!-- HARGA PROMO -->
       <label class="info-field-label">
         Harga Promo
       </label>
@@ -8216,7 +8262,12 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
       <input
         id="info-harga-promo"
         class="info-field"
-        placeholder="Rp 85.500"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value = formatInfoHarga(this.value);
+        "
       >
 
     `;
@@ -8233,6 +8284,7 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
 
     wrap.innerHTML = `
 
+      <!-- JUDUL DISKON -->
       <label class="info-field-label">
         Judul Diskon
       </label>
@@ -8244,6 +8296,7 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
       >
 
 
+      <!-- DESKRIPSI -->
       <label class="info-field-label">
         Deskripsi
       </label>
@@ -8255,9 +8308,10 @@ Segera lakukan pemesanan melalui aplikasi VIP sebelum promo berakhir.</textarea>
 
 Stok terbatas dan penawaran berlaku dalam waktu terbatas.
 
-Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
+Segera manfaatkan kesempatan ini sebelum periode diskon berakhir.</textarea>
 
 
+      <!-- HARGA NORMAL -->
       <label class="info-field-label">
         Harga Normal
       </label>
@@ -8265,24 +8319,55 @@ Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
       <input
         id="info-harga-normal"
         class="info-field"
-        placeholder="Rp 100.000"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value = formatInfoHarga(this.value);
+        "
       >
 
 
+      <!-- DISKON -->
       <label class="info-field-label">
         Diskon %
       </label>
 
-      <input
-        id="info-diskon"
-        class="info-field"
-        type="number"
-        min="0"
-        max="100"
-        placeholder="20"
-      >
+      <div style="
+        position:relative;
+      ">
+
+        <input
+          id="info-diskon"
+          class="info-field"
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+          inputmode="numeric"
+          placeholder="10"
+          style="
+            padding-right:38px;
+          "
+        >
+
+        <span style="
+          position:absolute;
+          right:13px;
+          top:50%;
+          transform:translateY(-50%);
+          color:#64748b;
+          font-size:11px;
+          font-weight:700;
+          pointer-events:none;
+        ">
+          %
+        </span>
+
+      </div>
 
 
+      <!-- PERIODE -->
       <label class="info-field-label">
         Periode
       </label>
@@ -8300,13 +8385,12 @@ Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
 
 
   /* =======================================================
-     DEFAULT / BELUM PILIH JENIS
+     DEFAULT
      ======================================================= */
 
   wrap.innerHTML = "";
 
 };
-
 
 
 /* =========================================================
@@ -8785,7 +8869,7 @@ window.infoProdukSend = async function(){
 
       showCancelButton:true,
 
-      confirmButtonText:"🚀 Kirim",
+      confirmButtonText:"Kirim",
 
       cancelButtonText:"Batal",
 
