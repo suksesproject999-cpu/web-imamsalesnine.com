@@ -4273,16 +4273,16 @@ body{
 
   <!-- BARU -->
   <button
-    type="button"
-    class="btn-info-produk"
-    onclick="openInfoProduk()"
-  >
-    <i class="fa-solid fa-bullhorn"></i>
-    INFO PRODUK
-    <span
-      id="info-selected-count"
-    ></span>
-  </button>
+  type="button"
+  class="btn-info-produk"
+  onclick="openInfoProdukMenu()"
+>
+  <i class="fa-solid fa-bullhorn"></i>
+  INFO PRODUK
+  <span
+    id="info-selected-count"
+  ></span>
+	</button>
 
 		</div>
 
@@ -9077,7 +9077,1895 @@ function formatInfoRupiah(value){
 
 
 
-	
+
+
+
+
+
+/* =========================================================
+   INFO PRODUK — MODE SELECTOR
+   STANDARD / SMART CAMPAIGN
+   ========================================================= */
+
+window.openInfoProdukMenu = async function(){
+
+  Swal.fire({
+
+    title: "Info Produk",
+
+    width: 560,
+
+    showConfirmButton: false,
+
+    showCloseButton: true,
+
+    html: `
+
+      <div
+        style="
+          text-align:left;
+          font-size:12px;
+        "
+      >
+
+        <div
+          style="
+            color:#64748b;
+            margin-bottom:14px;
+          "
+        >
+          Pilih mode pengiriman informasi produk.
+        </div>
+
+
+        <!-- STANDARD -->
+
+        <button
+          type="button"
+          onclick="infoProdukChooseMode('standard')"
+          style="
+            width:100%;
+            padding:16px;
+            margin-bottom:10px;
+            border:1px solid #dbe2ea;
+            border-radius:10px;
+            background:#fff;
+            text-align:left;
+            cursor:pointer;
+          "
+        >
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              gap:12px;
+            "
+          >
+
+            <div
+              style="
+                width:40px;
+                height:40px;
+                border-radius:9px;
+                background:#eff6ff;
+                color:#2563eb;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:18px;
+              "
+            >
+              📦
+            </div>
+
+            <div>
+
+              <div
+                style="
+                  font-weight:800;
+                  color:#172033;
+                "
+              >
+                INFORMASI STANDAR
+              </div>
+
+              <div
+                style="
+                  margin-top:3px;
+                  color:#64748b;
+                  font-size:11px;
+                "
+              >
+                Satu jenis campaign untuk banyak produk.
+              </div>
+
+            </div>
+
+          </div>
+
+        </button>
+
+
+        <!-- SMART -->
+
+        <button
+          type="button"
+          onclick="infoProdukChooseMode('smart')"
+          style="
+            width:100%;
+            padding:16px;
+            border:1px solid #8CC63F;
+            border-radius:10px;
+            background:linear-gradient(
+              135deg,
+              #f7ffe9,
+              #ffffff
+            );
+            text-align:left;
+            cursor:pointer;
+          "
+        >
+
+          <div
+            style="
+              display:flex;
+              align-items:center;
+              gap:12px;
+            "
+          >
+
+            <div
+              style="
+                width:40px;
+                height:40px;
+                border-radius:9px;
+                background:#8CC63F;
+                color:#fff;
+                display:flex;
+                align-items:center;
+                justify-content:center;
+                font-size:18px;
+              "
+            >
+              🚀
+            </div>
+
+            <div>
+
+              <div
+                style="
+                  font-weight:800;
+                  color:#172033;
+                "
+              >
+                SMART CAMPAIGN
+              </div>
+
+              <div
+                style="
+                  margin-top:3px;
+                  color:#64748b;
+                  font-size:11px;
+                "
+              >
+                Setiap produk boleh punya campaign berbeda,
+                tapi dikirim sebagai satu WA.
+              </div>
+
+            </div>
+
+          </div>
+
+        </button>
+
+
+        <div
+          style="
+            margin-top:14px;
+            padding:10px 12px;
+            background:#f8fafc;
+            border-radius:8px;
+            color:#64748b;
+            font-size:10px;
+            line-height:1.6;
+          "
+        >
+          💡 Smart Campaign cocok kalau dalam satu pengumuman
+          ada produk baru, promo, dan diskon sekaligus.
+        </div>
+
+      </div>
+
+    `
+
+  });
+
+};
+
+
+/* =========================================================
+   MODE ACTION
+   ========================================================= */
+
+window.infoProdukChooseMode = function(mode){
+
+  Swal.close();
+
+  setTimeout(async ()=>{
+
+    if(mode === "standard"){
+
+      /*
+       * FLOW LAMA
+       * TIDAK DIUBAH
+       */
+
+      await openInfoProduk();
+
+      return;
+
+    }
+
+
+    if(mode === "smart"){
+
+      await openSmartCampaign();
+
+    }
+
+  },150);
+
+};
+
+
+	/* =========================================================
+   SMART CAMPAIGN — OPEN
+   ========================================================= */
+
+window.openSmartCampaign = async function(){
+
+  try{
+
+    const selectedIds =
+      typeof getSelected === "function"
+      ? getSelected()
+      : [];
+
+
+    /* =========================================
+       PAKAI CHECKBOX YANG SUDAH DIPILIH
+       ========================================= */
+
+    if(selectedIds.length > 0){
+
+      await smartCampaignLoadSelected(
+        selectedIds
+      );
+
+      return;
+
+    }
+
+
+    /* =========================================
+       BELUM ADA PILIHAN
+       ========================================= */
+
+    await smartCampaignOpenPicker();
+
+  }catch(error){
+
+    console.error(
+      "SMART CAMPAIGN ERROR:",
+      error
+    );
+
+    Swal.fire({
+
+      icon:"error",
+
+      title:"Smart Campaign Error",
+
+      text:
+        error.message ||
+        "Smart Campaign gagal dijalankan.",
+
+      confirmButtonColor:"#8CC63F"
+
+    });
+
+  }
+
+};
+
+
+
+
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — LOAD SELECTED
+   ========================================================= */
+
+async function smartCampaignLoadSelected(ids){
+
+  const products = [];
+
+
+  for(const id of ids){
+
+    const snap =
+      await db
+      .collection("stok")
+      .doc(id)
+      .get();
+
+
+    if(!snap.exists)
+      continue;
+
+
+    const data =
+      snap.data();
+
+
+    products.push({
+
+      id:id,
+
+      nama:
+        data.nama || "",
+
+      kosong:
+        !!data.kosong
+
+    });
+
+  }
+
+
+  if(products.length === 0){
+
+    throw new Error(
+      "Produk yang dipilih tidak ditemukan."
+    );
+
+  }
+
+
+  window.smartCampaignProducts =
+    products;
+
+
+  smartCampaignForm();
+
+}
+
+
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — PRODUCT PICKER
+   ========================================================= */
+
+async function smartCampaignOpenPicker(){
+
+  const snap =
+    await db
+    .collection("stok")
+    .orderBy("nama")
+    .get();
+
+
+  const products = [];
+
+
+  snap.forEach(doc=>{
+
+    const data =
+      doc.data();
+
+
+    if(!data.nama)
+      return;
+
+
+    products.push({
+
+      id:doc.id,
+
+      nama:data.nama,
+
+      kosong:!!data.kosong
+
+    });
+
+  });
+
+
+  let selected = [];
+
+
+  Swal.fire({
+
+    title:"Smart Campaign",
+
+    width:650,
+
+    showConfirmButton:false,
+
+    showCloseButton:true,
+
+    html:`
+
+      <input
+        id="smart-search"
+        type="text"
+        placeholder="🔍 Cari produk..."
+        style="
+          width:100%;
+          height:42px;
+          padding:0 12px;
+          border:1px solid #dbe2ea;
+          border-radius:8px;
+          box-sizing:border-box;
+          outline:none;
+          margin-bottom:10px;
+        "
+      >
+
+
+      <div
+        style="
+          display:flex;
+          justify-content:space-between;
+          align-items:center;
+          margin-bottom:8px;
+          font-size:11px;
+        "
+      >
+
+        <span>
+          Dipilih:
+          <b id="smart-count">0</b>
+        </span>
+
+
+        <button
+          type="button"
+          id="smart-select-all"
+          style="
+            border:0;
+            background:#eff6ff;
+            color:#2563eb;
+            padding:7px 10px;
+            border-radius:6px;
+            font-size:10px;
+            font-weight:700;
+          "
+        >
+          PILIH SEMUA HASIL
+        </button>
+
+      </div>
+
+
+      <div
+        id="smart-product-list"
+        style="
+          max-height:320px;
+          overflow:auto;
+          border:1px solid #e5e7eb;
+          border-radius:8px;
+          text-align:left;
+        "
+      ></div>
+
+
+      <button
+        type="button"
+        id="smart-next"
+        style="
+          width:100%;
+          height:42px;
+          margin-top:10px;
+          border:0;
+          border-radius:8px;
+          background:#8CC63F;
+          color:#fff;
+          font-weight:700;
+        "
+      >
+        ATUR CAMPAIGN →
+      </button>
+
+    `
+
+  });
+
+
+  const search =
+    document.getElementById(
+      "smart-search"
+    );
+
+
+  const list =
+    document.getElementById(
+      "smart-product-list"
+    );
+
+
+  const count =
+    document.getElementById(
+      "smart-count"
+    );
+
+
+  function render(){
+
+    const keyword =
+      search.value
+      .toLowerCase()
+      .trim();
+
+
+    const results =
+      products.filter(p=>
+        p.nama
+        .toLowerCase()
+        .includes(keyword)
+      );
+
+
+    list.innerHTML = "";
+
+
+    results.forEach(product=>{
+
+      const checked =
+        selected.some(
+          p => p.id === product.id
+        );
+
+
+      const row =
+        document.createElement("label");
+
+
+      row.style.cssText = `
+
+        display:flex;
+        align-items:center;
+        gap:9px;
+        padding:11px 12px;
+        border-bottom:1px solid #f1f5f9;
+        cursor:pointer;
+        font-size:11px;
+
+      `;
+
+
+      row.innerHTML = `
+
+        <input
+          type="checkbox"
+          ${checked ? "checked" : ""}
+        >
+
+        <span
+          style="
+            flex:1;
+            font-weight:600;
+            color:#334155;
+          "
+        >
+          ${infoEscape(product.nama)}
+        </span>
+
+      `;
+
+
+      const cb =
+        row.querySelector("input");
+
+
+      cb.addEventListener(
+        "change",
+        ()=>{
+
+          if(cb.checked){
+
+            if(
+              !selected.some(
+                p => p.id === product.id
+              )
+            ){
+
+              selected.push(product);
+
+            }
+
+          }else{
+
+            selected =
+              selected.filter(
+                p => p.id !== product.id
+              );
+
+          }
+
+
+          count.textContent =
+            selected.length;
+
+        }
+      );
+
+
+      list.appendChild(row);
+
+    });
+
+  }
+
+
+  search.addEventListener(
+    "input",
+    render
+  );
+
+
+  document
+    .getElementById("smart-select-all")
+    .onclick = ()=>{
+
+      const keyword =
+        search.value
+        .toLowerCase()
+        .trim();
+
+
+      products
+        .filter(p=>
+          p.nama
+          .toLowerCase()
+          .includes(keyword)
+        )
+        .forEach(product=>{
+
+          if(
+            !selected.some(
+              p => p.id === product.id
+            )
+          ){
+
+            selected.push(product);
+
+          }
+
+        });
+
+
+      count.textContent =
+        selected.length;
+
+
+      render();
+
+    };
+
+
+  document
+    .getElementById("smart-next")
+    .onclick = ()=>{
+
+      if(selected.length === 0){
+
+        alert(
+          "Pilih minimal satu produk dulu bro 😏"
+        );
+
+        return;
+
+      }
+
+
+      window.smartCampaignProducts =
+        selected;
+
+
+      Swal.close();
+
+
+      setTimeout(
+        smartCampaignForm,
+        150
+      );
+
+    };
+
+
+  render();
+
+}
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — FORM
+   ========================================================= */
+
+window.smartCampaignForm = function(){
+
+  const products =
+    window.smartCampaignProducts || [];
+
+
+  if(products.length === 0){
+
+    smartCampaignOpenPicker();
+
+    return;
+
+  }
+
+
+  Swal.fire({
+
+    title:"🚀 Smart Campaign",
+
+    width:720,
+
+    showConfirmButton:false,
+
+    showCloseButton:true,
+
+    html:`
+
+      <div style="text-align:left;">
+
+        <div
+          style="
+            padding:10px 12px;
+            background:#f7ffe9;
+            border:1px solid #dff0bc;
+            border-radius:8px;
+            margin-bottom:12px;
+            font-size:10px;
+            color:#48611e;
+          "
+        >
+
+          <b>MODE SMART</b><br>
+
+          Setiap produk dapat mempunyai
+          jenis campaign, harga, diskon,
+          dan periode yang berbeda.
+
+          Semua akan digabung menjadi
+          <b>1 pesan WhatsApp per VIP.</b>
+
+        </div>
+
+
+        <label class="info-field-label">
+          Judul Campaign
+        </label>
+
+        <input
+          id="smart-judul"
+          class="info-field"
+          placeholder="Informasi Produk & Promo September"
+        >
+
+
+        <label class="info-field-label">
+          Deskripsi Pembuka
+        </label>
+
+        <textarea
+          id="smart-deskripsi"
+          class="info-textarea"
+          placeholder="Deskripsi campaign..."
+        >Berikut informasi produk dan penawaran terbaru untuk Anda.
+
+Silakan cek detail masing-masing produk di bawah ini.
+
+Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
+
+
+        <div
+          style="
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            margin-top:15px;
+            margin-bottom:8px;
+          "
+        >
+
+          <div
+            style="
+              font-size:11px;
+              font-weight:800;
+              color:#172033;
+            "
+          >
+            DETAIL PRODUK
+          </div>
+
+          <div
+            style="
+              font-size:10px;
+              color:#64748b;
+            "
+          >
+            ${products.length} produk
+          </div>
+
+        </div>
+
+
+        <div
+          id="smart-product-config"
+          style="
+            max-height:390px;
+            overflow:auto;
+            padding-right:2px;
+          "
+        >
+
+          ${
+            products.map(
+              (p,i)=>
+                smartCampaignProductCard(p,i)
+            ).join("")
+          }
+
+        </div>
+
+
+        <div
+          style="
+            display:flex;
+            gap:8px;
+            margin-top:14px;
+          "
+        >
+
+          <button
+            type="button"
+            onclick="smartCampaignPreview()"
+            style="
+              flex:1;
+              height:42px;
+              border:1px solid #dbe2ea;
+              border-radius:7px;
+              background:#fff;
+              font-weight:700;
+            "
+          >
+            👁 PREVIEW
+          </button>
+
+
+          <button
+            type="button"
+            onclick="smartCampaignSend()"
+            style="
+              flex:1;
+              height:42px;
+              border:0;
+              border-radius:7px;
+              background:#8CC63F;
+              color:#fff;
+              font-weight:700;
+            "
+          >
+            📲 KIRIM KE VIP
+          </button>
+
+        </div>
+
+
+        <div
+          style="
+            margin-top:10px;
+            font-size:9px;
+            color:#94a3b8;
+            text-align:center;
+          "
+        >
+          Admin → AppScript → Gabung Campaign →
+          Semua VIP → Fonnte
+        </div>
+
+      </div>
+
+    `
+
+  });
+
+};
+
+
+
+
+
+
+/* =========================================================
+   SMART CAMPAIGN — PRODUCT CARD
+   ========================================================= */
+
+function smartCampaignProductCard(product,index){
+
+  return `
+
+    <div
+      id="smart-card-${index}"
+      style="
+        border:1px solid #e2e8f0;
+        border-radius:9px;
+        padding:11px;
+        margin-bottom:9px;
+        background:#fff;
+      "
+    >
+
+      <div
+        style="
+          display:flex;
+          align-items:center;
+          gap:8px;
+          margin-bottom:8px;
+        "
+      >
+
+        <div
+          style="
+            width:25px;
+            height:25px;
+            border-radius:6px;
+            background:#eff6ff;
+            color:#2563eb;
+            display:flex;
+            align-items:center;
+            justify-content:center;
+            font-size:10px;
+            font-weight:800;
+          "
+        >
+          ${index+1}
+        </div>
+
+
+        <div
+          style="
+            flex:1;
+            font-size:11px;
+            font-weight:800;
+            color:#334155;
+          "
+        >
+          ${infoEscape(product.nama)}
+        </div>
+
+      </div>
+
+
+      <label class="info-field-label">
+        Jenis Campaign
+      </label>
+
+
+      <select
+        id="smart-type-${index}"
+        class="info-field"
+        onchange="smartCampaignTypeChange(${index})"
+      >
+
+        <option value="">
+          Pilih jenis...
+        </option>
+
+        <option value="produk_baru">
+          🆕 Produk Baru
+        </option>
+
+        <option value="promo">
+          🔥 Promo
+        </option>
+
+        <option value="diskon">
+          🏷️ Diskon
+        </option>
+
+      </select>
+
+
+      <div
+        id="smart-dynamic-${index}"
+      ></div>
+
+    </div>
+
+  `;
+
+			}
+
+
+	/* =========================================================
+   SMART CAMPAIGN — TYPE CHANGE
+   ========================================================= */
+
+window.smartCampaignTypeChange =
+function(index){
+
+  const type =
+    document.getElementById(
+      `smart-type-${index}`
+    )?.value;
+
+
+  const wrap =
+    document.getElementById(
+      `smart-dynamic-${index}`
+    );
+
+
+  if(!wrap)
+    return;
+
+
+  if(type === "produk_baru"){
+
+    wrap.innerHTML = `
+
+      <label class="info-field-label">
+        Keterangan
+      </label>
+
+      <textarea
+        id="smart-desc-${index}"
+        class="info-textarea"
+        placeholder="Keterangan produk baru..."
+      >Produk terbaru telah tersedia.
+
+Silakan cek dan lakukan pemesanan melalui aplikasi VIP.</textarea>
+
+
+      <label class="info-field-label">
+        Harga
+      </label>
+
+      <input
+        id="smart-harga-${index}"
+        class="info-field"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value =
+          formatInfoHarga(this.value);
+        "
+      >
+
+    `;
+
+    return;
+
+  }
+
+
+  if(type === "promo"){
+
+    wrap.innerHTML = `
+
+      <label class="info-field-label">
+        Keterangan Promo
+      </label>
+
+      <textarea
+        id="smart-desc-${index}"
+        class="info-textarea"
+        placeholder="Keterangan promo..."
+      >Dapatkan harga spesial selama periode promo berlangsung.
+
+Stok terbatas dan promo dapat berakhir sewaktu-waktu.</textarea>
+
+
+      <label class="info-field-label">
+        Harga Normal
+      </label>
+
+      <input
+        id="smart-harga-normal-${index}"
+        class="info-field"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value =
+          formatInfoHarga(this.value);
+        "
+      >
+
+
+      <label class="info-field-label">
+        Harga Promo
+      </label>
+
+      <input
+        id="smart-harga-promo-${index}"
+        class="info-field"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value =
+          formatInfoHarga(this.value);
+        "
+      >
+
+
+      <label class="info-field-label">
+        Periode
+      </label>
+
+      <input
+        id="smart-periode-${index}"
+        class="info-field"
+        placeholder="1 - 30 September 2026"
+      >
+
+    `;
+
+    return;
+
+  }
+
+
+  if(type === "diskon"){
+
+    wrap.innerHTML = `
+
+      <label class="info-field-label">
+        Keterangan Diskon
+      </label>
+
+      <textarea
+        id="smart-desc-${index}"
+        class="info-textarea"
+        placeholder="Keterangan diskon..."
+      >Dapatkan potongan harga khusus selama periode diskon berlangsung.
+
+Stok terbatas dan penawaran berlaku dalam waktu terbatas.</textarea>
+
+
+      <label class="info-field-label">
+        Harga Normal
+      </label>
+
+      <input
+        id="smart-harga-normal-${index}"
+        class="info-field"
+        inputmode="numeric"
+        autocomplete="off"
+        placeholder="Rp 0"
+        oninput="
+          this.value =
+          formatInfoHarga(this.value);
+        "
+      >
+
+
+      <label class="info-field-label">
+        Diskon %
+      </label>
+
+      <div style="position:relative;">
+
+        <input
+          id="smart-diskon-${index}"
+          class="info-field"
+          type="number"
+          min="0"
+          max="100"
+          step="1"
+          inputmode="numeric"
+          placeholder="10"
+          style="padding-right:38px;"
+        >
+
+        <span
+          style="
+            position:absolute;
+            right:13px;
+            top:50%;
+            transform:translateY(-50%);
+            color:#64748b;
+            font-size:11px;
+            font-weight:700;
+            pointer-events:none;
+          "
+        >
+          %
+        </span>
+
+      </div>
+
+
+      <label class="info-field-label">
+        Periode
+      </label>
+
+      <input
+        id="smart-periode-${index}"
+        class="info-field"
+        placeholder="1 - 30 September 2026"
+      >
+
+    `;
+
+  }
+
+};
+
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — COLLECT
+   ========================================================= */
+
+function smartCampaignCollect(){
+
+  const products =
+    window.smartCampaignProducts || [];
+
+
+  const judul =
+    document.getElementById(
+      "smart-judul"
+    )?.value.trim() || "";
+
+
+  const deskripsi =
+    document.getElementById(
+      "smart-deskripsi"
+    )?.value.trim() || "";
+
+
+  const rows =
+    products.map((p,index)=>{
+
+      const type =
+        document.getElementById(
+          `smart-type-${index}`
+        )?.value || "";
+
+
+      return {
+
+        id:p.id,
+
+        nama:
+          p.nama ||
+          "-",
+
+        jenis:type,
+
+        deskripsi:
+          document.getElementById(
+            `smart-desc-${index}`
+          )?.value.trim() || "",
+
+        harga:
+          document.getElementById(
+            `smart-harga-${index}`
+          )?.value || "",
+
+        hargaNormal:
+          document.getElementById(
+            `smart-harga-normal-${index}`
+          )?.value || "",
+
+        hargaPromo:
+          document.getElementById(
+            `smart-harga-promo-${index}`
+          )?.value || "",
+
+        diskon:
+          document.getElementById(
+            `smart-diskon-${index}`
+          )?.value || "",
+
+        periode:
+          document.getElementById(
+            `smart-periode-${index}`
+          )?.value || ""
+
+      };
+
+    });
+
+
+  return {
+
+    judul,
+
+    deskripsi,
+
+    products:rows
+
+  };
+
+		}
+
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — MESSAGE BUILDER
+   ========================================================= */
+
+function smartCampaignBuildMessage(data){
+
+  const groups = {
+
+    produk_baru:[],
+
+    promo:[],
+
+    diskon:[]
+
+  };
+
+
+  data.products.forEach(p=>{
+
+    if(groups[p.jenis]){
+
+      groups[p.jenis].push(p);
+
+    }
+
+  });
+
+
+  const lines = [];
+
+
+  lines.push(
+    "⌁ SMART CAMPAIGN"
+  );
+
+  lines.push("");
+
+  lines.push(
+    "────────────────────"
+  );
+
+  lines.push("");
+
+  lines.push(
+    "Halo bosku,"
+  );
+
+  lines.push("");
+
+  if(data.judul)
+    lines.push(data.judul);
+
+  lines.push("");
+
+
+  function addGroup(
+    type,
+    title,
+    icon
+  ){
+
+    const list =
+      groups[type];
+
+
+    if(!list.length)
+      return;
+
+
+    lines.push(
+      `${icon} ${title}`
+    );
+
+    lines.push("");
+
+
+    list.forEach((p,i)=>{
+
+      lines.push(
+        `${i+1}. ▸ ${p.nama}`
+      );
+
+
+      if(p.deskripsi){
+
+        lines.push("");
+
+        lines.push(
+          p.deskripsi
+        );
+
+      }
+
+
+      if(type === "produk_baru"){
+
+        if(p.harga){
+
+          lines.push("");
+
+          lines.push(
+            `Harga : ${p.harga}`
+          );
+
+        }
+
+      }
+
+
+      if(type === "promo"){
+
+        if(p.hargaNormal){
+
+          lines.push("");
+
+          lines.push(
+            `Harga Normal : ${p.hargaNormal}`
+          );
+
+        }
+
+        if(p.hargaPromo){
+
+          lines.push(
+            `Harga Promo  : ${p.hargaPromo}`
+          );
+
+        }
+
+      }
+
+
+      if(type === "diskon"){
+
+        if(p.hargaNormal){
+
+          lines.push("");
+
+          lines.push(
+            `Harga Normal : ${p.hargaNormal}`
+          );
+
+        }
+
+        if(p.diskon){
+
+          lines.push(
+            `Diskon       : ${p.diskon}%`
+          );
+
+        }
+
+      }
+
+
+      if(p.periode){
+
+        lines.push(
+          `◷ Periode     : ${p.periode}`
+        );
+
+      }
+
+
+      lines.push("");
+
+    });
+
+  }
+
+
+  addGroup(
+    "produk_baru",
+    "PRODUK BARU",
+    "🆕"
+  );
+
+
+  addGroup(
+    "promo",
+    "PROMO",
+    "🔥"
+  );
+
+
+  addGroup(
+    "diskon",
+    "DISKON",
+    "🏷️"
+  );
+
+
+  if(data.deskripsi){
+
+    lines.push(
+      data.deskripsi
+    );
+
+    lines.push("");
+
+  }
+
+
+  lines.push(
+    "────────────────────"
+  );
+
+  lines.push("");
+
+  lines.push(
+    "Pemesanan dapat dilakukan melalui aplikasi VIP."
+  );
+
+  lines.push("");
+
+  lines.push(
+    "Terima kasih atas kepercayaan dan kerja samanya."
+  );
+
+  lines.push("");
+
+  lines.push(
+    "Hormat saya,"
+  );
+
+  lines.push(
+    "Imamsalesnine.com"
+  );
+
+  lines.push("");
+
+  lines.push(
+    "> _Sent via fonnte.com_"
+  );
+
+
+  return lines.join("\n");
+
+	}
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — PREVIEW
+   ========================================================= */
+
+window.smartCampaignPreview = function(){
+
+  const data =
+    smartCampaignCollect();
+
+
+  if(!data.judul){
+
+    alert(
+      "Judul campaign belum diisi."
+    );
+
+    return;
+
+  }
+
+
+  if(!data.products.length){
+
+    alert(
+      "Belum ada produk."
+    );
+
+    return;
+
+  }
+
+
+  const invalid =
+    data.products.find(
+      p => !p.jenis
+    );
+
+
+  if(invalid){
+
+    alert(
+      `Jenis campaign untuk "${invalid.nama}" belum dipilih.`
+    );
+
+    return;
+
+  }
+
+
+  const message =
+    smartCampaignBuildMessage(
+      data
+    );
+
+
+  Swal.fire({
+
+    title:"Preview Smart Campaign",
+
+    width:650,
+
+    html:`
+
+      <div
+        style="
+          text-align:left;
+          background:#f8fafc;
+          border:1px solid #e2e8f0;
+          border-radius:8px;
+          padding:14px;
+          max-height:500px;
+          overflow:auto;
+          white-space:pre-wrap;
+          font-family:Arial,sans-serif;
+          font-size:11px;
+          line-height:1.65;
+        "
+      >
+        ${infoEscape(message)}
+      </div>
+
+    `,
+
+    confirmButtonColor:"#8CC63F",
+
+    confirmButtonText:"Tutup"
+
+  });
+
+};
+
+
+
+
+
+	/* =========================================================
+   SMART CAMPAIGN — SEND
+   ========================================================= */
+
+window.smartCampaignSend = async function(){
+
+  const data =
+    smartCampaignCollect();
+
+
+  if(!data.judul){
+
+    alert(
+      "Judul campaign belum diisi."
+    );
+
+    return;
+
+  }
+
+
+  if(!data.products.length){
+
+    alert(
+      "Belum ada produk."
+    );
+
+    return;
+
+  }
+
+
+  const invalid =
+    data.products.find(
+      p => !p.jenis
+    );
+
+
+  if(invalid){
+
+    alert(
+      `Jenis campaign "${invalid.nama}" belum dipilih.`
+    );
+
+    return;
+
+  }
+
+
+  const confirm =
+    await Swal.fire({
+
+      icon:"question",
+
+      title:"Kirim Smart Campaign?",
+
+      html:`
+
+        <div style="font-size:12px;line-height:1.7;">
+
+          <b>
+            ${data.products.length}
+          </b>
+          produk akan digabung menjadi
+
+          <b>
+            1 pesan WhatsApp per VIP.
+          </b>
+
+          <br><br>
+
+          Tidak ada satu pesan terpisah
+          untuk setiap produk.
+
+        </div>
+
+      `,
+
+      showCancelButton:true,
+
+      confirmButtonText:"KIRIM",
+
+      cancelButtonText:"BATAL",
+
+      confirmButtonColor:"#8CC63F"
+
+    });
+
+
+  if(!confirm.isConfirmed)
+    return;
+
+
+  const payload = {
+
+    mode:
+      "notifProdukSmart",
+
+    judul:
+      data.judul,
+
+    deskripsi:
+      data.deskripsi,
+
+    products:
+      data.products
+
+  };
+
+
+  Swal.fire({
+
+    title:"Mengirim Smart Campaign...",
+
+    text:
+      "Admin → AppScript → Gabung → Semua VIP → Fonnte",
+
+    allowOutsideClick:false,
+
+    showConfirmButton:false,
+
+    didOpen:()=>{
+
+      Swal.showLoading();
+
+    }
+
+  });
+
+
+  try{
+
+    await fetch(
+
+      URL,
+
+      {
+
+        method:"POST",
+
+        mode:"no-cors",
+
+        headers:{
+
+          "Content-Type":
+            "text/plain;charset=utf-8"
+
+        },
+
+        body:
+          JSON.stringify(payload)
+
+      }
+
+    );
+
+
+    Swal.fire({
+
+      icon:"success",
+
+      title:"Smart Campaign Terkirim",
+
+      html:`
+
+        <b>
+          ${data.products.length}
+        </b>
+        produk berhasil diteruskan sebagai
+
+        <b>
+          satu campaign gabungan
+        </b>
+
+        ke seluruh VIP.
+
+      `,
+
+      confirmButtonColor:"#8CC63F"
+
+    });
+
+
+  }catch(error){
+
+    console.error(
+      "SMART SEND ERROR:",
+      error
+    );
+
+
+    Swal.fire({
+
+      icon:"error",
+
+      title:"Pengiriman Gagal",
+
+      text:
+        error.message ||
+        "Smart Campaign gagal dikirim.",
+
+      confirmButtonColor:"#8CC63F"
+
+    });
+
+  }
+
+};
 
 	
 
