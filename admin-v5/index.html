@@ -8049,7 +8049,7 @@ function infoProdukForm(){
               cursor:pointer;
             "
           >
-            KIRIM KE VIP
+            KIRIM CAMPAIGN
           </button>
 
         </div>
@@ -9943,6 +9943,86 @@ Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
           "
         >
 
+
+<!-- =====================================================
+     TARGET PENGIRIMAN
+====================================================== -->
+
+<div style="
+  margin-top:16px;
+  padding:12px;
+  background:#f8fafc;
+  border:1px solid #e2e8f0;
+  border-radius:9px;
+">
+
+  <div style="
+    font-size:11px;
+    font-weight:800;
+    color:#172033;
+    margin-bottom:8px;
+  ">
+    TARGET PENGIRIMAN
+  </div>
+
+  <select
+    id="smart-target-mode"
+    class="info-field"
+    onchange="smartTargetModeChange()"
+  >
+    <option value="vip">
+      👥 Semua VIP
+    </option>
+
+    <option value="group">
+      💬 Grup WhatsApp
+    </option>
+
+    <option value="vip_group">
+      👥💬 Semua VIP + Grup
+    </option>
+  </select>
+
+  <div
+    id="smart-group-selector"
+    style="display:none;margin-top:8px;"
+  >
+
+    <div style="
+      font-size:10px;
+      color:#64748b;
+      margin-bottom:6px;
+    ">
+      Pilih grup WhatsApp:
+    </div>
+
+    <div
+      id="smart-group-list"
+      style="
+        max-height:150px;
+        overflow-y:auto;
+        border:1px solid #e2e8f0;
+        border-radius:7px;
+        background:#fff;
+      "
+    >
+      <div style="
+        padding:12px;
+        text-align:center;
+        color:#94a3b8;
+        font-size:10px;
+      ">
+        Memuat daftar grup...
+      </div>
+    </div>
+
+  </div>
+
+</div>
+
+
+		
+
           <button
             type="button"
             onclick="smartCampaignPreview()"
@@ -9972,7 +10052,7 @@ Segera lakukan pemesanan melalui aplikasi VIP.</textarea>
               font-weight:700;
             "
           >
-            📲 KIRIM KE VIP
+            📲 KIRIM CAMPAIGN
           </button>
 
         </div>
@@ -10754,9 +10834,13 @@ window.smartCampaignPreview = function(){
 
 
 
-	/* =========================================================
+/* =========================================================
    SMART CAMPAIGN — SEND
-   ========================================================= */
+   TARGET:
+   - VIP
+   - GROUP
+   - VIP + GROUP
+========================================================= */
 
 window.smartCampaignSend = async function(){
 
@@ -10766,9 +10850,7 @@ window.smartCampaignSend = async function(){
 
   if(!data.judul){
 
-    alert(
-      "Judul campaign belum diisi."
-    );
+    alert("Judul campaign belum diisi.");
 
     return;
 
@@ -10777,9 +10859,7 @@ window.smartCampaignSend = async function(){
 
   if(!data.products.length){
 
-    alert(
-      "Belum ada produk."
-    );
+    alert("Belum ada produk.");
 
     return;
 
@@ -10803,6 +10883,90 @@ window.smartCampaignSend = async function(){
   }
 
 
+  /* =======================================================
+     TARGET
+  ======================================================= */
+
+  const targetMode =
+    document.getElementById(
+      "smart-target-mode"
+    )?.value || "vip";
+
+
+  let groupIds = [];
+
+
+  /* =======================================================
+     AMBIL GROUP ID YANG DICENTANG
+  ======================================================= */
+
+  if(
+    targetMode === "group" ||
+    targetMode === "vip_group"
+  ){
+
+    const checked =
+      document.querySelectorAll(
+        ".smart-group-checkbox:checked"
+      );
+
+
+    groupIds =
+      Array.from(checked)
+        .map(function(el){
+
+          return String(
+            el.value || ""
+          ).trim();
+
+        })
+        .filter(Boolean);
+
+
+    if(groupIds.length === 0){
+
+      alert(
+        "Pilih minimal satu grup WhatsApp dulu bro."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /* =======================================================
+     LABEL TARGET
+  ======================================================= */
+
+  let targetLabel =
+    "semua VIP";
+
+
+  if(targetMode === "group"){
+
+    targetLabel =
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  if(targetMode === "vip_group"){
+
+    targetLabel =
+      "semua VIP + " +
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  /* =======================================================
+     KONFIRMASI
+  ======================================================= */
+
   const confirm =
     await Swal.fire({
 
@@ -10812,21 +10976,24 @@ window.smartCampaignSend = async function(){
 
       html:`
 
-        <div style="font-size:12px;line-height:1.7;">
+        <div style="
+          font-size:12px;
+          line-height:1.7;
+          text-align:left;
+        ">
 
           <b>
             ${data.products.length}
           </b>
           produk akan digabung menjadi
-
-          <b>
-            1 pesan WhatsApp per VIP.
-          </b>
+          <b>1 pesan campaign.</b>
 
           <br><br>
 
-          Tidak ada satu pesan terpisah
-          untuk setiap produk.
+          Target:
+          <b>
+            ${infoEscape(targetLabel)}
+          </b>
 
         </div>
 
@@ -10847,6 +11014,10 @@ window.smartCampaignSend = async function(){
     return;
 
 
+  /* =======================================================
+     PAYLOAD KE APPSCRIPT
+  ======================================================= */
+
   const payload = {
 
     mode:
@@ -10859,19 +11030,40 @@ window.smartCampaignSend = async function(){
       data.deskripsi,
 
     products:
-      data.products
+      data.products,
+
+    /* ===== TARGET BARU ===== */
+
+    targetMode:
+      targetMode,
+
+    groupIds:
+      groupIds
 
   };
 
 
+  console.log(
+    "🔥 SMART CAMPAIGN PAYLOAD:",
+    payload
+  );
+
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
   Swal.fire({
 
-    title:"Mengirim Smart Campaign...",
+    title:
+      "Mengirim Smart Campaign...",
 
     text:
-      "Admin → AppScript → Gabung → Semua VIP → Fonnte",
+      "Admin → AppScript → Fonnte",
 
     allowOutsideClick:false,
+
+    allowEscapeKey:false,
 
     showConfirmButton:false,
 
@@ -10883,6 +11075,10 @@ window.smartCampaignSend = async function(){
 
   });
 
+
+  /* =======================================================
+     SEND
+  ======================================================= */
 
   try{
 
@@ -10911,28 +11107,42 @@ window.smartCampaignSend = async function(){
     );
 
 
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
     Swal.fire({
 
       icon:"success",
 
-      title:"Smart Campaign Terkirim",
+      title:
+        "Smart Campaign Terkirim",
 
       html:`
 
-        <b>
-          ${data.products.length}
-        </b>
-        produk berhasil diteruskan sebagai
+        <div style="
+          font-size:12px;
+          line-height:1.7;
+        ">
 
-        <b>
-          satu campaign gabungan
-        </b>
+          <b>
+            ${data.products.length}
+          </b>
+          produk berhasil diproses.
 
-        ke seluruh VIP.
+          <br><br>
+
+          Target:
+          <b>
+            ${infoEscape(targetLabel)}
+          </b>
+
+        </div>
 
       `,
 
-      confirmButtonColor:"#8CC63F"
+      confirmButtonColor:
+        "#8CC63F"
 
     });
 
@@ -10949,19 +11159,247 @@ window.smartCampaignSend = async function(){
 
       icon:"error",
 
-      title:"Pengiriman Gagal",
+      title:
+        "Pengiriman Gagal",
 
       text:
         error.message ||
         "Smart Campaign gagal dikirim.",
 
-      confirmButtonColor:"#8CC63F"
+      confirmButtonColor:
+        "#8CC63F"
 
     });
 
   }
 
 };
+
+
+
+
+
+
+
+
+/* =========================================================
+   SMART CAMPAIGN — TARGET MODE
+========================================================= */
+
+window.smartTargetModeChange = async function(){
+
+  const mode =
+    document.getElementById(
+      "smart-target-mode"
+    )?.value || "vip";
+
+  const selector =
+    document.getElementById(
+      "smart-group-selector"
+    );
+
+  if(!selector)
+    return;
+
+
+  if(
+    mode === "group" ||
+    mode === "vip_group"
+  ){
+
+    selector.style.display = "block";
+
+    await smartLoadWhatsAppGroups();
+
+  }else{
+
+    selector.style.display = "none";
+
+  }
+
+};
+
+
+
+
+
+/* =========================================================
+   LOAD GROUP FONNTE
+========================================================= */
+
+window.smartLoadWhatsAppGroups = async function(){
+
+  const list =
+    document.getElementById(
+      "smart-group-list"
+    );
+
+  if(!list)
+    return;
+
+
+  list.innerHTML = `
+    <div style="
+      padding:12px;
+      text-align:center;
+      color:#64748b;
+      font-size:10px;
+    ">
+      Memuat grup WhatsApp...
+    </div>
+  `;
+
+
+  try{
+
+    const response =
+      await fetch(
+        URL + "?action=getWhatsAppGroups",
+        {
+          method:"GET"
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(
+      !result ||
+      !result.success
+    ){
+
+      throw new Error(
+        result?.message ||
+        "Gagal mengambil daftar grup."
+      );
+
+    }
+
+
+    /*
+      Kita sengaja tidak mengunci nama field
+      response Fonnte di sini sebelum melihat
+      response API sebenarnya.
+    */
+
+    const groups =
+      Array.isArray(result.data)
+      ? result.data
+      : (
+          Array.isArray(result.data?.data)
+          ? result.data.data
+          : []
+        );
+
+
+    if(groups.length === 0){
+
+      list.innerHTML = `
+        <div style="
+          padding:12px;
+          text-align:center;
+          color:#94a3b8;
+          font-size:10px;
+        ">
+          Belum ada grup yang tersedia.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    list.innerHTML =
+      groups.map(function(group,index){
+
+        /*
+          Support beberapa kemungkinan
+          struktur response tanpa mengganggu
+          data lain.
+        */
+
+        const id =
+          group.id ||
+          group.group_id ||
+          group.jid ||
+          group.chatId ||
+          "";
+
+        const name =
+          group.name ||
+          group.subject ||
+          group.group_name ||
+          ("Grup " + (index + 1));
+
+
+        if(!id)
+          return "";
+
+
+        return `
+          <label style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:9px 10px;
+            border-bottom:1px solid #f1f5f9;
+            cursor:pointer;
+          ">
+
+            <input
+              type="checkbox"
+              class="smart-group-checkbox"
+              value="${infoEscape(String(id))}"
+              data-group-name="${infoEscape(String(name))}"
+              style="
+                width:15px;
+                height:15px;
+                accent-color:#8CC63F;
+              "
+            >
+
+            <span style="
+              font-size:11px;
+              color:#334155;
+              font-weight:600;
+            ">
+              ${infoEscape(String(name))}
+            </span>
+
+          </label>
+        `;
+
+      }).join("");
+
+
+  }catch(error){
+
+    console.error(
+      "LOAD GROUP ERROR:",
+      error
+    );
+
+
+    list.innerHTML = `
+      <div style="
+        padding:12px;
+        color:#dc2626;
+        font-size:10px;
+        text-align:center;
+      ">
+        Gagal memuat grup.<br>
+        ${infoEscape(error.message)}
+      </div>
+    `;
+
+  }
+
+};
+
+	
 
 	
 
