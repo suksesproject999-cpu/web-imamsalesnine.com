@@ -5829,6 +5829,759 @@ function updateStok(produk, status){
 }
 
 
+
+
+
+
+
+
+
+/* =========================================================
+   TOGGLE STOK PER PRODUK
+   TARGET:
+   - SEMUA VIP
+   - GRUP WHATSAPP
+   - VIP + GRUP
+========================================================= */
+
+async function toggleStok(
+  id,
+  nama,
+  kosong
+){
+
+  /* =======================================================
+     STATUS BARU
+     kosong = true  → sekarang tersedia
+     kosong = false → sekarang kosong
+  ======================================================= */
+
+  const newKosong =
+    !kosong;
+
+  const status =
+    newKosong
+    ? "kosong"
+    : "tersedia";
+
+  const statusLabel =
+    newKosong
+    ? "KOSONG"
+    : "TERSEDIA";
+
+
+  /* =======================================================
+     PILIH TARGET NOTIFIKASI
+  ======================================================= */
+
+  const targetResult =
+    await Swal.fire({
+
+      title:
+        "Update Stok",
+
+      html:`
+
+        <div style="
+          text-align:left;
+          font-size:12px;
+          line-height:1.6;
+        ">
+
+          <div style="
+            margin-bottom:12px;
+            padding:10px;
+            background:#f8fafc;
+            border-radius:8px;
+          ">
+
+            <div style="
+              font-weight:700;
+              color:#0f172a;
+              margin-bottom:4px;
+            ">
+              ${infoEscape(nama)}
+            </div>
+
+            <div style="
+              color:${newKosong ? '#ef4444' : '#22c55e'};
+              font-weight:800;
+            ">
+              ● ${statusLabel}
+            </div>
+
+          </div>
+
+
+          <label style="
+            display:block;
+            font-size:11px;
+            font-weight:700;
+            color:#475569;
+            margin-bottom:6px;
+          ">
+            TARGET NOTIFIKASI
+          </label>
+
+
+          <select
+            id="toggle-stok-target-mode"
+            class="info-field"
+            style="
+              width:100%;
+              margin-bottom:10px;
+            "
+          >
+
+            <option value="vip">
+              Semua VIP
+            </option>
+
+            <option value="group">
+              Grup WhatsApp
+            </option>
+
+            <option value="vip_group">
+              Semua VIP + Grup WhatsApp
+            </option>
+
+          </select>
+
+
+          <div
+            id="toggle-stok-group-selector"
+            style="
+              display:none;
+              margin-top:8px;
+            "
+          >
+
+            <div style="
+              font-size:11px;
+              font-weight:700;
+              color:#475569;
+              margin-bottom:7px;
+            ">
+              PILIH GRUP WHATSAPP
+            </div>
+
+            <div
+              id="toggle-stok-group-list"
+              style="
+                max-height:180px;
+                overflow:auto;
+                border:1px solid #e2e8f0;
+                border-radius:8px;
+                padding:8px;
+                background:#fff;
+              "
+            >
+              <div style="
+                color:#94a3b8;
+                font-size:11px;
+                text-align:center;
+                padding:12px;
+              ">
+                Memuat grup...
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      `,
+
+      width:500,
+
+      showCancelButton:true,
+
+      confirmButtonText:
+        "LANJUT",
+
+      cancelButtonText:
+        "BATAL",
+
+      confirmButtonColor:
+        "#8CC63F",
+
+      didOpen:async ()=>{
+
+        const mode =
+          document.getElementById(
+            "toggle-stok-target-mode"
+          );
+
+        const selector =
+          document.getElementById(
+            "toggle-stok-group-selector"
+          );
+
+
+        if(!mode || !selector)
+          return;
+
+
+        mode.addEventListener(
+          "change",
+          async function(){
+
+            if(
+              this.value === "group" ||
+              this.value === "vip_group"
+            ){
+
+              selector.style.display =
+                "block";
+
+
+              await toggleStokLoadGroups();
+
+            }else{
+
+              selector.style.display =
+                "none";
+
+            }
+
+          }
+        );
+
+      }
+
+    });
+
+
+  if(!targetResult.isConfirmed){
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     AMBIL TARGET MODE
+  ======================================================= */
+
+  const targetMode =
+    document.getElementById(
+      "toggle-stok-target-mode"
+    )?.value || "vip";
+
+
+  let groupIds = [];
+
+
+  /* =======================================================
+     AMBIL GROUP ID
+  ======================================================= */
+
+  if(
+    targetMode === "group" ||
+    targetMode === "vip_group"
+  ){
+
+    const checked =
+      document.querySelectorAll(
+        ".toggle-stok-group-checkbox:checked"
+      );
+
+
+    groupIds =
+      Array.from(checked)
+        .map(function(el){
+
+          return String(
+            el.value || ""
+          ).trim();
+
+        })
+        .filter(Boolean);
+
+
+    if(groupIds.length === 0){
+
+      alert(
+        "Pilih minimal satu grup WhatsApp dulu bro."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /* =======================================================
+     LABEL TARGET
+  ======================================================= */
+
+  let targetLabel =
+    "semua VIP";
+
+
+  if(targetMode === "group"){
+
+    targetLabel =
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  if(targetMode === "vip_group"){
+
+    targetLabel =
+      "semua VIP + " +
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  /* =======================================================
+     KONFIRMASI
+  ======================================================= */
+
+  const confirm =
+    await Swal.fire({
+
+      icon:
+        "question",
+
+      title:
+        "Konfirmasi Update Stok",
+
+      html:`
+
+        <div style="
+          text-align:left;
+          font-size:12px;
+          line-height:1.7;
+        ">
+
+          <div style="
+            margin-bottom:10px;
+          ">
+
+            Produk:
+
+            <b>
+              ${infoEscape(nama)}
+            </b>
+
+            <br>
+
+            Status:
+
+            <b style="
+              color:${newKosong ? '#ef4444' : '#22c55e'};
+            ">
+              ${statusLabel}
+            </b>
+
+          </div>
+
+
+          <div style="
+            padding:10px;
+            background:#f8fafc;
+            border-radius:8px;
+          ">
+
+            Target notifikasi:
+
+            <br>
+
+            <b>
+              ${infoEscape(targetLabel)}
+            </b>
+
+          </div>
+
+        </div>
+
+      `,
+
+      showCancelButton:true,
+
+      confirmButtonText:
+        "YA, UPDATE & KIRIM",
+
+      cancelButtonText:
+        "BATAL",
+
+      confirmButtonColor:
+        "#8CC63F"
+
+    });
+
+
+  if(!confirm.isConfirmed){
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
+  Swal.fire({
+
+    title:
+      "Memproses stok...",
+
+    text:
+      "Update Firestore → AppScript → Fonnte",
+
+    allowOutsideClick:false,
+
+    allowEscapeKey:false,
+
+    showConfirmButton:false,
+
+    didOpen:()=>{
+
+      Swal.showLoading();
+
+    }
+
+  });
+
+
+  /* =======================================================
+     UPDATE FIRESTORE
+  ======================================================= */
+
+  try{
+
+    await db
+      .collection("stok")
+      .doc(id)
+      .update({
+
+        kosong:
+          newKosong
+
+      });
+
+
+    /* =====================================================
+       PAYLOAD NOTIFIKASI
+    ===================================================== */
+
+    const payload = {
+
+      mode:
+        "notifStokBulk",
+
+      status:
+        status,
+
+      produk:
+        [nama],
+
+      targetMode:
+        targetMode,
+
+      groupIds:
+        groupIds
+
+    };
+
+
+    console.log(
+      "🔥 TOGGLE STOCK NOTIFICATION PAYLOAD:",
+      payload
+    );
+
+
+    /* =====================================================
+       KIRIM KE APPSCRIPT
+    ===================================================== */
+
+    await fetch(
+
+      URL,
+
+      {
+
+        method:
+          "POST",
+
+        mode:
+          "no-cors",
+
+        headers:{
+          "Content-Type":
+            "text/plain;charset=utf-8"
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          )
+
+      }
+
+    );
+
+
+    /* =====================================================
+       REFRESH STOCK
+    ===================================================== */
+
+    await loadStokAdmin();
+
+
+    Swal.fire({
+
+      icon:
+        "success",
+
+      title:
+        "Stok berhasil diupdate",
+
+      html:`
+
+        <div style="
+          font-size:12px;
+          line-height:1.7;
+        ">
+
+          <b>
+            ${infoEscape(nama)}
+          </b>
+
+          <br>
+
+          Status:
+          <b>
+            ${statusLabel}
+          </b>
+
+          <br>
+
+          Notifikasi:
+          <b>
+            ${infoEscape(targetLabel)}
+          </b>
+
+        </div>
+
+      `,
+
+      confirmButtonColor:
+        "#8CC63F"
+
+    });
+
+
+  }catch(error){
+
+    console.error(
+      "❌ TOGGLE STOK ERROR:",
+      error
+    );
+
+
+    Swal.fire({
+
+      icon:
+        "error",
+
+      title:
+        "Gagal update stok",
+
+      text:
+        error.message ||
+        "Terjadi kesalahan."
+
+    });
+
+  }
+
+}
+
+
+/* =========================================================
+   LOAD GROUP UNTUK TOGGLE STOK
+========================================================= */
+
+async function toggleStokLoadGroups(){
+
+  const container =
+    document.getElementById(
+      "toggle-stok-group-list"
+    );
+
+
+  if(!container)
+    return;
+
+
+  container.innerHTML = `
+
+    <div style="
+      color:#94a3b8;
+      font-size:11px;
+      text-align:center;
+      padding:12px;
+    ">
+      Memuat grup WhatsApp...
+    </div>
+
+  `;
+
+
+  try{
+
+    const response =
+      await fetch(
+        URL +
+        "?action=getWhatsAppGroups"
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(
+      !result ||
+      !result.success
+    ){
+
+      throw new Error(
+        result?.message ||
+        "Gagal mengambil daftar grup."
+      );
+
+    }
+
+
+    const groups =
+      result.data?.data ||
+      result.data?.groups ||
+      result.data ||
+      [];
+
+
+    if(
+      !Array.isArray(groups) ||
+      groups.length === 0
+    ){
+
+      container.innerHTML = `
+
+        <div style="
+          color:#94a3b8;
+          font-size:11px;
+          text-align:center;
+          padding:12px;
+        ">
+          Tidak ada grup WhatsApp.
+        </div>
+
+      `;
+
+      return;
+
+    }
+
+
+    container.innerHTML =
+      groups.map(function(group,index){
+
+        const groupId =
+          String(
+            group.id ||
+            group.group_id ||
+            group.jid ||
+            group.jid_group ||
+            ""
+          ).trim();
+
+
+        const groupName =
+          String(
+            group.name ||
+            group.subject ||
+            group.group_name ||
+            ("Grup " + (index + 1))
+          );
+
+
+        if(!groupId)
+          return "";
+
+
+        return `
+
+          <label style="
+            display:flex;
+            align-items:center;
+            gap:8px;
+            padding:7px 4px;
+            border-bottom:1px solid #f1f5f9;
+            cursor:pointer;
+          ">
+
+            <input
+              type="checkbox"
+              class="toggle-stok-group-checkbox"
+              value="${infoEscape(groupId)}"
+            >
+
+            <span style="
+              font-size:11px;
+              color:#334155;
+              font-weight:600;
+            ">
+              ${infoEscape(groupName)}
+            </span>
+
+          </label>
+
+        `;
+
+      }).join("");
+
+
+  }catch(error){
+
+    console.error(
+      "❌ LOAD TOGGLE GROUP ERROR:",
+      error
+    );
+
+
+    container.innerHTML = `
+
+      <div style="
+        color:#ef4444;
+        font-size:11px;
+        text-align:center;
+        padding:12px;
+      ">
+        Gagal memuat grup WhatsApp.
+      </div>
+
+    `;
+
+  }
+
+			}
+
+
+
+
+
+
+	
+
 // SEARCH
 function searchProduk(val){
 
@@ -5869,11 +6622,26 @@ function getSelected(){
 }
 
 
-// BULK UPDATE
+
+
+
+/* =========================================================
+   BULK UPDATE STOK
+   TARGET:
+   - VIP
+   - GROUP
+   - VIP + GROUP
+========================================================= */
+
 async function bulkUpdate(status){
 
-  let selected =
-  getSelected();
+  /* =======================================================
+     AMBIL PRODUK TERPILIH
+  ======================================================= */
+
+  const selected =
+    getSelected();
+
 
   if(selected.length === 0){
 
@@ -5885,94 +6653,846 @@ async function bulkUpdate(status){
 
   }
 
-  let kosong =
-  status === "kosong";
 
-  let namaProduk = [];
+  /* =======================================================
+     AMBIL NAMA PRODUK DULU
+  ======================================================= */
+
+  const namaProduk = [];
+
 
   for(const id of selected){
 
-    const ref =
-    db.collection("stok")
-    .doc(id);
+    try{
 
-    const snap =
-    await ref.get();
+      const ref =
+        db.collection("stok")
+          .doc(id);
 
-    const data =
-    snap.data();
 
-    namaProduk.push(
-      data.nama
+      const snap =
+        await ref.get();
+
+
+      if(!snap.exists){
+
+        console.warn(
+          "Produk tidak ditemukan:",
+          id
+        );
+
+        continue;
+
+      }
+
+
+      const data =
+        snap.data();
+
+
+      if(data && data.nama){
+
+        namaProduk.push(
+          data.nama
+        );
+
+      }
+
+    }catch(error){
+
+      console.error(
+        "Gagal membaca produk:",
+        id,
+        error
+      );
+
+    }
+
+  }
+
+
+  if(namaProduk.length === 0){
+
+    alert(
+      "Data produk tidak ditemukan."
     );
 
-    await ref.update({
+    return;
 
-      kosong: kosong
+  }
+
+
+  /* =======================================================
+     STATUS
+  ======================================================= */
+
+  const statusLabel =
+    status === "tersedia"
+    ? "SET TERSEDIA"
+    : "SET KOSONG";
+
+
+  const kosong =
+    status === "kosong";
+
+
+  /* =======================================================
+     PILIH TARGET PENGIRIMAN
+  ======================================================= */
+
+  const targetResult =
+    await Swal.fire({
+
+      title:
+        `📦 ${statusLabel}`,
+
+      width:500,
+
+      showCancelButton:true,
+
+      confirmButtonText:
+        "LANJUT",
+
+      cancelButtonText:
+        "BATAL",
+
+      confirmButtonColor:
+        "#8CC63F",
+
+      html:`
+
+        <div style="
+          text-align:left;
+        ">
+
+          <div style="
+            padding:10px 12px;
+            background:#f8fafc;
+            border:1px solid #e2e8f0;
+            border-radius:8px;
+            margin-bottom:14px;
+            font-size:11px;
+            line-height:1.6;
+            color:#475569;
+          ">
+
+            <b style="color:#172033;">
+              ${namaProduk.length} produk
+            </b>
+            akan diubah menjadi
+
+            <b style="color:#172033;">
+              ${statusLabel}
+            </b>.
+
+          </div>
+
+
+          <label
+            class="info-field-label"
+          >
+            TARGET PENGIRIMAN
+          </label>
+
+
+          <select
+            id="stok-target-mode"
+            class="info-field"
+          >
+
+            <option value="vip">
+              👥 Semua VIP
+            </option>
+
+            <option value="group">
+              💬 Grup WhatsApp
+            </option>
+
+            <option value="vip_group">
+              👥💬 Semua VIP + Grup
+            </option>
+
+          </select>
+
+
+          <div
+            id="stok-group-selector"
+            style="
+              display:none;
+              margin-top:10px;
+            "
+          >
+
+            <div style="
+              font-size:10px;
+              color:#64748b;
+              margin-bottom:6px;
+            ">
+              Pilih grup WhatsApp:
+            </div>
+
+
+            <div
+              id="stok-group-list"
+              style="
+                max-height:180px;
+                overflow-y:auto;
+                border:1px solid #e2e8f0;
+                border-radius:7px;
+                background:#fff;
+              "
+            >
+
+              <div style="
+                padding:12px;
+                text-align:center;
+                color:#94a3b8;
+                font-size:10px;
+              ">
+                Memuat daftar grup...
+              </div>
+
+            </div>
+
+          </div>
+
+
+          <div style="
+            margin-top:12px;
+            padding:9px 10px;
+            background:#f8fafc;
+            border-radius:7px;
+            font-size:9px;
+            color:#64748b;
+            line-height:1.5;
+          ">
+
+            💡 Stok akan diperbarui terlebih dahulu,
+            kemudian notifikasi dikirim melalui
+            AppScript → Fonnte.
+
+          </div>
+
+        </div>
+
+      `,
+
+      didOpen:()=>{
+
+        const mode =
+          document.getElementById(
+            "stok-target-mode"
+          );
+
+        if(!mode)
+          return;
+
+
+        mode.addEventListener(
+          "change",
+          async function(){
+
+            const selector =
+              document.getElementById(
+                "stok-group-selector"
+              );
+
+
+            if(!selector)
+              return;
+
+
+            if(
+              this.value === "group" ||
+              this.value === "vip_group"
+            ){
+
+              selector.style.display =
+                "block";
+
+
+              await stokLoadWhatsAppGroups();
+
+            }else{
+
+              selector.style.display =
+                "none";
+
+            }
+
+          }
+        );
+
+      }
+
+    });
+
+
+  if(!targetResult.isConfirmed){
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     AMBIL TARGET MODE
+  ======================================================= */
+
+  const targetMode =
+    document.getElementById(
+      "stok-target-mode"
+    )?.value || "vip";
+
+
+  let groupIds = [];
+
+
+  /* =======================================================
+     AMBIL GROUP ID YANG DICENTANG
+  ======================================================= */
+
+  if(
+    targetMode === "group" ||
+    targetMode === "vip_group"
+  ){
+
+    const checked =
+      document.querySelectorAll(
+        ".stok-group-checkbox:checked"
+      );
+
+
+    groupIds =
+      Array.from(checked)
+        .map(function(el){
+
+          return String(
+            el.value || ""
+          ).trim();
+
+        })
+        .filter(Boolean);
+
+
+    if(groupIds.length === 0){
+
+      alert(
+        "Pilih minimal satu grup WhatsApp dulu bro."
+      );
+
+      return;
+
+    }
+
+  }
+
+
+  /* =======================================================
+     LABEL TARGET
+  ======================================================= */
+
+  let targetLabel =
+    "semua VIP";
+
+
+  if(targetMode === "group"){
+
+    targetLabel =
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  if(targetMode === "vip_group"){
+
+    targetLabel =
+      "semua VIP + " +
+      groupIds.length +
+      " grup WhatsApp";
+
+  }
+
+
+  /* =======================================================
+     KONFIRMASI FINAL
+  ======================================================= */
+
+  const confirm =
+    await Swal.fire({
+
+      icon:
+        "question",
+
+      title:
+        "Konfirmasi Update Stok",
+
+      html:`
+
+        <div style="
+          text-align:left;
+          font-size:12px;
+          line-height:1.7;
+        ">
+
+          <div style="
+            margin-bottom:10px;
+          ">
+
+            <b>
+              ${namaProduk.length}
+            </b>
+            produk akan diubah menjadi
+
+            <b>
+              ${statusLabel}
+            </b>.
+
+          </div>
+
+
+          <div style="
+            padding:10px;
+            background:#f8fafc;
+            border-radius:8px;
+          ">
+
+            Target notifikasi:
+
+            <br>
+
+            <b>
+              ${infoEscape(targetLabel)}
+            </b>
+
+          </div>
+
+        </div>
+
+      `,
+
+      showCancelButton:true,
+
+      confirmButtonText:
+        "YA, UPDATE & KIRIM",
+
+      cancelButtonText:
+        "BATAL",
+
+      confirmButtonColor:
+        "#8CC63F"
+
+    });
+
+
+  if(!confirm.isConfirmed){
+
+    return;
+
+  }
+
+
+  /* =======================================================
+     LOADING
+  ======================================================= */
+
+  Swal.fire({
+
+    title:
+      "Memproses stok...",
+
+    text:
+      "Update Firestore → AppScript → Fonnte",
+
+    allowOutsideClick:false,
+
+    allowEscapeKey:false,
+
+    showConfirmButton:false,
+
+    didOpen:()=>{
+
+      Swal.showLoading();
+
+    }
+
+  });
+
+
+  /* =======================================================
+     UPDATE FIRESTORE
+  ======================================================= */
+
+  try{
+
+    for(const id of selected){
+
+      const ref =
+        db.collection("stok")
+          .doc(id);
+
+
+      await ref.update({
+
+        kosong:
+          kosong
+
+      });
+
+    }
+
+
+    /* =====================================================
+       PAYLOAD NOTIFIKASI
+    ===================================================== */
+
+    const payload = {
+
+      mode:
+        "notifStokBulk",
+
+      status:
+        status,
+
+      produk:
+        namaProduk,
+
+      targetMode:
+        targetMode,
+
+      groupIds:
+        groupIds
+
+    };
+
+
+    console.log(
+      "🔥 STOCK NOTIFICATION PAYLOAD:",
+      payload
+    );
+
+
+    /* =====================================================
+       KIRIM KE APPSCRIPT
+    ===================================================== */
+
+    await fetch(
+
+      URL,
+
+      {
+
+        method:
+          "POST",
+
+        mode:
+          "no-cors",
+
+        headers:{
+
+          "Content-Type":
+            "text/plain;charset=utf-8"
+
+        },
+
+        body:
+          JSON.stringify(
+            payload
+          )
+
+      }
+
+    );
+
+
+    /* =====================================================
+       REFRESH STOK
+    ===================================================== */
+
+    await loadStokAdmin();
+
+
+    /* =====================================================
+       SUCCESS
+    ===================================================== */
+
+    Swal.fire({
+
+      icon:
+        "success",
+
+      title:
+        "Update Berhasil 🔥",
+
+      html:`
+
+        <div style="
+          font-size:12px;
+          line-height:1.7;
+        ">
+
+          <b>
+            ${namaProduk.length}
+          </b>
+          produk berhasil diperbarui.
+
+          <br>
+
+          Status:
+          <b>
+            ${infoEscape(statusLabel)}
+          </b>
+
+          <br>
+
+          Notifikasi:
+          <b>
+            ${infoEscape(targetLabel)}
+          </b>
+
+        </div>
+
+      `,
+
+      confirmButtonColor:
+        "#8CC63F"
+
+    });
+
+
+  }catch(error){
+
+    console.error(
+      "BULK STOCK ERROR:",
+      error
+    );
+
+
+    Swal.fire({
+
+      icon:
+        "error",
+
+      title:
+        "Update Gagal",
+
+      text:
+        error.message ||
+        "Terjadi kesalahan saat update stok.",
+
+      confirmButtonColor:
+        "#8CC63F"
 
     });
 
   }
 
-  // 🔥 NOTIF WA
-  fetch(
-
-    URL +
-    "?mode=notifStokBulk" +
-    "&status=" +
-    status +
-    "&produk=" +
-    encodeURIComponent(
-      JSON.stringify(
-        namaProduk
-      )
-    )
-
-  );
-
-  alert(
-    "Bulk update berhasil 😎🔥"
-  );
-
 }
 
-function toggleStok(
-  id,
-  nama,
-  kosong
-){
 
-  let newKosong =
-  !kosong;
 
-  // 🔥 UPDATE FIREBASE
-  db.collection("stok")
-  .doc(id)
-  .update({
 
-    kosong:newKosong
 
-  });
 
-  // 🔥 STATUS TEXT
-  let statusText =
-  newKosong
-  ? "kosong"
-  : "tersedia";
 
-  // 🔥 KIRIM NOTIF WA
-  fetch(
 
-    URL +
-    "?mode=notifStok" +
-    "&produk=" +
-    encodeURIComponent(nama) +
-    "&status=" +
-    statusText
 
-  );
 
-}
+
+/* =========================================================
+   LOAD GROUP WHATSAPP — STOCK NOTIFICATION
+========================================================= */
+
+window.stokLoadWhatsAppGroups = async function(){
+
+  const list =
+    document.getElementById(
+      "stok-group-list"
+    );
+
+
+  if(!list)
+    return;
+
+
+  list.innerHTML = `
+    <div style="
+      padding:12px;
+      text-align:center;
+      color:#64748b;
+      font-size:10px;
+    ">
+      Memuat grup WhatsApp...
+    </div>
+  `;
+
+
+  try{
+
+    const response =
+      await fetch(
+        URL +
+        "?action=getWhatsAppGroups",
+        {
+          method:"GET"
+        }
+      );
+
+
+    const result =
+      await response.json();
+
+
+    if(
+      !result ||
+      !result.success
+    ){
+
+      throw new Error(
+        result?.message ||
+        "Gagal mengambil daftar grup."
+      );
+
+    }
+
+
+    /* =====================================================
+       NORMALISASI RESPONSE
+    ===================================================== */
+
+    const groups =
+      Array.isArray(result.data)
+      ? result.data
+      : (
+          Array.isArray(
+            result.data?.data
+          )
+          ? result.data.data
+          : []
+        );
+
+
+    if(groups.length === 0){
+
+      list.innerHTML = `
+        <div style="
+          padding:12px;
+          text-align:center;
+          color:#94a3b8;
+          font-size:10px;
+        ">
+          Belum ada grup yang tersedia.
+        </div>
+      `;
+
+      return;
+
+    }
+
+
+    /* =====================================================
+       RENDER GROUP
+    ===================================================== */
+
+    list.innerHTML =
+      groups.map(
+        function(group,index){
+
+          const id =
+            group.id ||
+            group.group_id ||
+            group.jid ||
+            group.chatId ||
+            "";
+
+
+          const name =
+            group.name ||
+            group.subject ||
+            group.group_name ||
+            ("Grup " + (index + 1));
+
+
+          if(!id)
+            return "";
+
+
+          return `
+            <label style="
+              display:flex;
+              align-items:center;
+              gap:8px;
+              padding:9px 10px;
+              border-bottom:1px solid #f1f5f9;
+              cursor:pointer;
+            ">
+
+              <input
+                type="checkbox"
+                class="stok-group-checkbox"
+                value="${infoEscape(
+                  String(id)
+                )}"
+                data-group-name="${infoEscape(
+                  String(name)
+                )}"
+                style="
+                  width:15px;
+                  height:15px;
+                  accent-color:#8CC63F;
+                  flex-shrink:0;
+                "
+              >
+
+              <span style="
+                flex:1;
+                font-size:11px;
+                font-weight:600;
+                color:#334155;
+              ">
+                ${infoEscape(
+                  String(name)
+                )}
+              </span>
+
+            </label>
+          `;
+
+        }
+      ).join("");
+
+
+  }catch(error){
+
+    console.error(
+      "STOCK GROUP LOAD ERROR:",
+      error
+    );
+
+
+    list.innerHTML = `
+      <div style="
+        padding:12px;
+        text-align:center;
+        color:#ef4444;
+        font-size:10px;
+      ">
+        Gagal memuat grup WhatsApp.
+      </div>
+    `;
+
+  }
+
+};
+
+
+
+	
+	
+
+
+	
 
 // SELECT ALL
 function toggleAll(el){
