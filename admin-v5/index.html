@@ -6272,24 +6272,35 @@ async function toggleStok(
        PAYLOAD NOTIFIKASI
     ===================================================== */
 
+
+
+
+		const selectedProducts = [
+  {
+    id: id,
+    nama: nama || ""
+  }
+];
+
+	
+
     const payload = {
+  mode: "notifStokBulk",
 
-      mode:
-        "notifStokBulk",
+  status: status,
 
-      status:
-        status,
-
-      produk:
-        [nama],
-
-      targetMode:
-        targetMode,
-
-      groupIds:
-        groupIds
-
+  produk: selectedProducts.map(function(p) {
+    return {
+      id: p.id,
+      nama: p.nama || "",
+      gambar: p.gambar || ""
     };
+  }),
+
+  targetMode: targetMode,
+
+  groupIds: groupIds
+};
 
 
     console.log(
@@ -6660,6 +6671,8 @@ async function bulkUpdate(status){
 
   const namaProduk = [];
 
+	const selectedProducts = [];
+
 
   for(const id of selected){
 
@@ -6692,11 +6705,16 @@ async function bulkUpdate(status){
 
       if(data && data.nama){
 
-        namaProduk.push(
-          data.nama
-        );
+  namaProduk.push(
+    data.nama
+  );
 
-      }
+  selectedProducts.push({
+    id: id,
+    nama: data.nama
+  });
+
+			}
 
     }catch(error){
 
@@ -7147,24 +7165,26 @@ async function bulkUpdate(status){
        PAYLOAD NOTIFIKASI
     ===================================================== */
 
+
+		
+
     const payload = {
+  mode: "notifStokBulk",
 
-      mode:
-        "notifStokBulk",
+  status: status,
 
-      status:
-        status,
-
-      produk:
-        namaProduk,
-
-      targetMode:
-        targetMode,
-
-      groupIds:
-        groupIds
-
+  produk: selectedProducts.map(function(p) {
+    return {
+      id: p.id,
+      nama: p.nama || "",
+      gambar: p.gambar || ""
     };
+  }),
+
+  targetMode: targetMode,
+
+  groupIds: groupIds
+};
 
 
     console.log(
@@ -8991,14 +9011,11 @@ async function infoProdukLoadSelected(ids){
 
 
     products.push({
-
-      id:id,
-
-      nama:data.nama || "",
-
-      kosong:!!data.kosong
-
-    });
+  id:id,
+  nama:data.nama || "",
+  kosong:!!data.kosong,
+  gambar:data.gambar || ""
+});
 
   }
 
@@ -9048,14 +9065,11 @@ async function infoProdukOpenPicker(){
 
 
     products.push({
-
-      id:doc.id,
-
-      nama:data.nama,
-
-      kosong:!!data.kosong
-
-    });
+  id:doc.id,
+  nama:data.nama,
+  kosong:!!data.kosong,
+  gambar:data.gambar || ""
+});
 
   });
 
@@ -10333,7 +10347,10 @@ window.infoProdukSend = async function(){
           p.nama ||
           p.name ||
           p.title ||
-          "-"
+          "-",
+
+
+	       gambar:p.gambar || ""
 
       })),
 
@@ -10935,10 +10952,18 @@ async function smartCampaignLoadSelected(ids){
 
     products.push({
 
-      id:id,
+      id:
+        id,
 
       nama:
         data.nama || "",
+
+      sku:
+        data.sku ||
+        data.SKU ||
+        data.kode ||
+        data.kodeProduk ||
+        "",
 
       kosong:
         !!data.kosong
@@ -10957,16 +10982,19 @@ async function smartCampaignLoadSelected(ids){
   }
 
 
+  console.log(
+    "SMART PRODUCTS LOAD:",
+    products
+  );
+
+
   window.smartCampaignProducts =
     products;
 
 
   smartCampaignForm();
 
-}
-
-
-
+	}
 
 
 
@@ -10999,13 +11027,23 @@ async function smartCampaignOpenPicker(){
 
     products.push({
 
-      id:doc.id,
+  id:
+    doc.id,
 
-      nama:data.nama,
+  nama:
+    data.nama || "",
 
-      kosong:!!data.kosong
+  sku:
+    data.sku ||
+    data.SKU ||
+    data.kode ||
+    data.kodeProduk ||
+    "",
 
-    });
+  kosong:
+    !!data.kosong
+
+});
 
   });
 
@@ -11949,7 +11987,7 @@ function smartCampaignCollect(){
 
 
   const rows =
-    products.map((p,index)=>{
+    products.map(function(p,index){
 
       const type =
         document.getElementById(
@@ -11959,38 +11997,59 @@ function smartCampaignCollect(){
 
       return {
 
-        id:p.id,
+        /*
+         * IDENTITAS PRODUK
+         *
+         * SKU dikirim ke backend.
+         * ID Firestore tidak dipakai
+         * untuk menentukan gambar.
+         */
+
+        sku:
+          p.sku ||
+          p.SKU ||
+          p.kode ||
+          p.kodeProduk ||
+          "",
 
         nama:
           p.nama ||
+          p.name ||
           "-",
 
-        jenis:type,
+        jenis:
+          type,
+
 
         deskripsi:
           document.getElementById(
             `smart-desc-${index}`
           )?.value.trim() || "",
 
+
         harga:
           document.getElementById(
             `smart-harga-${index}`
           )?.value || "",
+
 
         hargaNormal:
           document.getElementById(
             `smart-harga-normal-${index}`
           )?.value || "",
 
+
         hargaPromo:
           document.getElementById(
             `smart-harga-promo-${index}`
           )?.value || "",
 
+
         diskon:
           document.getElementById(
             `smart-diskon-${index}`
           )?.value || "",
+
 
         periode:
           document.getElementById(
@@ -12002,23 +12061,26 @@ function smartCampaignCollect(){
     });
 
 
+  console.log(
+    "SMART PRODUCTS FINAL:",
+    rows
+  );
+
+
   return {
 
-    judul,
+    judul:
+      judul,
 
-    deskripsi,
+    deskripsi:
+      deskripsi,
 
-    products:rows
+    products:
+      rows
 
   };
 
-		}
-
-
-
-
-
-
+}
 	/* =========================================================
    SMART CAMPAIGN — MESSAGE BUILDER
    ========================================================= */
@@ -12568,6 +12630,7 @@ window.smartCampaignSend = async function(){
     payload
   );
 
+	
 
   /* =======================================================
      LOADING
