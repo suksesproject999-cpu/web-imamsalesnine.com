@@ -6272,35 +6272,24 @@ async function toggleStok(
        PAYLOAD NOTIFIKASI
     ===================================================== */
 
-
-
-
-		const selectedProducts = [
-  {
-    id: id,
-    nama: nama || ""
-  }
-];
-
-	
-
     const payload = {
-  mode: "notifStokBulk",
 
-  status: status,
+      mode:
+        "notifStokBulk",
 
-  produk: selectedProducts.map(function(p) {
-    return {
-      id: p.id,
-      nama: p.nama || "",
-      gambar: p.gambar || ""
+      status:
+        status,
+
+      produk:
+        [nama],
+
+      targetMode:
+        targetMode,
+
+      groupIds:
+        groupIds
+
     };
-  }),
-
-  targetMode: targetMode,
-
-  groupIds: groupIds
-};
 
 
     console.log(
@@ -6671,8 +6660,6 @@ async function bulkUpdate(status){
 
   const namaProduk = [];
 
-	const selectedProducts = [];
-
 
   for(const id of selected){
 
@@ -6705,16 +6692,11 @@ async function bulkUpdate(status){
 
       if(data && data.nama){
 
-  namaProduk.push(
-    data.nama
-  );
+        namaProduk.push(
+          data.nama
+        );
 
-  selectedProducts.push({
-    id: id,
-    nama: data.nama
-  });
-
-			}
+      }
 
     }catch(error){
 
@@ -7165,26 +7147,24 @@ async function bulkUpdate(status){
        PAYLOAD NOTIFIKASI
     ===================================================== */
 
-
-		
-
     const payload = {
-  mode: "notifStokBulk",
 
-  status: status,
+      mode:
+        "notifStokBulk",
 
-  produk: selectedProducts.map(function(p) {
-    return {
-      id: p.id,
-      nama: p.nama || "",
-      gambar: p.gambar || ""
+      status:
+        status,
+
+      produk:
+        namaProduk,
+
+      targetMode:
+        targetMode,
+
+      groupIds:
+        groupIds
+
     };
-  }),
-
-  targetMode: targetMode,
-
-  groupIds: groupIds
-};
 
 
     console.log(
@@ -9011,11 +8991,14 @@ async function infoProdukLoadSelected(ids){
 
 
     products.push({
-  id:id,
-  nama:data.nama || "",
-  kosong:!!data.kosong,
-  gambar:data.gambar || ""
-});
+
+      id:id,
+
+      nama:data.nama || "",
+
+      kosong:!!data.kosong
+
+    });
 
   }
 
@@ -9065,11 +9048,14 @@ async function infoProdukOpenPicker(){
 
 
     products.push({
-  id:doc.id,
-  nama:data.nama,
-  kosong:!!data.kosong,
-  gambar:data.gambar || ""
-});
+
+      id:doc.id,
+
+      nama:data.nama,
+
+      kosong:!!data.kosong
+
+    });
 
   });
 
@@ -10347,10 +10333,7 @@ window.infoProdukSend = async function(){
           p.nama ||
           p.name ||
           p.title ||
-          "-",
-
-
-	       gambar:p.gambar || ""
+          "-"
 
       })),
 
@@ -10951,11 +10934,16 @@ async function smartCampaignLoadSelected(ids){
 
 
     products.push({
-  id:id,
-  nama:data.nama || "",
-  kosong:!!data.kosong,
-  gambar:data.gambar || ""
-});
+
+      id:id,
+
+      nama:
+        data.nama || "",
+
+      kosong:
+        !!data.kosong
+
+    });
 
   }
 
@@ -11010,11 +10998,14 @@ async function smartCampaignOpenPicker(){
 
 
     products.push({
-  id:doc.id,
-  nama:data.nama,
-  kosong:!!data.kosong,
-  gambar:data.gambar || ""
-});
+
+      id:doc.id,
+
+      nama:data.nama,
+
+      kosong:!!data.kosong
+
+    });
 
   });
 
@@ -11944,33 +11935,37 @@ function smartCampaignCollect(){
   const products =
     window.smartCampaignProducts || [];
 
+
   const judul =
     document.getElementById(
       "smart-judul"
     )?.value.trim() || "";
+
 
   const deskripsi =
     document.getElementById(
       "smart-deskripsi"
     )?.value.trim() || "";
 
+
   const rows =
-    products.map(function(p,index){
+    products.map((p,index)=>{
 
       const type =
         document.getElementById(
           `smart-type-${index}`
         )?.value || "";
 
+
       return {
+
+        id:p.id,
 
         nama:
           p.nama ||
-          p.name ||
           "-",
 
-        jenis:
-          type,
+        jenis:type,
 
         deskripsi:
           document.getElementById(
@@ -12007,26 +12002,21 @@ function smartCampaignCollect(){
     });
 
 
-  console.log(
-    "SMART PRODUCTS TANPA ID:",
-    rows
-  );
-
-
   return {
 
-    judul:
-      judul,
+    judul,
 
-    deskripsi:
-      deskripsi,
+    deskripsi,
 
-    products:
-      rows
+    products:rows
 
   };
 
 		}
+
+
+
+
 
 
 	/* =========================================================
@@ -12578,7 +12568,6 @@ window.smartCampaignSend = async function(){
     payload
   );
 
-	
 
   /* =======================================================
      LOADING
