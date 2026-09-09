@@ -11892,21 +11892,78 @@ html.imam-sales-loader-seen #pageLoader{
 
 
 
-.ai-modal img.ai-product-image,
-.ai-modal .ai-product-image,
-.ai-grid img.ai-product-image,
-.ai-product-card img{
+/* ==========================================
+   AI PRODUCT IMAGE CONTAINER
+========================================== */
+
+.ai-product-image-wrap{
+
     width:100% !important;
-    max-width:100% !important;
-    height:220px !important;
-    max-height:220px !important;
-    object-fit:contain !important;
-    object-position:center !important;
+
+    height:200px !important;
+
+    display:flex !important;
+
+    align-items:center !important;
+
+    justify-content:center !important;
+
+    overflow:hidden !important;
+
+    background:#f7f7f7 !important;
+
+    border-radius:16px !important;
+
+    margin:0 auto 18px !important;
+
+}
+
+
+/* FOTO PRODUK */
+
+.ai-product-image-wrap .ai-product-image{
+
     display:block !important;
-    margin-left:auto !important;
-    margin-right:auto !important;
-    padding:12px !important;
-    box-sizing:border-box !important;
+
+    width:auto !important;
+
+    height:auto !important;
+
+    max-width:100% !important;
+
+    max-height:180px !important;
+
+    aspect-ratio:auto !important;
+
+    object-fit:contain !important;
+
+    object-position:center !important;
+
+    padding:0 !important;
+
+    margin:0 !important;
+
+}
+
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+    .ai-product-image-wrap{
+
+        height:175px !important;
+
+    }
+
+    .ai-product-image-wrap .ai-product-image{
+
+        max-width:95% !important;
+
+        max-height:155px !important;
+
+    }
+
 }
 
 
@@ -21602,9 +21659,12 @@ return `
 <div class="ai-product-card">
 
 ${product.Gambar ? `
-<img
-src="${product.Gambar}"
-class="ai-product-image">
+<div class="ai-product-image-wrap">
+    <img
+        src="${product.Gambar}"
+        class="ai-product-image"
+        alt="${product["Nama Produk"] || "Produk"}">
+</div>
 ` : ""}
 
 <div class="ai-product-title">
