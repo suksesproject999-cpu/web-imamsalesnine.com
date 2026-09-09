@@ -329,6 +329,17 @@ body.memory
   )
 : [];
 
+
+const productMemory =
+body.productMemory
+? JSON.parse(
+    Array.isArray(body.productMemory)
+    ? body.productMemory[0]
+    : body.productMemory
+  )
+: [];
+		
+
 const orders =
 body.orders
 ? JSON.parse(
@@ -392,6 +403,44 @@ const matchedProducts = products
     .sort((a, b) => b.score - a.score)
     .map(item => item.product)
     .slice(0, 50);
+
+
+		const visualMemoryContext =
+productMemory.length
+? `
+
+==================================================
+PREVIOUS PRODUCT VISUAL CONTEXT
+==================================================
+
+Produk yang sebelumnya ditampilkan kepada user:
+
+${productMemory.map(p => `
+Nama Produk: ${p.nama || "-"}
+Brand: ${p.brand || "-"}
+SKU: ${p.sku || "-"}
+Gambar: ${p.gambar || "-"}
+Varian: ${p.varian || "-"}
+Harga: ${p.harga || "-"}
+`).join("\n")}
+
+Gunakan konteks ini jika user merujuk
+kepada produk atau foto yang sebelumnya
+ditampilkan.
+
+Jika user mengatakan:
+"foto tadi",
+"gambar tadi",
+"yang pertama",
+"yang kedua",
+"produk tadi",
+atau referensi serupa,
+
+gunakan konteks produk sebelumnya untuk
+menentukan maksud user.
+
+`
+: "";
     
     
     
@@ -3244,7 +3293,25 @@ jawab secara pintar dan natural.
 
 `;
 
+// =====================
+// PRODUCT CONTEXT
+// =====================
+
 systemPrompt += productContext;
+
+
+// =====================
+// PREVIOUS PRODUCT MEMORY
+// =====================
+
+systemPrompt += visualMemoryContext;
+
+
+// =====================
+// OPENAI REQUEST
+// =====================
+
+
 
 
   

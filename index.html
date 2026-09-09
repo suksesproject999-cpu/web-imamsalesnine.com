@@ -22024,15 +22024,29 @@ let aiConversationHistory =
     );
 
 
+	let aiProductMemory =
+    JSON.parse(
+        sessionStorage.getItem("imamAIProductMemory") || "[]"
+    );
+
+
 // Batasi history agar request tidak terlalu besar
 function saveAIHistory(){
 
     aiConversationHistory =
         aiConversationHistory.slice(-12);
 
+    aiProductMemory =
+        aiProductMemory.slice(-20);
+
     sessionStorage.setItem(
         "imamAIHistory",
         JSON.stringify(aiConversationHistory)
+    );
+
+    sessionStorage.setItem(
+        "imamAIProductMemory",
+        JSON.stringify(aiProductMemory)
     );
 
 	}
@@ -22084,6 +22098,14 @@ formData.append(
     )
 );
 
+
+	formData.append(
+    "productMemory",
+    JSON.stringify(
+        aiProductMemory
+    )
+);
+
 formData.append(
     "orders",
     "[]"
@@ -22095,6 +22117,61 @@ formData.append(
         });
 
         const data = await res.json();
+
+
+
+	// ==========================================
+// SIMPAN PRODUK YANG BARU DITAMPILKAN
+// ==========================================
+
+try {
+
+    const singleProduct =
+        parseProductReply(data.reply || "");
+
+    if (
+        singleProduct &&
+        singleProduct["Nama Produk"] &&
+        singleProduct["Gambar"]
+    ) {
+
+        aiProductMemory.push({
+
+            nama:
+                singleProduct["Nama Produk"],
+
+            gambar:
+                singleProduct["Gambar"],
+
+            brand:
+                singleProduct["Brand"] || "",
+
+            kategori:
+                singleProduct["Kategori"] || "",
+
+            sku:
+                singleProduct["SKU"] || "",
+
+            varian:
+                singleProduct["Varian"] || "",
+
+            harga:
+                singleProduct["Harga"] || ""
+
+        });
+
+    }
+
+} catch(err){
+
+    console.warn(
+        "Gagal menyimpan product memory:",
+        err
+    );
+
+}
+
+saveAIHistory();
 
 
 	// Simpan percakapan user
@@ -22109,6 +22186,61 @@ aiConversationHistory.push({
     role: "assistant",
     content: data.reply || ""
 });
+
+
+
+	// ==========================================
+// PRODUCT VISUAL MEMORY
+// ==========================================
+
+let detectedProductMemory = [];
+
+try {
+
+    const parsedProduct =
+        parseProductReply(data.reply || "");
+
+    if (
+        parsedProduct &&
+        parsedProduct["Nama Produk"] &&
+        parsedProduct["Gambar"]
+    ) {
+
+        detectedProductMemory.push({
+
+            nama:
+                parsedProduct["Nama Produk"],
+
+            gambar:
+                parsedProduct["Gambar"],
+
+            brand:
+                parsedProduct["Brand"] || "",
+
+            kategori:
+                parsedProduct["Kategori"] || "",
+
+            sku:
+                parsedProduct["SKU"] || "",
+
+            varian:
+                parsedProduct["Varian"] || "",
+
+            harga:
+                parsedProduct["Harga"] || ""
+
+        });
+
+    }
+
+} catch(err) {
+
+    console.warn(
+        "Product visual memory gagal:",
+        err
+    );
+
+	}
 
 
 // Simpan ke session
