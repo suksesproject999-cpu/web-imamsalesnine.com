@@ -21696,27 +21696,35 @@ return `
 
 <div class="ai-product-card">
 
-${product.Gambar ? `
-<div class="ai-product-image-wrap">
+${(() => {
 
-    <img
-        src="${product.Gambar}"
-        class="ai-product-image"
-        alt="${product["Nama Produk"] || "Produk"}"
-        style="
-            display:block !important;
-            width:auto !important;
-            height:auto !important;
-            max-width:100% !important;
-            max-height:180px !important;
-            object-fit:contain !important;
-            object-position:center !important;
-            margin:0 auto !important;
-            padding:0 !important;
-        ">
+    const realProduct =
+        allProducts.find(p =>
+            String(p.nama || "")
+                .trim()
+                .toLowerCase() ===
+            String(product["Nama Produk"] || "")
+                .trim()
+                .toLowerCase()
+        );
 
-</div>
-` : ""}
+    const realImage =
+        realProduct?.gambar || "";
+
+    return realImage ? `
+
+    <div class="ai-product-image-wrap">
+
+        <img
+            src="${realImage}"
+            class="ai-product-image"
+            alt="${product["Nama Produk"] || "Produk"}">
+
+    </div>
+
+    ` : "";
+
+})()}
 
 <div class="ai-product-title">
 
@@ -21919,27 +21927,56 @@ function renderProductGrid(result){
 
 <div class="ai-product-grid">
 
-${result.products.map(p=>`
+${result.products.map(p=>{
+
+    const productName =
+        p["Nama Produk"] || "";
+
+    const realProduct =
+        allProducts.find(product =>
+            String(product.nama || "")
+            .trim()
+            .toLowerCase() ===
+            productName
+            .trim()
+            .toLowerCase()
+        );
+
+    const realImage =
+        realProduct?.gambar || "";
+
+    return `
 
 <div class="ai-grid-card">
 
-${p.Gambar ? `
+${realImage ? `
 <img
-src="${p.Gambar}"
-class="ai-grid-image">
+    src="${realImage}"
+    class="ai-grid-image"
+    alt="${productName}">
 ` : ""}
 
-<h3>${p["Nama Produk"]||"-"}</h3>
+<h3>${productName || "-"}</h3>
 
-<p><b>Kategori</b><br>${p.Kategori||"-"}</p>
+<p>
+<b>Kategori</b><br>
+${p.Kategori || "-"}
+</p>
 
-<p><b>Varian</b><br>${p.Varian||"-"}</p>
+<p>
+<b>Varian</b><br>
+${p.Varian || "-"}
+</p>
 
-<p class="price">${p.Harga||"-"}</p>
+<p class="price">
+${p.Harga || "-"}
+</p>
 
 </div>
 
-`).join("")}
+`;
+
+}).join("")}
 
 </div>
 
@@ -21967,7 +22004,9 @@ ${marked.parse(result.description)}
 
 `;
 
-}
+	}
+
+
 
 
 
