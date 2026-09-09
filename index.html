@@ -11919,9 +11919,40 @@ html.imam-sales-loader-seen #pageLoader{
 }
 
 
-/* FOTO PRODUK */
+/* ==========================================
+   IMAM AI — FOTO PRODUK FINAL LOCK
+========================================== */
 
-.ai-product-image-wrap .ai-product-image{
+.ai-product-image-wrap{
+
+    width:100% !important;
+
+    height:200px !important;
+
+    min-height:200px !important;
+    max-height:200px !important;
+
+    display:flex !important;
+
+    align-items:center !important;
+    justify-content:center !important;
+
+    overflow:hidden !important;
+
+    margin:0 0 18px 0 !important;
+
+    padding:0 !important;
+
+    box-sizing:border-box !important;
+
+    background:#f7f7f7 !important;
+
+    border-radius:16px !important;
+
+}
+
+
+.ai-product-image-wrap img.ai-product-image{
 
     display:block !important;
 
@@ -11929,19 +11960,23 @@ html.imam-sales-loader-seen #pageLoader{
 
     height:auto !important;
 
-    max-width:100% !important;
+    min-width:0 !important;
+    min-height:0 !important;
 
+    max-width:95% !important;
     max-height:180px !important;
 
     aspect-ratio:auto !important;
 
     object-fit:contain !important;
 
-    object-position:center !important;
+    object-position:center center !important;
+
+    margin:auto !important;
 
     padding:0 !important;
 
-    margin:0 !important;
+    border:0 !important;
 
 }
 
@@ -11954,18 +11989,21 @@ html.imam-sales-loader-seen #pageLoader{
 
         height:175px !important;
 
+        min-height:175px !important;
+
+        max-height:175px !important;
+
     }
 
-    .ai-product-image-wrap .ai-product-image{
+    .ai-product-image-wrap img.ai-product-image{
 
-        max-width:95% !important;
+        max-width:92% !important;
 
         max-height:155px !important;
 
     }
 
 }
-
 
 
 
@@ -21660,10 +21698,23 @@ return `
 
 ${product.Gambar ? `
 <div class="ai-product-image-wrap">
+
     <img
         src="${product.Gambar}"
         class="ai-product-image"
-        alt="${product["Nama Produk"] || "Produk"}">
+        alt="${product["Nama Produk"] || "Produk"}"
+        style="
+            display:block !important;
+            width:auto !important;
+            height:auto !important;
+            max-width:100% !important;
+            max-height:180px !important;
+            object-fit:contain !important;
+            object-position:center !important;
+            margin:0 auto !important;
+            padding:0 !important;
+        ">
+
 </div>
 ` : ""}
 
