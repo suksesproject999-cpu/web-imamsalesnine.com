@@ -3139,6 +3139,49 @@ systemPrompt += productContext;
 // OPENAI REQUEST
 // =====================
 
+
+const conversationHistory = Array.isArray(memory)
+  ? memory
+      .filter(item =>
+        item &&
+        (item.role === "user" || item.role === "assistant")
+      )
+      .slice(-12)
+  : [];
+
+const messages = [
+
+  {
+    role: "system",
+    content: systemPrompt
+  },
+
+  ...conversationHistory,
+
+  {
+    role: "user",
+    content: [
+      {
+        type: "text",
+        text: message
+      },
+
+      ...(uploadedImage
+        ? [{
+            type: "image_url",
+            image_url: {
+              url: uploadedImage
+            }
+          }]
+        : [])
+    ]
+  }
+
+];
+
+
+		
+
 const response = await fetch(
 
   "https://api.openai.com/v1/chat/completions",
@@ -3159,47 +3202,19 @@ const response = await fetch(
 
     body:JSON.stringify({
 
-      model:model,
+  model: model,
+
+  messages: messages
+
+})
+
+
+})
 
   
 
-      messages:[
 
-{
-  role:"system",
-  content:systemPrompt
-},
-
-{
-  role:"user",
-  content:[
-
-    {
-      type:"text",
-      text:message
-    },
-
-    ...(uploadedImage
-      ? [{
-          type:"image_url",
-          image_url:{
-            url:uploadedImage
-          }
-        }]
-      : [])
-
-  ]
-},
-
-...memory.slice(-5)
-
-]
-
-    })
-
-  }
-
-);
+			
 
 if(!response.ok){
 
