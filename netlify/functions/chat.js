@@ -523,7 +523,7 @@ yang ditemukan.
 Produk yang relevan:
 
 ${matchedProducts
-    .slice(0, 10)
+    .slice(0, 8)
     .map(formatProduct)
     .join("\n")}
 
@@ -550,7 +550,7 @@ User meminta PERBANDINGAN produk.
 Bandingkan produk berikut berdasarkan data resmi.
 
 ${matchedProducts
-    .slice(0,50)
+    .slice(0,8)
     .map(formatProduct)
     .join("\n")}
 
@@ -620,7 +620,7 @@ Tampilkan sebagai kartu (card), jangan gunakan tabel.
 DATA PRODUK RESMI
 
 ${matchedProducts
-    .slice(0,50)
+    .slice(0,8)
     .map(formatProduct)
     .join("\n")}
 
@@ -3359,7 +3359,7 @@ const conversationHistory = Array.isArray(memory)
         item &&
         (item.role === "user" || item.role === "assistant")
       )
-      .slice(-12)
+      .slice(-3)
   : [];
 
 const messages = [
