@@ -460,7 +460,8 @@ const askCompare =
 const askAvailability =
 /(ada|tersedia|ready|stok|punya)/i.test(message);
 
-
+const askPhoto =
+/(foto|gambar|image|lihat|tampilkan|tunjukkan)/i.test(message);
 // ==================================================
 // PRODUCT INTENT
 // ==================================================
@@ -471,6 +472,7 @@ const isProductQuery =
     askSpec ||
     askCompare ||
     askAvailability ||
+  	askPhoto ||
     /(sku|kode produk|nama produk|produk|varian produk|harga produk)/i.test(message);
 
 
@@ -508,6 +510,38 @@ let model = "gpt-6-astra";
 let productContext = "";
 
 if (useProductContext) {
+
+	if (askPhoto) {
+
+    productContext = `
+User meminta FOTO / GAMBAR PRODUK.
+
+Gunakan DATA PRODUK RESMI untuk produk
+yang ditemukan.
+
+Produk yang relevan:
+
+${matchedProducts
+    .slice(0, 10)
+    .map(formatProduct)
+    .join("\n")}
+
+Tampilkan informasi produk secara natural
+dan sertakan Gambar resmi dari DATA PRODUK
+jika tersedia.
+
+Jangan mengatakan foto tidak tersedia jika
+field Gambar pada DATA PRODUK RESMI tersedia.
+
+Jika user meminta beberapa produk,
+tampilkan semua produk yang relevan beserta
+gambar resminya.
+
+Jangan membuat atau mengarang URL gambar.
+
+`;
+
+} else if (askCompare) {
 
     if (askCompare) {
 
