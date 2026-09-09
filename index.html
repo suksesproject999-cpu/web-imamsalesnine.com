@@ -3272,96 +3272,10 @@ overflow-y:auto;
 }
 
 
-.ai-product-image{
-    display:block !important;
-    width:100% !important;
-    max-width:100% !important;
-
-    height:220px !important;
-    max-height:220px !important;
-
-    object-fit:contain !important;
-    object-position:center center !important;
-
-    padding:12px !important;
-    margin:0 auto 18px !important;
-
-    border-radius:18px !important;
-
-    box-sizing:border-box !important;
-
-    background:#f7f7f7 !important;
-
-    overflow:hidden !important;
-}
-
-
-
-	@media (max-width:768px){
-
-    .ai-product-image{
-        display:block !important;
-
-        width:100% !important;
-        max-width:100% !important;
-
-        height:190px !important;
-        max-height:190px !important;
-
-        object-fit:contain !important;
-        object-position:center center !important;
-
-        padding:10px !important;
-
-        margin:0 auto 16px !important;
-
-        border-radius:16px !important;
-
-        box-sizing:border-box !important;
-
-        background:#f7f7f7 !important;
-    }
-
-	}
-	
-
-
-.ai-grid-image{
-
-    display:block !important;
-
-    width:100% !important;
-
-    height:200px !important;
-
-    min-height:200px !important;
-
-    max-height:200px !important;
-
-    max-width:100% !important;
-
-    object-fit:contain !important;
-
-    object-position:center center !important;
-
-    background:#fafafa !important;
-
-    padding:12px !important;
-
-    margin:0 auto 16px !important;
-
-    border-radius:14px !important;
-
-    border:1px solid #eee !important;
-
-    box-sizing:border-box !important;
-
-	}
 
 
 
 
-	
 
 
 
@@ -11909,121 +11823,97 @@ html.imam-sales-loader-seen #pageLoader{
 
 
 
-/* ==========================================
-   AI PRODUCT IMAGE CONTAINER
-========================================== */
+
+
+
+
+
+/* =====================================================
+   FINAL AI PRODUCT IMAGE SYSTEM
+   SINGLE + GRID
+   ===================================================== */
 
 .ai-product-image-wrap{
-
     width:100% !important;
-
-    height:200px !important;
-
-    display:flex !important;
-
-    align-items:center !important;
-
-    justify-content:center !important;
-
-    overflow:hidden !important;
-
-    background:#f7f7f7 !important;
-
-    border-radius:16px !important;
-
-    margin:0 auto 18px !important;
-
-}
-
-
-/* ==========================================
-   IMAM AI — FOTO PRODUK FINAL LOCK
-========================================== */
-
-.ai-product-image-wrap{
-
-    width:100% !important;
-
     height:200px !important;
 
     min-height:200px !important;
     max-height:200px !important;
 
     display:flex !important;
-
     align-items:center !important;
     justify-content:center !important;
 
     overflow:hidden !important;
 
-    margin:0 0 18px 0 !important;
-
-    padding:0 !important;
-
-    box-sizing:border-box !important;
-
     background:#f7f7f7 !important;
 
     border-radius:16px !important;
 
+    margin:0 0 18px 0 !important;
+    padding:0 !important;
+
+    box-sizing:border-box !important;
 }
 
-
 .ai-product-image-wrap img.ai-product-image{
-
     display:block !important;
 
     width:auto !important;
-
     height:auto !important;
 
     min-width:0 !important;
     min-height:0 !important;
 
-    max-width:95% !important;
+    max-width:92% !important;
     max-height:180px !important;
 
-    aspect-ratio:auto !important;
-
     object-fit:contain !important;
-
     object-position:center center !important;
 
     margin:auto !important;
-
     padding:0 !important;
 
-    border:0 !important;
-
+    box-sizing:border-box !important;
 }
 
 
-/* MOBILE */
+/* =====================================================
+   MOBILE
+   ===================================================== */
 
-@media(max-width:768px){
+@media (max-width:768px){
 
     .ai-product-image-wrap{
+        width:100% !important;
 
         height:175px !important;
-
         min-height:175px !important;
-
         max-height:175px !important;
 
+        display:flex !important;
+        align-items:center !important;
+        justify-content:center !important;
+
+        overflow:hidden !important;
     }
 
     .ai-product-image-wrap img.ai-product-image{
+        width:auto !important;
+        height:auto !important;
 
         max-width:92% !important;
-
         max-height:155px !important;
 
+        object-fit:contain !important;
+
+        margin:auto !important;
     }
 
 }
 
 
-
+	
 	
 
   
@@ -21942,94 +21832,90 @@ function renderProductGrid(result){
 
     return `
 
-<div class="ai-product-grid">
+    <div class="ai-product-grid">
 
-${result.products.map(p=>{
+    ${result.products.map(product => {
 
-    const productName =
-        p["Nama Produk"] || "";
+        const productName =
+            product["Nama Produk"] || "";
 
-    const realProduct =
-        allProducts.find(product =>
-            String(product.nama || "")
-            .trim()
-            .toLowerCase() ===
-            productName
-            .trim()
-            .toLowerCase()
-        );
+        /*
+         * Ambil gambar LANGSUNG dari katalog website.
+         * Jangan percaya URL gambar dari response AI.
+         */
+        const realProduct =
+            allProducts.find(p =>
+                String(p.nama || "")
+                    .trim()
+                    .toLowerCase() ===
+                String(productName)
+                    .trim()
+                    .toLowerCase()
+            );
 
-    const realImage =
-        realProduct?.gambar || "";
+        const realImage =
+            realProduct?.gambar || "";
 
-    return `
+        return `
 
-<div class="ai-grid-card">
+        <div class="ai-grid-card">
 
-${realImage ? `
-<div class="ai-product-image-wrap">
+            ${
+                realImage
+                ? `
+                <div class="ai-product-image-wrap">
 
-    <img
-        src="${realImage}"
-        class="ai-product-image"
-        alt="${productName}"
-        loading="lazy">
+                    <img
+                        src="${realImage}"
+                        class="ai-product-image"
+                        alt="${productName || "Produk"}"
+                        loading="lazy"
+                    >
 
-</div>
-` : ""}
+                </div>
+                `
+                : ""
+            }
 
-<h3>${productName || "-"}</h3>
+            <div class="ai-product-title">
+                ${productName || "-"}
+            </div>
 
-<p>
-<b>Kategori</b><br>
-${p.Kategori || "-"}
-</p>
+            <p>
+                <b>Kategori</b><br>
+                ${product.Kategori || "-"}
+            </p>
 
-<p>
-<b>Varian</b><br>
-${p.Varian || "-"}
-</p>
+            <p>
+                <b>Varian</b><br>
+                ${product.Varian || "-"}
+            </p>
 
-<p class="price">
-${p.Harga || "-"}
-</p>
+            <p class="price">
+                ${product.Harga || "-"}
+            </p>
 
-</div>
+        </div>
 
-`;
+        `;
 
-}).join("")}
+    }).join("")}
 
-</div>
+    </div>
 
-${
+    ${
+        result.description
+        ? `
+        <div class="ai-description">
+            ${marked.parse(result.description)}
+        </div>
+        `
+        : ""
+    }
 
-result.description
-
-?
-
-`
-
-<div class="ai-description">
-
-${marked.parse(result.description)}
-
-</div>
-
-`
-
-:
-
-""
-
-}
-
-`;
+    `;
 
 	}
-
-
-
 
 
 
