@@ -21842,6 +21842,35 @@ function renderAIReply(reply){
 
 
 
+// ==========================================
+// IMAM AI - CONVERSATION MEMORY
+// ==========================================
+
+let aiConversationHistory =
+    JSON.parse(
+        sessionStorage.getItem("imamAIHistory") || "[]"
+    );
+
+
+// Batasi history agar request tidak terlalu besar
+function saveAIHistory(){
+
+    aiConversationHistory =
+        aiConversationHistory.slice(-12);
+
+    sessionStorage.setItem(
+        "imamAIHistory",
+        JSON.stringify(aiConversationHistory)
+    );
+
+	}
+
+
+
+	
+
+
+
 async function sendAI(){
 
     const input = document.getElementById("aiInput");
@@ -21870,9 +21899,23 @@ loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang berpikir
         const formData = new FormData();
 
         formData.append("vip","PUBLIC");
-        formData.append("message",text);
-        formData.append("memory","[]");
-        formData.append("orders","[]");
+
+formData.append(
+    "message",
+    text
+);
+
+formData.append(
+    "memory",
+    JSON.stringify(
+        aiConversationHistory
+    )
+);
+
+formData.append(
+    "orders",
+    "[]"
+);
 
         const res = await fetch("/.netlify/functions/chat",{
             method:"POST",
@@ -21880,6 +21923,24 @@ loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang berpikir
         });
 
         const data = await res.json();
+
+
+	// Simpan percakapan user
+aiConversationHistory.push({
+    role: "user",
+    content: text
+});
+
+
+// Simpan jawaban AI
+aiConversationHistory.push({
+    role: "assistant",
+    content: data.reply || ""
+});
+
+
+// Simpan ke session
+saveAIHistory();
 
         loading.innerHTML = renderAIReply(
     data.reply || "Maaf, AI tidak memberikan jawaban."
