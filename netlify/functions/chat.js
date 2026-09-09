@@ -511,7 +511,8 @@ let productContext = "";
 
 if (useProductContext) {
 
-	if (askPhoto) {
+	
+    if (askPhoto) {
 
     productContext = `
 User meminta FOTO / GAMBAR PRODUK.
@@ -542,8 +543,6 @@ Jangan membuat atau mengarang URL gambar.
 `;
 
 } else if (askCompare) {
-
-    if (askCompare) {
 
     productContext = `
 User meminta PERBANDINGAN produk.
