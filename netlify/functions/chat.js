@@ -419,7 +419,7 @@ const askAvailability =
 // PILIH MODEL AI
 // =====================
 
-let model = "gpt-5.6";
+let model = "gpt-6-astra";
 
 
 
@@ -3140,7 +3140,7 @@ if(uploadedImage){
 
       body:JSON.stringify({
 
-        model:"gpt-5.6",
+        model:"gpt-6-astra",
 
         messages:[
 
