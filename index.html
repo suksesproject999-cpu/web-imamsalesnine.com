@@ -22272,20 +22272,111 @@ function addCodeCopyButtons(container){
 
 
 
+// ==========================================
+// ESCAPE HTML — AMANKAN OUTPUT AI
+// ==========================================
+
+function escapeAIHtml(text){
+
+    return String(text || "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ==========================================
+// DETEKSI OUTPUT CODE
+// ==========================================
+
+function isCodeReply(reply){
+
+    const text =
+        String(reply || "").trim();
+
+    if(!text){
+        return false;
+    }
+
+    // Sudah fenced code
+    if(
+        /```[\s\S]*```/.test(text)
+    ){
+        return true;
+    }
+
+    // HTML lengkap
+    if(
+        /<!DOCTYPE\s+html/i.test(text) ||
+        /<html[\s>]/i.test(text) ||
+        /<\/html>/i.test(text)
+    ){
+        return true;
+    }
+
+    // CSS / JavaScript / PHP / Python
+    const codePatterns = [
+
+        /<style[\s>]/i,
+        /<\/style>/i,
+
+        /<script[\s>]/i,
+        /<\/script>/i,
+
+        /^\s*body\s*\{/im,
+        /^\s*\.[a-zA-Z0-9_-]+\s*\{/im,
+        /^\s*#[a-zA-Z0-9_-]+\s*\{/im,
+
+        /^\s*(const|let|var)\s+[a-zA-Z_$]/m,
+        /^\s*function\s+[a-zA-Z_$]/m,
+
+        /^\s*def\s+[a-zA-Z_]/m,
+        /^\s*class\s+[a-zA-Z_]/m,
+
+        /process\.env\./i,
+        /addEventListener\s*\(/i
+    ];
+
+    return codePatterns.some(
+        pattern => pattern.test(text)
+    );
+
+}
+
+
+// ==========================================
+// RENDER AI REPLY — SAFE
+// ==========================================
+
 function renderAIReply(reply){
 
-    if(isProductReply(reply)){
+    const text =
+        String(reply || "");
+
+    // ======================================
+    // PRODUCT
+    // ======================================
+
+    if(isProductReply(text)){
 
         return renderProductCard(
-            parseProductReply(reply)
+            parseProductReply(text)
         );
 
     }
 
-    if(isMarkdownTable(reply)){
+
+    // ======================================
+    // MARKDOWN TABLE
+    // ======================================
+
+    if(isMarkdownTable(text)){
 
         const table =
-        parseMarkdownTable(reply);
+            parseMarkdownTable(text);
 
         if(table){
 
@@ -22295,9 +22386,27 @@ function renderAIReply(reply){
 
     }
 
-    return marked.parse(reply);
 
-}
+    // ======================================
+    // CODE
+    // ======================================
+
+    if(isCodeReply(text)){
+
+        return `
+            <pre><code>${escapeAIHtml(text)}</code></pre>
+        `;
+
+    }
+
+
+    // ======================================
+    // NORMAL MARKDOWN
+    // ======================================
+
+    return marked.parse(text);
+
+	}
 
 
 
