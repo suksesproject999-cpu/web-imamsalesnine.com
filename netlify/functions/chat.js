@@ -502,7 +502,34 @@ const useProductContext =
 // PILIH MODEL AI
 // =====================
 
-let model = "gpt-4.1-mini";
+// MODEL PUBLIK — hemat
+const PUBLIC_MODEL = "gpt-4.1-mini";
+
+// MODEL RAHASIA — khusus admin
+const ASTRA_MODEL = "gpt-6-astra";
+
+// ==================================================
+// ADMIN ASTRA TRIGGER
+// ==================================================
+
+// Hanya aktif jika pesan DIAWALI dengan /Imam
+const isAstraMode =
+    message.trim().startsWith("/Imam");
+
+// Pilih model
+let model =
+    isAstraMode
+        ? ASTRA_MODEL
+        : PUBLIC_MODEL;
+
+// Pesan yang dikirim ke AI
+// /Imam tidak ikut dikirim sebagai isi pertanyaan
+const aiMessage =
+    isAstraMode
+        ? message.trim()
+            .slice("/Imam".length)
+            .trim()
+        : message;
 
 
 
@@ -3472,7 +3499,7 @@ const messages = [
     content: [
       {
         type: "text",
-        text: message
+        text: aiMessage
       },
 
       ...(uploadedImage
