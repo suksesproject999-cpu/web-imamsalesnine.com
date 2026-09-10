@@ -11964,9 +11964,46 @@ html.imam-sales-loader-seen #pageLoader{
 
 }
 
+
+
+
+
+
+.ai-generated-image{
+    width:100%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-top:16px;
+}
+
+.ai-generated-image img{
+    display:block!important;
+    width:auto!important;
+    height:auto!important;
+    max-width:92%!important;
+    max-height:520px!important;
+    object-fit:contain!important;
+    object-position:center!important;
+    margin:auto!important;
+    border-radius:16px;
+}
+
 	
 
 
+
+
+@media(max-width:768px){
+
+    .ai-generated-image img{
+        max-width:94%!important;
+        max-height:420px!important;
+    }
+
+}
+
+	
 
 /* =====================================================
    IMAM AI — UNIVERSAL PRODUCT IMAGE LOCK
@@ -22350,9 +22387,23 @@ try {
 // Simpan ke session
 saveAIHistory();
 
-        loading.innerHTML = renderAIReply(
+        let aiOutput = renderAIReply(
     data.reply || "Maaf, AI tidak memberikan jawaban."
 );
+
+if(data.image){
+
+    aiOutput += `
+        <div class="ai-generated-image">
+            <img
+                src="${data.image}"
+                alt="AI Generated Image">
+        </div>
+    `;
+
+}
+
+loading.innerHTML = aiOutput;
 
     }catch(err){
 
