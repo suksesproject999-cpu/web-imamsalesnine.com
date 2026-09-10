@@ -502,7 +502,7 @@ const useProductContext =
 // PILIH MODEL AI
 // =====================
 
-let model = "gpt-6-astra";
+let model = "gpt-4.1-mini";
 
 
 
@@ -3620,7 +3620,7 @@ if(uploadedImage){
 
       body:JSON.stringify({
 
-        model:"gpt-6-astra",
+        model:"gpt-4.1-mini",
 
         messages:[
 
