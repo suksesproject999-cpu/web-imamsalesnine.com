@@ -502,19 +502,19 @@ const useProductContext =
 // PILIH MODEL AI
 // =====================
 
-// MODEL PUBLIK — hemat
+// MODEL PUBLIK
 const PUBLIC_MODEL = "gpt-4.1-mini";
 
-// MODEL RAHASIA — khusus admin
+// MODEL KHUSUS /IMAM
 const ASTRA_MODEL = "gpt-6-astra";
 
-// ==================================================
-// ADMIN ASTRA TRIGGER
-// ==================================================
+// ==========================================
+// ADMIN /IMAM MODE
+// ==========================================
 
-// Hanya aktif jika pesan DIAWALI dengan /Imam
+// /Imam tidak sensitif huruf besar/kecil
 const isAstraMode =
-    message.trim().startsWith("/Imam");
+    /^\/imam\b/i.test(message.trim());
 
 // Pilih model
 let model =
@@ -522,12 +522,11 @@ let model =
         ? ASTRA_MODEL
         : PUBLIC_MODEL;
 
-// Pesan yang dikirim ke AI
-// /Imam tidak ikut dikirim sebagai isi pertanyaan
+// Hapus /Imam dari pesan yang dikirim ke AI
 const aiMessage =
     isAstraMode
         ? message.trim()
-            .slice("/Imam".length)
+            .replace(/^\/imam\b/i, "")
             .trim()
         : message;
 
@@ -3804,11 +3803,26 @@ const promptLooksLikeImage =
 
 
 const isImageRequest =
+  // ==========================================
+  // ADMIN /IMAM — BEBAS GENERATE IMAGE
+  // ==========================================
+  isAstraMode
+
+  ||
+
+  // ==========================================
+  // PUBLIC — IMAGE REQUEST EXISTING
+  // ==========================================
   (
     hasImageKeyword &&
     hasIntent
   )
+
   ||
+
+  // ==========================================
+  // CINEMATIC IMAGE PROMPT EXISTING
+  // ==========================================
   promptLooksLikeImage;
 
 console.log("IS IMAGE:", isImageRequest);
