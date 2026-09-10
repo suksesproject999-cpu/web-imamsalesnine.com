@@ -3802,28 +3802,24 @@ const promptLooksLikeImage =
   );
 
 
+// ==========================================
+// IMAGE GENERATION ACCESS
+// ==========================================
+
+// PUBLIC:
+// Tidak boleh generate gambar bebas.
+//
+// /IMAM:
+// Boleh generate gambar bebas jika request
+// memang merupakan permintaan gambar.
+
 const isImageRequest =
-  // ==========================================
-  // ADMIN /IMAM — BEBAS GENERATE IMAGE
-  // ==========================================
-  isAstraMode
-
-  ||
-
-  // ==========================================
-  // PUBLIC — IMAGE REQUEST EXISTING
-  // ==========================================
-  (
-    hasImageKeyword &&
-    hasIntent
-  )
-
-  ||
-
-  // ==========================================
-  // CINEMATIC IMAGE PROMPT EXISTING
-  // ==========================================
-  promptLooksLikeImage;
+    isAstraMode &&
+    (
+        hasImageKeyword ||
+        hasIntent ||
+        promptLooksLikeImage
+    );
 
 console.log("IS IMAGE:", isImageRequest);
 console.log("MESSAGE:", message);
