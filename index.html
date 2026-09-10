@@ -12010,12 +12010,199 @@ html.imam-sales-loader-seen #pageLoader{
 
 
 
+/* ==================================================
+   FIX AI MODAL — ANTI HORIZONTAL OVERFLOW
+   ================================================== */
+
+.ai-container,
+.ai-body,
+.ai-message{
+    min-width:0!important;
+    max-width:100%!important;
+    box-sizing:border-box!important;
+}
+
+/* BODY MODAL */
+.ai-body{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+
+    overflow-x:hidden!important;
+    overflow-y:auto!important;
+
+    box-sizing:border-box!important;
+}
+
+/* SEMUA BUBBLE AI */
+.ai-message{
+    width:100%!important;
+    min-width:0!important;
+    max-width:100%!important;
+
+    overflow:hidden!important;
+
+    box-sizing:border-box!important;
+
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+}
+
+/* ==================================================
+   CODE BLOCK
+   ================================================== */
+
+.ai-message pre{
+    display:block!important;
+
+    width:100%!important;
+    max-width:100%!important;
+    min-width:0!important;
+
+    box-sizing:border-box!important;
+
+    margin:16px 0!important;
+    padding:14px!important;
+
+    overflow-x:auto!important;
+    overflow-y:hidden!important;
+
+    white-space:pre!important;
+
+    border-radius:12px!important;
+
+    background:#111827!important;
+
+    scrollbar-width:thin;
+}
+
+/* CODE DI DALAM PRE */
+.ai-message pre code{
+    display:block!important;
+
+    width:max-content!important;
+    max-width:none!important;
+    min-width:0!important;
+
+    box-sizing:border-box!important;
+
+    white-space:pre!important;
+
+    word-break:normal!important;
+    overflow-wrap:normal!important;
+
+    font-family:
+        ui-monospace,
+        SFMono-Regular,
+        Menlo,
+        Monaco,
+        Consolas,
+        monospace!important;
+
+    font-size:13px!important;
+    line-height:1.6!important;
+}
+
+/* INLINE CODE */
+.ai-message code:not(pre code){
+    max-width:100%!important;
+
+    white-space:normal!important;
+
+    overflow-wrap:anywhere!important;
+    word-break:break-word!important;
+}
+
+/* ==================================================
+   GAMBAR DI DALAM CHAT
+   ================================================== */
+
+.ai-message img{
+    max-width:100%!important;
+    height:auto!important;
+    box-sizing:border-box!important;
+}
+
+/* ==================================================
+   TABLE / ELEMENT MARKDOWN
+   ================================================== */
+
+.ai-message table{
+    display:block!important;
+
+    width:100%!important;
+    max-width:100%!important;
+
+    overflow-x:auto!important;
+
+    box-sizing:border-box!important;
+}
+
+.ai-message iframe,
+.ai-message video{
+    max-width:100%!important;
+}
+
+/* ==================================================
+   MOBILE
+   ================================================== */
+
+@media(max-width:768px){
+
+    .ai-container{
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+
+        overflow:hidden!important;
+    }
+
+    .ai-body{
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+
+        padding:16px!important;
+
+        overflow-x:hidden!important;
+        overflow-y:auto!important;
+    }
+
+    .ai-message{
+        width:100%!important;
+        max-width:100%!important;
+        min-width:0!important;
+
+        overflow:hidden!important;
+    }
+
+    .ai-message pre{
+        width:100%!important;
+        max-width:100%!important;
+
+        margin:14px 0!important;
+        padding:12px!important;
+
+        overflow-x:auto!important;
+    }
+
+    .ai-message pre code{
+        font-size:12px!important;
+    }
+
+}
+
+
+
+	
+
+
 
 
 /* ==========================================
    AI CODE BLOCK — ANTI OVERFLOW
    ========================================== */
-
+/*
 .ai-message{
     box-sizing:border-box;
     min-width:0;
@@ -12031,6 +12218,7 @@ html.imam-sales-loader-seen #pageLoader{
 }
 
 /* CODE BLOCK */
+	/*
 .ai-message pre{
     display:block!important;
 
@@ -12054,6 +12242,7 @@ html.imam-sales-loader-seen #pageLoader{
 }
 
 /* CODE DI DALAM PRE */
+	/*
 .ai-message pre code{
     display:block!important;
 
@@ -12081,6 +12270,7 @@ html.imam-sales-loader-seen #pageLoader{
 }
 
 /* INLINE CODE */
+	/*
 .ai-message code:not(pre code){
     max-width:100%!important;
     overflow-wrap:anywhere!important;
@@ -12090,7 +12280,7 @@ html.imam-sales-loader-seen #pageLoader{
 /* ==========================================
    MOBILE
    ========================================== */
-
+/*
 @media(max-width:768px){
 
     .ai-message{
