@@ -21968,6 +21968,24 @@ function parseMarkdownTable(markdown){
 
 
 
+function normalizeProductName(name){
+
+    return String(name || "")
+        .replace(/<[^>]*>/g, "")
+        .replace(/\*\*/g, "")
+        .replace(/__/g, "")
+        .replace(/\*/g, "")
+        .replace(/_/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+	}
+
+
+
+	
+
 
 function renderProductGrid(result){
 
@@ -21978,24 +21996,22 @@ function renderProductGrid(result){
     ${result.products.map(product => {
 
         const productName =
-            product["Nama Produk"] || "";
+    String(p["Nama Produk"] || "")
+        .replace(/<[^>]*>/g, "")
+        .replace(/\*\*/g, "")
+        .replace(/__/g, "")
+        .replace(/\*/g, "")
+        .replace(/_/g, "")
+        .trim();
 
-        /*
-         * Ambil gambar LANGSUNG dari katalog website.
-         * Jangan percaya URL gambar dari response AI.
-         */
-        const realProduct =
-            allProducts.find(p =>
-                String(p.nama || "")
-                    .trim()
-                    .toLowerCase() ===
-                String(productName)
-                    .trim()
-                    .toLowerCase()
-            );
+const realProduct =
+    allProducts.find(product =>
+        normalizeProductName(product.nama) ===
+        normalizeProductName(productName)
+    );
 
-        const realImage =
-            realProduct?.gambar || "";
+const realImage =
+    realProduct?.gambar || "";
 
         return `
 

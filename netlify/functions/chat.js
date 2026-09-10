@@ -545,25 +545,30 @@ Jangan membuat atau mengarang URL gambar.
 } else if (askCompare) {
 
     productContext = `
-User meminta PERBANDINGAN produk.
+User meminta PERBANDINGAN beberapa produk.
 
-Bandingkan produk berikut berdasarkan data resmi.
+Gunakan DATA PRODUK RESMI berikut:
 
 ${matchedProducts
-    .slice(0,8)
+    .slice(0,50)
     .map(formatProduct)
     .join("\n")}
 
-Buat tabel perbandingan yang berisi:
+ATURAN WAJIB:
 
-- Nama Produk
-- Gambar
-- Kategori
-- Varian
-- Deskripsi
-- Harga
+- Tampilkan setiap produk sebagai blok/card produk terpisah.
+- JANGAN menggunakan Markdown table.
+- JANGAN menggunakan **bold** atau *italic* pada Nama Produk.
+- Nama Produk harus PERSIS sama dengan DATA PRODUK RESMI.
+- Gunakan URL Gambar PERSIS dari DATA PRODUK RESMI.
+- Jangan mengubah URL gambar.
+- Jangan membuat URL gambar.
+- Setelah semua produk, tulis bagian:
 
-Jangan menambahkan spesifikasi yang tidak ada pada data.
+Perbedaan Utama
+
+Gunakan hanya fakta yang tersedia pada DATA PRODUK RESMI.
+Jika informasi tidak tersedia, tulis "Belum tersedia".
 `;
 
 } else if (askType) {
@@ -616,18 +621,31 @@ Tampilkan sebagai kartu (card), jangan gunakan tabel.
 
     } else {
 
-        productContext = `
+    productContext = `
 DATA PRODUK RESMI
 
 ${matchedProducts
-    .slice(0,8)
+    .slice(0,50)
     .map(formatProduct)
     .join("\n")}
 
-Jika terdapat lebih dari satu produk, tampilkan dalam daftar yang rapi.
+ATURAN OUTPUT MULTI-PRODUK:
+
+Jika user meminta lebih dari satu produk:
+
+- Tampilkan setiap produk sebagai DATA PRODUK TERPISAH.
+- Jangan menggunakan Markdown table.
+- Jangan menggunakan format **bold** untuk Nama Produk.
+- Jangan menggunakan *italic*.
+- Nama Produk harus ditulis PERSIS seperti DATA PRODUK RESMI.
+- Gambar harus menggunakan URL Gambar dari DATA PRODUK RESMI.
+- Jangan mengubah URL gambar.
+- Jangan membuat URL gambar.
+- Jangan mengarang gambar.
+- Jangan menggabungkan dua produk menjadi satu produk.
 `;
 
-    }
+		}
 
 }
 
