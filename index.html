@@ -12031,6 +12031,75 @@ html.imam-sales-loader-seen #pageLoader{
 
 
 
+
+
+
+
+/* ==========================================
+   AI CODE COPY BUTTON
+========================================== */
+
+.ai-code-block{
+    position:relative;
+    width:100%;
+    max-width:100%;
+    min-width:0;
+    box-sizing:border-box;
+}
+
+.ai-copy-code{
+
+    position:absolute;
+
+    top:8px;
+    right:8px;
+
+    z-index:5;
+
+    border:none;
+
+    background:#8CC63F;
+
+    color:#fff;
+
+    padding:7px 11px;
+
+    border-radius:8px;
+
+    font-size:12px;
+
+    font-weight:700;
+
+    cursor:pointer;
+
+    display:flex;
+
+    align-items:center;
+
+    gap:6px;
+
+    transition:.2s;
+}
+
+.ai-copy-code:hover{
+    background:#79b52f;
+}
+
+.ai-copy-code:active{
+    transform:scale(.96);
+}
+
+.ai-copy-code.copied{
+    background:#22a447;
+}
+
+
+
+
+
+	
+
+
   
   
 </style>
@@ -22055,6 +22124,154 @@ const realImage =
 
 
 
+
+
+
+// ==========================================
+// AI CODE BLOCK — COPY BUTTON
+// ==========================================
+
+function addCodeCopyButtons(container){
+
+    const codeBlocks =
+        container.querySelectorAll("pre");
+
+    codeBlocks.forEach(pre => {
+
+        // Hindari tombol dibuat dua kali
+        if(pre.parentElement.classList.contains("ai-code-block")){
+            return;
+        }
+
+        const code =
+            pre.querySelector("code");
+
+        if(!code){
+            return;
+        }
+
+        // Wrapper
+        const wrapper =
+            document.createElement("div");
+
+        wrapper.className =
+            "ai-code-block";
+
+        // Pindahkan PRE ke wrapper
+        pre.parentNode.insertBefore(
+            wrapper,
+            pre
+        );
+
+        wrapper.appendChild(pre);
+
+        // Tombol
+        const button =
+            document.createElement("button");
+
+        button.type = "button";
+
+        button.className =
+            "ai-copy-code";
+
+        button.innerHTML =
+            '<i class="fa-regular fa-copy"></i> Salin';
+
+        button.addEventListener(
+            "click",
+            async function(){
+
+                const codeText =
+                    code.textContent;
+
+                try{
+
+                    await navigator.clipboard.writeText(
+                        codeText
+                    );
+
+                    button.innerHTML =
+                        '<i class="fa-solid fa-check"></i> Tersalin';
+
+                    button.classList.add("copied");
+
+                    setTimeout(() => {
+
+                        button.innerHTML =
+                            '<i class="fa-regular fa-copy"></i> Salin';
+
+                        button.classList.remove(
+                            "copied"
+                        );
+
+                    },1500);
+
+                }catch(err){
+
+                    // Fallback browser lama
+                    const textarea =
+                        document.createElement("textarea");
+
+                    textarea.value =
+                        codeText;
+
+                    textarea.style.position =
+                        "fixed";
+
+                    textarea.style.opacity =
+                        "0";
+
+                    document.body.appendChild(
+                        textarea
+                    );
+
+                    textarea.focus();
+                    textarea.select();
+
+                    try{
+
+                        document.execCommand("copy");
+
+                        button.innerHTML =
+                            '<i class="fa-solid fa-check"></i> Tersalin';
+
+                    }catch(copyErr){
+
+                        console.error(
+                            "Copy code gagal:",
+                            copyErr
+                        );
+
+                    }
+
+                    textarea.remove();
+
+                    setTimeout(() => {
+
+                        button.innerHTML =
+                            '<i class="fa-regular fa-copy"></i> Salin';
+
+                    },1500);
+
+                }
+
+            }
+        );
+
+        wrapper.appendChild(button);
+
+    });
+
+	}
+
+
+
+
+
+	
+
+
+
 function renderAIReply(reply){
 
     if(isProductReply(reply)){
@@ -22341,6 +22558,14 @@ if(data.image){
 }
 
 loading.innerHTML = aiOutput;
+
+// Tambahkan tombol copy pada semua code block
+addCodeCopyButtons(loading);
+
+
+
+
+	
 
     }catch(err){
 
