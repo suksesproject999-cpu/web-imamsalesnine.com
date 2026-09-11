@@ -22127,73 +22127,116 @@ const realImage =
 
 
 
-function addCodeCopyButtons(container) {
+function addCodeCopyButtons(container){
 
-    if (!container) return;
+    if(!container) return;
 
-    const codeBlocks = container.querySelectorAll("pre");
+    const preBlocks =
+        container.querySelectorAll("pre");
 
-    codeBlocks.forEach(pre => {
+    preBlocks.forEach(pre => {
 
-        if (pre.parentElement.classList.contains("ai-code-block")) {
+        // Hindari tombol dobel
+        if(pre.dataset.copyReady === "1"){
             return;
         }
 
-        const code = pre.querySelector("code");
+        const code =
+            pre.querySelector("code");
 
-        if (!code) return;
+        if(!code){
+            return;
+        }
 
-        const wrapper = document.createElement("div");
+        pre.dataset.copyReady = "1";
+
+        const wrapper =
+            document.createElement("div");
+
         wrapper.className = "ai-code-block";
 
-        pre.parentNode.insertBefore(wrapper, pre);
+        pre.parentNode.insertBefore(
+            wrapper,
+            pre
+        );
+
         wrapper.appendChild(pre);
 
-        const copyButton = document.createElement("button");
+        const button =
+            document.createElement("button");
 
-        copyButton.type = "button";
-        copyButton.className = "ai-copy-code";
-        copyButton.innerHTML = "▣ Salin";
+        button.type = "button";
+        button.className = "ai-copy-code";
+        button.textContent = "Salin";
 
-        copyButton.addEventListener("click", async () => {
+        button.addEventListener(
+            "click",
+            async function(){
 
-            // HANYA copy isi code
-            const codeText = code.textContent;
+                // =================================
+                // COPY CODE SAJA
+                // =================================
 
-            try {
+                const textToCopy =
+                    code.textContent;
 
-                await navigator.clipboard.writeText(codeText);
+                try{
 
-            } catch (err) {
+                    await navigator.clipboard.writeText(
+                        textToCopy
+                    );
 
-                const textarea = document.createElement("textarea");
+                }catch(error){
 
-                textarea.value = codeText;
-                textarea.style.position = "fixed";
-                textarea.style.opacity = "0";
+                    const textarea =
+                        document.createElement("textarea");
 
-                document.body.appendChild(textarea);
+                    textarea.value =
+                        textToCopy;
 
-                textarea.select();
-                document.execCommand("copy");
+                    textarea.setAttribute(
+                        "readonly",
+                        ""
+                    );
 
-                textarea.remove();
+                    textarea.style.position =
+                        "fixed";
+
+                    textarea.style.left =
+                        "-9999px";
+
+                    document.body.appendChild(
+                        textarea
+                    );
+
+                    textarea.select();
+
+                    document.execCommand(
+                        "copy"
+                    );
+
+                    textarea.remove();
+
+                }
+
+                button.textContent =
+                    "Tersalin";
+
+                setTimeout(() => {
+
+                    button.textContent =
+                        "Salin";
+
+                },1500);
+
             }
+        );
 
-            copyButton.innerHTML = "✓ Tersalin";
-
-            setTimeout(() => {
-                copyButton.innerHTML = "▣ Salin";
-            }, 1500);
-
-        });
-
-        wrapper.appendChild(copyButton);
+        wrapper.appendChild(button);
 
     });
+
 	}
-
-
 
 	
 
@@ -22280,30 +22323,18 @@ function isCodeReply(reply){
 
 function renderAIReply(reply){
 
-    const text =
-        String(reply || "");
-
-    // ======================================
-    // PRODUCT
-    // ======================================
-
-    if(isProductReply(text)){
+    if(isProductReply(reply)){
 
         return renderProductCard(
-            parseProductReply(text)
+            parseProductReply(reply)
         );
 
     }
 
-
-    // ======================================
-    // MARKDOWN TABLE
-    // ======================================
-
-    if(isMarkdownTable(text)){
+    if(isMarkdownTable(reply)){
 
         const table =
-            parseMarkdownTable(text);
+            parseMarkdownTable(reply);
 
         if(table){
 
@@ -22313,25 +22344,7 @@ function renderAIReply(reply){
 
     }
 
-
-    // ======================================
-    // CODE
-    // ======================================
-
-    if(isCodeReply(text)){
-
-        return `
-            <pre><code>${escapeAIHtml(text)}</code></pre>
-        `;
-
-    }
-
-
-    // ======================================
-    // NORMAL MARKDOWN
-    // ======================================
-
-    return marked.parse(text);
+    return marked.parse(reply);
 
 	}
 
