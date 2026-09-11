@@ -3935,72 +3935,114 @@ const imageKeywords = [
 
 ];
 
+
+
 const lowerMsg =
-message.toLowerCase();
+    message.toLowerCase();
 
-const imageIntentWords = [
 
-  "buat",
-  "generate",
-  "bikin",
-  "create",
-  "desain",
-  "render"
+// ==========================================
+// IMAGE REQUEST DETECTION
+// ==========================================
+
+// Kata/frasa yang memang menunjukkan
+// user meminta visual/gambar.
+//
+// Jangan masukkan kata seperti:
+// "buat", "bikin", "generate"
+// sendirian karena kata tersebut
+// juga sering dipakai untuk coding.
+
+const explicitImageWords = [
+
+    "gambar",
+    "foto",
+    "image",
+    "picture",
+    "ilustrasi",
+    "illustration",
+    "poster",
+    "wallpaper",
+    "thumbnail",
+    "cover",
+    "banner",
+    "mockup",
+    "render",
+    "visual",
+    "ai art",
+    "concept art",
+    "cinematic image",
+    "cinematic photo",
+    "photorealistic",
+    "photograph",
+
+    // otomotif visual
+    "foto mobil",
+    "gambar mobil",
+    "foto motor",
+    "gambar motor",
+    "foto produk",
+    "gambar produk",
+    "foto lampu",
+    "gambar lampu",
+
+    // social media visual
+    "instagram post",
+    "feed instagram",
+    "instagram story",
+    "story instagram"
 
 ];
 
-const hasImageKeyword =
+const hasExplicitImageWord =
+    explicitImageWords.some(keyword =>
+        lowerMsg.includes(keyword)
+    );
 
-imageKeywords.some(keyword =>
 
-  lowerMsg.includes(keyword)
+// ==========================================
+// EXPLICIT IMAGE PHRASE
+// ==========================================
 
-);
+const explicitImageRequest = /\b(buatkan\s+(gambar|foto|image|poster|banner|ilustrasi|render|visual)|buat\s+(gambar|foto|image|poster|banner|ilustrasi|render|visual)|bikin\s+(gambar|foto|image|poster|banner|ilustrasi|render|visual)|generate\s+(gambar|foto|image|poster|banner|ilustrasi|render|visual)|create\s+(gambar|foto|image|poster|banner|ilustrasi|render|visual)|tampilkan\s+(gambar|foto|image)|tunjukkan\s+(gambar|foto|image))\b/i.test(message);
 
-const hasIntent =
 
-imageIntentWords.some(word =>
-
-  lowerMsg.includes(word)
-
-);
+// ==========================================
+// CINEMATIC PROMPT DETECTION
+// ==========================================
 
 const promptLooksLikeImage =
-  lowerMsg.length > 80 &&
-  (
-    lowerMsg.includes("photorealistic") ||
-    lowerMsg.includes("ultra-realistic") ||
-    lowerMsg.includes("cinematic") ||
-    lowerMsg.includes("photograph") ||
-    lowerMsg.includes("macro photography") ||
-    lowerMsg.includes("professional photography") ||
-    lowerMsg.includes("depth of field") ||
-    lowerMsg.includes("cinematic lighting") ||
-    lowerMsg.includes("realistic lighting")
-  );
+
+    lowerMsg.length > 80 &&
+    (
+        lowerMsg.includes("photorealistic") ||
+        lowerMsg.includes("ultra-realistic") ||
+        lowerMsg.includes("cinematic lighting") ||
+        lowerMsg.includes("macro photography") ||
+        lowerMsg.includes("professional photography") ||
+        lowerMsg.includes("depth of field") ||
+        lowerMsg.includes("realistic lighting")
+    );
 
 
 // ==========================================
-// IMAGE GENERATION ACCESS
+// FINAL IMAGE DECISION
 // ==========================================
-
-// PUBLIC:
-// Tidak boleh generate gambar bebas.
-//
-// /IMAM:
-// Boleh generate gambar bebas jika request
-// memang merupakan permintaan gambar.
 
 const isImageRequest =
+
     isAstraMode &&
     (
-        hasImageKeyword ||
-        hasIntent ||
+        explicitImageRequest ||
+        hasExplicitImageWord ||
         promptLooksLikeImage
     );
 
+
 console.log("IS IMAGE:", isImageRequest);
 console.log("MESSAGE:", message);
+
+
 
 let visualContext = "";
 
