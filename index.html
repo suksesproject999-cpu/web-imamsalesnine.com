@@ -22127,144 +22127,71 @@ const realImage =
 
 
 
-// ==========================================
-// AI CODE BLOCK — COPY BUTTON
-// ==========================================
+function addCodeCopyButtons(container) {
 
-function addCodeCopyButtons(container){
+    if (!container) return;
 
-    const codeBlocks =
-        container.querySelectorAll("pre");
+    const codeBlocks = container.querySelectorAll("pre");
 
     codeBlocks.forEach(pre => {
 
-        // Hindari tombol dibuat dua kali
-        if(pre.parentElement.classList.contains("ai-code-block")){
+        if (pre.parentElement.classList.contains("ai-code-block")) {
             return;
         }
 
-        const code =
-            pre.querySelector("code");
+        const code = pre.querySelector("code");
 
-        if(!code){
-            return;
-        }
+        if (!code) return;
 
-        // Wrapper
-        const wrapper =
-            document.createElement("div");
+        const wrapper = document.createElement("div");
+        wrapper.className = "ai-code-block";
 
-        wrapper.className =
-            "ai-code-block";
-
-        // Pindahkan PRE ke wrapper
-        pre.parentNode.insertBefore(
-            wrapper,
-            pre
-        );
-
+        pre.parentNode.insertBefore(wrapper, pre);
         wrapper.appendChild(pre);
 
-        // Tombol
-        const button =
-            document.createElement("button");
+        const copyButton = document.createElement("button");
 
-        button.type = "button";
+        copyButton.type = "button";
+        copyButton.className = "ai-copy-code";
+        copyButton.innerHTML = "▣ Salin";
 
-        button.className =
-            "ai-copy-code";
+        copyButton.addEventListener("click", async () => {
 
-        button.innerHTML =
-            '<i class="fa-regular fa-copy"></i> Salin';
+            // HANYA copy isi code
+            const codeText = code.textContent;
 
-        button.addEventListener(
-            "click",
-            async function(){
+            try {
 
-                const codeText =
-                    code.textContent;
+                await navigator.clipboard.writeText(codeText);
 
-                try{
+            } catch (err) {
 
-                    await navigator.clipboard.writeText(
-                        codeText
-                    );
+                const textarea = document.createElement("textarea");
 
-                    button.innerHTML =
-                        '<i class="fa-solid fa-check"></i> Tersalin';
+                textarea.value = codeText;
+                textarea.style.position = "fixed";
+                textarea.style.opacity = "0";
 
-                    button.classList.add("copied");
+                document.body.appendChild(textarea);
 
-                    setTimeout(() => {
+                textarea.select();
+                document.execCommand("copy");
 
-                        button.innerHTML =
-                            '<i class="fa-regular fa-copy"></i> Salin';
-
-                        button.classList.remove(
-                            "copied"
-                        );
-
-                    },1500);
-
-                }catch(err){
-
-                    // Fallback browser lama
-                    const textarea =
-                        document.createElement("textarea");
-
-                    textarea.value =
-                        codeText;
-
-                    textarea.style.position =
-                        "fixed";
-
-                    textarea.style.opacity =
-                        "0";
-
-                    document.body.appendChild(
-                        textarea
-                    );
-
-                    textarea.focus();
-                    textarea.select();
-
-                    try{
-
-                        document.execCommand("copy");
-
-                        button.innerHTML =
-                            '<i class="fa-solid fa-check"></i> Tersalin';
-
-                    }catch(copyErr){
-
-                        console.error(
-                            "Copy code gagal:",
-                            copyErr
-                        );
-
-                    }
-
-                    textarea.remove();
-
-                    setTimeout(() => {
-
-                        button.innerHTML =
-                            '<i class="fa-regular fa-copy"></i> Salin';
-
-                    },1500);
-
-                }
-
+                textarea.remove();
             }
-        );
 
-        wrapper.appendChild(button);
+            copyButton.innerHTML = "✓ Tersalin";
+
+            setTimeout(() => {
+                copyButton.innerHTML = "▣ Salin";
+            }, 1500);
+
+        });
+
+        wrapper.appendChild(copyButton);
 
     });
-
 	}
-
-
 
 
 

@@ -534,24 +534,37 @@ const aiMessage =
 
 
 
-		if (isAstraMode && !aiMessage) {
+		// =====================
+// PUBLIC CODE ACCESS LOCK
+// =====================
+
+const asksToCreateCode =
+    /\b(buatkan|buat|bikin|tuliskan|tulis|generate|coding|kodekan|programkan|debug|perbaiki|edit|ubah|modifikasi)\b/i
+    .test(aiMessage);
+
+const codeTarget =
+    /\b(html|css|javascript|js|php|python|json|react|node|website|web|landing page|script|kode|program|coding|function|fungsi|bug|error)\b/i
+    .test(aiMessage);
+
+const isCodeRequest =
+    asksToCreateCode && codeTarget;
+
+if (!isAstraMode && isCodeRequest) {
+
     return {
         statusCode: 200,
+
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
             reply:
-                "🔥 Mode /Imam siap, bro. Kirim request lo setelah /Imam.\n\n" +
-                "Contoh:\n" +
-                "/Imam buatkan foto burung\n" +
-                "/Imam buatkan kode HTML\n" +
-                "/Imam cek bug chat.js\n" +
-                "/Imam analisis produk M6",
+                "Maaf bro, gue nggak bisa membantu membuat atau mengubah kode secara langsung.",
             image: null
         })
     };
-		}
+}
 
 
 
