@@ -22500,12 +22500,38 @@ formData.append(
 );
 
         const res = await fetch("/.netlify/functions/chat",{
-            method:"POST",
-            body:formData
-        });
+    method:"POST",
+    body:formData
+});
 
-        const data = await res.json();
+const rawResponse = await res.text();
 
+console.log("CHAT STATUS:", res.status);
+console.log("CHAT RESPONSE:", rawResponse);
+
+let data;
+
+try {
+
+    data = JSON.parse(rawResponse);
+
+} catch(err) {
+
+    throw new Error(
+        `Server mengembalikan response bukan JSON. HTTP ${res.status}: ${rawResponse}`
+    );
+
+}
+
+if(!res.ok){
+
+    throw new Error(
+        data?.error ||
+        data?.message ||
+        `HTTP ${res.status}`
+    );
+
+	}
 
 
 	// ==========================================
