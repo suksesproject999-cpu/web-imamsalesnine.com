@@ -499,36 +499,26 @@ const useProductContext =
 
 
     // =====================
-// PILIH MODEL AI
+// MODEL ROUTING
 // =====================
 
-// MODEL PUBLIK
 const PUBLIC_MODEL = "gpt-4.1-mini";
-
-// MODEL KHUSUS /IMAM
 const ASTRA_MODEL = "gpt-6-astra";
 
-// ==========================================
-// ADMIN /IMAM MODE
-// ==========================================
-
-// /Imam tidak sensitif huruf besar/kecil
 const isAstraMode =
     /^\/imam\b/i.test(message.trim());
 
-// Pilih model
-let model =
-    isAstraMode
-        ? ASTRA_MODEL
-        : PUBLIC_MODEL;
-
-// Hapus /Imam dari pesan yang dikirim ke AI
 const aiMessage =
     isAstraMode
         ? message.trim()
             .replace(/^\/imam\b/i, "")
             .trim()
         : message;
+
+const model =
+    isAstraMode
+        ? ASTRA_MODEL
+        : PUBLIC_MODEL;
 
 
 
@@ -538,22 +528,6 @@ const aiMessage =
 // PUBLIC CODE ACCESS LOCK
 // =====================
 
-const recentConversation =
-    Array.isArray(memory)
-        ? memory
-            .slice(-8)
-            .map(item => item.content || "")
-            .join("\n")
-        : "";
-
-const codingContext =
-    /\b(html|css|javascript|js|php|python|react|node|sql|json|script|source code|kode|coding|program|website|landing page|function|fungsi|debug|bug|error)\b/i
-        .test(recentConversation);
-
-const codingAction =
-    /\b(buat|buatkan|bikin|tulis|tuliskan|generate|kasih|kirim|lanjut|iya|yaudah|boleh|coba|implementasikan|implementasi|debug|perbaiki|ubah|edit)\b/i
-        .test(aiMessage);
-
 const directCodeRequest =
     /\b(buat|buatkan|bikin|tulis|tuliskan|generate|coding|kodekan|programkan|debug|perbaiki|edit|ubah|modifikasi)\b/i
         .test(aiMessage)
@@ -561,25 +535,46 @@ const directCodeRequest =
     /\b(html|css|javascript|js|php|python|react|node|sql|json|script|source code|kode|coding|program|website|landing page|function|fungsi|bug|error)\b/i
         .test(aiMessage);
 
+const recentConversation =
+    Array.isArray(memory)
+        ? memory
+            .slice(-8)
+            .map(item => item?.content || "")
+            .join("\n")
+        : "";
+
+const codingContext =
+    /\b(html|css|javascript|js|php|python|react|node|sql|json|script|source code|kode|coding|program|website|landing page|function|fungsi|bug|error)\b/i
+        .test(recentConversation);
+
+const followUpCoding =
+    codingContext &&
+    /\b(iya|ya|oke|ok|lanjut|buat|bikin|kirim|kasih|coba|boleh|gas|yaudah|silakan)\b/i
+        .test(aiMessage);
+
 const isPublicCodingAttempt =
     !isAstraMode &&
     (
         directCodeRequest ||
-        (codingContext && codingAction)
+        followUpCoding
     );
 
 if (isPublicCodingAttempt) {
+
     return {
         statusCode: 200,
+
         headers: {
             "Content-Type": "application/json"
         },
+
         body: JSON.stringify({
             reply:
                 "Maaf bro, gue nggak bisa membantu membuat atau mengubah kode secara langsung.",
             image: null
         })
     };
+
 }
 
 
@@ -601,7 +596,7 @@ yang ditemukan.
 Produk yang relevan:
 
 ${matchedProducts
-    .slice(0, 8)
+    .slice(0,8)
     .map(formatProduct)
     .join("\n")}
 
