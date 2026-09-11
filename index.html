@@ -22374,6 +22374,12 @@ let aiConversationHistory =
     );
 
 
+
+
+let imamMode =
+    sessionStorage.getItem("imamMode") === "1";
+	
+
 // Batasi history agar request tidak terlalu besar
 function saveAIHistory(){
 
@@ -22408,6 +22414,36 @@ async function sendAI(){
 
     if(!text) return;
 
+
+    // ==========================================
+    // /IMAM MODE
+    // ==========================================
+
+    const imamCommand =
+        /^\/imam\b/i.test(text);
+
+    const imamOff =
+        /^\/imam\s+off$/i.test(text);
+
+
+    if(imamOff){
+
+        imamMode = false;
+
+        sessionStorage.removeItem("imamMode");
+
+    }
+    else if(imamCommand){
+
+        imamMode = true;
+
+        sessionStorage.setItem(
+            "imamMode",
+            "1"
+        );
+
+	}
+
     const body = document.getElementById("aiMessages");
 
     body.innerHTML += `
@@ -22435,6 +22471,14 @@ formData.append(
     text
 );
 
+
+
+formData.append(
+    "imamMode",
+    imamMode ? "1" : "0"
+);
+
+	
 formData.append(
     "memory",
     JSON.stringify(

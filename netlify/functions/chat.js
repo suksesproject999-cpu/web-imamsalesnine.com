@@ -320,6 +320,16 @@ Array.isArray(body.message)
 ? body.message[0]
 : body.message || "";
 
+
+
+const imamMode =
+Array.isArray(body.imamMode)
+? body.imamMode[0]
+: body.imamMode || "0";
+
+
+		
+
 const memory =
 body.memory
 ? JSON.parse(
@@ -505,11 +515,15 @@ const useProductContext =
 const PUBLIC_MODEL = "gpt-4.1-mini";
 const ASTRA_MODEL = "gpt-6-astra";
 
-const isAstraMode =
+const hasImamCommand =
     /^\/imam\b/i.test(message.trim());
 
+const isAstraMode =
+    hasImamCommand ||
+    imamMode === "1";
+
 const aiMessage =
-    isAstraMode
+    hasImamCommand
         ? message.trim()
             .replace(/^\/imam\b/i, "")
             .trim()
