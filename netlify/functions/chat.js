@@ -3828,7 +3828,12 @@ const response = await fetch(
 
   model: model,
 
-  messages: messages
+  messages: messages,
+
+  max_completion_tokens:
+      isAstraMode
+          ? 12000
+          : 1500
 
 })
 
@@ -3867,73 +3872,6 @@ aidata.choices?.[0]
 
 "AI gagal menjawab 😭";
 
-// =====================
-// DETEKSI IMAGE REQUEST
-// =====================
-
-const imageKeywords = [
-
-  // basic
-  "gambar",
-  "foto",
-  "image",
-  "poster",
-  "desain",
-
-  // generate
-  "buatkan gambar",
-  "buat gambar",
-  "buat foto",
-  "generate image",
-  "generate gambar",
-  "bikinkan gambar",
-  "bikinin gambar",
-
-  // visual
-  "wallpaper",
-  "ilustrasi",
-  "render",
-  "mockup",
-  "banner",
-  "thumbnail",
-  "cover",
-
-  // otomotif
-  "mobil",
-  "motor",
-  "headlamp",
-  "foglamp",
-  "biled",
-  "lampu",
-
-  // karakter
-  "karakter",
-  "anime",
-  "robot",
-  "cyberpunk",
-
-  // property
-  "rumah",
-  "villa",
-  "gedung",
-
-  // cinematic
-  "cinematic",
-  "photorealistic",
-  "ultra realistic",
-  "realistic",
-
-  // social media
-  "instagram post",
-  "feed instagram",
-  "story instagram",
-
-  // AI art
-  "ai art",
-  "konsep art",
-  "concept art"
-
-];
 
 
 
@@ -4029,18 +3967,22 @@ const promptLooksLikeImage =
 // FINAL IMAGE DECISION
 // ==========================================
 
-const isImageRequest =
+const isCodingRequest =
+    /\b(html|css|javascript|typescript|php|python|react|node|sql|json|script|source code|kode|coding|program|website|landing page|function|fungsi|debug|bug|error|api|backend|frontend)\b/i
+        .test(aiMessage);
 
+const isImageRequest =
     isAstraMode &&
+    !isCodingRequest &&
     (
         explicitImageRequest ||
         hasExplicitImageWord ||
         promptLooksLikeImage
     );
 
-
+console.log("IS CODING:", isCodingRequest);
 console.log("IS IMAGE:", isImageRequest);
-console.log("MESSAGE:", message);
+console.log("MESSAGE:", aiMessage);
 
 
 
