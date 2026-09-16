@@ -14,10 +14,12 @@ exports.handler = async (event) => {
 
   try {
 
-    const { username, password } = JSON.parse(event.body);
+    const { username, password, target } = JSON.parse(event.body);
 
     const adminUser = process.env.ADMIN_USER;
     const adminPass = process.env.ADMIN_PASS;
+    const productAdminUser = process.env.PRODUCT_ADMIN_USER;
+    const productAdminPass = process.env.PRODUCT_ADMIN_PASS;
     const jwtSecret = process.env.JWT_SECRET;
     const vipAccounts = JSON.parse(process.env.VIP_ACCOUNTS || "[]");
 
@@ -32,7 +34,52 @@ exports.handler = async (event) => {
     }
 
     // ==========================
-    // LOGIN ADMIN
+    // LOGIN PRODUCT ADMIN
+    // Hanya berlaku dari flow ?target=product
+    // ==========================
+    if (
+      target === "product" &&
+      productAdminUser &&
+      productAdminPass &&
+      username === productAdminUser &&
+      password === productAdminPass
+    ) {
+
+      const token = jwt.sign(
+        {
+          role: "product_admin"
+        },
+        jwtSecret,
+        {
+          expiresIn: "30m"
+        }
+      );
+
+      return {
+        statusCode: 200,
+        body: JSON.stringify({
+          success: true,
+          role: "product_admin",
+          token
+        })
+      };
+
+    }
+
+    // Jika halaman login dibuka khusus Product Admin,
+    // jangan izinkan akun Admin/VIP existing masuk ke flow produk.
+    if (target === "product") {
+      return {
+        statusCode: 401,
+        body: JSON.stringify({
+          success: false,
+          message: "Username atau password salah"
+        })
+      };
+    }
+
+    // ==========================
+    // LOGIN ADMIN EXISTING
     // ==========================
     if (
       username === adminUser &&
@@ -61,7 +108,7 @@ exports.handler = async (event) => {
     }
 
     // ==========================
-    // LOGIN VIP
+    // LOGIN VIP EXISTING
     // ==========================
     const vip = vipAccounts.find(item =>
       item.username === username &&
@@ -96,9 +143,6 @@ exports.handler = async (event) => {
 
     }
 
-    // ==========================
-    // LOGIN GAGAL
-    // ==========================
     return {
       statusCode: 401,
       body: JSON.stringify({

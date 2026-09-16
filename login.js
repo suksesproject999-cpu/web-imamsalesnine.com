@@ -1,5 +1,8 @@
 async function login(){
 
+  const params = new URLSearchParams(window.location.search);
+  const target = params.get("target") === "product" ? "product" : "";
+
   const username = document.getElementById("username").value;
   const password = document.getElementById("password").value;
 
@@ -17,7 +20,7 @@ async function login(){
       headers:{
         "Content-Type":"application/json"
       },
-      body:JSON.stringify({username,password})
+      body:JSON.stringify({username,password,target})
     });
 
     const data = await res.json();
@@ -33,7 +36,9 @@ async function login(){
 
       setTimeout(()=>{
 
-        if(data.role === "admin"){
+        if(data.role === "product_admin"){
+  window.location.href = "/adminb.html";
+}else if(data.role === "admin"){
   window.location.href = "/admin";
 }else{
   window.location.href = "/vip/" + data.folder;
