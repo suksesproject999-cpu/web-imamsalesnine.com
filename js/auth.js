@@ -18,7 +18,6 @@
             localStorage.clear();
             window.location.href = "/login";
             return;
-
         }
 
         try {
@@ -32,73 +31,90 @@
                     }
                 }
             );
-            
+
             const data = await res.json();
 
-            if (!res.ok) {
+            if (!res.ok || !data.success || !data.user) {
 
                 localStorage.clear();
                 window.location.href = "/login";
                 return;
-
             }
-            
+
+            const userRole = data.user.role;
+
+
             // ==========================
-// PROTEKSI FOLDER VIP
-// ==========================
+            // PRODUCT ADMIN
+            // ==========================
 
-if (data.user.role === "vip") {
+            if (
+                path === "/adminb.html" &&
+                userRole !== "product_admin"
+            ) {
 
-    const urlParts =
-        window.location.pathname.split("/");
-
-    const currentFolder =
-        urlParts[2];
-
-    if (currentFolder !== data.user.folder) {
-
-        localStorage.clear();
-
-        window.location.href = "/login";
-
-        return;
-
-    }
-
-}
+                localStorage.clear();
+                window.location.href = "/login";
+                return;
+            }
 
 
-// ==========================
-// PROTEKSI ROLE
-// ==========================
+            // ==========================
+            // ADMIN
+            // ==========================
 
-const path = window.location.pathname;
+            if (
+                path.startsWith("/admin") &&
+                path !== "/adminb.html" &&
+                userRole !== "admin"
+            ) {
 
-// VIP tidak boleh ke admin
-if (path.startsWith("/admin") && data.user.role !== "admin") {
+                localStorage.clear();
+                window.location.href = "/login";
+                return;
+            }
 
-    localStorage.clear();
-    window.location.href = "/login";
-    return;
 
-}
+            // ==========================
+            // VIP
+            // ==========================
 
-// Admin tidak boleh ke VIP
-if (path.startsWith("/vip") && data.user.role === "admin") {
+            if (
+                path.startsWith("/vip") &&
+                userRole !== "vip"
+            ) {
 
-    localStorage.clear();
-    window.location.href = "/login";
-    return;
+                localStorage.clear();
+                window.location.href = "/login";
+                return;
+            }
 
-}
+
+            // ==========================
+            // PROTEKSI FOLDER VIP
+            // ==========================
+
+            if (userRole === "vip") {
+
+                const urlParts =
+                    window.location.pathname.split("/");
+
+                const currentFolder =
+                    urlParts[2];
+
+                if (currentFolder !== data.user.folder) {
+
+                    localStorage.clear();
+                    window.location.href = "/login";
+                    return;
+                }
+            }
 
         } catch (err) {
 
             localStorage.clear();
             window.location.href = "/login";
-
         }
-
     }
 
 })();
