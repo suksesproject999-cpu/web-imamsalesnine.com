@@ -5,117 +5,501 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>NINE Seller Center — Product CMS</title>
 
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
 <style>
 :root{
-  --brand:#8CC63F;--brand2:#6FA72E;--navy:#0F2D6B;--bg:#F5F7FA;--panel:#fff;
-  --line:#E6EAF0;--text:#1F2937;--muted:#6B7280;--danger:#E53935;
-  --shadow:0 8px 28px rgba(15,23,42,.08);--radius:16px;
+  --brand:#8CC63F;
+  --brand-2:#6FA72E;
+  --navy:#0F2D6B;
+  --pink:#EC407A;
+  --bg:#F5F7FA;
+  --panel:#FFFFFF;
+  --line:#E6EAF0;
+  --text:#1F2937;
+  --muted:#6B7280;
+  --danger:#E53935;
+  --warning:#F59E0B;
+  --shadow:0 8px 28px rgba(15,23,42,.08);
+  --radius:16px;
 }
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font:14px/1.45 Arial,sans-serif}
-button,input,select,textarea{font:inherit}button{cursor:pointer}a{text-decoration:none;color:inherit}
-.app{min-height:100vh;display:grid;grid-template-columns:240px 1fr}
-.sidebar{background:linear-gradient(180deg,#0F2D6B,#081C4F);color:white;padding:18px 14px;position:sticky;top:0;height:100vh}
-.logo{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;padding:8px 10px 22px}
-.logo-mark{width:38px;height:38px;border-radius:12px;background:var(--brand);display:grid;place-items:center;color:#10210c}
-.nav-title{font-size:10px;letter-spacing:1.2px;opacity:.55;padding:16px 12px 8px}
-.nav{display:grid;gap:6px}.nav button{width:100%;border:0;background:transparent;color:#dfe7f7;padding:11px 12px;border-radius:10px;display:flex;align-items:center;gap:10px;text-align:left;font-weight:700}
-.nav button:hover,.nav button.active{background:rgba(255,255,255,.11);color:#fff}.nav button.active{box-shadow:inset 3px 0 0 var(--brand)}
-.main{min-width:0}.topbar{height:68px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:30;display:flex;align-items:center;justify-content:space-between;padding:0 24px}
-.page-title{font-size:18px;font-weight:900}.subtle{color:var(--muted);font-size:12px}.top-actions{display:flex;gap:8px;align-items:center}
-.btn{border:0;border-radius:10px;padding:10px 14px;font-weight:800;background:var(--brand);color:#13210f}
-.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}.btn.danger{background:#fff2f2;color:#b42318;border:1px solid #ffd1d1}.btn.icon{width:40px;height:40px;padding:0;display:grid;place-items:center}.btn:disabled{opacity:.5;cursor:not-allowed}
-.content{padding:22px}.kpis{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:18px}.kpi{background:white;border:1px solid var(--line);border-radius:var(--radius);padding:16px;box-shadow:var(--shadow);display:flex;justify-content:space-between}.kpi strong{display:block;font-size:24px;margin-top:4px}.kpi .icon{width:44px;height:44px;border-radius:12px;background:#f0f8e9;color:var(--brand2);display:grid;place-items:center}
-.toolbar{background:#fff;border:1px solid var(--line);border-radius:var(--radius);padding:14px;box-shadow:var(--shadow);margin-bottom:14px}.toolbar-row{display:grid;grid-template-columns:minmax(240px,1fr) 180px 180px auto;gap:10px}
-.search{position:relative}.search i{position:absolute;left:13px;top:13px;color:#9AA3AF}.search input{padding-left:36px}
-input,select,textarea{width:100%;border:1px solid #DDE3EA;background:#fff;border-radius:10px;padding:11px 12px;outline:none;color:var(--text)}input:focus,select:focus,textarea:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(140,198,63,.10)}textarea{min-height:110px;resize:vertical}
-.table-card{background:#fff;border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow);overflow:hidden}.table-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center}
-.product-table{width:100%;border-collapse:collapse}.product-table th{background:#F8FAFC;color:#64748B;font-size:11px;text-transform:uppercase;padding:12px 14px;text-align:left;border-bottom:1px solid var(--line)}.product-table td{padding:12px 14px;border-bottom:1px solid #F0F2F5;vertical-align:middle}.product-table tr:hover{background:#FBFCFE}
-.prod{display:flex;align-items:center;gap:11px}.prod img{width:54px;height:54px;border-radius:10px;object-fit:contain;background:#fff;border:1px solid var(--line)}.prod-name{font-weight:900}.prod-meta{font-size:11px;color:var(--muted);margin-top:3px}
-.badge{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:5px 9px;font-size:11px;font-weight:800;background:#EEF2F7;color:#475569}.badge.on{background:#EEF9E6;color:#4C7D20}.badge.promo{background:#FFF3E8;color:#B45B00}.badge.off{background:#FFF0F0;color:#B42318}
-.table-actions{display:flex;gap:6px}.drawer{position:fixed;inset:0;display:none;z-index:80}.drawer.show{display:block}.drawer-backdrop{position:absolute;inset:0;background:rgba(15,23,42,.40);backdrop-filter:blur(3px)}
-.drawer-panel{position:absolute;top:0;right:0;width:min(1040px,96vw);height:100%;background:#F7F9FB;overflow:auto;box-shadow:-20px 0 60px rgba(15,23,42,.18)}.drawer-top{position:sticky;top:0;z-index:5;background:#fff;border-bottom:1px solid var(--line);padding:16px 18px;display:flex;justify-content:space-between;align-items:center}.drawer-title small{display:block;color:var(--muted);font-size:11px}.drawer-title strong{font-size:20px}
-.editor{padding:16px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}.card{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:0 5px 18px rgba(15,23,42,.05)}.card.full{grid-column:1/-1}.card h3{margin:0 0 14px;font-size:14px}.field{margin-bottom:11px}.field label{display:block;font-size:11px;font-weight:800;color:#64748B;margin-bottom:6px}.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.image-layout{display:grid;grid-template-columns:180px 1fr;gap:16px}.preview{height:180px;border:1px solid var(--line);border-radius:12px;background:white;display:grid;place-items:center;overflow:hidden}.preview img{max-width:100%;max-height:100%;object-fit:contain}
-.dropzone{border:2px dashed #CFD8E3;border-radius:14px;padding:18px;text-align:center;background:#FAFCFE;transition:.2s}.dropzone.drag{border-color:var(--brand);background:#F4FAEE}.dropzone i{font-size:28px;color:var(--brand);margin-bottom:8px}.dropzone input{display:none}.dropzone .pick{display:inline-block;margin-top:8px}.progress{height:8px;background:#EDF1F5;border-radius:999px;overflow:hidden;margin-top:10px;display:none}.progress>div{height:100%;width:0;background:var(--brand);transition:width .2s}
-.gallery-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:9px}.gitem{position:relative;border:1px solid var(--line);border-radius:10px;background:#fff;aspect-ratio:1;overflow:hidden}.gitem img{width:100%;height:100%;object-fit:contain}.gremove{position:absolute;right:5px;top:5px;width:26px;height:26px;border:0;border-radius:50%;background:#111b;color:#fff}
-.note{font-size:11px;color:var(--muted)}.spec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}.spec-row{display:grid;grid-template-columns:1fr 1.2fr 36px;gap:7px}.array-wrap{display:grid;gap:7px}.array-row{display:grid;grid-template-columns:1fr 36px;gap:7px}.iconbtn{border:1px solid var(--line);background:#fff;border-radius:9px;color:#64748B}.raw{font-family:monospace;font-size:12px;min-height:220px}
-.editor-footer{position:sticky;bottom:0;z-index:6;background:rgba(255,255,255,.95);backdrop-filter:blur(12px);border-top:1px solid var(--line);padding:12px 16px;display:flex;justify-content:space-between;align-items:center}.state{font-size:12px;color:var(--muted)}.switch{display:flex;align-items:center;gap:8px;font-weight:800;font-size:12px}.switch input{width:auto}
-.toast{position:fixed;right:18px;bottom:18px;z-index:120;display:none;background:#172019;color:#EFFFF0;border:1px solid #39502f;border-radius:11px;padding:13px 16px;box-shadow:0 12px 35px rgba(0,0,0,.22)}
-@media(max-width:900px){.app{grid-template-columns:72px 1fr}.sidebar .label,.sidebar .nav-title{display:none}.nav button{justify-content:center}.logo{justify-content:center}.kpis{grid-template-columns:repeat(2,1fr)}}
-@media(max-width:700px){.app{display:block}.sidebar{display:none}.topbar{padding:0 14px}.content{padding:14px}.kpis{grid-template-columns:1fr 1fr}.toolbar-row{grid-template-columns:1fr}.grid,.two,.spec-grid,.image-layout{grid-template-columns:1fr}.gallery-grid{grid-template-columns:repeat(3,1fr)}.product-table th:nth-child(3),.product-table td:nth-child(3),.product-table th:nth-child(4),.product-table td:nth-child(4){display:none}}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:var(--bg);
+  color:var(--text);
+  font:14px/1.45 Inter,Arial,sans-serif;
+}
+button,input,select,textarea{font:inherit}
+button{cursor:pointer}
+a{text-decoration:none;color:inherit}
+
+/* ===== SHELL ===== */
+.app{
+  min-height:100vh;
+  display:grid;
+  grid-template-columns:240px 1fr;
+}
+.sidebar{
+  background:linear-gradient(180deg,#0F2D6B,#081C4F);
+  color:#fff;
+  padding:18px 14px;
+  position:sticky;
+  top:0;
+  height:100vh;
+}
+.logo{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  font-weight:900;
+  letter-spacing:.5px;
+  font-size:17px;
+  padding:8px 10px 22px;
+}
+.logo-mark{
+  width:38px;height:38px;border-radius:12px;
+  background:var(--brand);
+  display:grid;place-items:center;color:#10210c;
+  box-shadow:0 8px 24px rgba(140,198,63,.25);
+}
+.nav-title{
+  font-size:10px;
+  letter-spacing:1.2px;
+  opacity:.55;
+  padding:16px 12px 8px;
+}
+.nav{
+  display:grid;
+  gap:6px;
+}
+.nav button{
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#dfe7f7;
+  padding:11px 12px;
+  border-radius:10px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+  text-align:left;
+  font-weight:700;
+}
+.nav button:hover,.nav button.active{
+  background:rgba(255,255,255,.11);
+  color:#fff;
+}
+.nav button.active{
+  box-shadow:inset 3px 0 0 var(--brand);
+}
+.nav .danger-link{color:#ffc5c5}
+
+.main{
+  min-width:0;
+}
+.topbar{
+  height:68px;
+  background:rgba(255,255,255,.92);
+  backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--line);
+  position:sticky;top:0;z-index:30;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;
+}
+.topbar-left{
+  display:flex;align-items:center;gap:10px;
+}
+.page-title{font-size:18px;font-weight:900}
+.subtle{color:var(--muted);font-size:12px}
+.top-actions{display:flex;gap:8px;align-items:center}
+
+.btn{
+  border:0;
+  border-radius:10px;
+  padding:10px 14px;
+  font-weight:800;
+  background:var(--brand);
+  color:#13210f;
+  box-shadow:0 4px 12px rgba(140,198,63,.18);
+}
+.btn:hover{filter:brightness(.98)}
+.btn.secondary{
+  background:#fff;color:var(--text);
+  border:1px solid var(--line);
+  box-shadow:none;
+}
+.btn.danger{
+  background:#fff2f2;color:#b42318;
+  border:1px solid #ffd1d1;box-shadow:none;
+}
+.btn.icon{
+  width:40px;height:40px;padding:0;
+  display:grid;place-items:center;
+}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+
+.content{padding:22px}
+
+/* ===== KPI ===== */
+.kpis{
+  display:grid;
+  grid-template-columns:repeat(4,minmax(0,1fr));
+  gap:14px;
+  margin-bottom:18px;
+}
+.kpi{
+  background:var(--panel);
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:var(--shadow);
+  display:flex;justify-content:space-between;gap:10px;
+}
+.kpi strong{display:block;font-size:24px;margin-top:4px}
+.kpi .icon{
+  width:44px;height:44px;border-radius:12px;
+  background:#f0f8e9;color:var(--brand-2);
+  display:grid;place-items:center;font-size:18px;
+}
+
+/* ===== TOOLBAR ===== */
+.toolbar{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  padding:14px;
+  box-shadow:var(--shadow);
+  margin-bottom:14px;
+}
+.toolbar-row{
+  display:grid;
+  grid-template-columns:minmax(240px,1fr) 180px 180px auto;
+  gap:10px;
+}
+.search{position:relative}
+.search i{position:absolute;left:13px;top:13px;color:#9AA3AF}
+.search input{padding-left:36px}
+input,select,textarea{
+  width:100%;
+  border:1px solid #DDE3EA;
+  background:#fff;
+  border-radius:10px;
+  padding:11px 12px;
+  outline:none;
+  color:var(--text);
+}
+input:focus,select:focus,textarea:focus{
+  border-color:var(--brand);
+  box-shadow:0 0 0 3px rgba(140,198,63,.10);
+}
+textarea{min-height:110px;resize:vertical}
+
+/* ===== LIST ===== */
+.table-card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  overflow:hidden;
+}
+.table-head{
+  padding:14px 16px;
+  border-bottom:1px solid var(--line);
+  display:flex;justify-content:space-between;align-items:center;
+}
+.product-table{
+  width:100%;
+  border-collapse:collapse;
+}
+.product-table th{
+  background:#F8FAFC;
+  color:#64748B;
+  font-size:11px;
+  text-transform:uppercase;
+  letter-spacing:.4px;
+  padding:12px 14px;
+  text-align:left;
+  border-bottom:1px solid var(--line);
+}
+.product-table td{
+  padding:12px 14px;
+  border-bottom:1px solid #F0F2F5;
+  vertical-align:middle;
+}
+.product-table tr:hover{background:#FBFCFE}
+.prod{
+  display:flex;align-items:center;gap:11px;
+}
+.prod img{
+  width:54px;height:54px;border-radius:10px;
+  object-fit:contain;background:#fff;
+  border:1px solid var(--line);
+}
+.prod-name{font-weight:900}
+.prod-meta{font-size:11px;color:var(--muted);margin-top:3px}
+.badge{
+  display:inline-flex;align-items:center;gap:6px;
+  border-radius:999px;padding:5px 9px;
+  font-size:11px;font-weight:800;
+  background:#EEF2F7;color:#475569;
+}
+.badge.on{background:#EEF9E6;color:#4C7D20}
+.badge.promo{background:#FFF3E8;color:#B45B00}
+.badge.off{background:#FFF0F0;color:#B42318}
+.table-actions{display:flex;gap:6px}
+
+/* ===== EDITOR ===== */
+.drawer{
+  position:fixed;
+  inset:0;
+  display:none;
+  z-index:80;
+}
+.drawer.show{display:block}
+.drawer-backdrop{
+  position:absolute;inset:0;
+  background:rgba(15,23,42,.40);
+  backdrop-filter:blur(3px);
+}
+.drawer-panel{
+  position:absolute;
+  top:0;right:0;
+  width:min(980px,94vw);
+  height:100%;
+  background:#F7F9FB;
+  overflow:auto;
+  box-shadow:-20px 0 60px rgba(15,23,42,.18);
+}
+.drawer-top{
+  position:sticky;top:0;z-index:5;
+  background:#fff;
+  border-bottom:1px solid var(--line);
+  padding:16px 18px;
+  display:flex;justify-content:space-between;gap:12px;align-items:center;
+}
+.drawer-title small{display:block;color:var(--muted);font-size:11px}
+.drawer-title strong{font-size:20px}
+.editor{padding:16px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.card{
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:16px;
+  box-shadow:0 5px 18px rgba(15,23,42,.05);
+}
+.card.full{grid-column:1/-1}
+.card h3{margin:0 0 14px;font-size:14px}
+.field{margin-bottom:11px}
+.field:last-child{margin-bottom:0}
+.field label{
+  display:block;
+  font-size:11px;
+  font-weight:800;
+  color:#64748B;
+  margin-bottom:6px;
+}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.image-row{display:grid;grid-template-columns:160px 1fr;gap:14px}
+.preview{
+  height:160px;border:1px solid var(--line);border-radius:12px;
+  background:#fff;display:grid;place-items:center;overflow:hidden;
+}
+.preview img{max-width:100%;max-height:100%;object-fit:contain}
+.note{font-size:11px;color:var(--muted)}
+.spec-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
+.spec-row{display:grid;grid-template-columns:1fr 1.2fr 36px;gap:7px}
+.array-wrap{display:grid;gap:7px}
+.array-row{display:grid;grid-template-columns:1fr 36px;gap:7px}
+.iconbtn{
+  border:1px solid var(--line);
+  background:#fff;
+  border-radius:9px;
+  color:#64748B;
+}
+.iconbtn:hover{color:#111;border-color:#AAB3BD}
+.raw{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:12px;min-height:220px}
+.editor-footer{
+  position:sticky;bottom:0;z-index:6;
+  background:rgba(255,255,255,.95);
+  backdrop-filter:blur(12px);
+  border-top:1px solid var(--line);
+  padding:12px 16px;
+  display:flex;justify-content:space-between;gap:10px;align-items:center;
+}
+.state{font-size:12px;color:var(--muted)}
+.switch{
+  display:flex;align-items:center;gap:8px;
+  font-weight:800;font-size:12px;
+}
+.switch input{width:auto}
+
+.empty{
+  padding:42px 16px;
+  text-align:center;color:var(--muted);
+}
+.empty i{font-size:38px;margin-bottom:10px;color:#CBD5E1}
+
+.toast{
+  position:fixed;right:18px;bottom:18px;z-index:120;
+  display:none;background:#172019;color:#EFFFF0;
+  border:1px solid #39502f;border-radius:11px;
+  padding:13px 16px;box-shadow:0 12px 35px rgba(0,0,0,.22);
+}
+
+@media(max-width:1050px){
+  .app{grid-template-columns:72px 1fr}
+  .sidebar .label,.sidebar .nav-title{display:none}
+  .logo{justify-content:center;padding-left:0;padding-right:0}
+  .nav button{justify-content:center}
+  .kpis{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:760px){
+  .app{display:block}
+  .sidebar{position:relative;height:auto;display:none}
+  .topbar{padding:0 14px}
+  .content{padding:14px}
+  .kpis{grid-template-columns:1fr 1fr}
+  .toolbar-row{grid-template-columns:1fr}
+  .product-table th:nth-child(3),
+  .product-table td:nth-child(3),
+  .product-table th:nth-child(4),
+  .product-table td:nth-child(4){display:none}
+  .grid,.two,.three,.spec-grid,.image-row{grid-template-columns:1fr}
+}
 </style>
 </head>
+
 <body>
 
 <div class="app">
-<aside class="sidebar">
-  <div class="logo"><div class="logo-mark"><i class="fa-solid fa-box"></i></div><span class="label">NINE <span style="color:var(--brand)">SELLER</span></span></div>
-  <div class="nav-title">MANAJEMEN</div>
-  <div class="nav">
-    <button class="active"><i class="fa-solid fa-boxes-stacked"></i><span class="label">Produk</span></button>
-    <button onclick="setFilter('promo')"><i class="fa-solid fa-bolt"></i><span class="label">Promo</span></button>
-    <button onclick="setFilter('hidden')"><i class="fa-solid fa-eye-slash"></i><span class="label">Disembunyikan</span></button>
-  </div>
-  <div class="nav-title">AKSES</div>
-  <div class="nav">
-    <button onclick="window.open('/','_blank')"><i class="fa-solid fa-store"></i><span class="label">Web Utama</span></button>
-    <button id="seedBtn"><i class="fa-solid fa-arrows-rotate"></i><span class="label">Sinkronkan Seed</span></button>
-  </div>
-</aside>
 
-<main class="main">
-<header class="topbar">
-  <div><div class="page-title">Product Center</div><div class="subtle">Produk, foto, harga, promo, dan katalog live.</div></div>
-  <div class="top-actions">
-    <button class="btn secondary icon" onclick="boot(true)" title="Refresh"><i class="fa-solid fa-rotate"></i></button>
-    <button class="btn" onclick="createProduct()"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
-  </div>
-</header>
+  <aside class="sidebar">
+    <div class="logo">
+      <div class="logo-mark"><i class="fa-solid fa-box"></i></div>
+      <span class="label">NINE <span style="color:var(--brand)">SELLER</span></span>
+    </div>
 
-<div class="content">
-<section class="kpis">
-  <div class="kpi"><div><span class="subtle">Total Produk</span><strong id="kpiTotal">0</strong></div><div class="icon"><i class="fa-solid fa-box"></i></div></div>
-  <div class="kpi"><div><span class="subtle">Produk Aktif</span><strong id="kpiActive">0</strong></div><div class="icon"><i class="fa-solid fa-circle-check"></i></div></div>
-  <div class="kpi"><div><span class="subtle">Promo Aktif</span><strong id="kpiPromo">0</strong></div><div class="icon"><i class="fa-solid fa-bolt"></i></div></div>
-  <div class="kpi"><div><span class="subtle">Disembunyikan</span><strong id="kpiHidden">0</strong></div><div class="icon"><i class="fa-solid fa-eye-slash"></i></div></div>
-</section>
+    <div class="nav-title">MANAJEMEN</div>
+    <div class="nav">
+      <button class="active"><i class="fa-solid fa-boxes-stacked"></i><span class="label">Produk</span></button>
+      <button onclick="setFilter('promo')"><i class="fa-solid fa-bolt"></i><span class="label">Promo</span></button>
+      <button onclick="setFilter('hidden')"><i class="fa-solid fa-eye-slash"></i><span class="label">Disembunyikan</span></button>
+    </div>
 
-<section class="toolbar">
-  <div class="toolbar-row">
-    <div class="search"><i class="fa-solid fa-magnifying-glass"></i><input id="search" placeholder="Cari nama, SKU, brand, kategori..."></div>
-    <select id="filter"><option value="all">Semua produk</option><option value="active">Produk aktif</option><option value="promo">Promo aktif</option><option value="hidden">Disembunyikan</option></select>
-    <select id="sort"><option value="name">Nama A–Z</option><option value="id">ID Produk</option><option value="promo">Urutan promo</option></select>
-    <button class="btn secondary" onclick="renderList()"><i class="fa-solid fa-filter"></i> Terapkan</button>
-  </div>
-</section>
+    <div class="nav-title">AKSES</div>
+    <div class="nav">
+      <button onclick="window.open('index.html','_blank')"><i class="fa-solid fa-store"></i><span class="label">Lihat Web</span></button>
+      <button id="seedBtn"><i class="fa-solid fa-arrows-rotate"></i><span class="label">Sinkronkan Seed</span></button>
+    </div>
+  </aside>
 
-<section class="table-card">
-  <div class="table-head"><div><strong>Daftar Produk</strong><div class="subtle"><span id="count">0 produk</span> · <span id="sync">Memuat...</span></div></div></div>
-  <div style="overflow:auto">
-    <table class="product-table">
-      <thead><tr><th>Produk</th><th>Status</th><th>Harga</th><th>Promo</th><th style="width:130px">Aksi</th></tr></thead>
-      <tbody id="productList"></tbody>
-    </table>
-  </div>
-</section>
-</div>
-</main>
+  <main class="main">
+    <header class="topbar">
+      <div class="topbar-left">
+        <div>
+          <div class="page-title">Product Center</div>
+          <div class="subtle">Kelola produk, promo, harga, dan katalog live.</div>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button class="btn secondary icon" onclick="boot(true)" title="Refresh">
+          <i class="fa-solid fa-rotate"></i>
+        </button>
+        <button class="btn" onclick="createProduct()">
+          <i class="fa-solid fa-plus"></i> Tambah Produk
+        </button>
+      </div>
+    </header>
+
+    <div class="content">
+
+      <section class="kpis">
+        <div class="kpi"><div><span class="subtle">Total Produk</span><strong id="kpiTotal">0</strong></div><div class="icon"><i class="fa-solid fa-box"></i></div></div>
+        <div class="kpi"><div><span class="subtle">Produk Aktif</span><strong id="kpiActive">0</strong></div><div class="icon"><i class="fa-solid fa-circle-check"></i></div></div>
+        <div class="kpi"><div><span class="subtle">Promo Aktif</span><strong id="kpiPromo">0</strong></div><div class="icon"><i class="fa-solid fa-bolt"></i></div></div>
+        <div class="kpi"><div><span class="subtle">Disembunyikan</span><strong id="kpiHidden">0</strong></div><div class="icon"><i class="fa-solid fa-eye-slash"></i></div></div>
+      </section>
+
+      <section class="toolbar">
+        <div class="toolbar-row">
+          <div class="search">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input id="search" placeholder="Cari nama produk, SKU, brand, kategori...">
+          </div>
+          <select id="filter">
+            <option value="all">Semua produk</option>
+            <option value="active">Produk aktif</option>
+            <option value="promo">Promo aktif</option>
+            <option value="hidden">Disembunyikan</option>
+          </select>
+          <select id="sort">
+            <option value="name">Nama A–Z</option>
+            <option value="id">ID Produk</option>
+            <option value="promo">Urutan promo</option>
+          </select>
+          <button class="btn secondary" onclick="renderList()">
+            <i class="fa-solid fa-filter"></i> Terapkan
+          </button>
+        </div>
+      </section>
+
+      <section class="table-card">
+        <div class="table-head">
+          <div>
+            <strong>Daftar Produk</strong>
+            <div class="subtle"><span id="count">0 produk</span> · <span id="sync">Memuat...</span></div>
+          </div>
+        </div>
+        <div style="overflow:auto">
+          <table class="product-table">
+            <thead>
+              <tr>
+                <th>Produk</th>
+                <th>Status</th>
+                <th>Harga</th>
+                <th>Promo</th>
+                <th style="width:130px">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="productList"></tbody>
+          </table>
+        </div>
+        <div id="emptyList" class="empty" hidden>
+          <i class="fa-solid fa-box-open"></i>
+          <div><strong>Belum ada produk</strong></div>
+          <div>Coba ubah filter atau tambah produk baru.</div>
+        </div>
+      </section>
+    </div>
+  </main>
 </div>
 
 <div class="drawer" id="drawer">
   <div class="drawer-backdrop" onclick="closeEditor()"></div>
   <section class="drawer-panel">
     <div class="drawer-top">
-      <div class="drawer-title"><small id="editorEyebrow">PRODUCT EDITOR</small><strong id="editorTitle">Produk</strong></div>
-      <button class="btn secondary icon" onclick="closeEditor()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="drawer-title">
+        <small id="editorEyebrow">PRODUCT EDITOR</small>
+        <strong id="editorTitle">Produk</strong>
+      </div>
+      <div class="top-actions">
+        <button class="btn secondary icon" onclick="closeEditor()"><i class="fa-solid fa-xmark"></i></button>
+      </div>
     </div>
     <div id="editor" class="editor"></div>
     <div class="editor-footer">
-      <div><strong>Publish ke web utama</strong><div class="state" id="saveState">Belum ada perubahan.</div></div>
+      <div>
+        <strong>Publish ke web utama</strong>
+        <div class="state" id="saveState">Belum ada perubahan.</div>
+      </div>
       <div class="top-actions">
-        <button class="btn danger" onclick="hideProduct()">Sembunyikan</button>
+        <button class="btn danger" onclick="deleteProduct()">Sembunyikan</button>
         <button class="btn secondary" onclick="resetDraft()">Reset</button>
         <button class="btn" id="saveBtn" onclick="saveProduct()"><i class="fa-solid fa-cloud-arrow-up"></i> Publish</button>
       </div>
@@ -126,6 +510,7 @@ input,select,textarea{width:100%;border:1px solid #DDE3EA;background:#fff;border
 <div id="toast" class="toast"></div>
 
 <script src="/js/auth.js"></script>
+
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 
@@ -139,10 +524,16 @@ const firebaseConfig={
   appId:"1:733140414417:web:b6967fd053ac462b2ffaf0",
   measurementId:"G-6ZN6TQ1YVE"
 };
-if(!firebase.apps.length)firebase.initializeApp(firebaseConfig);
+
+if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
 const db=firebase.firestore();
 const COL="cms_products";
-let seed=[],products=[],selectedId=null,draft=null,dirty=false;
+
+let seed=[];
+let products=[];
+let selectedId=null;
+let draft=null;
+let dirty=false;
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
@@ -167,219 +558,560 @@ function normalize(p){
   x.aplikasi=(x.aplikasi&&typeof x.aplikasi==="object")?x.aplikasi:{};
   return x;
 }
-function rupiah(n){return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n||0))}
+
+function rupiah(n){
+  return new Intl.NumberFormat("id-ID",{style:"currency",currency:"IDR",maximumFractionDigits:0}).format(Number(n||0));
+}
 
 async function boot(force=false){
   $("#sync").textContent="Memuat...";
-  try{const r=await fetch("/produk.json",{cache:"no-store"});seed=(await r.json()).map(normalize)}catch{seed=[]}
-  if(!window._cmsListener||force){
-    if(window._cmsListener)window._cmsListener();
+  try{
+    const r=await fetch("produk.json",{cache:"no-store"});
+    seed=(await r.json()).map(normalize);
+  }catch{
+    seed=[];
+  }
+
+  if(!window._cmsListener || force){
+    if(window._cmsListener) window._cmsListener();
     window._cmsListener=db.collection(COL).onSnapshot(snap=>{
-      const m=new Map();snap.forEach(d=>m.set(String(d.data().id??d.id),d.data()));
-      products=seed.map(s=>normalize(m.has(String(s.id))?{...s,...m.get(String(s.id))}:s));
-      m.forEach((v,k)=>{if(!products.some(p=>String(p.id)===k))products.push(normalize(v))});
-      $("#sync").textContent="Live • Firestore";updateKPI();renderList();
-    },e=>{$("#sync").textContent="Fallback lokal";toast("Firestore: "+e.message);products=seed.map(clone);updateKPI();renderList()});
+      const m=new Map();
+      snap.forEach(d=>m.set(String(d.data().id??d.id),d.data()));
+
+      products=seed.map(s=>normalize(
+        m.has(String(s.id))
+        ? {...s,...m.get(String(s.id))}
+        : s
+      ));
+
+      m.forEach((v,k)=>{
+        if(!products.some(p=>String(p.id)===k)){
+          products.push(normalize(v));
+        }
+      });
+
+      $("#sync").textContent="Live • Firestore";
+      updateKPI();
+      renderList();
+
+      if(selectedId!==null && !dirty){
+        const p=products.find(x=>String(x.id)===String(selectedId));
+        if(p){
+          draft=clone(p);
+          renderEditor();
+        }
+      }
+    },e=>{
+      $("#sync").textContent="Fallback lokal";
+      toast("Firestore belum dapat diakses: "+e.message);
+      products=seed.map(clone);
+      updateKPI();
+      renderList();
+    });
   }
 }
+
 function updateKPI(){
   $("#kpiTotal").textContent=products.length;
   $("#kpiActive").textContent=products.filter(p=>p.active&&!p.deleted).length;
   $("#kpiPromo").textContent=products.filter(p=>p.promo?.active&&!p.deleted).length;
   $("#kpiHidden").textContent=products.filter(p=>!p.active||p.deleted).length;
 }
+
 function filtered(){
-  const q=$("#search").value.toLowerCase().trim(),f=$("#filter").value,sort=$("#sort").value;
-  let a=products.filter(p=>`${p.nama||""} ${p.sku||""} ${p.brand||""} ${p.kategori||""}`.toLowerCase().includes(q));
+  const q=$("#search").value.toLowerCase().trim();
+  const f=$("#filter").value;
+  const sort=$("#sort").value;
+
+  let a=products.filter(p=>
+    `${p.nama||""} ${p.sku||""} ${p.brand||""} ${p.kategori||""}`
+      .toLowerCase().includes(q)
+  );
+
   if(f==="promo")a=a.filter(p=>p.promo?.active&&!p.deleted);
   if(f==="active")a=a.filter(p=>p.active&&!p.deleted);
   if(f==="hidden")a=a.filter(p=>!p.active||p.deleted);
-  a.sort((a,b)=>sort==="id"?String(a.id).localeCompare(String(b.id),undefined,{numeric:true}):sort==="promo"?Number(a.promo?.order||9999)-Number(b.promo?.order||9999):String(a.nama||"").localeCompare(String(b.nama||"")));
+
+  a.sort((a,b)=>
+    sort==="id"
+      ? String(a.id).localeCompare(String(b.id),undefined,{numeric:true})
+      : sort==="promo"
+      ? Number(a.promo?.order||9999)-Number(b.promo?.order||9999)
+      : String(a.nama||"").localeCompare(String(b.nama||""))
+  );
+
   return a;
 }
+
 function renderList(){
-  const a=filtered();$("#count").textContent=a.length+" produk";
+  const a=filtered();
+  $("#count").textContent=a.length+" produk";
+  $("#emptyList").hidden=a.length>0;
+
   $("#productList").innerHTML=a.map(p=>{
-    const status=p.active&&!p.deleted?`<span class="badge on">Aktif</span>`:`<span class="badge off">Hidden</span>`;
-    const promo=p.promo?.active?`<span class="badge promo">Promo #${Number(p.promo.order||9999)}</span>`:`<span class="badge">Tidak</span>`;
-    const hp=Number(p.harga?.promo||0),hn=Number(p.harga?.normal||0);
-    return `<tr>
-      <td><div class="prod"><img src="${esc(p.gambar||"images/no-image.png")}" onerror="this.src='images/no-image.png'"><div><div class="prod-name">${esc(p.nama||"Tanpa nama")}</div><div class="prod-meta">#${esc(p.id)} · ${esc(p.sku||"-")} · ${esc(p.brand||"-")}</div></div></div></td>
-      <td>${status}</td><td><strong>${rupiah(hp>0?hp:hn)}</strong>${hp>0&&hn>hp?`<div class="subtle"><s>${rupiah(hn)}</s></div>`:""}</td><td>${promo}</td>
-      <td><div class="table-actions"><button class="btn secondary icon" onclick="openProduct('${esc(p.id)}')"><i class="fa-solid fa-pen"></i></button><button class="btn secondary icon" onclick="duplicateProduct('${esc(p.id)}')"><i class="fa-solid fa-copy"></i></button></div></td>
-    </tr>`
+    const status=p.active&&!p.deleted
+      ? `<span class="badge on"><i class="fa-solid fa-circle-check"></i> Aktif</span>`
+      : `<span class="badge off"><i class="fa-solid fa-eye-slash"></i> Hidden</span>`;
+
+    const promo=p.promo?.active
+      ? `<span class="badge promo"><i class="fa-solid fa-bolt"></i> Promo #${Number(p.promo.order||9999)}</span>`
+      : `<span class="badge">Tidak</span>`;
+
+    const hargaPromo=Number(p.harga?.promo||0);
+    const hargaNormal=Number(p.harga?.normal||0);
+
+    return `
+      <tr>
+        <td>
+          <div class="prod">
+            <img src="${esc(p.gambar||"images/no-image.png")}" onerror="this.src='images/no-image.png'">
+            <div>
+              <div class="prod-name">${esc(p.nama||"Tanpa nama")}</div>
+              <div class="prod-meta">#${esc(p.id)} · ${esc(p.sku||"-")} · ${esc(p.brand||"-")}</div>
+            </div>
+          </div>
+        </td>
+        <td>${status}</td>
+        <td>
+          <strong>${rupiah(hargaPromo>0?hargaPromo:hargaNormal)}</strong>
+          ${hargaPromo>0&&hargaNormal>hargaPromo?`<div class="subtle"><s>${rupiah(hargaNormal)}</s></div>`:""}
+        </td>
+        <td>${promo}</td>
+        <td>
+          <div class="table-actions">
+            <button class="btn secondary icon" onclick="openProduct('${esc(p.id)}')" title="Edit">
+              <i class="fa-solid fa-pen"></i>
+            </button>
+            <button class="btn secondary icon" onclick="duplicateProduct('${esc(p.id)}')" title="Duplikat">
+              <i class="fa-solid fa-copy"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+    `;
   }).join("");
 }
-function setFilter(v){$("#filter").value=v;renderList()}
+
+function setFilter(v){
+  $("#filter").value=v;
+  renderList();
+}
 
 function createProduct(){
-  if(dirty&&!confirm("Ada perubahan belum dipublish. Buang?"))return;
-  selectedId="P-"+Date.now();
-  draft=normalize({id:selectedId,nama:"",sku:"",brand:"Nine Autoseries",kategori:"",whatsapp:"",gambar:"",deskripsi:"",active:true,deleted:false,harga:{normal:0,promo:0,status:""},promo:{active:false,order:9999},gallery:[],varian:[],keunggulan:[],isi_paket:[],tags:[],spesifikasi:{},aplikasi:{},garansi:{},stok:{}});
-  dirty=true;openDrawer();renderEditor();
-}
-function duplicateProduct(id){
-  const p=products.find(x=>String(x.id)===String(id));if(!p)return;
-  selectedId="P-"+Date.now();draft=clone(p);draft.id=selectedId;draft.nama=(draft.nama||"")+" COPY";draft.sku="";dirty=true;openDrawer();renderEditor();
-}
-function openProduct(id){
-  if(dirty&&!confirm("Ada perubahan belum dipublish. Buang?"))return;
-  const p=products.find(x=>String(x.id)===String(id));if(!p)return;
-  selectedId=id;draft=clone(p);dirty=false;openDrawer();renderEditor();
-}
-function openDrawer(){$("#drawer").classList.add("show");document.body.style.overflow="hidden"}
-function closeEditor(){if(dirty&&!confirm("Ada perubahan belum dipublish. Tutup editor?"))return;$("#drawer").classList.remove("show");document.body.style.overflow="";selectedId=null;draft=null;dirty=false}
+  if(dirty && !confirm("Ada perubahan belum dipublish. Buang perubahan?")) return;
 
-function specRow(k,v){return `<div class="spec-row"><input value="${esc(k)}" onchange="renameSpec('${esc(k)}',this.value)"><input value="${esc(Array.isArray(v)?v.join(", "):v)}" oninput="setSpec('${esc(k)}',this.value)"><button class="iconbtn" onclick="removeSpec('${esc(k)}')"><i class="fa-solid fa-xmark"></i></button></div>`}
-function arrEditor(key,title){const arr=Array.isArray(draft[key])?draft[key]:[];return `<div class="card"><h3>${title}</h3><div class="array-wrap">${arr.map((v,i)=>`<div class="array-row"><input value="${esc(typeof v==="string"?v:JSON.stringify(v))}" oninput="setArray('${key}',${i},this.value)"><button class="iconbtn" onclick="removeArray('${key}',${i})"><i class="fa-solid fa-xmark"></i></button></div>`).join("")}</div><button class="btn secondary" style="margin-top:9px" onclick="addArray('${key}')">+ Tambah</button></div>`}
+  selectedId="NEW-"+Date.now();
+  draft=normalize({
+    id:selectedId,
+    nama:"",
+    sku:"",
+    brand:"Nine Autoseries",
+    kategori:"",
+    whatsapp:"",
+    gambar:"",
+    deskripsi:"",
+    active:true,
+    deleted:false,
+    harga:{normal:0,promo:0,status:""},
+    promo:{active:false,order:9999},
+    gallery:[],
+    varian:[],
+    keunggulan:[],
+    isi_paket:[],
+    tags:[],
+    spesifikasi:{},
+    aplikasi:{},
+    garansi:{},
+    stok:{}
+  });
+
+  dirty=true;
+  openDrawer();
+  renderEditor();
+}
+
+function duplicateProduct(id){
+  const p=products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+  selectedId="COPY-"+Date.now();
+  draft=clone(p);
+  draft.id=selectedId;
+  draft.nama=(draft.nama||"")+" COPY";
+  draft.sku="";
+  dirty=true;
+  openDrawer();
+  renderEditor();
+}
+
+function openProduct(id){
+  if(dirty && !confirm("Ada perubahan belum dipublish. Buang perubahan?"))return;
+
+  selectedId=id;
+  const p=products.find(x=>String(x.id)===String(id));
+  if(!p)return;
+
+  draft=clone(p);
+  dirty=false;
+  openDrawer();
+  renderEditor();
+}
+
+function openDrawer(){
+  $("#drawer").classList.add("show");
+  document.body.style.overflow="hidden";
+}
+
+function closeEditor(){
+  if(dirty && !confirm("Ada perubahan belum dipublish. Tutup editor?"))return;
+  $("#drawer").classList.remove("show");
+  document.body.style.overflow="";
+  selectedId=null;
+  draft=null;
+  dirty=false;
+}
+
+function arrEditor(key,title){
+  const arr=Array.isArray(draft[key])?draft[key]:[];
+  return `
+    <div class="card">
+      <h3>${title}</h3>
+      <div class="array-wrap">
+        ${arr.map((v,i)=>`
+          <div class="array-row">
+            <input value="${esc(typeof v==="string"?v:JSON.stringify(v))}" oninput="setArray('${key}',${i},this.value)">
+            <button class="iconbtn" onclick="removeArray('${key}',${i})"><i class="fa-solid fa-xmark"></i></button>
+          </div>
+        `).join("")}
+      </div>
+      <button class="btn secondary" style="margin-top:9px" onclick="addArray('${key}')">+ Tambah</button>
+    </div>
+  `;
+}
+
+function specRow(k,v){
+  return `
+    <div class="spec-row">
+      <input value="${esc(k)}" onchange="renameSpec('${esc(k)}',this.value)">
+      <input value="${esc(Array.isArray(v)?v.join(", "):v)}" oninput="setSpec('${esc(k)}',this.value)">
+      <button class="iconbtn" onclick="removeSpec('${esc(k)}')"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  `;
+}
 
 function renderEditor(){
-  if(!draft)return;const p=draft,specs=Object.entries(p.spesifikasi||{});
-  $("#editorEyebrow").textContent="PRODUCT EDITOR · ID "+p.id;$("#editorTitle").textContent=p.nama||"Produk Baru";
-  $("#editor").innerHTML=`
-  <div class="grid">
-    <div class="card"><h3>Identitas Produk</h3>
-      <div class="two"><div class="field"><label>NAMA PRODUK</label><input value="${esc(p.nama||"")}" oninput="setPath('nama',this.value);$('#editorTitle').textContent=this.value||'Produk Baru'"></div><div class="field"><label>SKU</label><input value="${esc(p.sku||"")}" oninput="setPath('sku',this.value)"></div></div>
-      <div class="two"><div class="field"><label>BRAND</label><input value="${esc(p.brand||"")}" oninput="setPath('brand',this.value)"></div><div class="field"><label>KATEGORI</label><input value="${esc(p.kategori||"")}" oninput="setPath('kategori',this.value)"></div></div>
-      <div class="field"><label>WHATSAPP</label><input value="${esc(p.whatsapp||"")}" oninput="setPath('whatsapp',this.value)"></div>
-    </div>
-    <div class="card"><h3>Status & Penayangan</h3>
-      <div class="field"><label class="switch"><input type="checkbox" ${p.active?"checked":""} onchange="setPath('active',this.checked)"> Produk aktif</label></div>
-      <div class="field"><label class="switch"><input type="checkbox" ${p.promo?.active?"checked":""} onchange="setPath('promo.active',this.checked)"> Tampilkan di Promo</label></div>
-      <div class="field"><label>URUTAN PROMO</label><input type="number" value="${Number(p.promo?.order||9999)}" oninput="setPath('promo.order',Number(this.value))"></div>
-    </div>
-    <div class="card"><h3>Harga</h3>
-      <div class="two"><div class="field"><label>HARGA NORMAL</label><input type="number" value="${Number(p.harga?.normal||0)}" oninput="setPath('harga.normal',Number(this.value));updateDiscount()"></div><div class="field"><label>HARGA PROMO</label><input type="number" value="${Number(p.harga?.promo||0)}" oninput="setPath('harga.promo',Number(this.value));updateDiscount()"></div></div>
-      <div class="field"><label>STATUS HARGA</label><input value="${esc(p.harga?.status||"")}" oninput="setPath('harga.status',this.value)"></div>
-      <div class="note">Diskon otomatis: <b id="discount">${discount()}%</b></div>
-    </div>
+  if(!draft)return;
 
-    <div class="card full"><h3>Foto Produk — Upload Langsung</h3>
-      <div class="image-layout">
-        <div class="preview"><img id="mainPreview" src="${esc(p.gambar||"images/no-image.png")}" onerror="this.src='images/no-image.png'"></div>
-        <div>
-          <div class="dropzone" id="mainDrop">
-            <i class="fa-solid fa-cloud-arrow-up"></i>
-            <div><b>Tarik foto ke sini</b> atau pilih dari perangkat</div>
-            <div class="note">JPG, PNG, WEBP. Otomatis dikompres sebelum upload.</div>
-            <label class="btn secondary pick">Pilih Foto<input id="mainFile" type="file" accept="image/*"></label>
-            <div class="progress" id="mainProgress"><div></div></div>
-          </div>
-          <div class="field" style="margin-top:10px"><label>URL FOTO UTAMA</label><input id="imageUrl" value="${esc(p.gambar||"")}" readonly></div>
+  const p=draft;
+  const specs=Object.entries(p.spesifikasi||{});
+
+  $("#editorEyebrow").textContent="PRODUCT EDITOR · ID "+(p.id||"-");
+  $("#editorTitle").textContent=p.nama||"Produk Baru";
+
+  $("#editor").innerHTML=`
+    <div class="grid">
+
+      <div class="card">
+        <h3>Identitas Produk</h3>
+        <div class="two">
+          <div class="field"><label>NAMA PRODUK</label><input value="${esc(p.nama||"")}" oninput="setPath('nama',this.value);$('#editorTitle').textContent=this.value||'Produk Baru'"></div>
+          <div class="field"><label>SKU</label><input value="${esc(p.sku||"")}" oninput="setPath('sku',this.value)"></div>
+        </div>
+        <div class="two">
+          <div class="field"><label>BRAND</label><input value="${esc(p.brand||"")}" oninput="setPath('brand',this.value)"></div>
+          <div class="field"><label>KATEGORI</label><input value="${esc(p.kategori||"")}" oninput="setPath('kategori',this.value)"></div>
+        </div>
+        <div class="field"><label>WHATSAPP</label><input value="${esc(p.whatsapp||"")}" oninput="setPath('whatsapp',this.value)"></div>
+      </div>
+
+      <div class="card">
+        <h3>Status & Penayangan</h3>
+        <div class="field">
+          <label class="switch"><input type="checkbox" ${p.active?"checked":""} onchange="setPath('active',this.checked)"> Produk aktif</label>
+        </div>
+        <div class="field">
+          <label class="switch"><input type="checkbox" ${p.promo?.active?"checked":""} onchange="setPath('promo.active',this.checked)"> Tampilkan di Promo</label>
+        </div>
+        <div class="field">
+          <label>URUTAN PROMO</label>
+          <input type="number" value="${Number(p.promo?.order||9999)}" oninput="setPath('promo.order',Number(this.value))">
         </div>
       </div>
-    </div>
 
-    <div class="card full"><h3>Gallery Produk</h3>
-      <div class="dropzone" id="galleryDrop">
-        <i class="fa-solid fa-images"></i>
-        <div><b>Upload beberapa foto sekaligus</b></div>
-        <label class="btn secondary pick">Pilih Gallery<input id="galleryFile" type="file" accept="image/*" multiple></label>
-        <div class="progress" id="galleryProgress"><div></div></div>
+      <div class="card">
+        <h3>Harga</h3>
+        <div class="two">
+          <div class="field"><label>HARGA NORMAL</label><input type="number" value="${Number(p.harga?.normal||0)}" oninput="setPath('harga.normal',Number(this.value));updateDiscount()"></div>
+          <div class="field"><label>HARGA PROMO</label><input type="number" value="${Number(p.harga?.promo||0)}" oninput="setPath('harga.promo',Number(this.value));updateDiscount()"></div>
+        </div>
+        <div class="field"><label>STATUS HARGA</label><input value="${esc(p.harga?.status||"")}" oninput="setPath('harga.status',this.value)"></div>
+        <div class="note">Diskon otomatis: <b id="discount">${discount()}%</b></div>
       </div>
-      <div class="gallery-grid" style="margin-top:12px">${(p.gallery||[]).map((u,i)=>`<div class="gitem"><img src="${esc(u)}"><button class="gremove" onclick="removeGallery(${i})">×</button></div>`).join("")}</div>
+
+      <div class="card">
+        <h3>Foto Utama</h3>
+        <div class="image-row">
+          <div class="preview"><img id="mainPreview" src="${esc(p.gambar||"images/no-image.png")}" onerror="this.src='images/no-image.png'"></div>
+          <div>
+            <div class="field">
+              <label>PATH / URL GAMBAR</label>
+              <input id="imageUrl" value="${esc(p.gambar||"")}" placeholder="images/produk/nama-file.jpg" oninput="setPath('gambar',normalizeImagePath(this.value));$('#mainPreview').src=normalizeImagePath(this.value)">
+            </div>
+            <button class="btn secondary" onclick="testImagePath()">Cek Gambar</button>
+            <div class="note" style="margin-top:8px">Versi ini masih memakai path/URL gambar. Upload file langsung bisa ditambahkan di tahap berikutnya.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card full">
+        <h3>Deskripsi</h3>
+        <textarea oninput="setPath('deskripsi',this.value)">${esc(p.deskripsi||"")}</textarea>
+      </div>
+
+      <div class="card full">
+        <h3>Spesifikasi</h3>
+        <div class="spec-grid">${specs.map(([k,v])=>specRow(k,v)).join("")}</div>
+        <button class="btn secondary" style="margin-top:9px" onclick="addSpec()">+ Tambah Spesifikasi</button>
+      </div>
+
+      ${arrEditor("gallery","Gallery Gambar")}
+      ${arrEditor("varian","Varian")}
+      ${arrEditor("keunggulan","Keunggulan")}
+      ${arrEditor("isi_paket","Isi Paket")}
+      ${arrEditor("tags","Tags")}
+
+      <div class="card">
+        <h3>Aplikasi</h3>
+        <textarea class="raw" oninput="setJson('aplikasi',this.value)">${esc(JSON.stringify(p.aplikasi,null,2))}</textarea>
+      </div>
+
+      <div class="card">
+        <h3>Garansi</h3>
+        <textarea class="raw" oninput="setJson('garansi',this.value)">${esc(JSON.stringify(p.garansi,null,2))}</textarea>
+      </div>
+
+      <div class="card">
+        <h3>Stok</h3>
+        <textarea class="raw" oninput="setJson('stok',this.value)">${esc(JSON.stringify(p.stok,null,2))}</textarea>
+      </div>
+
+      <div class="card full">
+        <h3>Advanced — JSON Produk Lengkap</h3>
+        <div class="note" style="margin-bottom:8px">Untuk field khusus yang belum memiliki form visual. JSON harus valid.</div>
+        <textarea id="rawJson" class="raw">${esc(JSON.stringify(p,null,2))}</textarea>
+        <button class="btn secondary" style="margin-top:9px" onclick="applyRaw()">Terapkan JSON ke Editor</button>
+      </div>
     </div>
+  `;
 
-    <div class="card full"><h3>Deskripsi</h3><textarea oninput="setPath('deskripsi',this.value)">${esc(p.deskripsi||"")}</textarea></div>
-    <div class="card full"><h3>Spesifikasi</h3><div class="spec-grid">${specs.map(([k,v])=>specRow(k,v)).join("")}</div><button class="btn secondary" style="margin-top:9px" onclick="addSpec()">+ Tambah Spesifikasi</button></div>
-    ${arrEditor("varian","Varian")}${arrEditor("keunggulan","Keunggulan")}${arrEditor("isi_paket","Isi Paket")}${arrEditor("tags","Tags")}
-    <div class="card"><h3>Aplikasi</h3><textarea class="raw" oninput="setJson('aplikasi',this.value)">${esc(JSON.stringify(p.aplikasi,null,2))}</textarea></div>
-    <div class="card"><h3>Garansi</h3><textarea class="raw" oninput="setJson('garansi',this.value)">${esc(JSON.stringify(p.garansi,null,2))}</textarea></div>
-    <div class="card"><h3>Stok</h3><textarea class="raw" oninput="setJson('stok',this.value)">${esc(JSON.stringify(p.stok,null,2))}</textarea></div>
-  </div>`;
-  bindUploadUI();updateSaveState();
+  updateSaveState();
 }
 
-function setPath(path,val){let o=draft,a=path.split(".");a.slice(0,-1).forEach(k=>o=o[k]??(o[k]={}));o[a.at(-1)]=val;markDirty()}
-function discount(){const n=Number(draft?.harga?.normal||0),p=Number(draft?.harga?.promo||0);return n>0&&p>0&&p<n?Math.round((n-p)/n*100):0}
-function updateDiscount(){const e=$("#discount");if(e)e.textContent=discount()+"%"}
-function setArray(k,i,v){draft[k][i]=v;markDirty()}function addArray(k){draft[k].push("");markDirty();renderEditor()}function removeArray(k,i){draft[k].splice(i,1);markDirty();renderEditor()}
-function setJson(k,v){try{draft[k]=JSON.parse(v);markDirty()}catch{$("#saveState").textContent="JSON "+k+" belum valid."}}
-function setSpec(k,v){draft.spesifikasi[k]=v;markDirty()}function addSpec(){draft.spesifikasi["field_baru_"+(Object.keys(draft.spesifikasi).length+1)]="";markDirty();renderEditor()}function removeSpec(k){delete draft.spesifikasi[k];markDirty();renderEditor()}function renameSpec(oldk,newk){if(!newk||newk===oldk)return;draft.spesifikasi[newk]=draft.spesifikasi[oldk];delete draft.spesifikasi[oldk];markDirty();renderEditor()}
-function removeGallery(i){draft.gallery.splice(i,1);markDirty();renderEditor()}
-function markDirty(){dirty=true;updateSaveState()}function updateSaveState(){const s=$("#saveState");if(s)s.textContent=dirty?"Ada perubahan yang belum dipublish.":"Belum ada perubahan."}
-function resetDraft(){const p=products.find(x=>String(x.id)===String(selectedId));if(p){draft=clone(p);dirty=false;renderEditor()}}
-
-function bindUploadUI(){
-  bindDrop("mainDrop","mainFile",files=>files[0]&&uploadOne(files[0],"main"));
-  bindDrop("galleryDrop","galleryFile",files=>uploadGallery([...files]));
-}
-function bindDrop(dropId,inputId,handler){
-  const d=$("#"+dropId),inp=$("#"+inputId);if(!d||!inp)return;
-  inp.onchange=e=>handler(e.target.files);
-  ["dragenter","dragover"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.add("drag")}));
-  ["dragleave","drop"].forEach(ev=>d.addEventListener(ev,e=>{e.preventDefault();d.classList.remove("drag")}));
-  d.addEventListener("drop",e=>handler(e.dataTransfer.files));
+function setPath(path,val){
+  let o=draft;
+  const a=path.split(".");
+  a.slice(0,-1).forEach(k=>o=o[k]??(o[k]={}));
+  o[a.at(-1)]=val;
+  markDirty();
 }
 
-async function compressImage(file,maxSide=1800,quality=.86){
-  if(!file.type.startsWith("image/"))throw new Error("File bukan gambar.");
-  const dataURL=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(file)});
-  const img=await new Promise((res,rej)=>{const i=new Image();i.onload=()=>res(i);i.onerror=rej;i.src=dataURL});
-  let w=img.width,h=img.height;
-  const scale=Math.min(1,maxSide/Math.max(w,h));w=Math.round(w*scale);h=Math.round(h*scale);
-  const c=document.createElement("canvas");c.width=w;c.height=h;c.getContext("2d").drawImage(img,0,0,w,h);
-  const blob=await new Promise(res=>c.toBlob(res,"image/webp",quality));
-  return await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res({base64:String(r.result).split(",")[1],type:"image/webp",ext:"webp"});r.onerror=rej;r.readAsDataURL(blob)});
+function discount(){
+  const n=Number(draft?.harga?.normal||0);
+  const p=Number(draft?.harga?.promo||0);
+  return n>0&&p>0&&p<n ? Math.round((n-p)/n*100) : 0;
 }
-async function uploadAsset(file,kind,progressId){
-  const progress=$("#"+progressId),bar=progress?.firstElementChild;if(progress){progress.style.display="block";bar.style.width="15%"}
-  const packed=await compressImage(file);if(bar)bar.style.width="45%";
-  const token=localStorage.getItem("token");
-  const r=await fetch("/.netlify/functions/product-image-upload",{
-    method:"POST",
-    headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-    body:JSON.stringify({productId:String(draft.id),kind,filename:file.name,mime:packed.type,base64:packed.base64})
-  });
-  if(bar)bar.style.width="85%";
-  const data=await r.json();
-  if(!r.ok||!data.success)throw new Error(data.message||"Upload gagal");
-  if(bar)bar.style.width="100%";
-  setTimeout(()=>{if(progress){progress.style.display="none";bar.style.width="0"}},700);
-  return data.url;
+
+function updateDiscount(){
+  const el=$("#discount");
+  if(el)el.textContent=discount()+"%";
 }
-async function uploadOne(file,kind){
+
+function setArray(k,i,v){draft[k][i]=v;markDirty()}
+function addArray(k){draft[k].push("");markDirty();renderEditor()}
+function removeArray(k,i){draft[k].splice(i,1);markDirty();renderEditor()}
+
+function setJson(k,v){
   try{
-    const url=await uploadAsset(file,kind,"mainProgress");
-    draft.gambar=url;markDirty();$("#mainPreview").src=url;$("#imageUrl").value=url;toast("Foto utama berhasil diupload.");
-  }catch(e){toast(e.message)}
+    draft[k]=JSON.parse(v);
+    markDirty();
+  }catch{
+    $("#saveState").textContent="JSON "+k+" belum valid.";
+  }
 }
-async function uploadGallery(files){
+
+function setSpec(k,v){draft.spesifikasi[k]=v;markDirty()}
+function addSpec(){
+  draft.spesifikasi["field_baru_"+(Object.keys(draft.spesifikasi).length+1)]="";
+  markDirty();renderEditor();
+}
+function removeSpec(k){delete draft.spesifikasi[k];markDirty();renderEditor()}
+function renameSpec(oldk,newk){
+  if(!newk||newk===oldk)return;
+  draft.spesifikasi[newk]=draft.spesifikasi[oldk];
+  delete draft.spesifikasi[oldk];
+  markDirty();renderEditor();
+}
+
+function markDirty(){
+  dirty=true;
+  updateSaveState();
+}
+
+function updateSaveState(){
+  const s=$("#saveState");
+  if(!s)return;
+  s.textContent=dirty
+    ? "Ada perubahan yang belum dipublish."
+    : "Belum ada perubahan.";
+}
+
+function resetDraft(){
+  if(String(selectedId).startsWith("NEW-")||String(selectedId).startsWith("COPY-")){
+    createProduct();
+    return;
+  }
+  const p=products.find(x=>String(x.id)===String(selectedId));
+  if(!p)return;
+  draft=clone(p);
+  dirty=false;
+  renderEditor();
+}
+
+function applyRaw(){
   try{
-    for(let i=0;i<files.length;i++){
-      const url=await uploadAsset(files[i],"gallery","galleryProgress");
-      draft.gallery.push(url);markDirty();renderEditor();
-    }
-    toast("Gallery berhasil diupload.");
-  }catch(e){toast(e.message)}
+    draft=normalize(JSON.parse($("#rawJson").value));
+    dirty=true;
+    selectedId=draft.id;
+    renderEditor();
+    toast("JSON diterapkan. Belum dipublish.");
+  }catch(e){
+    toast("JSON tidak valid: "+e.message);
+  }
+}
+
+function normalizeImagePath(v){
+  v=String(v||"").trim().replace(/\\/g,"/");
+  if(!v)return "";
+  if(/^https?:\/\//i.test(v))return v;
+  v=v.replace(/^\/+/,"");
+  if(v.startsWith("images/"))return v;
+  if(v.startsWith("produk/"))return "images/"+v;
+  return "images/produk/"+v;
+}
+
+function testImagePath(){
+  const path=normalizeImagePath($("#imageUrl").value);
+  if(!path){toast("Path gambar masih kosong.");return}
+  const img=new Image();
+  img.onload=()=>toast("Gambar ditemukan.");
+  img.onerror=()=>toast("Gambar tidak ditemukan: "+path);
+  img.src=path+"?cms_check="+Date.now();
 }
 
 async function saveProduct(){
-  if(!draft||!String(draft.nama||"").trim()){toast("Nama produk wajib diisi.");return}
-  try{
-    $("#saveBtn").disabled=true;$("#saveState").textContent="Publishing...";
-    const token=localStorage.getItem("token");
-    const payload=clone(draft);
-    const r=await fetch("/.netlify/functions/product-save",{
-      method:"POST",
-      headers:{"Content-Type":"application/json","Authorization":"Bearer "+token},
-      body:JSON.stringify({product:payload})
-    });
-    const data=await r.json();
-    if(!r.ok||!data.success)throw new Error(data.message||"Publish gagal");
-    dirty=false;$("#saveState").textContent="Tersimpan dan live.";toast("Produk berhasil dipublish.");
-  }catch(e){toast(e.message)}finally{$("#saveBtn").disabled=false}
-}
-async function hideProduct(){
-  if(!draft||!confirm("Sembunyikan produk ini dari web utama dan promo?"))return;
-  draft.active=false;draft.deleted=true;draft.promo.active=false;dirty=true;await saveProduct();
-}
-async function seedAll(){toast("Seed tetap memakai sistem lama. Jalankan hanya bila diperlukan.")}
+  if(!draft)return;
 
-function toast(msg){const t=$("#toast");t.textContent=msg;t.style.display="block";clearTimeout(window._tt);window._tt=setTimeout(()=>t.style.display="none",4200)}
-$("#search").oninput=renderList;$("#filter").onchange=renderList;$("#sort").onchange=renderList;$("#seedBtn").onclick=seedAll;
-window.addEventListener("beforeunload",e=>{if(dirty){e.preventDefault();e.returnValue=""}});
-boot().catch(e=>toast(e.message));
+  if(!String(draft.nama||"").trim()){
+    toast("Nama produk wajib diisi.");
+    return;
+  }
+
+  if(!draft.id){
+    draft.id="P-"+Date.now();
+  }
+
+  try{
+    $("#saveBtn").disabled=true;
+    $("#saveState").textContent="Publishing...";
+
+    draft.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+
+    await db.collection(COL)
+      .doc(String(draft.id))
+      .set(draft,{merge:false});
+
+    selectedId=draft.id;
+    dirty=false;
+    $("#saveState").textContent="Tersimpan di Firestore.";
+    toast("Produk berhasil dipublish ke web utama.");
+  }catch(e){
+    toast("Publish gagal: "+e.message);
+  }finally{
+    $("#saveBtn").disabled=false;
+  }
+}
+
+async function deleteProduct(){
+  if(!draft)return;
+  if(!confirm("Sembunyikan produk ini dari web utama dan promo?"))return;
+
+  draft.active=false;
+  draft.deleted=true;
+  if(!draft.promo)draft.promo={};
+  draft.promo.active=false;
+
+  dirty=true;
+  await saveProduct();
+}
+
+async function seedAll(){
+  if(!confirm("Sinkronkan produk.json sebagai dokumen awal CMS? Data yang sudah ada tidak akan ditimpa."))return;
+
+  $("#seedBtn").disabled=true;
+  try{
+    let batch=db.batch(),n=0,total=0;
+
+    for(const p of seed){
+      const ref=db.collection(COL).doc(String(p.id));
+      const snap=await ref.get();
+
+      if(!snap.exists){
+        batch.set(ref,p);
+        n++;
+        total++;
+      }
+
+      if(n>=400){
+        await batch.commit();
+        batch=db.batch();
+        n=0;
+      }
+    }
+
+    if(n)await batch.commit();
+
+    toast(total+" produk seed ditambahkan.");
+  }catch(e){
+    toast("Sinkronisasi gagal: "+e.message);
+  }finally{
+    $("#seedBtn").disabled=false;
+  }
+}
+
+function toast(msg){
+  const t=$("#toast");
+  t.textContent=msg;
+  t.style.display="block";
+  clearTimeout(window._tt);
+  window._tt=setTimeout(()=>t.style.display="none",4200);
+}
+
+$("#search").oninput=renderList;
+$("#filter").onchange=renderList;
+$("#sort").onchange=renderList;
+$("#seedBtn").onclick=seedAll;
+
+window.addEventListener("beforeunload",e=>{
+  if(dirty){
+    e.preventDefault();
+    e.returnValue="";
+  }
+});
+
+boot().catch(e=>{
+  $("#sync").textContent="Gagal";
+  toast(e.message);
+});
 </script>
+
 </body>
 </html>
