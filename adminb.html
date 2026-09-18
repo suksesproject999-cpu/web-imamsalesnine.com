@@ -371,6 +371,82 @@ textarea{min-height:110px;resize:vertical}
   .product-table td:nth-child(4){display:none}
   .grid,.two,.three,.spec-grid,.image-row{grid-template-columns:1fr}
 }
+
+/* PREMIUM UPGRADE */
+body{
+  background:
+    radial-gradient(circle at 15% 10%, rgba(140,198,63,.08), transparent 28%),
+    linear-gradient(180deg,#f7f9fc 0%,#f3f5f8 100%);
+}
+.topbar{
+  height:76px;
+  padding:0 18px 0 22px;
+  box-shadow:0 8px 26px rgba(15,23,42,.06);
+}
+.page-title-wrap{display:flex;align-items:center;gap:12px}
+.page-title-icon{
+  width:42px;height:42px;border-radius:13px;display:grid;place-items:center;
+  background:linear-gradient(135deg,#8CC63F,#6FA72E);color:#fff;
+  box-shadow:0 8px 20px rgba(140,198,63,.24)
+}
+.top-actions .btn.web-main{background:#0F2D6B;color:#fff;box-shadow:0 7px 18px rgba(15,45,107,.18)}
+.menu-toggle{
+  width:44px;height:44px;border-radius:13px;border:1px solid var(--line);
+  background:#fff;color:#111827;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  gap:5px;box-shadow:0 4px 12px rgba(15,23,42,.05)
+}
+.menu-toggle span{width:21px;height:2.5px;border-radius:99px;background:currentColor;transition:.25s}
+.menu-toggle.active span:nth-child(1){transform:translateY(7.5px) rotate(45deg)}
+.menu-toggle.active span:nth-child(2){opacity:0}
+.menu-toggle.active span:nth-child(3){transform:translateY(-7.5px) rotate(-45deg)}
+.menu-overlay{position:fixed;inset:0;z-index:96;background:rgba(15,23,42,.35);backdrop-filter:blur(4px);opacity:0;visibility:hidden;transition:.25s}
+.menu-overlay.show{opacity:1;visibility:visible}
+.quick-menu{
+  position:fixed;top:88px;right:18px;z-index:97;width:min(360px,calc(100vw - 28px));
+  background:rgba(255,255,255,.98);border:1px solid rgba(226,232,240,.9);border-radius:20px;
+  padding:14px;box-shadow:0 24px 70px rgba(15,23,42,.2);opacity:0;visibility:hidden;
+  transform:translateY(-10px) scale(.98);transition:.25s ease
+}
+.quick-menu.show{opacity:1;visibility:visible;transform:none}
+.quick-menu-head{display:flex;justify-content:space-between;align-items:center;padding:6px 6px 12px;border-bottom:1px solid var(--line);margin-bottom:8px}
+.quick-menu-head strong{font-size:16px}.quick-menu-head span{font-size:11px;color:var(--muted)}
+.quick-menu-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quick-item{
+  border:1px solid var(--line);background:#fff;border-radius:14px;padding:13px;text-align:left;
+  display:flex;gap:10px;align-items:flex-start;transition:.22s
+}
+.quick-item:hover{transform:translateY(-2px);border-color:rgba(140,198,63,.55);box-shadow:0 9px 20px rgba(15,23,42,.07)}
+.quick-item i{width:34px;height:34px;border-radius:10px;background:#f0f8e9;color:var(--brand-2);display:grid;place-items:center;flex-shrink:0}
+.quick-item b{display:block;font-size:12px}.quick-item small{display:block;margin-top:2px;color:var(--muted);font-size:10px;line-height:1.35}
+.quick-menu-foot{margin-top:10px;padding-top:10px;border-top:1px solid var(--line);display:flex;gap:8px}
+.quick-menu-foot .btn{flex:1;text-align:center}
+.hero-panel{
+  background:linear-gradient(135deg,rgba(15,45,107,.98),rgba(8,28,79,.98));color:white;
+  border-radius:22px;padding:22px;margin-bottom:18px;position:relative;overflow:hidden;
+  box-shadow:0 18px 44px rgba(15,45,107,.18)
+}
+.hero-panel::after{content:"";position:absolute;width:220px;height:220px;border-radius:50%;right:-80px;top:-90px;background:rgba(140,198,63,.16)}
+.hero-panel-content{position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;gap:18px}
+.hero-panel h2{margin:0;font-size:22px}.hero-panel p{margin:7px 0 0;color:#dbe5f7;max-width:680px}
+.hero-status{display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.status-chip{display:inline-flex;gap:7px;align-items:center;padding:8px 11px;border-radius:999px;background:rgba(255,255,255,.10);border:1px solid rgba(255,255,255,.12);font-size:11px;white-space:nowrap}
+.status-chip i{color:#a8e75a}
+.kpi{transition:.24s ease}.kpi:hover{transform:translateY(-3px);box-shadow:0 14px 36px rgba(15,23,42,.10)}
+.table-head{padding:16px 18px}.table-head strong{font-size:15px}
+.drawer-panel{border-left:1px solid var(--line)}.editor-footer{box-shadow:0 -10px 35px rgba(15,23,42,.07)}
+.mobile-fab{display:none}
+@media(max-width:760px){
+  .topbar{height:70px;padding:0 10px 0 14px}
+  .top-actions .btn.web-main,.top-actions .btn.add-product-label{width:42px;height:42px;padding:0;display:grid;place-items:center;font-size:0}
+  .top-actions .btn.web-main i,.top-actions .btn.add-product-label i{font-size:15px}
+  .page-title-icon{width:38px;height:38px}.page-title{font-size:16px}.subtle{font-size:10px}
+  .hero-panel{padding:18px;border-radius:18px}.hero-panel-content{display:block}.hero-status{justify-content:flex-start;margin-top:14px}
+  .quick-menu{top:78px;right:10px}.quick-menu-grid{grid-template-columns:1fr}
+  .kpis{grid-template-columns:1fr 1fr;gap:10px}.kpi{padding:13px}.kpi strong{font-size:20px}.kpi .icon{width:38px;height:38px}
+  .drawer-panel{width:100vw}
+  .mobile-fab{display:grid;position:fixed;right:16px;bottom:16px;width:58px;height:58px;border-radius:50%;border:0;background:var(--brand);color:#13210f;place-items:center;font-size:20px;box-shadow:0 14px 30px rgba(140,198,63,.3);z-index:55}
+}
+
 </style>
 </head>
 
@@ -393,7 +469,7 @@ textarea{min-height:110px;resize:vertical}
 
     <div class="nav-title">AKSES</div>
     <div class="nav">
-      <button onclick="window.open('index.html','_blank')"><i class="fa-solid fa-store"></i><span class="label">Lihat Web</span></button>
+      <button onclick="openMainWeb()"><i class="fa-solid fa-store"></i><span class="label">Lihat Web</span></button>
       <button id="seedBtn"><i class="fa-solid fa-arrows-rotate"></i><span class="label">Sinkronkan Seed</span></button>
     </div>
   </aside>
@@ -401,23 +477,35 @@ textarea{min-height:110px;resize:vertical}
   <main class="main">
     <header class="topbar">
       <div class="topbar-left">
-        <div>
-          <div class="page-title">Product Center</div>
-          <div class="subtle">Kelola produk, promo, harga, dan katalog live.</div>
+        <div class="page-title-wrap">
+          <div class="page-title-icon"><i class="fa-solid fa-cubes-stacked"></i></div>
+          <div>
+            <div class="page-title">NINE Product Center</div>
+            <div class="subtle">Seller Center • katalog live • Firestore</div>
+          </div>
         </div>
       </div>
-
       <div class="top-actions">
-        <button class="btn secondary icon" onclick="boot(true)" title="Refresh">
-          <i class="fa-solid fa-rotate"></i>
-        </button>
-        <button class="btn" onclick="createProduct()">
-          <i class="fa-solid fa-plus"></i> Tambah Produk
-        </button>
+        <button class="btn secondary icon" onclick="boot(true)" title="Refresh data"><i class="fa-solid fa-rotate"></i></button>
+        <button class="btn web-main" onclick="openMainWeb()" title="Buka web utama"><i class="fa-solid fa-arrow-up-right-from-square"></i> Web Utama</button>
+        <button class="btn add-product-label" onclick="createProduct()" title="Tambah produk"><i class="fa-solid fa-plus"></i> Tambah Produk</button>
+        <button class="menu-toggle" id="menuToggle" onclick="toggleQuickMenu()" aria-label="Buka menu"><span></span><span></span><span></span></button>
       </div>
     </header>
 
     <div class="content">
+      <section class="hero-panel">
+        <div class="hero-panel-content">
+          <div>
+            <h2>Kelola Katalog Nine dengan Lebih Cepat</h2>
+            <p>Edit produk, harga, promo, status penayangan, spesifikasi, dan data katalog dari satu dashboard profesional.</p>
+          </div>
+          <div class="hero-status">
+            <span class="status-chip"><i class="fa-solid fa-shield-halved"></i> Product Admin</span>
+            <span class="status-chip"><i class="fa-solid fa-database"></i> Firestore Live</span>
+          </div>
+        </div>
+      </section>
 
       <section class="kpis">
         <div class="kpi"><div><span class="subtle">Total Produk</span><strong id="kpiTotal">0</strong></div><div class="icon"><i class="fa-solid fa-box"></i></div></div>
@@ -506,6 +594,28 @@ textarea{min-height:110px;resize:vertical}
     </div>
   </section>
 </div>
+
+
+<div class="menu-overlay" id="menuOverlay" onclick="closeQuickMenu()"></div>
+<aside class="quick-menu" id="quickMenu">
+  <div class="quick-menu-head">
+    <div><strong>Menu Cepat</strong><span>Seller Center</span></div>
+    <button class="btn secondary icon" onclick="closeQuickMenu()" title="Tutup menu"><i class="fa-solid fa-xmark"></i></button>
+  </div>
+  <div class="quick-menu-grid">
+    <button class="quick-item" onclick="closeQuickMenu();createProduct()"><i class="fa-solid fa-circle-plus"></i><span><b>Tambah Produk</b><small>Buat produk baru ke katalog.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();setFilter('promo')"><i class="fa-solid fa-bolt"></i><span><b>Promo Aktif</b><small>Lihat produk yang sedang promo.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();setFilter('hidden')"><i class="fa-solid fa-eye-slash"></i><span><b>Produk Hidden</b><small>Cek produk yang disembunyikan.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();setFilter('active')"><i class="fa-solid fa-circle-check"></i><span><b>Produk Aktif</b><small>Tampilkan produk yang live.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();boot(true)"><i class="fa-solid fa-arrows-rotate"></i><span><b>Refresh Data</b><small>Sinkronkan tampilan dashboard.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();document.getElementById('seedBtn').click()"><i class="fa-solid fa-database"></i><span><b>Sinkronkan Seed</b><small>Tambahkan seed yang belum ada.</small></span></button>
+  </div>
+  <div class="quick-menu-foot">
+    <button class="btn web-main" onclick="openMainWeb()"><i class="fa-solid fa-store"></i> Web Utama</button>
+    <button class="btn secondary" onclick="closeQuickMenu();logoutProductAdmin()"><i class="fa-solid fa-right-from-bracket"></i> Logout</button>
+  </div>
+</aside>
+<button class="mobile-fab" onclick="createProduct()" title="Tambah Produk"><i class="fa-solid fa-plus"></i></button>
 
 <div id="toast" class="toast"></div>
 
@@ -1094,6 +1204,32 @@ function toast(msg){
   clearTimeout(window._tt);
   window._tt=setTimeout(()=>t.style.display="none",4200);
 }
+
+
+function openMainWeb(){
+  window.open("/", "_blank", "noopener");
+}
+function toggleQuickMenu(){
+  const menu=$("#quickMenu"),overlay=$("#menuOverlay"),btn=$("#menuToggle");
+  const open=menu.classList.toggle("show");
+  overlay.classList.toggle("show",open);
+  btn.classList.toggle("active",open);
+  document.body.style.overflow=open ? "hidden" : "";
+}
+function closeQuickMenu(){
+  const menu=$("#quickMenu"),overlay=$("#menuOverlay"),btn=$("#menuToggle");
+  if(menu)menu.classList.remove("show");
+  if(overlay)overlay.classList.remove("show");
+  if(btn)btn.classList.remove("active");
+  document.body.style.overflow="";
+}
+function logoutProductAdmin(){
+  if(!confirm("Keluar dari Product Center?"))return;
+  localStorage.removeItem("token");
+  localStorage.removeItem("role");
+  window.location.href="/login";
+}
+document.addEventListener("keydown",e=>{if(e.key==="Escape")closeQuickMenu()});
 
 $("#search").oninput=renderList;
 $("#filter").onchange=renderList;
