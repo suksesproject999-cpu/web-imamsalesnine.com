@@ -1,7 +1,6 @@
 
 /**
- * NEXAI V9 RUNTIME SMOKE TEST
- * Jalankan setelah deploy:
+ * NEXAI V10 PRODUCTION TEST
  * node SELFTEST.js https://imamsalesnine.com/.netlify/functions/chat
  */
 const endpoint =
@@ -9,60 +8,74 @@ const endpoint =
   "https://imamsalesnine.com/.netlify/functions/chat";
 
 const tests = [
-  ["Bro", "smalltalk", ""],
+  ["Bro", "smalltalk", null],
   ["Harga R9 berapa", "product_price", "R9"],
-  ["Foto R9", "product_photo", "R9"],
-  ["Spek Z2", "product_spec", "Z2"],
-  ["Foto Z2 dan spek lengkap", "product_photo_spec", "Z2"]
+  ["Spek MS3", "product_spec", "MS3-SLIM"],
+  ["Q6pro apa ada", "product_stock", "Q6-PRO"],
+  ["Spek H6 LH2", "product_spec", "H6-LH2"],
+  ["Beda R9 dan R10 apa", "compare", null],
+  ["Kenapa gak bisa kerja kamu", "general", null]
 ];
 
+async function ask(message){
+  const form = new FormData();
+  form.append("message", message);
+  form.append("memory", "[]");
+  form.append("productMemory", "[]");
+  form.append("imamMode", "0");
+  form.append("clientTime", new Date().toISOString());
+  form.append("clientTimezone", "Asia/Jakarta");
+
+  const r = await fetch(endpoint,{
+    method:"POST",
+    body:form
+  });
+
+  return {
+    status:r.status,
+    data:await r.json()
+  };
+}
+
 (async()=>{
-  let fail = 0;
+  let fail=0;
 
-  for(const [message, expectedRoute, expectedSku] of tests){
-    const form = new FormData();
-    form.append("message", message);
-    form.append("memory", "[]");
-    form.append("productMemory", "[]");
-    form.append("imamMode", "0");
-    form.append("clientTime", new Date().toISOString());
-    form.append("clientTimezone", "Asia/Jakarta");
-
+  for(const [message,route,sku] of tests){
     try{
-      const r = await fetch(endpoint,{
-        method:"POST",
-        body:form
-      });
+      const {status,data}=await ask(message);
 
-      const data = await r.json();
+      const routeOK=data.route===route;
+      const skuOK=!sku ||
+        String(data.product?.sku||"").toUpperCase()===sku;
 
-      const routeOK =
-        data.route === expectedRoute;
+      const compareOK =
+        route!=="compare" ||
+        Array.isArray(data.products) &&
+        data.products.length>=2;
 
-      const skuOK =
-        !expectedSku ||
-        String(data.product?.sku || "").toUpperCase() === expectedSku;
-
-      const ok =
-        r.ok &&
+      const ok=
+        status===200 &&
         routeOK &&
-        skuOK;
+        skuOK &&
+        compareOK;
 
       console.log(
-        ok ? "PASS" : "FAIL",
+        ok?"PASS":"FAIL",
         message,
         "=>",
         data.route,
         data.product?.sku || "",
-        data.reply?.slice(0,100) || ""
+        Array.isArray(data.products)
+          ? data.products.map(x=>x.sku).join(",")
+          : ""
       );
 
       if(!ok) fail++;
     }catch(err){
-      console.log("FAIL", message, err.message);
+      console.log("FAIL",message,err.message);
       fail++;
     }
   }
 
-  process.exit(fail ? 1 : 0);
+  process.exit(fail?1:0);
 })();

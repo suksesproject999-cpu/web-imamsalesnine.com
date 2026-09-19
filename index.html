@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v9-stable">
+<meta name="nexai-ui-version" content="2026.09-v10-stable">
 
 <link rel="icon" href="favicon.png">
 
@@ -12670,12 +12670,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v9-stable">
+<meta name="nexai-ui-version" content="2026.09-v10-stable">
 
 <script>
-/* NEXAI V9 — one-time clean migration */
+/* NEXAI V10 — one-time clean migration */
 (function(){
-  const schema = "v9-stable";
+  const schema = "v10-stable";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
@@ -25580,7 +25580,7 @@ function openNexaiHybrid(event){
 </script>
 
 <script>
-/* NEXAI V9 — structured backend renderer */
+/* NEXAI V10 — structured backend renderer */
 (function(){
   const original =
     window.renderNexaiReply;
@@ -25588,9 +25588,21 @@ function openNexaiHybrid(event){
   window.renderNexaiReply =
     function(data){
 
+      const directRoutes = new Set([
+        "product_price",
+        "product_stock",
+        "product_photo",
+        "product_photo_spec",
+        "product_variant",
+        "product_spec",
+        "catalog_page",
+        "product_detail"
+      ]);
+
       if(
         !data ||
-        !data.product
+        !data.product ||
+        !directRoutes.has(data.route)
       ){
         return original
           ? original(data)
@@ -25690,6 +25702,33 @@ function openNexaiHybrid(event){
               ${esc(p.stock)}
             </div>
           `;
+        }
+      }
+
+
+      if(
+        route === "product_detail"
+      ){
+        if(p.brand){
+          html += `<div class="ai-product-item"><strong>Brand</strong><br>${esc(p.brand)}</div>`;
+        }
+        if(p.category){
+          html += `<div class="ai-product-item"><strong>Kategori</strong><br>${esc(p.category)}</div>`;
+        }
+        if(p.sku){
+          html += `<div class="ai-product-item"><strong>SKU</strong><br>${esc(p.sku)}</div>`;
+        }
+        if(p.price){
+          html += `<div class="ai-product-item"><strong>Harga</strong><br>${esc(p.price)}</div>`;
+        }
+        if(p.stock !== undefined && p.stock !== ""){
+          html += `<div class="ai-product-item"><strong>Stok</strong><br>${esc(p.stock)}</div>`;
+        }
+        if(Array.isArray(p.variants) && p.variants.length){
+          html += `<div class="ai-product-item"><strong>Varian</strong><br>${p.variants.map(x=>esc(x)).join(", ")}</div>`;
+        }
+        if(p.description){
+          html += `<div class="ai-product-item"><strong>Deskripsi</strong><br>${esc(p.description)}</div>`;
         }
       }
 

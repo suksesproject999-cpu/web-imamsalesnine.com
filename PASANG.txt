@@ -1,48 +1,42 @@
-NEXAI FINAL V9 STABLE — SIMPLE ARCHITECTURE
+NEXAI FINAL V10 STABLE
 
-V9 sengaja membuang over-engineering V7/V8.
+FOKUS V10:
+- Exact multi-product resolver.
+- MS3 tidak boleh berubah jadi M6.
+- Q6pro mengenali Q6-PRO walau tanpa tanda "-".
+- H6 LH2 memakai catalog_page resmi produk (page 14).
+- Perbandingan R9 vs R10 mengunci dua produk sekaligus.
+- Active product hanya dipakai untuk follow-up referensial seperti "fotonya", "speknya", "harganya".
+- Pertanyaan umum seperti "kenapa gak bisa kerja kamu" tidak boleh menampilkan kartu produk lama.
+- Stock object diformat sebagai teks, bukan [object Object].
+- Catalog mapping: catalog_page resmi dulu; fuzzy catalog lookup hanya fallback hati-hati.
+- Jika halaman katalog tidak punya object specs, V10 mencoba membaca blok Specification dari text halaman yang sama.
 
-SUMBER DATA:
-1. produk.json / URL produk resmi website
-   -> identitas produk, SKU, harga, stok, varian, deskripsi, foto.
-2. netlify/functions/data/catalog_specs.json
-   -> spesifikasi teknis resmi hasil ekstraksi katalog.
-3. Web search
-   -> hanya fitment kendaraan, socket, generasi, market, dan info aktual.
-4. AI
-   -> reasoning/general question, bukan database produk.
-
-ATURAN STABILITAS:
-- Exact SKU/nama/alias dicek dari produk.json sebelum AI.
-- Harga/stok/foto/spek/varian dijawab tanpa AI bila produk ditemukan.
-- Jika produk.json gagal dimuat, backend error jelas; AI tidak boleh mengarang.
-- Tidak ada Product Master, canonical registry, visuals registry, atau duplikasi identity data.
-- produk.json dicache 60 detik agar cepat tetapi data live tetap segar.
-- Jika file lokal produk.json tidak terbaca di runtime, backend fallback ke:
-  https://imamsalesnine.com/produk.json
-- catalog_specs.json dibundle langsung bersama Netlify Function agar path runtime stabil.
+STRUKTUR:
+root/
+  index.html
+  produk.json
+  SELFTEST.js
+  PASANG.txt
+  netlify/
+    functions/
+      chat.js
+      data/
+        catalog_specs.json
 
 PASANG:
-1. index.html -> root website.
-2. netlify/functions/chat.js -> replace.
-3. netlify/functions/data/catalog_specs.json -> copy persis.
-4. produk.json lama tetap di root.
-5. Deploy ulang Netlify.
-6. Hard refresh browser.
+1. Replace index.html
+2. Replace netlify/functions/chat.js
+3. Copy netlify/functions/data/catalog_specs.json
+4. produk.json lama tetap root
+5. Deploy ulang
+6. Hard refresh
 
-TEST PRODUCTION:
+HEALTH CHECK:
+Buka:
+https://imamsalesnine.com/.netlify/functions/chat?health=1
+
+Harus menunjukkan status ok dan SKU kritis seperti R9, R10, Z2, MS3-SLIM, Q6-PRO, H6-LH2 terdeteksi.
+
+PRODUCTION TEST:
 node SELFTEST.js https://imamsalesnine.com/.netlify/functions/chat
-
-EXPECTED:
-PASS Bro -> smalltalk
-PASS Harga R9 berapa -> product_price R9
-PASS Foto R9 -> product_photo R9
-PASS Spek Z2 -> product_spec Z2
-PASS Foto Z2 dan spek lengkap -> product_photo_spec Z2
-
-ENV:
-OPENAI_API_KEY
-NEXAI_MODEL_FAST (opsional)
-NEXAI_MODEL_SMART (opsional)
-NEXAI_PUBLIC_IMAGE=1 (opsional)
-NEXAI_PRODUCT_JSON_URL (opsional)
