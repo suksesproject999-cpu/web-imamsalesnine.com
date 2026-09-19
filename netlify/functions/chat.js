@@ -645,6 +645,51 @@ body.productMemory
     : body.productMemory
   )
 : [];
+
+
+// ==================================================
+// PREVIOUS PRODUCT VISUAL CONTEXT — SAFE
+// ==================================================
+// Selalu dideklarasikan sebelum dipakai oleh systemPrompt.
+
+const visualMemoryContext =
+    Array.isArray(productMemory) && productMemory.length
+    ? `
+
+==================================================
+PREVIOUS PRODUCT VISUAL CONTEXT
+==================================================
+
+Produk yang sebelumnya ditampilkan:
+
+${productMemory
+    .slice(-8)
+    .map(p => `
+Nama Produk: ${p?.nama || "-"}
+Brand: ${p?.brand || "-"}
+SKU: ${p?.sku || "-"}
+Gambar: ${p?.gambar || "-"}
+Varian: ${p?.varian || "-"}
+Harga: ${
+    typeof p?.harga === "object"
+        ? JSON.stringify(p.harga)
+        : (p?.harga || "-")
+}
+`).join("\n")}
+
+Gunakan konteks ini HANYA jika user jelas merujuk
+produk sebelumnya seperti:
+"yang tadi", "fotonya", "harganya", "produk tadi",
+"yang pertama", atau "yang kedua".
+
+Jika user mengganti topik ke pertanyaan umum,
+otomotif umum, waktu, atau creative baru,
+abaikan konteks produk sebelumnya.
+
+==================================================
+
+`
+    : "";
 		
 
 const orders =
@@ -783,15 +828,11 @@ const askCatalogPage =
     /\b(foto katalog|halaman katalog|full halaman|full page|katalog lengkap|halaman lengkap)\b/i
         .test(message);
 
-const hasExplicitProductWord =
-    /\b(produk|sku|kode produk|katalog|produk nine|produk luximos|produk soundblax|produk securicle|produk lx[\s-]?trix|produk 9power)\b/i
-        .test(message);
-
 const hasStrongProductSignal =
     Boolean(preExactProduct) ||
     productFollowUp ||
     hasProductBrandSignal ||
-    hasExplicitProductWord;
+    hasProductCategorySignal;
 
 const forceGeneralRoute =
     askCurrentTime ||
@@ -828,35 +869,17 @@ const exactProduct =
     preExactProduct;
 
 const productRequestSignal =
-    Boolean(exactProduct) ||
-    productFollowUp ||
+    askPrice ||
+    askStock ||
+    askSpec ||
+    askCompare ||
+    askType ||
+    askPhoto ||
+    askCatalogPage ||
     hasProductBrandSignal ||
-    hasExplicitProductWord ||
-    (
-        hasProductCategorySignal &&
-        (
-            hasProductBrandSignal ||
-            hasExplicitProductWord
-        )
-    ) ||
-    (
-        (
-            askPrice ||
-            askStock ||
-            askSpec ||
-            askCompare ||
-            askType ||
-            askPhoto ||
-            askCatalogPage
-        )
-        &&
-        (
-            Boolean(exactProduct) ||
-            productFollowUp ||
-            hasProductBrandSignal ||
-            hasExplicitProductWord
-        )
-    );
+    hasProductCategorySignal ||
+    productFollowUp ||
+    Boolean(exactProduct);
 
 const isProductQuery =
     !forceGeneralRoute &&
