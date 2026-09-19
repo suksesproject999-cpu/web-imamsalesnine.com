@@ -456,6 +456,160 @@ if (matchedToken >= 3)
 
 
 
+function formatOfficialPrice(harga){
+
+    if(
+        harga === null ||
+        harga === undefined ||
+        harga === ""
+    ){
+        return "Belum tersedia";
+    }
+
+    if(typeof harga === "number"){
+        return `Rp${Number(harga).toLocaleString("id-ID")}`;
+    }
+
+    if(typeof harga === "string"){
+        return harga;
+    }
+
+    if(typeof harga === "object"){
+
+        const normal =
+            Number(harga.normal || 0);
+
+        const promo =
+            Number(harga.promo || 0);
+
+        if(promo && normal){
+            return `Promo Rp${promo.toLocaleString("id-ID")} | Normal Rp${normal.toLocaleString("id-ID")}`;
+        }
+
+        if(promo){
+            return `Rp${promo.toLocaleString("id-ID")}`;
+        }
+
+        if(normal){
+            return `Rp${normal.toLocaleString("id-ID")}`;
+        }
+    }
+
+    return "Belum tersedia";
+}
+
+
+function formatOfficialStock(stok){
+
+    if(
+        stok === null ||
+        stok === undefined ||
+        stok === ""
+    ){
+        return "Belum tersedia";
+    }
+
+    if(typeof stok === "string"){
+        return stok;
+    }
+
+    if(typeof stok === "number"){
+        return String(stok);
+    }
+
+    if(typeof stok === "object"){
+
+        const status =
+            stok.status || "";
+
+        const qty =
+            stok.qty;
+
+        if(
+            qty !== null &&
+            qty !== undefined &&
+            qty !== ""
+        ){
+            return status
+                ? `${status} (${qty})`
+                : String(qty);
+        }
+
+        if(status){
+            return status;
+        }
+    }
+
+    return "Belum tersedia";
+}
+
+
+function detectRequestedProductCategory(text){
+
+    const t =
+        normalize(text);
+
+    const rules = [
+        {id:"foglamp", words:["foglamp","fog lamp","lampu kabut"]},
+        {id:"shooting_light", words:["shooting light","lampu sorot","lampu tembak","spotlight"]},
+        {id:"headlamp", words:["headlamp","headlight","lampu utama","lampu depan"]},
+        {id:"projector", words:["biled","projector","proyektor"]},
+        {id:"flasher", words:["flasher"]},
+        {id:"relay", words:["relay"]},
+        {id:"klakson", words:["klakson","klaxon","horn"]},
+        {id:"alarm", words:["alarm"]},
+        {id:"carpet", words:["karpet","carpet"]}
+    ];
+
+    return (
+        rules.find(rule =>
+            rule.words.some(word =>
+                t.includes(normalize(word))
+            )
+        )?.id || ""
+    );
+}
+
+
+function productMatchesRequestedCategory(
+    product,
+    categoryId
+){
+
+    if(!categoryId){
+        return true;
+    }
+
+    const haystack =
+        normalize([
+            product?.nama,
+            product?.kategori,
+            product?.deskripsi,
+            ...(Array.isArray(product?.tags)
+                ? product.tags
+                : [])
+        ].filter(Boolean).join(" "));
+
+    const words = {
+        foglamp:["foglamp","fog lamp","lampu kabut"],
+        shooting_light:["shooting light","lampu sorot","lampu tembak","spotlight"],
+        headlamp:["headlamp","headlight","lampu utama","lampu depan"],
+        projector:["biled","projector","proyektor"],
+        flasher:["flasher"],
+        relay:["relay"],
+        klakson:["klakson","klaxon","horn"],
+        alarm:["alarm"],
+        carpet:["karpet","carpet"]
+    };
+
+    return (
+        words[categoryId] || []
+    ).some(word =>
+        haystack.includes(normalize(word))
+    );
+}
+
+
 function formatProduct(product) {
 
     return `
@@ -464,7 +618,8 @@ Brand      : ${product.brand}
 Kategori   : ${product.kategori}
 SKU        : ${product.sku}
 Gambar     : ${getOfficialVisual(product).foto_utama || "Belum tersedia"}
-Harga      : ${product.harga || "Tersedia"}
+Harga      : ${formatOfficialPrice(product.harga)}
+Stok       : ${formatOfficialStock(product.stok)}
 Deskripsi  : ${product.deskripsi}
 
 Varian:
@@ -502,7 +657,10 @@ Varian:
 ${(product.varian || []).join(", ") || "Belum tersedia"}
 
 Harga:
-${product.harga || "Tersedia"}
+${formatOfficialPrice(product.harga)}
+
+Stok:
+${formatOfficialStock(product.stok)}
 
 Deskripsi:
 ${product.deskripsi}
@@ -645,51 +803,6 @@ body.productMemory
     : body.productMemory
   )
 : [];
-
-
-// ==================================================
-// PREVIOUS PRODUCT VISUAL CONTEXT — SAFE
-// ==================================================
-
-const visualMemoryContext =
-    Array.isArray(productMemory) &&
-    productMemory.length
-    ? `
-
-==================================================
-PREVIOUS PRODUCT VISUAL CONTEXT
-==================================================
-
-Produk yang sebelumnya ditampilkan:
-
-${productMemory
-    .slice(-8)
-    .map(p => `
-Nama Produk: ${p?.nama || "-"}
-Brand: ${p?.brand || "-"}
-SKU: ${p?.sku || "-"}
-Gambar: ${p?.gambar || "-"}
-Varian: ${p?.varian || "-"}
-Harga: ${
-    typeof p?.harga === "object"
-        ? JSON.stringify(p.harga)
-        : (p?.harga || "-")
-}
-`).join("\n")}
-
-Gunakan konteks ini HANYA jika user jelas merujuk
-produk sebelumnya seperti:
-"yang tadi", "fotonya", "harganya", "stoknya",
-"produk tadi", "yang pertama", atau "yang kedua".
-
-Jika user mengganti topik ke pertanyaan umum,
-otomotif umum, waktu/tanggal, atau creative baru,
-abaikan konteks produk sebelumnya.
-
-==================================================
-
-`
-    : "";
 		
 
 const orders =
@@ -747,46 +860,33 @@ keyword = keyword
 
 
 // ==================================================
-// NEXAI ROUTER V5 — STRICT DETERMINISTIC INTENT ENGINE
+// NEXAI ROUTER V4 — DETERMINISTIC INTENT GATE
 // ==================================================
 
 const preExactProduct =
     exactProductFromMessage(message);
 
-const compactMessage =
-    normalize(message);
-
-
-// --------------------------------------------------
-// GENERAL REAL-TIME / UTILITY
-// --------------------------------------------------
-
 const askCurrentTime =
-    /\b(jam\s*(berapa|brp)|sekarang\s+jam\s*(berapa|brp)|pukul\s*(berapa|brp)|waktu\s+sekarang|current\s+time|what\s+time)\b/i
+    /\b(jam berapa|sekarang jam|pukul berapa|waktu sekarang|what time)\b/i
         .test(message);
 
 const askCurrentDate =
-    /\b(tanggal\s*(berapa|brp)|hari\s+apa|tanggal\s+hari\s+ini|hari\s+ini\s+tanggal|current\s+date|what\s+date)\b/i
+    /\b(tanggal berapa|hari apa|tanggal hari ini|hari ini tanggal|what date)\b/i
         .test(message);
 
 const isGreetingOnly =
-    /^(halo|hai|hi|hello|pagi|siang|sore|malam|tes|test|assalamualaikum|salam)(\s+(bro|bang|gan|kak|om))?[\s!?.]*$/i
+    /^(halo|hai|hi|hello|pagi|siang|sore|malam|tes|test|assalamualaikum|salam)[\s!?.]*$/i
         .test(message.trim());
-
-
-// --------------------------------------------------
-// CREATIVE INTENT
-// --------------------------------------------------
 
 const explicitCreativeImageIntent =
     (
-        /\b(buat|buatkan|bikin|generate|create|render|desain)\b[\s\S]{0,120}\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b/i.test(message)
+        /\b(buat|buatkan|bikin|generate|create|render|desain)\b[\s\S]{0,100}\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b/i.test(message)
         ||
-        /\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b[\s\S]{0,120}\b(buat|buatkan|bikin|generate|create|render|desain)\b/i.test(message)
+        /\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b[\s\S]{0,100}\b(buat|buatkan|bikin|generate|create|render|desain)\b/i.test(message)
     );
 
 const explicitStoryboardIntent =
-    /\b(storyboard|scene|sinematik|cinematic|prompt\s+video|video\s+ai|creative\s+direction|iklan\s+sinematik)\b/i
+    /\b(storyboard|scene|sinematik|cinematic|prompt video|video ai|creative direction|iklan sinematik)\b/i
         .test(message);
 
 const creativeUsesExactProduct =
@@ -796,39 +896,31 @@ const creativeUsesExactProduct =
         explicitStoryboardIntent
     );
 
-
-// --------------------------------------------------
-// PRODUCT FOLLOW-UP MEMORY
-// --------------------------------------------------
-
 const hasPreviousProductContext =
     Array.isArray(productMemory) &&
     productMemory.length > 0;
 
 const productFollowUp =
     hasPreviousProductContext &&
-    /\b(yang\s+tadi|produk\s+tadi|fotonya|gambarnya|harganya|stoknya|variannya|spesifikasinya|yang\s+pertama|yang\s+kedua|full\s+halamannya|halaman\s+katalognya)\b/i
+    /\b(yang tadi|produk tadi|fotonya|gambarnya|harganya|stoknya|variannya|spesifikasinya|yang pertama|yang kedua|full halamannya|halaman katalognya)\b/i
         .test(message);
-
-
-// --------------------------------------------------
-// PRODUCT SIGNALS
-// --------------------------------------------------
 
 const hasProductBrandSignal =
-    /\b(nine|luximos|soundblax|securicle|lx[\s-]?trix|9power|nine\s+power|optimus)\b/i
-        .test(message);
-
-const hasExplicitProductWord =
-    /\b(produk|sku|kode\s+produk|katalog|produk\s+nine|produk\s+luximos|produk\s+soundblax|produk\s+securicle|produk\s+lx[\s-]?trix|produk\s+9power)\b/i
+    /\b(nine|luximos|soundblax|securicle|lx[\s-]?trix|9power|nine power|optimus)\b/i
         .test(message);
 
 const hasProductCategorySignal =
-    /\b(lampu\s+sorot|shooting\s+light|headlamp|headlight|foglamp|biled|projector|flasher|relay|klakson|klaxon|alarm|karpet|carpet)\b/i
+    /\b(produk|sku|kode produk|lampu sorot|shooting light|headlamp|headlight|foglamp|biled|projector|flasher|relay|klakson|klaxon|alarm|karpet|carpet)\b/i
         .test(message);
 
+
+const requestedProductCategory =
+    detectRequestedProductCategory(
+        message
+    );
+
 const askPrice =
-    /\b(harga|price|harganya|berapa\s+harga)\b/i
+    /\b(harga|price|harganya|berapa harga)\b/i
         .test(message);
 
 const askStock =
@@ -844,7 +936,7 @@ const askCompare =
         .test(message);
 
 const askType =
-    /\b(type|tipe|seri|model|apa\s+saja|list|daftar|macam)\b/i
+    /\b(type|tipe|seri|model|apa saja|list|daftar|macam)\b/i
         .test(message);
 
 const askPhoto =
@@ -852,16 +944,13 @@ const askPhoto =
         .test(message);
 
 const askCatalogPage =
-    /\b(foto\s+katalog|halaman\s+katalog|full\s+halaman|full\s+page|katalog\s+lengkap|halaman\s+lengkap)\b/i
+    /\b(foto katalog|halaman katalog|full halaman|full page|katalog lengkap|halaman lengkap)\b/i
         .test(message);
 
+const hasExplicitProductWord =
+    /\b(produk|sku|kode produk|katalog)\b/i
+        .test(message);
 
-// --------------------------------------------------
-// HARD ROUTE GATES
-// --------------------------------------------------
-
-// Istilah otomotif umum seperti foglamp/headlamp/H11/socket
-// TIDAK otomatis berarti user meminta produk Nine.
 const hasStrongProductSignal =
     Boolean(preExactProduct) ||
     productFollowUp ||
@@ -886,22 +975,32 @@ const shouldSearchProducts =
     !forceCreativeRoute &&
     hasStrongProductSignal;
 
-
-// --------------------------------------------------
-// FUZZY SEARCH — ONLY AFTER PRODUCT GATE
-// --------------------------------------------------
-
 const matchedProducts =
     shouldSearchProducts
     ? products
+        .filter(product =>
+            productMatchesRequestedCategory(
+                product,
+                requestedProductCategory
+            )
+        )
         .map(product => ({
             product,
-            score:getScore(product,tokens)
+            score:getScore(
+                product,
+                tokens
+            )
         }))
-        .filter(item => item.score > 0)
-        .sort((a,b) => b.score - a.score)
-        .map(item => item.product)
-        .slice(0,50)
+        .filter(item =>
+            item.score > 0
+        )
+        .sort((a,b) =>
+            b.score - a.score
+        )
+        .map(item =>
+            item.product
+        )
+        .slice(0,20)
     : [];
 
 const exactProduct =
@@ -1019,7 +1118,9 @@ if(
         officialProductList =
             resolvedProducts
                 .slice(0,8)
-                .map(serializeOfficialProduct)
+                .map(
+                    serializeOfficialProduct
+                )
                 .filter(Boolean);
 
     }
@@ -1043,8 +1144,7 @@ const visualMode =
     : "none";
 
 const exactProductVisualLock =
-    exactProduct &&
-    (intentRoute === "PRODUCT" || intentRoute === "CREATIVE_PRODUCT")
+    exactProduct
     ? `
 
 ==================================================
@@ -4444,9 +4544,7 @@ REAL-TIME CONTEXT
 Waktu aktual zona Asia/Jakarta:
 ${nowJakarta}
 
-Gunakan nilai ini sebagai satu-satunya sumber jawaban waktu/tanggal.
-Jawab langsung dan singkat.
-Jangan mengatakan tidak bisa melihat waktu real-time.
+Gunakan nilai ini untuk menjawab waktu/tanggal.
 Jangan gunakan data produk dan jangan menebak.
 
 ==================================================
@@ -4550,12 +4648,41 @@ await response.json();
 // AMBIL JAWABAN AI
 // =====================
 
-const reply =
+let reply =
 
 aidata.choices?.[0]
 ?.message?.content ||
 
 "AI gagal menjawab 😭";
+
+
+// ==================================================
+// SINGLE SOURCE OF TRUTH — PRODUCT FACTS
+// ==================================================
+
+if(
+    intentRoute === "PRODUCT" &&
+    exactProduct
+){
+
+    reply =
+        `Berikut data resmi ${exactProduct.nama} (SKU ${exactProduct.sku}) dari data produk aktif.`;
+
+}
+
+if(
+    intentRoute === "PRODUCT" &&
+    !exactProduct &&
+    officialProductList.length
+){
+
+    reply =
+        requestedProductCategory
+        ? `Saya menemukan ${officialProductList.length} produk resmi yang relevan untuk kategori ${requestedProductCategory.replace("_"," ")}.`
+        : `Saya menemukan ${officialProductList.length} produk resmi yang relevan.`;
+
+}
+
 
 
 
@@ -4677,9 +4804,7 @@ console.log("TIME INTENT:", askCurrentTime || askCurrentDate);
 console.log("CREATIVE INTENT:", explicitCreativeImageIntent || explicitStoryboardIntent);
 console.log("EXACT PRODUCT:", exactProduct?.sku || null);
 console.log("FUZZY ENABLED:", shouldSearchProducts);
-console.log("PRODUCT BRAND SIGNAL:", hasProductBrandSignal);
-console.log("EXPLICIT PRODUCT WORD:", hasExplicitProductWord);
-console.log("PRODUCT CATEGORY SIGNAL:", hasProductCategorySignal);
+console.log("REQUESTED CATEGORY:", requestedProductCategory || null);
 console.log("MATCHED PRODUCTS:", matchedProducts.slice(0,5).map(p => p.sku));
 console.log("MESSAGE:", aiMessage);
 
@@ -4769,6 +4894,18 @@ if(uploadedImage){
 
 let image = null;
 
+const officialCreativeProductReferenceUrl =
+    (
+        intentRoute === "CREATIVE_PRODUCT" &&
+        exactProduct
+    )
+    ? (
+        getOfficialVisual(
+            exactProduct
+        ).foto_utama || ""
+    )
+    : "";
+
 if(isImageRequest){
 
   try {
@@ -4779,46 +4916,74 @@ if(isImageRequest){
     // REFERENCE IMAGE MODE
     // ==================================================
 
-    if(uploadedImage){
+    if(
+        uploadedImage ||
+        officialCreativeProductReferenceUrl
+    ){
 
       console.log(
-        "IMAGE MODE: REFERENCE EDIT"
+        officialCreativeProductReferenceUrl
+        ? "IMAGE MODE: OFFICIAL PRODUCT REFERENCE EDIT"
+        : "IMAGE MODE: USER REFERENCE EDIT"
       );
 
+      let mimeType =
+        "image/jpeg";
 
-      // uploadedImage berbentuk:
-      // data:image/jpeg;base64,AAAA...
+      let imageBuffer;
 
-      const match =
-        uploadedImage.match(
-          /^data:(.+?);base64,(.+)$/
-        );
+      if(uploadedImage){
 
+        const match =
+          uploadedImage.match(
+            /^data:(.+?);base64,(.+)$/
+          );
 
-      if(!match){
+        if(!match){
 
-        throw new Error(
-          "Reference image format tidak valid"
-        );
+          throw new Error(
+            "Reference image format tidak valid"
+          );
+
+        }
+
+        mimeType =
+          match[1];
+
+        imageBuffer =
+          Buffer.from(
+            match[2],
+            "base64"
+          );
+
+      }else{
+
+        const referenceResponse =
+          await fetch(
+            officialCreativeProductReferenceUrl
+          );
+
+        if(!referenceResponse.ok){
+
+          throw new Error(
+            "Foto resmi produk gagal diambil"
+          );
+
+        }
+
+        mimeType =
+          referenceResponse.headers.get(
+            "content-type"
+          ) || "image/jpeg";
+
+        imageBuffer =
+          Buffer.from(
+            await referenceResponse.arrayBuffer()
+          );
 
       }
 
 
-      const mimeType =
-        match[1];
-
-      const base64Data =
-        match[2];
-
-
-      const imageBuffer =
-        Buffer.from(
-          base64Data,
-          "base64"
-        );
-
-
-      // Node 18+ / Netlify
       const formData =
         new FormData();
 
@@ -4869,9 +5034,19 @@ correct perspective, realistic scale,
 natural contact shadows, reflections,
 lighting interaction and depth.
 
+OFFICIAL PRODUCT:
+${exactProduct?.nama || "Reference subject"}
+
+SKU:
+${exactProduct?.sku || "-"}
+
 USER REQUEST:
 
 ${reply}
+
+Do not replace the official product with a generic
+or similar-looking product. Preserve the exact
+reference product identity.
   `.trim()
 );
 
@@ -5090,26 +5265,13 @@ return {
     image,
 
     products:
-        (
-            intentRoute === "PRODUCT" ||
-            intentRoute === "CREATIVE_PRODUCT"
-        )
+        intentRoute === "PRODUCT"
         ? officialProductList
         : [],
 
-    visualMode:
-        (
-            intentRoute === "PRODUCT" ||
-            intentRoute === "CREATIVE_PRODUCT"
-        )
-        ? visualMode
-        : "none",
+    visualMode,
 
     productSource:
-        (
-            intentRoute === "PRODUCT" ||
-            intentRoute === "CREATIVE_PRODUCT"
-        ) &&
         officialProductList.length
             ? "OFFICIAL_PRODUCT_DATA"
             : null,
