@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-final3">
+<meta name="nexai-ui-version" content="2026.09-v4">
 
 <link rel="icon" href="favicon.png">
 
@@ -12613,7 +12613,7 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-final3">
+<meta name="nexai-ui-version" content="2026.09-v4">
 </head>
 
 <!-- =========================================================
@@ -13932,10 +13932,10 @@ NEXAI
 
         <span class="nexai-copy">
 
-            <strong>Tanya NEXAI</strong>
+            <strong>NEXAI Web Aktif</strong>
 
             <small>
-                Chat langsung di website
+                Kamu sedang memakai NEXAI di website
             </small>
 
         </span>
@@ -23726,6 +23726,16 @@ async function sendAI(){
         formData.append(
             "message",
             text
+        );
+
+        formData.append(
+            "clientTime",
+            new Date().toISOString()
+        );
+
+        formData.append(
+            "clientTimezone",
+            Intl.DateTimeFormat().resolvedOptions().timeZone || ""
         );
 
 

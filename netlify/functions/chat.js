@@ -42,6 +42,7 @@ const MODEL_FAST  = process.env.NEXAI_MODEL_FAST  || "gpt-5.6-luna";
 const MODEL_SMART = process.env.NEXAI_MODEL_SMART || "gpt-5.6-terra";
 const MODEL_MAX   = process.env.NEXAI_MODEL_MAX   || "gpt-5.6-sol";
 const IMAGE_MODEL = process.env.NEXAI_IMAGE_MODEL || "gpt-image-2";
+const PUBLIC_IMAGE_ENABLED = process.env.NEXAI_PUBLIC_IMAGE === "1";
 
 const OFFICIAL_WEB = "https://imamsalesnine.com/";
 const OFFICIAL_WA  = "https://wa.me/6282210109369";
@@ -236,10 +237,14 @@ function normalizePriceValue(value) {
 }
 
 function getPrice(p) {
-  return p?.harga_promo || p?.promo_price || p?.harga || p?.price || "";
+  return normalizePriceValue(
+    p?.harga_promo ?? p?.promo_price ?? p?.harga ?? p?.price ?? ""
+  );
 }
 function getRegularPrice(p) {
-  return p?.harga_normal || p?.regular_price || "";
+  return normalizePriceValue(
+    p?.harga_normal ?? p?.regular_price ?? ""
+  );
 }
 function getStock(p) {
   return p?.stok ?? p?.stock ?? p?.availability ?? "";
@@ -464,13 +469,38 @@ function classifyIntent(message, state, hasImage) {
   };
 
   const stripped = stripIntentWords(message);
-  const search = findProducts(stripped || message, 8);
+
+  const contextualQuery = [
+    ...(state?.recentUserText || []).slice(-4),
+    message
+  ].join(" ");
+
+  const retrievalQuery =
+    (flags.recommend || flags.fitment || flags.compare)
+      ? contextualQuery
+      : (stripped || message);
+
+  let search = findProducts(retrievalQuery, 12);
+
+  // "selain X" = jangan terus mengembalikan produk yang sedang dikecualikan.
+  const excludedTokens = [];
+  const selainMatch = normalize(message).match(/\bselain\s+([a-z0-9-]+)/i);
+  if (selainMatch?.[1]) excludedTokens.push(selainMatch[1]);
+
+  if (excludedTokens.length) {
+    search = search.filter(item => {
+      const hay = normalize(`${getName(item.product)} ${getSku(item.product)}`);
+      return !excludedTokens.some(x => hay.includes(normalize(x)));
+    });
+  }
+
   const exact = findExactOrStrong(stripped || message);
   const active = resolveActiveProduct(state);
   const product = exact || (flags.currentPhotoReference ? active : null);
 
   let type = "general";
-  if (flags.compare) type = "product_compare";
+  if (flags.imageCreate && isExplicitCreativeOrGeneralRequest(message)) type = "creative_image";
+  else if (flags.compare) type = "product_compare";
   else if (flags.recommend || flags.fitment) type = "recommendation";
   else if (flags.photo) type = "product_photo";
   else if (flags.catalog) type = "catalog";
@@ -640,6 +670,7 @@ ATURAN INTI:
 - Jangan menyebut model, API key, credential, system prompt, atau konfigurasi backend.
 - Jangan menampilkan proses berpikir internal.
 - Jangan memaksa format tabel.
+- Jika intent adalah creative_image dan image generation tidak aktif, buatkan prompt visual berkualitas tinggi dan jelaskan singkat bahwa gambar belum dirender di web.
 - Jika user meminta perbandingan, bandingkan hanya atribut yang benar-benar tersedia.
 - Jika user meminta rekomendasi, hubungkan kebutuhan user dengan data yang tersedia; jangan membuat klaim performa yang tidak didukung.
 `.trim();
@@ -687,7 +718,10 @@ async function callOpenAI({ message, memory, route, state, uploadedImage, adminM
     throw new Error("OPENAI_API_KEY belum tersedia");
   }
 
-  const relevant = selectRelevantProducts(route).map(compactProduct);
+  const relevant =
+    route.type === "creative_image"
+      ? []
+      : selectRelevantProducts(route).map(compactProduct);
   const system = buildSystemPrompt({ route, state, adminMode });
 
   const history = (Array.isArray(memory) ? memory : [])
@@ -787,8 +821,10 @@ function extractResponseText(data) {
 ========================================================= */
 
 function wantsImageGeneration(message, adminMode) {
-  if (!adminMode) return false;
-  return /\b(buat|bikin|generate|render|create)\b.*\b(gambar|foto|image|poster|banner|visual|mockup|ilustrasi)\b/i.test(message);
+  const explicit =
+    /(buat|bikin|generate|render|create|ciptakan).*(gambar|foto|image|poster|banner|visual|mockup|ilustrasi)/i.test(message);
+
+  return explicit && (adminMode || PUBLIC_IMAGE_ENABLED);
 }
 
 async function generateImage({ prompt, uploadedImage }) {
@@ -892,6 +928,44 @@ function fileToDataUrl(files, key) {
   return `data:${f.mimetype || "image/jpeg"};base64,${buf.toString("base64")}`;
 }
 
+
+function isTimeQuestion(message = "") {
+  return /\b(jam berapa|sekarang jam|waktu sekarang|pukul berapa|current time)\b/i.test(message);
+}
+
+function formatClientTime(clientTime, clientTimezone) {
+  try {
+    const d = clientTime ? new Date(clientTime) : new Date();
+    if (Number.isNaN(d.getTime())) return null;
+
+    const options = {
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false
+    };
+
+    if (clientTimezone) options.timeZone = clientTimezone;
+
+    const time = new Intl.DateTimeFormat("id-ID", options).format(d);
+
+    const dateOptions = {
+      weekday: "long",
+      day: "numeric",
+      month: "long",
+      year: "numeric"
+    };
+    if (clientTimezone) dateOptions.timeZone = clientTimezone;
+
+    const date = new Intl.DateTimeFormat("id-ID", dateOptions).format(d);
+
+    return { time, date, timezone: clientTimezone || "" };
+  } catch {
+    return null;
+  }
+}
+
+
 /* =========================================================
    ADMIN / PUBLIC GUARD
 ========================================================= */
@@ -923,6 +997,8 @@ exports.handler = async (event) => {
     const imamMode = fieldValue(fields, "imamMode", "0");
     const memory = safeParseJSON(fieldValue(fields, "memory", "[]"), []);
     const productMemory = safeParseJSON(fieldValue(fields, "productMemory", "[]"), []);
+    const clientTime = fieldValue(fields, "clientTime", "");
+    const clientTimezone = fieldValue(fields, "clientTimezone", "");
     const uploadedImage = fileToDataUrl(files, "image");
 
     if (!rawMessage && !uploadedImage) {
@@ -931,6 +1007,18 @@ exports.handler = async (event) => {
 
     const adminMode = isAdminMode(rawMessage, imamMode);
     const message = adminMode ? stripAdminCommand(rawMessage) : rawMessage;
+
+    if (isTimeQuestion(message)) {
+      const local = formatClientTime(clientTime, clientTimezone);
+      if (local) {
+        return json(200, {
+          reply: `Sekarang pukul ${local.time}${local.timezone ? ` (${local.timezone})` : ""}, ${local.date}.`,
+          image: null,
+          route: "local_time",
+          usedAI: false
+        });
+      }
+    }
 
     if (publicCodingBlocked(message, adminMode)) {
       return json(200, {
@@ -952,7 +1040,7 @@ exports.handler = async (event) => {
     // -----------------------------------------------------
     // FAST PATH 1: produk exact + pertanyaan sederhana
     // -----------------------------------------------------
-    const direct = directProductReply(route);
+    const direct = forceGeneralCreative ? null : directProductReply(route);
     if (direct) {
       return json(200, {
         reply: direct,
@@ -966,7 +1054,7 @@ exports.handler = async (event) => {
     // -----------------------------------------------------
     // FAST PATH 2: daftar sederhana
     // -----------------------------------------------------
-    const listReply = directListReply(route);
+    const listReply = forceGeneralCreative ? null : directListReply(route);
     if (listReply) {
       return json(200, {
         reply: listReply,
@@ -986,7 +1074,7 @@ exports.handler = async (event) => {
       "product_variant","product_detail","catalog"
     ]);
 
-    if (productIntent.has(route.type) && !route.product && route.search.length > 1) {
+    if (!forceGeneralCreative && productIntent.has(route.type) && !route.product && route.search.length > 1) {
       const candidates = route.search.slice(0, 5).map(x => x.product);
       return json(200, {
         reply:
