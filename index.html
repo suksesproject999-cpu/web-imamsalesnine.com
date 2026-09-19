@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v7-knowledge-os">
+<meta name="nexai-ui-version" content="2026.09-v8-canonical">
 
 <link rel="icon" href="favicon.png">
 
@@ -12670,7 +12670,7 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v7-knowledge-os">
+<meta name="nexai-ui-version" content="2026.09-v8-canonical">
 </head>
 
 <!-- =========================================================
@@ -25564,5 +25564,84 @@ function openNexaiHybrid(event){
 }
 
 </script>
+
+<script>
+/* ==========================================
+   NEXAI V8 — STRUCTURED PRODUCT RENDERER
+   Backend canonical product payload wins.
+========================================== */
+(function(){
+    window.renderNexaiStructuredProduct = function(data){
+        const p = data && data.product;
+        if(!p || !p.product_id) return null;
+
+        const esc = (v) => typeof escapeAIHtml === "function"
+            ? escapeAIHtml(String(v ?? ""))
+            : String(v ?? "").replace(/[&<>"']/g, s => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[s]));
+
+        const money = (v) => {
+            if(typeof formatNexaiPrice === "function") return formatNexaiPrice(v);
+            return String(v || "");
+        };
+
+        const specs = p.specs || {};
+        const specRows = Object.entries(specs)
+            .filter(([k]) => k !== "_catalog_page")
+            .map(([k,v]) => `<div class="ai-product-item"><strong>${esc(k)}</strong><br>${esc(Array.isArray(v)?v.join(", "):v)}</div>`)
+            .join("");
+
+        const variants = Array.isArray(p.variants) && p.variants.length
+            ? `<div class="ai-product-item"><strong>Varian</strong><div class="variant-container">${p.variants.map(v=>`<span class="variant-chip">${esc(v)}</span>`).join("")}</div></div>`
+            : "";
+
+        const photo = p.visual && p.visual.main
+            ? `<div class="ai-product-image-wrap"><img class="ai-product-image" src="${esc(p.visual.main)}" alt="${esc(p.name)}" loading="lazy"></div>`
+            : "";
+
+        let html = `<div class="ai-product-card"><div class="ai-product-title">${esc(p.name)}</div>`;
+
+        // Foto hanya muncul untuk route yang meminta visual/detail penuh.
+        if(["product_photo","product_photo_spec","product_detail"].includes(data.route) && photo) html += photo;
+
+        if(p.brand) html += `<div class="ai-product-item"><strong>Brand</strong><br>${esc(p.brand)}</div>`;
+        if(p.category) html += `<div class="ai-product-item"><strong>Kategori</strong><br>${esc(p.category)}</div>`;
+        if(p.sku) html += `<div class="ai-product-item"><strong>SKU</strong><br>${esc(p.sku)}</div>`;
+
+        if(["product_price","product_detail"].includes(data.route)){
+            if(p.regular_price && p.price && p.regular_price !== p.price){
+                html += `<div class="ai-product-item"><strong>Harga Normal</strong><br>${esc(money(p.regular_price))}</div>`;
+                html += `<div class="ai-product-item"><strong>Harga Promo</strong><br>${esc(money(p.price))}</div>`;
+            }else if(p.price){
+                html += `<div class="ai-product-item"><strong>Harga</strong><br>${esc(money(p.price))}</div>`;
+            }
+            if(p.stock !== undefined && p.stock !== "") html += `<div class="ai-product-item"><strong>Stok</strong><br>${esc(p.stock)}</div>`;
+        }
+
+        if(["product_variant","product_detail"].includes(data.route)) html += variants;
+        if(["product_spec","product_photo_spec"].includes(data.route)) html += specRows || `<div class="ai-product-item">Spesifikasi teknis belum tersedia.</div>`;
+
+        if(data.route === "catalog_page" && p.visual && p.visual.full_page){
+            html += `<div class="ai-product-image-wrap"><img class="ai-product-image" src="${esc(p.visual.full_page)}" alt="Halaman katalog ${esc(p.name)}" loading="lazy"></div>`;
+        }
+
+        if(data.route === "product_detail" && p.description){
+            html += `<div class="ai-product-item"><strong>Deskripsi</strong><br>${esc(p.description)}</div>`;
+        }
+
+        html += `</div>`;
+        return html;
+    };
+
+    if(typeof window.renderNexaiReply === "function"){
+        const original = window.renderNexaiReply;
+        window.renderNexaiReply = function(data){
+            const structured = window.renderNexaiStructuredProduct(data);
+            if(structured) return structured;
+            return original(data);
+        };
+    }
+})();
+</script>
+
 </body>
 </html>

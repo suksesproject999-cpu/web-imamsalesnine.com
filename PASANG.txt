@@ -1,0 +1,35 @@
+NEXAI FINAL V8 — CANONICAL IDENTITY ENGINE
+
+TUJUAN:
+Membuat salah-identitas produk secara arsitektural jauh lebih sulit.
+
+PRINSIP:
+1. SKU/alias eksplisit di pesan user selalu menang atas memory produk sebelumnya.
+2. Setelah produk ditemukan, semua sumber memakai product_id canonical yang sama.
+3. Visual tidak lagi dicari dengan fuzzy text.
+4. Katalog memakai catalog_page canonical terlebih dahulu.
+5. Frontend merender object `product` terstruktur dari backend, bukan menebak ulang dari teks jawaban.
+6. Fuzzy search hanya untuk pencarian/rekomendasi, bukan untuk exact product query.
+
+PASANG:
+- index.html -> root project
+- data/* -> root/data/
+- netlify/functions/chat.js -> replace
+- netlify/functions/nexai/* -> replace
+- produk.json lama TETAP di root untuk harga/stok/data live.
+- Deploy ulang Netlify lalu hard refresh.
+
+SELF TEST:
+node SELFTEST.js
+
+Test wajib PASS:
+- harga R9 -> r9
+- foto R9 -> r9
+- V9 ada -> v9
+- foto Z2 dan spek lengkap -> z2
+- spek Z2 -> z2
+- foto saklar HB8S -> saklar-hb8s
+
+CATATAN:
+Tidak ada sistem yang secara realistis bisa dijamin "sempurna" untuk semua input.
+V8 memprioritaskan correctness identity, source routing, dan structured rendering agar bug seperti Z2 berubah menjadi HB8S tidak terjadi dari matcher/renderer.

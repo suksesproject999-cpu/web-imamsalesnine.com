@@ -11,8 +11,7 @@ function safeLoad(rel, fallback){
   }
 }
 
-const master = safeLoad("data/product_master.json",{products:[]});
-const visuals = safeLoad("data/visuals.json",{visuals:{}});
+const registry = safeLoad("data/product_registry.json",{products:{}});
 const catalog = safeLoad("data/catalog_specs.json",{pages:[]});
 const brands = safeLoad("data/brands.json",{});
 const business = safeLoad("data/business.json",{});
@@ -42,6 +41,46 @@ function money(v){
   const n=s.replace(/[^\d]/g,"");
   return n ? "Rp"+Number(n).toLocaleString("id-ID") : s;
 }
+
+const products = Object.values(registry.products||{});
+
+function aliasList(p){
+  return [...new Set([p.product_id,p.sku,p.name,...arr(p.aliases)].filter(Boolean).map(normalize))];
+}
+
+// Canonical entity resolver:
+// 1. explicit alias/SKU anywhere in message (longest match wins)
+// 2. exact whole-query alias
+// 3. active product only when NO explicit product mention
+function resolveMention(message){
+  const q = ` ${normalize(message)} `;
+  const candidates=[];
+
+  for(const p of products){
+    for(const alias of aliasList(p)){
+      if(!alias) continue;
+
+      const forms = [...new Set([
+        alias,
+        alias.replace(/[-/.+]+/g," ").replace(/\s+/g," ").trim()
+      ])].filter(Boolean);
+
+      for(const form of forms){
+        const escaped=form.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+        const re=new RegExp(`(^|\\s)${escaped}(?=\\s|$|[,.!?/+-])`,"i");
+        if(re.test(q.trim())){
+          candidates.push({
+            p,
+            alias:form,
+            weight:form.length + (alias===normalize(p.sku)?10000:0)
+          });
+        }
+      }
+    }  }
+  candidates.sort((a,b)=>b.weight-a.weight);
+  return candidates[0]?.p || null;
+}
+
 function legacyMatch(p){
   const sku=normalize(p.sku), name=normalize(p.name);
   return legacy.find(x=>{
@@ -49,28 +88,34 @@ function legacyMatch(p){
     return (sku&&xs&&sku===xs)||(name&&xn&&name===xn);
   })||null;
 }
-function visualFor(p){ return visuals.visuals[p.product_id]||{}; }
 
 function catalogFor(p){
-  const byPage = p.catalog_page ? catalog.pages.find(x=>String(x.page)===String(p.catalog_page)) : null;
-  if(byPage && Object.keys(byPage.specs||{}).length) return {...byPage.specs,_catalog_page:byPage.page};
+  const byPage = p.catalog_page
+    ? (catalog.pages||[]).find(x=>String(x.page)===String(p.catalog_page))
+    : null;
+  if(byPage && Object.keys(byPage.specs||{}).length){
+    return {...byPage.specs,_catalog_page:byPage.page};
+  }
 
+  // Fallback only if no canonical page exists.
   const keys=[p.name,p.sku,...arr(p.aliases)].map(normalize).filter(Boolean);
-  let best=null, score=0;
+  let best=null,score=0;
   for(const page of catalog.pages||[]){
     const hay=normalize(page.search_text);
     let s=0;
     for(const k of keys){
-      if(k.length>=2 && hay.includes(k)) s += k===normalize(p.sku)?1200:500;
+      if(!k || k.length<2) continue;
+      if(hay===k) s+=2000;
+      else if(hay.includes(k)) s += k===normalize(p.sku)?1200:400;
     }
     if(s>score){score=s;best=page;}
   }
-  return best && score>=500 ? {...(best.specs||{}),_catalog_page:best.page} : {};
+  return best&&score>=1000?{...(best.specs||{}),_catalog_page:best.page}:{};
 }
 
 function fullProduct(p){
+  if(!p) return null;
   const live=legacyMatch(p)||{};
-  const vis=visualFor(p);
   return {
     product_id:p.product_id,
     name:p.name,
@@ -85,46 +130,67 @@ function fullProduct(p){
     stock:live.stok ?? live.stock ?? live.availability ?? "",
     specs:catalogFor(p),
     visual:{
-      main:vis.main||live.gambar||live.image||"",
-      additional:vis.additional||[],
-      full_page:vis.full_page||"",
-      catalog_page:vis.catalog_page||p.catalog_page||null
+      main:p.visual?.main||live.gambar||live.image||"",
+      additional:p.visual?.additional||[],
+      full_page:p.visual?.full_page||"",
+      catalog_page:p.visual?.catalog_page||p.catalog_page||null
     }
   };
 }
+
+function byIdentity(identity){
+  const n=normalize(identity);
+  const p=products.find(p=>aliasList(p).includes(n));
+  return fullProduct(p);
+}
+
+function exactProduct(message){
+  return fullProduct(resolveMention(message));
+}
+
 function score(p,q){
-  const query=normalize(q), tokens=query.split(/\s+/).filter(x=>x.length>1);
-  const hay=normalize([
-    p.name,p.sku,...arr(p.aliases),...arr(p.variants),
-    JSON.stringify(catalogFor(p))
-  ].join(" "));
+  const query=normalize(q);
+  const tokens=query.split(/\s+/).filter(x=>x.length>1);
+  const specs=JSON.stringify(catalogFor(p));
+  const hay=normalize([p.name,p.sku,...arr(p.aliases),...arr(p.variants),specs].join(" "));
   let s=0;
-  if(query===normalize(p.sku)||query===normalize(p.name)) s+=3000;
-  if(query && hay.includes(query)) s+=700;
-  for(const t of tokens) if(hay.includes(t)) s+=70;
+  if(aliasList(p).includes(query)) s+=5000;
+  for(const token of tokens){
+    if(normalize(p.sku)===token) s+=1800;
+    if(hay.includes(token)) s+=80;
+  }
   return s;
 }
+
 function searchProducts(q,limit=8,exclude=[]){
   const ex=exclude.map(normalize);
-  return (master.products||[])
+  return products
     .map(p=>({p,score:score(p,q)}))
-    .filter(x=>x.score>0 && !ex.some(e=>e && normalize(`${x.p.name} ${x.p.sku}`).includes(e)))
+    .filter(x=>x.score>0 && !ex.some(e=>e&&normalize(`${x.p.name} ${x.p.sku}`).includes(e)))
     .sort((a,b)=>b.score-a.score)
     .slice(0,limit)
     .map(x=>fullProduct(x.p));
 }
-function exactProduct(q){
-  const n=normalize(q);
-  const p=(master.products||[]).find(p=>[p.name,p.sku,...arr(p.aliases)].map(normalize).includes(n));
-  return p?fullProduct(p):null;
-}
-function byIdentity(identity){
-  const n=normalize(identity);
-  const p=(master.products||[]).find(p=>normalize(p.product_id)===n||normalize(p.sku)===n||normalize(p.name)===n);
-  return p?fullProduct(p):null;
+
+function productPayload(p){
+  if(!p) return null;
+  return {
+    product_id:p.product_id,
+    name:p.name,
+    sku:p.sku,
+    brand:p.brand,
+    category:p.category,
+    price:p.price,
+    regular_price:p.regular_price,
+    stock:p.stock,
+    variants:p.variants,
+    description:p.description,
+    specs:p.specs,
+    visual:p.visual
+  };
 }
 
 module.exports={
-  normalize,money,searchProducts,exactProduct,byIdentity,
+  normalize,money,resolveMention,exactProduct,byIdentity,searchProducts,productPayload,
   brands,business,policy,fitment
 };
