@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v5-catalog">
+<meta name="nexai-ui-version" content="2026.09-v6-global-intelligence">
 
 <link rel="icon" href="favicon.png">
 
@@ -12614,6 +12614,21 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
     }
 }
 
+
+/* NEXAI WEB RESEARCH BADGE */
+.nexai-research-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+    padding:5px 9px;
+    border-radius:999px;
+    background:#eef8df;
+    color:#5f8f25;
+    font-size:11px;
+    font-weight:700;
+}
+
 </style>
 
 
@@ -12655,7 +12670,7 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v5-catalog">
+<meta name="nexai-ui-version" content="2026.09-v6-global-intelligence">
 </head>
 
 <!-- =========================================================
@@ -23887,6 +23902,15 @@ async function sendAI(){
 
         let aiOutput =
             renderNexaiReply(data);
+
+        if(data.usedWeb === true){
+            aiOutput =
+                `<div class="nexai-research-badge">
+                    <i class="fa-solid fa-globe"></i>
+                    Riset web global
+                </div>` +
+                aiOutput;
+        }
 
 
         if(data.image){
