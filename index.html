@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v8-canonical">
+<meta name="nexai-ui-version" content="2026.09-v8.1-stable">
 
 <link rel="icon" href="favicon.png">
 
@@ -12670,7 +12670,21 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v8-canonical">
+<meta name="nexai-ui-version" content="2026.09-v8.1-stable">
+
+<script>
+/* NEXAI V8.1 — one-time session memory migration */
+(function(){
+    const schema = "v8.1";
+    if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
+        sessionStorage.removeItem("imamAIHistory");
+        sessionStorage.removeItem("imamAIProductMemory");
+        sessionStorage.removeItem("nexaiHybridState");
+        sessionStorage.setItem("nexaiMemorySchema", schema);
+    }
+})();
+</script>
+
 </head>
 
 <!-- =========================================================

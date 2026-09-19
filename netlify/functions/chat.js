@@ -47,6 +47,18 @@ function stateFrom(memory,productMemory,message){
   }
   return st;
 }
+
+function smalltalkReply(message){
+  const m=K.normalize(message);
+  if(/^broo*$/.test(m)) return "Siap bro 👋 Mau tanya apa?";
+  if(/^(halo|hai|hi|hello)$/.test(m)) return "Halo bro 👋 Mau tanya produk Nine, otomotif, fitment, atau hal lain?";
+  if(/^(gas|gaskeun)$/.test(m)) return "Gas bro. Mau lanjut bahas produk, spek, foto, fitment, atau pertanyaan lain?";
+  if(/^(makasih|terima kasih|thanks)$/.test(m)) return "Sama-sama bro 👌";
+  if(/^(oke|ok|sip|siap)$/.test(m)) return "Siap bro.";
+  if(/^(pagi|siang|sore|malam)$/.test(m)) return `Selamat ${m}, bro 👋`;
+  return "Siap bro 👋";
+}
+
 function publicState(st,p){
   const x=p||(st.activeProduct?K.byIdentity(st.activeProduct.product_id||st.activeProduct.sku||st.activeProduct.name):null);
   return {
@@ -115,6 +127,18 @@ exports.handler=async(event)=>{
 
     const state=stateFrom(memory,productMemory,message);
     const route=Router.classify(message,state);
+
+    if(route.type==="smalltalk"){
+      return jsonResp(200,{
+        reply:smalltalkReply(message),
+        image:null,
+        route:"smalltalk",
+        source:"local_smalltalk",
+        usedAI:false,
+        state:publicState(state,null)
+      });
+    }
+
     const fast=direct(route);
 
     if(fast){

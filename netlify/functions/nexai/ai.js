@@ -70,12 +70,19 @@ SOURCE POLICY WAJIB:
 
 Jangan pernah memakai web untuk menimpa fakta resmi produk Nine.
 Untuk fitment, cari data kendaraan di web lalu panggil search_nine_products untuk mencocokkan produk Nine.
+Jangan pernah menebak jenis produk Nine dari pengetahuan umum atau asosiasi merek. Jika produk Nine disebut, gunakan data lokal/tool.
+Jangan menyebut produk Nine sebagai sepatu, helm, apparel, atau kategori lain kecuali data resmi memang menyatakan demikian.
+Jika user hanya menyapa atau memberi respons singkat, jangan membawa topik produk lama secara spontan.
 Jangan menjamin plug-and-play tanpa bukti kuat.
 Jika data tidak cukup, katakan batasannya.
 Jangan mengarang angka/spesifikasi/fitment.
 Jangan tampilkan proses berpikir internal.`;
 
-  const hist=(Array.isArray(memory)?memory:[]).filter(x=>x&&["user","assistant"].includes(x.role)&&typeof x.content==="string").slice(-6).map(x=>({role:x.role,content:x.content.slice(0,2500)}));
+  const historyLimit = route.type==="general" ? 2 : 6;
+  const hist=(Array.isArray(memory)?memory:[])
+    .filter(x=>x&&["user","assistant"].includes(x.role)&&typeof x.content==="string")
+    .slice(-historyLimit)
+    .map(x=>({role:x.role,content:x.content.slice(0,2500)}));
   const user=[{type:"input_text",text:`USER_MESSAGE:\n${message}\n\nSTATE:\n${JSON.stringify(state||{})}\nROUTE:${route.type}`}];
   if(image) user.push({type:"input_image",image_url:image});
   let input=[...hist,{role:"user",content:user}];

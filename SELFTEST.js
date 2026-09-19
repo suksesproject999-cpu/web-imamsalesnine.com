@@ -7,7 +7,9 @@ const tests=[
   ["v9 ada","v9","product_stock"],
   ["foto z2 dan spek lengkap","z2","product_photo_spec"],
   ["spek z2","z2","product_spec"],
-  ["foto saklar hb8s","saklar-hb8s","product_photo"]
+  ["foto saklar hb8s","saklar-hb8s","product_photo"],
+  ["bro",null,"smalltalk"],
+  ["gas",null,"smalltalk"]
 ];
 let failed=0;
 for(const [q,pid,type] of tests){

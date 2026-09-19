@@ -14,7 +14,8 @@ function classify(message,state={}){
     compare:/\b(vs|versus|beda|perbedaan|bandingkan|bandingin)\b/.test(m),
     fitment:/\b(cocok|fitment|socket|soket|wiring|plug.?and.?play|buat .*20\d{2}|pakai apa)\b/.test(m),
     web:/\b(cari web|cari online|internet|google|browsing|terbaru|latest|hari ini|update|berita)\b/.test(m),
-    creative:/\b(buat|bikin|generate|render|ciptakan)\b.*\b(foto|gambar|image|poster|banner|visual|ilustrasi)\b/.test(m)
+    creative:/\b(buat|bikin|generate|render|ciptakan)\b.*\b(foto|gambar|image|poster|banner|visual|ilustrasi)\b/.test(m),
+    smalltalk:/^(bro|broo+|halo|hai|hi|hello|gas|gaskeun|pagi|siang|sore|malam|makasih|terima kasih|thanks|oke|ok|sip|siap)[.!?\s]*$/.test(m)
   };
 
   // Explicit entity always wins over active memory.
@@ -30,7 +31,8 @@ function classify(message,state={}){
   }
 
   let type="general";
-  if(flags.time) type="local_time";
+  if(flags.smalltalk) type="smalltalk";
+  else if(flags.time) type="local_time";
   else if(flags.creative) type="creative_image";
   else if(flags.fitment) type="fitment";
   else if(flags.compare) type="compare";
@@ -64,7 +66,8 @@ function sourceFor(route){
     compare:"canonical_product_data_plus_ai",
     web_general:"web",
     general:"ai",
-    creative_image:"image_ai"
+    creative_image:"image_ai",
+    smalltalk:"local_smalltalk"
   };
   return map[route.type]||"ai";
 }
