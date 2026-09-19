@@ -803,6 +803,66 @@ body.productMemory
     : body.productMemory
   )
 : [];
+
+
+// ==================================================
+// VISUAL MEMORY CONTEXT — RUNTIME SAFE
+// ==================================================
+// WAJIB dideklarasikan sebelum systemPrompt memakainya.
+
+const visualMemoryContext =
+    (
+        Array.isArray(productMemory) &&
+        productMemory.length > 0
+    )
+    ? `
+
+==================================================
+PREVIOUS PRODUCT VISUAL CONTEXT
+==================================================
+
+Produk yang sebelumnya ditampilkan kepada user:
+
+${productMemory
+    .slice(-8)
+    .map(item => `
+Nama Produk: ${item?.nama || "-"}
+Brand: ${item?.brand || "-"}
+SKU: ${item?.sku || "-"}
+Gambar: ${item?.gambar || "-"}
+Varian: ${item?.varian || "-"}
+Harga: ${
+    typeof item?.harga === "object"
+        ? JSON.stringify(item.harga)
+        : (item?.harga || "-")
+}
+`).join("\n")}
+
+Gunakan konteks ini HANYA bila user jelas merujuk
+produk yang sebelumnya sudah dibahas/ditampilkan.
+
+Contoh:
+- "yang tadi"
+- "fotonya"
+- "harganya"
+- "stoknya"
+- "produk tadi"
+- "yang pertama"
+- "yang kedua"
+
+Jika user mengganti topik ke:
+- pertanyaan umum
+- otomotif umum
+- waktu/tanggal
+- creative request baru
+- topik lain yang tidak terkait produk sebelumnya
+
+maka ABAIKAN konteks produk lama.
+
+==================================================
+
+`
+    : "";
 		
 
 const orders =
@@ -4488,6 +4548,13 @@ routing, model, backend, atau akses internal.
 // =====================
 // PREVIOUS PRODUCT MEMORY
 // =====================
+
+console.log(
+    "VISUAL MEMORY ITEMS:",
+    Array.isArray(productMemory)
+        ? productMemory.length
+        : 0
+);
 
 systemPrompt += visualMemoryContext;
 
