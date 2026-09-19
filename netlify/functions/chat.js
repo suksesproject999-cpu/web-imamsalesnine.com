@@ -643,7 +643,9 @@ async function callOpenAI({ message, memory, route, state, uploadedImage, adminM
     .slice(-6)
     .map(x => ({
       role: x.role,
-      content: [{ type: "input_text", text: x.content.slice(0, 2500) }]
+      // Responses API menerima string langsung untuk history.
+      // Jangan pakai input_text pada role assistant karena akan ditolak.
+      content: x.content.slice(0, 2500)
     }));
 
   const structured = {
@@ -706,7 +708,7 @@ ${JSON.stringify(structured)}`
 
   if (!response.ok) {
     console.error("OPENAI ERROR:", raw);
-    throw new Error(data?.error?.message || "OpenAI request gagal");
+    throw new Error(data?.error?.message || data?.message || "OpenAI request gagal");
   }
 
   const reply = extractResponseText(data);
