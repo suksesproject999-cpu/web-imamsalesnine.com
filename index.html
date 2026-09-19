@@ -12613,6 +12613,7 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
+<meta name="nexai-ui-version" content="2026.09-final2">
 </head>
 
 <!-- =========================================================
@@ -13934,7 +13935,7 @@ NEXAI
             <strong>Tanya NEXAI</strong>
 
             <small>
-                Login ChatGPT diperlukan
+                Chat langsung di website
             </small>
 
         </span>
@@ -14005,7 +14006,7 @@ NEXAI
     title="Buka NEXAI versi ChatGPT"
 >
     <i class="fa-solid fa-up-right-from-square"></i>
-    <span>Buka NEXAI versi ChatGPT</span>
+    <span>NEXAI versi ChatGPT (opsional)</span>
 </a>
 
 
@@ -23205,6 +23206,60 @@ function saveAIHistory(){
 // PRODUCT LOOKUP LOKAL
 // ==========================================
 
+
+function formatNexaiPrice(value){
+
+    if(value === null || value === undefined || value === ""){
+        return "";
+    }
+
+    if(typeof value === "number"){
+        return "Rp" + Math.round(value).toLocaleString("id-ID");
+    }
+
+    if(typeof value === "string"){
+        const v = value.trim();
+        if(!v) return "";
+        if(/^rp/i.test(v)) return v;
+
+        const numeric = v.replace(/[^\d]/g, "");
+        return numeric
+            ? "Rp" + Number(numeric).toLocaleString("id-ID")
+            : v;
+    }
+
+    if(typeof value === "object"){
+
+        const preferred =
+            value.promo ??
+            value.harga_promo ??
+            value.sale ??
+            value.current ??
+            value.final ??
+            value.price ??
+            value.harga ??
+            value.normal ??
+            value.regular;
+
+        if(preferred !== undefined){
+            return formatNexaiPrice(preferred);
+        }
+
+        const primitive =
+            Object.values(value).find(v =>
+                typeof v === "string" ||
+                typeof v === "number"
+            );
+
+        return primitive !== undefined
+            ? formatNexaiPrice(primitive)
+            : "";
+    }
+
+    return "";
+}
+
+
 function normalizeAIProductKey(value){
 
     return String(value || "")
@@ -23327,9 +23382,11 @@ function syncNexaiState(data){
                 "",
 
             harga:
-                local?.harga_promo ||
-                local?.harga ||
-                ""
+                formatNexaiPrice(
+                    local?.harga_promo ||
+                    local?.harga ||
+                    ""
+                )
 
         };
 
@@ -23469,9 +23526,11 @@ function renderNexaiActiveProductCard(data){
                 : (local.varian || ""),
 
         "Harga":
-            local.harga_promo ||
-            local.harga ||
-            "",
+            formatNexaiPrice(
+                local.harga_promo ||
+                local.harga ||
+                ""
+            ),
 
         "Deskripsi":
             local.deskripsi || "",

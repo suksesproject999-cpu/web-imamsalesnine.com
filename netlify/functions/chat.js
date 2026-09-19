@@ -196,6 +196,45 @@ function getSku(p) {
 function getImage(p) {
   return p?.gambar || p?.image || p?.foto || p?.foto_utama || "";
 }
+
+function normalizePriceValue(value) {
+  if (value === null || value === undefined || value === "") return "";
+
+  if (typeof value === "number") {
+    return `Rp${Math.round(value).toLocaleString("id-ID")}`;
+  }
+
+  if (typeof value === "string") {
+    const v = value.trim();
+    if (!v) return "";
+    if (/^rp/i.test(v)) return v;
+    const numeric = v.replace(/[^\d]/g, "");
+    return numeric ? `Rp${Number(numeric).toLocaleString("id-ID")}` : v;
+  }
+
+  if (typeof value === "object") {
+    const preferred =
+      value.promo ??
+      value.harga_promo ??
+      value.sale ??
+      value.current ??
+      value.final ??
+      value.price ??
+      value.harga ??
+      value.normal ??
+      value.regular;
+
+    if (preferred !== undefined) return normalizePriceValue(preferred);
+
+    const firstPrimitive = Object.values(value).find(
+      v => typeof v === "string" || typeof v === "number"
+    );
+    return firstPrimitive !== undefined ? normalizePriceValue(firstPrimitive) : "";
+  }
+
+  return "";
+}
+
 function getPrice(p) {
   return p?.harga_promo || p?.promo_price || p?.harga || p?.price || "";
 }
@@ -389,6 +428,19 @@ function stripIntentWords(text) {
     .replace(/\b(harga|price|stok|ready|tersedia|foto|gambar|lihat|tampilkan|tunjukkan|spek|spec|spesifikasi|fitur|varian|warna|sku|kode|detail|produk|berapa|dong|bro|gan|mas)\b/gi, " ")
     .replace(/\s+/g, " ")
     .trim();
+}
+
+
+function isExplicitCreativeOrGeneralRequest(message = "") {
+  const q = normalizeText(message);
+
+  // Permintaan membuat visual/gambar umum, bukan permintaan foto produk.
+  const creativeImage =
+    /\b(buat|bikin|generate|ciptakan|gambar|ilustrasi|render|visualisasikan)\b/.test(q) &&
+    /\b(foto|gambar|image|ilustrasi|poster|logo|semut|kucing|anjing|orang|pemandangan|karakter)\b/.test(q) &&
+    !/\b(produk|nine|sku|katalog|harga|stok|varian|spesifikasi|spek)\b/.test(q);
+
+  return creativeImage;
 }
 
 function classifyIntent(message, state, hasImage) {
@@ -891,6 +943,11 @@ exports.handler = async (event) => {
 
     const state = deriveState(memory, productMemory, message);
     const route = classifyIntent(message, state, Boolean(uploadedImage));
+
+    // Creative/general request guard:
+    // jangan paksa query umum masuk ke matcher produk hanya karena ada token yang kebetulan mirip.
+    const forceGeneralCreative = isExplicitCreativeOrGeneralRequest(message);
+
 
     // -----------------------------------------------------
     // FAST PATH 1: produk exact + pertanyaan sederhana
