@@ -1,0 +1,48 @@
+NEXAI FINAL V9 STABLE — SIMPLE ARCHITECTURE
+
+V9 sengaja membuang over-engineering V7/V8.
+
+SUMBER DATA:
+1. produk.json / URL produk resmi website
+   -> identitas produk, SKU, harga, stok, varian, deskripsi, foto.
+2. netlify/functions/data/catalog_specs.json
+   -> spesifikasi teknis resmi hasil ekstraksi katalog.
+3. Web search
+   -> hanya fitment kendaraan, socket, generasi, market, dan info aktual.
+4. AI
+   -> reasoning/general question, bukan database produk.
+
+ATURAN STABILITAS:
+- Exact SKU/nama/alias dicek dari produk.json sebelum AI.
+- Harga/stok/foto/spek/varian dijawab tanpa AI bila produk ditemukan.
+- Jika produk.json gagal dimuat, backend error jelas; AI tidak boleh mengarang.
+- Tidak ada Product Master, canonical registry, visuals registry, atau duplikasi identity data.
+- produk.json dicache 60 detik agar cepat tetapi data live tetap segar.
+- Jika file lokal produk.json tidak terbaca di runtime, backend fallback ke:
+  https://imamsalesnine.com/produk.json
+- catalog_specs.json dibundle langsung bersama Netlify Function agar path runtime stabil.
+
+PASANG:
+1. index.html -> root website.
+2. netlify/functions/chat.js -> replace.
+3. netlify/functions/data/catalog_specs.json -> copy persis.
+4. produk.json lama tetap di root.
+5. Deploy ulang Netlify.
+6. Hard refresh browser.
+
+TEST PRODUCTION:
+node SELFTEST.js https://imamsalesnine.com/.netlify/functions/chat
+
+EXPECTED:
+PASS Bro -> smalltalk
+PASS Harga R9 berapa -> product_price R9
+PASS Foto R9 -> product_photo R9
+PASS Spek Z2 -> product_spec Z2
+PASS Foto Z2 dan spek lengkap -> product_photo_spec Z2
+
+ENV:
+OPENAI_API_KEY
+NEXAI_MODEL_FAST (opsional)
+NEXAI_MODEL_SMART (opsional)
+NEXAI_PUBLIC_IMAGE=1 (opsional)
+NEXAI_PRODUCT_JSON_URL (opsional)

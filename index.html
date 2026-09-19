@@ -20,6 +20,8 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="robots" content="index,follow">
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
+<meta name="nexai-hybrid-version" content="2026.09-final">
+<meta name="nexai-ui-version" content="2026.09-v9-stable">
 
 <link rel="icon" href="favicon.png">
 
@@ -12532,6 +12534,101 @@ html.imam-sales-loader-seen #pageLoader{
 }
 @media(prefers-reduced-motion:reduce){.promo-slider-track{transition:none!important}}
 
+
+/* ==========================================
+   NEXAI CHATGPT SECONDARY LINK
+========================================== */
+.nexai-chatgpt-secondary{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    margin-top:8px;
+    padding:8px 12px;
+    border-radius:12px;
+    color:#6f7d64;
+    text-decoration:none;
+    font-size:11px;
+    font-weight:700;
+    transition:.2s ease;
+}
+
+.nexai-chatgpt-secondary:hover{
+    background:#f4f8ef;
+    color:#6fa52d;
+}
+
+.nexai-chatgpt-secondary i{
+    font-size:11px;
+}
+
+body.dark-mode .nexai-chatgpt-secondary{
+    color:#aeb6c2;
+}
+
+body.dark-mode .nexai-chatgpt-secondary:hover{
+    background:rgba(140,198,63,.08);
+    color:#9ddd4d;
+}
+
+
+/* ==========================================
+   NEXAI PRODUCT PHOTO — FULL IMAGE, NO CROP
+========================================== */
+.ai-product-image-wrap{
+    width:100% !important;
+    height:auto !important;
+    min-height:0 !important;
+    max-height:none !important;
+    overflow:visible !important;
+    padding:10px !important;
+    background:#f7f7f7 !important;
+}
+
+.ai-product-image-wrap img.ai-product-image{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-width:100% !important;
+    max-height:520px !important;
+    object-fit:contain !important;
+    object-position:center center !important;
+    margin:auto !important;
+}
+
+@media(max-width:768px){
+    .ai-product-image-wrap{
+        height:auto !important;
+        min-height:0 !important;
+        max-height:none !important;
+        overflow:visible !important;
+    }
+
+    .ai-product-image-wrap img.ai-product-image{
+        width:100% !important;
+        height:auto !important;
+        max-width:100% !important;
+        max-height:420px !important;
+        object-fit:contain !important;
+    }
+}
+
+
+/* NEXAI WEB RESEARCH BADGE */
+.nexai-research-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:6px;
+    margin-bottom:8px;
+    padding:5px 9px;
+    border-radius:999px;
+    background:#eef8df;
+    color:#5f8f25;
+    font-size:11px;
+    font-weight:700;
+}
+
 </style>
 
 
@@ -12572,6 +12669,21 @@ html.imam-sales-loader-seen #pageLoader{
 </script>
 
 
+
+<meta name="nexai-ui-version" content="2026.09-v9-stable">
+
+<script>
+/* NEXAI V9 — one-time clean migration */
+(function(){
+  const schema = "v9-stable";
+  if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
+    sessionStorage.removeItem("imamAIHistory");
+    sessionStorage.removeItem("imamAIProductMemory");
+    sessionStorage.removeItem("nexaiHybridState");
+    sessionStorage.setItem("nexaiMemorySchema", schema);
+  }
+})();
+</script>
 
 </head>
 
@@ -13809,7 +13921,7 @@ box-shadow:0 0 8px #35d04b;
 
 <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-Imam AI
+NEXAI
 
 </h2>
 
@@ -13829,8 +13941,8 @@ Imam AI
             <div class="ai-message bot">
 
                 Halo 👋<br>
-                Saya Imam AI.<br>
-                Silakan tanyakan produk Nine Autoseries.
+                Saya NEXAI.<br>
+                Silakan tanya produk Nine, otomotif, atau hal lainnya.
 
             </div>
 
@@ -13860,11 +13972,10 @@ Imam AI
 
     <!-- NEXAI CTA -->
     <a
-        href="https://chatgpt.com/g/g-6aa8c41eb5bc81919bd15e57cd104b75-nexai"
-        class="nexai-cta"
+        
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Tanya NEXAI">
+        aria-label="Tanya NEXAI" class="nexai-cta" href="#" onclick="openNexaiHybrid(event)">
 
         <span class="nexai-icon">
 
@@ -13892,10 +14003,10 @@ Imam AI
 
         <span class="nexai-copy">
 
-            <strong>Tanya NEXAI</strong>
+            <strong>NEXAI Web Aktif</strong>
 
             <small>
-                Login ChatGPT diperlukan
+                Kamu sedang memakai NEXAI di website
             </small>
 
         </span>
@@ -13957,6 +14068,18 @@ Imam AI
         </span>
 
     </a>
+
+<a
+    class="nexai-chatgpt-secondary"
+    href="https://chatgpt.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Buka NEXAI versi ChatGPT"
+>
+    <i class="fa-solid fa-up-right-from-square"></i>
+    <span>NEXAI versi ChatGPT (opsional)</span>
+</a>
+
 
 								</div>
 
@@ -22764,7 +22887,7 @@ function renderProductGrid(result){
     ${result.products.map(product => {
 
         const productName =
-    String(p["Nama Produk"] || "")
+    String(product["Nama Produk"] || "")
         .replace(/<[^>]*>/g, "")
         .replace(/\*\*/g, "")
         .replace(/__/g, "")
@@ -23084,7 +23207,8 @@ function renderAIReply(reply){
 
 
 // ==========================================
-// IMAM AI - CONVERSATION MEMORY
+// NEXAI HYBRID — CONVERSATION + STATE MEMORY
+// Sinkron dengan chat_nexai_hybrid_final.js
 // ==========================================
 
 let aiConversationHistory =
@@ -23092,27 +23216,44 @@ let aiConversationHistory =
         sessionStorage.getItem("imamAIHistory") || "[]"
     );
 
-
-	let aiProductMemory =
+let aiProductMemory =
     JSON.parse(
         sessionStorage.getItem("imamAIProductMemory") || "[]"
     );
 
-
-
+let nexaiHybridState =
+    JSON.parse(
+        sessionStorage.getItem("nexaiHybridState") || "{}"
+    );
 
 let imamMode =
     sessionStorage.getItem("imamMode") === "1";
-	
 
-// Batasi history agar request tidak terlalu besar
+let aiRequestBusy = false;
+
+
+// ==========================================
+// MEMORY — RINGKAS, TERSTRUKTUR, HEMAT TOKEN
+// ==========================================
+
 function saveAIHistory(){
 
+    // Backend baru sendiri hanya memakai history terbaru.
+    // Frontend juga dibatasi supaya payload tidak membengkak.
     aiConversationHistory =
-        aiConversationHistory.slice(-12);
+        aiConversationHistory
+            .filter(item =>
+                item &&
+                (item.role === "user" || item.role === "assistant") &&
+                typeof item.content === "string"
+            )
+            .slice(-8);
 
+    // Produk aktif/follow-up cukup beberapa item terakhir.
     aiProductMemory =
-        aiProductMemory.slice(-20);
+        aiProductMemory
+            .filter(Boolean)
+            .slice(-6);
 
     sessionStorage.setItem(
         "imamAIHistory",
@@ -23124,20 +23265,444 @@ function saveAIHistory(){
         JSON.stringify(aiProductMemory)
     );
 
-	}
+    sessionStorage.setItem(
+        "nexaiHybridState",
+        JSON.stringify(nexaiHybridState || {})
+    );
+
+}
 
 
+// ==========================================
+// PRODUCT LOOKUP LOKAL
+// ==========================================
 
-	
+
+function formatNexaiPrice(value){
+
+    if(value === null || value === undefined || value === ""){
+        return "";
+    }
+
+    if(typeof value === "number"){
+        return "Rp" + Math.round(value).toLocaleString("id-ID");
+    }
+
+    if(typeof value === "string"){
+        const v = value.trim();
+        if(!v) return "";
+        if(/^rp/i.test(v)) return v;
+
+        const numeric = v.replace(/[^\d]/g, "");
+        return numeric
+            ? "Rp" + Number(numeric).toLocaleString("id-ID")
+            : v;
+    }
+
+    if(typeof value === "object"){
+
+        const preferred =
+            value.promo ??
+            value.harga_promo ??
+            value.sale ??
+            value.current ??
+            value.final ??
+            value.price ??
+            value.harga ??
+            value.normal ??
+            value.regular;
+
+        if(preferred !== undefined){
+            return formatNexaiPrice(preferred);
+        }
+
+        const primitive =
+            Object.values(value).find(v =>
+                typeof v === "string" ||
+                typeof v === "number"
+            );
+
+        return primitive !== undefined
+            ? formatNexaiPrice(primitive)
+            : "";
+    }
+
+    return "";
+}
 
 
+function normalizeAIProductKey(value){
+
+    return String(value || "")
+        .replace(/<[^>]*>/g, "")
+        .replace(/\s+/g, " ")
+        .trim()
+        .toLowerCase();
+
+}
+
+
+function findAIProductLocal(activeProduct){
+
+    if(
+        !activeProduct ||
+        typeof allProducts === "undefined" ||
+        !Array.isArray(allProducts)
+    ){
+        return null;
+    }
+
+    const sku =
+        normalizeAIProductKey(activeProduct.sku);
+
+    const nama =
+        normalizeAIProductKey(
+            activeProduct.nama ||
+            activeProduct.name
+        );
+
+    return allProducts.find(product => {
+
+        const pSku =
+            normalizeAIProductKey(
+                product.sku ||
+                product.kode
+            );
+
+        const pName =
+            normalizeAIProductKey(
+                product.nama ||
+                product.name
+            );
+
+        if(sku && pSku && sku === pSku){
+            return true;
+        }
+
+        if(nama && pName && nama === pName){
+            return true;
+        }
+
+        return false;
+
+    }) || null;
+
+}
+
+
+// ==========================================
+// STATE DARI BACKEND → FRONTEND
+// ==========================================
+
+function syncNexaiState(data){
+
+    if(!data || typeof data !== "object"){
+        return;
+    }
+
+    if(
+        data.state &&
+        typeof data.state === "object"
+    ){
+        nexaiHybridState = {
+            ...nexaiHybridState,
+            ...data.state
+        };
+    }
+
+    const active =
+        data?.state?.activeProduct ||
+        nexaiHybridState?.activeProduct ||
+        null;
+
+    if(active){
+
+        const local =
+            findAIProductLocal(active);
+
+        const memoryItem = {
+
+            nama:
+                active.nama ||
+                active.name ||
+                local?.nama ||
+                "",
+
+            sku:
+                active.sku ||
+                local?.sku ||
+                "",
+
+            gambar:
+                active.gambar ||
+                active.image ||
+                local?.gambar ||
+                "",
+
+            brand:
+                local?.brand ||
+                "",
+
+            kategori:
+                local?.kategori ||
+                "",
+
+            varian:
+                local?.varian ||
+                active.varian ||
+                "",
+
+            harga:
+                formatNexaiPrice(
+                    local?.harga_promo ||
+                    local?.harga ||
+                    ""
+                )
+
+        };
+
+        const key =
+            normalizeAIProductKey(
+                memoryItem.sku ||
+                memoryItem.nama
+            );
+
+        if(key){
+
+            aiProductMemory =
+                aiProductMemory.filter(item => {
+
+                    const itemKey =
+                        normalizeAIProductKey(
+                            item?.sku ||
+                            item?.nama
+                        );
+
+                    return itemKey !== key;
+
+                });
+
+            aiProductMemory.push(memoryItem);
+
+        }
+
+    }
+
+}
+
+
+// ==========================================
+// RENDER RESPONSE HYBRID
+// ==========================================
+
+function renderNexaiPhoto(data){
+
+    const active =
+        data?.state?.activeProduct ||
+        nexaiHybridState?.activeProduct ||
+        null;
+
+    const local =
+        findAIProductLocal(active);
+
+    const name =
+        active?.nama ||
+        local?.nama ||
+        "Produk Nine";
+
+    const image =
+        active?.gambar ||
+        local?.gambar ||
+        "";
+
+    const safeName =
+        escapeAIHtml(name);
+
+    const safeImage =
+        escapeAIHtml(image);
+
+    let html = `
+        <div class="ai-product-card">
+
+            <div class="ai-product-title">
+                ${safeName}
+            </div>
+    `;
+
+    if(safeImage){
+
+        html += `
+            <div class="ai-product-image-wrap">
+                <img
+                    src="${safeImage}"
+                    class="ai-product-image"
+                    alt="${safeName}"
+                    loading="lazy"
+                >
+            </div>
+        `;
+
+    }else{
+
+        html += `
+            <div class="ai-description">
+                Foto resmi belum tersedia pada data produk saat ini.
+            </div>
+        `;
+
+    }
+
+    html += `
+        </div>
+    `;
+
+    return html;
+
+}
+
+
+function renderNexaiActiveProductCard(data){
+
+    const active =
+        data?.state?.activeProduct ||
+        nexaiHybridState?.activeProduct ||
+        null;
+
+    const local =
+        findAIProductLocal(active);
+
+    if(!local){
+        return null;
+    }
+
+    const product = {
+        "Nama Produk":
+            local.nama || active?.nama || "",
+
+        "Brand":
+            local.brand || "",
+
+        "Kategori":
+            local.kategori || "",
+
+        "SKU":
+            local.sku || active?.sku || "",
+
+        "Gambar":
+            local.gambar || active?.gambar || "",
+
+        "Varian":
+            Array.isArray(local.varian)
+                ? local.varian.join(", ")
+                : (local.varian || ""),
+
+        "Harga":
+            formatNexaiPrice(
+                local.harga_promo ||
+                local.harga ||
+                ""
+            ),
+
+        "Deskripsi":
+            local.deskripsi || "",
+
+        "Whatsapp":
+            local.whatsapp ||
+            "https://wa.me/6282210109369"
+    };
+
+    return renderProductCard(product);
+
+}
+
+
+function renderNexaiReply(data){
+
+    const reply =
+        data?.reply ||
+        "Maaf, AI tidak memberikan jawaban.";
+
+    const route =
+        String(data?.route || "");
+
+    // Foto produk resmi: render langsung dari state/database,
+    // tidak lagi menebak URL dari teks AI.
+    if(route === "product_photo"){
+        return renderNexaiPhoto(data);
+    }
+
+    // Detail produk exact bisa memakai card native website.
+    if(route === "product_detail"){
+
+        const card =
+            renderNexaiActiveProductCard(data);
+
+        if(card){
+            return card;
+        }
+
+    }
+
+    // Untuk route lain, gunakan renderer lama sebagai fallback.
+    // Ini mempertahankan kompatibilitas response Markdown lama.
+    return renderAIReply(reply);
+
+}
+
+
+// ==========================================
+// UI STATUS
+// ==========================================
+
+function setAISendBusy(isBusy){
+
+    aiRequestBusy = Boolean(isBusy);
+
+    const input =
+        document.getElementById("aiInput");
+
+    const button =
+        document.querySelector(
+            ".ai-input-row button[onclick='sendAI()']"
+        );
+
+    if(input){
+        input.disabled = aiRequestBusy;
+    }
+
+    if(button){
+
+        button.disabled = aiRequestBusy;
+
+        button.innerHTML =
+            aiRequestBusy
+                ? '<i class="fa-solid fa-spinner fa-spin"></i>'
+                : "Kirim";
+
+    }
+
+}
+
+
+// ==========================================
+// SEND — NEXAI HYBRID FINAL
+// ==========================================
 
 async function sendAI(){
 
-    const input = document.getElementById("aiInput");
-    const text = input.value.trim();
+    if(aiRequestBusy){
+        return;
+    }
 
-    if(!text) return;
+    const input =
+        document.getElementById("aiInput");
+
+    const text =
+        String(input?.value || "").trim();
+
+    if(!text){
+        return;
+    }
 
 
     // ==========================================
@@ -23155,7 +23720,9 @@ async function sendAI(){
 
         imamMode = false;
 
-        sessionStorage.removeItem("imamMode");
+        sessionStorage.removeItem(
+            "imamMode"
+        );
 
     }
     else if(imamCommand){
@@ -23167,271 +23734,287 @@ async function sendAI(){
             "1"
         );
 
-	}
+    }
 
-    const body = document.getElementById("aiMessages");
 
-    body.innerHTML += `
+    const body =
+        document.getElementById("aiMessages");
+
+    if(!body){
+        return;
+    }
+
+
+    // User text wajib di-escape supaya tidak bisa
+    // menyuntikkan HTML ke dalam chatbox.
+    body.insertAdjacentHTML(
+        "beforeend",
+        `
         <div class="ai-message user">
-            ${text}
+            ${escapeAIHtml(text)}
         </div>
-    `;
+        `
+    );
+
 
     input.value = "";
-    body.scrollTop = body.scrollHeight;
 
-    const loading = document.createElement("div");
-loading.className = "ai-message bot";
-loading.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Sedang berpikir...';
-    body.appendChild(loading);
+    body.scrollTop =
+        body.scrollHeight;
+
+
+    const loading =
+        document.createElement("div");
+
+    loading.className =
+        "ai-message bot";
+
+    loading.innerHTML =
+        '<i class="fa-solid fa-spinner fa-spin"></i> Sedang berpikir...';
+
+    body.appendChild(
+        loading
+    );
+
+
+    setAISendBusy(true);
+
 
     try{
 
-        const formData = new FormData();
-
-        formData.append("vip","PUBLIC");
-
-formData.append(
-    "message",
-    text
-);
+        const formData =
+            new FormData();
 
 
-
-formData.append(
-    "imamMode",
-    imamMode ? "1" : "0"
-);
-
-	
-formData.append(
-    "memory",
-    JSON.stringify(
-        aiConversationHistory
-    )
-);
+        // Dipertahankan agar kompatibel dengan backend lama
+        // bila sewaktu-waktu rollback.
+        formData.append(
+            "vip",
+            "PUBLIC"
+        );
 
 
-	formData.append(
-    "productMemory",
-    JSON.stringify(
-        aiProductMemory
-    )
-);
+        formData.append(
+            "message",
+            text
+        );
 
-formData.append(
-    "orders",
-    "[]"
-);
+        formData.append(
+            "clientTime",
+            new Date().toISOString()
+        );
 
-        const res = await fetch("/.netlify/functions/chat",{
-    method:"POST",
-    body:formData
-});
-
-const rawResponse = await res.text();
-
-console.log("CHAT STATUS:", res.status);
-console.log("CHAT RESPONSE:", rawResponse);
-
-let data;
-
-try {
-
-    data = JSON.parse(rawResponse);
-
-} catch(err) {
-
-    throw new Error(
-        `Server mengembalikan response bukan JSON. HTTP ${res.status}: ${rawResponse}`
-    );
-
-}
-
-if(!res.ok){
-
-    throw new Error(
-        data?.error ||
-        data?.message ||
-        `HTTP ${res.status}`
-    );
-
-	}
+        formData.append(
+            "clientTimezone",
+            Intl.DateTimeFormat().resolvedOptions().timeZone || ""
+        );
 
 
-	// ==========================================
-// SIMPAN PRODUK YANG BARU DITAMPILKAN
-// ==========================================
+        formData.append(
+            "imamMode",
+            imamMode ? "1" : "0"
+        );
 
-try {
 
-    const singleProduct =
-        parseProductReply(data.reply || "");
+        // Hanya history ringkas.
+        formData.append(
+            "memory",
+            JSON.stringify(
+                aiConversationHistory.slice(-8)
+            )
+        );
 
-    if (
-        singleProduct &&
-        singleProduct["Nama Produk"] &&
-        singleProduct["Gambar"]
-    ) {
 
-        aiProductMemory.push({
+        // Product memory sekarang berasal dari state backend,
+        // bukan parse teks reply.
+        formData.append(
+            "productMemory",
+            JSON.stringify(
+                aiProductMemory.slice(-6)
+            )
+        );
 
-            nama:
-                singleProduct["Nama Produk"],
 
-            gambar:
-                singleProduct["Gambar"],
+        formData.append(
+            "orders",
+            "[]"
+        );
 
-            brand:
-                singleProduct["Brand"] || "",
 
-            kategori:
-                singleProduct["Kategori"] || "",
+        const res =
+            await fetch(
+                "/.netlify/functions/chat",
+                {
+                    method:"POST",
+                    body:formData
+                }
+            );
 
-            sku:
-                singleProduct["SKU"] || "",
 
-            varian:
-                singleProduct["Varian"] || "",
+        const rawResponse =
+            await res.text();
 
-            harga:
-                singleProduct["Harga"] || ""
 
+        let data;
+
+        try{
+
+            data =
+                JSON.parse(
+                    rawResponse
+                );
+
+        }catch(error){
+
+            throw new Error(
+                `Server mengembalikan response bukan JSON. HTTP ${res.status}`
+            );
+
+        }
+
+
+        if(!res.ok){
+
+            throw new Error(
+                data?.error ||
+                data?.message ||
+                `HTTP ${res.status}`
+            );
+
+        }
+
+
+        // ==========================================
+        // STATE RESMI DARI BACKEND
+        // ==========================================
+
+        syncNexaiState(data);
+
+
+        // ==========================================
+        // CONVERSATION MEMORY
+        // ==========================================
+
+        aiConversationHistory.push({
+            role:"user",
+            content:text
         });
 
-    }
 
-} catch(err){
-
-    console.warn(
-        "Gagal menyimpan product memory:",
-        err
-    );
-
-}
-
-
-
-	// Simpan percakapan user
-aiConversationHistory.push({
-    role: "user",
-    content: text
-});
-
-
-// Simpan jawaban AI
-aiConversationHistory.push({
-    role: "assistant",
-    content: data.reply || ""
-});
-
-
-
-	// ==========================================
-// PRODUCT VISUAL MEMORY
-// ==========================================
-
-let detectedProductMemory = [];
-
-try {
-
-    const parsedProduct =
-        parseProductReply(data.reply || "");
-
-    if (
-        parsedProduct &&
-        parsedProduct["Nama Produk"] &&
-        parsedProduct["Gambar"]
-    ) {
-
-        detectedProductMemory.push({
-
-            nama:
-                parsedProduct["Nama Produk"],
-
-            gambar:
-                parsedProduct["Gambar"],
-
-            brand:
-                parsedProduct["Brand"] || "",
-
-            kategori:
-                parsedProduct["Kategori"] || "",
-
-            sku:
-                parsedProduct["SKU"] || "",
-
-            varian:
-                parsedProduct["Varian"] || "",
-
-            harga:
-                parsedProduct["Harga"] || ""
-
+        aiConversationHistory.push({
+            role:"assistant",
+            content:data.reply || ""
         });
 
-    }
 
-} catch(err) {
-
-    console.warn(
-        "Product visual memory gagal:",
-        err
-    );
-
-	}
-
-     saveAIHistory();
-
-        let aiOutput = renderAIReply(
-    data.reply || "Maaf, AI tidak memberikan jawaban."
-);
-
-if(data.image){
-
-    aiOutput += `
-        <div class="ai-generated-image">
-            <img
-                src="${data.image}"
-                alt="AI Generated Image">
-        </div>
-    `;
-
-}
-
-loading.innerHTML = aiOutput;
-
-// Tambahkan tombol copy pada semua code block
-addCodeCopyButtons(loading);
+        saveAIHistory();
 
 
+        // ==========================================
+        // RENDER
+        // ==========================================
+
+        let aiOutput =
+            renderNexaiReply(data);
+
+        if(data.usedWeb === true){
+            aiOutput =
+                `<div class="nexai-research-badge">
+                    <i class="fa-solid fa-globe"></i>
+                    Riset web global
+                </div>` +
+                aiOutput;
+        }
 
 
-	
+        if(data.image){
+
+            aiOutput += `
+                <div class="ai-generated-image">
+                    <img
+                        src="${escapeAIHtml(data.image)}"
+                        alt="AI Generated Image"
+                        loading="lazy"
+                    >
+                </div>
+            `;
+
+        }
+
+
+        loading.innerHTML =
+            aiOutput;
+
+
+        addCodeCopyButtons(
+            loading
+        );
+
+
+        // Debug ringan tanpa membocorkan konfigurasi.
+        console.log(
+            "NEXAI ROUTE:",
+            data.route || "general",
+            "| AI:",
+            data.usedAI === true
+        );
+
 
     }catch(err){
 
-        loading.innerHTML = "❌ AI sedang tidak dapat dihubungi.";
+        loading.innerHTML =
+            "❌ Sistem sedang tidak dapat dihubungi. Silakan coba lagi.";
 
-        console.error(err);
+        console.error(
+            "NEXAI CHAT ERROR:",
+            err
+        );
+
+    }finally{
+
+        setAISendBusy(false);
+
+        body.scrollTop =
+            body.scrollHeight;
+
+        if(input){
+            input.focus();
+        }
 
     }
-
-    body.scrollTop = body.scrollHeight;
 
 }
 
 
+// ==========================================
+// ENTER TO SEND
+// ==========================================
 
-document.getElementById("aiInput")
-.addEventListener("keypress",function(e){
+const nexaiInput =
+    document.getElementById("aiInput");
 
-    if(e.key==="Enter"){
+if(nexaiInput){
 
-        sendAI();
+    nexaiInput.addEventListener(
+        "keydown",
+        function(e){
 
-    }
+            if(
+                e.key === "Enter" &&
+                !e.shiftKey
+            ){
 
-});
+                e.preventDefault();
+
+                sendAI();
+
+            }
+
+        }
+    );
+
+}
+
 
 
 let stickyClosed = false;
@@ -24930,5 +25513,266 @@ class="purchase-panel">
 
 })();
 </script>
+<script>
+
+// ==========================================
+// NEXAI HYBRID — OPEN INTERNAL CHAT
+// ==========================================
+
+function openNexaiHybrid(event){
+
+    if(event){
+        event.preventDefault();
+    }
+
+    const modal =
+        document.querySelector(".ai-modal");
+
+    const body =
+        document.getElementById("aiMessages");
+
+    const input =
+        document.getElementById("aiInput");
+
+    if(!modal){
+        console.error("NEXAI modal tidak ditemukan.");
+        return;
+    }
+
+    modal.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+
+    if(
+        body &&
+        !body.dataset.nexaiWelcome
+    ){
+
+        body.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div class="ai-message bot">
+                <strong>NEXAI</strong><br>
+                Halo 👋 Mau tanya produk Nine, harga, stok, foto, spesifikasi, rekomendasi, fitment, atau hal lain? Gas aja.
+            </div>
+            `
+        );
+
+        body.dataset.nexaiWelcome = "1";
+
+    }
+
+    setTimeout(() => {
+
+        if(input){
+            input.focus();
+        }
+
+        if(body){
+            body.scrollTop =
+                body.scrollHeight;
+        }
+
+    }, 80);
+
+}
+
+</script>
+
+<script>
+/* NEXAI V9 — structured backend renderer */
+(function(){
+  const original =
+    window.renderNexaiReply;
+
+  window.renderNexaiReply =
+    function(data){
+
+      if(
+        !data ||
+        !data.product
+      ){
+        return original
+          ? original(data)
+          : (data?.reply || "");
+      }
+
+      const p =
+        data.product;
+
+      const esc =
+        v =>
+          typeof escapeAIHtml === "function"
+            ? escapeAIHtml(
+                String(v ?? "")
+              )
+            : String(v ?? "");
+
+      const route =
+        data.route || "";
+
+      let html =
+        `<div class="ai-product-card">
+          <div class="ai-product-title">
+            ${esc(p.name || "Produk Nine")}
+          </div>`;
+
+      if(
+        [
+          "product_photo",
+          "product_photo_spec"
+        ].includes(route) &&
+        p.visual?.main
+      ){
+        html += `
+          <div class="ai-product-image-wrap">
+            <img
+              class="ai-product-image"
+              src="${esc(p.visual.main)}"
+              alt="${esc(p.name)}"
+              loading="lazy"
+            >
+          </div>
+        `;
+      }
+
+      if(
+        route === "catalog_page" &&
+        p.visual?.full_page
+      ){
+        html += `
+          <div class="ai-product-image-wrap">
+            <img
+              class="ai-product-image"
+              src="${esc(p.visual.full_page)}"
+              alt="Halaman katalog ${esc(p.name)}"
+              loading="lazy"
+            >
+          </div>
+        `;
+      }
+
+      if(
+        route === "product_price"
+      ){
+        if(
+          p.regular_price &&
+          p.price &&
+          p.regular_price !== p.price
+        ){
+          html += `
+            <div class="ai-product-item">
+              <strong>Harga Normal</strong><br>
+              ${esc(p.regular_price)}
+            </div>
+
+            <div class="ai-product-item">
+              <strong>Harga Promo</strong><br>
+              ${esc(p.price)}
+            </div>
+          `;
+        }else{
+          html += `
+            <div class="ai-product-item">
+              <strong>Harga</strong><br>
+              ${esc(p.price || "Belum tersedia")}
+            </div>
+          `;
+        }
+
+        if(
+          p.stock !== undefined &&
+          p.stock !== ""
+        ){
+          html += `
+            <div class="ai-product-item">
+              <strong>Stok</strong><br>
+              ${esc(p.stock)}
+            </div>
+          `;
+        }
+      }
+
+      if(
+        route === "product_stock"
+      ){
+        html += `
+          <div class="ai-product-item">
+            <strong>Stok</strong><br>
+            ${esc(
+              p.stock !== undefined &&
+              p.stock !== ""
+                ? p.stock
+                : "Belum tersedia"
+            )}
+          </div>
+        `;
+      }
+
+      if(
+        route === "product_variant"
+      ){
+        html += `
+          <div class="ai-product-item">
+            <strong>Varian</strong>
+            <div class="variant-container">
+              ${
+                Array.isArray(p.variants) &&
+                p.variants.length
+                  ? p.variants
+                      .map(
+                        x =>
+                          `<span class="variant-chip">${esc(x)}</span>`
+                      )
+                      .join("")
+                  : "Belum tersedia"
+              }
+            </div>
+          </div>
+        `;
+      }
+
+      if(
+        [
+          "product_spec",
+          "product_photo_spec"
+        ].includes(route)
+      ){
+        const specs =
+          Object.entries(
+            p.specs || {}
+          ).filter(
+            ([key]) =>
+              key !== "_catalog_page"
+          );
+
+        html += specs.length
+          ? specs
+              .map(
+                ([key, value]) =>
+                  `<div class="ai-product-item">
+                    <strong>${esc(key)}</strong><br>
+                    ${esc(
+                      Array.isArray(value)
+                        ? value.join(", ")
+                        : value
+                    )}
+                  </div>`
+              )
+              .join("")
+          : `
+            <div class="ai-product-item">
+              Spesifikasi teknis belum tersedia.
+            </div>
+          `;
+      }
+
+      html += "</div>";
+
+      return html;
+    };
+})();
+</script>
+
 </body>
 </html>
