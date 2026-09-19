@@ -21,6 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
+<meta name="nexai-ui-version" content="2026.09-internal-chat">
 
 <link rel="icon" href="favicon.png">
 
@@ -12533,6 +12534,44 @@ html.imam-sales-loader-seen #pageLoader{
 }
 @media(prefers-reduced-motion:reduce){.promo-slider-track{transition:none!important}}
 
+
+/* ==========================================
+   NEXAI CHATGPT SECONDARY LINK
+========================================== */
+.nexai-chatgpt-secondary{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    width:100%;
+    margin-top:8px;
+    padding:8px 12px;
+    border-radius:12px;
+    color:#6f7d64;
+    text-decoration:none;
+    font-size:11px;
+    font-weight:700;
+    transition:.2s ease;
+}
+
+.nexai-chatgpt-secondary:hover{
+    background:#f4f8ef;
+    color:#6fa52d;
+}
+
+.nexai-chatgpt-secondary i{
+    font-size:11px;
+}
+
+body.dark-mode .nexai-chatgpt-secondary{
+    color:#aeb6c2;
+}
+
+body.dark-mode .nexai-chatgpt-secondary:hover{
+    background:rgba(140,198,63,.08);
+    color:#9ddd4d;
+}
+
 </style>
 
 
@@ -13810,7 +13849,7 @@ box-shadow:0 0 8px #35d04b;
 
 <i class="fa-solid fa-wand-magic-sparkles"></i>
 
-Imam AI
+NEXAI
 
 </h2>
 
@@ -13861,11 +13900,10 @@ Imam AI
 
     <!-- NEXAI CTA -->
     <a
-        href="https://chatgpt.com/g/g-6aa8c41eb5bc81919bd15e57cd104b75-nexai"
-        class="nexai-cta"
+        
         target="_blank"
         rel="noopener noreferrer"
-        aria-label="Tanya NEXAI">
+        aria-label="Tanya NEXAI" class="nexai-cta" href="#" onclick="openNexaiHybrid(event)">
 
         <span class="nexai-icon">
 
@@ -13958,6 +13996,18 @@ Imam AI
         </span>
 
     </a>
+
+<a
+    class="nexai-chatgpt-secondary"
+    href="https://chatgpt.com/"
+    target="_blank"
+    rel="noopener noreferrer"
+    title="Buka NEXAI versi ChatGPT"
+>
+    <i class="fa-solid fa-up-right-from-square"></i>
+    <span>Buka NEXAI versi ChatGPT</span>
+</a>
+
 
 								</div>
 
@@ -25313,6 +25363,71 @@ class="purchase-panel">
 
 
 })();
+</script>
+<script>
+
+// ==========================================
+// NEXAI HYBRID — OPEN INTERNAL CHAT
+// ==========================================
+
+function openNexaiHybrid(event){
+
+    if(event){
+        event.preventDefault();
+    }
+
+    const modal =
+        document.querySelector(".ai-modal");
+
+    const body =
+        document.getElementById("aiMessages");
+
+    const input =
+        document.getElementById("aiInput");
+
+    if(!modal){
+        console.error("NEXAI modal tidak ditemukan.");
+        return;
+    }
+
+    modal.style.display = "flex";
+
+    document.body.style.overflow = "hidden";
+
+    if(
+        body &&
+        !body.dataset.nexaiWelcome
+    ){
+
+        body.insertAdjacentHTML(
+            "beforeend",
+            `
+            <div class="ai-message bot">
+                <strong>NEXAI</strong><br>
+                Halo 👋 Mau tanya produk Nine, harga, stok, foto, spesifikasi, rekomendasi, fitment, atau hal lain? Gas aja.
+            </div>
+            `
+        );
+
+        body.dataset.nexaiWelcome = "1";
+
+    }
+
+    setTimeout(() => {
+
+        if(input){
+            input.focus();
+        }
+
+        if(body){
+            body.scrollTop =
+                body.scrollHeight;
+        }
+
+    }, 80);
+
+}
+
 </script>
 </body>
 </html>
