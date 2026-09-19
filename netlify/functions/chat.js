@@ -24,6 +24,201 @@ const products = JSON.parse(
 );
 
 
+// ==================================================
+// NEXAI / IMAM AI — OFFICIAL PRODUCT VISUAL REGISTRY
+// ==================================================
+
+let productVisualMap = {};
+
+try {
+
+    const visualMapPath =
+        path.join(
+            process.cwd(),
+            "product-visual-map.json"
+        );
+
+    if(fs.existsSync(visualMapPath)){
+
+        productVisualMap =
+            JSON.parse(
+                fs.readFileSync(
+                    visualMapPath,
+                    "utf8"
+                )
+            );
+
+    }
+
+}catch(error){
+
+    console.log(
+        "PRODUCT VISUAL MAP LOAD ERROR:",
+        error.message
+    );
+
+    productVisualMap = {};
+
+}
+
+
+function publicAssetUrl(value){
+
+    if(!value) return "";
+
+    const text =
+        String(value).trim();
+
+    if(
+        text.startsWith("http://") ||
+        text.startsWith("https://")
+    ){
+        return text;
+    }
+
+    return (
+        "https://imamsalesnine.com/" +
+        text.replace(/^\/+/,"")
+    );
+
+}
+
+
+function getOfficialVisual(product){
+
+    const sku =
+        String(product?.sku || "")
+            .trim()
+            .toUpperCase();
+
+    const mapped =
+        productVisualMap[sku] || {};
+
+    const fotoUtama =
+        mapped.foto_utama ||
+        publicAssetUrl(
+            product?.gambar || ""
+        );
+
+    const fotoTambahan =
+        (
+            Array.isArray(mapped.foto_tambahan) &&
+            mapped.foto_tambahan.length
+        )
+        ? mapped.foto_tambahan
+        : (
+            Array.isArray(product?.gallery)
+            ? product.gallery
+                .map(publicAssetUrl)
+                .filter(Boolean)
+            : []
+        );
+
+    return {
+        foto_utama:fotoUtama,
+        foto_tambahan:fotoTambahan,
+        full_page:
+            mapped.full_page || "",
+        catalog_page:
+            mapped.catalog_page || "",
+        foto_utama_tersedia:
+            Boolean(fotoUtama),
+        galeri_tersedia:
+            fotoTambahan.length > 0,
+        full_page_tersedia:
+            Boolean(mapped.full_page)
+    };
+
+}
+
+
+function exactProductFromMessage(text){
+
+    const query =
+        normalize(text);
+
+    if(!query) return null;
+
+    // Exact SKU adalah prioritas tertinggi.
+    const skuMatch =
+        products.find(product =>
+            normalize(product.sku) === query
+        );
+
+    if(skuMatch) return skuMatch;
+
+    // Exact nama.
+    const nameMatch =
+        products.find(product =>
+            normalize(product.nama) === query
+        );
+
+    if(nameMatch) return nameMatch;
+
+    // Jika kalimat user mengandung SKU utuh.
+    const containedSku =
+        products.find(product => {
+
+            const sku =
+                normalize(product.sku);
+
+            return (
+                sku.length >= 2 &&
+                new RegExp(
+                    `(^|\\s)${sku.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(\\s|$)`,
+                    "i"
+                ).test(query)
+            );
+
+        });
+
+    return containedSku || null;
+
+}
+
+
+function serializeOfficialProduct(product){
+
+    if(!product) return null;
+
+    return {
+        id:
+            product.id ?? null,
+        nama:
+            product.nama || "",
+        brand:
+            product.brand || "",
+        kategori:
+            product.kategori || "",
+        sku:
+            product.sku || "",
+        harga:
+            product.harga ?? null,
+        stok:
+            product.stok ?? null,
+        varian:
+            product.varian || [],
+        keunggulan:
+            product.keunggulan || [],
+        aplikasi:
+            product.aplikasi || null,
+        spesifikasi:
+            product.spesifikasi || null,
+        garansi:
+            product.garansi || null,
+        isi_paket:
+            product.isi_paket || [],
+        deskripsi:
+            product.deskripsi || "",
+        whatsapp:
+            product.whatsapp || "",
+        visual:
+            getOfficialVisual(product)
+    };
+
+}
+
+
 function normalize(text) {
     return String(text || "")
         .toLowerCase()
@@ -472,6 +667,13 @@ const askAvailability =
 
 const askPhoto =
 /(foto|gambar|image|lihat|tampilkan|tunjukkan)/i.test(message);
+
+const askCatalogPage =
+/(foto katalog|halaman katalog|full halaman|full page|katalog lengkap)/i.test(message);
+
+const exactProduct =
+    exactProductFromMessage(message);
+
 // ==================================================
 // PRODUCT INTENT
 // ==================================================
@@ -482,7 +684,9 @@ const isProductQuery =
     askSpec ||
     askCompare ||
     askAvailability ||
-  	askPhoto ||
+    askPhoto ||
+    askCatalogPage ||
+    Boolean(exactProduct) ||
     /(sku|kode produk|nama produk|produk|varian produk|harga produk)/i.test(message);
 
 
@@ -504,6 +708,48 @@ const isSalesStrategy =
 const useProductContext =
     isProductQuery &&
     matchedProducts.length > 0;
+
+
+// ==================================================
+// STRUCTURED PRODUCT OUTPUT
+// Frontend memakai data ini untuk render foto resmi.
+// Model tidak menentukan URL visual.
+// ==================================================
+
+let officialProductList = [];
+
+if(isProductQuery){
+
+    if(exactProduct){
+
+        officialProductList = [
+            serializeOfficialProduct(
+                exactProduct
+            )
+        ];
+
+    }else if(matchedProducts.length){
+
+        officialProductList =
+            matchedProducts
+                .slice(0,8)
+                .map(
+                    serializeOfficialProduct
+                )
+                .filter(Boolean);
+
+    }
+
+}
+
+const visualMode =
+    askCatalogPage
+        ? "catalog"
+        : (
+            askPhoto
+                ? "photo"
+                : "product"
+        );
 
 
 
@@ -3974,6 +4220,8 @@ const isCodingRequest =
 const isImageRequest =
     isAstraMode &&
     !isCodingRequest &&
+    !useProductContext &&
+    !exactProduct &&
     (
         explicitImageRequest ||
         hasExplicitImageWord ||
@@ -4389,7 +4637,17 @@ return {
 
     reply,
 
-    image
+    image,
+
+    products:
+        officialProductList,
+
+    visualMode,
+
+    productSource:
+        officialProductList.length
+            ? "OFFICIAL_PRODUCT_DATA"
+            : null
 
   })
 

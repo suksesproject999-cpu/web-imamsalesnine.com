@@ -22764,7 +22764,7 @@ function renderProductGrid(result){
     ${result.products.map(product => {
 
         const productName =
-    String(p["Nama Produk"] || "")
+    String(product["Nama Produk"] || "")
         .replace(/<[^>]*>/g, "")
         .replace(/\*\*/g, "")
         .replace(/__/g, "")
@@ -23046,6 +23046,315 @@ function isCodeReply(reply){
 // RENDER AI REPLY — SAFE
 // ==========================================
 
+
+// ==========================================
+// OFFICIAL STRUCTURED PRODUCT RENDERER
+// Foto produk tidak lagi dipilih oleh model.
+// ==========================================
+
+function formatLivePrice(harga){
+
+    if(
+        harga === null ||
+        harga === undefined ||
+        harga === ""
+    ){
+        return "Belum tersedia";
+    }
+
+    if(typeof harga === "number"){
+
+        return "Rp" +
+            Number(harga)
+                .toLocaleString("id-ID");
+
+    }
+
+    if(typeof harga === "string"){
+
+        return harga;
+
+    }
+
+    const normal =
+        Number(harga.normal || 0);
+
+    const promo =
+        Number(harga.promo || 0);
+
+    if(promo && normal){
+
+        return `
+            <div>
+                <strong>
+                    Rp${promo.toLocaleString("id-ID")}
+                </strong>
+            </div>
+            <small style="
+                color:#888;
+                text-decoration:line-through;
+            ">
+                Rp${normal.toLocaleString("id-ID")}
+            </small>
+        `;
+
+    }
+
+    const value =
+        promo || normal;
+
+    return value
+        ? "Rp" + value.toLocaleString("id-ID")
+        : "Belum tersedia";
+
+}
+
+
+function renderOfficialProductResponse(
+    products,
+    visualMode,
+    reply
+){
+
+    if(
+        !Array.isArray(products) ||
+        !products.length
+    ){
+        return renderAIReply(
+            reply || ""
+        );
+    }
+
+    const cards =
+        products.map(product => {
+
+            const visual =
+                product.visual || {};
+
+            const primary =
+                visual.foto_utama || "";
+
+            const additional =
+                Array.isArray(
+                    visual.foto_tambahan
+                )
+                ? visual.foto_tambahan
+                : [];
+
+            const fullPage =
+                visual.full_page || "";
+
+            let visualHtml = "";
+
+            if(
+                visualMode === "catalog"
+            ){
+
+                visualHtml =
+                    fullPage
+                    ? `
+                    <div class="ai-product-image-wrap">
+                        <img
+                            src="${escapeAIHtml(fullPage)}"
+                            class="ai-product-image"
+                            alt="Halaman katalog ${escapeAIHtml(product.nama || "Produk")}"
+                            loading="lazy">
+                    </div>
+                    `
+                    : `
+                    <div style="
+                        padding:14px;
+                        background:#fff7e8;
+                        border-radius:12px;
+                        margin-bottom:14px;
+                    ">
+                        Halaman katalog produk ini belum tersedia.
+                    </div>
+                    `;
+
+            }else{
+
+                if(primary){
+
+                    visualHtml += `
+                    <div class="ai-product-image-wrap">
+                        <img
+                            src="${escapeAIHtml(primary)}"
+                            class="ai-product-image"
+                            alt="${escapeAIHtml(product.nama || "Produk")}"
+                            loading="lazy">
+                    </div>
+                    `;
+
+                }
+
+                if(
+                    visualMode === "photo" &&
+                    additional.length
+                ){
+
+                    visualHtml += `
+                    <div style="
+                        display:grid;
+                        grid-template-columns:
+                            repeat(auto-fit,minmax(110px,1fr));
+                        gap:8px;
+                        margin-top:10px;
+                    ">
+                    ${additional.map(url => `
+                        <img
+                            src="${escapeAIHtml(url)}"
+                            alt="${escapeAIHtml(product.nama || "Produk")}"
+                            loading="lazy"
+                            style="
+                                width:100%;
+                                aspect-ratio:1/1;
+                                object-fit:contain;
+                                background:#fff;
+                                border:1px solid #eee;
+                                border-radius:12px;
+                            ">
+                    `).join("")}
+                    </div>
+                    `;
+
+                }
+
+            }
+
+            const variants =
+                Array.isArray(product.varian)
+                ? product.varian
+                : [];
+
+            const stock =
+                (
+                    product.stok &&
+                    typeof product.stok === "object"
+                )
+                ? (
+                    product.stok.status ||
+                    "Belum tersedia"
+                )
+                : (
+                    product.stok ||
+                    "Belum tersedia"
+                );
+
+            return `
+            <div class="ai-product-card">
+
+                ${visualHtml}
+
+                <div class="ai-product-title">
+                    ${escapeAIHtml(product.nama || "-")}
+                </div>
+
+                <div class="ai-product-item">
+                    <b>Brand</b>
+                    <div>
+                        ${escapeAIHtml(product.brand || "-")}
+                    </div>
+                </div>
+
+                <div class="ai-product-item">
+                    <b>Kategori</b>
+                    <div>
+                        ${escapeAIHtml(product.kategori || "-")}
+                    </div>
+                </div>
+
+                <div class="ai-product-item">
+                    <b>SKU</b>
+                    <div>
+                        ${escapeAIHtml(product.sku || "-")}
+                    </div>
+                </div>
+
+                <div class="ai-product-item">
+                    <b>Harga</b>
+                    <div class="price">
+                        ${formatLivePrice(product.harga)}
+                    </div>
+                </div>
+
+                <div class="ai-product-item">
+                    <b>Stok</b>
+                    <div>
+                        ${escapeAIHtml(stock)}
+                    </div>
+                </div>
+
+                ${
+                    variants.length
+                    ? `
+                    <div class="ai-product-item">
+                        <b>Varian</b>
+                        <div class="variant-container">
+                            ${variants.map(v => `
+                                <span class="variant-chip">
+                                    ${escapeAIHtml(v)}
+                                </span>
+                            `).join("")}
+                        </div>
+                    </div>
+                    `
+                    : ""
+                }
+
+                ${
+                    product.deskripsi
+                    ? `
+                    <div class="ai-product-item">
+                        <b>Deskripsi</b>
+                        <div>
+                            ${escapeAIHtml(product.deskripsi)}
+                        </div>
+                    </div>
+                    `
+                    : ""
+                }
+
+                ${
+                    product.whatsapp
+                    ? `
+                    <div class="ai-product-action">
+                        <a
+                            href="${escapeAIHtml(product.whatsapp)}"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            class="ai-wa-btn">
+                            💬 Konsultasi Sekarang
+                        </a>
+                    </div>
+                    `
+                    : ""
+                }
+
+            </div>
+            `;
+
+        }).join("");
+
+    const explanation =
+        reply
+        ? `
+        <div class="ai-description">
+            ${marked.parse(reply)}
+        </div>
+        `
+        : "";
+
+    return `
+        <div class="ai-product-grid">
+            ${cards}
+        </div>
+        ${explanation}
+    `;
+
+}
+
+
 function renderAIReply(reply){
 
     if(isProductReply(reply)){
@@ -23259,6 +23568,55 @@ if(!res.ok){
 	}
 
 
+// ==========================================
+// SIMPAN STRUCTURED PRODUCT MEMORY
+// ==========================================
+
+if(
+    Array.isArray(data.products) &&
+    data.products.length
+){
+
+    data.products.forEach(product => {
+
+        const memoryItem = {
+            nama:
+                product.nama || "",
+            gambar:
+                product.visual?.foto_utama || "",
+            brand:
+                product.brand || "",
+            kategori:
+                product.kategori || "",
+            sku:
+                product.sku || "",
+            varian:
+                Array.isArray(product.varian)
+                    ? product.varian.join(", ")
+                    : "",
+            harga:
+                product.harga || ""
+        };
+
+        // Hindari duplikat SKU yang sama.
+        aiProductMemory =
+            aiProductMemory.filter(item =>
+                String(item.sku || "")
+                    .toLowerCase() !==
+                String(memoryItem.sku || "")
+                    .toLowerCase()
+            );
+
+        aiProductMemory.push(
+            memoryItem
+        );
+
+    });
+
+}
+
+
+
 	// ==========================================
 // SIMPAN PRODUK YANG BARU DITAMPILKAN
 // ==========================================
@@ -23382,9 +23740,29 @@ try {
 
      saveAIHistory();
 
-        let aiOutput = renderAIReply(
-    data.reply || "Maaf, AI tidak memberikan jawaban."
-);
+        let aiOutput;
+
+if(
+    Array.isArray(data.products) &&
+    data.products.length
+){
+
+    aiOutput =
+        renderOfficialProductResponse(
+            data.products,
+            data.visualMode || "product",
+            data.reply || ""
+        );
+
+}else{
+
+    aiOutput =
+        renderAIReply(
+            data.reply ||
+            "Maaf, AI tidak memberikan jawaban."
+        );
+
+}
 
 if(data.image){
 
