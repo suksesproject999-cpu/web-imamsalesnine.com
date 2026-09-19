@@ -134,48 +134,126 @@ function getOfficialVisual(product){
 
 function exactProductFromMessage(text){
 
+    const raw =
+        String(text || "")
+            .toLowerCase();
+
     const query =
         normalize(text);
 
     if(!query) return null;
 
-    // Exact SKU adalah prioritas tertinggi.
-    const skuMatch =
+
+    // ==========================================
+    // EXACT SKU / NAME
+    // ==========================================
+
+    const exactSku =
         products.find(product =>
             normalize(product.sku) === query
         );
 
-    if(skuMatch) return skuMatch;
+    if(exactSku) return exactSku;
 
-    // Exact nama.
-    const nameMatch =
+
+    const exactName =
         products.find(product =>
             normalize(product.nama) === query
         );
 
-    if(nameMatch) return nameMatch;
+    if(exactName) return exactName;
 
-    // Jika kalimat user mengandung SKU utuh.
-    const containedSku =
+
+    // ==========================================
+    // FLEXIBLE SKU MATCH
+    //
+    // Contoh:
+    // Q9-PRO
+    // q9pro
+    // q9 pro
+    // q9_pro
+    //
+    // semuanya harus match Q9-PRO.
+    // ==========================================
+
+    const flexibleSku =
         products.find(product => {
 
             const sku =
-                normalize(product.sku);
+                String(product.sku || "")
+                    .trim()
+                    .toLowerCase();
+
+            if(!sku) return false;
+
+            const chunks =
+                sku
+                    .split(/[^a-z0-9]+/)
+                    .filter(Boolean);
+
+            if(!chunks.length)
+                return false;
+
+            const escaped =
+                chunks.map(chunk =>
+                    chunk.replace(
+                        /[.*+?^${}()|[\]\\]/g,
+                        "\\$&"
+                    )
+                );
+
+            const pattern =
+                escaped.join(
+                    "[^a-z0-9]*"
+                );
+
+            const regex =
+                new RegExp(
+                    `(^|[^a-z0-9])${pattern}($|[^a-z0-9])`,
+                    "i"
+                );
+
+            return regex.test(raw);
+
+        });
+
+    if(flexibleSku)
+        return flexibleSku;
+
+
+    // ==========================================
+    // COMPACT FALLBACK
+    //
+    // Digunakan hanya untuk SKU yang cukup khas.
+    // ==========================================
+
+    const compactMessage =
+        raw.replace(
+            /[^a-z0-9]/g,
+            ""
+        );
+
+    const compactSku =
+        products.find(product => {
+
+            const sku =
+                String(product.sku || "")
+                    .toLowerCase()
+                    .replace(
+                        /[^a-z0-9]/g,
+                        ""
+                    );
 
             return (
-                sku.length >= 2 &&
-                new RegExp(
-                    `(^|\\s)${sku.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(\\s|$)`,
-                    "i"
-                ).test(query)
+                sku.length >= 3 &&
+                compactMessage.includes(sku)
             );
 
         });
 
-    return containedSku || null;
+    return compactSku || null;
 
 }
-
 
 function serializeOfficialProduct(product){
 
@@ -370,7 +448,7 @@ Nama       : ${product.nama}
 Brand      : ${product.brand}
 Kategori   : ${product.kategori}
 SKU        : ${product.sku}
-Gambar     : ${product.gambar}
+Gambar     : ${getOfficialVisual(product).foto_utama || "Belum tersedia"}
 Harga      : ${product.harga || "Tersedia"}
 Deskripsi  : ${product.deskripsi}
 
@@ -403,7 +481,7 @@ ${product.kategori}
 SKU:
 ${product.sku}
 
-Gambar: ${product.gambar}
+Gambar: ${getOfficialVisual(product).foto_utama || "Belum tersedia"}
 
 Varian:
 ${(product.varian || []).join(", ") || "Belum tersedia"}
@@ -714,9 +792,14 @@ const isSalesStrategy =
 // DATA PRODUK hanya boleh masuk ke AI
 // jika user memang sedang bertanya tentang produk.
 
+const resolvedProducts =
+    exactProduct
+        ? [exactProduct]
+        : resolvedProducts;
+
 const useProductContext =
     isProductQuery &&
-    matchedProducts.length > 0;
+    resolvedProducts.length > 0;
 
 
 // ==================================================
@@ -737,10 +820,10 @@ if(isProductQuery){
             )
         ];
 
-    }else if(matchedProducts.length){
+    }else if(resolvedProducts.length){
 
         officialProductList =
-            matchedProducts
+            resolvedProducts
                 .slice(0,8)
                 .map(
                     serializeOfficialProduct
@@ -759,6 +842,39 @@ const visualMode =
                 ? "photo"
                 : "product"
         );
+
+const exactProductVisualLock =
+    exactProduct
+    ? `
+
+==================================================
+EXACT PRODUCT LOCK
+==================================================
+
+Produk exact yang dimaksud user:
+
+Nama:
+${exactProduct.nama}
+
+SKU:
+${exactProduct.sku}
+
+ATURAN WAJIB:
+
+- Identitas produk ini SUDAH TERKUNCI.
+- Jangan mengganti dengan produk lain.
+- Jangan menebak produk berdasarkan gambar internet.
+- Jangan membuat URL foto.
+- Jangan mengganti foto resmi dengan image generation.
+- Foto resmi akan dirender frontend dari data backend.
+- Jika field visual resmi kosong, jangan tampilkan visual lain.
+- Harga, stok, varian, SKU, dan fakta produk wajib mengikuti
+  DATA PRODUK RESMI backend.
+
+==================================================
+
+`
+    : "";
 
 
 
@@ -864,7 +980,7 @@ yang ditemukan.
 
 Produk yang relevan:
 
-${matchedProducts
+${resolvedProducts
     .slice(0,8)
     .map(formatProduct)
     .join("\n")}
@@ -891,7 +1007,7 @@ User meminta PERBANDINGAN beberapa produk.
 
 Gunakan DATA PRODUK RESMI berikut:
 
-${matchedProducts
+${resolvedProducts
     .slice(0,50)
     .map(formatProduct)
     .join("\n")}
@@ -915,9 +1031,9 @@ Jika informasi tidak tersedia, tulis "Belum tersedia".
 
 } else if (askType) {
 
-    if (matchedProducts.length === 1) {
+    if (resolvedProducts.length === 1) {
 
-        const p = matchedProducts[0];
+        const p = resolvedProducts[0];
 
 productContext = `
 ${formatProductCard(p)}
@@ -932,7 +1048,7 @@ Tampilkan dalam format yang rapi menggunakan heading dan bullet point.
     } else {
 
         const uniqueNames = [...new Set(
-            matchedProducts.map(p => p.nama)
+            resolvedProducts.map(p => p.nama)
         )];
 
         productContext = `
@@ -951,9 +1067,9 @@ Jika terdapat lebih dari satu produk, tampilkan dalam bentuk daftar yang rapi.
 
 } else {
 
-    if (matchedProducts.length === 1) {
+    if (resolvedProducts.length === 1) {
 
-        const p = matchedProducts[0];
+        const p = resolvedProducts[0];
 
 productContext = `
 ${formatProductCard(p)}
@@ -966,7 +1082,7 @@ Tampilkan sebagai kartu (card), jangan gunakan tabel.
     productContext = `
 DATA PRODUK RESMI
 
-${matchedProducts
+${resolvedProducts
     .slice(0,50)
     .map(formatProduct)
     .join("\n")}
@@ -4000,6 +4116,8 @@ END NEXAI MODE
 // =====================
 
 systemPrompt += productContext;
+
+systemPrompt += exactProductVisualLock;
 
 
 
