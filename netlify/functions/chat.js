@@ -29,6 +29,23 @@ const { formidable } = require("formidable");
 
 const PRODUCTS_PATH = path.join(process.cwd(), "produk.json");
 
+
+const CATALOG_SPECS_PATH = path.join(process.cwd(), "catalog_specs.json");
+
+let catalogSpecPages = [];
+try {
+  const catalogPayload = JSON.parse(
+    fs.readFileSync(CATALOG_SPECS_PATH, "utf8")
+  );
+  catalogSpecPages = Array.isArray(catalogPayload?.pages)
+    ? catalogPayload.pages
+    : [];
+} catch (e) {
+  console.warn("catalog_specs.json belum tersedia:", e.message);
+  catalogSpecPages = [];
+}
+
+
 let products = [];
 try {
   products = JSON.parse(fs.readFileSync(PRODUCTS_PATH, "utf8"));
@@ -265,6 +282,57 @@ function getWhatsapp(p) {
   return p?.whatsapp || OFFICIAL_WA;
 }
 
+
+function catalogSpecsForProduct(p) {
+  if (!p || !catalogSpecPages.length) return {};
+
+  const name = normalize(getName(p));
+  const sku = normalize(getSku(p));
+  const important = [...new Set(
+    `${name} ${sku}`.split(/\s+/).filter(x => x.length >= 2)
+  )];
+
+  let best = null;
+  let bestScore = 0;
+
+  for (const page of catalogSpecPages) {
+    const hay = normalize(page?.search_text || "");
+    if (!hay) continue;
+
+    let score = 0;
+
+    if (sku && new RegExp(`(^|\\s)${escapeRegExp(sku)}(\\s|$)`, "i").test(hay)) {
+      score += 1500;
+    }
+
+    if (name && hay.includes(name)) {
+      score += 1200;
+    }
+
+    for (const token of important) {
+      if (hay.includes(token)) score += 45;
+    }
+
+    if (score > bestScore) {
+      bestScore = score;
+      best = page;
+    }
+  }
+
+  // Threshold mencegah spesifikasi produk mirip tertukar.
+  if (!best || bestScore < 180) return {};
+
+  return {
+    ...(best.specs || {}),
+    "_catalog_page": best.page
+  };
+}
+
+function escapeRegExp(value) {
+  return String(value || "").replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
+
 function collectSpecs(p) {
   const skip = new Set([
     "nama","name","brand","subbrand","kategori","category","sku","kode",
@@ -294,6 +362,15 @@ function collectSpecs(p) {
       if (String(v).length <= 300) specs[k] = v;
     }
   }
+  const fromCatalog = catalogSpecsForProduct(p);
+
+  // Katalog adalah sumber spesifikasi teknis utama.
+  // Data live produk tetap menang untuk harga/stok/visual karena tidak dicampur ke sini.
+  specs = {
+    ...specs,
+    ...fromCatalog
+  };
+
   return specs;
 }
 
@@ -563,7 +640,7 @@ function directProductReply(route) {
 
     case "product_spec": {
       const specs = collectSpecs(p);
-      const entries = Object.entries(specs);
+      const entries = Object.entries(specs).filter(([k]) => k !== "_catalog_page");
       if (!entries.length) {
         return `${getName(p)}\nSpesifikasi yang diminta belum tersedia pada data produk saat ini.`;
       }
@@ -660,7 +737,7 @@ Kamu adalah NEXAI Public, asisten cerdas di Imamsalesnine.com.
 Bahasa utama: Bahasa Indonesia natural, jelas, ringkas, dan membantu.
 
 ATURAN INTI:
-- Untuk fakta produk Nine, hanya gunakan PRODUCT_DATA yang diberikan.
+- Untuk fakta produk Nine, gunakan PRODUCT_DATA yang diberikan. Spesifikasi teknis di PRODUCT_DATA dapat berasal dari katalog resmi.
 - Jangan mengarang SKU, harga, stok, varian, spesifikasi, kompatibilitas, garansi, atau fitur.
 - Jika data produk tidak memuat jawaban, katakan datanya belum tersedia.
 - Pengetahuan umum boleh dipakai untuk edukasi otomotif/general knowledge, tetapi jangan mengubah fakta resmi produk.
