@@ -233,25 +233,40 @@ function exactProductFromMessage(text){
             ""
         );
 
-    const compactSku =
-        products.find(product => {
+    // Compact fallback hanya boleh dipakai untuk query yang memang
+    // terlihat seperti SKU/nama produk pendek. Jangan scan kalimat
+    // creative/general karena raw substring bisa salah match.
+    const looksLikeShortProductQuery =
+        query.split(/\s+/).length <= 4 &&
+        raw.length <= 40 &&
+        !/\b(buat|bikin|generate|create|gambar|foto|image|poster|ilustrasi|render|visual|semut|hewan|manusia|kota|pemandangan)\b/i.test(raw);
 
-            const sku =
-                String(product.sku || "")
-                    .toLowerCase()
-                    .replace(
-                        /[^a-z0-9]/g,
-                        ""
-                    );
+    if(looksLikeShortProductQuery){
 
-            return (
-                sku.length >= 3 &&
-                compactMessage.includes(sku)
-            );
+        const compactSku =
+            products.find(product => {
 
-        });
+                const sku =
+                    String(product.sku || "")
+                        .toLowerCase()
+                        .replace(
+                            /[^a-z0-9]/g,
+                            ""
+                        );
 
-    return compactSku || null;
+                return (
+                    sku.length >= 3 &&
+                    compactMessage === sku
+                );
+
+            });
+
+        if(compactSku)
+            return compactSku;
+
+    }
+
+    return null;
 
 }
 
@@ -765,15 +780,23 @@ const exactProduct =
 // PRODUCT INTENT
 // ==================================================
 
+const hasProductReference =
+    Boolean(exactProduct) ||
+    matchedProducts.length > 0 ||
+    /(sku|kode produk|nama produk|produk|varian produk|harga produk|nine|luximos|soundblax|securicle|lx-trix|9power|optimus)/i.test(message);
+
 const isProductQuery =
     askType ||
     askPrice ||
     askSpec ||
     askCompare ||
     askAvailability ||
-    askPhoto ||
     askCatalogPage ||
     Boolean(exactProduct) ||
+    (
+        askPhoto &&
+        hasProductReference
+    ) ||
     /(sku|kode produk|nama produk|produk|varian produk|harga produk)/i.test(message);
 
 
@@ -4074,6 +4097,15 @@ PRIORITAS:
 3. Konteks percakapan.
 4. Pengetahuan umum untuk konteks non-produk.
 
+ROUTING INTENT:
+- Kata "foto/gambar/visual" sendiri TIDAK berarti produk.
+- "foto R8", "foto Q9-PRO", atau nama/SKU produk terdeteksi
+  → gunakan visual produk resmi.
+- "buat foto semut", "buat gambar kota", "render pemandangan",
+  atau creative request tanpa identitas produk
+  → masuk creative image generation.
+- Jika intent ambigu dan tidak ada identitas produk, jangan memaksa product resolver.
+
 ATURAN PRODUK:
 - Jangan mengarang harga, SKU, stok, varian,
   spesifikasi, fitur, atau visual produk.
@@ -4404,7 +4436,7 @@ const isCodingRequest =
         .test(aiMessage);
 
 const isImageRequest =
-    isAstraMode &&
+    (isAstraMode || isNexaiMode) &&
     !isCodingRequest &&
     !useProductContext &&
     !exactProduct &&
