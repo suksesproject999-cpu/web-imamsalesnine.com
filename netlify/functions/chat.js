@@ -795,7 +795,7 @@ const isSalesStrategy =
 const resolvedProducts =
     exactProduct
         ? [exactProduct]
-        : resolvedProducts;
+        : matchedProducts;
 
 const useProductContext =
     isProductQuery &&
