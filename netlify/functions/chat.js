@@ -650,10 +650,10 @@ body.productMemory
 // ==================================================
 // PREVIOUS PRODUCT VISUAL CONTEXT — SAFE
 // ==================================================
-// Selalu dideklarasikan sebelum dipakai oleh systemPrompt.
 
 const visualMemoryContext =
-    Array.isArray(productMemory) && productMemory.length
+    Array.isArray(productMemory) &&
+    productMemory.length
     ? `
 
 ==================================================
@@ -679,11 +679,11 @@ Harga: ${
 
 Gunakan konteks ini HANYA jika user jelas merujuk
 produk sebelumnya seperti:
-"yang tadi", "fotonya", "harganya", "produk tadi",
-"yang pertama", atau "yang kedua".
+"yang tadi", "fotonya", "harganya", "stoknya",
+"produk tadi", "yang pertama", atau "yang kedua".
 
 Jika user mengganti topik ke pertanyaan umum,
-otomotif umum, waktu, atau creative baru,
+otomotif umum, waktu/tanggal, atau creative baru,
 abaikan konteks produk sebelumnya.
 
 ==================================================
@@ -747,33 +747,46 @@ keyword = keyword
 
 
 // ==================================================
-// NEXAI ROUTER V4 — DETERMINISTIC INTENT GATE
+// NEXAI ROUTER V5 — STRICT DETERMINISTIC INTENT ENGINE
 // ==================================================
 
 const preExactProduct =
     exactProductFromMessage(message);
 
+const compactMessage =
+    normalize(message);
+
+
+// --------------------------------------------------
+// GENERAL REAL-TIME / UTILITY
+// --------------------------------------------------
+
 const askCurrentTime =
-    /\b(jam berapa|sekarang jam|pukul berapa|waktu sekarang|what time)\b/i
+    /\b(jam\s*(berapa|brp)|sekarang\s+jam\s*(berapa|brp)|pukul\s*(berapa|brp)|waktu\s+sekarang|current\s+time|what\s+time)\b/i
         .test(message);
 
 const askCurrentDate =
-    /\b(tanggal berapa|hari apa|tanggal hari ini|hari ini tanggal|what date)\b/i
+    /\b(tanggal\s*(berapa|brp)|hari\s+apa|tanggal\s+hari\s+ini|hari\s+ini\s+tanggal|current\s+date|what\s+date)\b/i
         .test(message);
 
 const isGreetingOnly =
-    /^(halo|hai|hi|hello|pagi|siang|sore|malam|tes|test|assalamualaikum|salam)[\s!?.]*$/i
+    /^(halo|hai|hi|hello|pagi|siang|sore|malam|tes|test|assalamualaikum|salam)(\s+(bro|bang|gan|kak|om))?[\s!?.]*$/i
         .test(message.trim());
+
+
+// --------------------------------------------------
+// CREATIVE INTENT
+// --------------------------------------------------
 
 const explicitCreativeImageIntent =
     (
-        /\b(buat|buatkan|bikin|generate|create|render|desain)\b[\s\S]{0,100}\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b/i.test(message)
+        /\b(buat|buatkan|bikin|generate|create|render|desain)\b[\s\S]{0,120}\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b/i.test(message)
         ||
-        /\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b[\s\S]{0,100}\b(buat|buatkan|bikin|generate|create|render|desain)\b/i.test(message)
+        /\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b[\s\S]{0,120}\b(buat|buatkan|bikin|generate|create|render|desain)\b/i.test(message)
     );
 
 const explicitStoryboardIntent =
-    /\b(storyboard|scene|sinematik|cinematic|prompt video|video ai|creative direction|iklan sinematik)\b/i
+    /\b(storyboard|scene|sinematik|cinematic|prompt\s+video|video\s+ai|creative\s+direction|iklan\s+sinematik)\b/i
         .test(message);
 
 const creativeUsesExactProduct =
@@ -783,25 +796,39 @@ const creativeUsesExactProduct =
         explicitStoryboardIntent
     );
 
+
+// --------------------------------------------------
+// PRODUCT FOLLOW-UP MEMORY
+// --------------------------------------------------
+
 const hasPreviousProductContext =
     Array.isArray(productMemory) &&
     productMemory.length > 0;
 
 const productFollowUp =
     hasPreviousProductContext &&
-    /\b(yang tadi|produk tadi|fotonya|gambarnya|harganya|stoknya|variannya|spesifikasinya|yang pertama|yang kedua|full halamannya|halaman katalognya)\b/i
+    /\b(yang\s+tadi|produk\s+tadi|fotonya|gambarnya|harganya|stoknya|variannya|spesifikasinya|yang\s+pertama|yang\s+kedua|full\s+halamannya|halaman\s+katalognya)\b/i
         .test(message);
 
+
+// --------------------------------------------------
+// PRODUCT SIGNALS
+// --------------------------------------------------
+
 const hasProductBrandSignal =
-    /\b(nine|luximos|soundblax|securicle|lx[\s-]?trix|9power|nine power|optimus)\b/i
+    /\b(nine|luximos|soundblax|securicle|lx[\s-]?trix|9power|nine\s+power|optimus)\b/i
+        .test(message);
+
+const hasExplicitProductWord =
+    /\b(produk|sku|kode\s+produk|katalog|produk\s+nine|produk\s+luximos|produk\s+soundblax|produk\s+securicle|produk\s+lx[\s-]?trix|produk\s+9power)\b/i
         .test(message);
 
 const hasProductCategorySignal =
-    /\b(produk|sku|kode produk|lampu sorot|shooting light|headlamp|headlight|foglamp|biled|projector|flasher|relay|klakson|klaxon|alarm|karpet|carpet)\b/i
+    /\b(lampu\s+sorot|shooting\s+light|headlamp|headlight|foglamp|biled|projector|flasher|relay|klakson|klaxon|alarm|karpet|carpet)\b/i
         .test(message);
 
 const askPrice =
-    /\b(harga|price|harganya|berapa harga)\b/i
+    /\b(harga|price|harganya|berapa\s+harga)\b/i
         .test(message);
 
 const askStock =
@@ -817,7 +844,7 @@ const askCompare =
         .test(message);
 
 const askType =
-    /\b(type|tipe|seri|model|apa saja|list|daftar|macam)\b/i
+    /\b(type|tipe|seri|model|apa\s+saja|list|daftar|macam)\b/i
         .test(message);
 
 const askPhoto =
@@ -825,14 +852,21 @@ const askPhoto =
         .test(message);
 
 const askCatalogPage =
-    /\b(foto katalog|halaman katalog|full halaman|full page|katalog lengkap|halaman lengkap)\b/i
+    /\b(foto\s+katalog|halaman\s+katalog|full\s+halaman|full\s+page|katalog\s+lengkap|halaman\s+lengkap)\b/i
         .test(message);
 
+
+// --------------------------------------------------
+// HARD ROUTE GATES
+// --------------------------------------------------
+
+// Istilah otomotif umum seperti foglamp/headlamp/H11/socket
+// TIDAK otomatis berarti user meminta produk Nine.
 const hasStrongProductSignal =
     Boolean(preExactProduct) ||
     productFollowUp ||
     hasProductBrandSignal ||
-    hasProductCategorySignal;
+    hasExplicitProductWord;
 
 const forceGeneralRoute =
     askCurrentTime ||
@@ -852,6 +886,11 @@ const shouldSearchProducts =
     !forceCreativeRoute &&
     hasStrongProductSignal;
 
+
+// --------------------------------------------------
+// FUZZY SEARCH — ONLY AFTER PRODUCT GATE
+// --------------------------------------------------
+
 const matchedProducts =
     shouldSearchProducts
     ? products
@@ -869,17 +908,35 @@ const exactProduct =
     preExactProduct;
 
 const productRequestSignal =
-    askPrice ||
-    askStock ||
-    askSpec ||
-    askCompare ||
-    askType ||
-    askPhoto ||
-    askCatalogPage ||
-    hasProductBrandSignal ||
-    hasProductCategorySignal ||
+    Boolean(exactProduct) ||
     productFollowUp ||
-    Boolean(exactProduct);
+    hasProductBrandSignal ||
+    hasExplicitProductWord ||
+    (
+        hasProductCategorySignal &&
+        (
+            hasProductBrandSignal ||
+            hasExplicitProductWord
+        )
+    ) ||
+    (
+        (
+            askPrice ||
+            askStock ||
+            askSpec ||
+            askCompare ||
+            askType ||
+            askPhoto ||
+            askCatalogPage
+        )
+        &&
+        (
+            Boolean(exactProduct) ||
+            productFollowUp ||
+            hasProductBrandSignal ||
+            hasExplicitProductWord
+        )
+    );
 
 const isProductQuery =
     !forceGeneralRoute &&
@@ -962,9 +1019,7 @@ if(
         officialProductList =
             resolvedProducts
                 .slice(0,8)
-                .map(
-                    serializeOfficialProduct
-                )
+                .map(serializeOfficialProduct)
                 .filter(Boolean);
 
     }
@@ -988,7 +1043,8 @@ const visualMode =
     : "none";
 
 const exactProductVisualLock =
-    exactProduct
+    exactProduct &&
+    (intentRoute === "PRODUCT" || intentRoute === "CREATIVE_PRODUCT")
     ? `
 
 ==================================================
@@ -4388,7 +4444,9 @@ REAL-TIME CONTEXT
 Waktu aktual zona Asia/Jakarta:
 ${nowJakarta}
 
-Gunakan nilai ini untuk menjawab waktu/tanggal.
+Gunakan nilai ini sebagai satu-satunya sumber jawaban waktu/tanggal.
+Jawab langsung dan singkat.
+Jangan mengatakan tidak bisa melihat waktu real-time.
 Jangan gunakan data produk dan jangan menebak.
 
 ==================================================
@@ -4619,6 +4677,9 @@ console.log("TIME INTENT:", askCurrentTime || askCurrentDate);
 console.log("CREATIVE INTENT:", explicitCreativeImageIntent || explicitStoryboardIntent);
 console.log("EXACT PRODUCT:", exactProduct?.sku || null);
 console.log("FUZZY ENABLED:", shouldSearchProducts);
+console.log("PRODUCT BRAND SIGNAL:", hasProductBrandSignal);
+console.log("EXPLICIT PRODUCT WORD:", hasExplicitProductWord);
+console.log("PRODUCT CATEGORY SIGNAL:", hasProductCategorySignal);
 console.log("MATCHED PRODUCTS:", matchedProducts.slice(0,5).map(p => p.sku));
 console.log("MESSAGE:", aiMessage);
 
@@ -5029,11 +5090,26 @@ return {
     image,
 
     products:
-        officialProductList,
+        (
+            intentRoute === "PRODUCT" ||
+            intentRoute === "CREATIVE_PRODUCT"
+        )
+        ? officialProductList
+        : [],
 
-    visualMode,
+    visualMode:
+        (
+            intentRoute === "PRODUCT" ||
+            intentRoute === "CREATIVE_PRODUCT"
+        )
+        ? visualMode
+        : "none",
 
     productSource:
+        (
+            intentRoute === "PRODUCT" ||
+            intentRoute === "CREATIVE_PRODUCT"
+        ) &&
         officialProductList.length
             ? "OFFICIAL_PRODUCT_DATA"
             : null,
