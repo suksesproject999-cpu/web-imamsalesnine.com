@@ -3333,6 +3333,25 @@ font-size:15px;
     transform:translateX(3px) !important;
 }
 
+.nexai-cta.nexai-active{
+    background:linear-gradient(135deg,#eff9e4 0%,#e5f5d3 100%) !important;
+    border-color:#8CC63F !important;
+    box-shadow:0 10px 28px rgba(79,110,35,.16) !important;
+}
+
+.nexai-cta.nexai-active::before{
+    width:5px !important;
+}
+
+.nexai-cta.nexai-active .nexai-icon{
+    background:#8CC63F !important;
+    color:#fff !important;
+}
+
+.nexai-cta.nexai-active .nexai-copy strong{
+    color:#5d8f1f !important;
+}
+
 
 /* ==========================================
    MOBILE — HARD LOCK
@@ -13858,105 +13877,47 @@ Imam AI
     </div>
 
 
-    <!-- NEXAI CTA -->
-    <a
-        href="https://chatgpt.com/g/g-6aa8c41eb5bc81919bd15e57cd104b75-nexai"
+    <!-- NEXAI MODE SWITCH -->
+    <button
+        type="button"
+        id="nexaiModeButton"
         class="nexai-cta"
-        target="_blank"
-        rel="noopener noreferrer"
-        aria-label="Tanya NEXAI">
+        onclick="toggleNexaiMode()"
+        aria-pressed="false"
+        aria-label="Aktifkan NEXAI Mode">
 
         <span class="nexai-icon">
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-
+            <svg viewBox="0 0 24 24" fill="none"
+                 xmlns="http://www.w3.org/2000/svg">
                 <path
                     d="M12 3.5L14.15 9.85L20.5 12L14.15 14.15L12 20.5L9.85 14.15L3.5 12L9.85 9.85L12 3.5Z"
                     stroke="currentColor"
                     stroke-width="1.7"
                     stroke-linejoin="round"/>
-
                 <path
                     d="M18.2 3.8V7.2M16.5 5.5H19.9"
                     stroke="currentColor"
                     stroke-width="1.4"
                     stroke-linecap="round"/>
-
             </svg>
-
         </span>
-
 
         <span class="nexai-copy">
-
-            <strong>Tanya NEXAI</strong>
-
-            <small>
-                Login ChatGPT diperlukan
+            <strong id="nexaiModeTitle">Aktifkan NEXAI</strong>
+            <small id="nexaiModeSubtitle">
+                Mode advanced di dalam Imam AI
             </small>
-
         </span>
 
-
-        <span class="nexai-info" title="Info akses">
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-
-                <circle
-                    cx="12"
-                    cy="12"
-                    r="8.5"
-                    stroke="currentColor"
-                    stroke-width="1.5"/>
-
-                <path
-                    d="M12 10.5V16"
-                    stroke="currentColor"
-                    stroke-width="1.6"
-                    stroke-linecap="round"/>
-
-                <circle
-                    cx="12"
-                    cy="7.5"
-                    r="1"
-                    fill="currentColor"/>
-
-            </svg>
-
+        <span class="nexai-info" title="Mode NEXAI">
+            <i class="fa-solid fa-circle-info"></i>
         </span>
-
 
         <span class="nexai-arrow">
-
-            <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg">
-
-                <path
-                    d="M5 12H18"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"/>
-
-                <path
-                    d="M13 6L19 12L13 18"
-                    stroke="currentColor"
-                    stroke-width="1.8"
-                    stroke-linecap="round"
-                    stroke-linejoin="round"/>
-
-            </svg>
-
+            <i class="fa-solid fa-toggle-off"
+               id="nexaiToggleIcon"></i>
         </span>
-
-    </a>
+    </button>
 
 								</div>
 
@@ -23412,6 +23373,118 @@ let aiConversationHistory =
 
 let imamMode =
     sessionStorage.getItem("imamMode") === "1";
+
+
+let nexaiMode =
+    sessionStorage.getItem("nexaiMode") === "1";
+
+
+function syncNexaiModeUI(){
+
+    const button =
+        document.getElementById("nexaiModeButton");
+
+    const title =
+        document.getElementById("nexaiModeTitle");
+
+    const subtitle =
+        document.getElementById("nexaiModeSubtitle");
+
+    const icon =
+        document.getElementById("nexaiToggleIcon");
+
+    const header =
+        document.querySelector(".ai-header h2");
+
+    if(!button) return;
+
+    button.classList.toggle(
+        "nexai-active",
+        nexaiMode
+    );
+
+    button.setAttribute(
+        "aria-pressed",
+        nexaiMode ? "true" : "false"
+    );
+
+    if(title){
+        title.textContent =
+            nexaiMode
+            ? "NEXAI Aktif"
+            : "Aktifkan NEXAI";
+    }
+
+    if(subtitle){
+        subtitle.textContent =
+            nexaiMode
+            ? "Advanced product, automotive & creative mode"
+            : "Mode advanced di dalam Imam AI";
+    }
+
+    if(icon){
+        icon.className =
+            nexaiMode
+            ? "fa-solid fa-toggle-on"
+            : "fa-solid fa-toggle-off";
+    }
+
+    if(header){
+        header.innerHTML =
+            nexaiMode
+            ? '<i class="fa-solid fa-wand-magic-sparkles"></i> NEXAI'
+            : '<i class="fa-solid fa-wand-magic-sparkles"></i> Imam AI';
+    }
+
+}
+
+
+function toggleNexaiMode(){
+
+    nexaiMode = !nexaiMode;
+
+    if(nexaiMode){
+        sessionStorage.setItem(
+            "nexaiMode",
+            "1"
+        );
+    }else{
+        sessionStorage.removeItem(
+            "nexaiMode"
+        );
+    }
+
+    syncNexaiModeUI();
+
+    const body =
+        document.getElementById("aiMessages");
+
+    if(body){
+
+        const notice =
+            document.createElement("div");
+
+        notice.className =
+            "ai-message bot";
+
+        notice.innerHTML =
+            nexaiMode
+            ? "✨ <b>NEXAI Mode aktif.</b><br>Produk, otomotif, analisis dan creative mode siap digunakan."
+            : "Imam AI aktif kembali.";
+
+        body.appendChild(notice);
+        body.scrollTop =
+            body.scrollHeight;
+    }
+
+}
+
+
+// Sinkronkan UI setelah DOM siap.
+document.addEventListener(
+    "DOMContentLoaded",
+    syncNexaiModeUI
+);
 	
 
 // Batasi history agar request tidak terlalu besar
@@ -23510,6 +23583,12 @@ formData.append(
 formData.append(
     "imamMode",
     imamMode ? "1" : "0"
+);
+
+
+formData.append(
+    "nexaiMode",
+    nexaiMode ? "1" : "0"
 );
 
 	
