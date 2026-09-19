@@ -701,104 +701,167 @@ keyword = keyword
 )];
 
 
-const matchedProducts = products
-    .map(product => ({
-        product,
-        score: getScore(product, tokens)
-    }))
-    .filter(item => item.score > 0)
-    .sort((a, b) => b.score - a.score)
-    .map(item => item.product)
-    .slice(0, 50);
+// ==================================================
+// NEXAI ROUTER V4 — DETERMINISTIC INTENT GATE
+// ==================================================
 
-
-		const visualMemoryContext =
-productMemory.length
-? `
-
-==================================================
-PREVIOUS PRODUCT VISUAL CONTEXT
-==================================================
-
-Produk yang sebelumnya ditampilkan kepada user:
-
-${productMemory.map(p => `
-Nama Produk: ${p.nama || "-"}
-Brand: ${p.brand || "-"}
-SKU: ${p.sku || "-"}
-Gambar: ${p.gambar || "-"}
-Varian: ${p.varian || "-"}
-Harga: ${p.harga || "-"}
-`).join("\n")}
-
-Gunakan konteks ini jika user merujuk
-kepada produk atau foto yang sebelumnya
-ditampilkan.
-
-Jika user mengatakan:
-"foto tadi",
-"gambar tadi",
-"yang pertama",
-"yang kedua",
-"produk tadi",
-atau referensi serupa,
-
-gunakan konteks produk sebelumnya untuk
-menentukan maksud user.
-
-`
-: "";
-    
-    
-    
-    
-    const askType =
-/(type|tipe|seri|model|apa saja|list|macam)/i.test(message);
-
-const askPrice =
-/(harga|price|berapa)/i.test(message);
-
-const askSpec =
-/(spesifikasi|spec|fitur|kelebihan)/i.test(message);
-
-const askCompare =
-/(beda|perbedaan|vs|bandingkan|bandingin)/i.test(message);
-
-const askAvailability =
-/(ada|tersedia|ready|stok|punya)/i.test(message);
-
-const askPhoto =
-/(foto|gambar|image|lihat|tampilkan|tunjukkan)/i.test(message);
-
-const askCatalogPage =
-/(foto katalog|halaman katalog|full halaman|full page|katalog lengkap)/i.test(message);
-
-const exactProduct =
+const preExactProduct =
     exactProductFromMessage(message);
 
-// ==================================================
-// PRODUCT INTENT
-// ==================================================
+const askCurrentTime =
+    /\b(jam berapa|sekarang jam|pukul berapa|waktu sekarang|what time)\b/i
+        .test(message);
 
-const hasProductReference =
-    Boolean(exactProduct) ||
-    matchedProducts.length > 0 ||
-    /(sku|kode produk|nama produk|produk|varian produk|harga produk|nine|luximos|soundblax|securicle|lx-trix|9power|optimus)/i.test(message);
+const askCurrentDate =
+    /\b(tanggal berapa|hari apa|tanggal hari ini|hari ini tanggal|what date)\b/i
+        .test(message);
 
-const isProductQuery =
-    askType ||
+const isGreetingOnly =
+    /^(halo|hai|hi|hello|pagi|siang|sore|malam|tes|test|assalamualaikum|salam)[\s!?.]*$/i
+        .test(message.trim());
+
+const explicitCreativeImageIntent =
+    (
+        /\b(buat|buatkan|bikin|generate|create|render|desain)\b[\s\S]{0,100}\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b/i.test(message)
+        ||
+        /\b(foto|gambar|image|poster|ilustrasi|illustration|visual|wallpaper|banner|mockup)\b[\s\S]{0,100}\b(buat|buatkan|bikin|generate|create|render|desain)\b/i.test(message)
+    );
+
+const explicitStoryboardIntent =
+    /\b(storyboard|scene|sinematik|cinematic|prompt video|video ai|creative direction|iklan sinematik)\b/i
+        .test(message);
+
+const creativeUsesExactProduct =
+    Boolean(preExactProduct) &&
+    (
+        explicitCreativeImageIntent ||
+        explicitStoryboardIntent
+    );
+
+const hasPreviousProductContext =
+    Array.isArray(productMemory) &&
+    productMemory.length > 0;
+
+const productFollowUp =
+    hasPreviousProductContext &&
+    /\b(yang tadi|produk tadi|fotonya|gambarnya|harganya|stoknya|variannya|spesifikasinya|yang pertama|yang kedua|full halamannya|halaman katalognya)\b/i
+        .test(message);
+
+const hasProductBrandSignal =
+    /\b(nine|luximos|soundblax|securicle|lx[\s-]?trix|9power|nine power|optimus)\b/i
+        .test(message);
+
+const hasProductCategorySignal =
+    /\b(produk|sku|kode produk|lampu sorot|shooting light|headlamp|headlight|foglamp|biled|projector|flasher|relay|klakson|klaxon|alarm|karpet|carpet)\b/i
+        .test(message);
+
+const askPrice =
+    /\b(harga|price|harganya|berapa harga)\b/i
+        .test(message);
+
+const askStock =
+    /\b(stok|stock|ready|tersedia|ketersediaan)\b/i
+        .test(message);
+
+const askSpec =
+    /\b(spesifikasi|spec|spek|fitur|kelebihan|watt|volt|lumen|kelvin|garansi)\b/i
+        .test(message);
+
+const askCompare =
+    /\b(beda|perbedaan|vs|versus|bandingkan|bandingin|compare)\b/i
+        .test(message);
+
+const askType =
+    /\b(type|tipe|seri|model|apa saja|list|daftar|macam)\b/i
+        .test(message);
+
+const askPhoto =
+    /\b(foto|gambar|image|lihat|tampilkan|tunjukkan)\b/i
+        .test(message);
+
+const askCatalogPage =
+    /\b(foto katalog|halaman katalog|full halaman|full page|katalog lengkap|halaman lengkap)\b/i
+        .test(message);
+
+const hasStrongProductSignal =
+    Boolean(preExactProduct) ||
+    productFollowUp ||
+    hasProductBrandSignal ||
+    hasProductCategorySignal;
+
+const forceGeneralRoute =
+    askCurrentTime ||
+    askCurrentDate ||
+    isGreetingOnly;
+
+const forceCreativeRoute =
+    !forceGeneralRoute &&
+    (
+        explicitCreativeImageIntent ||
+        explicitStoryboardIntent
+    ) &&
+    !creativeUsesExactProduct;
+
+const shouldSearchProducts =
+    !forceGeneralRoute &&
+    !forceCreativeRoute &&
+    hasStrongProductSignal;
+
+const matchedProducts =
+    shouldSearchProducts
+    ? products
+        .map(product => ({
+            product,
+            score:getScore(product,tokens)
+        }))
+        .filter(item => item.score > 0)
+        .sort((a,b) => b.score - a.score)
+        .map(item => item.product)
+        .slice(0,50)
+    : [];
+
+const exactProduct =
+    preExactProduct;
+
+const productRequestSignal =
     askPrice ||
+    askStock ||
     askSpec ||
     askCompare ||
-    askAvailability ||
+    askType ||
+    askPhoto ||
     askCatalogPage ||
-    Boolean(exactProduct) ||
-    (
-        askPhoto &&
-        hasProductReference
-    ) ||
-    /(sku|kode produk|nama produk|produk|varian produk|harga produk)/i.test(message);
+    hasProductBrandSignal ||
+    hasProductCategorySignal ||
+    productFollowUp ||
+    Boolean(exactProduct);
 
+const isProductQuery =
+    !forceGeneralRoute &&
+    !forceCreativeRoute &&
+    productRequestSignal &&
+    (
+        Boolean(exactProduct) ||
+        productFollowUp ||
+        matchedProducts.length > 0
+    );
+
+const intentRoute =
+    forceGeneralRoute
+        ? "GENERAL"
+        : (
+            forceCreativeRoute
+                ? "CREATIVE"
+                : (
+                    creativeUsesExactProduct
+                        ? "CREATIVE_PRODUCT"
+                        : (
+                            isProductQuery
+                                ? "PRODUCT"
+                                : "GENERAL"
+                        )
+                )
+        );
 
 // ==================================================
 // GENERAL / SALES INTENT
@@ -821,7 +884,10 @@ const resolvedProducts =
         : matchedProducts;
 
 const useProductContext =
-    isProductQuery &&
+    (
+        intentRoute === "PRODUCT" ||
+        intentRoute === "CREATIVE_PRODUCT"
+    ) &&
     resolvedProducts.length > 0;
 
 
@@ -833,7 +899,10 @@ const useProductContext =
 
 let officialProductList = [];
 
-if(isProductQuery){
+if(
+    intentRoute === "PRODUCT" ||
+    intentRoute === "CREATIVE_PRODUCT"
+){
 
     if(exactProduct){
 
@@ -858,13 +927,20 @@ if(isProductQuery){
 }
 
 const visualMode =
-    askCatalogPage
-        ? "catalog"
-        : (
-            askPhoto
-                ? "photo"
-                : "product"
-        );
+    (
+        intentRoute === "PRODUCT" ||
+        intentRoute === "CREATIVE_PRODUCT"
+    )
+    ? (
+        askCatalogPage
+            ? "catalog"
+            : (
+                askPhoto
+                    ? "photo"
+                    : "product"
+            )
+      )
+    : "none";
 
 const exactProductVisualLock =
     exactProduct
@@ -4098,13 +4174,17 @@ PRIORITAS:
 4. Pengetahuan umum untuk konteks non-produk.
 
 ROUTING INTENT:
-- Kata "foto/gambar/visual" sendiri TIDAK berarti produk.
-- "foto R8", "foto Q9-PRO", atau nama/SKU produk terdeteksi
-  → gunakan visual produk resmi.
-- "buat foto semut", "buat gambar kota", "render pemandangan",
-  atau creative request tanpa identitas produk
-  → masuk creative image generation.
-- Jika intent ambigu dan tidak ada identitas produk, jangan memaksa product resolver.
+- GENERAL tidak boleh berubah menjadi PRODUCT karena fuzzy match.
+- Pertanyaan waktu/tanggal, sapaan, sales umum, bisnis umum,
+  edukasi, atau otomotif umum tanpa identitas produk → GENERAL.
+- Kata "berapa", "ada", "tipe", "foto", "gambar" sendiri
+  TIDAK cukup untuk mengaktifkan PRODUCT.
+- PRODUCT hanya aktif jika ada exact SKU/nama, brand/kategori produk,
+  atau follow-up produk yang jelas dari product memory.
+- Creative command eksplisit tanpa produk exact → CREATIVE.
+- Creative command dengan produk exact → CREATIVE_PRODUCT.
+- Fuzzy product search hanya berjalan setelah PRODUCT gate aktif.
+- Jika route GENERAL atau CREATIVE, jangan kirim product card.
 
 ATURAN PRODUK:
 - Jangan mengarang harga, SKU, stok, varian,
@@ -4232,6 +4312,44 @@ const conversationHistory = Array.isArray(memory)
       )
       .slice(-3)
   : [];
+
+
+const nowJakarta =
+    new Intl.DateTimeFormat(
+        "id-ID",
+        {
+            timeZone:"Asia/Jakarta",
+            weekday:"long",
+            year:"numeric",
+            month:"long",
+            day:"numeric",
+            hour:"2-digit",
+            minute:"2-digit",
+            second:"2-digit",
+            hour12:false
+        }
+    ).format(new Date());
+
+if(
+    askCurrentTime ||
+    askCurrentDate
+){
+    systemPrompt += `
+
+==================================================
+REAL-TIME CONTEXT
+==================================================
+
+Waktu aktual zona Asia/Jakarta:
+${nowJakarta}
+
+Gunakan nilai ini untuk menjawab waktu/tanggal.
+Jangan gunakan data produk dan jangan menebak.
+
+==================================================
+
+`;
+}
 
 const messages = [
 
@@ -4438,18 +4556,26 @@ const isCodingRequest =
 const isImageRequest =
     (isAstraMode || isNexaiMode) &&
     !isCodingRequest &&
-    !useProductContext &&
-    !exactProduct &&
     (
+        intentRoute === "CREATIVE" ||
+        intentRoute === "CREATIVE_PRODUCT"
+    ) &&
+    (
+        explicitCreativeImageIntent ||
         explicitImageRequest ||
         hasExplicitImageWord ||
         promptLooksLikeImage
     );
 
+console.log("ROUTE:", intentRoute);
 console.log("IS CODING:", isCodingRequest);
 console.log("IS IMAGE:", isImageRequest);
+console.log("TIME INTENT:", askCurrentTime || askCurrentDate);
+console.log("CREATIVE INTENT:", explicitCreativeImageIntent || explicitStoryboardIntent);
+console.log("EXACT PRODUCT:", exactProduct?.sku || null);
+console.log("FUZZY ENABLED:", shouldSearchProducts);
+console.log("MATCHED PRODUCTS:", matchedProducts.slice(0,5).map(p => p.sku));
 console.log("MESSAGE:", aiMessage);
-
 
 
 let visualContext = "";
@@ -4870,7 +4996,9 @@ return {
     assistantMode:
         isNexaiMode
             ? "NEXAI"
-            : "IMAM_AI"
+            : "IMAM_AI",
+
+    intentRoute
 
   })
 
