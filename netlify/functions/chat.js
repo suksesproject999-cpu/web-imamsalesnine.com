@@ -432,7 +432,7 @@ function stripIntentWords(text) {
 
 
 function isExplicitCreativeOrGeneralRequest(message = "") {
-  const q = normalizeText(message);
+  const q = normalize(message);
 
   // Permintaan membuat visual/gambar umum, bukan permintaan foto produk.
   const creativeImage =
