@@ -645,6 +645,59 @@ body.productMemory
     : body.productMemory
   )
 : [];
+
+
+// ==================================================
+// PREVIOUS PRODUCT VISUAL MEMORY — SAFE DECLARATION
+// ==================================================
+//
+// Harus dideklarasikan sebelum dipakai oleh systemPrompt.
+// Patch router sebelumnya menghapus deklarasi ini sehingga
+// semua request normal bisa terkena ReferenceError.
+
+const visualMemoryContext =
+    Array.isArray(productMemory) &&
+    productMemory.length
+    ? `
+
+==================================================
+PREVIOUS PRODUCT VISUAL CONTEXT
+==================================================
+
+Produk yang sebelumnya ditampilkan kepada user:
+
+${productMemory
+    .slice(-8)
+    .map(p => `
+Nama Produk: ${p?.nama || "-"}
+Brand: ${p?.brand || "-"}
+SKU: ${p?.sku || "-"}
+Gambar: ${p?.gambar || "-"}
+Varian: ${p?.varian || "-"}
+Harga: ${
+    typeof p?.harga === "object"
+        ? JSON.stringify(p.harga)
+        : (p?.harga || "-")
+}
+`).join("\n")}
+
+Gunakan konteks ini HANYA bila user jelas merujuk
+produk yang sebelumnya ditampilkan.
+
+Contoh:
+"foto tadi"
+"yang pertama"
+"harganya"
+"produk tadi"
+
+Jangan gunakan konteks produk lama bila user sudah
+mengganti topik ke pertanyaan umum atau creative baru.
+
+==================================================
+
+`
+    : "";
+
 		
 
 const orders =
