@@ -295,6 +295,300 @@ function searchProducts(text, categoryId, brand, limit = 12) {
     .slice(0, limit);
 }
 
+
+// =========================
+// ADVANCED PRODUCT INTELLIGENCE
+// Intent + entity + constraints + exclusions + state
+// =========================
+
+const PRODUCT_FUNCTION_RULES = [
+  {
+    id: "light_source",
+    include: [
+      "led", "bulb", "bohlam", "lampu led",
+      "headlamp bulb", "headlight bulb",
+      "foglamp bulb", "lampu utama", "lampu foglamp"
+    ],
+    exclude: [
+      "fitting", "socket", "adapter", "switch",
+      "relay", "cable", "kabel", "harness",
+      "alarm", "karpet", "carpet"
+    ]
+  },
+  {
+    id: "fitting",
+    include: ["fitting", "socket", "adapter"],
+    exclude: ["bulb", "bohlam"]
+  },
+  {
+    id: "shooting_light",
+    include: ["shooting light", "lampu sorot", "lampu tembak", "spotlight"],
+    exclude: ["fitting", "socket", "adapter"]
+  },
+  {
+    id: "alarm",
+    include: ["alarm", "security"],
+    exclude: ["lampu", "bulb", "foglamp", "headlamp"]
+  },
+  {
+    id: "electrical_accessory",
+    include: ["relay", "flasher", "switch", "cable", "kabel", "harness"],
+    exclude: ["bulb", "bohlam"]
+  }
+];
+
+function detectSocket(text) {
+  const n = normalize(text);
+
+  const sockets = [
+    "h1","h3","h4","h7","h8","h9","h10","h11","h16",
+    "hb3","hb4","9005","9006","9012","d2s","d4s",
+    "t10","t15","t20","t25","h27","h27w","h27w2"
+  ];
+
+  return sockets.find(s => new RegExp(`(^|\\s)${s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}($|\\s)`, "i").test(n)) || "";
+}
+
+function detectProductFunction(text) {
+  const n = normalize(text);
+
+  if (/\b(fitting|socket|adapter)\b/i.test(n)) {
+    return "fitting";
+  }
+
+  if (/\b(shooting light|lampu sorot|lampu tembak|spotlight)\b/i.test(n)) {
+    return "shooting_light";
+  }
+
+  if (/\b(alarm|security)\b/i.test(n)) {
+    return "alarm";
+  }
+
+  if (/\b(relay|flasher|switch|cable|kabel|harness)\b/i.test(n)) {
+    return "electrical_accessory";
+  }
+
+  if (
+    /\b(bohlam|bulb|lampu led|headlamp|headlight|foglamp|h4|h7|h11|h16|hb3|hb4|9005|9006)\b/i.test(n)
+  ) {
+    return "light_source";
+  }
+
+  return "";
+}
+
+function detectBrightnessIntent(text) {
+  const n = normalize(text);
+  return /\b(terang|lebih terang|bright|brightness|lumens?|high brightness|maksimal cahaya|cahaya kuat)\b/i.test(n);
+}
+
+function detectVehicleEntities(text) {
+  const n = normalize(text);
+
+  const brands = [
+    "toyota","suzuki","honda","daihatsu","mitsubishi",
+    "nissan","mazda","hyundai","kia","isuzu","wuling"
+  ];
+
+  const brand = brands.find(b => n.includes(b)) || "";
+
+  const knownModels = [
+    "ertiga","rush","avanza","xenia","innova","brio","xpander",
+    "pajero","fortuner","agya","ayla","sigra","calya","mobilio",
+    "crv","hrv","jazz","city","livina","terios","rocky","raize"
+  ];
+
+  const model = knownModels.find(m => n.includes(m)) || "";
+
+  const yearMatch = String(text || "").match(/\b(19|20)\d{2}\b/);
+
+  return {
+    brand,
+    model,
+    year: yearMatch ? Number(yearMatch[0]) : null
+  };
+}
+
+function buildAutomotiveStateFromHistory(message, memory) {
+  const recent = Array.isArray(memory)
+    ? memory.slice(-8).map(x => x?.content || "").join("\n")
+    : "";
+
+  const combined = `${recent}\n${message}`;
+
+  const vehicle = detectVehicleEntities(combined);
+
+  const position =
+    /\bfoglamp|fog lamp|lampu kabut\b/i.test(combined)
+      ? "foglamp"
+      : (
+          /\bheadlamp|headlight|lampu utama|lampu depan\b/i.test(combined)
+            ? "headlamp"
+            : ""
+        );
+
+  const socket = detectSocket(combined);
+
+  return {
+    vehicle,
+    position,
+    socket
+  };
+}
+
+function productText(product) {
+  return normalize([
+    product?.nama,
+    product?.brand,
+    product?.kategori,
+    product?.sku,
+    product?.deskripsi,
+    product?.aplikasi,
+    ...(Array.isArray(product?.tags) ? product.tags : []),
+    ...(Array.isArray(product?.varian) ? product.varian : [])
+  ].filter(Boolean).join(" "));
+}
+
+function matchesFunction(product, functionId) {
+  if (!functionId) return true;
+
+  const rule = PRODUCT_FUNCTION_RULES.find(r => r.id === functionId);
+  if (!rule) return true;
+
+  const hay = productText(product);
+
+  const hasInclude =
+    !rule.include.length ||
+    rule.include.some(term => hay.includes(normalize(term)));
+
+  const hasExclude =
+    rule.exclude.some(term => hay.includes(normalize(term)));
+
+  return hasInclude && !hasExclude;
+}
+
+function matchesSocket(product, socket) {
+  if (!socket) return true;
+
+  const hay = productText(product);
+  const s = normalize(socket);
+
+  // Hard requirement: socket must be explicitly present.
+  return new RegExp(`(^|\\s)${s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}($|\\s)`, "i").test(hay);
+}
+
+function semanticProductSearch({
+  text,
+  memory,
+  limit = 10
+}) {
+  const brand = detectBrand(text);
+  const categoryId = detectCategory(text);
+  const functionId = detectProductFunction(text);
+  const socket = detectSocket(text);
+  const wantsBright = detectBrightnessIntent(text);
+
+  const state = buildAutomotiveStateFromHistory(text, memory);
+
+  let candidates = products
+    .filter(p => matchesBrand(p, brand))
+    .filter(p => matchesCategory(p, categoryId))
+    .filter(p => matchesFunction(p, functionId))
+    .filter(p => matchesSocket(p, socket));
+
+  // If explicit socket + function request returns nothing,
+  // do NOT broaden to unrelated accessories.
+  if (socket && functionId && candidates.length === 0) {
+    return {
+      items: [],
+      constraints: {
+        brand,
+        categoryId,
+        functionId,
+        socket,
+        wantsBright,
+        automotiveState: state
+      }
+    };
+  }
+
+  const scored = candidates
+    .map(p => {
+      let score = scoreProduct(p, text);
+
+      const hay = productText(p);
+
+      if (socket && hay.includes(normalize(socket))) {
+        score += 600;
+      }
+
+      if (functionId && matchesFunction(p, functionId)) {
+        score += 400;
+      }
+
+      if (categoryId && matchesCategory(p, categoryId)) {
+        score += 300;
+      }
+
+      if (wantsBright) {
+        if (/\b(high brightness|bright|terang|lumen|lux)\b/i.test(hay)) {
+          score += 120;
+        }
+      }
+
+      // Penalize generic fitting/accessories when user asks light source.
+      if (
+        functionId === "light_source" &&
+        /\b(fitting|socket|adapter|switch|relay|cable|kabel|harness)\b/i.test(hay)
+      ) {
+        score -= 1000;
+      }
+
+      return { product: p, score };
+    })
+    .sort((a,b) => b.score - a.score)
+    .filter(x => x.score > 0);
+
+  const seen = new Set();
+  const items = [];
+
+  for (const row of scored) {
+    const sku = String(row.product?.sku || "").toUpperCase();
+    if (!sku || seen.has(sku)) continue;
+    seen.add(sku);
+    items.push(row.product);
+    if (items.length >= limit) break;
+  }
+
+  return {
+    items,
+    constraints: {
+      brand,
+      categoryId,
+      functionId,
+      socket,
+      wantsBright,
+      automotiveState: state
+    }
+  };
+}
+
+function isRecommendationRequest(text) {
+  return /\b(rekomendasi|recommend|yang cocok|cocok untuk|pilihan|type apa|tipe apa|yang terang|yang bagus|mana yang cocok)\b/i.test(text);
+}
+
+function shouldUseContextualRecommendation(text, memory) {
+  if (!isRecommendationRequest(text)) return false;
+
+  const recent = Array.isArray(memory)
+    ? memory.slice(-6).map(x => x?.content || "").join(" ")
+    : "";
+
+  const combined = `${recent} ${text}`;
+
+  return /\b(foglamp|headlamp|headlight|lampu utama|lampu kabut|h4|h7|h11|h16|hb3|hb4|9005|9006|produk nine|luximos)\b/i.test(combined);
+}
+
 // =========================
 // INTENT ROUTER
 // =========================
@@ -336,7 +630,11 @@ function detectIntent(text, activeProduct) {
   const categoryId = detectCategory(text);
   const explicitProduct = /\b(produk|sku|kode\s+produk|katalog)\b/i.test(text);
 
-  if (brand || explicitProduct) {
+  if (
+    brand ||
+    explicitProduct ||
+    isRecommendationRequest(text)
+  ) {
     return {
       route: "PRODUCT_SEARCH",
       brand,
@@ -594,6 +892,9 @@ exports.handler = async event => {
     console.log("ROUTE:", route);
     console.log("EXACT SKU:", exact?.sku || null);
     console.log("MEMORY SKU:", remembered?.sku || null);
+    console.log("CATEGORY:", detectCategory(message) || null);
+    console.log("FUNCTION:", detectProductFunction(message) || null);
+    console.log("SOCKET:", detectSocket(message) || null);
 
     // TIME: deterministic, no AI.
     if (route === "UTILITY_TIME") {
@@ -634,13 +935,31 @@ exports.handler = async event => {
         });
       }
 
+      const serialized = serializeProduct(activeProduct);
+
+      let exactReply =
+        `Data resmi ${activeProduct.nama} (SKU ${activeProduct.sku}). ` +
+        `Harga: ${formatPrice(activeProduct.harga)}. ` +
+        `Stok: ${formatStock(activeProduct.stok)}.`;
+
+      if (
+        route === "PRODUCT_VISUAL" &&
+        !serialized.visual?.foto_utama_tersedia
+      ) {
+        exactReply += " Foto resmi produk ini belum tersedia pada visual mapping aktif.";
+      }
+
+      if (
+        route === "PRODUCT_CATALOG" &&
+        !serialized.visual?.full_page_tersedia
+      ) {
+        exactReply += " Halaman katalog resmi produk ini belum tersedia pada visual mapping aktif.";
+      }
+
       return jsonResponse(200, {
-        reply:
-          `Data resmi ${activeProduct.nama} (SKU ${activeProduct.sku}). ` +
-          `Harga: ${formatPrice(activeProduct.harga)}. ` +
-          `Stok: ${formatStock(activeProduct.stok)}.`,
+        reply: exactReply,
         image: null,
-        products: [serializeProduct(activeProduct)],
+        products: [serialized],
         visualMode:
           route === "PRODUCT_VISUAL" ? "photo" :
           route === "PRODUCT_CATALOG" ? "catalog" : "product",
@@ -650,23 +969,35 @@ exports.handler = async event => {
       });
     }
 
-    // PRODUCT SEARCH: category first, then scoring.
+    // PRODUCT SEARCH: semantic constraints first, then ranking.
     if (route === "PRODUCT_SEARCH") {
-      const categoryId = intent.categoryId || detectCategory(message);
-      const brand = intent.brand || detectBrand(message);
-      const list = searchProducts(message, categoryId, brand, 12);
+      const semantic = semanticProductSearch({
+        text: message,
+        memory,
+        limit: 12
+      });
+
+      const list = semantic.items;
+      const constraints = semantic.constraints;
 
       return jsonResponse(200, {
         reply: list.length
-          ? `Ditemukan ${list.length} produk resmi${categoryId ? ` untuk kategori ${categoryId.replace("_", " ")}` : ""}.`
-          : `Belum ditemukan produk resmi${categoryId ? ` untuk kategori ${categoryId.replace("_", " ")}` : ""} pada data aktif.`,
+          ? `Ditemukan ${list.length} produk resmi yang sesuai dengan filter fungsi/socket/kategori.`
+          : `Belum ditemukan produk resmi yang benar-benar sesuai dengan filter yang diminta. Saya tidak akan menampilkan produk lain yang tidak relevan.`,
         image: null,
         products: list.map(serializeProduct),
         visualMode: "product",
         productSource: "OFFICIAL_PRODUCT_DATA",
         assistantMode: nexaiMode ? "NEXAI" : "IMAM_AI",
         intentRoute: route,
-        filters: { category: categoryId || null, brand: brand || null }
+        filters: {
+          brand: constraints.brand || null,
+          category: constraints.categoryId || null,
+          function: constraints.functionId || null,
+          socket: constraints.socket || null,
+          brightness: constraints.wantsBright || false,
+          automotiveState: constraints.automotiveState
+        }
       });
     }
 
