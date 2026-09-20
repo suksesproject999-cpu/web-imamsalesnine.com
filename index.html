@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v15.3-final-desktop-height-caret">
+<meta name="nexai-ui-version" content="2026.09-v15.4-manual-input-focus">
 
 <link rel="icon" href="favicon.png">
 
@@ -14575,12 +14575,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v15.3-final-desktop-height-caret">
+<meta name="nexai-ui-version" content="2026.09-v15.4-manual-input-focus">
 
 <script>
 /* NEXAI V13 — one-time clean migration */
 (function(){
-  const schema = "v15.3-final-desktop-height-caret";
+  const schema = "v15.4-manual-input-focus";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
@@ -24545,17 +24545,6 @@ function chooseNexaiTemplate(text){
     input.value = String(text || "").trim();
 
     setNexaiTemplateMenu(false);
-
-    input.focus({
-        preventScroll:true
-    });
-
-    try{
-        input.setSelectionRange(
-            input.value.length,
-            input.value.length
-        );
-    }catch{}
 }
 
 function initNexaiTemplateMenu(){
@@ -26481,6 +26470,9 @@ async function revealNexaiAnswer(node, html, startedAt){
             behavior:"smooth"
         });
     }
+    // V15.4 keep answer in focus; user taps composer manually for next question.
+    document.getElementById("aiInput")?.blur();
+
 }
 
 
@@ -26494,6 +26486,9 @@ async function sendAI(){
 
     const input =
         document.getElementById("aiInput");
+
+    // V15.4 manual focus: close keyboard after sending.
+    input?.blur();
 
     const text =
         String(input?.value || "").trim();
@@ -26779,7 +26774,7 @@ async function sendAI(){
         setAISendBusy(false);
 
 if(input){
-            input.focus();
+            
         }
 
     }
@@ -28370,7 +28365,7 @@ function openNexaiHybrid(event){
     setTimeout(() => {
 
         if(input){
-            input.focus();
+            
         }
 
         if(body){
