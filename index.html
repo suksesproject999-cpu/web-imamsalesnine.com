@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v15-final-modal-refactor">
+<meta name="nexai-ui-version" content="2026.09-v15.3-final-desktop-height-caret">
 
 <link rel="icon" href="favicon.png">
 
@@ -14185,6 +14185,355 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
     }
 }
 
+
+/* ==========================================================
+   NEXAI V15.1 — DESKTOP WIDE MODAL ONLY
+   Scope: desktop >= 769px. Mobile is intentionally untouched.
+   Goal: match the comfortable footprint of the visitor-comment modal.
+========================================================== */
+@media(min-width:769px){
+
+    #aiModal{
+        padding:
+            clamp(24px, 4vh, 56px)
+            clamp(18px, 2.5vw, 48px)
+            clamp(24px, 4vh, 56px)
+            !important;
+
+        align-items:center !important;
+        justify-content:center !important;
+    }
+
+    #aiModal > .nexai-sheet{
+        width:min(1180px, calc(100vw - 48px)) !important;
+        height:min(86vh, 860px) !important;
+        max-width:1180px !important;
+        max-height:860px !important;
+
+        margin:auto !important;
+
+        border-radius:20px !important;
+
+        box-shadow:
+            0 26px 80px rgba(0,0,0,.30),
+            0 3px 12px rgba(0,0,0,.08)
+            !important;
+    }
+
+    #aiModal .nexai-sheet-grab-zone{
+        height:20px !important;
+        min-height:20px !important;
+        flex-basis:20px !important;
+    }
+
+    #aiModal .nexai-sheet-header{
+        height:64px !important;
+        min-height:64px !important;
+        flex-basis:64px !important;
+
+        padding:0 22px !important;
+    }
+
+    #aiModal .nexai-sheet-header h2{
+        font-size:22px !important;
+    }
+
+    #aiModal .nexai-sheet-body{
+        padding:
+            24px
+            clamp(28px, 4vw, 56px)
+            36px
+            !important;
+
+        font-size:16px !important;
+    }
+
+    #aiModal .ai-message.bot{
+        max-width:900px !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+
+        font-size:16px !important;
+        line-height:1.72 !important;
+    }
+
+    #aiModal .ai-message.user{
+        max-width:72% !important;
+        font-size:16px !important;
+    }
+
+    #aiModal .nexai-sheet-footer{
+        padding:
+            12px
+            clamp(20px, 3vw, 36px)
+            16px
+            !important;
+
+        gap:8px !important;
+    }
+
+    #aiModal .nexai-template-toolbar{
+        height:34px !important;
+        min-height:34px !important;
+        flex-basis:34px !important;
+    }
+
+    #aiModal .nexai-template-trigger{
+        width:108px !important;
+        min-width:108px !important;
+        height:34px !important;
+        flex-basis:108px !important;
+
+        font-size:12.5px !important;
+    }
+
+    #aiModal .ai-input-row{
+        min-height:58px !important;
+        padding:6px !important;
+
+        border-radius:30px !important;
+    }
+
+    #aiModal .ai-input-row > input{
+        height:46px !important;
+        font-size:16px !important;
+        padding-left:18px !important;
+    }
+
+    #aiModal .ai-input-row > button{
+        width:108px !important;
+        min-width:108px !important;
+        flex-basis:108px !important;
+        height:46px !important;
+
+        border-radius:24px !important;
+        font-size:15px !important;
+    }
+
+    #aiModal .ai-product-card{
+        max-width:900px !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+    }
+
+    #aiModal .ai-product-image-wrap{
+        max-width:760px !important;
+        margin-left:auto !important;
+        margin-right:auto !important;
+    }
+
+    #aiModal .ai-product-image-wrap img.ai-product-image,
+    #aiModal .ai-generated-image img{
+        max-height:520px !important;
+    }
+
+    #aiModal .nexai-template-menu{
+        width:min(360px, calc(100vw - 80px)) !important;
+    }
+
+    /* Keep minimized behavior stable, only widen the dock proportionally */
+    #aiModal.nexai-minimized{
+        align-items:flex-end !important;
+    }
+
+    #aiModal.nexai-minimized > .nexai-sheet{
+        width:min(760px, calc(100vw - 48px)) !important;
+        height:68px !important;
+        max-height:68px !important;
+        margin:0 auto !important;
+
+        border-radius:20px !important;
+    }
+
+    #aiModal.nexai-minimized .nexai-sheet-header{
+        height:68px !important;
+        min-height:68px !important;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V15.2 — DESKTOP HEIGHT + VISIBLE CARET ONLY
+   Desktop detection uses fine pointer/hover so HP mode stays untouched.
+========================================================== */
+
+/* Desktop/laptop only — keeps existing phone layout intact */
+@media (hover:hover) and (pointer:fine){
+
+    #aiModal{
+        padding:
+            clamp(28px, 3.2vh, 48px)
+            clamp(18px, 2.5vw, 48px)
+            !important;
+
+        align-items:center !important;
+        justify-content:center !important;
+    }
+
+    #aiModal > .nexai-sheet{
+        width:min(1180px, calc(100vw - 48px)) !important;
+
+        /* Match the comfortable vertical footprint of the comment modal */
+        height:min(90vh, 1120px) !important;
+        max-height:calc(100vh - 56px) !important;
+
+        margin:auto !important;
+    }
+
+    /* Conversation gets the extra vertical space, footer/header stay fixed */
+    #aiModal .nexai-sheet-body{
+        flex:1 1 auto !important;
+        min-height:0 !important;
+    }
+
+    /* Make text-entry state obvious */
+    #aiModal .ai-input-row > input{
+        color:#202124 !important;
+        caret-color:#202124 !important;
+        cursor:text !important;
+        opacity:1 !important;
+        -webkit-text-fill-color:#202124 !important;
+    }
+
+    #aiModal .ai-input-row:focus-within{
+        border-color:#9acb57 !important;
+        box-shadow:
+            0 0 0 3px rgba(140,198,63,.13),
+            0 2px 10px rgba(0,0,0,.04)
+            !important;
+    }
+
+    #aiModal .ai-input-row > input:focus{
+        outline:none !important;
+    }
+
+    #aiModal .ai-input-row > input::placeholder{
+        color:#90959a !important;
+        opacity:1 !important;
+    }
+}
+
+/* Extra-wide desktop keeps the same proportions, not an oversized fullscreen panel */
+@media (min-width:1280px) and (hover:hover) and (pointer:fine){
+    #aiModal > .nexai-sheet{
+        width:min(1240px, calc(100vw - 72px)) !important;
+        height:min(90vh, 1120px) !important;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V15.3 FINAL — DESKTOP HEIGHT + CARET FIX
+   Desktop detection uses viewport width, so Android "Desktop site"
+   mode is handled correctly.
+========================================================== */
+
+/* CARET FIX — scoped to NEXAI only, layout unchanged */
+#aiModal .ai-input-row > input,
+#aiModal #aiInput{
+    caret-color:#202124 !important;
+    color:#202124 !important;
+    -webkit-text-fill-color:#202124 !important;
+    cursor:text !important;
+    opacity:1 !important;
+}
+
+#aiModal .ai-input-row:focus-within{
+    border-color:#98c954 !important;
+    box-shadow:
+        0 0 0 3px rgba(140,198,63,.14),
+        0 2px 10px rgba(0,0,0,.04)
+        !important;
+}
+
+#aiModal .ai-input-row > input:focus,
+#aiModal #aiInput:focus{
+    outline:none !important;
+    caret-color:#202124 !important;
+}
+
+/* TRUE DESKTOP / BROWSER DESKTOP-SITE MODE
+   Mobile normal mode keeps its existing geometry because its CSS viewport
+   remains below this breakpoint. */
+@media (min-width:769px){
+
+    #aiModal{
+        padding:32px 18px !important;
+        align-items:center !important;
+        justify-content:center !important;
+    }
+
+    #aiModal > .nexai-sheet{
+        width:min(1180px,calc(100vw - 36px)) !important;
+
+        /* Tall like the visitor-comment modal */
+        height:calc(100vh - 64px) !important;
+        max-height:calc(100vh - 64px) !important;
+        min-height:620px !important;
+
+        margin:auto !important;
+        border-radius:20px !important;
+    }
+
+    /* Make sure no older svh/vh rule can shrink the desktop sheet */
+    @supports (height:100dvh){
+        #aiModal > .nexai-sheet{
+            height:calc(100dvh - 64px) !important;
+            max-height:calc(100dvh - 64px) !important;
+        }
+    }
+
+    #aiModal .nexai-sheet-body{
+        flex:1 1 auto !important;
+        min-height:0 !important;
+        height:auto !important;
+        max-height:none !important;
+        overflow-y:auto !important;
+    }
+
+    #aiModal .nexai-sheet-header{
+        flex:0 0 64px !important;
+        height:64px !important;
+        min-height:64px !important;
+    }
+
+    #aiModal .nexai-sheet-footer{
+        flex:0 0 auto !important;
+    }
+
+    /* Keep desktop text/input comfortable */
+    #aiModal .ai-message.bot,
+    #aiModal .ai-message.user{
+        font-size:16px !important;
+    }
+
+    #aiModal .ai-input-row > input,
+    #aiModal #aiInput{
+        height:46px !important;
+        font-size:16px !important;
+    }
+}
+
+/* Larger desktop */
+@media (min-width:1200px){
+    #aiModal{
+        padding:36px 24px !important;
+    }
+
+    #aiModal > .nexai-sheet{
+        width:min(1240px,calc(100vw - 48px)) !important;
+        height:calc(100vh - 72px) !important;
+        max-height:calc(100vh - 72px) !important;
+    }
+
+    @supports (height:100dvh){
+        #aiModal > .nexai-sheet{
+            height:calc(100dvh - 72px) !important;
+            max-height:calc(100dvh - 72px) !important;
+        }
+    }
+}
+
 </style>
 
 
@@ -14226,12 +14575,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v15-final-modal-refactor">
+<meta name="nexai-ui-version" content="2026.09-v15.3-final-desktop-height-caret">
 
 <script>
 /* NEXAI V13 — one-time clean migration */
 (function(){
-  const schema = "v15-final-modal-refactor";
+  const schema = "v15.3-final-desktop-height-caret";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
