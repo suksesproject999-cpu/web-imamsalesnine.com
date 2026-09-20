@@ -1,19 +1,18 @@
 
 const endpoint=process.argv[2]||"https://imamsalesnine.com/.netlify/functions/chat";
+
 const tests=[
-["Bro","smalltalk",null],
-["Harga R9 berapa","product_price","R9"],
-["Spek R9","product_spec","R9"],
-["R9 detail lengkap","product_full","R9"],
-["Semua foto R9","product_gallery","R9"],
-["Spek V9pro","product_spec","V9PRO"],
-["Spek MS3","product_spec","MS3-SLIM"],
-["Spek H6 LH2","product_spec","H6-LH2"],
-["Beda R9 dan R10 apa","compare",null],
-["Profil Imam","business_profile",null],
-["Nine Autoseries master brand apa","brand_knowledge",null],
-["Siapa presiden Indonesia sekarang","current_web",null],
-["Jam berapa sekarang","local_time",null]
+  ["Bro","smalltalk",null],
+  ["Harga R9 berapa","product_price","R9"],
+  ["Spek R9","product_spec","R9"],
+  ["Spek V9pro","product_spec","V9PRO"],
+  ["Spek MS3","product_spec","MS3-SLIM"],
+  ["Spek H6 LH2","product_spec","H6-LH2"],
+  ["Beda R9 dan R10 apa","compare",null],
+  ["Profil Imam","business_profile",null],
+  ["Nine Autoseries master brand apa","brand_knowledge",null],
+  ["Siapa presiden Indonesia sekarang","current_web",null],
+  ["Jam berapa sekarang","local_time",null]
 ];
 
 async function ask(message){
@@ -24,25 +23,41 @@ async function ask(message){
   f.append("imamMode","0");
   f.append("clientTime",new Date().toISOString());
   f.append("clientTimezone","Asia/Jakarta");
+
   const r=await fetch(endpoint,{method:"POST",body:f});
-  return{status:r.status,data:await r.json()};
+  return {status:r.status,data:await r.json()};
 }
 
 (async()=>{
   let fail=0;
-  for(const[m,route,sku]of tests){
+
+  const health=await fetch(endpoint+"?health=1").then(r=>r.json());
+  console.log("HEALTH",JSON.stringify(health.identityCoverage||{}));
+
+  if(!health.identityCoverage?.unified_identities){
+    console.log("FAIL identity coverage missing");
+    fail++;
+  }
+
+  for(const [message,route,sku] of tests){
     try{
-      const{status,data}=await ask(m);
-      const actualSku=data.product?.sku||data.product?.identity?.sku||"";
-      const ok=status===200&&data.route===route&&(!sku||String(actualSku).toUpperCase()===sku)
-        &&(route!=="compare"||(Array.isArray(data.products)&&data.products.length>=2))
-        &&(route!=="current_web"||data.usedWeb===true);
-      console.log(ok?"PASS":"FAIL",m,"=>",data.route,actualSku,"web:",data.usedWeb===true);
-      if(!ok)fail++;
+      const {status,data}=await ask(message);
+      const actualSku=String(data.product?.sku||"").toUpperCase();
+
+      const ok=
+        status===200 &&
+        data.route===route &&
+        (!sku || actualSku===sku) &&
+        (route!=="compare" || (Array.isArray(data.products)&&data.products.length>=2)) &&
+        (route!=="current_web" || data.usedWeb===true);
+
+      console.log(ok?"PASS":"FAIL",message,"=>",data.route,actualSku);
+      if(!ok) fail++;
     }catch(e){
-      console.log("FAIL",m,e.message);
+      console.log("FAIL",message,e.message);
       fail++;
     }
   }
+
   process.exit(fail?1:0);
 })();

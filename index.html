@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v13-product-knowledge-center">
+<meta name="nexai-ui-version" content="2026.09-v14-chatgpt-ui-identity">
 
 <link rel="icon" href="favicon.png">
 
@@ -12629,6 +12629,348 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
     font-weight:700;
 }
 
+
+/* ==========================================================
+   NEXAI V14 — CHATGPT-LIKE MODAL + PROPORTIONAL MOBILE UI
+========================================================== */
+
+.ai-modal{
+    padding:20px !important;
+    background:rgba(10,12,14,.48) !important;
+    backdrop-filter:blur(10px) !important;
+    -webkit-backdrop-filter:blur(10px) !important;
+}
+
+.ai-container{
+    position:relative !important;
+    width:min(920px,94vw) !important;
+    height:min(720px,86dvh) !important;
+    max-height:86dvh !important;
+    border-radius:24px !important;
+    background:#fff !important;
+    overflow:hidden !important;
+    transform:translateY(0) scale(1) !important;
+    transition:
+        height .28s cubic-bezier(.2,.8,.2,1),
+        max-height .28s cubic-bezier(.2,.8,.2,1),
+        width .28s ease,
+        transform .28s ease,
+        border-radius .28s ease,
+        box-shadow .28s ease !important;
+}
+
+.nexai-sheet-handle-wrap{
+    display:none;
+    height:22px;
+    flex:0 0 22px;
+    align-items:center;
+    justify-content:center;
+    background:#fff;
+}
+
+.nexai-sheet-handle{
+    width:54px;
+    height:20px;
+    padding:0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border:0;
+    background:transparent;
+    cursor:pointer;
+    touch-action:manipulation;
+}
+
+.nexai-sheet-handle span{
+    display:block;
+    width:38px;
+    height:4px;
+    border-radius:999px;
+    background:#c9cdd2;
+    transition:width .2s ease, background .2s ease;
+}
+
+.nexai-sheet-handle:hover span{
+    width:44px;
+    background:#aeb4bb;
+}
+
+.ai-header{
+    height:62px !important;
+    min-height:62px !important;
+    padding:0 18px !important;
+}
+
+.ai-header h2{
+    font-size:22px !important;
+    letter-spacing:-.02em;
+}
+
+.ai-close{
+    width:42px !important;
+    height:42px !important;
+    border-radius:999px !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    font-size:26px !important;
+    transition:background .18s ease, transform .18s ease !important;
+}
+
+.ai-close:hover,
+.ai-close:active{
+    background:rgba(255,255,255,.16) !important;
+    transform:scale(.96);
+}
+
+.ai-body{
+    padding:22px 28px 28px !important;
+    gap:22px !important;
+    overscroll-behavior:contain;
+    scroll-padding-bottom:30px;
+    background:#fff !important;
+}
+
+.ai-message{
+    animation:none !important;
+    transition:opacity .22s ease, transform .22s ease;
+}
+
+.ai-message.bot{
+    width:100% !important;
+    max-width:100% !important;
+    padding:2px 0 10px !important;
+    border:0 !important;
+    border-radius:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+    color:#202123 !important;
+    line-height:1.72 !important;
+}
+
+.ai-message.user{
+    max-width:min(78%,680px) !important;
+    padding:11px 16px !important;
+    border-radius:20px !important;
+    border-bottom-right-radius:7px !important;
+    box-shadow:none !important;
+}
+
+.nexai-answer-reveal{
+    opacity:0;
+    transform:translateY(7px);
+    transition:
+        opacity .26s ease,
+        transform .32s cubic-bezier(.2,.8,.2,1);
+}
+
+.nexai-answer-reveal.is-visible{
+    opacity:1;
+    transform:none;
+}
+
+.ai-product-card{
+    border:0 !important;
+    border-radius:18px !important;
+    padding:0 !important;
+    box-shadow:none !important;
+    background:transparent !important;
+}
+
+.ai-product-title{
+    font-size:23px !important;
+    margin:14px 0 18px !important;
+    letter-spacing:-.02em;
+}
+
+.ai-product-item{
+    margin-bottom:14px !important;
+    padding-bottom:12px;
+    border-bottom:1px solid #eff0f2;
+}
+
+.ai-product-item:last-child{
+    border-bottom:0;
+}
+
+.ai-product-image-wrap{
+    width:100% !important;
+    height:auto !important;
+    max-height:none !important;
+    overflow:hidden !important;
+    border-radius:18px !important;
+    background:#f6f7f8 !important;
+    padding:10px !important;
+    margin:4px 0 16px !important;
+}
+
+.ai-product-image-wrap img.ai-product-image,
+.ai-generated-image img{
+    display:block !important;
+    width:100% !important;
+    height:auto !important;
+    max-height:460px !important;
+    object-fit:contain !important;
+    object-position:center !important;
+    border-radius:12px;
+    opacity:0;
+    transform:scale(.992);
+    transition:opacity .3s ease, transform .35s ease;
+}
+
+.ai-product-image-wrap img.ai-product-image.nexai-image-ready,
+.ai-generated-image img.nexai-image-ready{
+    opacity:1;
+    transform:none;
+}
+
+.ai-footer{
+    padding:12px 16px 14px !important;
+    background:rgba(255,255,255,.96) !important;
+    backdrop-filter:blur(10px);
+}
+
+.ai-input-row{
+    border:1px solid #e1e3e6;
+    border-radius:26px;
+    padding:5px;
+    gap:7px !important;
+    background:#fff;
+    box-shadow:0 2px 10px rgba(0,0,0,.04);
+}
+
+.ai-footer input{
+    border:0 !important;
+    box-shadow:none !important;
+    height:42px !important;
+    background:transparent !important;
+}
+
+.ai-footer button{
+    height:42px !important;
+}
+
+.ai-modal.nexai-minimized{
+    pointer-events:none;
+    background:transparent !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+    align-items:flex-end !important;
+    justify-content:center !important;
+}
+
+.ai-modal.nexai-minimized .ai-container{
+    pointer-events:auto;
+    width:min(520px,calc(100vw - 24px)) !important;
+    height:72px !important;
+    max-height:72px !important;
+    border-radius:20px !important;
+    margin-bottom:14px;
+    box-shadow:0 16px 46px rgba(0,0,0,.22) !important;
+}
+
+.ai-modal.nexai-minimized .ai-body,
+.ai-modal.nexai-minimized .ai-footer{
+    display:none !important;
+}
+
+.ai-modal.nexai-minimized .nexai-sheet-handle-wrap{
+    display:none !important;
+}
+
+.ai-modal.nexai-minimized .ai-header{
+    flex:1;
+    height:72px !important;
+    min-height:72px !important;
+    border-radius:20px;
+    cursor:pointer;
+}
+
+@media(max-width:768px){
+    .ai-modal{
+        padding:0 10px 12px !important;
+        align-items:flex-end !important;
+    }
+
+    .ai-container{
+        width:100% !important;
+        height:min(78dvh,680px) !important;
+        max-height:78dvh !important;
+        border-radius:24px !important;
+        margin:0 !important;
+    }
+
+    .nexai-sheet-handle-wrap{
+        display:flex;
+    }
+
+    .ai-header{
+        height:56px !important;
+        min-height:56px !important;
+        padding:0 14px !important;
+    }
+
+    .ai-header h2{
+        font-size:20px !important;
+    }
+
+    .ai-body{
+        padding:16px 15px 24px !important;
+        gap:18px !important;
+    }
+
+    .ai-message{
+        font-size:14.5px !important;
+    }
+
+    .ai-message.user{
+        max-width:86% !important;
+    }
+
+    .ai-footer{
+        padding:9px 10px max(10px,env(safe-area-inset-bottom)) !important;
+    }
+
+    .nexai-cta,
+    .nexai-chatgpt-secondary{
+        display:none !important;
+    }
+
+    .ai-product-title{
+        font-size:20px !important;
+    }
+
+    .ai-product-image-wrap img.ai-product-image,
+    .ai-generated-image img{
+        max-height:340px !important;
+    }
+
+    .ai-modal.nexai-minimized{
+        padding:0 10px max(10px,env(safe-area-inset-bottom)) !important;
+    }
+
+    .ai-modal.nexai-minimized .ai-container{
+        width:100% !important;
+        height:64px !important;
+        max-height:64px !important;
+        border-radius:18px !important;
+        margin:0 !important;
+    }
+
+    .ai-modal.nexai-minimized .ai-header{
+        height:64px !important;
+        min-height:64px !important;
+        border-radius:18px;
+    }
+}
+
+@media(max-height:650px) and (max-width:768px){
+    .ai-container{
+        height:72dvh !important;
+        max-height:72dvh !important;
+    }
+}
+
 </style>
 
 
@@ -12670,12 +13012,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v13-product-knowledge-center">
+<meta name="nexai-ui-version" content="2026.09-v14-chatgpt-ui-identity">
 
 <script>
 /* NEXAI V13 — one-time clean migration */
 (function(){
-  const schema = "v13-product-knowledge-center";
+  const schema = "v14-chatgpt-ui-identity";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
@@ -13915,6 +14257,17 @@ box-shadow:0 0 8px #35d04b;
 
     <div class="ai-container">
 
+        <div class="nexai-sheet-handle-wrap">
+            <button
+                type="button"
+                class="nexai-sheet-handle"
+                aria-label="Minimalkan atau buka NEXAI"
+                title="Minimalkan / buka kembali"
+                onclick="toggleNexaiMinimize()">
+                <span></span>
+            </button>
+        </div>
+
         <div class="ai-header">
 
     <h2>
@@ -13928,6 +14281,8 @@ NEXAI
     <button
         type="button"
         class="ai-close"
+        aria-label="Tutup NEXAI"
+        title="Tutup"
         onclick="closeAI()">
 
         <i class="fa-solid fa-xmark"></i>
@@ -22513,27 +22868,87 @@ Kirim Komentar
 // AI MODAL
 // =========================
 
+let nexaiMinimized = false;
+let nexaiBodyOverflowBeforeOpen = "";
+
+function setNexaiPageScrollLocked(locked){
+    if(locked){
+        if(!document.body.classList.contains("nexai-modal-open")){
+            nexaiBodyOverflowBeforeOpen = document.body.style.overflow || "";
+        }
+
+        document.body.classList.add("nexai-modal-open");
+        document.body.style.overflow = "hidden";
+    }else{
+        document.body.classList.remove("nexai-modal-open");
+        document.body.style.overflow = nexaiBodyOverflowBeforeOpen;
+    }
+}
+
 function openAI(){
+    const modal = document.getElementById("aiModal");
+    if(!modal) return;
 
-    document.getElementById("aiModal").style.display="flex";
+    modal.style.display = "flex";
+    modal.classList.remove("nexai-minimized");
+    nexaiMinimized = false;
+    setNexaiPageScrollLocked(true);
 
+    requestAnimationFrame(()=>{
+        document.getElementById("aiInput")?.focus();
+    });
 }
 
 function closeAI(){
+    const modal = document.getElementById("aiModal");
+    if(!modal) return;
 
-    document.getElementById("aiModal").style.display="none";
-
+    modal.style.display = "none";
+    modal.classList.remove("nexai-minimized");
+    nexaiMinimized = false;
+    setNexaiPageScrollLocked(false);
 }
 
-// Klik di luar modal untuk menutup
-document.getElementById("aiModal").addEventListener("click",function(e){
+function toggleNexaiMinimize(){
+    const modal = document.getElementById("aiModal");
+    if(!modal) return;
 
-    if(e.target===this){
+    nexaiMinimized = !nexaiMinimized;
+    modal.classList.toggle("nexai-minimized", nexaiMinimized);
 
-        closeAI();
+    // Minimized mode releases page scroll so user can browse the site.
+    setNexaiPageScrollLocked(!nexaiMinimized);
 
+    if(!nexaiMinimized){
+        requestAnimationFrame(()=>{
+            document.getElementById("aiInput")?.focus();
+        });
     }
+}
 
+// Clicking minimized header opens the chat again.
+document.querySelector("#aiModal .ai-header")?.addEventListener("click",function(e){
+    if(nexaiMinimized && !e.target.closest(".ai-close")){
+        toggleNexaiMinimize();
+    }
+});
+
+// Outside click closes only in expanded mode.
+document.getElementById("aiModal")?.addEventListener("click",function(e){
+    if(e.target===this && !nexaiMinimized){
+        closeAI();
+    }
+});
+
+// Escape behaves like the X button.
+document.addEventListener("keydown",function(e){
+    if(e.key==="Escape"){
+        const modal = document.getElementById("aiModal");
+
+        if(modal && modal.style.display==="flex"){
+            closeAI();
+        }
+    }
 });
 
 
@@ -23688,7 +24103,74 @@ function setAISendBusy(isBusy){
 // SEND — NEXAI HYBRID FINAL
 // ==========================================
 
+
+function nexaiWait(ms){
+    return new Promise(resolve=>setTimeout(resolve,ms));
+}
+
+function prepareNexaiImages(root){
+    if(!root) return;
+
+    root.querySelectorAll("img").forEach(img=>{
+        img.classList.remove("nexai-image-ready");
+
+        const reveal = ()=>{
+            requestAnimationFrame(()=>{
+                img.classList.add("nexai-image-ready");
+            });
+        };
+
+        if(img.complete){
+            reveal();
+        }else{
+            img.addEventListener("load",reveal,{once:true});
+            img.addEventListener("error",reveal,{once:true});
+        }
+    });
+}
+
+async function revealNexaiAnswer(node, html, startedAt){
+    if(!node) return;
+
+    // Even very fast local answers get a short, natural transition instead of "jumping".
+    const elapsed = performance.now() - startedAt;
+    const minimumThinkingMs = 320;
+
+    if(elapsed < minimumThinkingMs){
+        await nexaiWait(minimumThinkingMs - elapsed);
+    }
+
+    node.innerHTML = `<div class="nexai-answer-reveal">${html}</div>`;
+
+    const reveal = node.querySelector(".nexai-answer-reveal");
+
+    prepareNexaiImages(node);
+
+    requestAnimationFrame(()=>{
+        requestAnimationFrame(()=>{
+            reveal?.classList.add("is-visible");
+        });
+    });
+
+    const body = document.getElementById("aiMessages");
+
+    if(body){
+        const targetTop = Math.max(
+            0,
+            node.offsetTop - 16
+        );
+
+        body.scrollTo({
+            top:targetTop,
+            behavior:"smooth"
+        });
+    }
+}
+
+
 async function sendAI(){
+
+    const nexaiRequestStartedAt = performance.now();
 
     if(aiRequestBusy){
         return;
@@ -23942,8 +24424,11 @@ async function sendAI(){
         }
 
 
-        loading.innerHTML =
-            aiOutput;
+        await revealNexaiAnswer(
+            loading,
+            aiOutput,
+            nexaiRequestStartedAt
+        );
 
 
         addCodeCopyButtons(
@@ -23962,8 +24447,11 @@ async function sendAI(){
 
     }catch(err){
 
-        loading.innerHTML =
-            "❌ Sistem sedang tidak dapat dihubungi. Silakan coba lagi.";
+        await revealNexaiAnswer(
+            loading,
+            "❌ Sistem sedang tidak dapat dihubungi. Silakan coba lagi.",
+            nexaiRequestStartedAt
+        );
 
         console.error(
             "NEXAI CHAT ERROR:",
@@ -23974,8 +24462,19 @@ async function sendAI(){
 
         setAISendBusy(false);
 
-        body.scrollTop =
-            body.scrollHeight;
+        if(body){
+            const distanceFromBottom =
+                body.scrollHeight -
+                body.scrollTop -
+                body.clientHeight;
+
+            if(distanceFromBottom < 180){
+                body.scrollTo({
+                    top:body.scrollHeight,
+                    behavior:"smooth"
+                });
+            }
+        }
 
         if(input){
             input.focus();

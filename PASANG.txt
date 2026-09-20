@@ -1,44 +1,27 @@
-NEXAI FINAL V13 — PRODUCT KNOWLEDGE CENTER
+NEXAI FINAL V14 — CHATGPT-LIKE UI + COMPLETE IDENTITY BACKBONE
 
-TUJUAN:
-Setiap produk Nine memiliki satu record pusat informasi yang menyatukan seluruh data resmi yang tersedia.
+BACKEND:
+- Product Knowledge Center tetap menjadi sumber detail resmi produk.
+- Identitas produk sekarang menggunakan UNION:
+  1) semua identity di Product Knowledge Center
+  2) semua produk live dari produk.json
+- Jika produk ada di Knowledge Center tapi tidak ada di produk.json, produk tetap dapat dikenali.
+- Jika ada produk baru di produk.json yang belum masuk Knowledge Center, identitasnya tetap ikut terbaca.
+- Health endpoint menampilkan identityCoverage.
 
-ISI SATU RECORD:
-- identitas: product_id, SKU, nama, alias
-- brand: Nine Autoseries + subbrand bila tersedia
-- classification: kategori, fungsi, aplikasi
-- katalog resmi: deskripsi, fitur, spesifikasi, raw catalog text, halaman
-- varian
-- visual: foto utama, foto tambahan, full page
-- compatibility: socket + vehicle notes
-- commercial: harga, stok, promo, WhatsApp (diisi dari produk.json saat runtime)
-- provenance/source status
-
-HASIL BUILD:
-- Total produk: 172
-- Produk dengan halaman katalog terverifikasi: 152
-- Produk dengan deskripsi katalog terstruktur: 111
-- Produk dengan spesifikasi terstruktur: 120
-- Produk dengan foto utama resmi: 170
-
-SOURCE POLICY:
-1. Katalog resmi menang untuk deskripsi, fitur, spesifikasi, fungsi, aplikasi, socket.
-2. PRODUCT IMAGE MAPPING FULL menang untuk foto/galeri/full page.
-3. produk.json hanya melengkapi harga, stok, promo, WhatsApp, kategori, subbrand, dan varian tambahan.
-4. Fitment kendaraan dan fakta aktual/dinamis memakai web.
-5. Waktu lokal memakai waktu browser user.
-6. Web tidak boleh menimpa fakta resmi produk Nine.
-
-HIRARKI BRAND:
-Master brand: Nine Autoseries
-Subbrand:
-- Nine Luximos
-- Nine LX-Trix
-- Nine Securicle
-- Nine Soundblax
-- Optimus
-- Cady
-- Nine Power / 9Power
+UI / UX:
+- Modal HP tidak lagi memenuhi 95% layar; default sekitar 78dvh.
+- Tombol X benar-benar menutup modal dan mengembalikan scroll halaman.
+- Ada handle "—" di atas modal.
+- Klik handle meminimalkan NEXAI menjadi dock kecil dan scroll halaman kembali aktif.
+- Klik header dock membuka NEXAI kembali.
+- Escape = close.
+- Klik area luar = close saat modal expanded.
+- Jawaban cepat tidak "meloncat": minimum transition singkat + fade/slide.
+- Gambar menunggu load lalu fade-in.
+- Scroll jawaban halus dan proporsional.
+- Tampilan bot dibuat lebih bersih seperti conversational UI modern/ChatGPT.
+- Foto menggunakan contain, tidak crop.
 
 STRUKTUR:
 root/
@@ -55,12 +38,12 @@ root/
         brand_knowledge.json
 
 PASANG:
-1. Replace index.html.
-2. Replace netlify/functions/chat.js.
-3. Copy seluruh netlify/functions/data/.
-4. produk.json lama tetap di root.
-5. Deploy Netlify.
-6. Hard refresh browser.
+1. Replace index.html
+2. Replace netlify/functions/chat.js
+3. Copy seluruh netlify/functions/data/
+4. produk.json lama tetap root
+5. Deploy ulang Netlify
+6. Hard refresh
 
 HEALTH:
 https://imamsalesnine.com/.netlify/functions/chat?health=1

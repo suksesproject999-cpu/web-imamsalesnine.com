@@ -163,11 +163,112 @@ function productPayload(p){
     },
     source_status:{
       catalog_verified:k?.catalog?.verified===true,
-      live_commercial:true,
+      live_commercial:p?.__nexai_identity_source!=="knowledge_center",
       visual_verified:!!(k?.visual?.main||k?.visual?.full_page)
     }
   };
 }
+
+
+function unifiedProducts(liveProducts){
+  const live = Array.isArray(liveProducts) ? liveProducts : [];
+  const out = [];
+  const seen = new Set();
+
+  function liveForKnowledge(k){
+    const sku = compact(k?.identity?.sku || "");
+    const name = compact(k?.identity?.name || "");
+
+    return live.find(p=>{
+      const ps = compact(pSku(p));
+      const pn = compact(pName(p));
+
+      return (
+        (sku && ps && sku === ps) ||
+        (name && pn && name === pn)
+      );
+    }) || null;
+  }
+
+  // Product Knowledge Center is the permanent identity backbone.
+  for(const k of knowledgeDB.products || []){
+    const sku = k?.identity?.sku || "";
+    const name = k?.identity?.name || "";
+    const key = compact(sku || name);
+
+    if(!key || seen.has(key)) continue;
+
+    const lp = liveForKnowledge(k);
+
+    if(lp){
+      out.push(lp);
+    }else{
+      // Synthetic runtime product keeps identity/catalog/visual searchable
+      // even when commercial live JSON does not contain the product.
+      out.push({
+        sku,
+        nama: name,
+        alias: k?.identity?.aliases || [],
+        varian: k?.variants || [],
+        catalog_page: k?.catalog?.page || null,
+        visual: {
+          foto_utama: k?.visual?.main || "",
+          full_page: k?.visual?.full_page || "",
+          catalog_page: k?.visual?.catalog_page || k?.catalog?.page || null
+        },
+        __nexai_identity_source: "knowledge_center"
+      });
+    }
+
+    seen.add(key);
+  }
+
+  // Keep every live product too, including future products not yet added to PKC.
+  for(const p of live){
+    const key = compact(pSku(p) || pName(p));
+    if(!key || seen.has(key)) continue;
+
+    out.push({
+      ...p,
+      __nexai_identity_source: "live_product_data"
+    });
+
+    seen.add(key);
+  }
+
+  return out;
+}
+
+function identityCoverageStats(liveProducts, unified){
+  const knowledgeCount = (knowledgeDB.products || []).length;
+  const liveCount = Array.isArray(liveProducts) ? liveProducts.length : 0;
+
+  const liveKeys = new Set(
+    (liveProducts || [])
+      .map(p=>compact(pSku(p) || pName(p)))
+      .filter(Boolean)
+  );
+
+  const knowledgeKeys = new Set(
+    (knowledgeDB.products || [])
+      .map(k=>compact(k?.identity?.sku || k?.identity?.name || ""))
+      .filter(Boolean)
+  );
+
+  let liveOnly = 0;
+
+  for(const key of liveKeys){
+    if(!knowledgeKeys.has(key)) liveOnly++;
+  }
+
+  return {
+    knowledge_center: knowledgeCount,
+    live_products: liveCount,
+    live_only_new_products: liveOnly,
+    unified_identities: Array.isArray(unified) ? unified.length : 0
+  };
+}
+
 
 const STOP=new Set(["apa","yang","dan","atau","dengan","untuk","dari","di","ke","ini","itu","nya","bro","bang","gan","mas","pak","minta","tolong","coba","produk","lampu","nine","autoseries","berapa","harga","stok","ready","tersedia","foto","gambar","lihat","spek","spec","spesifikasi","fitur","varian","warna","tipe","type","seri","model","kode","sku"]);
 function fuzzySearch(products,q,limit=8){
@@ -293,8 +394,9 @@ function response(statusCode,body){return{statusCode,headers:{"Content-Type":"ap
 
 exports.handler=async event=>{
  try{
-  const products=await loadProducts();
-  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
+  const liveProducts=await loadProducts();
+  const products=unifiedProducts(liveProducts);
+  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
   const{fields,files}=await parseMultipartEvent(event),message=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
   if(!message&&!img)return response(400,{reply:"Pesan kosong.",image:null});
   const explicit=resolveProducts(products,message,4),route=classify(message,explicit.length>0);
