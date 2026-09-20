@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v14-chatgpt-ui-identity">
+<meta name="nexai-ui-version" content="2026.09-v15-final-modal-refactor">
 
 <link rel="icon" href="favicon.png">
 
@@ -12971,6 +12971,1220 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
     }
 }
 
+
+/* ==========================================================
+   NEXAI V14.1 — PROFESSIONAL CHAT TYPOGRAPHY + SHEET GESTURE
+========================================================== */
+
+:root{
+    --nexai-text:#202124;
+    --nexai-muted:#6f7479;
+    --nexai-line:#eceef0;
+    --nexai-soft:#f7f8f9;
+    --nexai-green:#8CC63F;
+}
+
+/* More breathing room inside conversation */
+.ai-body{
+    padding-top:22px !important;
+    padding-left:22px !important;
+    padding-right:22px !important;
+    padding-bottom:34px !important;
+    gap:24px !important;
+}
+
+.ai-message.bot{
+    padding:0 4px 12px !important;
+    line-height:1.72 !important;
+    color:var(--nexai-text) !important;
+}
+
+.ai-message.bot p{
+    margin:0 0 14px !important;
+}
+
+.ai-message.bot p:last-child{
+    margin-bottom:0 !important;
+}
+
+.ai-message.bot h1,
+.ai-message.bot h2,
+.ai-message.bot h3,
+.ai-message.bot h4{
+    color:#17191b;
+    line-height:1.25;
+    letter-spacing:-.025em;
+    margin:0 0 12px;
+}
+
+.ai-message.bot h2{
+    font-size:22px;
+    font-weight:750;
+}
+
+.ai-message.bot h3{
+    font-size:19px;
+    font-weight:750;
+}
+
+.ai-message.bot h4{
+    margin-top:20px;
+    font-size:15.5px;
+    font-weight:750;
+    color:#2b2e31;
+}
+
+.ai-message.bot ul,
+.ai-message.bot ol{
+    margin:8px 0 16px 0 !important;
+    padding-left:24px !important;
+}
+
+.ai-message.bot li{
+    margin:7px 0 !important;
+    padding-left:2px;
+    line-height:1.62;
+}
+
+.ai-message.bot strong{
+    font-weight:750;
+}
+
+.nexai-answer-shell{
+    width:100%;
+}
+
+.nexai-answer-title{
+    display:block;
+    margin:0 0 17px;
+    font-size:21px;
+    line-height:1.26;
+    font-weight:780;
+    letter-spacing:-.025em;
+    color:#17191b;
+}
+
+.nexai-answer-section{
+    margin:20px 0 9px;
+    font-size:15.5px;
+    line-height:1.35;
+    font-weight:760;
+    color:#25282b;
+}
+
+.nexai-answer-body{
+    font-size:15px;
+    line-height:1.72;
+}
+
+.nexai-answer-body > :first-child{
+    margin-top:0 !important;
+}
+
+.nexai-answer-body > :last-child{
+    margin-bottom:0 !important;
+}
+
+/* Comparison output: readable separation instead of one long text wall */
+.nexai-answer-body .nexai-compare-product{
+    margin:18px 0;
+    padding:16px 0 4px;
+    border-top:1px solid var(--nexai-line);
+}
+
+.nexai-answer-body .nexai-compare-product:first-child{
+    border-top:0;
+    padding-top:0;
+}
+
+/* Quick prompt launcher */
+.nexai-quick-prompts{
+    width:100%;
+    padding:2px 0 4px;
+    flex-shrink:0;
+}
+
+.nexai-quick-title{
+    display:flex;
+    align-items:center;
+    gap:7px;
+    margin:0 2px 10px;
+    color:#6b7075;
+    font-size:12.5px;
+    font-weight:650;
+    letter-spacing:.01em;
+}
+
+.nexai-quick-spark{
+    color:var(--nexai-green);
+    font-size:15px;
+}
+
+.nexai-quick-scroll{
+    display:flex;
+    gap:8px;
+    width:100%;
+    overflow-x:auto;
+    overscroll-behavior-x:contain;
+    scroll-snap-type:x proximity;
+    padding:0 2px 7px;
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+}
+
+.nexai-quick-scroll::-webkit-scrollbar{
+    display:none;
+}
+
+.nexai-quick-chip{
+    flex:0 0 auto !important;
+    width:auto !important;
+    height:36px !important;
+    padding:0 13px !important;
+    border-radius:999px !important;
+    border:1px solid #dfe6d5 !important;
+    background:#f8fbf5 !important;
+    color:#3d4b31 !important;
+    font-size:13px !important;
+    font-weight:620 !important;
+    line-height:1 !important;
+    box-shadow:none !important;
+    cursor:pointer;
+    scroll-snap-align:start;
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease !important;
+}
+
+.nexai-quick-chip:hover,
+.nexai-quick-chip:active{
+    background:#eff7e7 !important;
+    border-color:#c9dda9 !important;
+    transform:translateY(-1px);
+}
+
+/* Sheet handle becomes a real gesture affordance */
+.nexai-sheet-handle-wrap{
+    position:relative;
+    z-index:5;
+    touch-action:none;
+    user-select:none;
+    -webkit-user-select:none;
+}
+
+.nexai-sheet-handle{
+    touch-action:none !important;
+    cursor:grab !important;
+}
+
+.nexai-sheet-handle:active{
+    cursor:grabbing !important;
+}
+
+.ai-container.nexai-dragging{
+    transition:none !important;
+    will-change:transform;
+}
+
+.ai-container.nexai-snapback{
+    transition:transform .22s cubic-bezier(.2,.8,.2,1) !important;
+}
+
+/* Composer visually detached from messages like a modern chat app */
+.ai-footer{
+    border-top:1px solid var(--nexai-line) !important;
+    box-shadow:0 -8px 24px rgba(255,255,255,.92);
+}
+
+.ai-input-row{
+    min-height:52px;
+}
+
+.ai-footer input{
+    padding-left:16px !important;
+    font-size:15px !important;
+}
+
+/* Product/card spacing */
+.ai-product-card{
+    padding:4px 0 8px !important;
+}
+
+.ai-product-title{
+    margin:0 0 18px !important;
+}
+
+.ai-product-image-wrap{
+    margin:0 0 20px !important;
+}
+
+.ai-product-item{
+    margin:0 !important;
+    padding:14px 0 !important;
+}
+
+.ai-description{
+    padding:4px 0 8px;
+    line-height:1.7;
+}
+
+/* Avoid answers feeling glued to composer/header on small screens */
+@media(max-width:768px){
+    .ai-container{
+        height:min(76dvh,650px) !important;
+        max-height:76dvh !important;
+    }
+
+    .ai-body{
+        padding:18px 16px 30px !important;
+        gap:22px !important;
+    }
+
+    .ai-message.bot{
+        font-size:15px !important;
+        padding-left:2px !important;
+        padding-right:2px !important;
+    }
+
+    .ai-message.user{
+        font-size:15px !important;
+        line-height:1.45 !important;
+    }
+
+    .nexai-answer-title{
+        font-size:20px;
+        margin-bottom:15px;
+    }
+
+    .nexai-answer-section{
+        margin-top:18px;
+    }
+
+    .nexai-quick-prompts{
+        margin-top:-4px;
+    }
+
+    .nexai-quick-chip{
+        height:35px !important;
+        font-size:12.5px !important;
+    }
+
+    .ai-product-image-wrap{
+        border-radius:16px !important;
+        padding:8px !important;
+    }
+
+    .ai-product-image-wrap img.ai-product-image,
+    .ai-generated-image img{
+        max-height:300px !important;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V14.2 — TEMPLATE DROPDOWN + DYNAMIC DRAWER DISMISS
+========================================================== */
+
+/* Old in-chat prompt chips are intentionally disabled in V14.2 */
+.nexai-quick-prompts{
+    display:none !important;
+}
+
+/* Right-aligned template launcher above composer */
+.nexai-template-toolbar{
+    position:relative;
+    display:flex;
+    justify-content:flex-end;
+    align-items:center;
+    width:100%;
+    margin:0 0 8px;
+    padding:0 2px;
+    z-index:30;
+}
+
+.nexai-template-anchor{
+    position:relative;
+}
+
+.nexai-template-trigger{
+    width:auto !important;
+    height:34px !important;
+    display:inline-flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    gap:7px !important;
+    padding:0 11px !important;
+    border:1px solid #dfe4d9 !important;
+    border-radius:999px !important;
+    background:#f8fbf5 !important;
+    color:#526344 !important;
+    font-size:12.5px !important;
+    font-weight:650 !important;
+    line-height:1 !important;
+    box-shadow:none !important;
+    cursor:pointer;
+    transition:
+        background .18s ease,
+        border-color .18s ease,
+        transform .18s ease !important;
+}
+
+.nexai-template-trigger:hover,
+.nexai-template-trigger:active,
+.nexai-template-trigger[aria-expanded="true"]{
+    background:#eff7e7 !important;
+    border-color:#c9dda9 !important;
+}
+
+.nexai-template-trigger:active{
+    transform:scale(.98);
+}
+
+.nexai-template-trigger-icon{
+    color:#82b836;
+    font-size:14px;
+    line-height:1;
+}
+
+.nexai-template-trigger svg{
+    width:14px;
+    height:14px;
+    transition:transform .18s ease;
+}
+
+.nexai-template-trigger[aria-expanded="true"] svg{
+    transform:rotate(180deg);
+}
+
+/* Popup rises above the button and stays aligned to right edge */
+.nexai-template-menu{
+    position:absolute;
+    right:0;
+    bottom:calc(100% + 8px);
+    width:min(330px,calc(100vw - 40px));
+    padding:7px;
+    border:1px solid #e5e7e9;
+    border-radius:18px;
+    background:rgba(255,255,255,.985);
+    box-shadow:
+        0 18px 45px rgba(0,0,0,.16),
+        0 2px 8px rgba(0,0,0,.05);
+    backdrop-filter:blur(14px);
+    -webkit-backdrop-filter:blur(14px);
+    transform-origin:bottom right;
+    opacity:0;
+    visibility:hidden;
+    pointer-events:none;
+    transform:translateY(7px) scale(.97);
+    transition:
+        opacity .16s ease,
+        transform .18s cubic-bezier(.2,.8,.2,1),
+        visibility .16s ease;
+}
+
+.nexai-template-menu.is-open{
+    opacity:1;
+    visibility:visible;
+    pointer-events:auto;
+    transform:none;
+}
+
+.nexai-template-menu-head{
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+    padding:8px 10px 9px;
+    border-bottom:1px solid #f0f1f2;
+    margin-bottom:4px;
+}
+
+.nexai-template-menu-head strong{
+    color:#24272a;
+    font-size:13px;
+    font-weight:750;
+}
+
+.nexai-template-menu-head span{
+    color:#8a8f94;
+    font-size:10.5px;
+}
+
+.nexai-template-menu > button{
+    width:100% !important;
+    min-height:52px !important;
+    height:auto !important;
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-start !important;
+    gap:10px !important;
+    padding:8px 10px !important;
+    border:0 !important;
+    border-radius:12px !important;
+    background:transparent !important;
+    color:#202326 !important;
+    text-align:left !important;
+    box-shadow:none !important;
+    cursor:pointer;
+    transition:background .15s ease !important;
+}
+
+.nexai-template-menu > button:hover,
+.nexai-template-menu > button:active{
+    background:#f5f7f3 !important;
+}
+
+.nexai-template-menu > button > span:last-child{
+    min-width:0;
+    display:flex;
+    flex-direction:column;
+    gap:2px;
+}
+
+.nexai-template-menu > button strong{
+    font-size:12.5px;
+    font-weight:700;
+    color:#26292c;
+}
+
+.nexai-template-menu > button small{
+    font-size:10.5px;
+    line-height:1.25;
+    font-weight:450;
+    color:#858a90;
+}
+
+.nexai-template-dot{
+    width:28px;
+    height:28px;
+    flex:0 0 28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:9px;
+    background:#eef6e5;
+    color:#6a9532;
+    font-size:9.5px;
+    font-weight:750;
+}
+
+/* Dynamic drawer drag state */
+.ai-modal.nexai-sheet-dragging{
+    transition:none !important;
+}
+
+.ai-modal.nexai-sheet-dragging::before{
+    transition:none !important;
+}
+
+.ai-container.nexai-dragging{
+    transform-origin:center bottom !important;
+    transition:none !important;
+    will-change:transform, opacity, border-radius, width;
+}
+
+.ai-container.nexai-dragging .nexai-sheet-handle span{
+    background:#aeb4bb;
+}
+
+.ai-container.nexai-drawer-closing{
+    transition:
+        transform .22s cubic-bezier(.4,0,1,1),
+        opacity .18s ease,
+        border-radius .22s ease !important;
+}
+
+/* Mobile spacing */
+@media(max-width:768px){
+    .nexai-template-toolbar{
+        margin-bottom:7px;
+        padding:0;
+    }
+
+    .nexai-template-trigger{
+        height:32px !important;
+        padding:0 10px !important;
+        font-size:12px !important;
+    }
+
+    .nexai-template-menu{
+        width:min(318px,calc(100vw - 28px));
+        right:0;
+        border-radius:17px;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V14.3 FINAL — UNIFIED MOBILE/DESKTOP BOTTOM SHEET
+========================================================== */
+
+/* Desktop and mobile intentionally share the same visual language */
+.ai-modal{
+    padding:0 12px 12px !important;
+    align-items:flex-end !important;
+    justify-content:center !important;
+}
+
+.ai-container{
+    width:min(720px,calc(100vw - 24px)) !important;
+    height:min(76dvh,680px) !important;
+    max-height:76dvh !important;
+    margin:0 auto !important;
+    border-radius:24px !important;
+    transform-origin:center bottom !important;
+}
+
+.nexai-sheet-handle-wrap{
+    display:flex !important;
+}
+
+.ai-header{
+    height:56px !important;
+    min-height:56px !important;
+    padding:0 14px !important;
+}
+
+.ai-header h2{
+    font-size:20px !important;
+}
+
+.ai-body{
+    padding:18px 16px 30px !important;
+    gap:22px !important;
+}
+
+.ai-message{
+    font-size:15px !important;
+}
+
+.ai-message.user{
+    max-width:86% !important;
+    font-size:15px !important;
+}
+
+.ai-product-title{
+    font-size:20px !important;
+}
+
+.ai-footer{
+    padding:9px 10px max(10px,env(safe-area-inset-bottom)) !important;
+}
+
+.ai-input-row{
+    width:100% !important;
+}
+
+.ai-footer input{
+    font-size:15px !important;
+}
+
+/* Keep footer clean on desktop too, same as mobile */
+.nexai-cta,
+.nexai-chatgpt-secondary{
+    display:none !important;
+}
+
+/* Template button stays above input and aligned right on all screen sizes */
+.nexai-template-toolbar{
+    width:100%;
+    margin:0 0 7px !important;
+    padding:0 !important;
+}
+
+/* Unified image sizing */
+.ai-product-image-wrap img.ai-product-image,
+.ai-generated-image img{
+    max-height:320px !important;
+}
+
+/* Minimized dock uses same centered-width language */
+.ai-modal.nexai-minimized .ai-container{
+    width:min(720px,calc(100vw - 24px)) !important;
+    height:64px !important;
+    max-height:64px !important;
+    margin:0 auto !important;
+    border-radius:18px !important;
+}
+
+.ai-modal.nexai-minimized .ai-header{
+    height:64px !important;
+    min-height:64px !important;
+}
+
+/* During drag, width contraction is visual, not layout-janking */
+.ai-container.nexai-dragging{
+    width:min(720px,calc(100vw - 24px)) !important;
+    transform-origin:center bottom !important;
+    will-change:transform,opacity,border-radius !important;
+}
+
+@media(min-width:769px){
+    .ai-modal{
+        padding-bottom:18px !important;
+    }
+
+    .ai-container{
+        width:min(720px,calc(100vw - 40px)) !important;
+        height:min(76dvh,680px) !important;
+        max-height:76dvh !important;
+    }
+
+    .ai-body{
+        padding-left:18px !important;
+        padding-right:18px !important;
+    }
+
+    .ai-modal.nexai-minimized .ai-container{
+        width:min(720px,calc(100vw - 40px)) !important;
+    }
+}
+
+/* Short landscape screens */
+@media(max-height:680px){
+    .ai-container{
+        height:72dvh !important;
+        max-height:72dvh !important;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V14.4 — TEMPLATE BUTTON DIRECTLY ABOVE SEND
+========================================================== */
+
+/* IMPORTANT:
+   Older stylesheet defines .ai-footer as a horizontal flex row.
+   Force composer into a vertical stack on EVERY viewport.
+*/
+.ai-footer{
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+    gap:6px !important;
+    width:100% !important;
+    box-sizing:border-box !important;
+}
+
+/* Template row occupies its own line above composer */
+.nexai-template-toolbar{
+    order:1 !important;
+    display:flex !important;
+    width:100% !important;
+    flex:0 0 auto !important;
+    justify-content:flex-end !important;
+    align-items:center !important;
+    margin:0 !important;
+    padding:0 !important;
+    overflow:visible !important;
+    z-index:60 !important;
+}
+
+.nexai-template-anchor{
+    position:relative !important;
+    display:flex !important;
+    justify-content:flex-end !important;
+    flex:0 0 auto !important;
+}
+
+/* Align visually with send button below */
+.nexai-template-trigger{
+    width:95px !important;
+    min-width:95px !important;
+    height:32px !important;
+    flex:0 0 95px !important;
+    padding:0 10px !important;
+}
+
+/* Composer is always the next row */
+.ai-input-row{
+    order:2 !important;
+    display:flex !important;
+    align-items:center !important;
+    width:100% !important;
+    min-width:0 !important;
+    flex:0 0 auto !important;
+    gap:8px !important;
+    margin:0 !important;
+}
+
+/* Input must take all remaining width */
+.ai-input-row > input{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+}
+
+/* Send remains fixed so template can sit directly above it */
+.ai-input-row > button{
+    flex:0 0 95px !important;
+    width:95px !important;
+    min-width:95px !important;
+}
+
+/* Dropdown opens upward from the button's right edge */
+.nexai-template-menu{
+    right:0 !important;
+    left:auto !important;
+    bottom:calc(100% + 8px) !important;
+    z-index:999 !important;
+}
+
+/* Hide legacy footer extras without affecting layout */
+.nexai-cta,
+.nexai-chatgpt-secondary{
+    display:none !important;
+}
+
+/* Mobile keeps same architecture, just narrower action buttons */
+@media(max-width:768px){
+    .ai-footer{
+        gap:6px !important;
+    }
+
+    .nexai-template-trigger{
+        width:86px !important;
+        min-width:86px !important;
+        flex-basis:86px !important;
+        height:31px !important;
+        font-size:11.5px !important;
+    }
+
+    .ai-input-row > button{
+        width:86px !important;
+        min-width:86px !important;
+        flex-basis:86px !important;
+    }
+}
+
+
+/* ==========================================================
+   NEXAI V15 FINAL MODAL REFACTOR
+   Scope: #aiModal only. Other website UI is intentionally untouched.
+========================================================== */
+
+#aiModal{
+    --nexai-sheet-width:720px;
+    --nexai-sheet-height:min(680px,76svh);
+    --nexai-sheet-radius:24px;
+    --nexai-backdrop-alpha:.48;
+
+    position:fixed !important;
+    inset:0 !important;
+    z-index:2147483000 !important;
+
+    display:none;
+    align-items:flex-end !important;
+    justify-content:center !important;
+
+    padding:0 12px 12px !important;
+    box-sizing:border-box !important;
+
+    background:rgba(10,12,14,var(--nexai-backdrop-alpha)) !important;
+    backdrop-filter:blur(10px) !important;
+    -webkit-backdrop-filter:blur(10px) !important;
+
+    overscroll-behavior:none !important;
+}
+
+/* Single sheet geometry for desktop + mobile */
+#aiModal > .nexai-sheet{
+    position:relative !important;
+    display:flex !important;
+    flex-direction:column !important;
+
+    width:min(var(--nexai-sheet-width),calc(100vw - 24px)) !important;
+    height:var(--nexai-sheet-height) !important;
+    max-height:calc(100svh - 24px) !important;
+
+    margin:0 auto !important;
+    padding:0 !important;
+
+    overflow:hidden !important;
+    border-radius:var(--nexai-sheet-radius) !important;
+    background:#fff !important;
+
+    transform:none !important;
+    transform-origin:center bottom !important;
+    opacity:1 !important;
+
+    box-shadow:
+        0 24px 70px rgba(0,0,0,.26),
+        0 2px 8px rgba(0,0,0,.06) !important;
+
+    /* Deliberately NO height/max-height transition:
+       prevents keyboard open/close from making the sheet jump. */
+    transition:
+        transform .24s cubic-bezier(.2,.82,.22,1),
+        opacity .18s ease,
+        border-radius .22s ease,
+        box-shadow .22s ease !important;
+
+    will-change:auto;
+}
+
+/* Native bottom-sheet grab area */
+#aiModal .nexai-sheet-grab-zone{
+    position:relative !important;
+    z-index:10 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    width:100% !important;
+    height:22px !important;
+    min-height:22px !important;
+    flex:0 0 22px !important;
+
+    padding:0 !important;
+    margin:0 !important;
+
+    background:#fff !important;
+
+    touch-action:none !important;
+    user-select:none !important;
+    -webkit-user-select:none !important;
+
+    cursor:grab !important;
+}
+
+#aiModal .nexai-sheet-grab-zone:active{
+    cursor:grabbing !important;
+}
+
+#aiModal .nexai-sheet-handle{
+    width:64px !important;
+    height:22px !important;
+    min-width:64px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    margin:0 !important;
+    padding:0 !important;
+
+    border:0 !important;
+    background:transparent !important;
+    box-shadow:none !important;
+
+    touch-action:none !important;
+}
+
+#aiModal .nexai-sheet-handle span{
+    display:block !important;
+    width:38px !important;
+    height:4px !important;
+
+    border-radius:999px !important;
+    background:#c8cdd2 !important;
+
+    transition:
+        width .16s ease,
+        background .16s ease !important;
+}
+
+#aiModal .nexai-sheet-grab-zone:active .nexai-sheet-handle span{
+    width:44px !important;
+    background:#aeb5bb !important;
+}
+
+/* Header */
+#aiModal .nexai-sheet-header{
+    position:relative !important;
+    z-index:8 !important;
+
+    width:100% !important;
+    height:58px !important;
+    min-height:58px !important;
+    flex:0 0 58px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:space-between !important;
+
+    padding:0 15px !important;
+    margin:0 !important;
+
+    box-sizing:border-box !important;
+    border-radius:0 !important;
+}
+
+#aiModal .nexai-sheet-header h2{
+    margin:0 !important;
+    font-size:20px !important;
+    line-height:1 !important;
+}
+
+#aiModal .ai-close{
+    position:relative !important;
+    z-index:20 !important;
+
+    width:42px !important;
+    height:42px !important;
+    min-width:42px !important;
+    flex:0 0 42px !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+
+    padding:0 !important;
+    margin:0 !important;
+
+    border:0 !important;
+    border-radius:999px !important;
+
+    cursor:pointer !important;
+    touch-action:manipulation !important;
+}
+
+/* Message area */
+#aiModal .nexai-sheet-body{
+    position:relative !important;
+
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    width:100% !important;
+
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+
+    padding:18px 16px 30px !important;
+    margin:0 !important;
+
+    box-sizing:border-box !important;
+
+    scroll-behavior:smooth !important;
+    overscroll-behavior:contain !important;
+    -webkit-overflow-scrolling:touch !important;
+}
+
+/* Footer is ALWAYS 2 rows:
+   row 1 = template at right
+   row 2 = input + send */
+#aiModal .nexai-sheet-footer{
+    position:relative !important;
+    z-index:40 !important;
+
+    display:flex !important;
+    flex-direction:column !important;
+    align-items:stretch !important;
+    justify-content:flex-start !important;
+
+    width:100% !important;
+    flex:0 0 auto !important;
+
+    gap:6px !important;
+
+    padding:9px 10px max(10px,env(safe-area-inset-bottom)) !important;
+    margin:0 !important;
+
+    box-sizing:border-box !important;
+
+    border-top:1px solid #eceef0 !important;
+    background:rgba(255,255,255,.98) !important;
+
+    backdrop-filter:blur(12px) !important;
+    -webkit-backdrop-filter:blur(12px) !important;
+}
+
+#aiModal .nexai-template-toolbar{
+    order:1 !important;
+
+    display:flex !important;
+    align-items:center !important;
+    justify-content:flex-end !important;
+
+    width:100% !important;
+    height:32px !important;
+    min-height:32px !important;
+    flex:0 0 32px !important;
+
+    padding:0 !important;
+    margin:0 !important;
+
+    overflow:visible !important;
+}
+
+#aiModal .nexai-template-anchor{
+    position:relative !important;
+    display:flex !important;
+    justify-content:flex-end !important;
+}
+
+#aiModal .nexai-template-trigger{
+    width:92px !important;
+    min-width:92px !important;
+    height:31px !important;
+    flex:0 0 92px !important;
+}
+
+#aiModal .nexai-template-menu{
+    right:0 !important;
+    left:auto !important;
+    bottom:calc(100% + 8px) !important;
+    z-index:9999 !important;
+}
+
+#aiModal .ai-input-row{
+    order:2 !important;
+
+    display:flex !important;
+    align-items:center !important;
+
+    width:100% !important;
+    min-width:0 !important;
+    flex:0 0 auto !important;
+
+    gap:8px !important;
+
+    padding:5px !important;
+    margin:0 !important;
+
+    box-sizing:border-box !important;
+}
+
+#aiModal .ai-input-row > input{
+    flex:1 1 auto !important;
+    min-width:0 !important;
+}
+
+#aiModal .ai-input-row > button{
+    width:92px !important;
+    min-width:92px !important;
+    flex:0 0 92px !important;
+}
+
+/* Legacy footer extras stay hidden inside this modal only */
+#aiModal .nexai-cta,
+#aiModal .nexai-chatgpt-secondary{
+    display:none !important;
+}
+
+/* Drag controller: JS writes these CSS variables only. */
+#aiModal.is-sheet-dragging > .nexai-sheet{
+    transform:
+        translate3d(0,var(--nexai-drag-y,0px),0)
+        scaleX(var(--nexai-drag-scale-x,1))
+        scaleY(var(--nexai-drag-scale-y,1))
+        !important;
+
+    opacity:var(--nexai-drag-opacity,1) !important;
+    border-radius:var(--nexai-drag-radius,24px) !important;
+
+    transition:none !important;
+    will-change:transform,opacity,border-radius !important;
+}
+
+/* Smooth spring back */
+#aiModal.is-sheet-snapping > .nexai-sheet{
+    transform:none !important;
+    opacity:1 !important;
+    border-radius:var(--nexai-sheet-radius) !important;
+
+    transition:
+        transform .24s cubic-bezier(.2,.82,.22,1),
+        opacity .18s ease,
+        border-radius .22s ease !important;
+}
+
+/* Complete drawer close */
+#aiModal.is-sheet-closing > .nexai-sheet{
+    transform:translate3d(0,112%,0) scaleX(.78) scaleY(.94) !important;
+    opacity:0 !important;
+    border-radius:52px !important;
+
+    transition:
+        transform .22s cubic-bezier(.4,0,1,1),
+        opacity .18s ease,
+        border-radius .20s ease !important;
+}
+
+/* Minimized dock */
+#aiModal.nexai-minimized{
+    pointer-events:none !important;
+
+    align-items:flex-end !important;
+    justify-content:center !important;
+
+    background:transparent !important;
+    backdrop-filter:none !important;
+    -webkit-backdrop-filter:none !important;
+}
+
+#aiModal.nexai-minimized > .nexai-sheet{
+    pointer-events:auto !important;
+
+    width:min(var(--nexai-sheet-width),calc(100vw - 24px)) !important;
+    height:64px !important;
+    max-height:64px !important;
+
+    border-radius:18px !important;
+}
+
+#aiModal.nexai-minimized .nexai-sheet-grab-zone,
+#aiModal.nexai-minimized .nexai-sheet-body,
+#aiModal.nexai-minimized .nexai-sheet-footer{
+    display:none !important;
+}
+
+#aiModal.nexai-minimized .nexai-sheet-header{
+    height:64px !important;
+    min-height:64px !important;
+    flex:1 1 auto !important;
+
+    border-radius:18px !important;
+    cursor:pointer !important;
+}
+
+/* Phones use the exact same structure; only width is tighter. */
+@media(max-width:768px){
+    #aiModal{
+        padding:0 8px max(8px,env(safe-area-inset-bottom)) !important;
+    }
+
+    #aiModal > .nexai-sheet{
+        width:100% !important;
+        height:min(650px,76svh) !important;
+        max-height:calc(100svh - 16px) !important;
+        border-radius:24px !important;
+    }
+
+    #aiModal .nexai-sheet-body{
+        padding:17px 15px 28px !important;
+    }
+
+    #aiModal .nexai-template-trigger,
+    #aiModal .ai-input-row > button{
+        width:86px !important;
+        min-width:86px !important;
+        flex-basis:86px !important;
+    }
+
+    #aiModal.nexai-minimized > .nexai-sheet{
+        width:100% !important;
+    }
+}
+
+/* Keyboard-safe:
+   Use SVH, not DVH, and never animate height.
+   This removes the large jump when virtual keyboard opens/closes. */
+@supports(height:100svh){
+    #aiModal > .nexai-sheet{
+        height:min(680px,76svh) !important;
+        max-height:calc(100svh - 24px) !important;
+    }
+
+    @media(max-width:768px){
+        #aiModal > .nexai-sheet{
+            height:min(650px,76svh) !important;
+            max-height:calc(100svh - 16px) !important;
+        }
+    }
+}
+
 </style>
 
 
@@ -13012,12 +14226,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v14-chatgpt-ui-identity">
+<meta name="nexai-ui-version" content="2026.09-v15-final-modal-refactor">
 
 <script>
 /* NEXAI V13 — one-time clean migration */
 (function(){
-  const schema = "v14-chatgpt-ui-identity";
+  const schema = "v15-final-modal-refactor";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
@@ -14255,20 +15469,19 @@ box-shadow:0 0 8px #35d04b;
 
 <div id="aiModal" class="ai-modal">
 
-    <div class="ai-container">
+    <div class="ai-container nexai-sheet" id="nexaiSheet">
 
-        <div class="nexai-sheet-handle-wrap">
+        <div class="nexai-sheet-handle-wrap nexai-sheet-grab-zone" id="nexaiSheetGrabZone">
             <button
                 type="button"
                 class="nexai-sheet-handle"
                 aria-label="Minimalkan atau buka NEXAI"
-                title="Minimalkan / buka kembali"
-                onclick="toggleNexaiMinimize()">
+                title="Minimalkan / buka kembali">
                 <span></span>
             </button>
         </div>
 
-        <div class="ai-header">
+        <div class="ai-header nexai-sheet-header">
 
     <h2>
 
@@ -14282,8 +15495,7 @@ NEXAI
         type="button"
         class="ai-close"
         aria-label="Tutup NEXAI"
-        title="Tutup"
-        onclick="closeAI()">
+        title="Tutup">
 
         <i class="fa-solid fa-xmark"></i>
 
@@ -14306,10 +15518,81 @@ NEXAI
 
 
        
-                <div class="ai-footer">
+                <div class="ai-footer nexai-sheet-footer">
 
     <!-- INPUT ROW -->
-    <div class="ai-input-row">
+    
+    <div class="nexai-template-toolbar">
+        <div class="nexai-template-anchor">
+            <button
+                type="button"
+                class="nexai-template-trigger"
+                id="nexaiTemplateTrigger"
+                aria-haspopup="menu"
+                aria-expanded="false"
+                onclick="toggleNexaiTemplateMenu(event)">
+                <span class="nexai-template-trigger-icon">✦</span>
+                <span>Template</span>
+                <svg viewBox="0 0 20 20" aria-hidden="true">
+                    <path d="M6 8l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+
+            <div
+                class="nexai-template-menu"
+                id="nexaiTemplateMenu"
+                role="menu"
+                aria-label="Template pertanyaan NEXAI">
+
+                <div class="nexai-template-menu-head">
+                    <strong>Pertanyaan cepat</strong>
+                    <span>Pilih lalu edit jika perlu</span>
+                </div>
+
+                <button type="button" role="menuitem" data-template="Imam siapa">
+                    <span class="nexai-template-dot">01</span>
+                    <span>
+                        <strong>Imam siapa</strong>
+                        <small>Profil Imam Sales Nine</small>
+                    </span>
+                </button>
+
+                <button type="button" role="menuitem" data-template="Nine Autoseries">
+                    <span class="nexai-template-dot">02</span>
+                    <span>
+                        <strong>Nine Autoseries</strong>
+                        <small>Master brand dan hirarki</small>
+                    </span>
+                </button>
+
+                <button type="button" role="menuitem" data-template="Luximos">
+                    <span class="nexai-template-dot">03</span>
+                    <span>
+                        <strong>Luximos</strong>
+                        <small>Subbrand dan kategori produk</small>
+                    </span>
+                </button>
+
+                <button type="button" role="menuitem" data-template="Spek H6 LS5">
+                    <span class="nexai-template-dot">04</span>
+                    <span>
+                        <strong>Spek H6 LS5</strong>
+                        <small>Contoh spesifikasi produk</small>
+                    </span>
+                </button>
+
+                <button type="button" role="menuitem" data-template="Foto H6 LS5">
+                    <span class="nexai-template-dot">05</span>
+                    <span>
+                        <strong>Foto H6 LS5</strong>
+                        <small>Contoh permintaan visual produk</small>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+<div class="ai-input-row">
 
         <input
             type="text"
@@ -22868,89 +24151,637 @@ Kirim Komentar
 // AI MODAL
 // =========================
 
+
+
+let nexaiTemplateMenuOpen = false;
 let nexaiMinimized = false;
 let nexaiBodyOverflowBeforeOpen = "";
+let nexaiSheetPointerId = null;
+let nexaiSheetStartY = 0;
+let nexaiSheetCurrentY = 0;
+let nexaiSheetStartTime = 0;
+let nexaiSheetMoved = false;
+let nexaiSheetSuppressClickUntil = 0;
+
+function setNexaiTemplateMenu(open){
+    const trigger = document.getElementById("nexaiTemplateTrigger");
+    const menu = document.getElementById("nexaiTemplateMenu");
+
+    nexaiTemplateMenuOpen = Boolean(open);
+
+    trigger?.setAttribute(
+        "aria-expanded",
+        nexaiTemplateMenuOpen ? "true" : "false"
+    );
+
+    menu?.classList.toggle(
+        "is-open",
+        nexaiTemplateMenuOpen
+    );
+}
+
+function toggleNexaiTemplateMenu(event){
+    event?.stopPropagation?.();
+
+    setNexaiTemplateMenu(
+        !nexaiTemplateMenuOpen
+    );
+}
+
+function chooseNexaiTemplate(text){
+    const input = document.getElementById("aiInput");
+
+    if(!input) return;
+
+    input.value = String(text || "").trim();
+
+    setNexaiTemplateMenu(false);
+
+    input.focus({
+        preventScroll:true
+    });
+
+    try{
+        input.setSelectionRange(
+            input.value.length,
+            input.value.length
+        );
+    }catch{}
+}
+
+function initNexaiTemplateMenu(){
+    const menu = document.getElementById("nexaiTemplateMenu");
+
+    if(!menu || menu.dataset.ready==="1"){
+        return;
+    }
+
+    menu.dataset.ready = "1";
+
+    menu
+        .querySelectorAll("[data-template]")
+        .forEach(button=>{
+            button.addEventListener("click",event=>{
+                event.stopPropagation();
+
+                chooseNexaiTemplate(
+                    button.dataset.template ||
+                    button.textContent
+                );
+            });
+        });
+
+    document.addEventListener("click",event=>{
+        if(
+            nexaiTemplateMenuOpen &&
+            !event.target.closest(".nexai-template-anchor")
+        ){
+            setNexaiTemplateMenu(false);
+        }
+    });
+}
 
 function setNexaiPageScrollLocked(locked){
     if(locked){
         if(!document.body.classList.contains("nexai-modal-open")){
-            nexaiBodyOverflowBeforeOpen = document.body.style.overflow || "";
+            nexaiBodyOverflowBeforeOpen =
+                document.body.style.overflow || "";
         }
 
         document.body.classList.add("nexai-modal-open");
         document.body.style.overflow = "hidden";
     }else{
         document.body.classList.remove("nexai-modal-open");
-        document.body.style.overflow = nexaiBodyOverflowBeforeOpen;
+        document.body.style.overflow =
+            nexaiBodyOverflowBeforeOpen;
     }
+}
+
+function resetNexaiSheetVisual(){
+    const modal = document.getElementById("aiModal");
+
+    if(!modal) return;
+
+    modal.classList.remove(
+        "is-sheet-dragging",
+        "is-sheet-snapping",
+        "is-sheet-closing"
+    );
+
+    modal.style.removeProperty("--nexai-drag-y");
+    modal.style.removeProperty("--nexai-drag-scale-x");
+    modal.style.removeProperty("--nexai-drag-scale-y");
+    modal.style.removeProperty("--nexai-drag-opacity");
+    modal.style.removeProperty("--nexai-drag-radius");
+
+    modal.style.background = "";
+    modal.style.backdropFilter = "";
+    modal.style.webkitBackdropFilter = "";
 }
 
 function openAI(){
     const modal = document.getElementById("aiModal");
+
     if(!modal) return;
 
-    modal.style.display = "flex";
-    modal.classList.remove("nexai-minimized");
+    setNexaiTemplateMenu(false);
+    resetNexaiSheetVisual();
+
     nexaiMinimized = false;
+    nexaiSheetPointerId = null;
+    nexaiSheetMoved = false;
+
+    modal.classList.remove("nexai-minimized");
+    modal.style.display = "flex";
+
     setNexaiPageScrollLocked(true);
 
-    requestAnimationFrame(()=>{
-        document.getElementById("aiInput")?.focus();
-    });
+    /*
+      Intentionally DO NOT auto-focus the input.
+      Auto-focus immediately opens the mobile keyboard and was one
+      of the causes of the old "jumping" transition.
+    */
 }
 
 function closeAI(){
     const modal = document.getElementById("aiModal");
+
     if(!modal) return;
 
-    modal.style.display = "none";
-    modal.classList.remove("nexai-minimized");
+    setNexaiTemplateMenu(false);
+
+    nexaiSheetPointerId = null;
+    nexaiSheetMoved = false;
     nexaiMinimized = false;
+
+    resetNexaiSheetVisual();
+
+    modal.classList.remove("nexai-minimized");
+    modal.style.display = "none";
+
     setNexaiPageScrollLocked(false);
+
+    document.getElementById("aiInput")?.blur();
 }
 
 function toggleNexaiMinimize(){
     const modal = document.getElementById("aiModal");
+
     if(!modal) return;
 
+    setNexaiTemplateMenu(false);
+
     nexaiMinimized = !nexaiMinimized;
-    modal.classList.toggle("nexai-minimized", nexaiMinimized);
 
-    // Minimized mode releases page scroll so user can browse the site.
-    setNexaiPageScrollLocked(!nexaiMinimized);
+    modal.classList.toggle(
+        "nexai-minimized",
+        nexaiMinimized
+    );
 
-    if(!nexaiMinimized){
-        requestAnimationFrame(()=>{
-            document.getElementById("aiInput")?.focus();
-        });
+    setNexaiPageScrollLocked(
+        !nexaiMinimized
+    );
+
+    if(nexaiMinimized){
+        document.getElementById("aiInput")?.blur();
     }
 }
 
-// Clicking minimized header opens the chat again.
-document.querySelector("#aiModal .ai-header")?.addEventListener("click",function(e){
-    if(nexaiMinimized && !e.target.closest(".ai-close")){
-        toggleNexaiMinimize();
+function nexaiSheetProgress(clientY){
+    const modal = document.getElementById("aiModal");
+    const sheet = document.getElementById("nexaiSheet");
+
+    if(!modal || !sheet) return;
+
+    nexaiSheetCurrentY = clientY;
+
+    const dy = Math.max(
+        0,
+        clientY - nexaiSheetStartY
+    );
+
+    if(dy > 6){
+        nexaiSheetMoved = true;
     }
-});
 
-// Outside click closes only in expanded mode.
-document.getElementById("aiModal")?.addEventListener("click",function(e){
-    if(e.target===this && !nexaiMinimized){
-        closeAI();
+    const closeDistance = Math.max(
+        180,
+        Math.min(
+            window.innerHeight * .34,
+            sheet.offsetHeight * .42
+        )
+    );
+
+    const progress = Math.min(
+        1,
+        dy / closeDistance
+    );
+
+    const dragY =
+        dy * (0.92 + progress * .08);
+
+    const scaleX =
+        1 - progress * .16;
+
+    const scaleY =
+        1 - progress * .045;
+
+    const opacity =
+        1 - progress * .22;
+
+    const radius =
+        24 + progress * 26;
+
+    modal.style.setProperty(
+        "--nexai-drag-y",
+        `${dragY}px`
+    );
+
+    modal.style.setProperty(
+        "--nexai-drag-scale-x",
+        String(scaleX)
+    );
+
+    modal.style.setProperty(
+        "--nexai-drag-scale-y",
+        String(scaleY)
+    );
+
+    modal.style.setProperty(
+        "--nexai-drag-opacity",
+        String(opacity)
+    );
+
+    modal.style.setProperty(
+        "--nexai-drag-radius",
+        `${radius}px`
+    );
+
+    /* Backdrop fades in sync with the drawer itself. */
+    const alpha =
+        .48 * (1 - progress);
+
+    modal.style.setProperty(
+        "background",
+        `rgba(10,12,14,${alpha})`,
+        "important"
+    );
+
+    modal.style.setProperty(
+        "backdrop-filter",
+        `blur(${10 * (1-progress)}px)`,
+        "important"
+    );
+
+    modal.style.setProperty(
+        "-webkit-backdrop-filter",
+        `blur(${10 * (1-progress)}px)`,
+        "important"
+    );
+}
+
+function startNexaiSheetDrag(event){
+    if(nexaiMinimized) return;
+
+    if(
+        event.button !== undefined &&
+        event.button !== 0
+    ){
+        return;
     }
-});
 
-// Escape behaves like the X button.
-document.addEventListener("keydown",function(e){
-    if(e.key==="Escape"){
-        const modal = document.getElementById("aiModal");
+    const modal = document.getElementById("aiModal");
+    const zone = document.getElementById("nexaiSheetGrabZone");
 
-        if(modal && modal.style.display==="flex"){
+    if(!modal || !zone) return;
+
+    setNexaiTemplateMenu(false);
+
+    nexaiSheetPointerId = event.pointerId;
+    nexaiSheetStartY = event.clientY;
+    nexaiSheetCurrentY = event.clientY;
+    nexaiSheetStartTime = performance.now();
+    nexaiSheetMoved = false;
+
+    modal.classList.remove(
+        "is-sheet-snapping",
+        "is-sheet-closing"
+    );
+
+    modal.classList.add(
+        "is-sheet-dragging"
+    );
+
+    try{
+        zone.setPointerCapture(event.pointerId);
+    }catch{}
+
+    event.preventDefault();
+}
+
+function moveNexaiSheetDrag(event){
+    if(
+        nexaiSheetPointerId === null ||
+        event.pointerId !== nexaiSheetPointerId
+    ){
+        return;
+    }
+
+    nexaiSheetProgress(
+        event.clientY
+    );
+
+    event.preventDefault();
+}
+
+function finishNexaiSheetDrag(event){
+    if(
+        nexaiSheetPointerId === null ||
+        event.pointerId !== nexaiSheetPointerId
+    ){
+        return;
+    }
+
+    const modal = document.getElementById("aiModal");
+    const sheet = document.getElementById("nexaiSheet");
+
+    if(!modal || !sheet){
+        nexaiSheetPointerId = null;
+        return;
+    }
+
+    nexaiSheetCurrentY =
+        Number.isFinite(event.clientY)
+            ? event.clientY
+            : nexaiSheetCurrentY;
+
+    const dy = Math.max(
+        0,
+        nexaiSheetCurrentY - nexaiSheetStartY
+    );
+
+    const elapsed = Math.max(
+        1,
+        performance.now() - nexaiSheetStartTime
+    );
+
+    const velocity =
+        dy / elapsed;
+
+    const closeDistance = Math.max(
+        180,
+        Math.min(
+            window.innerHeight * .34,
+            sheet.offsetHeight * .42
+        )
+    );
+
+    const progress = Math.min(
+        1,
+        dy / closeDistance
+    );
+
+    const shouldClose =
+        progress >= .44 ||
+        (dy >= 68 && velocity >= .52);
+
+    nexaiSheetPointerId = null;
+
+    if(shouldClose){
+        modal.classList.remove(
+            "is-sheet-dragging"
+        );
+
+        modal.classList.add(
+            "is-sheet-closing"
+        );
+
+        modal.style.setProperty(
+            "background",
+            "rgba(10,12,14,0)",
+            "important"
+        );
+
+        modal.style.setProperty(
+            "backdrop-filter",
+            "blur(0px)",
+            "important"
+        );
+
+        modal.style.setProperty(
+            "-webkit-backdrop-filter",
+            "blur(0px)",
+            "important"
+        );
+
+        nexaiSheetSuppressClickUntil =
+            performance.now() + 450;
+
+        window.setTimeout(()=>{
+            closeAI();
+        },225);
+
+        event.preventDefault();
+
+        return;
+    }
+
+    modal.classList.remove(
+        "is-sheet-dragging"
+    );
+
+    modal.classList.add(
+        "is-sheet-snapping"
+    );
+
+    modal.style.background = "";
+    modal.style.backdropFilter = "";
+    modal.style.webkitBackdropFilter = "";
+
+    nexaiSheetSuppressClickUntil =
+        performance.now() + 300;
+
+    window.setTimeout(()=>{
+        modal.classList.remove(
+            "is-sheet-snapping"
+        );
+
+        modal.style.removeProperty("--nexai-drag-y");
+        modal.style.removeProperty("--nexai-drag-scale-x");
+        modal.style.removeProperty("--nexai-drag-scale-y");
+        modal.style.removeProperty("--nexai-drag-opacity");
+        modal.style.removeProperty("--nexai-drag-radius");
+
+        nexaiSheetMoved = false;
+    },250);
+
+    event.preventDefault();
+}
+
+function cancelNexaiSheetDrag(event){
+    if(
+        nexaiSheetPointerId === null ||
+        event.pointerId !== nexaiSheetPointerId
+    ){
+        return;
+    }
+
+    nexaiSheetPointerId = null;
+
+    const modal = document.getElementById("aiModal");
+
+    if(!modal) return;
+
+    modal.classList.remove(
+        "is-sheet-dragging"
+    );
+
+    modal.classList.add(
+        "is-sheet-snapping"
+    );
+
+    modal.style.background = "";
+    modal.style.backdropFilter = "";
+    modal.style.webkitBackdropFilter = "";
+
+    window.setTimeout(()=>{
+        resetNexaiSheetVisual();
+        nexaiSheetMoved = false;
+    },250);
+}
+
+function handleNexaiSheetTap(event){
+    if(
+        nexaiSheetMoved ||
+        performance.now() < nexaiSheetSuppressClickUntil
+    ){
+        nexaiSheetMoved = false;
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+    }
+
+    toggleNexaiMinimize();
+}
+
+function initNexaiBottomSheetGestures(){
+    const zone =
+        document.getElementById("nexaiSheetGrabZone");
+
+    const handle =
+        zone?.querySelector(".nexai-sheet-handle");
+
+    if(!zone || zone.dataset.dragReady==="1"){
+        return;
+    }
+
+    zone.dataset.dragReady = "1";
+
+    zone.addEventListener(
+        "pointerdown",
+        startNexaiSheetDrag
+    );
+
+    zone.addEventListener(
+        "pointermove",
+        moveNexaiSheetDrag
+    );
+
+    zone.addEventListener(
+        "pointerup",
+        finishNexaiSheetDrag
+    );
+
+    zone.addEventListener(
+        "pointercancel",
+        cancelNexaiSheetDrag
+    );
+
+    handle?.addEventListener(
+        "click",
+        handleNexaiSheetTap
+    );
+}
+
+function initNexaiModalController(){
+    initNexaiBottomSheetGestures();
+    initNexaiTemplateMenu();
+
+    const modal =
+        document.getElementById("aiModal");
+
+    const header =
+        modal?.querySelector(".nexai-sheet-header");
+
+    const close =
+        modal?.querySelector(".ai-close");
+
+    /* X always owns its click and can never bubble into drawer logic. */
+    close?.addEventListener(
+        "click",
+        event=>{
+            event.preventDefault();
+            event.stopPropagation();
             closeAI();
         }
-    }
-});
+    );
 
+    /* Minimized dock opens again by tapping the header. */
+    header?.addEventListener(
+        "click",
+        event=>{
+            if(
+                nexaiMinimized &&
+                !event.target.closest(".ai-close")
+            ){
+                event.preventDefault();
+                toggleNexaiMinimize();
+            }
+        }
+    );
+
+    /* Backdrop click closes expanded sheet only. */
+    modal?.addEventListener(
+        "click",
+        event=>{
+            if(
+                event.target === modal &&
+                !nexaiMinimized
+            ){
+                closeAI();
+            }
+        }
+    );
+
+    document.addEventListener(
+        "keydown",
+        event=>{
+            if(event.key!=="Escape") return;
+
+            if(nexaiTemplateMenuOpen){
+                setNexaiTemplateMenu(false);
+                return;
+            }
+
+            if(
+                modal &&
+                modal.style.display==="flex"
+            ){
+                closeAI();
+            }
+        }
+    );
+}
+
+if(document.readyState==="loading"){
+    document.addEventListener(
+        "DOMContentLoaded",
+        initNexaiModalController,
+        {once:true}
+    );
+}else{
+    initNexaiModalController();
+}
 
 
 function isProductReply(reply){
@@ -23584,6 +25415,139 @@ function isCodeReply(reply){
 // RENDER AI REPLY — SAFE
 // ==========================================
 
+
+function escapeNexaiText(value){
+    return String(value ?? "")
+        .replace(/&/g,"&amp;")
+        .replace(/</g,"&lt;")
+        .replace(/>/g,"&gt;")
+        .replace(/"/g,"&quot;")
+        .replace(/'/g,"&#039;");
+}
+
+function renderNexaiStructuredText(reply, route=""){
+    const text = String(reply || "").replace(/\r/g,"").trim();
+
+    if(!text){
+        return "";
+    }
+
+    const productRoutes = new Set([
+        "product_spec",
+        "product_features",
+        "product_description",
+        "product_variant",
+        "product_stock",
+        "product_price",
+        "product_photo_spec",
+        "product_detail",
+        "product_full",
+        "compare"
+    ]);
+
+    if(!productRoutes.has(route)){
+        return renderAIReply(text);
+    }
+
+    const lines = text
+        .split("\n")
+        .map(line=>line.trim())
+        .filter(Boolean);
+
+    if(!lines.length){
+        return renderAIReply(text);
+    }
+
+    let title = "";
+    let start = 0;
+
+    // First plain line on product routes is treated as product/answer title.
+    if(
+        !/^[-*•]\s+/.test(lines[0]) &&
+        !/^\d+[.)]\s+/.test(lines[0]) &&
+        !lines[0].endsWith(":")
+    ){
+        title = lines[0];
+        start = 1;
+    }
+
+    let html = `<div class="nexai-answer-shell">`;
+
+    if(title){
+        html += `<div class="nexai-answer-title">${escapeNexaiText(title)}</div>`;
+    }
+
+    html += `<div class="nexai-answer-body">`;
+
+    let listOpen = false;
+
+    const closeList = ()=>{
+        if(listOpen){
+            html += `</ul>`;
+            listOpen = false;
+        }
+    };
+
+    for(let i=start;i<lines.length;i++){
+        const line = lines[i];
+
+        // Standalone section headings produced by backend.
+        if(
+            /^(Spesifikasi resmi|Spesifikasi|Fitur resmi|Fitur|Varian|Deskripsi|Perbandingan .*|Sumber web):?$/i.test(line)
+        ){
+            closeList();
+            html += `<div class="nexai-answer-section">${escapeNexaiText(line.replace(/:$/,""))}</div>`;
+            continue;
+        }
+
+        const bullet = line.match(/^[-*•]\s*(.+)$/);
+
+        if(bullet){
+            if(!listOpen){
+                html += `<ul>`;
+                listOpen = true;
+            }
+
+            // Make "Label: value" visually clearer without changing content.
+            const item = bullet[1];
+            const kv = item.match(/^([^:]{1,38}):\s*(.+)$/);
+
+            if(kv){
+                html += `<li><strong>${escapeNexaiText(kv[1])}:</strong> ${escapeNexaiText(kv[2])}</li>`;
+            }else{
+                html += `<li>${escapeNexaiText(item)}</li>`;
+            }
+
+            continue;
+        }
+
+        closeList();
+
+        // Plain key/value row.
+        const kv = line.match(/^([^:]{1,38}):\s*(.+)$/);
+
+        if(kv){
+            html += `<p><strong>${escapeNexaiText(kv[1])}:</strong> ${escapeNexaiText(kv[2])}</p>`;
+            continue;
+        }
+
+        // Product name inside comparison gets a visual subsection.
+        if(route==="compare" && /^[A-Z0-9][A-Z0-9+\-/ .()]{2,}$/i.test(line) && line.length < 90){
+            html += `<div class="nexai-answer-section">${escapeNexaiText(line)}</div>`;
+            continue;
+        }
+
+        html += `<p>${escapeNexaiText(line)}</p>`;
+    }
+
+    closeList();
+
+    html += `</div></div>`;
+
+    return html;
+}
+
+
 function renderAIReply(reply){
 
     if(isProductReply(reply)){
@@ -24060,7 +26024,10 @@ function renderNexaiReply(data){
 
     // Untuk route lain, gunakan renderer lama sebagai fallback.
     // Ini mempertahankan kompatibilitas response Markdown lama.
-    return renderAIReply(reply);
+    return renderNexaiStructuredText(
+        reply,
+        route
+    );
 
 }
 
@@ -24157,7 +26124,7 @@ async function revealNexaiAnswer(node, html, startedAt){
     if(body){
         const targetTop = Math.max(
             0,
-            node.offsetTop - 16
+            node.offsetTop - 28
         );
 
         body.scrollTo({
@@ -24462,21 +26429,7 @@ async function sendAI(){
 
         setAISendBusy(false);
 
-        if(body){
-            const distanceFromBottom =
-                body.scrollHeight -
-                body.scrollTop -
-                body.clientHeight;
-
-            if(distanceFromBottom < 180){
-                body.scrollTo({
-                    top:body.scrollHeight,
-                    behavior:"smooth"
-                });
-            }
-        }
-
-        if(input){
+if(input){
             input.focus();
         }
 
@@ -24515,6 +26468,10 @@ if(nexaiInput){
 }
 
 
+
+
+initNexaiTemplateMenu();
+initNexaiBottomSheetGestures();
 
 let stickyClosed = false;
 let stickyScrollHandler = null;
