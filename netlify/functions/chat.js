@@ -52,6 +52,11 @@ const catalogPages = Array.isArray(catalogPayload?.pages)
   ? catalogPayload.pages
   : [];
 
+const businessKnowledge = safeReadJSON(
+  path.join(__dirname, "data", "business_knowledge.json"),
+  {}
+);
+
 async function loadProducts() {
   const now = Date.now();
 
@@ -823,6 +828,25 @@ function catalogSpecsForProduct(p) {
     ...productLiveSpecs(p)
   };
 
+  // Last-resort same-page extraction only; never jump to a different product.
+  if (!Object.keys(specs).length && page.search_text) {
+    const raw = String(page.search_text);
+
+    const extractors = [
+      ["Daya", /(?:power|wattage|daya)\s*:?\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?\s*w(?:att)?)/i],
+      ["Tegangan", /(?:voltage|tegangan)\s*:?\s*([0-9]+(?:\s*[-–]\s*[0-9]+)?\s*v(?:\s*\/\s*dc)?)/i],
+      ["Lumen", /(?:luminous flux|lumen|aliran lumen)\s*:?\s*([0-9.,]+\s*lm)/i],
+      ["Suhu warna", /(?:color temp(?:erature)?|suhu warna)\s*:?\s*([0-9k,\s-]+)/i],
+      ["Material", /(?:material|bahan)\s*:?\s*([a-z0-9\-\s]+?)(?=\s{2,}|\s(?:cooling|function|fungsi|waterproof|warna)\b|$)/i],
+      ["Tingkat tahan air", /(?:waterproof rate|waterproof|tingkat tahan air)\s*:?\s*(ip\d{2,3})/i]
+    ];
+
+    for (const [key, rx] of extractors) {
+      const m = raw.match(rx);
+      if (m?.[1]) specs[key] = m[1].trim();
+    }
+  }
+
   if (Object.keys(specs).length) {
     specs._catalog_page = page.page;
   }
@@ -857,6 +881,41 @@ function productPayload(p) {
 /* =========================================================
    INTENT + FOLLOW-UP POLICY
 ========================================================= */
+
+
+function isBusinessProfileQuestion(message) {
+  const m = normalize(message);
+
+  return (
+    /\b(imam siapa|siapa imam|imam sales nine|imamsalesnine|siapa pemilik|siapa owner|kontak imam|nomor imam|whatsapp imam|website imam|alamat imam)\b/.test(m)
+  );
+}
+
+function businessProfileReply(message) {
+  const m = normalize(message);
+
+  const profile =
+    String(businessKnowledge?.profile_text || "");
+
+  const business =
+    String(businessKnowledge?.business_text || "");
+
+  const combined =
+    `${profile}\n${business}`;
+
+  // Deterministic responses for common public questions.
+  if (/\b(imam siapa|siapa imam|imam sales nine|imamsalesnine|siapa pemilik|siapa owner)\b/.test(m)) {
+    // Keep public-facing answer concise; source text remains internal.
+    return "Imam adalah pengelola Imam Sales Nine yang membantu informasi dan penjualan produk Nine Autoseries melalui imamsalesnine.com.";
+  }
+
+  if (/\b(website imam|website|situs)\b/.test(m)) {
+    return "Website resmi Imam Sales Nine: https://imamsalesnine.com/";
+  }
+
+  return null;
+}
+
 
 function classify(message, hasExplicitProduct = false) {
   const m = normalize(message);
@@ -902,7 +961,8 @@ function classify(message, hasExplicitProduct = false) {
 
   let type = "general";
 
-  if (flags.smalltalk) type = "smalltalk";
+  if (isBusinessProfileQuestion(message)) type = "business_profile";
+  else if (flags.smalltalk) type = "smalltalk";
   else if (flags.time) type = "local_time";
   else if (flags.creative) type = "creative_image";
   else if (flags.fitment) type = "fitment";
@@ -1571,6 +1631,7 @@ ATURAN WAJIB:
 - Web tidak boleh mengubah fakta resmi produk Nine.
 - Bila LOCAL_PRODUCTS kosong, jangan mengaku produk tertentu tidak ada kecuali memang hasil tool lokal mendukung itu.
 - Untuk pertanyaan umum/nonproduk, jawab normal tanpa menyeret produk yang dibahas sebelumnya.
+- Untuk pertanyaan tentang Imam/Imam Sales Nine, backend menyediakan business_profile route; jangan mengarang identitas user.
 - Jangan tampilkan proses berpikir internal.
   `.trim();
 
@@ -2111,6 +2172,30 @@ exports.handler = async event => {
         message,
         explicitProducts.length > 0
       );
+
+    if (
+      route.type ===
+      "business_profile"
+    ) {
+      const reply =
+        businessProfileReply(
+          message
+        );
+
+      if (reply) {
+        return jsonResponse(
+          200,
+          {
+            reply,
+            image: null,
+            route:
+              "business_profile",
+            usedAI: false,
+            usedWeb: false
+          }
+        );
+      }
+    }
 
     if (
       route.type ===

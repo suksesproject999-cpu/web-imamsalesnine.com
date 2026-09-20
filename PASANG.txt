@@ -1,16 +1,22 @@
-NEXAI FINAL V10 STABLE
+NEXAI FINAL V11 — KNOWLEDGE ROUTER
 
-FOKUS V10:
-- Exact multi-product resolver.
-- MS3 tidak boleh berubah jadi M6.
-- Q6pro mengenali Q6-PRO walau tanpa tanda "-".
-- H6 LH2 memakai catalog_page resmi produk (page 14).
-- Perbandingan R9 vs R10 mengunci dua produk sekaligus.
-- Active product hanya dipakai untuk follow-up referensial seperti "fotonya", "speknya", "harganya".
-- Pertanyaan umum seperti "kenapa gak bisa kerja kamu" tidak boleh menampilkan kartu produk lama.
-- Stock object diformat sebagai teks, bukan [object Object].
-- Catalog mapping: catalog_page resmi dulu; fuzzy catalog lookup hanya fallback hati-hati.
-- Jika halaman katalog tidak punya object specs, V10 mencoba membaca blok Specification dari text halaman yang sama.
+FOKUS:
+1. Produk Nine:
+   - produk.json = identitas, SKU, harga, stok, varian, foto, catalog_page
+   - catalog_specs.json = spesifikasi teknis
+2. Business/Profile:
+   - business_knowledge.json untuk pertanyaan "Imam siapa", website, dll.
+3. Fitment/current info:
+   - web search hanya saat perlu
+4. General:
+   - AI tanpa menyeret produk lama
+
+FIX V11:
+- V9 Pro memakai catalog_page yang sama dan fallback ekstraksi pada halaman itu saja.
+- Tidak lagi langsung "spesifikasi belum tersedia" kalau text halaman katalog masih memuat data.
+- "Imam siapa" tidak lagi dianggap nama user.
+- Tetap mempertahankan exact multi-product resolver V10.
+- Active product hanya untuk follow-up referensial.
 
 STRUKTUR:
 root/
@@ -23,20 +29,18 @@ root/
       chat.js
       data/
         catalog_specs.json
+        business_knowledge.json
 
 PASANG:
 1. Replace index.html
 2. Replace netlify/functions/chat.js
-3. Copy netlify/functions/data/catalog_specs.json
-4. produk.json lama tetap root
+3. Copy kedua file dalam netlify/functions/data/
+4. produk.json lama tetap di root
 5. Deploy ulang
 6. Hard refresh
 
-HEALTH CHECK:
-Buka:
+HEALTH:
 https://imamsalesnine.com/.netlify/functions/chat?health=1
 
-Harus menunjukkan status ok dan SKU kritis seperti R9, R10, Z2, MS3-SLIM, Q6-PRO, H6-LH2 terdeteksi.
-
-PRODUCTION TEST:
+TEST:
 node SELFTEST.js https://imamsalesnine.com/.netlify/functions/chat

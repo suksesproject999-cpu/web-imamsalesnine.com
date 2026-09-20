@@ -1,6 +1,6 @@
 
 /**
- * NEXAI V10 PRODUCTION TEST
+ * NEXAI V11 PRODUCTION TEST
  * node SELFTEST.js https://imamsalesnine.com/.netlify/functions/chat
  */
 const endpoint =
@@ -13,7 +13,9 @@ const tests = [
   ["Spek MS3", "product_spec", "MS3-SLIM"],
   ["Q6pro apa ada", "product_stock", "Q6-PRO"],
   ["Spek H6 LH2", "product_spec", "H6-LH2"],
+  ["Spek V9pro", "product_spec", "V9PRO"],
   ["Beda R9 dan R10 apa", "compare", null],
+  ["Imam siapa", "business_profile", null],
   ["Kenapa gak bisa kerja kamu", "general", null]
 ];
 
@@ -53,11 +55,16 @@ async function ask(message){
         Array.isArray(data.products) &&
         data.products.length>=2;
 
+      const businessOK =
+        route!=="business_profile" ||
+        /Imam/i.test(data.reply||"");
+
       const ok=
         status===200 &&
         routeOK &&
         skuOK &&
-        compareOK;
+        compareOK &&
+        businessOK;
 
       console.log(
         ok?"PASS":"FAIL",
@@ -67,7 +74,8 @@ async function ask(message){
         data.product?.sku || "",
         Array.isArray(data.products)
           ? data.products.map(x=>x.sku).join(",")
-          : ""
+          : "",
+        (data.reply||"").slice(0,80)
       );
 
       if(!ok) fail++;
