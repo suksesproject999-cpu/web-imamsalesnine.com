@@ -21,7 +21,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v11-knowledge-router">
+<meta name="nexai-ui-version" content="2026.09-v12-catalog-first">
 
 <link rel="icon" href="favicon.png">
 
@@ -12670,12 +12670,12 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v11-knowledge-router">
+<meta name="nexai-ui-version" content="2026.09-v12-catalog-first">
 
 <script>
-/* NEXAI V11 — one-time clean migration */
+/* NEXAI V12 — one-time clean migration */
 (function(){
-  const schema = "v11-knowledge-router";
+  const schema = "v12-catalog-first";
   if(sessionStorage.getItem("nexaiMemorySchema") !== schema){
     sessionStorage.removeItem("imamAIHistory");
     sessionStorage.removeItem("imamAIProductMemory");
@@ -25580,7 +25580,7 @@ function openNexaiHybrid(event){
 </script>
 
 <script>
-/* NEXAI V11 — structured backend renderer */
+/* NEXAI V12 — structured backend renderer */
 (function(){
   const original =
     window.renderNexaiReply;
@@ -25779,7 +25779,7 @@ function openNexaiHybrid(event){
       ){
         const specs =
           Object.entries(
-            p.specs || {}
+            p.specifications || {}
           ).filter(
             ([key]) =>
               key !== "_catalog_page"

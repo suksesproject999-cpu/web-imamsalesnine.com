@@ -1,22 +1,12 @@
-NEXAI FINAL V11 — KNOWLEDGE ROUTER
+NEXAI FINAL V12 — CATALOG FIRST + LIVE GLOBAL INTELLIGENCE
 
-FOKUS:
-1. Produk Nine:
-   - produk.json = identitas, SKU, harga, stok, varian, foto, catalog_page
-   - catalog_specs.json = spesifikasi teknis
-2. Business/Profile:
-   - business_knowledge.json untuk pertanyaan "Imam siapa", website, dll.
-3. Fitment/current info:
-   - web search hanya saat perlu
-4. General:
-   - AI tanpa menyeret produk lama
-
-FIX V11:
-- V9 Pro memakai catalog_page yang sama dan fallback ekstraksi pada halaman itu saja.
-- Tidak lagi langsung "spesifikasi belum tersedia" kalau text halaman katalog masih memuat data.
-- "Imam siapa" tidak lagi dianggap nama user.
-- Tetap mempertahankan exact multi-product resolver V10.
-- Active product hanya untuk follow-up referensial.
+SUMBER:
+1. Katalog resmi = deskripsi, fitur, spesifikasi, fungsi produk.
+2. produk.json = harga, stok, promo, foto, WhatsApp, varian tambahan, mapping halaman.
+3. Profil Imam = business knowledge.
+4. Nine Autoseries = master brand; subbrand: Nine Luximos, Nine LX-Trix, Nine Securicle, Nine Soundblax, Optimus, Cady, Nine Power/9Power.
+5. Fitment + fakta aktual = web search.
+6. Jam lokal = waktu browser user.
 
 STRUKTUR:
 root/
@@ -28,16 +18,16 @@ root/
     functions/
       chat.js
       data/
-        catalog_specs.json
+        catalog_products.json
         business_knowledge.json
+        brand_knowledge.json
 
 PASANG:
 1. Replace index.html
 2. Replace netlify/functions/chat.js
-3. Copy kedua file dalam netlify/functions/data/
+3. Copy SEMUA isi netlify/functions/data/
 4. produk.json lama tetap di root
-5. Deploy ulang
-6. Hard refresh
+5. Deploy ulang + hard refresh
 
 HEALTH:
 https://imamsalesnine.com/.netlify/functions/chat?health=1
