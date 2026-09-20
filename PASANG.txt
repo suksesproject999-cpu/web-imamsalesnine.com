@@ -1,12 +1,44 @@
-NEXAI FINAL V12 — CATALOG FIRST + LIVE GLOBAL INTELLIGENCE
+NEXAI FINAL V13 — PRODUCT KNOWLEDGE CENTER
 
-SUMBER:
-1. Katalog resmi = deskripsi, fitur, spesifikasi, fungsi produk.
-2. produk.json = harga, stok, promo, foto, WhatsApp, varian tambahan, mapping halaman.
-3. Profil Imam = business knowledge.
-4. Nine Autoseries = master brand; subbrand: Nine Luximos, Nine LX-Trix, Nine Securicle, Nine Soundblax, Optimus, Cady, Nine Power/9Power.
-5. Fitment + fakta aktual = web search.
-6. Jam lokal = waktu browser user.
+TUJUAN:
+Setiap produk Nine memiliki satu record pusat informasi yang menyatukan seluruh data resmi yang tersedia.
+
+ISI SATU RECORD:
+- identitas: product_id, SKU, nama, alias
+- brand: Nine Autoseries + subbrand bila tersedia
+- classification: kategori, fungsi, aplikasi
+- katalog resmi: deskripsi, fitur, spesifikasi, raw catalog text, halaman
+- varian
+- visual: foto utama, foto tambahan, full page
+- compatibility: socket + vehicle notes
+- commercial: harga, stok, promo, WhatsApp (diisi dari produk.json saat runtime)
+- provenance/source status
+
+HASIL BUILD:
+- Total produk: 172
+- Produk dengan halaman katalog terverifikasi: 152
+- Produk dengan deskripsi katalog terstruktur: 111
+- Produk dengan spesifikasi terstruktur: 120
+- Produk dengan foto utama resmi: 170
+
+SOURCE POLICY:
+1. Katalog resmi menang untuk deskripsi, fitur, spesifikasi, fungsi, aplikasi, socket.
+2. PRODUCT IMAGE MAPPING FULL menang untuk foto/galeri/full page.
+3. produk.json hanya melengkapi harga, stok, promo, WhatsApp, kategori, subbrand, dan varian tambahan.
+4. Fitment kendaraan dan fakta aktual/dinamis memakai web.
+5. Waktu lokal memakai waktu browser user.
+6. Web tidak boleh menimpa fakta resmi produk Nine.
+
+HIRARKI BRAND:
+Master brand: Nine Autoseries
+Subbrand:
+- Nine Luximos
+- Nine LX-Trix
+- Nine Securicle
+- Nine Soundblax
+- Optimus
+- Cady
+- Nine Power / 9Power
 
 STRUKTUR:
 root/
@@ -18,16 +50,17 @@ root/
     functions/
       chat.js
       data/
-        catalog_products.json
+        product_knowledge_center.json
         business_knowledge.json
         brand_knowledge.json
 
 PASANG:
-1. Replace index.html
-2. Replace netlify/functions/chat.js
-3. Copy SEMUA isi netlify/functions/data/
-4. produk.json lama tetap di root
-5. Deploy ulang + hard refresh
+1. Replace index.html.
+2. Replace netlify/functions/chat.js.
+3. Copy seluruh netlify/functions/data/.
+4. produk.json lama tetap di root.
+5. Deploy Netlify.
+6. Hard refresh browser.
 
 HEALTH:
 https://imamsalesnine.com/.netlify/functions/chat?health=1

@@ -12,7 +12,7 @@ const PUBLIC_IMAGE_ENABLED=process.env.NEXAI_PUBLIC_IMAGE==="1";
 const IMAGE_MODEL=process.env.NEXAI_IMAGE_MODEL||"gpt-image-1";
 
 function readJSON(file,fallback){try{return JSON.parse(fs.readFileSync(file,"utf8"));}catch{return fallback;}}
-const catalogDB=readJSON(path.join(__dirname,"data","catalog_products.json"),{products:[]});
+const knowledgeDB=readJSON(path.join(__dirname,"data","product_knowledge_center.json"),{products:[]});
 const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),{});
 const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
 
@@ -106,24 +106,66 @@ function resolveProducts(products,message,limit=4){
   return out;
 }
 
-function catalogFor(p){
+function knowledgeFor(p){
   if(!p)return null;
   const page=String(pCatalogPage(p)||""),sku=compact(pSku(p)),name=compact(pName(p));
-  if(page){const hit=(catalogDB.products||[]).find(x=>String(x.catalog_page)===page);if(hit)return hit;}
-  if(sku){const hit=(catalogDB.products||[]).find(x=>compact(x.sku)===sku);if(hit)return hit;}
-  if(name){const hit=(catalogDB.products||[]).find(x=>compact(x.catalog_name)===name);if(hit)return hit;}
+
+  if(sku){
+    const hit=(knowledgeDB.products||[]).find(x=>compact(x?.identity?.sku)===sku);
+    if(hit)return hit;
+  }
+
+  if(page){
+    const hit=(knowledgeDB.products||[]).find(x=>String(x?.catalog?.page||"")===page);
+    if(hit)return hit;
+  }
+
+  if(name){
+    const hit=(knowledgeDB.products||[]).find(x=>compact(x?.identity?.name)===name);
+    if(hit)return hit;
+  }
+
   return null;
 }
+
 function productPayload(p){
-  const cat=catalogFor(p);
+  const k=knowledgeFor(p);
+
+  const catalogDescription=k?.catalog?.description||"";
+  const catalogFeatures=Array.isArray(k?.catalog?.features)?k.catalog.features:[];
+  const catalogSpecs=k?.catalog?.specifications||{};
+
   return{
-    name:cat?.catalog_name||pName(p),sku:pSku(p)||cat?.sku||"",brand:pBrand(p),category:pCategory(p),
-    description:cat?.description||pDescription(p)||"",
-    features:Array.isArray(cat?.features)&&cat.features.length?cat.features:arr(p?.keunggulan||p?.features),
-    specifications:cat?.specifications&&Object.keys(cat.specifications).length?cat.specifications:(p?.spesifikasi&&typeof p.spesifikasi==="object"?p.spesifikasi:{}),
-    variants:pVariants(p),price:pPrice(p),regular_price:pRegularPrice(p),stock:pStock(p),whatsapp:pWhatsapp(p),
-    catalog_page:cat?.catalog_page||pCatalogPage(p)||null,
-    visual:{main:pImage(p),full_page:pFullPage(p)}
+    product_id:k?.product_id||null,
+    name:k?.identity?.name||pName(p),
+    sku:pSku(p)||k?.identity?.sku||"",
+    brand:pBrand(p)||k?.brand?.subbrand||k?.brand?.master||"",
+    master_brand:"Nine Autoseries",
+    subbrand:pBrand(p)||k?.brand?.subbrand||"",
+    category:pCategory(p)||k?.classification?.category||"",
+    description:catalogDescription||pDescription(p)||"",
+    features:catalogFeatures.length?catalogFeatures:arr(p?.keunggulan||p?.features),
+    specifications:Object.keys(catalogSpecs).length?catalogSpecs:(p?.spesifikasi&&typeof p.spesifikasi==="object"?p.spesifikasi:{}),
+    function:k?.classification?.function||catalogSpecs["Fungsi"]||"",
+    application:k?.classification?.application||catalogSpecs["Cocok untuk"]||"",
+    socket:k?.compatibility?.socket||catalogSpecs["Soket"]||catalogSpecs["Tipe Soket"]||"",
+    variants:[...new Set([...(k?.variants||[]),...pVariants(p)])],
+    price:pPrice(p),
+    regular_price:pRegularPrice(p),
+    stock:pStock(p),
+    whatsapp:pWhatsapp(p),
+    catalog_page:k?.catalog?.page||pCatalogPage(p)||null,
+    raw_catalog_text:k?.catalog?.raw_text||"",
+    visual:{
+      main:k?.visual?.main||pImage(p),
+      additional:k?.visual?.additional||[],
+      full_page:k?.visual?.full_page||pFullPage(p)
+    },
+    source_status:{
+      catalog_verified:k?.catalog?.verified===true,
+      live_commercial:true,
+      visual_verified:!!(k?.visual?.main||k?.visual?.full_page)
+    }
   };
 }
 
@@ -166,19 +208,19 @@ function classify(message,hasProduct){
   const m=normalize(message),f={
     smalltalk:/^(bro|broo+|halo|hai|hi|hello|gas|gaskeun|sip|siap|oke|ok|makasih|terima kasih|thanks)[.!?\s]*$/.test(m),
     price:/\b(harga|price|harganya)\b/.test(m),stock:/\b(stok|stock|ready|tersedia|availability)\b/.test(m)||(hasProduct&&/\b(ada|ready)\b/.test(m)),
-    photo:/\b(foto|gambar|lihat|tampilkan|tunjukkan)\b/.test(m),catalog:/\b(halaman katalog|foto katalog|full page|katalog)\b/.test(m),
+    photo:/\b(foto|gambar|lihat|tampilkan|tunjukkan)\b/.test(m),gallery:/\b(semua foto|galeri|foto tambahan|foto lainnya)\b/.test(m),catalog:/\b(halaman katalog|foto katalog|full page|katalog)\b/.test(m),
     spec:/\b(spek|spec|spesifikasi|watt|daya|volt|tegangan|lumen|material|kelvin|suhu|pendingin|chip|ampere|arus)\b/.test(m),
     variant:/\b(varian|warna|variant|color)\b/.test(m),features:/\b(fitur|keunggulan|kelebihan)\b/.test(m),
-    description:/\b(deskripsi|jelaskan produk|produk ini apa|itu apa)\b/.test(m),compare:/\b(vs|versus|beda|perbedaan|bandingkan|bandingin)\b/.test(m),
+    description:/\b(deskripsi|jelaskan produk|produk ini apa|itu apa)\b/.test(m),full:/\b(detail lengkap|lengkap dong|semua informasi|full detail|semua detail)\b/.test(m),compare:/\b(vs|versus|beda|perbedaan|bandingkan|bandingin)\b/.test(m),
     fitment:/\b(cocok|fitment|socket|soket|wiring|plug.?and.?play|pakai apa|buat .*20\d{2})\b/.test(m),
     creative:/\b(buat|bikin|generate|render|ciptakan)\b.*\b(foto|gambar|image|poster|banner|visual|ilustrasi)\b/.test(m)
   };
   let type="general";
   if(isBusiness(message))type="business_profile";else if(isBrand(message)&&!hasProduct)type="brand_knowledge";else if(f.smalltalk)type="smalltalk";
   else if(isTime(message))type="local_time";else if(f.creative)type="creative_image";else if(f.fitment)type="fitment";else if(f.compare)type="compare";
-  else if(f.catalog)type="catalog_page";else if(f.photo&&f.spec)type="product_photo_spec";else if(f.photo)type="product_photo";else if(f.price)type="product_price";
+  else if(f.catalog)type="catalog_page";else if(f.gallery)type="product_gallery";else if(f.photo&&f.spec)type="product_photo_spec";else if(f.photo)type="product_photo";else if(f.price)type="product_price";
   else if(f.stock)type="product_stock";else if(f.spec)type="product_spec";else if(f.features)type="product_features";else if(f.description)type="product_description";
-  else if(f.variant)type="product_variant";else if(isCurrent(message))type="current_web";else if(hasProduct)type="product_detail";
+  else if(f.variant)type="product_variant";else if(f.full&&hasProduct)type="product_full";else if(isCurrent(message))type="current_web";else if(hasProduct)type="product_detail";
   return{type,flags:f};
 }
 function referential(message){
@@ -206,13 +248,14 @@ function direct(type,p){
   if(type==="product_price"){const r=[x.name];if(x.regular_price&&x.price&&x.regular_price!==x.price){r.push(`Harga normal: ${x.regular_price}`,`Harga promo: ${x.price}`);}else r.push(`Harga: ${x.price||"Belum tersedia"}`);if(x.stock!=="")r.push(`Stok: ${x.stock}`);return r.join("\n");}
   if(type==="product_stock")return`${x.name}\nStok: ${x.stock||"Belum tersedia"}`;
   if(type==="product_photo")return`${x.name}\nGambar: ${x.visual.main||"Foto resmi belum tersedia"}`;
+  if(type==="product_gallery")return[x.name,"Galeri resmi:",x.visual.main?`- ${x.visual.main}`:"",...(x.visual.additional||[]).map(v=>`- ${v}`)].filter(Boolean).join("\n");
   if(type==="product_photo_spec")return`${x.name}\nGambar: ${x.visual.main||"Foto resmi belum tersedia"}\n\n${specText(x)}`;
   if(type==="product_spec")return specText(x);
   if(type==="product_features")return[x.name,"Fitur resmi:",...(x.features?.length?x.features.map(v=>`- ${v}`):["- Fitur belum tersedia pada katalog resmi."])].join("\n");
   if(type==="product_description")return`${x.name}\n${x.description||"Deskripsi resmi belum tersedia pada katalog."}`;
   if(type==="product_variant")return`${x.name}\nVarian:\n${x.variants?.length?x.variants.map(v=>`- ${v}`).join("\n"):"Belum tersedia"}`;
   if(type==="catalog_page")return`${x.name}\n${x.visual.full_page?`Halaman katalog: ${x.visual.full_page}`:`Halaman katalog: ${x.catalog_page||"Belum tersedia"}`}`;
-  if(type==="product_detail"){const r=[x.name];if(x.description)r.push(`Deskripsi: ${x.description}`);if(x.features?.length){r.push("Fitur:",...x.features.slice(0,10).map(v=>`- ${v}`));}const specs=Object.entries(x.specifications||{});if(specs.length)r.push("Spesifikasi:",...specs.slice(0,14).map(([k,v])=>`- ${k}: ${v}`));if(x.variants?.length)r.push(`Varian: ${x.variants.join(", ")}`);if(x.price)r.push(`Harga: ${x.price}`);if(x.stock!=="")r.push(`Stok: ${x.stock}`);return r.join("\n");}
+  if(type==="product_detail"||type==="product_full"){const r=[x.name];if(x.description)r.push(`Deskripsi: ${x.description}`);if(x.master_brand)r.push(`Master brand: ${x.master_brand}`);if(x.subbrand)r.push(`Subbrand: ${x.subbrand}`);if(x.category)r.push(`Kategori: ${x.category}`);if(x.features?.length){r.push("Fitur:",...x.features.slice(0,type==="product_full"?24:10).map(v=>`- ${v}`));}const specs=Object.entries(x.specifications||{});if(specs.length)r.push("Spesifikasi:",...specs.slice(0,type==="product_full"?50:14).map(([k,v])=>`- ${k}: ${v}`));if(x.function)r.push(`Fungsi: ${x.function}`);if(x.application)r.push(`Aplikasi: ${x.application}`);if(x.socket)r.push(`Socket: ${x.socket}`);if(x.variants?.length)r.push(`Varian: ${x.variants.join(", ")}`);if(x.price)r.push(`Harga: ${x.price}`);if(x.stock!=="")r.push(`Stok: ${x.stock}`);return r.join("\n");}
   return null;
 }
 function compare(products){const ps=products.slice(0,4).map(productPayload),r=[`Perbandingan ${ps.map(x=>x.sku||x.name).join(" vs ")}:`];for(const p of ps){r.push("",`${p.name}${p.sku?` (${p.sku})`:""}`);if(p.description)r.push(`- Deskripsi: ${p.description}`);for(const[k,v]of Object.entries(p.specifications||{}).slice(0,10))r.push(`- ${k}: ${v}`);if(p.price)r.push(`- Harga: ${p.price}`);if(p.stock!=="")r.push(`- Stok: ${p.stock}`);}r.push("","Perbandingan di atas hanya menggunakan data resmi yang tersedia.");return r.join("\n");}
@@ -224,7 +267,7 @@ function sources(d){const o=[],s=new Set(),add=(u,t)=>{if(u&&!s.has(u)){s.add(u)
 async function callAI({products,message,route,state,memory,image,explicitProducts}){
   if(!process.env.OPENAI_API_KEY)throw new Error("OPENAI_API_KEY belum tersedia");
   const useWeb=route.type==="fitment"||route.type==="current_web",model=useWeb?MODEL_SMART:MODEL_FAST,tools=[productTool()];if(useWeb)tools.unshift({type:"web_search"});
-  const instructions=`Kamu adalah NEXAI Web. Detail produk Nine wajib catalog-first. Harga/stok/promo/foto/WhatsApp berasal dari data live pelengkap. Nine Autoseries adalah master brand; subbrand: Nine Luximos, Nine LX-Trix, Nine Securicle, Nine Soundblax, Optimus, Cady, Nine Power. Profil Imam hanya dari BUSINESS resmi. Fitment dan fakta aktual/dinamis menggunakan web. Pertanyaan presiden, pejabat, berita, jadwal, cuaca, kurs, dan fakta "sekarang" WAJIB web search. Web tidak boleh menimpa fakta produk resmi Nine. Jangan mengarang data. Jangan sebut nama file/arsitektur internal.`;
+  const instructions=`Kamu adalah NEXAI Web. Product Knowledge Center adalah sumber utama detail produk Nine: identitas, deskripsi, fitur, spesifikasi, fungsi, aplikasi, socket, visual, dan provenance. Harga/stok/promo/WhatsApp berasal dari data live pelengkap. Nine Autoseries adalah master brand; subbrand: Nine Luximos, Nine LX-Trix, Nine Securicle, Nine Soundblax, Optimus, Cady, Nine Power. Profil Imam hanya dari BUSINESS resmi. Fitment dan fakta aktual/dinamis menggunakan web. Pertanyaan presiden, pejabat, berita, jadwal, cuaca, kurs, dan fakta "sekarang" WAJIB web search. Web tidak boleh menimpa fakta produk resmi Nine. Jangan mengarang data. Jangan sebut nama file/arsitektur internal.`;
   const hist=(Array.isArray(memory)?memory:[]).filter(x=>x&&["user","assistant"].includes(x.role)&&typeof x.content==="string").slice(-(route.type==="general"?2:5)).map(x=>({role:x.role,content:x.content.slice(0,1800)}));
   const user=[{type:"input_text",text:`USER_MESSAGE:\n${message}\nROUTE:${route.type}\nSTATE:${JSON.stringify(state||{})}\nLOCAL_PRODUCTS:${JSON.stringify((explicitProducts||[]).map(productPayload))}\nBUSINESS:${JSON.stringify(businessDB)}\nBRAND:${JSON.stringify(brandDB)}`}];if(image)user.push({type:"input_image",image_url:image});
   let input=[...hist,{role:"user",content:user}],data=null,src=[];
@@ -251,7 +294,7 @@ function response(statusCode,body){return{statusCode,headers:{"Content-Type":"ap
 exports.handler=async event=>{
  try{
   const products=await loadProducts();
-  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,catalogProductCount:(catalogDB.products||[]).length,masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
+  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
   const{fields,files}=await parseMultipartEvent(event),message=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
   if(!message&&!img)return response(400,{reply:"Pesan kosong.",image:null});
   const explicit=resolveProducts(products,message,4),route=classify(message,explicit.length>0);
@@ -265,7 +308,7 @@ exports.handler=async event=>{
 
   if(route.type==="compare"&&explicit.length>=2)return response(200,{reply:compare(explicit),image:null,route:"compare",usedAI:false,usedWeb:false,products:explicit.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
 
-  const directRoutes=new Set(["product_price","product_stock","product_photo","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail"]);
+  const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
   if(directRoutes.has(route.type)&&product)return response(200,{reply:direct(route.type,product),image:null,route:route.type,usedAI:false,usedWeb:false,product:productPayload(product),state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
   if(directRoutes.has(route.type)&&!product)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
