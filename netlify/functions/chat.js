@@ -16,6 +16,7 @@ function readJSON(file,fallback){try{return JSON.parse(fs.readFileSync(file,"utf
 const knowledgeDB=readJSON(path.join(__dirname,"data","product_knowledge_center.json"),{products:[]});
 const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),{});
 const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
+const vehicleClassDB=readJSON(path.join(__dirname,"data","product_vehicle_classification_v1.json"),{groups:{}});
 
 const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
 const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
@@ -442,6 +443,45 @@ function runtimeFitmentReply(runtimeResult,direction){
   return lines.join("\n");
 }
 
+
+function vehicleClassRuleForProductId(productId){
+  if(!productId)return null;
+  for(const [groupName,group] of Object.entries(vehicleClassDB?.groups||{})){
+    for(const r of group?.records||[]){
+      if(r?.product_id===productId){
+        return{
+          group:groupName,
+          vehicle_class:Array.isArray(r.vehicle_class)?r.vehicle_class:[r.vehicle_class].filter(Boolean),
+          allow_car:r.allow_car_recommendation!==false,
+          allow_motorcycle:r.allow_motorcycle_recommendation!==false
+        };
+      }
+    }
+  }
+  return null;
+}
+function asksCarFitment(message){
+  const m=normalize(message);
+  return /\b(mobil|car)\b/.test(m);
+}
+function asksMotorcycleFitment(message){
+  const m=normalize(message);
+  return /\b(motor|motorcycle|sepeda motor)\b/.test(m);
+}
+function authoritativeVehicleClassReply(message,productId,product){
+  if(!productId)return null;
+  const rule=vehicleClassRuleForProductId(productId);
+  if(!rule)return null;
+  const name=product?productPayload(product).name:productId;
+  if(asksCarFitment(message)&&rule.allow_car===false){
+    return `${name} diklasifikasikan untuk penggunaan motor, sehingga tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
+  }
+  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle===false){
+    return `${name} diklasifikasikan untuk penggunaan mobil, sehingga tidak direkomendasikan sebagai produk motor. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
+  }
+  return null;
+}
+
 function productTool(){return{type:"function",name:"search_nine_products",description:"Cari produk Nine resmi berdasarkan kebutuhan, fungsi, socket, kategori, atau spesifikasi.",strict:true,parameters:{type:"object",properties:{query:{type:"string"},limit:{type:"integer",minimum:1,maximum:8}},required:["query","limit"],additionalProperties:false}};}
 function extractText(d){if(typeof d?.output_text==="string"&&d.output_text.trim())return d.output_text.trim();const c=[];for(const i of d?.output||[])for(const x of i?.content||[])if(x?.text)c.push(x.text);return c.join("\n").trim();}
 function sources(d){const o=[],s=new Set(),add=(u,t)=>{if(u&&!s.has(u)){s.add(u);o.push({url:u,title:t||u});}};for(const i of d?.output||[]){for(const x of i?.action?.sources||[])add(x.url,x.title);for(const c of i?.content||[])for(const a of c?.annotations||[])if(a?.type==="url_citation")add(a?.url||a?.url_citation?.url,a?.title||a?.url_citation?.title);}return o.slice(0,5);}
@@ -496,6 +536,9 @@ exports.handler=async event=>{
   const runtimeProductId=runtimeResult?.entities?.products?.[0]||null;
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
+
+  const authoritativeClassReply=authoritativeVehicleClassReply(message,runtimeProductId,runtimeProduct);
+  if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_guard",usedAI:false,usedWeb:false,runtime:true});
 
   if(runtimeResult?.intents?.includes("vehicle_info")){
     const vf=runtimeResult?.facts?.vehicles?.[0];
