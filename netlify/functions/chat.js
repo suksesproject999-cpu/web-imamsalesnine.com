@@ -541,6 +541,109 @@ function classReply(message,rule,product){
   }
   return null;
 }
+
+function normalizedVehicleTokens(s){
+  return normalize(s).split(/\s+/).filter(x=>x.length>1);
+}
+function motorcycleGroupCatalog(){
+  const out=[];
+  for(const [groupName,group] of Object.entries(vehicleClassDB?.groups||{})){
+    if(group?.vehicle_class!=="motorcycle")continue;
+    const examples=[];
+    for(const r of group.records||[]){
+      for(const ex of vehicleExamples(r))if(ex&&!examples.includes(ex))examples.push(ex);
+    }
+    out.push({groupName,group,examples});
+  }
+  return out;
+}
+function detectMotorcycleGroups(message){
+  const q=normalize(message);
+  const year=(q.match(/\b(?:19|20)\d{2}\b/)||[])[0]||null;
+  const groups=motorcycleGroupCatalog();
+  const hits=[];
+
+  for(const g of groups){
+    let best=0, matched=[];
+    for(const ex of g.examples){
+      const ne=normalize(ex);
+      if(!ne)continue;
+
+      // If user supplies a year, prefer examples whose year/range can support it.
+      const yr=ne.match(/\b((?:19|20)\d{2})(?:\s*-\s*((?:19|20)\d{2}))?\b/);
+      if(year&&yr){
+        const y=Number(year), a=Number(yr[1]), b=Number(yr[2]||yr[1]);
+        if(!(a<=y&&y<=b))continue;
+      }
+
+      if(q.includes(ne)){
+        best=Math.max(best,5000+ne.length);matched.push(ex);continue;
+      }
+
+      // Brandless model matching for natural phrases such as "kalau motor vixion".
+      const toks=normalizedVehicleTokens(ne).filter(t=>
+        !["honda","yamaha","suzuki","kawasaki","vespa","benelli","fi","esp"].includes(t) &&
+        !/^\d{4}$/.test(t)
+      );
+      const meaningful=toks.filter(t=>t.length>=3);
+      const matchedTokens=meaningful.filter(t=>q.includes(t));
+      if(matchedTokens.length){
+        const sc=1000+matchedTokens.reduce((n,t)=>n+t.length,0);
+        if(sc>best){best=sc;matched=[ex];}
+      }
+    }
+    if(best>0)hits.push({groupName:g.groupName,group:g.group,score:best,matched});
+  }
+
+  hits.sort((a,b)=>b.score-a.score||a.groupName.localeCompare(b.groupName));
+
+  // Keep only groups at the strongest semantic tier.
+  if(!hits.length)return {groups:[],ambiguous:false};
+  const top=hits[0].score;
+  const selected=hits.filter(h=>h.score===top || (top<5000 && h.score>=1000));
+
+  // Generic "Scoopy" legitimately spans two year-specific groups.
+  // With no year/generation, do not guess one group.
+  const uniq=[...new Set(selected.map(x=>x.groupName))];
+  const ambiguous=!year&&uniq.length>1;
+
+  return {groups:selected,ambiguous};
+}
+function motorcycleRecommendationReply(message,products){
+  const detected=detectMotorcycleGroups(message);
+  if(!detected.groups.length)return null;
+
+  if(detected.ambiguous){
+    const names=detected.groups.map(x=>x.matched?.[0]).filter(Boolean);
+    return `Model motor terdeteksi memiliki lebih dari satu kelompok aplikasi. Sebutkan tahun/generasinya agar rekomendasi tidak salah.${names.length?` Contoh data yang tersedia: ${names.join(", ")}.`:""}`;
+  }
+
+  const allowedGroups=new Set(detected.groups.map(x=>x.groupName));
+  const rules=classificationRecords().filter(r=>
+    r.allow_motorcycle_recommendation===true &&
+    allowedGroups.has(r.__group)
+  );
+
+  const out=[],seen=new Set();
+  for(const r of rules){
+    if(seen.has(r.product_id))continue;
+    seen.add(r.product_id);out.push(r);
+  }
+
+  out.sort((a,b)=>String(a.canonical_name||"").localeCompare(String(b.canonical_name||"")));
+
+  if(!out.length)return "Belum ada produk Nine yang terklasifikasi untuk kelompok motor tersebut.";
+
+  const groupLabel=[...allowedGroups].join(", ");
+  const lines=[`Rekomendasi produk Nine berdasarkan kelompok aplikasi motor ${groupLabel}:`];
+  for(const r of out.slice(0,16)){
+    const note=r.application_note?` (${r.application_note})`:"";
+    lines.push(`${lines.length}. ${r.canonical_name||r.clue_name||r.product_id}${note}`);
+  }
+  lines.push("Catatan: rekomendasi mengikuti kelompok aplikasi yang sudah diklasifikasikan. Tahun/generasi dan kondisi socket tetap perlu diverifikasi sebelum pemasangan.");
+  return lines.join("\n");
+}
+
 function humanPosition(p){
   const m={headlamp_combined:"Headlamp",headlamp_low:"Headlamp dekat",headlamp_high:"Headlamp jauh",headlamp:"Headlamp",foglamp:"Foglamp",parking_front:"Lampu senja depan",turn_signal_front:"Sein depan",turn_signal_rear:"Sein belakang",brake:"Lampu rem",reverse:"Lampu mundur",license_plate_rear:"Lampu plat belakang"};
   return m[p]||String(p||"").replace(/_/g," ");
@@ -616,6 +719,11 @@ exports.handler=async event=>{
   const authoritativeClassReply=classReply(message,classRule,product||active);
   if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
 
+  const motorcycleRecommendation=motorcycleRecommendationReply(message,products);
+  if(motorcycleRecommendation){
+    return response(200,{reply:motorcycleRecommendation,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true});
+  }
+
   if(runtimeResult?.intents?.includes("vehicle_info")){
     const vf=runtimeResult?.facts?.vehicles?.[0];
     const vr=runtimeVehicleReply(vf);
@@ -646,6 +754,10 @@ exports.handler=async event=>{
 
   if(asksVehicleCompatibility(message)&&classRule){
     return response(200,{reply:"Klasifikasi produk sudah dikenali, tetapi data kendaraan terverifikasi belum cukup untuk jawaban tambahan. Saya tidak akan menebak kecocokan dari socket saja.",image:null,route:"classified_fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
+  }
+
+  if(/\b(beat|vario|scoopy|mio|jupiter|supra|revo|verza|vixion|r15|cb150r|cbr150|byson|klx|vespa|inazuma|zafferano|zaferrano|fino|xeon|nex|smash|satria|spacy|x-ride|xride)\b/.test(normalize(message))){
+    return response(200,{reply:"Model motor dikenali, tetapi kelompok aplikasi belum dapat dipastikan dengan aman. Sebutkan model lengkap dan tahun/generasinya.",image:null,route:"motorcycle_group_clarification",usedAI:false,usedWeb:false,runtime:true});
   }
 
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});

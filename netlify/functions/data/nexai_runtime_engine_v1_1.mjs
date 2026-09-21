@@ -139,19 +139,33 @@ export class NexaiRuntimeEngine {
 
   productVehicleClass(productId){
     const groups=this.vehicleClass?.groups||{};
+    const matches=[];
     for(const [groupName,group] of Object.entries(groups)){
       for(const r of group.records||[]){
         if(r.product_id===productId){
-          return {
+          matches.push({
             group:groupName,
             vehicle_class:(r.vehicle_class||group.vehicle_class||[]),
             allow_car:r.allow_car_recommendation!==false,
-            allow_motorcycle:r.allow_motorcycle_recommendation!==false
-          };
+            allow_motorcycle:r.allow_motorcycle_recommendation!==false,
+            position:r.position||group.position||[],
+            socket:r.socket||[],
+            application_note:r.application_note||""
+          });
         }
       }
     }
-    return null;
+    if(!matches.length)return null;
+    return {
+      matches,
+      allow_car:matches.some(x=>x.allow_car===true),
+      allow_motorcycle:matches.some(x=>x.allow_motorcycle===true),
+      vehicle_class:[...new Set(matches.flatMap(x=>Array.isArray(x.vehicle_class)?x.vehicle_class:[x.vehicle_class]).filter(Boolean))]
+    };
+  }
+
+  isHeadlampPosition(position=""){
+    return String(position||"").toLowerCase().startsWith("headlamp");
   }
 
   isCarVehicle(vehicleId){
@@ -175,18 +189,38 @@ export class NexaiRuntimeEngine {
     const isCar=this.isCarVehicle(vehicleId);
     return recs.filter(r=>{
       const cls=this.productVehicleClass(r.product_id);
-      if(!cls) return true; // Produk belum diklasifikasikan: pertahankan behavior lama.
-      if(isCar && cls.allow_car===false) return false;
-      if(!isCar && cls.allow_motorcycle===false) return false;
+
+      // HEADLAMP = STRICT ALLOWLIST.
+      // If product is not explicitly classified for this vehicle class, it cannot
+      // enter headlamp recommendations merely because the socket matches.
+      if(this.isHeadlampPosition(r.position)){
+        if(!cls)return false;
+        if(isCar)return cls.allow_car===true;
+        return cls.allow_motorcycle===true;
+      }
+
+      // Non-headlamp positions keep normal fitment behavior, but explicit bans
+      // in classification remain authoritative.
+      if(!cls)return true;
+      if(isCar && cls.allow_car===false)return false;
+      if(!isCar && cls.allow_motorcycle===false)return false;
       return true;
     });
   }
 
   filterFitmentForProduct(productId,recs){
     const cls=this.productVehicleClass(productId);
-    if(!cls) return recs;
-    // Room 4 saat ini hanya mobil. Produk yang motorcycle-only tidak boleh menghasilkan daftar mobil.
-    if(cls.allow_car===false) return [];
+
+    // For headlamp compatibility, unclassified products are not allowed to infer
+    // car compatibility from socket alone.
+    const hasHeadlamp=recs.some(r=>this.isHeadlampPosition(r.position));
+    if(hasHeadlamp){
+      if(!cls)return [];
+      if(cls.allow_car!==true)return [];
+    }
+
+    if(!cls)return recs;
+    if(cls.allow_car===false)return [];
     return recs;
   }
 
