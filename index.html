@@ -14534,6 +14534,248 @@ body.dark-mode .nexai-chatgpt-secondary:hover{
     }
 }
 
+
+/* ============================================================
+   NEXAI VEHICLE PICKER V2 — CLEAN ADD-ON
+   Scope dikunci ke #aiModal agar tidak mengganggu UI lain.
+============================================================ */
+#aiModal .nexai-template-menu{
+    max-height:min(520px,calc(100dvh - 150px)) !important;
+    overflow:hidden !important;
+}
+
+#aiModal .nexai-vehicle-search-wrap{
+    flex:0 0 auto !important;
+    padding:8px 8px 7px !important;
+    margin:0 !important;
+    background:#fff !important;
+    border-bottom:1px solid #f0f1f2 !important;
+}
+
+#aiModal .nexai-vehicle-search{
+    position:relative !important;
+    width:100% !important;
+}
+
+#aiModal .nexai-vehicle-search > i{
+    position:absolute !important;
+    left:13px !important;
+    top:50% !important;
+    transform:translateY(-50%) !important;
+    color:#91979d !important;
+    font-size:13px !important;
+    pointer-events:none !important;
+    z-index:2 !important;
+}
+
+#aiModal .nexai-vehicle-search > input{
+    display:block !important;
+    width:100% !important;
+    height:40px !important;
+    min-height:40px !important;
+    margin:0 !important;
+    padding:0 36px 0 36px !important;
+    border:1px solid #e1e4e7 !important;
+    border-radius:11px !important;
+    background:#f8f9fa !important;
+    color:#25282b !important;
+    font-size:13px !important;
+    font-weight:500 !important;
+    line-height:40px !important;
+    box-shadow:none !important;
+    outline:none !important;
+    box-sizing:border-box !important;
+}
+
+#aiModal .nexai-vehicle-search > input:focus{
+    background:#fff !important;
+    border-color:#a9ce73 !important;
+    box-shadow:0 0 0 3px rgba(140,198,63,.12) !important;
+}
+
+#aiModal .nexai-vehicle-search > input::placeholder{
+    color:#9a9fa5 !important;
+}
+
+/* Saat pencarian aktif, template cepat lama disembunyikan.
+   Jadi hasil kendaraan tidak menumpuk dengan tombol 01–05. */
+#aiModal .nexai-template-menu.vehicle-search-active > button[role="menuitem"]{
+    display:none !important;
+}
+
+#aiModal .nexai-vehicle-results{
+    display:block !important;
+    flex:1 1 auto !important;
+    min-height:0 !important;
+    max-height:340px !important;
+    overflow-y:auto !important;
+    overflow-x:hidden !important;
+    padding:5px 7px 8px !important;
+    margin:0 !important;
+    background:#fff !important;
+    overscroll-behavior:contain !important;
+    scrollbar-width:thin !important;
+    scrollbar-color:rgba(140,198,63,.55) transparent !important;
+}
+
+#aiModal .nexai-vehicle-results[hidden]{
+    display:none !important;
+}
+
+#aiModal .nexai-vehicle-results::-webkit-scrollbar{
+    width:4px !important;
+}
+#aiModal .nexai-vehicle-results::-webkit-scrollbar-thumb{
+    background:rgba(140,198,63,.55) !important;
+    border-radius:999px !important;
+}
+
+#aiModal .nexai-vehicle-group{
+    padding:8px 8px 5px !important;
+    margin:0 !important;
+    color:#8b9197 !important;
+    font-size:10px !important;
+    font-weight:800 !important;
+    letter-spacing:.08em !important;
+    text-transform:uppercase !important;
+}
+
+/* Penting: selector lebih spesifik dari .ai-footer button */
+#aiModal .ai-footer .nexai-vehicle-item{
+    display:grid !important;
+    grid-template-columns:48px minmax(0,1fr) !important;
+    align-items:center !important;
+    gap:10px !important;
+
+    width:100% !important;
+    min-width:0 !important;
+    max-width:none !important;
+    height:auto !important;
+    min-height:54px !important;
+
+    margin:0 0 3px !important;
+    padding:8px 9px !important;
+
+    border:0 !important;
+    border-radius:11px !important;
+    background:transparent !important;
+    color:#25282b !important;
+
+    text-align:left !important;
+    font-size:13px !important;
+    font-weight:500 !important;
+    line-height:1.3 !important;
+
+    box-shadow:none !important;
+    transform:none !important;
+    cursor:pointer !important;
+    box-sizing:border-box !important;
+}
+
+#aiModal .ai-footer .nexai-vehicle-item:hover,
+#aiModal .ai-footer .nexai-vehicle-item:focus-visible{
+    background:#f1f7e9 !important;
+    color:#25282b !important;
+    outline:none !important;
+    transform:none !important;
+    box-shadow:none !important;
+}
+
+#aiModal .nexai-vehicle-badge{
+    display:flex !important;
+    align-items:center !important;
+    justify-content:center !important;
+    width:48px !important;
+    min-width:48px !important;
+    height:26px !important;
+    padding:0 !important;
+    margin:0 !important;
+    border-radius:999px !important;
+    background:#eef6e5 !important;
+    color:#69932f !important;
+    font-size:9.5px !important;
+    font-weight:800 !important;
+    line-height:1 !important;
+}
+
+#aiModal .nexai-vehicle-copy{
+    display:block !important;
+    min-width:0 !important;
+    overflow:hidden !important;
+}
+
+#aiModal .nexai-vehicle-copy strong{
+    display:block !important;
+    margin:0 !important;
+    padding:0 !important;
+    color:#25282b !important;
+    font-size:12.5px !important;
+    font-weight:700 !important;
+    line-height:1.35 !important;
+    white-space:normal !important;
+    overflow-wrap:anywhere !important;
+}
+
+#aiModal .nexai-vehicle-copy small{
+    display:block !important;
+    margin:2px 0 0 !important;
+    padding:0 !important;
+    color:#8b9197 !important;
+    font-size:10px !important;
+    font-weight:500 !important;
+    line-height:1.25 !important;
+    white-space:normal !important;
+}
+
+#aiModal .nexai-vehicle-empty{
+    padding:18px 10px !important;
+    color:#8b9197 !important;
+    font-size:12px !important;
+    text-align:center !important;
+}
+
+/* Dark mode */
+body.dark-mode #aiModal .nexai-vehicle-search-wrap,
+body.dark-mode #aiModal .nexai-vehicle-results{
+    background:#171c22 !important;
+    border-color:#2b323b !important;
+}
+
+body.dark-mode #aiModal .nexai-vehicle-search > input{
+    background:#10151a !important;
+    color:#f3f4f6 !important;
+    border-color:#303740 !important;
+}
+
+body.dark-mode #aiModal .ai-footer .nexai-vehicle-item{
+    color:#f3f4f6 !important;
+}
+
+body.dark-mode #aiModal .ai-footer .nexai-vehicle-item:hover,
+body.dark-mode #aiModal .ai-footer .nexai-vehicle-item:focus-visible{
+    background:rgba(140,198,63,.12) !important;
+}
+
+body.dark-mode #aiModal .nexai-vehicle-copy strong{
+    color:#f3f4f6 !important;
+}
+
+body.dark-mode #aiModal .nexai-vehicle-badge{
+    background:rgba(140,198,63,.13) !important;
+    color:#9bd64c !important;
+}
+
+@media(max-width:768px){
+    #aiModal .nexai-template-menu{
+        width:min(318px,calc(100vw - 28px)) !important;
+        max-height:min(470px,calc(100dvh - 135px)) !important;
+    }
+
+    #aiModal .nexai-vehicle-results{
+        max-height:300px !important;
+    }
+}
+
 </style>
 
 
@@ -15897,6 +16139,25 @@ AINEX
                     <strong>Pertanyaan cepat</strong>
                     <span>Pilih lalu edit jika perlu</span>
                 </div>
+
+                <div class="nexai-vehicle-search-wrap">
+                    <div class="nexai-vehicle-search">
+                        <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
+                        <input
+                            type="search"
+                            id="nexaiVehicleSearch"
+                            placeholder="Cari mobil atau motor..."
+                            autocomplete="off"
+                            spellcheck="false"
+                            aria-label="Cari mobil atau motor">
+                    </div>
+                </div>
+
+                <div
+                    class="nexai-vehicle-results"
+                    id="nexaiVehicleResults"
+                    aria-live="polite"
+                    hidden></div>
 
                 <button type="button" role="menuitem" data-template="Imam siapa">
                     <span class="nexai-template-dot">01</span>
@@ -28612,6 +28873,238 @@ function openNexaiHybrid(event){
 
       return html;
     };
+})();
+</script>
+
+
+<script>
+/* ============================================================
+   NEXAI VEHICLE PICKER V2 — CLEAN ADD-ON ONLY
+============================================================ */
+(function(){
+    const DATA_URL="/data/vehicle_picker_v1.json";
+    const MAX_RESULTS=24;
+
+    let pickerData=null;
+    let pickerPromise=null;
+
+    function vpNorm(v){
+        return String(v||"")
+            .toLowerCase()
+            .normalize("NFD")
+            .replace(/[\u0300-\u036f]/g,"")
+            .replace(/[^a-z0-9]+/g," ")
+            .replace(/\s+/g," ")
+            .trim();
+    }
+
+    function vpEsc(v){
+        return String(v||"").replace(/[&<>"']/g,function(c){
+            return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c];
+        });
+    }
+
+    function loadVehiclePicker(){
+        if(pickerData)return Promise.resolve(pickerData);
+        if(pickerPromise)return pickerPromise;
+
+        pickerPromise=fetch(DATA_URL,{cache:"no-cache"})
+            .then(function(r){
+                if(!r.ok)throw new Error("HTTP "+r.status);
+                return r.json();
+            })
+            .then(function(data){
+                pickerData=data;
+                return data;
+            })
+            .catch(function(err){
+                console.warn("[NEXAI] vehicle picker:",err);
+                return null;
+            });
+
+        return pickerPromise;
+    }
+
+    function vpScore(v,q){
+        const display=vpNorm(v.display);
+        const model=vpNorm(v.model);
+        const brand=vpNorm(v.brand);
+        const year=vpNorm(v.year);
+        const terms=(v.search_terms||[]).map(vpNorm);
+
+        let s=0;
+        if(model===q)s=1000;
+        if(display===q)s=Math.max(s,980);
+        if((brand+" "+model).trim()===q)s=Math.max(s,950);
+        if(model.startsWith(q))s=Math.max(s,900);
+        if(display.startsWith(q))s=Math.max(s,850);
+        if(model.includes(q))s=Math.max(s,800);
+        if(display.includes(q))s=Math.max(s,760);
+        if(year&&year===q)s=Math.max(s,500);
+
+        terms.forEach(function(t){
+            if(t===q)s=Math.max(s,920);
+            else if(t.startsWith(q))s=Math.max(s,820);
+            else if(t.includes(q))s=Math.max(s,720);
+        });
+
+        const qt=q.split(" ").filter(Boolean);
+        const hay=[display,brand,model,year].join(" ");
+        if(qt.length>1&&qt.every(function(t){return hay.includes(t);})){
+            s=Math.max(s,840+qt.length);
+        }
+        return s;
+    }
+
+    function closePickerMenu(){
+        const menu=document.getElementById("nexaiTemplateMenu");
+        const trigger=document.getElementById("nexaiTemplateTrigger");
+
+        if(typeof closeNexaiTemplateMenu==="function"){
+            closeNexaiTemplateMenu();
+            return;
+        }
+
+        if(menu){
+            menu.classList.remove("is-open","show");
+            menu.classList.remove("vehicle-search-active");
+        }
+        if(trigger)trigger.setAttribute("aria-expanded","false");
+    }
+
+    function sendVehicleToChat(v){
+        const input=document.getElementById("aiInput");
+        if(!input)return;
+
+        input.value=v.chat_query||v.display||"";
+        input.dispatchEvent(new Event("input",{bubbles:true}));
+
+        closePickerMenu();
+
+        if(typeof sendAI==="function"){
+            sendAI();
+        }else{
+            input.focus();
+        }
+    }
+
+    function renderVehicleSearch(raw){
+        const input=document.getElementById("nexaiVehicleSearch");
+        const box=document.getElementById("nexaiVehicleResults");
+        const menu=document.getElementById("nexaiTemplateMenu");
+        if(!box||!menu)return;
+
+        const q=vpNorm(raw);
+
+        if(!q){
+            box.innerHTML="";
+            box.hidden=true;
+            menu.classList.remove("vehicle-search-active");
+            return;
+        }
+
+        menu.classList.add("vehicle-search-active");
+        box.hidden=false;
+        box.innerHTML='<div class="nexai-vehicle-empty">Mencari kendaraan...</div>';
+
+        loadVehiclePicker().then(function(data){
+            if(!data||!Array.isArray(data.vehicles)){
+                box.innerHTML='<div class="nexai-vehicle-empty">Data kendaraan belum berhasil dimuat.</div>';
+                return;
+            }
+
+            const rows=data.vehicles
+                .map(function(v){return {v:v,s:vpScore(v,q)};})
+                .filter(function(x){return x.s>0;})
+                .sort(function(a,b){
+                    return b.s-a.s || String(a.v.display||"").localeCompare(String(b.v.display||""));
+                })
+                .slice(0,MAX_RESULTS);
+
+            if(!rows.length){
+                box.innerHTML='<div class="nexai-vehicle-empty">Kendaraan tidak ditemukan.</div>';
+                return;
+            }
+
+            const car=rows.filter(function(x){return x.v.type==="car";});
+            const motor=rows.filter(function(x){return x.v.type==="motorcycle";});
+
+            let markup="";
+
+            [["Mobil",car],["Motor",motor]].forEach(function(group){
+                if(!group[1].length)return;
+
+                markup+='<div class="nexai-vehicle-group">'+group[0]+'</div>';
+
+                group[1].forEach(function(x){
+                    const v=x.v;
+                    const meta=[v.brand||"",v.year||""].filter(Boolean).join(" • ");
+
+                    markup+=
+                        '<button type="button" class="nexai-vehicle-item" data-vp-id="'+vpEsc(v.id||"")+'">'+
+                            '<span class="nexai-vehicle-badge">'+(v.type==="car"?"Mobil":"Motor")+'</span>'+
+                            '<span class="nexai-vehicle-copy">'+
+                                '<strong>'+vpEsc(v.display||"")+'</strong>'+
+                                (meta?'<small>'+vpEsc(meta)+'</small>':"")+
+                            '</span>'+
+                        '</button>';
+                });
+            });
+
+            box.innerHTML=markup;
+
+            box.querySelectorAll(".nexai-vehicle-item").forEach(function(btn){
+                btn.addEventListener("click",function(){
+                    const id=btn.getAttribute("data-vp-id");
+                    const v=data.vehicles.find(function(item){return String(item.id)===String(id);});
+                    if(v)sendVehicleToChat(v);
+                });
+            });
+        });
+    }
+
+    function initVehiclePicker(){
+        const input=document.getElementById("nexaiVehicleSearch");
+        const trigger=document.getElementById("nexaiTemplateTrigger");
+        if(!input)return;
+
+        let timer=null;
+
+        input.addEventListener("input",function(){
+            clearTimeout(timer);
+            const value=input.value;
+            timer=setTimeout(function(){renderVehicleSearch(value);},60);
+        });
+
+        input.addEventListener("keydown",function(e){
+            if(e.key==="Escape"){
+                input.value="";
+                renderVehicleSearch("");
+                input.blur();
+            }
+        });
+
+        if(trigger){
+            trigger.addEventListener("click",function(){
+                loadVehiclePicker();
+                setTimeout(function(){
+                    if(trigger.getAttribute("aria-expanded")==="true")input.focus({preventScroll:true});
+                },80);
+            });
+        }
+
+        if("requestIdleCallback" in window){
+            requestIdleCallback(loadVehiclePicker,{timeout:2200});
+        }else{
+            setTimeout(loadVehiclePicker,1400);
+        }
+    }
+
+    if(document.readyState==="loading"){
+        document.addEventListener("DOMContentLoaded",initVehiclePicker,{once:true});
+    }else{
+        initVehiclePicker();
+    }
 })();
 </script>
 
