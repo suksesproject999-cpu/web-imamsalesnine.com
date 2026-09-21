@@ -1,16 +1,16 @@
 {
-  "schema": "nexai_product_vehicle_classification_v1",
-  "version": "1.0",
-  "purpose": "Filter kelas kendaraan sebelum rekomendasi fitment agar produk motor tidak direkomendasikan ke mobil dan sebaliknya.",
-  "policy": {
+  "schema": "nexai_product_vehicle_classification_v2",
+  "version": "2.0",
+  "purpose": "Authoritative vehicle-class and application filter for recommendation runtime.",
+  "source_policy": {
+    "canonical_product_identity": "active product knowledge master",
+    "vehicle_application": "user-provided classification in current conversation",
+    "no_silent_merge": true,
     "socket_match_alone_is_not_sufficient": true,
-    "motorcycle_products_must_not_be_recommended_for_cars": true,
-    "car_products_must_not_be_recommended_for_motorcycles": true,
-    "user_vehicle_examples_are_not_installation_verified": true,
-    "classification_precedes_fitment_ranking": true
+    "unresolved_product_clues_must_not_be_activated": true
   },
   "groups": {
-    "motorcycle_h6_family": {
+    "motorcycle_h6_group": {
       "vehicle_class": "motorcycle",
       "position": [
         "headlamp"
@@ -24,11 +24,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -88,13 +95,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -105,11 +105,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -169,13 +176,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -186,11 +186,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -250,13 +257,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -267,11 +267,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -331,13 +338,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -348,11 +348,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -412,13 +419,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -429,11 +429,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -493,13 +500,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -510,11 +510,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -574,13 +581,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -591,11 +591,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -655,13 +662,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -672,11 +672,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -736,13 +743,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -753,12 +753,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
           ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": {
             "Honda": [
               "Beat",
@@ -817,13 +821,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -834,12 +831,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
           ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": {
             "Honda": [
               "Beat",
@@ -898,13 +899,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -915,11 +909,18 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -979,13 +980,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -996,12 +990,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
           ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": {
             "Honda": [
               "Beat",
@@ -1060,13 +1058,6 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         },
         {
@@ -1077,11 +1068,96 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h6_family",
-          "allowed_vehicle_brands": [
-            "Honda",
-            "Yamaha",
-            "Suzuki"
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "known_vehicle_examples": {
+            "Honda": [
+              "Beat",
+              "Beat Fi",
+              "Beat Esp FI",
+              "Vario 110 Techno",
+              "Vario 125 Techno Fi",
+              "Scoopy 2011-2012",
+              "Spacy",
+              "Spacy Fi",
+              "Revo",
+              "Revo Absolute",
+              "Revo AT",
+              "Revo Fi",
+              "Blade 110",
+              "Supra X 125",
+              "Supra X 125 Fi",
+              "CS1"
+            ],
+            "Yamaha": [
+              "Mio",
+              "Mio Soul",
+              "Mio Fi",
+              "Mio J Fi",
+              "Mio Soul Fi",
+              "Mio M3",
+              "Xeon",
+              "Xeon RC",
+              "Xeon GT 125",
+              "Fino 115",
+              "Fino 115 Premium Fi",
+              "Fino 125 Fi",
+              "X-Ride 115 Fi",
+              "Vega R",
+              "Vega ZR",
+              "Force RR",
+              "Lexam",
+              "Jupiter Z",
+              "Jupiter MX 135"
+            ],
+            "Suzuki": [
+              "Spin",
+              "Skywave",
+              "Skydrive",
+              "Hayate",
+              "Nex",
+              "Nex Fi",
+              "Lets Fi",
+              "Address",
+              "Smash",
+              "Smash Titan",
+              "Arashi",
+              "Shogun 125",
+              "Shooter Fi",
+              "Satria FU 150 R",
+              "Satria F115 Young Star",
+              "Thunder 125"
+            ]
+          }
+        },
+        {
+          "clue_name": "H6 C1",
+          "product_id": "h6-c1",
+          "canonical_name": "H6 C1",
+          "sku": "H6-C1",
+          "vehicle_class": [
+            "motorcycle"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H6"
           ],
           "known_vehicle_examples": {
             "Honda": [
@@ -1141,18 +1217,11 @@
               "Satria F115 Young Star",
               "Thunder 125"
             ]
-          },
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
           }
         }
       ]
     },
-    "motorcycle_h4_family": {
+    "motorcycle_h4_group": {
       "vehicle_class": "motorcycle",
       "position": [
         "headlamp"
@@ -1166,7 +1235,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1185,14 +1266,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 GOLD",
@@ -1202,7 +1276,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1221,14 +1307,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 MH1",
@@ -1238,7 +1317,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1257,14 +1348,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 MH2",
@@ -1274,7 +1358,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1293,14 +1389,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 MH3",
@@ -1310,7 +1399,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1329,14 +1430,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 LS2",
@@ -1346,7 +1440,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1365,14 +1471,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H4 LS3",
@@ -1382,7 +1481,19 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ],
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1401,14 +1512,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "Z2",
@@ -1418,7 +1522,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1437,14 +1550,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "Z3",
@@ -1454,7 +1560,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1473,50 +1588,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
-        },
-        {
-          "clue_name": "MP1",
-          "product_id": "h4-mp1",
-          "canonical_name": "H4 MP1",
-          "sku": "H4-MP1",
-          "vehicle_class": [
-            "motorcycle"
-          ],
-          "recommendation_class": "motorcycle_headlamp_h4_family",
-          "known_vehicle_examples": [
-            "Honda Verza",
-            "Yamaha R15",
-            "Honda CB150R",
-            "Honda CBR150",
-            "Yamaha New V-Ixion Lightning (NVL)",
-            "Yamaha Vixion",
-            "Yamaha Byson",
-            "Honda Scoopy FI eSP 2013-2017",
-            "Kawasaki KLX 150",
-            "Kawasaki KLX 250",
-            "Vespa LX",
-            "Vespa S",
-            "Vespa Primavera",
-            "Vespa Sprint",
-            "Vespa GTS",
-            "Suzuki Inazuma",
-            "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "H6 C1",
@@ -1526,7 +1598,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_user_group_h4_h6",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1545,107 +1626,6 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          },
-          "motorcycle_application_groups": [
-            {
-              "group": "bebek_matic_h6",
-              "known_vehicle_examples": {
-                "Honda": [
-                  "Beat",
-                  "Beat Fi",
-                  "Beat Esp FI",
-                  "Vario 110 Techno",
-                  "Vario 125 Techno Fi",
-                  "Scoopy 2011-2012",
-                  "Spacy",
-                  "Spacy Fi",
-                  "Revo",
-                  "Revo Absolute",
-                  "Revo AT",
-                  "Revo Fi",
-                  "Blade 110",
-                  "Supra X 125",
-                  "Supra X 125 Fi",
-                  "CS1"
-                ],
-                "Yamaha": [
-                  "Mio",
-                  "Mio Soul",
-                  "Mio Fi",
-                  "Mio J Fi",
-                  "Mio Soul Fi",
-                  "Mio M3",
-                  "Xeon",
-                  "Xeon RC",
-                  "Xeon GT 125",
-                  "Fino 115",
-                  "Fino 115 Premium Fi",
-                  "Fino 125 Fi",
-                  "X-Ride 115 Fi",
-                  "Vega R",
-                  "Vega ZR",
-                  "Force RR",
-                  "Lexam",
-                  "Jupiter Z",
-                  "Jupiter MX 135"
-                ],
-                "Suzuki": [
-                  "Spin",
-                  "Skywave",
-                  "Skydrive",
-                  "Hayate",
-                  "Nex",
-                  "Nex Fi",
-                  "Lets Fi",
-                  "Address",
-                  "Smash",
-                  "Smash Titan",
-                  "Arashi",
-                  "Shogun 125",
-                  "Shooter Fi",
-                  "Satria FU 150 R",
-                  "Satria F115 Young Star",
-                  "Thunder 125"
-                ]
-              },
-              "source_status": "user_provided_classification_claim"
-            },
-            {
-              "group": "sport_and_other_user_group",
-              "known_vehicle_examples": [
-                "Honda Verza",
-                "Yamaha R15",
-                "Honda CB150R",
-                "Honda CBR150",
-                "Yamaha New V-Ixion Lightning (NVL)",
-                "Yamaha Vixion",
-                "Yamaha Byson",
-                "Honda Scoopy FI eSP 2013-2017",
-                "Kawasaki KLX 150",
-                "Kawasaki KLX 250",
-                "Vespa LX",
-                "Vespa S",
-                "Vespa Primavera",
-                "Vespa Sprint",
-                "Vespa GTS",
-                "Suzuki Inazuma",
-                "Benelli Zafferano"
-              ],
-              "source_status": "user_provided_classification_claim"
-            }
-          ],
-          "motorcycle_segment": [
-            "bebek",
-            "matic",
-            "sport",
-            "other_verified_by_user_group"
           ]
         },
         {
@@ -1656,7 +1636,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_user_group_h4_h6",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1675,14 +1664,7 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         },
         {
           "clue_name": "M6",
@@ -1692,7 +1674,16 @@
           "vehicle_class": [
             "motorcycle"
           ],
-          "recommendation_class": "motorcycle_headlamp_user_group_h4_h6",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": false,
+          "allow_motorcycle_recommendation": true,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "known_vehicle_examples": [
             "Honda Verza",
             "Yamaha R15",
@@ -1711,22 +1702,12 @@
             "Vespa GTS",
             "Suzuki Inazuma",
             "Benelli Zafferano"
-          ],
-          "allow_car_recommendation": false,
-          "allow_motorcycle_recommendation": true,
-          "source_status": {
-            "canonical_product_identity": "matched_to_active_product_master",
-            "vehicle_application": "user_provided_classification_claim",
-            "installation_verification": false
-          }
+          ]
         }
       ]
     },
-    "car_h4_family": {
+    "car_h4_group": {
       "vehicle_class": "car",
-      "socket": [
-        "H4"
-      ],
       "position": [
         "headlamp"
       ],
@@ -1739,10 +1720,6 @@
           "vehicle_class": [
             "car"
           ],
-          "recommendation_class": "car_headlamp_h4_family",
-          "socket": [
-            "H4"
-          ],
           "position": [
             "headlamp"
           ],
@@ -1752,7 +1729,10 @@
             "canonical_product_identity": "matched_to_active_product_master",
             "vehicle_application": "user_provided_classification_claim",
             "installation_verification": false
-          }
+          },
+          "socket": [
+            "H4"
+          ]
         },
         {
           "clue_name": "H4 MP1PRO",
@@ -1762,10 +1742,6 @@
           "vehicle_class": [
             "car"
           ],
-          "recommendation_class": "car_headlamp_h4_family",
-          "socket": [
-            "H4"
-          ],
           "position": [
             "headlamp"
           ],
@@ -1775,7 +1751,10 @@
             "canonical_product_identity": "matched_to_active_product_master",
             "vehicle_application": "user_provided_classification_claim",
             "installation_verification": false
-          }
+          },
+          "socket": [
+            "H4"
+          ]
         },
         {
           "clue_name": "H4 MP3",
@@ -1785,10 +1764,6 @@
           "vehicle_class": [
             "car"
           ],
-          "recommendation_class": "car_headlamp_h4_family",
-          "socket": [
-            "H4"
-          ],
           "position": [
             "headlamp"
           ],
@@ -1798,7 +1773,10 @@
             "canonical_product_identity": "matched_to_active_product_master",
             "vehicle_application": "user_provided_classification_claim",
             "installation_verification": false
-          }
+          },
+          "socket": [
+            "H4"
+          ]
         },
         {
           "clue_name": "H4 MP3PRO",
@@ -1808,10 +1786,6 @@
           "vehicle_class": [
             "car"
           ],
-          "recommendation_class": "car_headlamp_h4_family",
-          "socket": [
-            "H4"
-          ],
           "position": [
             "headlamp"
           ],
@@ -1821,7 +1795,10 @@
             "canonical_product_identity": "matched_to_active_product_master",
             "vehicle_application": "user_provided_classification_claim",
             "installation_verification": false
-          }
+          },
+          "socket": [
+            "H4"
+          ]
         },
         {
           "clue_name": "H4 MP3 ULTRA",
@@ -1831,9 +1808,27 @@
           "vehicle_class": [
             "car"
           ],
-          "recommendation_class": "car_headlamp_h4_family",
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
           "socket": [
             "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 X9",
+          "product_id": "x9",
+          "canonical_name": "X9 TRICOLOR",
+          "sku": "X9",
+          "vehicle_class": [
+            "car"
           ],
           "position": [
             "headlamp"
@@ -1844,7 +1839,120 @@
             "canonical_product_identity": "matched_to_active_product_master",
             "vehicle_application": "user_provided_classification_claim",
             "installation_verification": false
-          }
+          },
+          "socket": [
+            "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 X7",
+          "product_id": "x7",
+          "canonical_name": "X7 WHITE",
+          "sku": "X7",
+          "vehicle_class": [
+            "car"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 V9",
+          "product_id": "v9",
+          "canonical_name": "V9 TRICOLOR",
+          "sku": "V9",
+          "vehicle_class": [
+            "car"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 V9PRO",
+          "product_id": "v9pro",
+          "canonical_name": "V9-PRO WHITE 120W",
+          "sku": "V9PRO",
+          "vehicle_class": [
+            "car"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 V8PRO",
+          "product_id": "v8pro",
+          "canonical_name": "V8-PRO WHITE 75W",
+          "sku": "V8PRO",
+          "vehicle_class": [
+            "car"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ]
+        },
+        {
+          "clue_name": "H4 LH1PRO",
+          "product_id": "lh1-pro",
+          "canonical_name": "LED HEADLIGHT LH1-PRO CSP PLUG N PLAY.",
+          "sku": "LH1-PRO",
+          "vehicle_class": [
+            "car"
+          ],
+          "position": [
+            "headlamp"
+          ],
+          "allow_car_recommendation": true,
+          "allow_motorcycle_recommendation": false,
+          "source_status": {
+            "canonical_product_identity": "matched_to_active_product_master",
+            "vehicle_application": "user_provided_classification_claim",
+            "installation_verification": false
+          },
+          "socket": [
+            "H4"
+          ]
         }
       ]
     }
@@ -1852,58 +1960,60 @@
   "unresolved_product_clues": [
     {
       "clue_name": "H6 LS1",
-      "status": "not_found_in_active_product_master",
-      "action": "do_not_invent; verify against produk.json or catalog before activation"
+      "group_id": "motorcycle_h6_group",
+      "status": "unresolved_canonical_identity",
+      "action": "do_not_invent"
     },
     {
       "clue_name": "H4 LS1",
-      "expected_product_id": "h4-ls1",
-      "status": "not_found_in_active_product_master"
+      "group_id": "motorcycle_h4_group",
+      "status": "unresolved_canonical_identity",
+      "action": "do_not_invent"
+    },
+    {
+      "clue_name": "MP1",
+      "group_id": "motorcycle_h4_group",
+      "status": "unresolved_canonical_identity",
+      "action": "do_not_invent"
     },
     {
       "clue_name": "H4 MP3 ULTRA TRICOLOR",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 X9",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 X7",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 V9",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 V9PRO",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 V8PRO",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
+      "group_id": "car_h4_group",
+      "status": "unresolved_canonical_identity",
+      "action": "do_not_invent"
     },
     {
       "clue_name": "H4 V8",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
-    },
-    {
-      "clue_name": "H4 LH1PRO",
-      "status": "not_uniquely_matched_to_active_product_master",
-      "candidate_count": 0
+      "group_id": "car_h4_group",
+      "status": "unresolved_canonical_identity",
+      "action": "do_not_invent"
     }
   ],
-  "activation_status": {
-    "motorcycle_h6_family": "active",
-    "motorcycle_h4_family": "active",
-    "car_h4_family": "active_for_canonical_matches_only"
+  "integrity": {
+    "record_count": 38,
+    "unique_product_count": 33,
+    "cross_vehicle_class_conflicts": [],
+    "multi_group_membership": {
+      "z2": [
+        "motorcycle_h6_group",
+        "motorcycle_h4_group"
+      ],
+      "z3": [
+        "motorcycle_h6_group",
+        "motorcycle_h4_group"
+      ],
+      "m3": [
+        "motorcycle_h6_group",
+        "motorcycle_h4_group"
+      ],
+      "m6": [
+        "motorcycle_h6_group",
+        "motorcycle_h4_group"
+      ],
+      "h6-c1": [
+        "motorcycle_h6_group",
+        "motorcycle_h4_group"
+      ]
+    }
   }
 }

@@ -12,6 +12,7 @@ function norm(s=""){
 function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
 function hasPhrase(q,a){ return new RegExp(`(^|\\s)${esc(a)}(?=\\s|$)`,"i").test(q); }
 
+function normalizeVehicleTypos(q=""){return q.replace(/\bavansa\b/g,"avanza");}
 export class NexaiRuntimeEngine {
   constructor(root="."){
     const j=n=>readJson(path.join(root,n));
@@ -46,7 +47,7 @@ export class NexaiRuntimeEngine {
   }
 
   resolve(query){
-    const q=norm(query), cq=q.replace(/\s+/g,"");
+    const q=normalizeVehicleTypos(norm(query)), cq=q.replace(/\s+/g,"");
     const products=[], spans=[];
 
     // Compact alias scan first: catches "V9 Pro" -> "v9pro" without confusing it with V9.
@@ -143,6 +144,18 @@ export class NexaiRuntimeEngine {
     return !!this.vById[vehicleId];
   }
 
+  positionPriority(position=""){
+    const p=String(position||"").toLowerCase();
+    if(p.startsWith("headlamp"))return 0;
+    if(p.startsWith("foglamp"))return 1;
+    if(p.includes("parking")||p.includes("senja"))return 2;
+    if(p.includes("turn_signal")||p.includes("sein"))return 3;
+    if(p.includes("brake")||p.includes("rem"))return 4;
+    if(p.includes("reverse")||p.includes("mundur"))return 5;
+    if(p.includes("license_plate")||p.includes("plat"))return 6;
+    return 9;
+  }
+
   filterFitmentForVehicle(vehicleId,recs){
     const isCar=this.isCarVehicle(vehicleId);
     return recs.filter(r=>{
@@ -185,7 +198,7 @@ export class NexaiRuntimeEngine {
         const ids=this.fitment.indexes.by_product?.[pid]||[];
         let recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence));
         recs=this.filterFitmentForProduct(pid,recs)
-          .sort((a,b)=>(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||a.vehicle_id.localeCompare(b.vehicle_id))
+          .sort((a,b)=>this.positionPriority(a.position)-this.positionPriority(b.position)||(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||String(a.vehicle_id||"").localeCompare(String(b.vehicle_id||"")))
           .slice(0,20);
         (facts.fitment_product_to_vehicle??=[]).push({product_id:pid,candidates:recs});
       }
@@ -198,7 +211,7 @@ export class NexaiRuntimeEngine {
         const ids=this.fitment.indexes.by_vehicle?.[vid]||[];
         let recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence));
         recs=this.filterFitmentForVehicle(vid,recs)
-          .sort((a,b)=>(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||a.position.localeCompare(b.position))
+          .sort((a,b)=>this.positionPriority(a.position)-this.positionPriority(b.position)||(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||String(a.product_id||"").localeCompare(String(b.product_id||"")))
           .slice(0,20);
         (facts.fitment_vehicle_to_product??=[]).push({vehicle_id:vid,candidates:recs});
       }

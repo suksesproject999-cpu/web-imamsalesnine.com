@@ -423,117 +423,87 @@ function runtimeVehicleReply(v){
   add("Plat belakang",L.license_plate_rear);
   return [`${title}${range?` (${range})`:""}`,...rows].join("\n");
 }
-function runtimeFitmentReply(runtimeResult,direction){
+function runtimeFitmentReply(runtimeResult,direction,runtime){
   const key=direction==="vehicle"?"fitment_vehicle_to_product":"fitment_product_to_vehicle";
-  const groups=runtimeResult?.facts?.[key]||[];
-  if(!groups.length)return null;
-  const candidates=(groups[0]?.candidates||[]).filter(x=>x&&["high","medium"].includes(x.confidence));
-  if(!candidates.length)return direction==="vehicle"
-    ?"Belum ada kandidat produk Nine dengan confidence memadai untuk kendaraan tersebut."
-    :"Belum ada kandidat kendaraan dengan confidence memadai untuk produk tersebut.";
-  const shown=candidates.slice(0,12);
-  const lines=shown.map((x,i)=>{
+  const gs=runtimeResult?.facts?.[key]||[]; if(!gs.length)return null;
+  const cs=(gs[0]?.candidates||[]).filter(x=>x&&["high","medium"].includes(x.confidence));
+  if(!cs.length)return null;
+  const lines=cs.slice(0,12).map((x,i)=>{
     const left=direction==="vehicle"
-      ?`${x.product_name||x.product_id}${x.position?` — ${x.position}`:""}`
-      :`${x.vehicle_id}${x.position?` — ${x.position}`:""}`;
-    const tag=x.confidence==="high"?"kandidat kuat":"perlu verifikasi";
-    return `${i+1}. ${left} (${tag})`;
+      ?`${x.product_name||x.product_id}${x.position?` — ${humanPosition(x.position)}`:""}`
+      :`${humanVehicle(runtime,x.vehicle_id)}${x.position?` — ${humanPosition(x.position)}`:""}`;
+    return `${i+1}. ${left} (${x.confidence==="high"?"kandidat kuat":"perlu verifikasi"})`;
   });
-  lines.push("Catatan: kecocokan kandidat belum otomatis berarti plug-and-play terverifikasi; cek socket, posisi, ruang fisik, kelistrikan, dan CANBUS bila relevan.");
+  lines.push("Catatan: kandidat fitment belum otomatis berarti plug-and-play terverifikasi.");
   return lines.join("\n");
 }
+
 
 
 function classificationRecords(){
   const out=[];
   for(const [groupName,group] of Object.entries(vehicleClassDB?.groups||{})){
-    for(const r of group?.records||[])out.push({...r,__group:groupName});
+    for(const r of group?.records||[]) out.push({...r,__group:groupName,__vehicleClass:group?.vehicle_class});
   }
   return out;
 }
-function classificationRuleForAny({productId,product,message}){
-  const records=classificationRecords();
-
+function classRuleFor({productId,product,message}){
+  const rs=classificationRecords(), q=normalize(message||""), qc=compact(message||"");
+  const family=/\bh4\b/.test(q)?"h4":/\bh6\b/.test(q)?"h6":null;
+  const familyOK=r=>{
+    if(!family)return true;
+    const h=normalize(`${r?.clue_name||""} ${r?.canonical_name||""} ${r?.sku||""}`);
+    return new RegExp(`(^|\\s)${family}(?=\\s|$)`).test(h);
+  };
   if(productId){
-    const hit=records.find(r=>r?.product_id===productId);
-    if(hit)return hit;
+    const x=rs.find(r=>r.product_id===productId&&familyOK(r)); if(x)return x;
   }
-
-  const sku=compact(product?productPayload(product).sku:"");
-  const name=compact(product?productPayload(product).name:"");
-  if(sku){
-    const hit=records.find(r=>compact(r?.sku||"")===sku);
-    if(hit)return hit;
-  }
-  if(name){
-    const hit=records.find(r=>compact(r?.canonical_name||"")===name);
-    if(hit)return hit;
-  }
-
-  // Final fallback: match query against clue/canonical/SKU from classification itself.
-  const q=normalize(message||"");
-  const qc=compact(message||"");
-  let best=null,bestScore=0;
-  for(const r of records){
-    for(const alias of [r?.clue_name,r?.canonical_name,r?.sku].filter(Boolean)){
-      const an=normalize(alias), ac=compact(alias);
-      let score=0;
-      if(q===an||qc===ac)score=100000+ac.length;
-      else if(an&&new RegExp(`(^|\\s)${an.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(?=\\s|$|[,.!?/+-])`,"i").test(q))score=60000+an.length;
-      else if(ac&&qc.includes(ac))score=50000+ac.length;
-      if(score>bestScore){best=r;bestScore=score;}
+  const pn=compact(product?productPayload(product).name:""), ps=compact(product?productPayload(product).sku:"");
+  if(ps){const x=rs.find(r=>familyOK(r)&&compact(r.sku||"")===ps);if(x)return x;}
+  if(pn){const x=rs.find(r=>familyOK(r)&&compact(r.canonical_name||"")===pn);if(x)return x;}
+  let best=null,score=0;
+  for(const r of rs){
+    if(!familyOK(r))continue;
+    for(const a of [r.clue_name,r.canonical_name,r.sku].filter(Boolean)){
+      const ac=compact(a); if(!ac)continue;
+      let sc=0;
+      if(qc===ac)sc=100000+ac.length;
+      else if(qc.includes(ac))sc=50000+ac.length;
+      if(sc>score){score=sc;best=r;}
     }
   }
   return best;
 }
-function asksCarFitment(message){
-  return /\b(mobil|car)\b/.test(normalize(message));
-}
-function asksMotorcycleFitment(message){
-  return /\b(motor|motorcycle|sepeda motor)\b/.test(normalize(message));
-}
-function flattenVehicleExamples(rule){
-  const out=[];
-  const push=v=>{if(v&&!out.includes(v))out.push(v);};
-
-  const kve=rule?.known_vehicle_examples;
-  if(Array.isArray(kve))for(const v of kve)push(v);
-  else if(kve&&typeof kve==="object")for(const arr of Object.values(kve))for(const v of (Array.isArray(arr)?arr:[]))push(v);
-
-  for(const g of rule?.motorcycle_application_groups||[]){
-    const ex=g?.known_vehicle_examples;
-    if(Array.isArray(ex))for(const v of ex)push(v);
-    else if(ex&&typeof ex==="object")for(const arr of Object.values(ex))for(const v of (Array.isArray(arr)?arr:[]))push(v);
-  }
+function asksCar(m){return /\b(mobil|car)\b/.test(normalize(m));}
+function asksMotor(m){return /\b(motor|motorcycle|sepeda motor)\b/.test(normalize(m));}
+function vehicleExamples(rule){
+  const x=rule?.known_vehicle_examples,out=[];
+  const add=v=>{if(v&&!out.includes(v))out.push(v);};
+  if(Array.isArray(x))x.forEach(add);
+  else if(x&&typeof x==="object")Object.values(x).forEach(a=>(Array.isArray(a)?a:[]).forEach(add));
   return out;
 }
-function authoritativeVehicleClassReply(message,rule,product){
+function classReply(message,rule,product){
   if(!rule)return null;
-  const name=product?productPayload(product).name:(rule.canonical_name||rule.clue_name||rule.product_id);
-
-  if(asksCarFitment(message)&&rule.allow_car_recommendation===false){
-    return `${name} diklasifikasikan untuk penggunaan motor, sehingga tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
+  const name=product?productPayload(product).name:(rule.canonical_name||rule.clue_name);
+  if(asksCar(message)&&rule.allow_car_recommendation===false)
+    return `${name} diklasifikasikan untuk motor dan tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi.`;
+  if(asksMotor(message)&&rule.allow_motorcycle_recommendation===false)
+    return `${name} diklasifikasikan khusus untuk mobil dan tidak direkomendasikan untuk motor.`;
+  if(asksMotor(message)&&rule.allow_motorcycle_recommendation===true){
+    const ex=vehicleExamples(rule);
+    if(ex.length)return [`${name} masuk kelompok aplikasi motor.`,`Contoh kendaraan yang tercatat:`,...ex.slice(0,30).map(v=>`- ${v}`),`Catatan: klasifikasi aplikasi bukan jaminan plug-and-play; tahun/generasi dan kondisi socket tetap perlu diverifikasi.`].join("\n");
   }
-
-  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle_recommendation===false){
-    return `${name} diklasifikasikan untuk penggunaan mobil, sehingga tidak direkomendasikan sebagai produk motor. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
-  }
-
-  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle_recommendation!==false){
-    const examples=flattenVehicleExamples(rule);
-    if(examples.length){
-      const shown=examples.slice(0,24);
-      return[
-        `${name} diklasifikasikan untuk penggunaan motor.`,
-        "Contoh motor yang sesuai berdasarkan klasifikasi yang tersedia:",
-        ...shown.map(v=>`- ${v}`),
-        examples.length>shown.length?`- dan ${examples.length-shown.length} model lain dalam kelompok klasifikasi ini.`:"",
-        "Catatan: daftar ini adalah klasifikasi aplikasi, bukan jaminan plug-and-play. Tahun/generasi dan kondisi soket tetap perlu dicek."
-      ].filter(Boolean).join("\n");
-    }
-  }
-
   return null;
+}
+function humanPosition(p){
+  const m={headlamp_combined:"Headlamp",headlamp_low:"Headlamp dekat",headlamp_high:"Headlamp jauh",headlamp:"Headlamp",foglamp:"Foglamp",parking_front:"Lampu senja depan",turn_signal_front:"Sein depan",turn_signal_rear:"Sein belakang",brake:"Lampu rem",reverse:"Lampu mundur",license_plate_rear:"Lampu plat belakang"};
+  return m[p]||String(p||"").replace(/_/g," ");
+}
+function humanVehicle(runtime,id){
+  const v=runtime?.vById?.[id]; if(!v)return String(id||"").replace(/-/g," ");
+  const i=v.identity||{},y=i.year||{},yr=y.start&&y.end?(y.start===y.end?`${y.start}`:`${y.start}-${y.end}`):(y.raw||"");
+  return [i.brand,i.model_source,yr].filter(Boolean).join(" ");
 }
 
 function productTool(){return{type:"function",name:"search_nine_products",description:"Cari produk Nine resmi berdasarkan kebutuhan, fungsi, socket, kategori, atau spesifikasi.",strict:true,parameters:{type:"object",properties:{query:{type:"string"},limit:{type:"integer",minimum:1,maximum:8}},required:["query","limit"],additionalProperties:false}};}
@@ -591,9 +561,9 @@ exports.handler=async event=>{
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
-  const classRule=classificationRuleForAny({productId:runtimeProductId,product,message});
-  const authoritativeClassReply=authoritativeVehicleClassReply(message,classRule,product);
-  if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_guard",usedAI:false,usedWeb:false,runtime:true});
+  const classRule=classRuleFor({productId:runtimeProductId,product,message});
+  const authoritativeClassReply=classReply(message,classRule,product);
+  if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
 
   if(runtimeResult?.intents?.includes("vehicle_info")){
     const vf=runtimeResult?.facts?.vehicles?.[0];
@@ -602,12 +572,12 @@ exports.handler=async event=>{
   }
 
   if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")){
-    const fr=runtimeFitmentReply(runtimeResult,"vehicle");
+    const fr=runtimeFitmentReply(runtimeResult,"vehicle",runtime);
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_vehicle_to_product",usedAI:false,usedWeb:false,runtime:true});
   }
 
   if(runtimeResult?.intents?.includes("fitment_product_to_vehicle")){
-    const fr=runtimeFitmentReply(runtimeResult,"product");
+    const fr=runtimeFitmentReply(runtimeResult,"product",runtime);
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_product_to_vehicle",usedAI:false,usedWeb:false,runtime:true});
   }
   if(explicit[0])state.activeProduct={name:pName(explicit[0]),sku:pSku(explicit[0])};
@@ -617,6 +587,10 @@ exports.handler=async event=>{
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
   if(directRoutes.has(route.type)&&product)return response(200,{reply:direct(route.type,product),image:null,route:route.type,usedAI:false,usedWeb:false,product:productPayload(product),state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
   if(directRoutes.has(route.type)&&!product)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
+
+  if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)){
+    return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
+  }
 
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});
   let generated=null;if(route.type==="creative_image"&&PUBLIC_IMAGE_ENABLED)generated=await generateImage(message);
