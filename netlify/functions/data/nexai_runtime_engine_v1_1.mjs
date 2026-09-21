@@ -24,6 +24,7 @@ export class NexaiRuntimeEngine {
     this.orchestrator=j("nexai_runtime_orchestrator_v1.json");
     this.imam=j("imam_intelligence_runtime_v1.json");
     this.brand=j("brand_intelligence_runtime_v1.json");
+    this.vehicleClass=j("product_vehicle_classification_v1.json");
 
     this.pById=Object.fromEntries(this.products.products.map(x=>[x.product_id,x]));
     this.vById=Object.fromEntries(this.vehicles.vehicles.map(x=>[x.vehicle_id,x]));
@@ -119,6 +120,48 @@ export class NexaiRuntimeEngine {
     return [...new Set(out)];
   }
 
+
+  productVehicleClass(productId){
+    const groups=this.vehicleClass?.groups||{};
+    for(const [groupName,group] of Object.entries(groups)){
+      for(const r of group.records||[]){
+        if(r.product_id===productId){
+          return {
+            group:groupName,
+            vehicle_class:(r.vehicle_class||group.vehicle_class||[]),
+            allow_car:r.allow_car_recommendation!==false,
+            allow_motorcycle:r.allow_motorcycle_recommendation!==false
+          };
+        }
+      }
+    }
+    return null;
+  }
+
+  isCarVehicle(vehicleId){
+    // Kamar 4 saat ini berisi database mobil; semua vehicle_id di room ini diperlakukan sebagai car.
+    return !!this.vById[vehicleId];
+  }
+
+  filterFitmentForVehicle(vehicleId,recs){
+    const isCar=this.isCarVehicle(vehicleId);
+    return recs.filter(r=>{
+      const cls=this.productVehicleClass(r.product_id);
+      if(!cls) return true; // Produk belum diklasifikasikan: pertahankan behavior lama.
+      if(isCar && cls.allow_car===false) return false;
+      if(!isCar && cls.allow_motorcycle===false) return false;
+      return true;
+    });
+  }
+
+  filterFitmentForProduct(productId,recs){
+    const cls=this.productVehicleClass(productId);
+    if(!cls) return recs;
+    // Room 4 saat ini hanya mobil. Produk yang motorcycle-only tidak boleh menghasilkan daftar mobil.
+    if(cls.allow_car===false) return [];
+    return recs;
+  }
+
   handle(query,session={}){
     const entities=this.resolve(query), intents=this.intents(query,entities);
     const facts={}, warnings=[];
@@ -140,7 +183,8 @@ export class NexaiRuntimeEngine {
       if(intents.includes("product_visual")) (facts.visual??=[]).push({product_id:pid,...(p.visual||{})});
       if(intents.includes("fitment_product_to_vehicle")){
         const ids=this.fitment.indexes.by_product?.[pid]||[];
-        const recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence))
+        let recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence));
+        recs=this.filterFitmentForProduct(pid,recs)
           .sort((a,b)=>(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||a.vehicle_id.localeCompare(b.vehicle_id))
           .slice(0,20);
         (facts.fitment_product_to_vehicle??=[]).push({product_id:pid,candidates:recs});
@@ -152,7 +196,8 @@ export class NexaiRuntimeEngine {
       if(intents.includes("vehicle_info")) (facts.vehicles??=[]).push({vehicle_id:vid,identity:v.identity,lighting:v.lighting,verification:v.verification});
       if(intents.includes("fitment_vehicle_to_product")){
         const ids=this.fitment.indexes.by_vehicle?.[vid]||[];
-        const recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence))
+        let recs=ids.map(id=>this.fById[id]).filter(x=>x&&["high","medium"].includes(x.confidence));
+        recs=this.filterFitmentForVehicle(vid,recs)
           .sort((a,b)=>(a.confidence==="high"?0:1)-(b.confidence==="high"?0:1)||a.position.localeCompare(b.position))
           .slice(0,20);
         (facts.fitment_vehicle_to_product??=[]).push({vehicle_id:vid,candidates:recs});
