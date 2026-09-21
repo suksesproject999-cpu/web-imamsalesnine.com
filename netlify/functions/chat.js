@@ -455,6 +455,20 @@ function classRuleFor({productId,product,message}){
     const h=normalize(`${r?.clue_name||""} ${r?.canonical_name||""} ${r?.sku||""}`);
     return new RegExp(`(^|\\s)${family}(?=\\s|$)`).test(h);
   };
+  // Explicit clue in the current user message outranks runtime product resolution.
+  // This prevents "H4 MH2" from inheriting an H6 MH2 identity.
+  let explicitBest=null,explicitScore=0;
+  for(const r of rs){
+    if(!familyOK(r))continue;
+    const ac=compact(r.clue_name||"");
+    if(!ac)continue;
+    let sc=0;
+    if(qc===ac)sc=200000+ac.length;
+    else if(qc.includes(ac))sc=150000+ac.length;
+    if(sc>explicitScore){explicitScore=sc;explicitBest=r;}
+  }
+  if(explicitBest)return explicitBest;
+
   if(productId){
     const x=rs.find(r=>r.product_id===productId&&familyOK(r)); if(x)return x;
   }
@@ -476,6 +490,18 @@ function classRuleFor({productId,product,message}){
 }
 function asksCar(m){return /\b(mobil|car)\b/.test(normalize(m));}
 function asksMotor(m){return /\b(motor|motorcycle|sepeda motor)\b/.test(normalize(m));}
+function asksVehicleCompatibility(m){
+  const q=normalize(m);
+  return /\b(cocok|kompatibel|pakai|untuk|fitment)\b/.test(q)&&/\b(mobil|motor|kendaraan|car|motorcycle)\b/.test(q)
+    || /\b(mobil|motor)\s+apa\b/.test(q)
+    || /\bapa\s+yang\s+cocok\b/.test(q);
+}
+function classRuleFromActiveProduct(active){
+  if(!active)return null;
+  const rs=classificationRecords();
+  const p=productPayload(active), sku=compact(p.sku||""), name=compact(p.name||"");
+  return rs.find(r=>(sku&&compact(r.sku||"")===sku)||(name&&compact(r.canonical_name||"")===name))||null;
+}
 function vehicleExamples(rule){
   const x=rule?.known_vehicle_examples,out=[];
   const add=v=>{if(v&&!out.includes(v))out.push(v);};
@@ -485,7 +511,7 @@ function vehicleExamples(rule){
 }
 function classReply(message,rule,product){
   if(!rule)return null;
-  const name=product?productPayload(product).name:(rule.canonical_name||rule.clue_name);
+  const name=rule.canonical_name||rule.clue_name||(product?productPayload(product).name:"Produk");
   if(asksCar(message)&&rule.allow_car_recommendation===false)
     return `${name} diklasifikasikan untuk motor dan tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi.`;
   if(asksMotor(message)&&rule.allow_motorcycle_recommendation===false)
@@ -561,8 +587,10 @@ exports.handler=async event=>{
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
-  const classRule=classRuleFor({productId:runtimeProductId,product,message});
-  const authoritativeClassReply=classReply(message,classRule,product);
+  const explicitClassRule=classRuleFor({productId:runtimeProductId,product,message});
+  const activeClassRule=referential(message)||asksVehicleCompatibility(message)?classRuleFromActiveProduct(active):null;
+  const classRule=explicitClassRule||activeClassRule;
+  const authoritativeClassReply=classReply(message,classRule,product||active);
   if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
 
   if(runtimeResult?.intents?.includes("vehicle_info")){
@@ -590,6 +618,10 @@ exports.handler=async event=>{
 
   if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)){
     return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
+  }
+
+  if(asksVehicleCompatibility(message)&&classRule){
+    return response(200,{reply:"Klasifikasi produk sudah dikenali, tetapi data kendaraan terverifikasi belum cukup untuk jawaban tambahan. Saya tidak akan menebak kecocokan dari socket saja.",image:null,route:"classified_fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});

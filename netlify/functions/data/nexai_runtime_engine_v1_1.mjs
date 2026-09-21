@@ -13,6 +13,11 @@ function esc(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&"); }
 function hasPhrase(q,a){ return new RegExp(`(^|\\s)${esc(a)}(?=\\s|$)`,"i").test(q); }
 
 function normalizeVehicleTypos(q=""){return q.replace(/\bavansa\b/g,"avanza");}
+function requestedSocketFamily(q=""){
+  if(/\bh4\b/.test(q))return "h4";
+  if(/\bh6\b/.test(q))return "h6";
+  return null;
+}
 export class NexaiRuntimeEngine {
   constructor(root="."){
     const j=n=>readJson(path.join(root,n));
@@ -73,6 +78,16 @@ export class NexaiRuntimeEngine {
       for(const [a,pid] of this.productAliases){
         if(hasPhrase(q,a) && !products.includes(pid)) products.push(pid);
       }
+    }
+
+    const requestedFamily=requestedSocketFamily(q);
+    if(requestedFamily&&products.length){
+      const strict=products.filter(pid=>{
+        const p=this.pById[pid];
+        const h=norm(`${p?.identity?.sku||""} ${p?.identity?.name||""}`);
+        return new RegExp(`(^|\\s)${requestedFamily}(?=\\s|$)`).test(h);
+      });
+      if(strict.length)products.splice(0,products.length,...strict);
     }
 
     const ym=q.match(/\b(?:19|20)?\d{2}\b/g);
