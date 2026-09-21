@@ -119,7 +119,17 @@ function mentionScore(p,message){
   return score;
 }
 function resolveProducts(products,message,limit=4){
-  const ranked=products.map(product=>({product,score:mentionScore(product,message)})).filter(x=>x.score>0).sort((a,b)=>b.score-a.score);
+  const q=normalize(message);
+  const requestedFamily=/\bh4\b/.test(q)?"h4":/\bh6\b/.test(q)?"h6":null;
+  let ranked=products.map(product=>({product,score:mentionScore(product,message)})).filter(x=>x.score>0);
+  if(requestedFamily){
+    const strict=ranked.filter(x=>{
+      const h=normalize(`${pSku(x.product)} ${pName(x.product)}`);
+      return new RegExp(`(^|\\s)${requestedFamily}(?=\\s|$|[-_/])`,"i").test(h);
+    });
+    if(strict.length)ranked=strict;
+  }
+  ranked.sort((a,b)=>b.score-a.score);
   const out=[],seen=new Set();
   for(const x of ranked){
     const key=compact(pSku(x.product)||pName(x.product));if(!key||seen.has(key))continue;
