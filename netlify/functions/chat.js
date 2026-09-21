@@ -2,6 +2,7 @@
 exports.config={api:{bodyParser:false}};
 const fs=require("fs");
 const path=require("path");
+const {pathToFileURL}=require("url");
 const {Readable}=require("stream");
 const {formidable}=require("formidable");
 
@@ -15,6 +16,26 @@ function readJSON(file,fallback){try{return JSON.parse(fs.readFileSync(file,"utf
 const knowledgeDB=readJSON(path.join(__dirname,"data","product_knowledge_center.json"),{products:[]});
 const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),{});
 const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
+
+const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
+const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
+let nexaiRuntimePromise=null;
+
+async function getNexaiRuntime(){
+  if(nexaiRuntimePromise)return nexaiRuntimePromise;
+  nexaiRuntimePromise=(async()=>{
+    try{
+      if(!fs.existsSync(RUNTIME_ENGINE_FILE))return null;
+      const mod=await import(pathToFileURL(RUNTIME_ENGINE_FILE).href);
+      if(!mod?.NexaiRuntimeEngine)return null;
+      return new mod.NexaiRuntimeEngine(RUNTIME_DATA_ROOT);
+    }catch(e){
+      console.warn("NEXAI runtime warning:",e.message);
+      return null;
+    }
+  })();
+  return nexaiRuntimePromise;
+}
 
 let productCache=null,productCacheAt=0;
 const PRODUCT_TTL=60000;
@@ -362,6 +383,65 @@ function direct(type,p){
 function compare(products){const ps=products.slice(0,4).map(productPayload),r=[`Perbandingan ${ps.map(x=>x.sku||x.name).join(" vs ")}:`];for(const p of ps){r.push("",`${p.name}${p.sku?` (${p.sku})`:""}`);if(p.description)r.push(`- Deskripsi: ${p.description}`);for(const[k,v]of Object.entries(p.specifications||{}).slice(0,10))r.push(`- ${k}: ${v}`);if(p.price)r.push(`- Harga: ${p.price}`);if(p.stock!=="")r.push(`- Stok: ${p.stock}`);}r.push("","Perbandingan di atas hanya menggunakan data resmi yang tersedia.");return r.join("\n");}
 function localTime(iso,tz){try{const d=iso?new Date(iso):new Date();const t=new Intl.DateTimeFormat("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz||undefined}).format(d);const dt=new Intl.DateTimeFormat("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:tz||undefined}).format(d);return`Sekarang pukul ${t}${tz?` (${tz})`:""}, ${dt}.`;}catch{return null;}}
 
+
+function runtimeProductFromId(products,productId){
+  if(!productId)return null;
+  const k=(knowledgeDB.products||[]).find(x=>x?.product_id===productId);
+  if(!k)return null;
+  const sku=compact(k?.identity?.sku||""),name=compact(k?.identity?.name||"");
+  return products.find(p=>{
+    const ps=compact(pSku(p)),pn=compact(pName(p));
+    return (sku&&ps&&sku===ps)||(name&&pn&&name===pn);
+  })||null;
+}
+function runtimeVehicleReply(v){
+  if(!v)return null;
+  const id=v.identity||{},yr=id.year||{},L=v.lighting||{};
+  const title=[id.brand,id.model_source].filter(Boolean).join(" ");
+  const range=yr.start&&yr.end?(yr.start===yr.end?String(yr.start):`${yr.start}-${yr.end}`):yr.raw||"";
+  const rows=[];
+  const add=(label,obj)=>{
+    if(!obj)return;
+    const vals=[
+      ...(obj.low_beam||[]),
+      ...(obj.high_beam||[]),
+      ...(obj.combined||[]),
+      ...(obj.options||[])
+    ].filter(Boolean);
+    const raw=obj.raw||"";
+    const val=[...new Set(vals)].join(" / ")||raw;
+    if(val)rows.push(`- ${label}: ${val}`);
+  };
+  add("Headlamp",L.headlamp);
+  add("Foglamp",L.foglamp);
+  add("Senja depan",L.parking_front);
+  add("Lampu mundur",L.reverse);
+  add("Sein depan",L.turn_signal_front);
+  add("Sein belakang",L.turn_signal_rear);
+  add("Lampu rem",L.brake);
+  add("Plat belakang",L.license_plate_rear);
+  return [`${title}${range?` (${range})`:""}`,...rows].join("\n");
+}
+function runtimeFitmentReply(runtimeResult,direction){
+  const key=direction==="vehicle"?"fitment_vehicle_to_product":"fitment_product_to_vehicle";
+  const groups=runtimeResult?.facts?.[key]||[];
+  if(!groups.length)return null;
+  const candidates=(groups[0]?.candidates||[]).filter(x=>x&&["high","medium"].includes(x.confidence));
+  if(!candidates.length)return direction==="vehicle"
+    ?"Belum ada kandidat produk Nine dengan confidence memadai untuk kendaraan tersebut."
+    :"Belum ada kandidat kendaraan dengan confidence memadai untuk produk tersebut.";
+  const shown=candidates.slice(0,12);
+  const lines=shown.map((x,i)=>{
+    const left=direction==="vehicle"
+      ?`${x.product_name||x.product_id}${x.position?` — ${x.position}`:""}`
+      :`${x.vehicle_id}${x.position?` — ${x.position}`:""}`;
+    const tag=x.confidence==="high"?"kandidat kuat":"perlu verifikasi";
+    return `${i+1}. ${left} (${tag})`;
+  });
+  lines.push("Catatan: kecocokan kandidat belum otomatis berarti plug-and-play terverifikasi; cek socket, posisi, ruang fisik, kelistrikan, dan CANBUS bila relevan.");
+  return lines.join("\n");
+}
+
 function productTool(){return{type:"function",name:"search_nine_products",description:"Cari produk Nine resmi berdasarkan kebutuhan, fungsi, socket, kategori, atau spesifikasi.",strict:true,parameters:{type:"object",properties:{query:{type:"string"},limit:{type:"integer",minimum:1,maximum:8}},required:["query","limit"],additionalProperties:false}};}
 function extractText(d){if(typeof d?.output_text==="string"&&d.output_text.trim())return d.output_text.trim();const c=[];for(const i of d?.output||[])for(const x of i?.content||[])if(x?.text)c.push(x.text);return c.join("\n").trim();}
 function sources(d){const o=[],s=new Set(),add=(u,t)=>{if(u&&!s.has(u)){s.add(u);o.push({url:u,title:t||u});}};for(const i of d?.output||[]){for(const x of i?.action?.sources||[])add(x.url,x.title);for(const c of i?.content||[])for(const a of c?.annotations||[])if(a?.type==="url_citation")add(a?.url||a?.url_citation?.url,a?.title||a?.url_citation?.title);}return o.slice(0,5);}
@@ -396,7 +476,7 @@ exports.handler=async event=>{
  try{
   const liveProducts=await loadProducts();
   const products=unifiedProducts(liveProducts);
-  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
+  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,runtimeEngine:fs.existsSync(RUNTIME_ENGINE_FILE),checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
   const{fields,files}=await parseMultipartEvent(event),message=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
   if(!message&&!img)return response(400,{reply:"Pesan kosong.",image:null});
   const explicit=resolveProducts(products,message,4),route=classify(message,explicit.length>0);
@@ -405,7 +485,33 @@ exports.handler=async event=>{
   if(route.type==="smalltalk")return response(200,{reply:smalltalk(message),image:null,route:"smalltalk",usedAI:false,usedWeb:false});
   if(route.type==="local_time"){const r=localTime(fieldValue(fields,"clientTime",""),fieldValue(fields,"clientTimezone",""));if(r)return response(200,{reply:r,image:null,route:"local_time",usedAI:false,usedWeb:false});}
 
-  const state=buildState(memory,productMemory),active=activeProduct(products,state),product=explicit[0]||(referential(message)?active:null);
+  const state=buildState(memory,productMemory),active=activeProduct(products,state);
+  const runtime=await getNexaiRuntime();
+  let runtimeResult=null;
+  if(runtime){
+    try{runtimeResult=runtime.handle(message,{last_product_id:state?.activeProduct?.sku||null,last_vehicle_id:null,last_intent:null});}
+    catch(e){console.warn("NEXAI runtime handle warning:",e.message);}
+  }
+
+  const runtimeProductId=runtimeResult?.entities?.products?.[0]||null;
+  const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
+  const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
+
+  if(runtimeResult?.intents?.includes("vehicle_info")){
+    const vf=runtimeResult?.facts?.vehicles?.[0];
+    const vr=runtimeVehicleReply(vf);
+    if(vr)return response(200,{reply:vr,image:null,route:"vehicle_info",usedAI:false,usedWeb:false,runtime:true});
+  }
+
+  if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")){
+    const fr=runtimeFitmentReply(runtimeResult,"vehicle");
+    if(fr)return response(200,{reply:fr,image:null,route:"fitment_vehicle_to_product",usedAI:false,usedWeb:false,runtime:true});
+  }
+
+  if(runtimeResult?.intents?.includes("fitment_product_to_vehicle")){
+    const fr=runtimeFitmentReply(runtimeResult,"product");
+    if(fr)return response(200,{reply:fr,image:null,route:"fitment_product_to_vehicle",usedAI:false,usedWeb:false,runtime:true});
+  }
   if(explicit[0])state.activeProduct={name:pName(explicit[0]),sku:pSku(explicit[0])};
 
   if(route.type==="compare"&&explicit.length>=2)return response(200,{reply:compare(explicit),image:null,route:"compare",usedAI:false,usedWeb:false,products:explicit.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
@@ -417,5 +523,5 @@ exports.handler=async event=>{
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});
   let generated=null;if(route.type==="creative_image"&&PUBLIC_IMAGE_ENABLED)generated=await generateImage(message);
   return response(200,{reply:ai.reply,image:generated,route:route.type,usedAI:true,usedWeb:ai.usedWeb,sources:ai.sources,state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
- }catch(e){console.error("NEXAI V12 ERROR:",e);return response(500,{reply:"Maaf, data NEXAI sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message});}
+ }catch(e){console.error("NEXAI V13 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data NEXAI sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message});}
 };

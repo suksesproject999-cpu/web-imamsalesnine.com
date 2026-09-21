@@ -1,0 +1,325 @@
+{
+  "schema": "nexai_knowledge_router_v1_runtime",
+  "version": "1.0",
+  "architecture_role": "Intent Router / Knowledge Router",
+  "design_goal": "Memilih kamar informasi paling tepat setelah entity resolver mengenali produk/kendaraan, dengan prioritas jawaban faktual dan minim pemakaian AI.",
+  "policy": {
+    "deterministic_first": true,
+    "llm_fallback_only": true,
+    "multi_route_allowed": true,
+    "entity_first": true,
+    "no_silent_fact_inference": true,
+    "fitment_authority": "Kamar 5",
+    "product_authority": "Kamar 3",
+    "vehicle_authority": "Kamar 4",
+    "current_info_policy": "Informasi aktual/berubah cepat harus memakai sumber live/current, bukan knowledge statis.",
+    "visual_policy": "Permintaan foto/gambar produk diarahkan ke visual mapping resmi.",
+    "commercial_policy": "Harga/stok/promo diarahkan ke data komersial dinamis bila tersedia."
+  },
+  "route_priority": [
+    "product_visual",
+    "product_commercial",
+    "fitment_vehicle_to_product",
+    "fitment_product_to_vehicle",
+    "product_compare",
+    "product_info",
+    "vehicle_info",
+    "imam_profile",
+    "brand_subbrand",
+    "current_info",
+    "general_ai"
+  ],
+  "intents": {
+    "imam_profile": {
+      "target_room": "imam_intelligence",
+      "requires_entity": false,
+      "keywords": [
+        "imam siapa",
+        "siapa imam",
+        "imam sales nine",
+        "profil imam",
+        "tentang imam",
+        "kontak imam",
+        "hubungi imam"
+      ]
+    },
+    "brand_subbrand": {
+      "target_room": "brand_intelligence",
+      "requires_entity": false,
+      "keywords": [
+        "nine autoseries",
+        "subbrand nine",
+        "sub brand nine",
+        "luximos",
+        "lx trix",
+        "lx-trix",
+        "securicle",
+        "soundblax",
+        "optimus",
+        "cady",
+        "nine power"
+      ]
+    },
+    "product_info": {
+      "target_room": "product_knowledge",
+      "requires_entity": "product",
+      "keywords": [
+        "spek",
+        "spesifikasi",
+        "fitur",
+        "fungsi",
+        "daya",
+        "watt",
+        "lumen",
+        "volt",
+        "tegangan",
+        "warna",
+        "material",
+        "umur pakai",
+        "socket",
+        "soket",
+        "tipe led",
+        "deskripsi"
+      ]
+    },
+    "product_visual": {
+      "target_room": "visual_intelligence",
+      "requires_entity": "product",
+      "keywords": [
+        "foto",
+        "fotonya",
+        "gambar",
+        "lihat produk",
+        "tampilkan produk",
+        "semua foto",
+        "galeri",
+        "foto tambahan",
+        "foto katalog",
+        "halaman katalog"
+      ]
+    },
+    "product_commercial": {
+      "target_room": "commercial_intelligence",
+      "requires_entity": "product",
+      "keywords": [
+        "harga",
+        "promo",
+        "diskon",
+        "stok",
+        "ready",
+        "garansi",
+        "beli",
+        "whatsapp",
+        "wa",
+        "pesan"
+      ]
+    },
+    "vehicle_info": {
+      "target_room": "vehicle_intelligence",
+      "requires_entity": "vehicle",
+      "keywords": [
+        "socket mobil",
+        "soket mobil",
+        "lampu bawaan",
+        "headlamp",
+        "foglamp",
+        "lampu dekat",
+        "lampu jauh",
+        "sein",
+        "lampu mundur",
+        "lampu plat",
+        "lampu rem"
+      ]
+    },
+    "fitment_vehicle_to_product": {
+      "target_room": "fitment_intelligence",
+      "requires_entity": "vehicle",
+      "keywords": [
+        "cocok pakai apa",
+        "pakai lampu apa",
+        "produk nine apa",
+        "rekomendasi lampu",
+        "lampu nine untuk",
+        "yang cocok untuk",
+        "cocoknya apa",
+        "rekomendasi produk"
+      ]
+    },
+    "fitment_product_to_vehicle": {
+      "target_room": "fitment_intelligence",
+      "requires_entity": "product",
+      "keywords": [
+        "cocok mobil apa",
+        "untuk mobil apa",
+        "bisa dipakai di mobil apa",
+        "compatible mobil",
+        "kendaraan apa",
+        "cocok untuk mobil"
+      ]
+    },
+    "product_compare": {
+      "target_room": "product_knowledge",
+      "requires_entity": "product_or_multiple",
+      "keywords": [
+        "bandingkan",
+        "compare",
+        "beda",
+        "perbedaan",
+        "vs",
+        "versus",
+        "lebih cocok mana"
+      ],
+      "notes": "Fakta produk diambil dari Kamar 3; AI hanya boleh menyusun penjelasan bila diperlukan."
+    },
+    "current_info": {
+      "target_room": "current_global_intelligence",
+      "requires_entity": false,
+      "keywords": [
+        "sekarang",
+        "hari ini",
+        "terbaru",
+        "terkini",
+        "saat ini",
+        "presiden sekarang",
+        "kurs sekarang",
+        "cuaca hari ini"
+      ]
+    },
+    "general_ai": {
+      "target_room": "general_ai",
+      "requires_entity": false,
+      "keywords": [],
+      "fallback": true
+    }
+  },
+  "routing_rules": [
+    {
+      "id": "R01",
+      "when": "product_entity AND visual_keyword",
+      "route": [
+        "product_visual"
+      ]
+    },
+    {
+      "id": "R02",
+      "when": "product_entity AND commercial_keyword",
+      "route": [
+        "product_commercial"
+      ]
+    },
+    {
+      "id": "R03",
+      "when": "vehicle_entity AND vehicle_to_product_fitment_keyword",
+      "route": [
+        "fitment_vehicle_to_product"
+      ]
+    },
+    {
+      "id": "R04",
+      "when": "product_entity AND product_to_vehicle_fitment_keyword",
+      "route": [
+        "fitment_product_to_vehicle"
+      ]
+    },
+    {
+      "id": "R05",
+      "when": "multiple_product_entities AND compare_keyword",
+      "route": [
+        "product_compare"
+      ]
+    },
+    {
+      "id": "R06",
+      "when": "product_entity AND product_info_keyword",
+      "route": [
+        "product_info"
+      ]
+    },
+    {
+      "id": "R07",
+      "when": "vehicle_entity AND vehicle_info_keyword",
+      "route": [
+        "vehicle_info"
+      ]
+    },
+    {
+      "id": "R08",
+      "when": "imam_keyword",
+      "route": [
+        "imam_profile"
+      ]
+    },
+    {
+      "id": "R09",
+      "when": "brand_keyword",
+      "route": [
+        "brand_subbrand"
+      ]
+    },
+    {
+      "id": "R10",
+      "when": "current_keyword",
+      "route": [
+        "current_info"
+      ]
+    },
+    {
+      "id": "R11",
+      "when": "no_specific_route",
+      "route": [
+        "general_ai"
+      ]
+    }
+  ],
+  "multi_route_examples": [
+    {
+      "query_pattern": "harga dan foto [produk]",
+      "routes": [
+        "product_commercial",
+        "product_visual"
+      ]
+    },
+    {
+      "query_pattern": "spek dan harga [produk]",
+      "routes": [
+        "product_info",
+        "product_commercial"
+      ]
+    },
+    {
+      "query_pattern": "[mobil] cocok produk apa dan berapa harganya",
+      "routes": [
+        "fitment_vehicle_to_product",
+        "product_commercial"
+      ]
+    }
+  ],
+  "confidence_filter": {
+    "fitment": {
+      "high": "boleh ditampilkan sebagai kandidat kuat dengan catatan bukan jaminan plug-and-play",
+      "medium": "boleh ditampilkan dengan catatan perlu verifikasi fungsi/posisi",
+      "low": "jangan ditampilkan sebagai rekomendasi final",
+      "verified": "hanya jika ada bukti verifikasi instalasi yang memadai"
+    },
+    "entity": {
+      "exact": "auto_resolve",
+      "compact_exact": "auto_resolve",
+      "model_year_exact": "auto_resolve",
+      "ambiguous": "ask_for_clarification",
+      "fuzzy_below_threshold": "ask_for_confirmation"
+    }
+  },
+  "runtime_dependencies": {
+    "entity_resolver": "entity_resolver_v1_1_runtime.json",
+    "fitment_runtime": "fitment_intelligence_kamar5_v2_1_integrity_repair.json"
+  },
+  "quality_control": {
+    "intent_count": 11,
+    "routing_rule_count": 11,
+    "multi_route_example_count": 3,
+    "has_general_fallback": true,
+    "fitment_source_version": "2.1",
+    "resolver_version": "1.1",
+    "valid_route_targets": true
+  }
+}

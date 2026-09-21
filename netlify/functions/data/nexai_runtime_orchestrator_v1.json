@@ -1,0 +1,282 @@
+{
+  "schema": "nexai_runtime_orchestrator_v1",
+  "version": "1.0",
+  "architecture_role": "Runtime Orchestrator",
+  "design_goal": "Menyatukan entity resolution, routing, retrieval, confidence filtering, dan response composition dengan konteks minimum.",
+  "execution_order": [
+    "normalize_query",
+    "resolve_entities",
+    "detect_intents",
+    "select_rooms",
+    "retrieve_minimal_facts",
+    "apply_confidence_filter",
+    "compose_structured_response",
+    "invoke_llm_only_if_needed",
+    "return_render_payload"
+  ],
+  "policies": {
+    "deterministic_first": true,
+    "minimal_context": true,
+    "llm_optional": true,
+    "no_silent_inference": true,
+    "no_cross_room_fact_override": true,
+    "source_authority": {
+      "product_facts": "product_knowledge",
+      "vehicle_facts": "vehicle_intelligence",
+      "fitment": "fitment_intelligence",
+      "visual": "visual_mapping",
+      "commercial": "commercial_live",
+      "imam": "imam_intelligence",
+      "brand_subbrand": "brand_intelligence",
+      "current": "live_current_source",
+      "general": "general_ai"
+    },
+    "fitment_safety": {
+      "high": "candidate_strong_not_verified_install",
+      "medium": "candidate_requires_additional_verification",
+      "low": "exclude_from_final_recommendation",
+      "verified": "requires_installation_evidence"
+    }
+  },
+  "runtime_components": {
+    "entity_resolver": {
+      "version": "1.1",
+      "role": "entity_resolution",
+      "load": "runtime"
+    },
+    "knowledge_router": {
+      "version": "1.0",
+      "role": "intent_and_room_routing",
+      "load": "runtime"
+    },
+    "response_composer": {
+      "version": "1.0",
+      "role": "confidence_filter_and_response_composition",
+      "load": "runtime"
+    },
+    "product_knowledge": {
+      "version": "3.0",
+      "count": 172,
+      "role": "room_3_product_facts"
+    },
+    "vehicle_intelligence": {
+      "version": "3.0",
+      "count": 133,
+      "role": "room_4_vehicle_facts"
+    },
+    "fitment_intelligence": {
+      "version": "2.1",
+      "count": 13830,
+      "role": "room_5_vehicle_product_relations"
+    }
+  },
+  "room_registry": {
+    "product_knowledge": {
+      "room": 3,
+      "lookup_keys": [
+        "product_id",
+        "sku",
+        "aliases"
+      ],
+      "fields_default": [
+        "identity",
+        "brand",
+        "classification",
+        "technical.best_available",
+        "features",
+        "variants",
+        "visual",
+        "commercial",
+        "confidence"
+      ]
+    },
+    "vehicle_intelligence": {
+      "room": 4,
+      "lookup_keys": [
+        "vehicle_id",
+        "brand",
+        "model",
+        "year"
+      ],
+      "fields_default": [
+        "identity",
+        "lighting",
+        "search_index.socket_tags",
+        "verification"
+      ]
+    },
+    "fitment_intelligence": {
+      "room": 5,
+      "lookup_keys": [
+        "vehicle_id",
+        "product_id",
+        "position"
+      ],
+      "fields_default": [
+        "vehicle_id",
+        "position",
+        "vehicle_base",
+        "product_id",
+        "product_name",
+        "product_bases",
+        "confidence",
+        "status",
+        "reasons",
+        "verification"
+      ]
+    },
+    "imam_intelligence": {
+      "room": 1,
+      "load_strategy": "small_static_context"
+    },
+    "brand_intelligence": {
+      "room": 2,
+      "load_strategy": "small_static_context"
+    },
+    "visual_mapping": {
+      "room": 6,
+      "load_strategy": "direct_lookup"
+    },
+    "commercial_live": {
+      "room": 7,
+      "load_strategy": "direct_lookup_dynamic"
+    },
+    "current_global_intelligence": {
+      "room": 8,
+      "load_strategy": "live_only"
+    },
+    "general_ai": {
+      "room": 9,
+      "load_strategy": "fallback"
+    }
+  },
+  "intent_workflows": {
+    "product_info": {
+      "rooms": [
+        "product_knowledge"
+      ],
+      "llm_required": false,
+      "retrieval": "single_product_minimal"
+    },
+    "product_visual": {
+      "rooms": [
+        "visual_mapping"
+      ],
+      "llm_required": false,
+      "retrieval": "direct_visual"
+    },
+    "product_commercial": {
+      "rooms": [
+        "commercial_live"
+      ],
+      "llm_required": false,
+      "retrieval": "direct_commercial"
+    },
+    "vehicle_info": {
+      "rooms": [
+        "vehicle_intelligence"
+      ],
+      "llm_required": false,
+      "retrieval": "single_vehicle_minimal"
+    },
+    "fitment_vehicle_to_product": {
+      "rooms": [
+        "vehicle_intelligence",
+        "fitment_intelligence",
+        "product_knowledge"
+      ],
+      "llm_required": false,
+      "retrieval": "vehicle_then_fitment_then_product_summary"
+    },
+    "fitment_product_to_vehicle": {
+      "rooms": [
+        "product_knowledge",
+        "fitment_intelligence",
+        "vehicle_intelligence"
+      ],
+      "llm_required": false,
+      "retrieval": "product_then_fitment_then_vehicle_summary"
+    },
+    "product_compare": {
+      "rooms": [
+        "product_knowledge"
+      ],
+      "llm_required": true,
+      "retrieval": "multiple_product_minimal"
+    },
+    "imam_profile": {
+      "rooms": [
+        "imam_intelligence"
+      ],
+      "llm_required": false
+    },
+    "brand_subbrand": {
+      "rooms": [
+        "brand_intelligence"
+      ],
+      "llm_required": false
+    },
+    "current_info": {
+      "rooms": [
+        "current_global_intelligence"
+      ],
+      "llm_required": false
+    },
+    "general_ai": {
+      "rooms": [
+        "general_ai"
+      ],
+      "llm_required": true
+    }
+  },
+  "cost_control": {
+    "simple_lookup_llm_calls": 0,
+    "fitment_lookup_llm_calls": 0,
+    "commercial_lookup_llm_calls": 0,
+    "visual_lookup_llm_calls": 0,
+    "comparison_llm_calls": 1,
+    "general_ai_llm_calls": 1,
+    "rule": "LLM hanya menerima fakta terpilih dari room yang relevan."
+  },
+  "runtime_response_contract": {
+    "request": {
+      "query": "string",
+      "session_context": {
+        "last_product_id": "string|null",
+        "last_vehicle_id": "string|null",
+        "last_intent": "string|null"
+      }
+    },
+    "response": {
+      "resolved_entities": "array",
+      "intents": "array",
+      "rooms_used": "array",
+      "facts": "object",
+      "confidence": "object",
+      "render": "object",
+      "llm_used": "boolean"
+    }
+  },
+  "error_handling": {
+    "entity_ambiguous": "return_clarification_options",
+    "entity_unresolved": "route_to_general_or_request_context",
+    "room_data_missing": "state_data_not_available",
+    "fitment_low_only": "do_not_recommend_final",
+    "live_source_failure": "state_current_data_unavailable",
+    "visual_render_failure": "state_visual_not_rendered"
+  },
+  "quality_control": {
+    "resolver_version": "1.1",
+    "router_version": "1.0",
+    "composer_version": "1.0",
+    "product_count": 172,
+    "vehicle_count": 133,
+    "fitment_count": 13830,
+    "all_fitment_product_refs_resolve": true,
+    "all_fitment_vehicle_refs_resolve": true,
+    "router_has_general_fallback": true,
+    "composer_suppresses_low_fitment": true,
+    "simple_lookup_zero_llm": true,
+    "fitment_lookup_zero_llm": true
+  }
+}

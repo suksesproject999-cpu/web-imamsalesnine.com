@@ -1,0 +1,314 @@
+{
+  "schema": "nexai_response_composer_v1_runtime",
+  "version": "1.0",
+  "architecture_role": "Response Composer + Confidence Filter Runtime",
+  "design_goal": "Menggabungkan fakta dari kamar terpilih menjadi jawaban Bahasa Indonesia yang ringkas, terstruktur, faktual, dan hemat token.",
+  "runtime_dependencies": {
+    "entity_resolver": "entity_resolver_v1_1_runtime.json",
+    "knowledge_router": "knowledge_router_v1_runtime.json",
+    "fitment": "fitment_intelligence_kamar5_v2_1_integrity_repair.json"
+  },
+  "principles": {
+    "facts_before_reasoning": true,
+    "no_silent_inference": true,
+    "preserve_source_priority": true,
+    "minimal_llm_context": true,
+    "multi_room_merge_allowed": true,
+    "never_upgrade_unverified_claim": true,
+    "response_language": "Bahasa Indonesia"
+  },
+  "confidence_filter": {
+    "entity_resolution": {
+      "exact_normalized_alias": {
+        "action": "accept",
+        "label": "resolved"
+      },
+      "exact_compact_alias": {
+        "action": "accept",
+        "label": "resolved"
+      },
+      "vehicle_model_year": {
+        "action": "accept",
+        "label": "resolved"
+      },
+      "ambiguous": {
+        "action": "clarify",
+        "label": "needs_user_context"
+      },
+      "fuzzy_candidate_requires_confirmation": {
+        "action": "confirm",
+        "label": "needs_confirmation"
+      },
+      "unresolved": {
+        "action": "fallback_or_clarify",
+        "label": "unresolved"
+      }
+    },
+    "product_fact": {
+      "catalog_verified": {
+        "action": "state_as_fact"
+      },
+      "operational_supplement": {
+        "action": "state_with_source_scope"
+      },
+      "unknown": {
+        "action": "omit_or_state_unavailable"
+      }
+    },
+    "fitment": {
+      "high": {
+        "action": "show_candidate",
+        "phrasing": "kandidat kuat",
+        "must_include": "Belum otomatis berarti plug-and-play terverifikasi."
+      },
+      "medium": {
+        "action": "show_with_caution",
+        "phrasing": "kandidat yang perlu verifikasi tambahan",
+        "must_include": "Perlu cek fungsi/posisi/socket sebelum pemasangan."
+      },
+      "low": {
+        "action": "hide_from_final_recommendation",
+        "phrasing": "jangan tampil sebagai rekomendasi final"
+      },
+      "verified": {
+        "action": "show_verified",
+        "requires": [
+          "installation_verified",
+          "physical_clearance_verified",
+          "electrical_compatibility_verified",
+          "canbus_verified"
+        ]
+      }
+    },
+    "commercial": {
+      "live_source": {
+        "action": "show_if_present"
+      },
+      "missing": {
+        "action": "state_unavailable"
+      }
+    },
+    "current_info": {
+      "static_knowledge": {
+        "action": "reject_for_current_fact"
+      },
+      "live_verified": {
+        "action": "show"
+      }
+    }
+  },
+  "field_priority": {
+    "product": [
+      "identity.name",
+      "identity.sku",
+      "brand.master",
+      "brand.subbrand",
+      "catalog.description",
+      "technical.best_available",
+      "features",
+      "variants",
+      "commercial"
+    ],
+    "vehicle": [
+      "identity.brand",
+      "identity.model_source",
+      "identity.year",
+      "lighting",
+      "search_index.socket_tags"
+    ],
+    "fitment": [
+      "vehicle_id",
+      "position",
+      "vehicle_base",
+      "product_id",
+      "product_name",
+      "product_bases",
+      "confidence",
+      "status",
+      "reasons",
+      "verification"
+    ]
+  },
+  "answer_templates": {
+    "product_info": {
+      "sections": [
+        "title",
+        "description",
+        "specifications",
+        "features",
+        "variants",
+        "verification_note"
+      ],
+      "max_sections": 6
+    },
+    "product_visual": {
+      "sections": [
+        "title",
+        "visual_payload"
+      ],
+      "render_rule": "Jangan mengklaim visual tampil sebelum frontend benar-benar merender."
+    },
+    "product_commercial": {
+      "sections": [
+        "title",
+        "price",
+        "promo",
+        "stock",
+        "warranty"
+      ],
+      "omit_missing": true
+    },
+    "vehicle_info": {
+      "sections": [
+        "title",
+        "year_range",
+        "lighting_positions",
+        "socket_summary",
+        "source_note"
+      ]
+    },
+    "fitment_vehicle_to_product": {
+      "sections": [
+        "vehicle_context",
+        "position",
+        "high_candidates",
+        "medium_candidates",
+        "verification_note"
+      ],
+      "exclude_confidence": [
+        "low"
+      ]
+    },
+    "fitment_product_to_vehicle": {
+      "sections": [
+        "product_context",
+        "compatible_vehicle_candidates",
+        "verification_note"
+      ],
+      "exclude_confidence": [
+        "low"
+      ]
+    },
+    "product_compare": {
+      "sections": [
+        "compared_products",
+        "verified_differences",
+        "shared_features",
+        "uncertainties"
+      ],
+      "rule": "Tidak membuat pemenang otomatis; hanya membandingkan fakta."
+    },
+    "imam_profile": {
+      "sections": [
+        "identity",
+        "role",
+        "business_context",
+        "contact_if_available"
+      ]
+    },
+    "brand_subbrand": {
+      "sections": [
+        "master_brand",
+        "subbrands",
+        "category_or_function",
+        "relationship"
+      ]
+    },
+    "current_info": {
+      "sections": [
+        "answer",
+        "freshness",
+        "source_status"
+      ]
+    },
+    "general_ai": {
+      "sections": [
+        "answer"
+      ]
+    }
+  },
+  "token_budget_policy": {
+    "default_mode": "compact",
+    "simple_lookup": {
+      "max_fact_items": 8,
+      "llm_required": false
+    },
+    "multi_room_lookup": {
+      "max_fact_items_per_room": 6,
+      "llm_required": false
+    },
+    "explanation_or_comparison": {
+      "max_fact_items_per_entity": 10,
+      "llm_required": true,
+      "context_rule": "Kirim hanya fakta terpilih dari kamar terkait, bukan seluruh JSON."
+    }
+  },
+  "merge_rules": [
+    {
+      "id": "M01",
+      "routes": [
+        "product_info",
+        "product_commercial"
+      ],
+      "order": [
+        "product_info",
+        "product_commercial"
+      ]
+    },
+    {
+      "id": "M02",
+      "routes": [
+        "product_commercial",
+        "product_visual"
+      ],
+      "order": [
+        "product_commercial",
+        "product_visual"
+      ]
+    },
+    {
+      "id": "M03",
+      "routes": [
+        "fitment_vehicle_to_product",
+        "product_commercial"
+      ],
+      "order": [
+        "fitment_vehicle_to_product",
+        "product_commercial"
+      ]
+    }
+  ],
+  "runtime_output_contract": {
+    "type": "object",
+    "required": [
+      "intent",
+      "entity",
+      "facts",
+      "confidence",
+      "render"
+    ],
+    "shape": {
+      "intent": "string_or_array",
+      "entity": "resolved entity summary",
+      "facts": "filtered factual payload",
+      "confidence": "confidence/provenance summary",
+      "render": {
+        "format": "text|product_card|visual|comparison|fitment_list",
+        "title": "string",
+        "sections": "array",
+        "warnings": "array"
+      }
+    }
+  },
+  "quality_control": {
+    "resolver_version": "1.1",
+    "router_version": "1.0",
+    "fitment_version": "2.1",
+    "answer_template_count": 11,
+    "merge_rule_count": 3,
+    "has_low_fitment_suppression": true,
+    "has_unknown_omit_policy": true,
+    "has_minimal_context_policy": true,
+    "has_runtime_output_contract": true
+  }
+}
