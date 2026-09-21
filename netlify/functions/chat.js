@@ -506,6 +506,14 @@ function asksVehicleCompatibility(m){
     || /\b(mobil|motor)\s+apa\b/.test(q)
     || /\bapa\s+yang\s+cocok\b/.test(q);
 }
+
+function isProductCompatibilityFollowup(m){
+  const q=normalize(m);
+  return /^(mobil|motor|kendaraan)\s+apa(\s+yang\s+cocok)?[?!.]*$/.test(q)
+    || /^(cocok|kompatibel)\s+(untuk\s+)?(mobil|motor)\s+apa[?!.]*$/.test(q)
+    || /^(buat|untuk)\s+(mobil|motor)\s+apa[?!.]*$/.test(q);
+}
+
 function classRuleFromActiveProduct(active){
   if(!active)return null;
   const rs=classificationRecords();
@@ -599,7 +607,11 @@ exports.handler=async event=>{
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
   const explicitClassRule=classRuleFor({productId:runtimeProductId,product,message});
-  const activeClassRule=referential(message)||asksVehicleCompatibility(message)?classRuleFromActiveProduct(active):null;
+  const hasCurrentVehicle=Array.isArray(runtimeResult?.entities?.vehicles)&&runtimeResult.entities.vehicles.length>0;
+  const hasCurrentProduct=!!runtimeProductId||explicit.length>0;
+  const activeClassRule=(!hasCurrentVehicle&&!hasCurrentProduct&&(referential(message)||isProductCompatibilityFollowup(message)))
+    ?classRuleFromActiveProduct(active)
+    :null;
   const classRule=explicitClassRule||activeClassRule;
   const authoritativeClassReply=classReply(message,classRule,product||active);
   if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
@@ -610,6 +622,7 @@ exports.handler=async event=>{
     if(vr)return response(200,{reply:vr,image:null,route:"vehicle_info",usedAI:false,usedWeb:false,runtime:true});
   }
 
+  // Fresh vehicle query must outrank prior active-product context.
   if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")){
     const fr=runtimeFitmentReply(runtimeResult,"vehicle",runtime);
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_vehicle_to_product",usedAI:false,usedWeb:false,runtime:true});
