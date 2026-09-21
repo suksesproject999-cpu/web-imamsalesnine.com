@@ -512,13 +512,14 @@ function vehicleExamples(rule){
 function classReply(message,rule,product){
   if(!rule)return null;
   const name=rule.canonical_name||rule.clue_name||(product?productPayload(product).name:"Produk");
+  const appNote=rule?.application_note?` (${rule.application_note})`:"";
   if(asksCar(message)&&rule.allow_car_recommendation===false)
     return `${name} diklasifikasikan untuk motor dan tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi.`;
   if(asksMotor(message)&&rule.allow_motorcycle_recommendation===false)
     return `${name} diklasifikasikan khusus untuk mobil dan tidak direkomendasikan untuk motor.`;
   if(asksMotor(message)&&rule.allow_motorcycle_recommendation===true){
     const ex=vehicleExamples(rule);
-    if(ex.length)return [`${name} masuk kelompok aplikasi motor.`,`Contoh kendaraan yang tercatat:`,...ex.slice(0,30).map(v=>`- ${v}`),`Catatan: klasifikasi aplikasi bukan jaminan plug-and-play; tahun/generasi dan kondisi socket tetap perlu diverifikasi.`].join("\n");
+    if(ex.length)return [`${name} masuk kelompok aplikasi motor${appNote}.`,`Contoh kendaraan yang tercatat:`,...ex.slice(0,30).map(v=>`- ${v}`),`Catatan: klasifikasi aplikasi bukan jaminan plug-and-play; tahun/generasi dan kondisi socket tetap perlu diverifikasi.`].join("\n");
   }
   return null;
 }
