@@ -444,41 +444,95 @@ function runtimeFitmentReply(runtimeResult,direction){
 }
 
 
-function vehicleClassRuleForProductId(productId){
-  if(!productId)return null;
+function classificationRecords(){
+  const out=[];
   for(const [groupName,group] of Object.entries(vehicleClassDB?.groups||{})){
-    for(const r of group?.records||[]){
-      if(r?.product_id===productId){
-        return{
-          group:groupName,
-          vehicle_class:Array.isArray(r.vehicle_class)?r.vehicle_class:[r.vehicle_class].filter(Boolean),
-          allow_car:r.allow_car_recommendation!==false,
-          allow_motorcycle:r.allow_motorcycle_recommendation!==false
-        };
-      }
+    for(const r of group?.records||[])out.push({...r,__group:groupName});
+  }
+  return out;
+}
+function classificationRuleForAny({productId,product,message}){
+  const records=classificationRecords();
+
+  if(productId){
+    const hit=records.find(r=>r?.product_id===productId);
+    if(hit)return hit;
+  }
+
+  const sku=compact(product?productPayload(product).sku:"");
+  const name=compact(product?productPayload(product).name:"");
+  if(sku){
+    const hit=records.find(r=>compact(r?.sku||"")===sku);
+    if(hit)return hit;
+  }
+  if(name){
+    const hit=records.find(r=>compact(r?.canonical_name||"")===name);
+    if(hit)return hit;
+  }
+
+  // Final fallback: match query against clue/canonical/SKU from classification itself.
+  const q=normalize(message||"");
+  const qc=compact(message||"");
+  let best=null,bestScore=0;
+  for(const r of records){
+    for(const alias of [r?.clue_name,r?.canonical_name,r?.sku].filter(Boolean)){
+      const an=normalize(alias), ac=compact(alias);
+      let score=0;
+      if(q===an||qc===ac)score=100000+ac.length;
+      else if(an&&new RegExp(`(^|\\s)${an.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(?=\\s|$|[,.!?/+-])`,"i").test(q))score=60000+an.length;
+      else if(ac&&qc.includes(ac))score=50000+ac.length;
+      if(score>bestScore){best=r;bestScore=score;}
     }
   }
-  return null;
+  return best;
 }
 function asksCarFitment(message){
-  const m=normalize(message);
-  return /\b(mobil|car)\b/.test(m);
+  return /\b(mobil|car)\b/.test(normalize(message));
 }
 function asksMotorcycleFitment(message){
-  const m=normalize(message);
-  return /\b(motor|motorcycle|sepeda motor)\b/.test(m);
+  return /\b(motor|motorcycle|sepeda motor)\b/.test(normalize(message));
 }
-function authoritativeVehicleClassReply(message,productId,product){
-  if(!productId)return null;
-  const rule=vehicleClassRuleForProductId(productId);
+function flattenVehicleExamples(rule){
+  const out=[];
+  const push=v=>{if(v&&!out.includes(v))out.push(v);};
+
+  const kve=rule?.known_vehicle_examples;
+  if(Array.isArray(kve))for(const v of kve)push(v);
+  else if(kve&&typeof kve==="object")for(const arr of Object.values(kve))for(const v of (Array.isArray(arr)?arr:[]))push(v);
+
+  for(const g of rule?.motorcycle_application_groups||[]){
+    const ex=g?.known_vehicle_examples;
+    if(Array.isArray(ex))for(const v of ex)push(v);
+    else if(ex&&typeof ex==="object")for(const arr of Object.values(ex))for(const v of (Array.isArray(arr)?arr:[]))push(v);
+  }
+  return out;
+}
+function authoritativeVehicleClassReply(message,rule,product){
   if(!rule)return null;
-  const name=product?productPayload(product).name:productId;
-  if(asksCarFitment(message)&&rule.allow_car===false){
+  const name=product?productPayload(product).name:(rule.canonical_name||rule.clue_name||rule.product_id);
+
+  if(asksCarFitment(message)&&rule.allow_car_recommendation===false){
     return `${name} diklasifikasikan untuk penggunaan motor, sehingga tidak direkomendasikan sebagai produk mobil. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
   }
-  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle===false){
+
+  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle_recommendation===false){
     return `${name} diklasifikasikan untuk penggunaan mobil, sehingga tidak direkomendasikan sebagai produk motor. Kecocokan socket saja tidak cukup untuk mengubah klasifikasi aplikasi produk.`;
   }
+
+  if(asksMotorcycleFitment(message)&&rule.allow_motorcycle_recommendation!==false){
+    const examples=flattenVehicleExamples(rule);
+    if(examples.length){
+      const shown=examples.slice(0,24);
+      return[
+        `${name} diklasifikasikan untuk penggunaan motor.`,
+        "Contoh motor yang sesuai berdasarkan klasifikasi yang tersedia:",
+        ...shown.map(v=>`- ${v}`),
+        examples.length>shown.length?`- dan ${examples.length-shown.length} model lain dalam kelompok klasifikasi ini.`:"",
+        "Catatan: daftar ini adalah klasifikasi aplikasi, bukan jaminan plug-and-play. Tahun/generasi dan kondisi soket tetap perlu dicek."
+      ].filter(Boolean).join("\n");
+    }
+  }
+
   return null;
 }
 
@@ -537,7 +591,8 @@ exports.handler=async event=>{
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
-  const authoritativeClassReply=authoritativeVehicleClassReply(message,runtimeProductId,runtimeProduct);
+  const classRule=classificationRuleForAny({productId:runtimeProductId,product,message});
+  const authoritativeClassReply=authoritativeVehicleClassReply(message,classRule,product);
   if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_guard",usedAI:false,usedWeb:false,runtime:true});
 
   if(runtimeResult?.intents?.includes("vehicle_info")){
