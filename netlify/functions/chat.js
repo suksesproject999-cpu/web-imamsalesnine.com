@@ -382,53 +382,15 @@ function referential(message){
 }
 
 function safeParse(v,f){try{return v?JSON.parse(v):f;}catch{return f;}}
-function vehicleMentionFromText(text){
-  const raw=String(text||""),q=normalize(raw);
-  const year=raw.match(/\b(19|20)\d{2}\b/)?.[0]||null;
-
-  const known=[
-    ["mitsubishi","xpander",["xpander","expander"]],
-    ["mitsubishi","pajero dakar",["pajero dakar"]],
-    ["mitsubishi","pajero",["pajero"]],
-    ["toyota","fortuner",["fortuner"]],
-    ["toyota","avanza",["avanza"]],
-    ["toyota","veloz",["veloz"]],
-    ["daihatsu","xenia",["xenia"]],
-    ["hyundai","stargazer",["stargazer"]],
-    ["yamaha","vixion",["vixion"]],
-    ["honda","beat",["beat"]],
-    ["honda","vario",["vario"]]
-  ];
-
-  for(const [brand,model,aliases] of known){
-    if(aliases.some(a=>new RegExp(`\\b${a.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\b`,"i").test(q))){
-      return{brand,model,year};
-    }
-  }
-
-  const m=raw.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu|chevrolet|ford|vespa|benelli)\b\s+([a-z0-9][a-z0-9-]*)/i);
-  if(m)return{brand:m[1].toLowerCase(),model:m[2].toLowerCase(),year};
-  return null;
-}
-
 function buildState(memory,productMemory){
   const s={activeProduct:null,vehicle:{},recentUserText:[]},pm=Array.isArray(productMemory)?productMemory:[];
   if(pm.length){const p=pm[pm.length-1];s.activeProduct={name:p?.nama||p?.name||"",sku:p?.sku||""};}
-
-  const users=(Array.isArray(memory)?memory:[]).filter(x=>x?.role==="user"&&typeof x.content==="string").slice(-12);
-  for(const x of users)s.recentUserText.push(x.content);
-
-  // Single authoritative source: newest explicit user vehicle mention wins.
-  // Year is taken from the SAME message, never mixed with another vehicle.
-  for(let i=users.length-1;i>=0;i--){
-    const v=vehicleMentionFromText(users[i].content);
-    if(v){
-      s.vehicle={brand:v.brand,model:v.model};
-      if(v.year)s.vehicle.year=v.year;
-      break;
+  for(const x of(Array.isArray(memory)?memory:[]).slice(-8)){
+    if(x?.role==="user"&&typeof x.content==="string"){
+      s.recentUserText.push(x.content);const y=x.content.match(/\b(19|20)\d{2}\b/)?.[0];if(y)s.vehicle.year=y;
+      const v=x.content.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu)\b\s+([a-z0-9-]+)/i);if(v){s.vehicle.brand=v[1];s.vehicle.model=v[2];}
     }
-  }
-  return s;
+  }return s;
 }
 function activeProduct(products,state){if(!state?.activeProduct)return null;const key=state.activeProduct.sku||state.activeProduct.name;return key?resolveProducts(products,key,1)[0]||null:null;}
 
@@ -966,21 +928,26 @@ exports.handler=async event=>{
   if(route.type==="local_time"){const r=localTime(fieldValue(fields,"clientTime",""),fieldValue(fields,"clientTimezone",""));if(r)return response(200,{reply:r,image:null,route:"local_time",usedAI:false,usedWeb:false});}
 
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
-  const currentVehicleMention=vehicleMentionFromText(message);
-  if(currentVehicleMention){
-    state.vehicle={brand:currentVehicleMention.brand,model:currentVehicleMention.model};
-    if(currentVehicleMention.year)state.vehicle.year=currentVehicleMention.year;
+
+  // Agent is a true sidecar: when OFF/missing/error, every legacy/core route behaves exactly as before.
+  const agentModule=await getAinexAgentModule();
+  let agentControl={enabled:false,mode:"off",monitor:false};
+  if(agentModule&&typeof agentModule.getAinexAgentControl==="function"){
+    try{agentControl=await agentModule.getAinexAgentControl();}
+    catch(e){console.warn("AINEX agent control warning:",e.message);}
   }
 
-  const agentVehicleRecommendationRequest=(
-    /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(message) ||
-    /\bbi[\s-]?led\b/i.test(message) ||
-    /\bsekalian\b|\bsekaligus\b/i.test(message)
-  )&&(
-    !!currentVehicleMention ||
-    !!state.vehicle?.model ||
-    /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket)\b/i.test(message)
+  const agentVehicleRecommendationRequest=agentControl.enabled===true&&(
+    (
+      /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(message) ||
+      /\bbi[\s-]?led\b/i.test(message) ||
+      /\bsekalian\b|\bsekaligus\b/i.test(message)
+    )&&(
+      /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket|xpander|expander|pajero|xenia|avanza|veloz|fortuner)\b/i.test(message) ||
+      (state.recentUserText||[]).some(t=>/\b(mobil|motor|xpander|expander|pajero|xenia|avanza|veloz|fortuner)\b/i.test(t))
+    )
   );
+
   const runtime=await getNexaiRuntime();
   let runtimeResult=null;
   if(runtime){
@@ -1070,16 +1037,14 @@ exports.handler=async event=>{
     return response(200,{reply:"Model motor dikenali, tetapi kelompok aplikasi belum dapat dipastikan dengan aman. Sebutkan model lengkap dan tahun/generasinya.",image:null,route:"motorcycle_group_clarification",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  const agentModule=await getAinexAgentModule();
   let agentResult=null;
-  if(agentModule){
+  if(agentModule&&agentControl.enabled===true){
     try{agentResult=await agentModule.runAinexAgent({
       products,message,route,state,memory,runtimeResult,
       conversationContext:{
         lastProductId:state.activeProduct?.id||null,
         lastProductName:state.activeProduct?.nama||null,
         vehicle:state.vehicle||null,
-        authoritativeVehicle:state.vehicle||null,
         recentUserText:state.recentUserText||[],
         memory
       },

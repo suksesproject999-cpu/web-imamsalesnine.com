@@ -162,7 +162,7 @@ function vehicleFromHistory(ctx){
 function lockedVehicle(ctx){
   // CURRENT MESSAGE wins only when user explicitly mentions a vehicle.
   // Otherwise NEVER let runtime invent/change vehicle; keep conversation state/history.
-  return explicitVehicleFromText(ctx.message)||stateVehicle(ctx)||vehicleFromHistory(ctx)||null;
+  return explicitVehicleFromText(ctx.message)||vehicleFromHistory(ctx)||stateVehicle(ctx)||null;
 }
 
 function vehicleLabel(v){
@@ -295,7 +295,7 @@ function exactCandidatesForCar(socket,position){
 
   // HARD BUSINESS RULE: factory H8/H16 -> LH1PRO only.
   if(["H8","H16"].includes(original)){
-    const allowedIds=new Set(["lh1pro"]);
+    const allowedIds=new Set(["lh1-pro"]);
     const sources=[
       ...(db?.headlamp_family_candidates||[]),
       ...Object.entries(db?.product_socket_catalog||{}).map(([product_id,x])=>({product_id,...x}))
@@ -400,20 +400,19 @@ function requestedPositions(message){
 function isBiLedQuery(message){
   return /\bbi[\s-]?led\b/i.test(String(message||""));
 }
-function biledProducts(){
-  // Category-safe: only products whose official name/SKU explicitly says BILED.
-  const products=readJSON("produk.json",[]);
+function biledProducts(ctx){
+  // Category-safe: scan live product data passed by core, so deployment does not depend on produk.json existing locally.
+  const products=Array.isArray(ctx?.products)?ctx.products:[];
   const out=[];
-  for(const p of products||[]){
-    const name=String(p?.nama||"");
+  for(const p of products){
+    const name=String(p?.nama||p?.name||"");
     const sku=String(p?.sku||"");
     if(!/\bbi[\s-]?led\b/i.test(`${name} ${sku}`))continue;
     const pid=String(p?.product_id||p?.id||"").trim();
-    // Lifecycle only when product_id is available; unknown lifecycle remains informational, not "fitment".
-    if(pid&& !recommendationEnabled(pid))continue;
-    out.push({name,sku,variants:p?.varian||[],product_id:pid||null});
+    if(pid&&!recommendationEnabled(pid))continue;
+    out.push({name,sku,variants:p?.varian||p?.variants||[],product_id:pid||null});
   }
-  return out.slice(0,12);
+  return out.slice(0,16);
 }
 
 function deterministicPack(ctx){
@@ -454,7 +453,7 @@ function deterministicPack(ctx){
     }:null,
     positions,
     biled_query:biled,
-    biled_catalog:biled?biledProducts():[]
+    biled_catalog:biled?biledProducts(ctx):[]
   };
 }
 
@@ -568,6 +567,12 @@ function outputText(data){
   const out=[];
   for(const x of data?.output||[])for(const c of x?.content||[])if(c?.type==="output_text"&&c?.text)out.push(c.text);
   return out.join("\n").trim();
+}
+
+
+export async function getAinexAgentControl(){
+  const cfg=await getConfig();
+  return {enabled:cfg.enabled===true,mode:cfg.mode||"hybrid",monitor:cfg.monitor!==false};
 }
 
 export async function runAinexAgent(ctx={}){
