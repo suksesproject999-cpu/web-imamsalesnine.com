@@ -18,6 +18,7 @@ const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),
 const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
 const vehicleClassDB=readJSON(path.join(__dirname,"data","product_vehicle_classification_v1.json"),{groups:{}});
 const productLifecycleDB=readJSON(path.join(__dirname,"data","product_lifecycle_v1.json"),{policy:{default_status:"active",status_rules:{}},products:{}});
+const recommendationShortlistDB=readJSON(path.join(__dirname,"data","recommended_product_shortlist_v1.json"),{policy:{},curated_socket_products:{},product_socket_catalog:{}});
 
 const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
 const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
@@ -434,6 +435,103 @@ function runtimeVehicleReply(v){
   add("Plat belakang",L.license_plate_rear);
   return [`${title}${range?` (${range})`:""}`,...rows].join("\n");
 }
+
+function socketNorm(v){return String(v||"").trim().toUpperCase();}
+function productSocketEntry(productId){return recommendationShortlistDB?.product_socket_catalog?.[productId]||null;}
+function productHasExactSocket(productId,socket){
+  const e=productSocketEntry(productId),s=socketNorm(socket);
+  return !!(e&&(e.socket_variants||[]).some(v=>socketNorm(v)===s));
+}
+function activeRecommendationProduct(productId){
+  return lifecycleForProductId(productId).recommendation_enabled===true;
+}
+function curatedSocketCandidates(socket){
+  const s=socketNorm(socket);
+  return (recommendationShortlistDB?.curated_socket_products?.[s]||[])
+    .filter(x=>x?.product_id&&activeRecommendationProduct(x.product_id));
+}
+function lightingPositionRows(vehicle){
+  const l=vehicle?.lighting||{},rows=[];
+  const add=(key,label,sockets)=>{
+    const vals=[...new Set((sockets||[]).map(socketNorm).filter(Boolean))];
+    if(vals.length)rows.push({key,label,sockets:vals});
+  };
+  add("headlamp_low","Headlamp dekat",l?.headlamp?.low_beam);
+  add("headlamp_high","Headlamp jauh",l?.headlamp?.high_beam);
+  add("headlamp_combined","Headlamp utama",l?.headlamp?.combined);
+  add("foglamp","Foglamp",l?.foglamp?.options);
+  add("parking_front","Lampu senja depan",l?.parking_front?.options);
+  add("reverse","Lampu mundur",l?.reverse?.options);
+  add("turn_signal_front","Sein depan",l?.turn_signal_front?.options);
+  add("turn_signal_rear","Sein belakang",l?.turn_signal_rear?.options);
+  add("brake","Lampu rem",l?.brake?.options);
+  add("license_plate_rear","Lampu plat belakang",l?.license_plate_rear?.options);
+  add("cabin","Lampu kabin",l?.cabin?.options);
+  add("luggage","Lampu bagasi",l?.luggage?.options);
+  return rows;
+}
+function exactCandidatesForPosition(runtimeResult,position,socket){
+  const groups=runtimeResult?.facts?.fitment_vehicle_to_product||[];
+  const candidates=(groups[0]?.candidates||[]).filter(x=>x&&x.position===position);
+  const out=[],seen=new Set();
+  for(const c of candidates){
+    if(!c.product_id||seen.has(c.product_id))continue;
+    if(!activeRecommendationProduct(c.product_id))continue;
+    if(!productHasExactSocket(c.product_id,socket))continue;
+    const e=productSocketEntry(c.product_id);
+    if(!e)continue;
+    seen.add(c.product_id);
+    out.push({
+      product_id:c.product_id,
+      name:e.name||c.product_name||c.product_id,
+      sku:e.sku||c.product_sku||"",
+      socket:socketNorm(socket)
+    });
+  }
+  return out;
+}
+function detailedVehicleRecommendationReply(runtimeResult,runtime){
+  const vehicleId=runtimeResult?.entities?.vehicles?.[0];
+  const vehicle=vehicleId?runtime?.vById?.[vehicleId]:null;
+  if(!vehicle)return null;
+
+  const i=vehicle.identity||{},y=i.year||{};
+  const years=y.start&&y.end?(y.start===y.end?String(y.start):`${y.start}-${y.end}`):(y.raw||"");
+  const title=[i.brand,i.model_source,years].filter(Boolean).join(" ");
+  const rows=lightingPositionRows(vehicle);
+  if(!rows.length)return null;
+
+  const lines=[title,""];
+  for(const row of rows){
+    lines.push(`${row.label}`);
+    lines.push(`• Socket kendaraan: ${row.sockets.join(" / ")}`);
+    lines.push("• Rekomendasi Nine:");
+
+    for(const socket of row.sockets){
+      const s=socketNorm(socket);
+      const curated=["S25","T20","T10"].includes(s)?curatedSocketCandidates(s):null;
+      const candidates=curated!==null
+        ?curated.map(x=>({product_id:x.product_id,name:x.name,sku:x.sku,socket:s}))
+        :exactCandidatesForPosition(runtimeResult,row.key,s);
+
+      if(!candidates.length){
+        lines.push(`  - ${s}: [Saat ini produk Nine tidak tersedia untuk socket ${s}]`);
+        continue;
+      }
+
+      if(row.sockets.length>1)lines.push(`  - Socket ${s}:`);
+      for(const c of candidates.slice(0,8)){
+        const prefix=row.sockets.length>1?"    ":"  - ";
+        lines.push(`${prefix}${c.name} — Socket ${c.socket}`);
+      }
+    }
+    lines.push("");
+  }
+
+  lines.push("Catatan: rekomendasi hanya memakai kandidat dengan socket yang tersedia secara faktual pada data produk. Socket yang tidak memiliki kandidat exact tidak diganti dengan socket lain.");
+  return lines.join("\n");
+}
+
 function runtimeFitmentReply(runtimeResult,direction,runtime){
   const key=direction==="vehicle"?"fitment_vehicle_to_product":"fitment_product_to_vehicle";
   const gs=runtimeResult?.facts?.[key]||[]; if(!gs.length)return null;
@@ -795,6 +893,8 @@ exports.handler=async event=>{
 
   // Fresh vehicle query must outrank prior active-product context.
   if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")){
+    const detailed=detailedVehicleRecommendationReply(runtimeResult,runtime);
+    if(detailed)return response(200,{reply:detailed,image:null,route:"fitment_vehicle_to_product_detailed",usedAI:false,usedWeb:false,runtime:true});
     const fr=runtimeFitmentReply(runtimeResult,"vehicle",runtime);
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_vehicle_to_product",usedAI:false,usedWeb:false,runtime:true});
   }
