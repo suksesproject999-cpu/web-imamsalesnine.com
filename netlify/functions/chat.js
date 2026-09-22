@@ -17,6 +17,7 @@ const knowledgeDB=readJSON(path.join(__dirname,"data","product_knowledge_center.
 const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),{});
 const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
 const vehicleClassDB=readJSON(path.join(__dirname,"data","product_vehicle_classification_v1.json"),{groups:{}});
+const productLifecycleDB=readJSON(path.join(__dirname,"data","product_lifecycle_v1.json"),{policy:{default_status:"active",status_rules:{}},products:{}});
 
 const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
 const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
@@ -450,6 +451,43 @@ function runtimeFitmentReply(runtimeResult,direction,runtime){
 
 
 
+function lifecycleForProductId(productId){
+  const policy=productLifecycleDB?.policy||{};
+  const rules=policy.status_rules||{};
+  const entry=productLifecycleDB?.products?.[productId]||{};
+  const status=entry.status||policy.default_status||"active";
+  const rule=rules[status]||rules.active||{
+    search_enabled:true,
+    direct_answer_enabled:true,
+    recommendation_enabled:true
+  };
+  return{
+    product_id:productId,
+    status,
+    search_enabled:entry.search_enabled ?? rule.search_enabled ?? true,
+    direct_answer_enabled:entry.direct_answer_enabled ?? rule.direct_answer_enabled ?? true,
+    recommendation_enabled:entry.recommendation_enabled ?? rule.recommendation_enabled ?? true,
+    note:entry.note||""
+  };
+}
+function lifecycleForProduct(product){
+  if(!product)return lifecycleForProductId("");
+  const payload=productPayload(product);
+  return lifecycleForProductId(payload.product_id||"");
+}
+function lifecycleLabel(lf){
+  if(!lf)return "";
+  if(lf.status==="discontinued")return "Produk ini sudah discontinue dan tidak lagi masuk rekomendasi produk aktif.";
+  if(lf.status==="upcoming")return "Produk ini berstatus upcoming / segera hadir dan belum masuk rekomendasi aktif.";
+  if(lf.status==="hidden")return "Produk ini tidak tersedia untuk ditampilkan.";
+  return "";
+}
+function withLifecycleNotice(text,product){
+  const lf=lifecycleForProduct(product);
+  const label=lifecycleLabel(lf);
+  return label?`${label}\n\n${text}`:text;
+}
+
 function classificationRecords(){
   const out=[];
   for(const [groupName,group] of Object.entries(vehicleClassDB?.groups||{})){
@@ -630,7 +668,8 @@ function motorcycleRecommendationReply(message,products){
   const allowedGroups=new Set(detected.groups.map(x=>x.groupName));
   const rules=classificationRecords().filter(r=>
     r.allow_motorcycle_recommendation===true &&
-    allowedGroups.has(r.__group)
+    allowedGroups.has(r.__group) &&
+    lifecycleForProductId(r.product_id).recommendation_enabled===true
   );
 
   const out=[],seen=new Set();
@@ -718,6 +757,16 @@ exports.handler=async event=>{
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
+  const productLifecycle=product?lifecycleForProduct(product):lifecycleForProductId(runtimeProductId||"");
+  if(productLifecycle.status==="hidden"){
+    return response(200,{reply:"Produk yang dimaksud tidak tersedia untuk ditampilkan.",image:null,route:"product_hidden",usedAI:false,usedWeb:false,runtime:true});
+  }
+
+  if(product&&productLifecycle.recommendation_enabled===false&&asksVehicleCompatibility(message)){
+    const statusText=lifecycleLabel(productLifecycle)||"Produk ini tidak aktif untuk rekomendasi.";
+    return response(200,{reply:statusText,image:null,route:"product_lifecycle_recommendation_block",usedAI:false,usedWeb:false,runtime:true});
+  }
+
   const explicitClassRule=classRuleFor({productId:runtimeProductId,product,message});
   const hasCurrentVehicle=Array.isArray(runtimeResult?.entities?.vehicles)&&runtimeResult.entities.vehicles.length>0;
   const hasCurrentProduct=!!runtimeProductId||explicit.length>0;
@@ -759,7 +808,7 @@ exports.handler=async event=>{
   if(route.type==="compare"&&explicit.length>=2)return response(200,{reply:compare(explicit),image:null,route:"compare",usedAI:false,usedWeb:false,products:explicit.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
 
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
-  if(directRoutes.has(route.type)&&product)return response(200,{reply:direct(route.type,product),image:null,route:route.type,usedAI:false,usedWeb:false,product:productPayload(product),state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
+  if(directRoutes.has(route.type)&&product)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
   if(directRoutes.has(route.type)&&!product)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
   if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)){

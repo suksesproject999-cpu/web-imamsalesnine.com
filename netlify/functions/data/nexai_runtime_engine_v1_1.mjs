@@ -31,6 +31,7 @@ export class NexaiRuntimeEngine {
     this.imam=j("imam_intelligence_runtime_v1.json");
     this.brand=j("brand_intelligence_runtime_v1.json");
     this.vehicleClass=j("product_vehicle_classification_v1.json");
+    this.productLifecycle=j("product_lifecycle_v1.json");
 
     this.pById=Object.fromEntries(this.products.products.map(x=>[x.product_id,x]));
     this.vById=Object.fromEntries(this.vehicles.vehicles.map(x=>[x.vehicle_id,x]));
@@ -112,7 +113,8 @@ export class NexaiRuntimeEngine {
       });
       vehicles=vehicles.slice(0,1);
     }
-    return {products:[...new Set(products)],vehicles,year};
+    const visibleProducts=[...new Set(products)].filter(pid=>this.lifecycleFor(pid).search_enabled===true);
+    return {products:visibleProducts,vehicles,year};
   }
 
   intents(query,entities){
@@ -136,6 +138,30 @@ export class NexaiRuntimeEngine {
     return [...new Set(out)];
   }
 
+
+  lifecycleFor(productId){
+    const policy=this.productLifecycle?.policy||{};
+    const rules=policy.status_rules||{};
+    const entry=this.productLifecycle?.products?.[productId]||{};
+    const status=entry.status||policy.default_status||"active";
+    const rule=rules[status]||rules.active||{
+      search_enabled:true,
+      direct_answer_enabled:true,
+      recommendation_enabled:true
+    };
+    return {
+      product_id:productId,
+      status,
+      search_enabled:entry.search_enabled ?? rule.search_enabled ?? true,
+      direct_answer_enabled:entry.direct_answer_enabled ?? rule.direct_answer_enabled ?? true,
+      recommendation_enabled:entry.recommendation_enabled ?? rule.recommendation_enabled ?? true,
+      note:entry.note||""
+    };
+  }
+
+  recommendationEnabled(productId){
+    return this.lifecycleFor(productId).recommendation_enabled===true;
+  }
 
   productVehicleClass(productId){
     const groups=this.vehicleClass?.groups||{};
@@ -188,6 +214,7 @@ export class NexaiRuntimeEngine {
   filterFitmentForVehicle(vehicleId,recs){
     const isCar=this.isCarVehicle(vehicleId);
     return recs.filter(r=>{
+      if(!this.recommendationEnabled(r.product_id))return false;
       const cls=this.productVehicleClass(r.product_id);
 
       // HEADLAMP = STRICT ALLOWLIST.
@@ -209,6 +236,7 @@ export class NexaiRuntimeEngine {
   }
 
   filterFitmentForProduct(productId,recs){
+    if(!this.recommendationEnabled(productId))return [];
     const cls=this.productVehicleClass(productId);
 
     // For headlamp compatibility, unclassified products are not allowed to infer
@@ -235,6 +263,7 @@ export class NexaiRuntimeEngine {
       if(intents.includes("product_info")||intents.includes("product_compare")){
         (facts.products??=[]).push({
           product_id:pid,name:p.identity?.name,sku:p.identity?.sku,
+          lifecycle:this.lifecycleFor(pid),
           subbrand:p.brand?.subbrand,description:p.catalog?.description,
           technical:p.technical?.best_available,
           features:p.features?.combined_search_features,

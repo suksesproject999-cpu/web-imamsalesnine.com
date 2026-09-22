@@ -1,0 +1,36 @@
+{
+  "schema": "nexai_product_lifecycle_v1",
+  "version": "1.0",
+  "policy": {
+    "default_status": "active",
+    "valid_statuses": [
+      "active",
+      "discontinued",
+      "upcoming",
+      "hidden"
+    ],
+    "status_rules": {
+      "active": {
+        "search_enabled": true,
+        "direct_answer_enabled": true,
+        "recommendation_enabled": true
+      },
+      "discontinued": {
+        "search_enabled": true,
+        "direct_answer_enabled": true,
+        "recommendation_enabled": false
+      },
+      "upcoming": {
+        "search_enabled": true,
+        "direct_answer_enabled": true,
+        "recommendation_enabled": false
+      },
+      "hidden": {
+        "search_enabled": false,
+        "direct_answer_enabled": false,
+        "recommendation_enabled": false
+      }
+    }
+  },
+  "products": {}
+}
