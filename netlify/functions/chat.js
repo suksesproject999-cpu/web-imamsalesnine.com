@@ -392,6 +392,24 @@ function buildState(memory,productMemory){
     }
   }return s;
 }
+function currentTurnVehicleHint(text){
+  const q=normalize(text||"");
+  const aliases={
+    "avansa":"avanza","avanza":"avanza","veloz":"veloz","xenia":"xenia","brio":"brio",
+    "fortuner":"fortuner","xpander":"xpander","expander":"xpander","pajero":"pajero",
+    "stargazer":"stargazer","vixion":"vixion","verza":"verza","r15":"r15","cb150r":"cb150r",
+    "cbr150":"cbr150","byson":"byson","beat":"beat","vario":"vario","scoopy":"scoopy",
+    "jupiter":"jupiter","mio":"mio","fino":"fino","klx":"klx"
+  };
+  for(const [a,m] of Object.entries(aliases)){
+    if(new RegExp(`\\b${a}\\b`,"i").test(q)){
+      const y=String(text||"").match(/\b(19|20)\d{2}\b/)?.[0]||null;
+      return{model:m,year:y};
+    }
+  }
+  return null;
+}
+
 function activeProduct(products,state){if(!state?.activeProduct)return null;const key=state.activeProduct.sku||state.activeProduct.name;return key?resolveProducts(products,key,1)[0]||null:null;}
 
 function smalltalk(message){const m=normalize(message);if(/^broo*$/.test(m))return"Siap bro 👋 Mau tanya apa?";if(/^(halo|hai|hi|hello)$/.test(m))return"Halo bro 👋 Mau tanya produk Nine, otomotif, fitment, atau hal lain?";if(/^(gas|gaskeun)$/.test(m))return"Gas bro. Mau lanjut bahas apa?";if(/^(makasih|terima kasih|thanks)$/.test(m))return"Sama-sama bro 👌";return"Siap bro.";}
@@ -928,6 +946,11 @@ exports.handler=async event=>{
   if(route.type==="local_time"){const r=localTime(fieldValue(fields,"clientTime",""),fieldValue(fields,"clientTimezone",""));if(r)return response(200,{reply:r,image:null,route:"local_time",usedAI:false,usedWeb:false});}
 
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
+  const currentVehicleHint=currentTurnVehicleHint(message);
+  if(currentVehicleHint){
+    state.vehicle={model:currentVehicleHint.model};
+    if(currentVehicleHint.year)state.vehicle.year=currentVehicleHint.year;
+  }
 
   // Agent is a true sidecar: when OFF/missing/error, every legacy/core route behaves exactly as before.
   const agentModule=await getAinexAgentModule();
@@ -943,6 +966,7 @@ exports.handler=async event=>{
       /\bbi[\s-]?led\b/i.test(message) ||
       /\bsekalian\b|\bsekaligus\b/i.test(message)
     )&&(
+      !!currentVehicleHint?.model ||
       !!state.vehicle?.model ||
       /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket)\b/i.test(message)
     )
@@ -1033,7 +1057,7 @@ exports.handler=async event=>{
     return response(200,{reply:"Klasifikasi produk sudah dikenali, tetapi data kendaraan terverifikasi belum cukup untuk jawaban tambahan. Saya tidak akan menebak kecocokan dari socket saja.",image:null,route:"classified_fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(!currentVehicleIsCar&&/\b(beat|vario|scoopy|mio|jupiter|supra|revo|verza|vixion|r15|cb150r|cbr150|byson|klx|vespa|inazuma|zafferano|zaferrano|fino|xeon|nex|smash|satria|spacy|x-ride|xride)\b/.test(normalize(message))){
+  if(!agentVehicleRecommendationRequest&&!currentVehicleIsCar&&/\b(beat|vario|scoopy|mio|jupiter|supra|revo|verza|vixion|r15|cb150r|cbr150|byson|klx|vespa|inazuma|zafferano|zaferrano|fino|xeon|nex|smash|satria|spacy|x-ride|xride)\b/.test(normalize(message))){
     return response(200,{reply:"Model motor dikenali, tetapi kelompok aplikasi belum dapat dipastikan dengan aman. Sebutkan model lengkap dan tahun/generasinya.",image:null,route:"motorcycle_group_clarification",usedAI:false,usedWeb:false,runtime:true});
   }
 

@@ -117,21 +117,66 @@ function complex(q){
 }
 
 function explicitVehicleFromText(text){
-  const q=String(text||"");
-  const brandRe="(Honda|Toyota|Daihatsu|Suzuki|Mitsubishi|Yamaha|Kawasaki|Nissan|Wuling|Hyundai|Kia|Mazda|Isuzu|Chevrolet|Ford|Vespa|Benelli)";
-  const re=new RegExp(`\\b${brandRe}\\s+([A-Za-z0-9][A-Za-z0-9\\- ]{1,35}?)(?:\\s+((?:19|20)\\d{2}))?(?=\\s*(?:,|\\.|\\?|$|lampu|foglamp|headlamp|mau|yang|pakai|pake|cocok))`,"i");
-  const m=q.match(re);
-  if(m)return{brand:m[1],model:m[2].trim(),year:m[3]?Number(m[3]):null,source:"current_message"};
+  const raw=String(text||"");
+  const q=norm(raw);
+  const yearRaw=raw.match(/\b(19|20)\d{2}\b/)?.[0]||null;
+  const year=yearRaw?Number(yearRaw):null;
 
-  // Common model-only mentions for follow-up/new question.
-  const known=["xpander","expander","pajero dakar","pajero","fortuner","xenia","avanza","veloz","stargazer","vixion","beat","vario"];
-  const lower=q.toLowerCase();
-  for(const model of known){
-    if(lower.includes(model)){
-      const y=q.match(/\b(19|20)\d{2}\b/)?.[0];
-      return{brand:"",model:model==="expander"?"xpander":model,year:y?Number(y):null,source:"current_message_model"};
+  const manualAliases={
+    "avansa":"avanza",
+    "avanza":"avanza",
+    "veloz":"veloz",
+    "expander":"xpander",
+    "xpander":"xpander",
+    "pajero":"pajero",
+    "pajero dakar":"pajero dakar",
+    "brio":"brio",
+    "xenia":"xenia",
+    "fortuner":"fortuner",
+    "stargazer":"stargazer",
+    "vixion":"vixion",
+    "beat":"beat",
+    "vario":"vario"
+  };
+
+  const aliases=[];
+  const vdb=vehicleDB();
+  for(const v of vdb?.vehicles||[]){
+    const i=v?.identity||{};
+    const brand=norm(i.brand);
+    const model=norm(i.model_source);
+    const all=[model,...(i.aliases||[]).map(norm)].filter(Boolean);
+    for(const a of all)aliases.push({alias:a,brand,model,record:v});
+  }
+  for(const [a,canonical] of Object.entries(manualAliases)){
+    const hit=aliases.find(x=>x.model===canonical||x.alias===canonical);
+    aliases.push({alias:a,brand:hit?.brand||"",model:hit?.model||canonical,record:hit?.record||null});
+  }
+
+  aliases.sort((a,b)=>b.alias.length-a.alias.length);
+  for(const x of aliases){
+    const rx=new RegExp(`(^|\\b)${x.alias.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}($|\\b)`,"i");
+    if(rx.test(q))return{brand:x.brand,model:x.model,year,source:"current_message",record:x.record||null};
+  }
+
+  const tokens=q.split(/[^a-z0-9-]+/).filter(x=>x.length>=4);
+  let best=null;
+  for(const token of tokens){
+    for(const x of aliases){
+      if(x.alias.includes(" "))continue;
+      const a=token,b=x.alias;
+      const max=Math.max(a.length,b.length);
+      if(max<4||Math.abs(a.length-b.length)>2)continue;
+      let same=0;
+      for(let i=0;i<Math.min(a.length,b.length);i++)if(a[i]===b[i])same++;
+      const score=same/max;
+      if(score>=0.72&&(!best||score>best.score))best={...x,score};
     }
   }
+  if(best)return{brand:best.brand,model:best.model,year,source:"current_message_fuzzy",record:best.record||null};
+
+  const brandMatch=raw.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu|chevrolet|ford|vespa|benelli)\b\s+([a-z0-9-]+)/i);
+  if(brandMatch)return{brand:brandMatch[1],model:brandMatch[2],year,source:"current_message_brand_model"};
   return null;
 }
 
@@ -160,9 +205,16 @@ function vehicleFromHistory(ctx){
 }
 
 function lockedVehicle(ctx){
-  // CURRENT MESSAGE wins only when user explicitly mentions a vehicle.
-  // Otherwise NEVER let runtime invent/change vehicle; keep conversation state/history.
-  return explicitVehicleFromText(ctx.message)||vehicleFromHistory(ctx)||stateVehicle(ctx)||null;
+  const current=explicitVehicleFromText(ctx.message);
+  if(current)return current;
+
+  const q=norm(ctx.message||"");
+  const looksLikeVehicleSwitch=/\b(mobil|motor|kendaraan|avansa|avanza|veloz|xenia|brio|fortuner|xpander|expander|pajero|stargazer)\b/i.test(q);
+  if(looksLikeVehicleSwitch&&/\b(lampu|foglamp|headlamp|mundur|senja|sein|rem|rekomendasi|cocok)\b/i.test(q)){
+    return null;
+  }
+
+  return vehicleFromHistory(ctx)||stateVehicle(ctx)||null;
 }
 
 function vehicleLabel(v){
@@ -222,11 +274,140 @@ function resolveVehicleRecord(lock){
   };
 }
 
+
+function flattenKnownMotorcycles(record){
+  const kv=record?.known_vehicle_examples;
+  const out=[];
+  if(Array.isArray(kv)){
+    for(const x of kv)if(x)out.push(String(x));
+  }else if(kv&&typeof kv==="object"){
+    for(const [brand,list] of Object.entries(kv)){
+      for(const x of Array.isArray(list)?list:[])if(x)out.push(`${brand} ${x}`);
+    }
+  }
+  return out;
+}
+
+function motorcycleApplications(){
+  const db=classificationDB();
+  const apps=[];
+  for(const [groupName,group] of Object.entries(db?.groups||{})){
+    if(group?.vehicle_class!=="motorcycle")continue;
+    for(const r of group?.records||[]){
+      if(r?.allow_motorcycle_recommendation!==true)continue;
+      for(const full of flattenKnownMotorcycles(r)){
+        const text=norm(full);
+        if(!text)continue;
+        const parts=text.split(" ");
+        const brand=parts[0]||"";
+        const model=parts.slice(1).join(" ")||text;
+        apps.push({groupName,brand,model,full:text,record:r});
+      }
+    }
+  }
+  return apps;
+}
+
+function resolveMotorcycleContext(text){
+  const q=norm(text||"");
+  if(!q)return null;
+
+  const manual={
+    "verza":"honda verza",
+    "vixion":"yamaha vixion",
+    "new v-ixion lightning":"yamaha new v-ixion lightning",
+    "nvl":"yamaha new v-ixion lightning",
+    "r15":"yamaha r15",
+    "cb150r":"honda cb150r",
+    "cbr150":"honda cbr150",
+    "byson":"yamaha byson",
+    "scoopy fi esp":"honda scoopy fi esp 2013-2017",
+    "klx 150":"kawasaki klx 150",
+    "klx 250":"kawasaki klx 250",
+    "inazuma":"suzuki inazuma",
+    "zafferano":"benelli zafferano",
+    "beat":"honda beat",
+    "beat fi":"honda beat fi",
+    "vario 125 techno fi":"honda vario 125 techno fi",
+    "jupiter mx 135":"yamaha jupiter mx 135",
+    "jupiter z":"yamaha jupiter z"
+  };
+
+  const apps=motorcycleApplications();
+  const candidates=[];
+
+  for(const a of apps){
+    const names=[a.full,a.model];
+    for(const n of names){
+      if(!n)continue;
+      const rx=new RegExp(`(^|\\b)${n.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}($|\\b)`,"i");
+      if(rx.test(q))candidates.push({...a,matched:n,score:n.length});
+    }
+  }
+
+  for(const [alias,canonical] of Object.entries(manual)){
+    const rx=new RegExp(`(^|\\b)${alias.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}($|\\b)`,"i");
+    if(!rx.test(q))continue;
+    const hit=apps.find(a=>a.full===canonical||a.model===canonical.replace(/^[^ ]+ /,""));
+    if(hit)candidates.push({...hit,matched:alias,score:alias.length+100});
+  }
+
+  if(!candidates.length)return null;
+  candidates.sort((a,b)=>b.score-a.score);
+  const best=candidates[0];
+  const groups=[...new Set(candidates.filter(x=>x.matched===best.matched||x.full===best.full).map(x=>x.groupName))];
+
+  return{
+    brand:best.brand,
+    model:best.model,
+    full:best.full,
+    groups:groups.length?groups:[best.groupName],
+    source:"motorcycle_classification"
+  };
+}
+
+function motorcycleCandidatesForContext(mctx){
+  if(!mctx?.groups?.length)return[];
+  const db=classificationDB();
+  const lifecycle=lifecycleDB();
+  const out=[],seen=new Set();
+
+  for(const groupName of mctx.groups){
+    const group=db?.groups?.[groupName];
+    if(!group||group.vehicle_class!=="motorcycle")continue;
+
+    for(const r of group.records||[]){
+      if(r?.allow_motorcycle_recommendation!==true||!r?.product_id)continue;
+
+      const lc=lifecycle?.products?.[r.product_id]||{};
+      const status=lc.status||lifecycle?.policy?.default_status||"active";
+      if(["hidden","discontinued","upcoming"].includes(status))continue;
+      if(lc.recommendation_enabled===false)continue;
+
+      if(seen.has(r.product_id))continue;
+      seen.add(r.product_id);
+      out.push({
+        product_id:r.product_id,
+        name:r.canonical_name||r.clue_name||r.product_id,
+        sku:r.sku||"",
+        group:groupName,
+        application_note:r.application_note||"",
+        lifecycle:{status}
+      });
+    }
+  }
+
+  out.sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+  return out;
+}
+
 function vehicleClass(lock,vehicleMatch){
-  if(vehicleMatch?.record)return"car"; // this intelligence DB is the car lighting source.
+  const mctx=resolveMotorcycleContext([lock?.brand,lock?.model].filter(Boolean).join(" "));
+  if(mctx)return"motorcycle";
+  if(vehicleMatch?.record)return"car";
   const b=norm(lock?.brand);
   if(MOTOR_BRANDS.has(b))return"motorcycle";
-  if(CAR_BRANDS.has(b))return"car";
+  if(CAR_BRANDS.has(b)&&!["honda","suzuki"].includes(b))return"car";
   return"unknown";
 }
 
@@ -417,8 +598,28 @@ function biledProducts(ctx){
 
 function deterministicPack(ctx){
   const lock=lockedVehicle(ctx);
-  const match=resolveVehicleRecord(lock);
-  const klass=vehicleClass(lock,match);
+  const mctx=resolveMotorcycleContext(ctx.message)||resolveMotorcycleContext([lock?.brand,lock?.model].filter(Boolean).join(" "));
+  const match=mctx?null:resolveVehicleRecord(lock);
+  const klass=mctx?"motorcycle":vehicleClass(lock,match);
+
+  if(mctx){
+    return{
+      locked_vehicle:{
+        brand:mctx.brand,
+        model:mctx.model,
+        year:lock?.year||null,
+        source:mctx.source
+      },
+      vehicle_label:[mctx.brand,mctx.model,lock?.year].filter(Boolean).join(" "),
+      vehicle_class:"motorcycle",
+      motorcycle_groups:mctx.groups,
+      motorcycle_candidates:motorcycleCandidatesForContext(mctx),
+      vehicle_record:null,
+      positions:[],
+      biled_query:isBiLedQuery(ctx.message),
+      biled_catalog:isBiLedQuery(ctx.message)?biledProducts(ctx):[]
+    };
+  }
   const allPositions=vehiclePositions(match);
   const wanted=requestedPositions(ctx.message);
   const filtered=wanted.length
@@ -478,6 +679,25 @@ function renderDeterministicRecommendation(pack,message){
   const out=[title];
   if(pack?.vehicle_record?.year_exact===false&&pack?.vehicle_record?.requested_year){
     out.push(`Catatan: tahun ${pack.vehicle_record.requested_year} tidak tercakup persis pada rentang record sumber yang tersedia; data socket di bawah mengikuti record model yang tersedia.`);
+  }
+
+  if(pack?.vehicle_class==="motorcycle"){
+    out.push("");
+    const groups=(pack.motorcycle_groups||[]).join(", ");
+    out.push(`Kelompok aplikasi: ${groups||"motorcycle"}`);
+    out.push("");
+    out.push("Rekomendasi Nine:");
+    const candidates=pack.motorcycle_candidates||[];
+    if(!candidates.length){
+      out.push("- [Saat ini produk Nine belum tersedia untuk kelompok aplikasi motor tersebut]");
+    }else{
+      for(const c of candidates){
+        out.push(`- ${c.name}${c.application_note?` (${c.application_note})`:""}`);
+      }
+    }
+    out.push("");
+    out.push("Catatan: rekomendasi mengikuti klasifikasi aplikasi motor yang sudah ditetapkan. Tahun/generasi dan kondisi socket tetap perlu diverifikasi sebelum pemasangan.");
+    return out.join("\\n");
   }
 
   if(pack?.biled_query){
@@ -579,6 +799,7 @@ function mandatoryAutomotiveRecommendation(ctx){
   if(!hasRecommendationIntent)return false;
 
   const hasVehicleContext=
+    !!resolveMotorcycleContext(q) ||
     !!lockedVehicle(ctx)?.model ||
     !!ctx?.conversationContext?.vehicle?.model ||
     !!ctx?.state?.vehicle?.model ||
@@ -609,6 +830,22 @@ export async function runAinexAgent(ctx={}){
 
   const pack=deterministicPack(ctx);
   const usedTools=["inspect_locked_vehicle","inspect_recommendation_pack"];
+
+  const currentLooksVehicleSpecific=/\b(mobil|motor|kendaraan|avansa|avanza|veloz|xenia|brio|fortuner|xpander|expander|pajero|stargazer)\b/i.test(ctx.message||"");
+  if(currentLooksVehicleSpecific&&!pack?.locked_vehicle?.model){
+    const ms=Date.now()-start;
+    const reply="Kendaraan pada pertanyaan terbaru belum berhasil saya identifikasi dengan aman. Sebutkan model kendaraan dengan jelas agar saya tidak membawa konteks kendaraan sebelumnya.";
+    await updateMetrics({
+      agent_used:1,agent_ms:ms,last_total_ms:ms,last_status:"COMPLETED",
+      last_request_id:requestId,last_route:ctx.route?.type||"",
+      last_tools:[...new Set(usedTools)]
+    });
+    return{
+      used:true,reply,mode:cfg.mode,shadow:false,safe_shadow_override:cfg.mode==="shadow",
+      request_id:requestId,tools:[...new Set(usedTools)],duration_ms:ms,
+      locked_vehicle:null,vehicle_class:"unknown",deterministic:true
+    };
+  }
 
   // High-risk fitment/recommendation lane: NO model discretion.
   // Agent orchestrates deterministic data and renders the answer directly.
