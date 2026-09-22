@@ -382,15 +382,53 @@ function referential(message){
 }
 
 function safeParse(v,f){try{return v?JSON.parse(v):f;}catch{return f;}}
+function vehicleMentionFromText(text){
+  const raw=String(text||""),q=normalize(raw);
+  const year=raw.match(/\b(19|20)\d{2}\b/)?.[0]||null;
+
+  const known=[
+    ["mitsubishi","xpander",["xpander","expander"]],
+    ["mitsubishi","pajero dakar",["pajero dakar"]],
+    ["mitsubishi","pajero",["pajero"]],
+    ["toyota","fortuner",["fortuner"]],
+    ["toyota","avanza",["avanza"]],
+    ["toyota","veloz",["veloz"]],
+    ["daihatsu","xenia",["xenia"]],
+    ["hyundai","stargazer",["stargazer"]],
+    ["yamaha","vixion",["vixion"]],
+    ["honda","beat",["beat"]],
+    ["honda","vario",["vario"]]
+  ];
+
+  for(const [brand,model,aliases] of known){
+    if(aliases.some(a=>new RegExp(`\\b${a.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\b`,"i").test(q))){
+      return{brand,model,year};
+    }
+  }
+
+  const m=raw.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu|chevrolet|ford|vespa|benelli)\b\s+([a-z0-9][a-z0-9-]*)/i);
+  if(m)return{brand:m[1].toLowerCase(),model:m[2].toLowerCase(),year};
+  return null;
+}
+
 function buildState(memory,productMemory){
   const s={activeProduct:null,vehicle:{},recentUserText:[]},pm=Array.isArray(productMemory)?productMemory:[];
   if(pm.length){const p=pm[pm.length-1];s.activeProduct={name:p?.nama||p?.name||"",sku:p?.sku||""};}
-  for(const x of(Array.isArray(memory)?memory:[]).slice(-8)){
-    if(x?.role==="user"&&typeof x.content==="string"){
-      s.recentUserText.push(x.content);const y=x.content.match(/\b(19|20)\d{2}\b/)?.[0];if(y)s.vehicle.year=y;
-      const v=x.content.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu)\b\s+([a-z0-9-]+)/i);if(v){s.vehicle.brand=v[1];s.vehicle.model=v[2];}
+
+  const users=(Array.isArray(memory)?memory:[]).filter(x=>x?.role==="user"&&typeof x.content==="string").slice(-12);
+  for(const x of users)s.recentUserText.push(x.content);
+
+  // Single authoritative source: newest explicit user vehicle mention wins.
+  // Year is taken from the SAME message, never mixed with another vehicle.
+  for(let i=users.length-1;i>=0;i--){
+    const v=vehicleMentionFromText(users[i].content);
+    if(v){
+      s.vehicle={brand:v.brand,model:v.model};
+      if(v.year)s.vehicle.year=v.year;
+      break;
     }
-  }return s;
+  }
+  return s;
 }
 function activeProduct(products,state){if(!state?.activeProduct)return null;const key=state.activeProduct.sku||state.activeProduct.name;return key?resolveProducts(products,key,1)[0]||null:null;}
 
@@ -928,6 +966,21 @@ exports.handler=async event=>{
   if(route.type==="local_time"){const r=localTime(fieldValue(fields,"clientTime",""),fieldValue(fields,"clientTimezone",""));if(r)return response(200,{reply:r,image:null,route:"local_time",usedAI:false,usedWeb:false});}
 
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
+  const currentVehicleMention=vehicleMentionFromText(message);
+  if(currentVehicleMention){
+    state.vehicle={brand:currentVehicleMention.brand,model:currentVehicleMention.model};
+    if(currentVehicleMention.year)state.vehicle.year=currentVehicleMention.year;
+  }
+
+  const agentVehicleRecommendationRequest=(
+    /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(message) ||
+    /\bbi[\s-]?led\b/i.test(message) ||
+    /\bsekalian\b|\bsekaligus\b/i.test(message)
+  )&&(
+    !!currentVehicleMention ||
+    !!state.vehicle?.model ||
+    /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket)\b/i.test(message)
+  );
   const runtime=await getNexaiRuntime();
   let runtimeResult=null;
   if(runtime){
@@ -969,7 +1022,7 @@ exports.handler=async event=>{
     return response(200,{reply:motorcycleRecommendation,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  const agentComplexRecommendation=/\b(rekomendasi|cocok|pilih|carikan)\b/i.test(message)&&(
+  const agentComplexRecommendation=agentVehicleRecommendationRequest||(/\b(rekomendasi|cocok|pilih|carikan)\b/i.test(message)&&(
     /\bsekalian\b|\bsekaligus\b/i.test(message) ||
     [
       /\bheadlamp\b|\blampu depan\b/i,
@@ -977,7 +1030,7 @@ exports.handler=async event=>{
       /\blampu mundur\b|\breverse\b/i,
       /\bsenja\b/i
     ].filter(rx=>rx.test(message)).length>=2
-  );
+  ));
 
   if(runtimeResult?.intents?.includes("vehicle_info")&&!agentComplexRecommendation){
     const vf=runtimeResult?.facts?.vehicles?.[0];
@@ -1003,7 +1056,7 @@ exports.handler=async event=>{
 
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
   if(directRoutes.has(route.type)&&product)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
-  if(directRoutes.has(route.type)&&!product)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
+  if(directRoutes.has(route.type)&&!product&&!agentVehicleRecommendationRequest)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
   if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)&&!agentComplexRecommendation){
     return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
@@ -1026,6 +1079,8 @@ exports.handler=async event=>{
         lastProductId:state.activeProduct?.id||null,
         lastProductName:state.activeProduct?.nama||null,
         vehicle:state.vehicle||null,
+        authoritativeVehicle:state.vehicle||null,
+        recentUserText:state.recentUserText||[],
         memory
       },
       explicitProducts:explicit.map(productPayload)

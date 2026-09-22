@@ -136,7 +136,7 @@ function explicitVehicleFromText(text){
 }
 
 function stateVehicle(ctx){
-  const v=ctx?.conversationContext?.vehicle||ctx?.state?.vehicle||null;
+  const v=ctx?.conversationContext?.authoritativeVehicle||ctx?.conversationContext?.vehicle||ctx?.state?.vehicle||null;
   if(v&&typeof v==="object"&&(v.brand||v.model)){
     return{
       brand:String(v.brand||"").trim(),
@@ -458,6 +458,78 @@ function deterministicPack(ctx){
   };
 }
 
+
+function requestedWhite(message){
+  return /\bputih|white\b/i.test(String(message||""));
+}
+function requestedLowWatt(message){
+  return /\b(watt jangan terlalu tinggi|watt rendah|low watt|hemat daya)\b/i.test(String(message||""));
+}
+function formatVehicleTitle(pack){
+  const v=pack?.locked_vehicle||{};
+  const brand=v.brand?String(v.brand).replace(/\b\w/g,c=>c.toUpperCase()):"";
+  const model=v.model?String(v.model).replace(/\b\w/g,c=>c.toUpperCase()):"";
+  return [brand,model,v.year].filter(Boolean).join(" ").trim()||pack?.vehicle_label||"Kendaraan";
+}
+function candidateLine(c){
+  return `- ${c.name||c.product_id} — Socket ${c.socket}`;
+}
+function renderDeterministicRecommendation(pack,message){
+  const title=formatVehicleTitle(pack);
+  const out=[title];
+  if(pack?.vehicle_record?.year_exact===false&&pack?.vehicle_record?.requested_year){
+    out.push(`Catatan: tahun ${pack.vehicle_record.requested_year} tidak tercakup persis pada rentang record sumber yang tersedia; data socket di bawah mengikuti record model yang tersedia.`);
+  }
+
+  if(pack?.biled_query){
+    out.push("");
+    out.push("BiLED:");
+    out.push("- Fitment BiLED kendaraan ini belum terverifikasi secara spesifik.");
+    if(Array.isArray(pack.biled_catalog)&&pack.biled_catalog.length){
+      out.push("- Opsi katalog BiLED Nine untuk kebutuhan custom:");
+      for(const p of pack.biled_catalog){
+        out.push(`  - ${p.name}${p.sku?` (${p.sku})`:""}`);
+      }
+      out.push("- Opsi di atas bukan klaim plug-and-play; pemasangan tetap perlu verifikasi dimensi, dudukan, projector, wiring, dan ruang headlamp.");
+    }else{
+      out.push("- [Saat ini produk Nine belum tersedia/terverifikasi sebagai BiLED spesifik untuk kendaraan ini]");
+    }
+    return out.join("\n");
+  }
+
+  if(!Array.isArray(pack?.positions)||!pack.positions.length){
+    return `${title}\n\nData posisi/socket untuk kebutuhan ini belum terverifikasi cukup. Saya tidak akan menebak rekomendasi produk.`;
+  }
+
+  if(requestedWhite(message)||requestedLowWatt(message)){
+    out.push("");
+    out.push("Preferensi user:");
+    if(requestedWhite(message))out.push("- Warna: putih");
+    if(requestedLowWatt(message))out.push("- Watt: tidak terlalu tinggi; angka watt hanya akan dianggap pasti bila tersedia pada data produk.");
+  }
+
+  for(const pos of pack.positions){
+    out.push("");
+    out.push(`${pos.position}:`);
+    const sockets=pos.sockets||[];
+    if(sockets.length>1){
+      out.push(`- Database mencatat alternatif socket: ${sockets.map(x=>x.source_socket).join(" / ")}. Verifikasi socket fisik kendaraan sebelum pemasangan.`);
+    }
+    for(const s of sockets){
+      out.push(`- Socket bawaan: ${s.source_socket}`);
+      if(s.equivalent_socket)out.push(`- Socket rekomendasi ekuivalen: ${s.equivalent_socket}`);
+      const candidates=s.candidates||[];
+      if(!candidates.length){
+        out.push("- Rekomendasi Nine: [Saat ini produk Nine belum tersedia untuk kebutuhan/socket tersebut]");
+        continue;
+      }
+      out.push("- Rekomendasi Nine:");
+      for(const c of candidates)out.push(`  ${candidateLine(c)}`);
+    }
+  }
+  return out.join("\n");
+}
+
 function tools(){
   return[
     {
@@ -515,7 +587,34 @@ export async function runAinexAgent(ctx={}){
   const pack=deterministicPack(ctx);
   const usedTools=["inspect_locked_vehicle","inspect_recommendation_pack"];
 
-  const instructions=`Kamu adalah AINEX Agent V1.3 Strict Gate.
+  // High-risk fitment/recommendation lane: NO model discretion.
+  // Agent orchestrates deterministic data and renders the answer directly.
+  const automotiveRecommendation=(
+    pack?.locked_vehicle?.model &&
+    (
+      /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(ctx.message||"") ||
+      /\bbi[\s-]?led\b/i.test(ctx.message||"") ||
+      /\bsekalian\b|\bsekaligus\b/i.test(ctx.message||"")
+    )
+  );
+  if(automotiveRecommendation){
+    const reply=renderDeterministicRecommendation(pack,ctx.message||"");
+    const ms=Date.now()-start;
+    await updateMetrics({
+      agent_used:1,agent_ms:ms,last_total_ms:ms,last_status:"COMPLETED",
+      last_request_id:requestId,last_route:ctx.route?.type||"",
+      last_tools:[...new Set(usedTools)]
+    });
+    return{
+      used:true,reply,mode:cfg.mode,shadow:cfg.mode==="shadow",
+      request_id:requestId,tools:[...new Set(usedTools)],duration_ms:ms,
+      locked_vehicle:pack.locked_vehicle||null,
+      vehicle_class:pack.vehicle_class,
+      deterministic:true
+    };
+  }
+
+  const instructions=`Kamu adalah AINEX Agent V1.5 Adaptive Orchestrator.
 
 KAMU HANYA MENYUSUN JAWABAN DARI FINAL_PACK.
 Tidak boleh menciptakan kendaraan, socket, produk, fitment, atau klasifikasi.
