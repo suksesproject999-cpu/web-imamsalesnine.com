@@ -943,8 +943,8 @@ exports.handler=async event=>{
       /\bbi[\s-]?led\b/i.test(message) ||
       /\bsekalian\b|\bsekaligus\b/i.test(message)
     )&&(
-      /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket|xpander|expander|pajero|xenia|avanza|veloz|fortuner)\b/i.test(message) ||
-      (state.recentUserText||[]).some(t=>/\b(mobil|motor|xpander|expander|pajero|xenia|avanza|veloz|fortuner)\b/i.test(t))
+      !!state.vehicle?.model ||
+      /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket)\b/i.test(message)
     )
   );
 
@@ -960,11 +960,11 @@ exports.handler=async event=>{
   const product=runtimeProduct||explicit[0]||(referential(message)?active:null);
 
   const productLifecycle=product?lifecycleForProduct(product):lifecycleForProductId(runtimeProductId||"");
-  if(productLifecycle.status==="hidden"){
+  if(productLifecycle.status==="hidden"&&!agentVehicleRecommendationRequest){
     return response(200,{reply:"Produk yang dimaksud tidak tersedia untuk ditampilkan.",image:null,route:"product_hidden",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(product&&productLifecycle.recommendation_enabled===false&&asksVehicleCompatibility(message)){
+  if(product&&productLifecycle.recommendation_enabled===false&&asksVehicleCompatibility(message)&&!agentVehicleRecommendationRequest){
     const statusText=lifecycleLabel(productLifecycle)||"Produk ini tidak aktif untuk rekomendasi.";
     return response(200,{reply:statusText,image:null,route:"product_lifecycle_recommendation_block",usedAI:false,usedWeb:false,runtime:true});
   }
@@ -977,14 +977,14 @@ exports.handler=async event=>{
     :null;
   const classRule=explicitClassRule||activeClassRule;
   const authoritativeClassReply=classReply(message,classRule,product||active);
-  if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
+  if(authoritativeClassReply&&!agentVehicleRecommendationRequest)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
 
   const currentVehicleId=runtimeResult?.entities?.vehicles?.[0]||null;
   const currentVehicleIsCar=!!(currentVehicleId&&runtime&&typeof runtime.isCarVehicle==="function"&&runtime.isCarVehicle(currentVehicleId));
 
   // Vehicle Resolver is authoritative for current car queries.
   // A resolved Kamar-4 car must never be reclassified by motorcycle text matching.
-  const motorcycleRecommendation=currentVehicleIsCar?null:motorcycleRecommendationReply(message,products);
+  const motorcycleRecommendation=(currentVehicleIsCar||agentVehicleRecommendationRequest)?null:motorcycleRecommendationReply(message,products);
   if(motorcycleRecommendation){
     return response(200,{reply:motorcycleRecommendation,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true});
   }
@@ -1013,7 +1013,7 @@ exports.handler=async event=>{
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_vehicle_to_product",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(runtimeResult?.intents?.includes("fitment_product_to_vehicle")){
+  if(runtimeResult?.intents?.includes("fitment_product_to_vehicle")&&!agentComplexRecommendation){
     const fr=runtimeFitmentReply(runtimeResult,"product",runtime);
     if(fr)return response(200,{reply:fr,image:null,route:"fitment_product_to_vehicle",usedAI:false,usedWeb:false,runtime:true});
   }
@@ -1022,14 +1022,14 @@ exports.handler=async event=>{
   if(route.type==="compare"&&explicit.length>=2)return response(200,{reply:compare(explicit),image:null,route:"compare",usedAI:false,usedWeb:false,products:explicit.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
 
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
-  if(directRoutes.has(route.type)&&product)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
+  if(directRoutes.has(route.type)&&product&&!agentVehicleRecommendationRequest)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
   if(directRoutes.has(route.type)&&!product&&!agentVehicleRecommendationRequest)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
   if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)&&!agentComplexRecommendation){
     return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(asksVehicleCompatibility(message)&&classRule){
+  if(asksVehicleCompatibility(message)&&classRule&&!agentVehicleRecommendationRequest){
     return response(200,{reply:"Klasifikasi produk sudah dikenali, tetapi data kendaraan terverifikasi belum cukup untuk jawaban tambahan. Saya tidak akan menebak kecocokan dari socket saja.",image:null,route:"classified_fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 

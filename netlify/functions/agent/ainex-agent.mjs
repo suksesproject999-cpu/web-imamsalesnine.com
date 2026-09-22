@@ -570,6 +570,23 @@ function outputText(data){
 }
 
 
+
+function mandatoryAutomotiveRecommendation(ctx){
+  const q=String(ctx?.message||"");
+  const hasRecommendationIntent=
+    /\b(rekomendasi|recommend|cocok|pilih|carikan|pakai apa|tipe apa|type apa|bi[\s-]?led)\b/i.test(q) ||
+    /\bsekalian\b|\bsekaligus\b/i.test(q);
+  if(!hasRecommendationIntent)return false;
+
+  const hasVehicleContext=
+    !!lockedVehicle(ctx)?.model ||
+    !!ctx?.conversationContext?.vehicle?.model ||
+    !!ctx?.state?.vehicle?.model ||
+    /\b(mobil|motor|headlamp|foglamp|lampu|socket|soket)\b/i.test(q);
+
+  return hasVehicleContext;
+}
+
 export async function getAinexAgentControl(){
   const cfg=await getConfig();
   return {enabled:cfg.enabled===true,mode:cfg.mode||"hybrid",monitor:cfg.monitor!==false};
@@ -580,7 +597,8 @@ export async function runAinexAgent(ctx={}){
   await updateMetrics({requests:1,last_status:cfg.enabled?"STANDBY":"OFF",last_request_id:requestId,last_route:ctx.route?.type||""});
 
   if(!cfg.enabled)return{used:false,reason:"disabled",mode:cfg.mode,request_id:requestId};
-  if(cfg.mode==="hybrid"&&!complex(ctx.message||"")){
+  const mandatoryRecommendation=mandatoryAutomotiveRecommendation(ctx);
+  if(cfg.mode==="hybrid"&&!complex(ctx.message||"")&&!mandatoryRecommendation){
     await updateMetrics({bypass:1,last_status:"BYPASSED",last_request_id:requestId,last_route:ctx.route?.type||""});
     return{used:false,reason:"simple_bypass",mode:cfg.mode,request_id:requestId};
   }
@@ -594,14 +612,7 @@ export async function runAinexAgent(ctx={}){
 
   // High-risk fitment/recommendation lane: NO model discretion.
   // Agent orchestrates deterministic data and renders the answer directly.
-  const automotiveRecommendation=(
-    pack?.locked_vehicle?.model &&
-    (
-      /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(ctx.message||"") ||
-      /\bbi[\s-]?led\b/i.test(ctx.message||"") ||
-      /\bsekalian\b|\bsekaligus\b/i.test(ctx.message||"")
-    )
-  );
+  const automotiveRecommendation=mandatoryRecommendation&&!!pack?.locked_vehicle?.model;
   if(automotiveRecommendation){
     const reply=renderDeterministicRecommendation(pack,ctx.message||"");
     const ms=Date.now()-start;
@@ -611,7 +622,9 @@ export async function runAinexAgent(ctx={}){
       last_tools:[...new Set(usedTools)]
     });
     return{
-      used:true,reply,mode:cfg.mode,shadow:cfg.mode==="shadow",
+      used:true,reply,mode:cfg.mode,
+      shadow:false,
+      safe_shadow_override:cfg.mode==="shadow",
       request_id:requestId,tools:[...new Set(usedTools)],duration_ms:ms,
       locked_vehicle:pack.locked_vehicle||null,
       vehicle_class:pack.vehicle_class,
