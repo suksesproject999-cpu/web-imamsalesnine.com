@@ -24,6 +24,24 @@ const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.
 const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
 let nexaiRuntimePromise=null;
 
+const AINEX_AGENT_FILE=path.join(__dirname,"agent","ainex-agent.mjs");
+let ainexAgentModulePromise=null;
+async function getAinexAgentModule(){
+  if(ainexAgentModulePromise)return ainexAgentModulePromise;
+  ainexAgentModulePromise=(async()=>{
+    try{
+      if(!fs.existsSync(AINEX_AGENT_FILE))return null;
+      const mod=await import(pathToFileURL(AINEX_AGENT_FILE).href);
+      return typeof mod?.runAinexAgent==="function"?mod:null;
+    }catch(e){
+      console.warn("AINEX agent sidecar warning:",e.message);
+      return null;
+    }
+  })();
+  return ainexAgentModulePromise;
+}
+
+
 async function getNexaiRuntime(){
   if(nexaiRuntimePromise)return nexaiRuntimePromise;
   nexaiRuntimePromise=(async()=>{
@@ -989,8 +1007,18 @@ exports.handler=async event=>{
     return response(200,{reply:"Model motor dikenali, tetapi kelompok aplikasi belum dapat dipastikan dengan aman. Sebutkan model lengkap dan tahun/generasinya.",image:null,route:"motorcycle_group_clarification",usedAI:false,usedWeb:false,runtime:true});
   }
 
+  const agentModule=await getAinexAgentModule();
+  let agentResult=null;
+  if(agentModule){
+    try{agentResult=await agentModule.runAinexAgent({products,message,route,state,memory,runtimeResult,explicitProducts:explicit.map(productPayload)});}
+    catch(e){console.warn("AINEX agent execution warning:",e.message);}
+  }
+  if(agentResult?.used&&agentResult?.shadow!==true){
+    let generated=null;if(route.type==="creative_image"&&PUBLIC_IMAGE_ENABLED)generated=await generateImage(message);
+    return response(200,{reply:agentResult.reply,image:generated,route:`agent:${route.type}`,usedAI:true,usedWeb:false,sources:[],agent:{used:true,mode:agentResult.mode,request_id:agentResult.request_id,tools:agentResult.tools||[],duration_ms:agentResult.duration_ms||0,fallback:false},state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
+  }
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});
   let generated=null;if(route.type==="creative_image"&&PUBLIC_IMAGE_ENABLED)generated=await generateImage(message);
-  return response(200,{reply:ai.reply,image:generated,route:route.type,usedAI:true,usedWeb:ai.usedWeb,sources:ai.sources,state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
+  return response(200,{reply:ai.reply,image:generated,route:route.type,usedAI:true,usedWeb:ai.usedWeb,sources:ai.sources,agent:agentResult?{used:!!agentResult.used,mode:agentResult.mode||"off",request_id:agentResult.request_id||null,tools:agentResult.tools||[],duration_ms:agentResult.duration_ms||0,fallback:!!agentResult.fallback,reason:agentResult.reason||null}:null,state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
  }catch(e){console.error("NEXAI V13 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data NEXAI sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message});}
 };

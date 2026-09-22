@@ -447,6 +447,29 @@ body{
   .mobile-fab{display:grid;position:fixed;right:16px;bottom:16px;width:58px;height:58px;border-radius:50%;border:0;background:var(--brand);color:#13210f;place-items:center;font-size:20px;box-shadow:0 14px 30px rgba(140,198,63,.3);z-index:55}
 }
 
+
+/* AINEX AGENT CONTROL CENTER - ADDITIVE UI V1 */
+.agent-modal{position:fixed;inset:0;z-index:160;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(15,23,42,.52);backdrop-filter:blur(6px)}
+.agent-modal.show{display:flex}
+.agent-box{width:min(980px,96vw);max-height:92vh;overflow:auto;background:#f6f8fb;border-radius:24px;border:1px solid #dfe5ec;box-shadow:0 35px 100px rgba(15,23,42,.28)}
+.agent-head{position:sticky;top:0;z-index:2;background:rgba(255,255,255,.97);backdrop-filter:blur(12px);padding:17px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;gap:12px}
+.agent-title{display:flex;align-items:center;gap:12px}.agent-icon{width:44px;height:44px;border-radius:14px;background:linear-gradient(135deg,#0F2D6B,#183E88);color:#fff;display:grid;place-items:center}
+.agent-title h2{margin:0;font-size:19px}.agent-title p{margin:3px 0 0;color:var(--muted);font-size:10px}.agent-preview{display:inline-flex;margin-left:7px;padding:4px 7px;border-radius:999px;background:#fff6dd;color:#9a6500;font-size:8px;font-weight:900}
+.agent-body{padding:16px}.agent-status{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}.agent-card,.agent-panel{background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:0 6px 18px rgba(15,23,42,.05)}
+.agent-card{padding:13px}.agent-card small{display:block;color:var(--muted);font-size:9px;font-weight:800;text-transform:uppercase}.agent-card strong{display:block;margin-top:6px;font-size:16px}
+.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;background:#9ca3af}.dot.green{background:#2fb344}.dot.yellow{background:#f59e0b}.dot.blue{background:#2563eb}.dot.red{background:#e53935}
+.agent-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.agent-panel{padding:15px}.agent-panel h3{margin:0 0 11px;font-size:13px;justify-content:flex-start}.agent-panel h3 i{color:var(--brand-2)}
+.agent-setting{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:11px 0;border-bottom:1px solid #eef1f4}.agent-setting:last-child{border-bottom:0}.agent-setting b{display:block;font-size:12px}.agent-setting small{display:block;margin-top:2px;color:var(--muted);font-size:9px}
+.aswitch{position:relative;width:50px;height:28px;flex:0 0 auto}.aswitch input{opacity:0;position:absolute}.aslider{position:absolute;inset:0;border-radius:999px;background:#d8dee7;transition:.2s}.aslider:before{content:"";position:absolute;width:22px;height:22px;left:3px;top:3px;border-radius:50%;background:#fff;box-shadow:0 2px 7px rgba(0,0,0,.18);transition:.2s}.aswitch input:checked+.aslider{background:var(--brand)}.aswitch input:checked+.aslider:before{transform:translateX(22px)}
+.agent-modes{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}.agent-mode{border:1px solid var(--line);background:#fff;border-radius:11px;padding:9px 6px;font-size:10px;font-weight:900}.agent-mode small{display:block;color:var(--muted);font-size:8px;margin-top:2px}.agent-mode.active{border-color:var(--brand);background:#f2f9e9;color:#527f20}
+.agent-banner{margin-top:11px;padding:11px 12px;border-radius:12px;background:#f8fafc;border:1px solid #e6eaf0;font-size:10px;line-height:1.45}.agent-banner b{display:block;margin-bottom:2px}
+.agent-metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metric{padding:10px;border-radius:11px;background:#f8fafc;border:1px solid #e9edf2}.metric small{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;font-weight:800}.metric strong{display:block;margin-top:3px;font-size:15px}
+.trace-top{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:10px}.trace-pill{padding:5px 8px;border-radius:999px;background:#eef2f7;font-size:8px;font-weight:900}.trace-info{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:9px}.trace-box{padding:8px;border:1px solid #e9edf2;border-radius:10px;background:#fbfcfd}.trace-box small{display:block;color:var(--muted);font-size:8px}.trace-box b{font-size:10px}
+.steps{display:grid;gap:6px}.step{display:grid;grid-template-columns:26px 1fr auto;gap:8px;align-items:center;padding:8px 9px;border:1px solid #e9edf2;border-radius:10px}.step-no{width:26px;height:26px;border-radius:8px;background:#f1f5f9;display:grid;place-items:center;font-size:8px;font-weight:900}.step b{font-size:10px}.step small{display:block;color:var(--muted);font-size:8px}.step i.ok{color:#2fb344}.step i.wait{color:#f59e0b}.step i.off{color:#9ca3af}
+.agent-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:11px}.agent-note{margin-top:11px;padding:10px 11px;border-radius:11px;background:#fff9e8;border:1px solid #f5e6b8;color:#6b5a24;font-size:9px;line-height:1.5}
+@media(max-width:850px){.agent-status{grid-template-columns:1fr 1fr}.agent-grid{grid-template-columns:1fr}}
+@media(max-width:560px){.agent-modal{padding:0;align-items:flex-end}.agent-box{width:100vw;max-height:94vh;border-radius:24px 24px 0 0}.agent-body{padding:11px}.agent-modes{grid-template-columns:1fr}.agent-metrics{grid-template-columns:1fr 1fr}.trace-info{grid-template-columns:1fr}}
+
 </style>
 </head>
 
@@ -608,6 +631,7 @@ body{
     <button class="quick-item" onclick="closeQuickMenu();setFilter('hidden')"><i class="fa-solid fa-eye-slash"></i><span><b>Produk Hidden</b><small>Cek produk yang disembunyikan.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();setFilter('active')"><i class="fa-solid fa-circle-check"></i><span><b>Produk Aktif</b><small>Tampilkan produk yang live.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();boot(true)"><i class="fa-solid fa-arrows-rotate"></i><span><b>Refresh Data</b><small>Sinkronkan tampilan dashboard.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();openAgentControl()"><i class="fa-solid fa-microchip"></i><span><b>AINEX Agent</b><small>Control Center, mode, monitor, dan metrics.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();document.getElementById('seedBtn').click()"><i class="fa-solid fa-database"></i><span><b>Sinkronkan Seed</b><small>Tambahkan seed yang belum ada.</small></span></button>
   </div>
   <div class="quick-menu-foot">
@@ -616,6 +640,70 @@ body{
   </div>
 </aside>
 <button class="mobile-fab" onclick="createProduct()" title="Tambah Produk"><i class="fa-solid fa-plus"></i></button>
+
+
+<div class="agent-modal" id="agentModal" onclick="if(event.target===this)closeAgentControl()">
+  <section class="agent-box">
+    <div class="agent-head">
+      <div class="agent-title"><div class="agent-icon"><i class="fa-solid fa-microchip"></i></div><div><h2>AINEX Agent Control Center <span class="agent-preview">LIVE CONTROL</span></h2><p>ON/OFF, mode kerja, monitor, metrics, dan trace request.</p></div></div>
+      <button class="btn secondary icon" onclick="closeAgentControl()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="agent-body">
+      <div class="agent-status">
+        <div class="agent-card"><small>Core Engine</small><strong><span class="dot green"></span>ONLINE</strong></div>
+        <div class="agent-card"><small>AINEX Agent</small><strong><span class="dot" id="agentDot"></span><span id="agentStatus">OFF</span></strong></div>
+        <div class="agent-card"><small>Mode</small><strong id="agentModeTop">HYBRID</strong></div>
+        <div class="agent-card"><small>Monitor</small><strong><span class="dot blue"></span><span id="agentMonitorTop">ON</span></strong></div>
+      </div>
+
+      <div class="agent-grid">
+        <div class="agent-panel">
+          <h3><i class="fa-solid fa-sliders"></i> Agent Control</h3>
+          <div class="agent-setting"><div><b>Aktifkan AINEX Agent</b><small>OFF = core engine existing tetap normal.</small></div><label class="aswitch"><input id="agentEnabled" type="checkbox" onchange="agentChanged()"><span class="aslider"></span></label></div>
+          <div class="agent-setting" style="display:block"><div><b>Mode Agent</b><small>Pilih bagaimana Agent ikut menangani request.</small></div>
+            <div class="agent-modes">
+              <button class="agent-mode" data-mode="shadow" onclick="setAgentMode('shadow')">Shadow<small>Tes di belakang</small></button>
+              <button class="agent-mode active" data-mode="hybrid" onclick="setAgentMode('hybrid')">Hybrid<small>Kompleks → Agent</small></button>
+              <button class="agent-mode" data-mode="full" onclick="setAgentMode('full')">Full<small>Agent utama</small></button>
+            </div>
+          </div>
+          <div class="agent-setting"><div><b>Agent Monitor</b><small>Tampilkan trace, waktu, dan fallback untuk admin.</small></div><label class="aswitch"><input id="agentMonitor" type="checkbox" checked onchange="agentChanged()"><span class="aslider"></span></label></div>
+          <div class="agent-banner"><b id="agentStateTitle">Agent OFF — Core Engine Aman</b><span id="agentStateText">Website tetap memakai mesin existing. Agent tidak melakukan request.</span></div>
+          <div class="agent-actions">
+            <button class="btn" onclick="simulateAgent()"><i class="fa-solid fa-vial"></i> Test Tampilan Agent</button>
+            <button class="btn secondary" onclick="resetAgentMetrics()"><i class="fa-solid fa-rotate-left"></i> Reset Metrics</button>
+          </div>
+          <div class="agent-note"><b>Preview aman:</b> kontrol ini terhubung ke konfigurasi Agent melalui Firestore. Core engine tetap independen dan menjadi fallback bila Agent OFF, dilepas, atau gagal.</div>
+        </div>
+
+        <div>
+          <div class="agent-panel" style="margin-bottom:12px">
+            <h3><i class="fa-solid fa-chart-line"></i> Agent Metrics</h3>
+            <div class="agent-metrics">
+              <div class="metric"><small>Requests</small><strong id="mReq">0</strong></div>
+              <div class="metric"><small>Agent Used</small><strong id="mUsed">0</strong></div>
+              <div class="metric"><small>Bypass</small><strong id="mBypass">0</strong></div>
+              <div class="metric"><small>Avg Agent</small><strong id="mTime">0 ms</strong></div>
+              <div class="metric"><small>Fallback</small><strong id="mFallback">0</strong></div>
+              <div class="metric"><small>Errors</small><strong id="mErrors">0</strong></div>
+            </div>
+          </div>
+
+          <div class="agent-panel">
+            <div class="trace-top"><h3 style="margin:0"><i class="fa-solid fa-route"></i> Request Trace Terakhir</h3><span class="trace-pill" id="traceStatus"><span class="dot"></span>IDLE</span></div>
+            <div class="trace-info">
+              <div class="trace-box"><small>Request ID</small><b id="tReq">-</b></div>
+              <div class="trace-box"><small>Route</small><b id="tRoute">-</b></div>
+              <div class="trace-box"><small>Tools</small><b id="tTools">0</b></div>
+              <div class="trace-box"><small>Total Time</small><b id="tTime">0 ms</b></div>
+            </div>
+            <div class="steps" id="traceSteps"><div class="step"><span class="step-no">01</span><span><b>Menunggu request</b><small>Trace muncul saat Agent dites/digunakan.</small></span><i class="fa-solid fa-minus off"></i></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
 
 <div id="toast" class="toast"></div>
 
@@ -1206,6 +1294,53 @@ function toast(msg){
 }
 
 
+
+/* AINEX AGENT CONTROL CENTER - ADDITIVE UI V1 */
+const AGENT_CONTROL_REF=db.collection("ainex_system").doc("agent_control");
+const AGENT_METRICS_REF=db.collection("ainex_system").doc("agent_metrics");
+let agentControlState={enabled:false,mode:"hybrid",monitor:true};
+let agentMetricsState={requests:0,agent_used:0,bypass:0,total_agent_ms:0,agent_time_count:0,fallback:0,errors:0,last_status:"IDLE",last_route:"",last_request_id:"",last_tools:[],last_total_ms:0};
+let _agentControlUnsub=null,_agentMetricsUnsub=null;
+
+function openAgentControl(){startAgentListeners();syncAgentUI();$("#agentModal").classList.add("show");document.body.style.overflow="hidden"}
+function closeAgentControl(){const m=$("#agentModal");if(m)m.classList.remove("show");document.body.style.overflow=""}
+function startAgentListeners(){
+  if(!_agentControlUnsub)_agentControlUnsub=AGENT_CONTROL_REF.onSnapshot(s=>{if(s.exists)agentControlState={...agentControlState,...s.data()};syncAgentUI()},e=>toast("Agent Control belum dapat dibaca: "+e.message));
+  if(!_agentMetricsUnsub)_agentMetricsUnsub=AGENT_METRICS_REF.onSnapshot(s=>{if(s.exists)agentMetricsState={...agentMetricsState,...s.data()};syncAgentMetrics();syncAgentTrace()},()=>{});
+}
+async function saveAgentControl(patch){
+  try{await AGENT_CONTROL_REF.set({...patch,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});toast("Konfigurasi AINEX Agent diperbarui.")}
+  catch(e){toast("Gagal menyimpan Agent Control: "+e.message)}
+}
+async function agentChanged(){await saveAgentControl({enabled:!!$("#agentEnabled")?.checked,monitor:!!$("#agentMonitor")?.checked})}
+async function setAgentMode(mode){if(["shadow","hybrid","full"].includes(mode))await saveAgentControl({mode})}
+function syncAgentUI(){
+  const c=agentControlState;if($("#agentEnabled"))$("#agentEnabled").checked=!!c.enabled;if($("#agentMonitor"))$("#agentMonitor").checked=c.monitor!==false;
+  document.querySelectorAll("[data-mode]").forEach(b=>b.classList.toggle("active",b.dataset.mode===c.mode));
+  $("#agentModeTop").textContent=String(c.mode||"hybrid").toUpperCase();$("#agentMonitorTop").textContent=c.monitor===false?"OFF":"ON";
+  $("#agentStatus").textContent=c.enabled?"STANDBY":"OFF";$("#agentDot").className="dot "+(c.enabled?"yellow":"");
+  $("#agentStateTitle").textContent=c.enabled?"Agent Aktif — Core Engine Tetap Dilindungi":"Agent OFF — Core Engine Aman";
+  $("#agentStateText").textContent=c.enabled?(c.mode==="shadow"?"Shadow: Agent dites di jalur AI fallback, jawaban user tetap core engine.":c.mode==="hybrid"?"Hybrid: request sederhana tetap core; query kompleks di jalur AI fallback dapat ke Agent.":"Full: semua request yang mencapai AI fallback diberikan ke Agent. Route deterministic tetap prioritas."):"Website tetap memakai mesin existing. Agent sidecar tidak digunakan.";
+  syncAgentMetrics();syncAgentTrace();
+}
+function syncAgentMetrics(){
+  const m=agentMetricsState,avg=Number(m.agent_time_count||0)?Math.round(Number(m.total_agent_ms||0)/Number(m.agent_time_count||1)):0;
+  $("#mReq").textContent=Number(m.requests||0);$("#mUsed").textContent=Number(m.agent_used||0);$("#mBypass").textContent=Number(m.bypass||0);$("#mTime").textContent=avg+" ms";$("#mFallback").textContent=Number(m.fallback||0);$("#mErrors").textContent=Number(m.errors||0);
+}
+function traceStatus(label,color=""){if($("#traceStatus"))$("#traceStatus").innerHTML=`<span class="dot ${color}"></span>${esc(label||"IDLE")}`}
+function syncAgentTrace(){
+  const m=agentMetricsState;$("#tReq").textContent=m.last_request_id||"-";$("#tRoute").textContent=m.last_route||"-";$("#tTools").textContent=Array.isArray(m.last_tools)?m.last_tools.length:0;$("#tTime").textContent=Number(m.last_total_ms||0)+" ms";
+  const status=String(m.last_status||"IDLE").toUpperCase(),color=status==="COMPLETED"?"green":status==="FALLBACK"||status==="ERROR"?"red":status==="WORKING"?"blue":status==="STANDBY"?"yellow":"";traceStatus(status,color);
+  const tools=Array.isArray(m.last_tools)?m.last_tools:[];
+  $("#traceSteps").innerHTML=tools.length?tools.map((tool,i)=>`<div class="step"><span class="step-no">${String(i+1).padStart(2,"0")}</span><span><b>${esc(tool)}</b><small>Tool dipanggil Agent pada request terakhir.</small></span><i class="fa-solid fa-circle-check ok"></i></div>`).join(""):`<div class="step"><span class="step-no">01</span><span><b>${status==="BYPASSED"?"Core Engine / Bypass":"Menunggu Agent"}</b><small>${status==="BYPASSED"?"Request tidak membutuhkan Agent.":"Tool trace akan muncul setelah Agent digunakan."}</small></span><i class="fa-solid ${status==="BYPASSED"?"fa-circle-check ok":"fa-minus off"}"></i></div>`;
+}
+function simulateAgent(){toast("Web utama dibuka. Kirim pertanyaan kompleks untuk mengetes Agent sebenarnya.");openMainWeb()}
+async function resetAgentMetrics(){
+  if(!confirm("Reset metrics AINEX Agent?"))return;
+  try{await AGENT_METRICS_REF.set({requests:0,agent_used:0,bypass:0,total_agent_ms:0,agent_time_count:0,fallback:0,errors:0,last_status:"IDLE",last_route:"",last_request_id:"",last_tools:[],last_total_ms:0,updated_at:new Date().toISOString()},{merge:false});toast("Metrics AINEX Agent direset.")}
+  catch(e){toast("Reset metrics gagal: "+e.message)}
+}
+
 function openMainWeb(){
   window.open("/", "_blank", "noopener");
 }
@@ -1229,7 +1364,7 @@ function logoutProductAdmin(){
   localStorage.removeItem("role");
   window.location.href="/login";
 }
-document.addEventListener("keydown",e=>{if(e.key==="Escape")closeQuickMenu()});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){closeQuickMenu();closeAgentControl();}});
 
 $("#search").oninput=renderList;
 $("#filter").onchange=renderList;
@@ -1242,6 +1377,9 @@ window.addEventListener("beforeunload",e=>{
     e.returnValue="";
   }
 });
+
+startAgentListeners();
+AGENT_CONTROL_REF.get().then(s=>{if(!s.exists)return AGENT_CONTROL_REF.set({enabled:false,mode:"hybrid",monitor:true,createdAt:firebase.firestore.FieldValue.serverTimestamp()})}).catch(()=>{});
 
 boot().catch(e=>{
   $("#sync").textContent="Gagal";
