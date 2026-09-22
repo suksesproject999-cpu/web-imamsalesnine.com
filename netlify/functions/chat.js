@@ -557,6 +557,14 @@ function motorcycleGroupCatalog(){
   }
   return out;
 }
+function normalizedPhraseMatch(query,phrase){
+  const q=` ${normalize(query)} `;
+  const p=` ${normalize(phrase)} `;
+  return p.trim().length>0&&q.includes(p);
+}
+function normalizedTokenSet(value){
+  return new Set(normalize(value).split(/\s+/).filter(Boolean));
+}
 function detectMotorcycleGroups(message){
   const q=normalize(message);
   const year=(q.match(/\b(?:19|20)\d{2}\b/)||[])[0]||null;
@@ -576,17 +584,18 @@ function detectMotorcycleGroups(message){
         if(!(a<=y&&y<=b))continue;
       }
 
-      if(q.includes(ne)){
+      if(normalizedPhraseMatch(q,ne)){
         best=Math.max(best,5000+ne.length);matched.push(ex);continue;
       }
 
       // Brandless model matching for natural phrases such as "kalau motor vixion".
       const toks=normalizedVehicleTokens(ne).filter(t=>
         !["honda","yamaha","suzuki","kawasaki","vespa","benelli","fi","esp"].includes(t) &&
-        !/^\d{4}$/.test(t)
+        !/^\d+$/.test(t)
       );
       const meaningful=toks.filter(t=>t.length>=3);
-      const matchedTokens=meaningful.filter(t=>q.includes(t));
+      const queryTokens=normalizedTokenSet(q);
+      const matchedTokens=meaningful.filter(t=>queryTokens.has(t));
       if(matchedTokens.length){
         const sc=1000+matchedTokens.reduce((n,t)=>n+t.length,0);
         if(sc>best){best=sc;matched=[ex];}
@@ -719,7 +728,12 @@ exports.handler=async event=>{
   const authoritativeClassReply=classReply(message,classRule,product||active);
   if(authoritativeClassReply)return response(200,{reply:authoritativeClassReply,image:null,route:"vehicle_classification_v2_guard",usedAI:false,usedWeb:false,runtime:true});
 
-  const motorcycleRecommendation=motorcycleRecommendationReply(message,products);
+  const currentVehicleId=runtimeResult?.entities?.vehicles?.[0]||null;
+  const currentVehicleIsCar=!!(currentVehicleId&&runtime&&typeof runtime.isCarVehicle==="function"&&runtime.isCarVehicle(currentVehicleId));
+
+  // Vehicle Resolver is authoritative for current car queries.
+  // A resolved Kamar-4 car must never be reclassified by motorcycle text matching.
+  const motorcycleRecommendation=currentVehicleIsCar?null:motorcycleRecommendationReply(message,products);
   if(motorcycleRecommendation){
     return response(200,{reply:motorcycleRecommendation,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true});
   }
@@ -756,7 +770,7 @@ exports.handler=async event=>{
     return response(200,{reply:"Klasifikasi produk sudah dikenali, tetapi data kendaraan terverifikasi belum cukup untuk jawaban tambahan. Saya tidak akan menebak kecocokan dari socket saja.",image:null,route:"classified_fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(/\b(beat|vario|scoopy|mio|jupiter|supra|revo|verza|vixion|r15|cb150r|cbr150|byson|klx|vespa|inazuma|zafferano|zaferrano|fino|xeon|nex|smash|satria|spacy|x-ride|xride)\b/.test(normalize(message))){
+  if(!currentVehicleIsCar&&/\b(beat|vario|scoopy|mio|jupiter|supra|revo|verza|vixion|r15|cb150r|cbr150|byson|klx|vespa|inazuma|zafferano|zaferrano|fino|xeon|nex|smash|satria|spacy|x-ride|xride)\b/.test(normalize(message))){
     return response(200,{reply:"Model motor dikenali, tetapi kelompok aplikasi belum dapat dipastikan dengan aman. Sebutkan model lengkap dan tahun/generasinya.",image:null,route:"motorcycle_group_clarification",usedAI:false,usedWeb:false,runtime:true});
   }
 
