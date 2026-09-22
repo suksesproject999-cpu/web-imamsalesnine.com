@@ -969,14 +969,24 @@ exports.handler=async event=>{
     return response(200,{reply:motorcycleRecommendation,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true});
   }
 
-  if(runtimeResult?.intents?.includes("vehicle_info")){
+  const agentComplexRecommendation=/\b(rekomendasi|cocok|pilih|carikan)\b/i.test(message)&&(
+    /\bsekalian\b|\bsekaligus\b/i.test(message) ||
+    [
+      /\bheadlamp\b|\blampu depan\b/i,
+      /\bfoglamp\b|\blampu kabut\b/i,
+      /\blampu mundur\b|\breverse\b/i,
+      /\bsenja\b/i
+    ].filter(rx=>rx.test(message)).length>=2
+  );
+
+  if(runtimeResult?.intents?.includes("vehicle_info")&&!agentComplexRecommendation){
     const vf=runtimeResult?.facts?.vehicles?.[0];
     const vr=runtimeVehicleReply(vf);
     if(vr)return response(200,{reply:vr,image:null,route:"vehicle_info",usedAI:false,usedWeb:false,runtime:true});
   }
 
   // Fresh vehicle query must outrank prior active-product context.
-  if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")){
+  if(runtimeResult?.intents?.includes("fitment_vehicle_to_product")&&!agentComplexRecommendation){
     const detailed=detailedVehicleRecommendationReply(runtimeResult,runtime);
     if(detailed)return response(200,{reply:detailed,image:null,route:"fitment_vehicle_to_product_detailed",usedAI:false,usedWeb:false,runtime:true});
     const fr=runtimeFitmentReply(runtimeResult,"vehicle",runtime);
@@ -995,7 +1005,7 @@ exports.handler=async event=>{
   if(directRoutes.has(route.type)&&product)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
   if(directRoutes.has(route.type)&&!product)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
-  if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)){
+  if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)&&!agentComplexRecommendation){
     return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});
   }
 

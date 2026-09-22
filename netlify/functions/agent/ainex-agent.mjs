@@ -293,6 +293,24 @@ function exactCandidatesForCar(socket,position){
   const db=shortlistDB(),original=up(socket),target=replacementSocket(original);
   const out=[],seen=new Set();
 
+  // HARD BUSINESS RULE: factory H8/H16 -> LH1PRO only.
+  if(["H8","H16"].includes(original)){
+    const allowedIds=new Set(["lh1pro"]);
+    const sources=[
+      ...(db?.headlamp_family_candidates||[]),
+      ...Object.entries(db?.product_socket_catalog||{}).map(([product_id,x])=>({product_id,...x}))
+    ];
+    for(const x of sources){
+      if(!x?.product_id||!allowedIds.has(x.product_id)||seen.has(x.product_id))continue;
+      if(!recommendationEnabled(x.product_id))continue;
+      const variants=(x.socket_variants||[]).map(up);
+      if(!variants.includes(target))continue;
+      seen.add(x.product_id);
+      out.push({product_id:x.product_id,name:x.name||"LED HEADLIGHT LH1-PRO CSP PLUG N PLAY.",sku:x.sku||"",socket:target,source:"hard_h8_h16_lh1pro"});
+    }
+    return out;
+  }
+
   // Small bulbs: ONLY curated shortlist chosen by business rules.
   if(["T10","T15","T20","S25"].includes(target)){
     for(const x of db?.curated_socket_products?.[target]||[]){
@@ -408,6 +426,7 @@ function deterministicPack(ctx){
     ?allPositions.filter(p=>wanted.includes(p.key))
     :allPositions;
 
+  const biled=isBiLedQuery(ctx.message);
   const positions=filtered.map(p=>({
     position:p.label,
     key:p.key,
@@ -416,9 +435,9 @@ function deterministicPack(ctx){
       return{
         source_socket:s,
         equivalent_socket:target!==up(s)?target:"",
-        candidates:klass==="car"
+        candidates:biled?[]:(klass==="car"
           ?exactCandidatesForCar(s,p.key).map(c=>({...c,lifecycle:lifecycleFor(c.product_id)}))
-          :[]
+          :[])
       };
     })
   }));
@@ -434,8 +453,8 @@ function deterministicPack(ctx){
       requested_year:match.requested_year
     }:null,
     positions,
-    biled_query:isBiLedQuery(ctx.message),
-    biled_catalog:isBiLedQuery(ctx.message)?biledProducts():[]
+    biled_query:biled,
+    biled_catalog:biled?biledProducts():[]
   };
 }
 
@@ -513,7 +532,8 @@ ATURAN MUTLAK:
    - Jika user meminta rekomendasi, jawab sampai nama produk + socket.
    - Jika candidates kosong, tulis: [Saat ini produk Nine belum tersedia untuk kebutuhan/socket tersebut]
 4. BI-LED:
-   - Jika biled_query=true, jangan mengubah lampu H4/H6 biasa menjadi "BiLED".
+   - Jika biled_query=true, candidates lampu LED biasa sengaja dikosongkan dan DILARANG ditampilkan.
+   - Jangan tampilkan V8/V9/LH1PRO/MP1/MP3 atau LED headlight biasa sebagai jawaban BiLED hanya karena socket sama.
    - biled_catalog hanya daftar produk BiLED resmi yang tersedia di katalog, BUKAN bukti fitment kendaraan.
    - Jika tidak ada mapping fitment BiLED spesifik ke kendaraan, jelaskan "fitment BiLED kendaraan ini belum terverifikasi".
    - Boleh tampilkan biled_catalog sebagai opsi kategori untuk pengecekan custom, tetapi JANGAN sebut "cocok/plug-and-play" tanpa bukti.
