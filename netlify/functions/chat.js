@@ -438,6 +438,21 @@ function runtimeVehicleReply(v){
 
 function socketNorm(v){return String(v||"").trim().toUpperCase();}
 function productSocketEntry(productId){return recommendationShortlistDB?.product_socket_catalog?.[productId]||null;}
+function socketPolicyFor(socket){
+  const s=socketNorm(socket);
+  return recommendationShortlistDB?.socket_policy?.equivalences?.[s]||null;
+}
+function replacementSocketFor(socket){
+  const s=socketNorm(socket);
+  const policy=socketPolicyFor(s);
+  return socketNorm(policy?.replacement_socket||s);
+}
+function displayEquivalentFor(socket){
+  const s=socketNorm(socket);
+  const policy=socketPolicyFor(s);
+  const eq=socketNorm(policy?.display_equivalent||"");
+  return eq&&eq!==s?eq:"";
+}
 function productHasExactSocket(productId,socket){
   const e=productSocketEntry(productId),s=socketNorm(socket);
   return !!(e&&(e.socket_variants||[]).some(v=>socketNorm(v)===s));
@@ -449,6 +464,26 @@ function curatedSocketCandidates(socket){
   const s=socketNorm(socket);
   return (recommendationShortlistDB?.curated_socket_products?.[s]||[])
     .filter(x=>x?.product_id&&activeRecommendationProduct(x.product_id));
+}
+function headlampFamilyCandidatesFor(socket,sourceSocket){
+  const target=replacementSocketFor(socket);
+  const source=socketNorm(sourceSocket||socket);
+  const policy=socketPolicyFor(source);
+  const preferred=new Set(policy?.preferred_product_ids||[]);
+  const rows=(recommendationShortlistDB?.headlamp_family_candidates||[])
+    .filter(x=>x?.product_id&&activeRecommendationProduct(x.product_id))
+    .filter(x=>(x.socket_variants||[]).some(v=>socketNorm(v)===target));
+
+  if(preferred.size){
+    return rows.filter(x=>preferred.has(x.product_id));
+  }
+
+  // D2 / D4 family diarahkan khusus ke V9 PRO.
+  if(["D2","D2R","D2S","D4","D4R","D4S"].includes(source)){
+    return rows.filter(x=>x.product_id==="v9pro");
+  }
+
+  return rows;
 }
 function lightingPositionRows(vehicle){
   const l=vehicle?.lighting||{},rows=[];
@@ -471,23 +506,40 @@ function lightingPositionRows(vehicle){
   return rows;
 }
 function exactCandidatesForPosition(runtimeResult,position,socket){
+  const sourceSocket=socketNorm(socket);
+  const targetSocket=replacementSocketFor(sourceSocket);
   const groups=runtimeResult?.facts?.fitment_vehicle_to_product||[];
   const candidates=(groups[0]?.candidates||[]).filter(x=>x&&x.position===position);
   const out=[],seen=new Set();
-  for(const c of candidates){
-    if(!c.product_id||seen.has(c.product_id))continue;
-    if(!activeRecommendationProduct(c.product_id))continue;
-    if(!productHasExactSocket(c.product_id,socket))continue;
-    const e=productSocketEntry(c.product_id);
-    if(!e)continue;
-    seen.add(c.product_id);
+
+  function pushCandidate(productId,name,sku){
+    if(!productId||seen.has(productId))return;
+    if(!activeRecommendationProduct(productId))return;
+    if(!productHasExactSocket(productId,targetSocket))return;
+    const e=productSocketEntry(productId);
+    if(!e)return;
+    seen.add(productId);
     out.push({
-      product_id:c.product_id,
-      name:e.name||c.product_name||c.product_id,
-      sku:e.sku||c.product_sku||"",
-      socket:socketNorm(socket)
+      product_id:productId,
+      name:e.name||name||productId,
+      sku:e.sku||sku||"",
+      socket:targetSocket,
+      source_socket:sourceSocket,
+      equivalent_socket:displayEquivalentFor(sourceSocket)
     });
   }
+
+  // Kandidat dari fitment existing.
+  for(const c of candidates){
+    pushCandidate(c.product_id,c.product_name,c.product_sku);
+  }
+
+  // Tambahkan family terkurasi (V8 PRO / V9 TRICOLOR / V9 PRO / LH1 PRO)
+  // tetap wajib lolos varian socket aktual.
+  for(const f of headlampFamilyCandidatesFor(targetSocket,sourceSocket)){
+    pushCandidate(f.product_id,f.name,f.sku);
+  }
+
   return out;
 }
 function detailedVehicleRecommendationReply(runtimeResult,runtime){
@@ -509,13 +561,27 @@ function detailedVehicleRecommendationReply(runtimeResult,runtime){
 
     for(const socket of row.sockets){
       const s=socketNorm(socket);
-      const curated=["S25","T20","T10"].includes(s)?curatedSocketCandidates(s):null;
+      const replacement=replacementSocketFor(s);
+      const equivalent=displayEquivalentFor(s);
+      const curated=["S25","T20","T10","T15"].includes(s)?curatedSocketCandidates(s):null;
       const candidates=curated!==null
-        ?curated.map(x=>({product_id:x.product_id,name:x.name,sku:x.sku,socket:s}))
+        ?curated.map(x=>({
+            product_id:x.product_id,
+            name:x.name,
+            sku:x.sku,
+            socket:s,
+            source_socket:s,
+            equivalent_socket:""
+          }))
         :exactCandidatesForPosition(runtimeResult,row.key,s);
 
+      if(equivalent){
+        lines.push(`  - Socket ekuivalen rekomendasi: ${equivalent}`);
+      }
+
       if(!candidates.length){
-        lines.push(`  - ${s}: [Saat ini produk Nine tidak tersedia untuk socket ${s}]`);
+        const unavailableTarget=equivalent||s;
+        lines.push(`  - ${s}: [Saat ini produk Nine tidak tersedia untuk socket ${unavailableTarget}]`);
         continue;
       }
 
