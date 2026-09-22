@@ -1010,7 +1010,16 @@ exports.handler=async event=>{
   const agentModule=await getAinexAgentModule();
   let agentResult=null;
   if(agentModule){
-    try{agentResult=await agentModule.runAinexAgent({products,message,route,state,memory,runtimeResult,explicitProducts:explicit.map(productPayload)});}
+    try{agentResult=await agentModule.runAinexAgent({
+      products,message,route,state,memory,runtimeResult,
+      conversationContext:{
+        lastProductId:state.activeProduct?.id||null,
+        lastProductName:state.activeProduct?.nama||null,
+        vehicle:state.vehicle||null,
+        memory
+      },
+      explicitProducts:explicit.map(productPayload)
+    });}
     catch(e){console.warn("AINEX agent execution warning:",e.message);}
   }
   if(agentResult?.used&&agentResult?.shadow!==true){
