@@ -791,7 +791,18 @@ function outputText(data){
 
 
 
+
+function activeUniversalTask(ctx){
+  const t=ctx?.conversationContext?.activeTask||null;
+  if(!t||!t.intent)return null;
+  return t;
+}
+function blockedByUniversalTask(ctx){
+  const t=activeUniversalTask(ctx);
+  return !!(t&&["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison","creative_general"].includes(t.intent));
+}
 function mandatoryAutomotiveRecommendation(ctx){
+  if(blockedByUniversalTask(ctx))return false;
   const q=String(ctx?.message||"");
   const hasRecommendationIntent=
     /\b(rekomendasi|recommend|cocok|pilih|carikan|pakai apa|tipe apa|type apa|bi[\s-]?led)\b/i.test(q) ||
