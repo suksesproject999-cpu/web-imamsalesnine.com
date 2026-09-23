@@ -930,7 +930,23 @@ async function generateImage(prompt){if(!PUBLIC_IMAGE_ENABLED||!process.env.OPEN
 async function parseMultipartEvent(event){if(!event.body)throw new Error("Empty body");const b=Buffer.from(event.body,event.isBase64Encoded?"base64":"utf8"),req=new Readable();req.push(b);req.push(null);req.headers={...(event.headers||{}),"content-length":b.length};req.method=event.httpMethod;req.url="/";const form=formidable({multiples:false});return await new Promise((resolve,reject)=>form.parse(req,(e,fields,files)=>e?reject(e):resolve({fields:fields||{},files:files||{}})));}
 function fieldValue(fields,key,f=""){const v=fields?.[key];return Array.isArray(v)?(v[0]??f):(v??f);}
 function imageData(files){const v=files?.image;if(!v)return null;const f=Array.isArray(v)?v[0]:v;if(!f?.filepath)return null;return`data:${f.mimetype||"image/jpeg"};base64,${fs.readFileSync(f.filepath).toString("base64")}`;}
-function response(statusCode,body){return{statusCode,headers:{"Content-Type":"application/json","Cache-Control":"no-store"},body:JSON.stringify(body)};}
+function normalizeReplyFormatting(value){
+  if(typeof value!=="string")return value;
+  let s=value;
+  // Some template/search/agent paths can return escaped line breaks as literal text.
+  // Normalize only reply presentation; product/vehicle intelligence is untouched.
+  for(let i=0;i<2;i++){
+    s=s.replace(/\\r\\n/g,"\n").replace(/\\n/g,"\n").replace(/\\r/g,"\n").replace(/\\t/g,"\t");
+  }
+  s=s.replace(/\n{3,}/g,"\n\n");
+  return s.trim();
+}
+function normalizeResponseBody(body){
+  if(!body||typeof body!=="object"||Array.isArray(body))return body;
+  if(typeof body.reply!=="string")return body;
+  return{...body,reply:normalizeReplyFormatting(body.reply)};
+}
+function response(statusCode,body){const normalizedBody=normalizeResponseBody(body);return{statusCode,headers:{"Content-Type":"application/json","Cache-Control":"no-store"},body:JSON.stringify(normalizedBody)};}
 
 exports.handler=async event=>{
  try{
