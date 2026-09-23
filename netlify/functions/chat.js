@@ -506,6 +506,116 @@ function buildUniversalContext({message,memory,products,state}){
   };
 }
 
+
+function taskNeedsProduct(intent){
+  return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison"].includes(intent);
+}
+
+function productFactPayload(p){
+  if(!p)return null;
+  const x=productPayload(p);
+  return{
+    name:x.name||"",
+    sku:x.sku||"",
+    brand:x.brand||x.subbrand||"",
+    category:x.category||"",
+    description:x.description||"",
+    features:Array.isArray(x.features)?x.features.slice(0,16):[],
+    specifications:x.specifications||{},
+    function:x.function||"",
+    application:x.application||"",
+    socket:x.socket||"",
+    variants:Array.isArray(x.variants)?x.variants.slice(0,24):[],
+    price:x.price||"",
+    stock:x.stock||"",
+    source_status:x.source_status||{}
+  };
+}
+
+function universalTaskFacts(ctx){
+  return{
+    intent:ctx?.intent||"general",
+    vehicle:ctx?.vehicle||null,
+    target_products:(ctx?.products||[]).slice(0,3).map(productFactPayload).filter(Boolean),
+    exclusions:ctx?.exclusions||[],
+    source_text:ctx?.sourceText||ctx?.currentMessage||"",
+    current_message:ctx?.currentMessage||""
+  };
+}
+
+function explicitProductRequested(message,products){
+  const ranked=resolvePositiveProductsGlobal(products,message,3);
+  if(!ranked.length)return null;
+  const q=normalize(message);
+  for(const p of ranked){
+    const sku=normalize(pSku(p)),name=normalize(pName(p));
+    if((sku&&q.includes(sku))||(name&&q.includes(name)))return p;
+  }
+  return null;
+}
+
+function validateUniversalTaskContext(ctx,products){
+  const currentExplicitProduct=explicitProductRequested(ctx?.currentMessage||"",products);
+  if(currentExplicitProduct){
+    ctx.products=[currentExplicitProduct];
+  }
+
+  if(taskNeedsProduct(ctx?.intent)&&!(ctx?.products||[]).length){
+    return{ok:false,reply:"Produk target untuk tugas ini belum berhasil saya identifikasi dengan aman. Sebutkan nama atau SKU produk yang ingin dipakai."};
+  }
+
+  if((ctx?.products||[]).some(p=>isExcludedProduct(p,ctx?.sourceText||ctx?.currentMessage||""))){
+    return{ok:false,reply:"Produk target bertabrakan dengan instruksi pengecualian Anda. Sebutkan produk yang ingin dipakai agar saya tidak menebak."};
+  }
+
+  return{ok:true};
+}
+
+function knownVehicleTokens(text){
+  const q=normalize(text||"");
+  const names=["avanza","avansa","veloz","xenia","brio","fortuner","rush","terios","xpander","expander","pajero","stargazer","innova","calya","sigra","agya","ayla","ertiga","vixion","verza","r15","cb150r","cbr150","byson","beat","vario","scoopy","jupiter","mio","fino","klx","vespa"];
+  return names.filter(n=>new RegExp(`\\b${n}\\b`,"i").test(q));
+}
+
+function replyContaminated(reply,ctx){
+  const text=String(reply||"");
+  const low=normalize(text);
+
+  for(const ex of ctx?.exclusions||[]){
+    const n=normalize(ex);
+    if(n&&low.includes(n))return{bad:true,reason:`excluded:${ex}`};
+  }
+
+  if(ctx?.vehicle?.model){
+    const allowed=normalize(ctx.vehicle.model);
+    for(const v of knownVehicleTokens(text)){
+      const nv=normalize(v==="expander"?"xpander":v==="avansa"?"avanza":v);
+      const na=normalize(allowed==="expander"?"xpander":allowed==="avansa"?"avanza":allowed);
+      if(nv!==na)return{bad:true,reason:`vehicle:${v}`};
+    }
+  }
+
+  return{bad:false};
+}
+
+function hardTaskInstruction(ctx){
+  const facts=universalTaskFacts(ctx);
+  return[
+    universalTaskInstruction(ctx),
+    "",
+    "FACT_FIREWALL:",
+    JSON.stringify(facts),
+    "",
+    "ATURAN KERAS:",
+    "1. Gunakan HANYA fakta produk di FACT_FIREWALL untuk spesifikasi, fitur, daya, warna, harga, stok, aplikasi, socket, garansi, umur pakai, dan kompatibilitas.",
+    "2. Jangan membuat klaim kompatibilitas kendaraan jika tidak tertulis eksplisit pada fakta terverifikasi.",
+    "3. Jangan mengarang garansi, tingkat kecerahan, hemat energi, premium, keselamatan, plug-and-play, atau manfaat teknis lain yang tidak tersedia.",
+    "4. Jangan menyebut produk yang masuk EXCLUDE.",
+    "5. Jangan membawa kendaraan atau produk dari percakapan lama yang berbeda.",
+    "6. Untuk materi kreatif, boleh kreatif pada gaya bahasa dan struktur, tetapi FAKTA tetap harus berasal dari FACT_FIREWALL.",
+    "7. Jika fakta penting tidak tersedia, tulis secara netral tanpa mengisinya dengan asumsi."
+  ].join("\n");
+}
 function shouldUseUniversalTaskRoute(ctx){
   return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison","creative_general"].includes(ctx?.intent);
 }
@@ -1131,6 +1241,8 @@ exports.handler=async event=>{
 
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
   const universalCtx=buildUniversalContext({message,memory,products,state});
+  const currentExplicitTaskProduct=explicitProductRequested(message,products);
+  if(currentExplicitTaskProduct)universalCtx.products=[currentExplicitTaskProduct];
   const currentVehicleHint=currentTurnVehicleHint(message)||universalCtx.vehicle;
   if(currentVehicleHint){
     state.vehicle={model:currentVehicleHint.model};
@@ -1197,10 +1309,31 @@ exports.handler=async event=>{
   const currentVehicleIsCar=!!(currentVehicleId&&runtime&&typeof runtime.isCarVehicle==="function"&&runtime.isCarVehicle(currentVehicleId));
 
   if(shouldUseUniversalTaskRoute(universalCtx)){
+    const taskCheck=validateUniversalTaskContext(universalCtx,products);
+    if(!taskCheck.ok){
+      return response(200,{reply:taskCheck.reply,image:null,route:`task_guard:${universalCtx.intent}`,usedAI:false,usedWeb:false,sources:[],state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle,activeTask:{intent:universalCtx.intent,sourceText:universalCtx.sourceText}}});
+    }
+
     const targetProducts=universalCtx.products||[];
-    const taskMessage=universalTaskInstruction(universalCtx);
     const taskRoute={...route,type:universalCtx.intent};
-    const ai=await callAI({products,message:taskMessage,route:taskRoute,state,memory,image:img,explicitProducts:targetProducts});
+    let taskMessage=hardTaskInstruction(universalCtx);
+    let ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory,image:img,explicitProducts:targetProducts});
+
+    const contamination=replyContaminated(ai.reply,universalCtx);
+    if(contamination.bad){
+      taskMessage += `\n\nVALIDASI GAGAL: ${contamination.reason}. Tulis ulang dari nol hanya dengan FACT_FIREWALL. Jangan menyebut entitas yang dilarang atau context lama.`;
+      ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory:[],image:img,explicitProducts:targetProducts});
+    }
+
+    const finalCheck=replyContaminated(ai.reply,universalCtx);
+    if(finalCheck.bad){
+      return response(200,{
+        reply:"Saya menahan jawaban karena hasil generasi masih membawa konteks atau entitas yang tidak sesuai. Ulangi permintaan dengan produk/kendaraan target yang eksplisit agar saya tidak mengarang.",
+        image:null,route:`task_blocked:${universalCtx.intent}`,usedAI:true,usedWeb:false,sources:[],
+        state:{activeProduct:targetProducts[0]?{name:pName(targetProducts[0]),sku:pSku(targetProducts[0])}:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle,activeTask:{intent:universalCtx.intent,sourceText:universalCtx.sourceText}}
+      });
+    }
+
     return response(200,{
       reply:ai.reply,
       image:null,

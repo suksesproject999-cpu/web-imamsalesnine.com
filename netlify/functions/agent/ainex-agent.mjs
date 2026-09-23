@@ -697,7 +697,7 @@ function renderDeterministicRecommendation(pack,message){
     }
     out.push("");
     out.push("Catatan: rekomendasi mengikuti klasifikasi aplikasi motor yang sudah ditetapkan. Tahun/generasi dan kondisi socket tetap perlu diverifikasi sebelum pemasangan.");
-    return out.join("\\n");
+    return out.join("\n");
   }
 
   if(pack?.biled_query){
@@ -797,6 +797,20 @@ function activeUniversalTask(ctx){
   if(!t||!t.intent)return null;
   return t;
 }
+
+function currentTurnExplicitVehicle(ctx){
+  return explicitVehicleFromText(ctx?.message||"")||resolveMotorcycleContext(ctx?.message||"")||null;
+}
+
+function contextConflict(ctx){
+  const current=currentTurnExplicitVehicle(ctx);
+  const inherited=ctx?.conversationContext?.vehicle||ctx?.state?.vehicle||null;
+  if(!current||!inherited?.model)return null;
+  const cm=norm(current.model),im=norm(inherited.model);
+  if(cm&&im&&cm!==im)return{current,inherited};
+  return null;
+}
+
 function blockedByUniversalTask(ctx){
   const t=activeUniversalTask(ctx);
   return !!(t&&["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison","creative_general"].includes(t.intent));
@@ -837,6 +851,11 @@ export async function runAinexAgent(ctx={}){
   if(!process.env.OPENAI_API_KEY){
     await updateMetrics({errors:1,last_status:"ERROR",last_request_id:requestId,last_route:ctx.route?.type||""});
     return{used:false,reason:"api_key_missing",mode:cfg.mode,request_id:requestId};
+  }
+
+  const conflict=contextConflict(ctx);
+  if(conflict){
+    ctx={...ctx,conversationContext:{...(ctx.conversationContext||{}),vehicle:conflict.current}};
   }
 
   const pack=deterministicPack(ctx);
