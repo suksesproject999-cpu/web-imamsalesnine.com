@@ -238,7 +238,7 @@ function unifiedProducts(liveProducts){
       return (
         (sku && ps && sku === ps) ||
         (name && pn && name === pn)
-      ));
+      );
     }) || null;
   }
 
