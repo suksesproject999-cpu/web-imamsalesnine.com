@@ -32,6 +32,7 @@ const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
 const vehicleClassDB=readJSON(path.join(__dirname,"data","product_vehicle_classification_v1.json"),{groups:{}});
 const productLifecycleDB=readJSON(path.join(__dirname,"data","product_lifecycle_v1.json"),{policy:{default_status:"active",status_rules:{}},products:{}});
 const recommendationShortlistDB=readJSON(path.join(__dirname,"data","recommended_product_shortlist_v1.json"),{policy:{},curated_socket_products:{},product_socket_catalog:{}});
+const vehicleIntelligenceDB=readJSON(path.join(__dirname,"data","vehicle_intelligence_kamar4_v3_normalized.json"),{vehicles:[]});
 
 const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
 const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
@@ -419,7 +420,62 @@ function isFollowupLike(message){
   return /^(kalau|kalo)\b|\b(yang tadi|produk tadi|mobil tadi|motor tadi|kendaraan tadi|lanjutkan|versi lain|yang itu|yang ini)\b/.test(m);
 }
 
+function vehicleYearsFromText(message){
+  return (String(message||"").match(/\b(?:19|20)\d{2}\b/g)||[]).map(Number);
+}
+function phraseInNormalizedText(q,phrase){
+  const p=normalize(phrase||"");
+  if(!p)return false;
+  return new RegExp(`(^|\\s)${p.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}(?=\\s|$)`,"i").test(q);
+}
+function databaseVehicleEntity(message,{allowOutOfRange=false}={}){
+  const q=normalize(message||"");
+  const years=vehicleYearsFromText(message);
+  const candidates=[];
+
+  for(const v of vehicleIntelligenceDB?.vehicles||[]){
+    const id=v.identity||{}, yr=id.year||{};
+    const aliases=[...(id.aliases||[]),...(v.search_index?.aliases||[]),id.model_source,[id.brand,id.model_source].filter(Boolean).join(" ")].filter(Boolean);
+    let bestAlias="";
+    for(const a of aliases){
+      const na=normalize(a);
+      if(na.length>bestAlias.length&&phraseInNormalizedText(q,na))bestAlias=na;
+    }
+    if(!bestAlias)continue;
+
+    const ys=Number(yr.start||0), ye=Number(yr.end||0);
+    const exactYear=!years.length||!ys||!ye||years.every(y=>ys<=y&&y<=ye);
+    const overlaps=!years.length||!ys||!ye||years.some(y=>ys<=y&&y<=ye);
+    if(years.length&&!allowOutOfRange&&!exactYear&&!overlaps)continue;
+
+    let score=bestAlias.length*100;
+    if(exactYear)score+=10000;
+    else if(overlaps)score+=5000;
+    if(normalize(id.brand)&&phraseInNormalizedText(q,id.brand))score+=1000;
+
+    candidates.push({v,score,exactYear});
+  }
+
+  candidates.sort((a,b)=>b.score-a.score);
+  const hit=candidates[0]?.v;
+  if(!hit)return null;
+  const id=hit.identity||{},yr=id.year||{};
+  const yearValue=years.length>1?`${Math.min(...years)}-${Math.max(...years)}`:(years[0]?String(years[0]):"");
+  return{
+    brand:normalize(id.brand||""),
+    model:normalize(id.model_source||""),
+    year:yearValue||null,
+    year_start:yr.start||null,
+    year_end:yr.end||null,
+    vehicle_id:hit.vehicle_id||null,
+    source:"vehicle_database"
+  };
+}
+
 function explicitVehicleEntity(message){
+  const db=databaseVehicleEntity(message);
+  if(db)return db;
+
   const raw=String(message||"");
   const q=normalize(raw);
   const y=raw.match(/\b(19|20)\d{2}\b/)?.[0]||null;
@@ -437,12 +493,12 @@ function explicitVehicleEntity(message){
   for(const [a,model] of sorted){
     if(new RegExp(`\\b${a.replace(/[.*+?^${}()|[\]\\]/g,"\\$&")}\\b`,"i").test(q)){
       const brandMatch=raw.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu|vespa|benelli)\b/i);
-      return{brand:brandMatch?brandMatch[1].toLowerCase():"",model,year:y};
+      return{brand:brandMatch?brandMatch[1].toLowerCase():"",model,year:y,vehicle_id:null,source:"fallback_alias"};
     }
   }
 
   const generic=raw.match(/\b(honda|toyota|daihatsu|suzuki|mitsubishi|yamaha|kawasaki|nissan|wuling|hyundai|kia|mazda|isuzu|vespa|benelli)\b\s+([a-z0-9-]+)/i);
-  if(generic)return{brand:generic[1].toLowerCase(),model:generic[2].toLowerCase(),year:y};
+  if(generic)return{brand:generic[1].toLowerCase(),model:generic[2].toLowerCase(),year:y,vehicle_id:null,source:"generic_brand_model"};
   return null;
 }
 
@@ -604,6 +660,17 @@ function buildUniversalContext({message,memory,products,state}){
 }
 
 
+
+function isCreativeTaskIntent(intent){
+  return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","creative_general"].includes(intent);
+}
+function taskMemoryPolicy(ctx,memory){
+  if(!isCreativeTaskIntent(ctx?.intent))return Array.isArray(memory)?memory:[];
+  const explicitVehicle=explicitVehicleEntity(ctx?.currentMessage||"")||currentTurnVehicleHint(ctx?.currentMessage||"");
+  if(!ctx?.followup&&!explicitVehicle)return[];
+  return Array.isArray(memory)?memory:[];
+}
+
 function taskNeedsProduct(intent){
   return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison"].includes(intent);
 }
@@ -640,13 +707,35 @@ function universalTaskFacts(ctx){
   };
 }
 
+
+function resolveExactProductLock(products,message){
+  const q=normalize(message||"");
+  const tokenSet=new Set(q.split(/\s+/).map(compact).filter(Boolean));
+  let best=null;
+  for(const p of products){
+    const sku=compact(pSku(p)), name=normalize(pName(p)), cname=compact(name);
+    const aliases=[...arr(p?.alias),...arr(p?.aliases)].map(x=>({raw:normalize(x),compact:compact(x)})).filter(x=>x.compact);
+    let score=0,reason="";
+    if(sku&&tokenSet.has(sku)){score=10000+sku.length;reason="exact_sku";}
+    if(cname&&compact(q).includes(cname)&&cname.length>=5&&score<9000){score=9000+cname.length;reason="exact_name";}
+    for(const a of aliases){
+      if(tokenSet.has(a.compact)&&score<9500){score=9500+a.compact.length;reason="exact_alias";}
+      else if(a.raw&&q.includes(a.raw)&&score<9200){score=9200+a.raw.length;reason="exact_alias_phrase";}
+    }
+    if(score&&(!best||score>best.score))best={product:p,score,reason};
+  }
+  return best;
+}
+
 function explicitProductRequested(message,products){
+  const locked=resolveExactProductLock(products,message);
+  if(locked?.product)return locked.product;
   const ranked=resolvePositiveProductsGlobal(products,message,3);
   if(!ranked.length)return null;
-  const q=normalize(message);
+  const cq=compact(message);
   for(const p of ranked){
-    const sku=normalize(pSku(p)),name=normalize(pName(p));
-    if((sku&&q.includes(sku))||(name&&q.includes(name)))return p;
+    const sku=compact(pSku(p)),name=compact(pName(p));
+    if((sku&&cq.includes(sku))||(name&&cq.includes(name)))return p;
   }
   return null;
 }
@@ -674,15 +763,12 @@ function knownVehicleTokens(text){
   return names.filter(n=>new RegExp(`\\b${n}\\b`,"i").test(q));
 }
 
-function replyContaminated(reply,ctx){
-  const text=String(reply||"");
-  const low=normalize(text);
-
+function replyContaminated(reply,ctx,allProducts=[]){
+  const text=String(reply||""), low=normalize(text);
   for(const ex of ctx?.exclusions||[]){
-    const n=normalize(ex);
-    if(n&&low.includes(n))return{bad:true,reason:`excluded:${ex}`};
+    const n=normalize(ex); if(n&&low.includes(n))return{bad:true,reason:`excluded:${ex}`};
   }
-
+  const explicitVehicle=explicitVehicleEntity(ctx?.currentMessage||"")||currentTurnVehicleHint(ctx?.currentMessage||"");
   if(ctx?.vehicle?.model){
     const allowed=normalize(ctx.vehicle.model);
     for(const v of knownVehicleTokens(text)){
@@ -690,9 +776,36 @@ function replyContaminated(reply,ctx){
       const na=normalize(allowed==="expander"?"xpander":allowed==="avansa"?"avanza":allowed);
       if(nv!==na)return{bad:true,reason:`vehicle:${v}`};
     }
+  }else if(isCreativeTaskIntent(ctx?.intent)&&!ctx?.followup&&!explicitVehicle){
+    const mentioned=knownVehicleTokens(text);
+    if(mentioned.length)return{bad:true,reason:`stale_vehicle:${mentioned[0]}`};
   }
-
+  const targets=new Set((ctx?.products||[]).map(p=>compact(pSku(p)||pName(p))).filter(Boolean));
+  if(targets.size){
+    for(const p of allProducts||[]){
+      const key=compact(pSku(p)||pName(p));
+      if(!key||targets.has(key))continue;
+      const fullName=normalize(pName(p));
+      if(fullName&&fullName.length>=6&&low.includes(fullName))return{bad:true,reason:`wrong_product:${pSku(p)||pName(p)}`};
+    }
+  }
   return{bad:false};
+}
+
+function unverifiedCreativeClaim(reply,ctx){
+  if(!isCreativeTaskIntent(ctx?.intent))return null;
+  const s=normalize(reply||"");
+  const risky=[
+    ["dirancang khusus",/\bdirancang khusus\b/],
+    ["cocok untuk kendaraan",/\bcocok untuk\b.*\b(avanza|veloz|rush|xpander|pajero|brio|xenia|fortuner|stargazer)\b/],
+    ["plug-and-play",/\bplug.?and.?play\b/],
+    ["lebih aman",/\blebih aman\b/],
+    ["hemat energi",/\bhemat energi\b/],
+    ["garansi",/\bgaransi\b/],
+    ["umur pakai",/\bumur pakai\b/]
+  ];
+  for(const [label,rx] of risky)if(rx.test(s))return label;
+  return null;
 }
 
 function hardTaskInstruction(ctx){
@@ -736,9 +849,10 @@ function universalTaskInstruction(ctx){
 function resolveRequestContext({message,memory,products,state}){
   const currentVehicle=explicitVehicleEntity(message)||currentTurnVehicleHint(message)||null;
   const intent=universalIntent(message);
+  const exactLock=resolveExactProductLock(products,message);
   const currentProducts=intent==="comparison"
     ?resolveComparisonProducts(products,message,6)
-    :resolvePositiveProductsGlobal(products,message,6);
+    :(exactLock?.product?[exactLock.product]:resolvePositiveProductsGlobal(products,message,6));
   const followup=isFollowupLike(message);
   const prior=followup?latestTaskContext(memory):null;
 
@@ -758,6 +872,17 @@ function resolveRequestContext({message,memory,products,state}){
     }
     if(prior?.sourceText)sourceText=prior.sourceText;
     exclusions=[...new Set([...exclusions,...(prior?.exclusions||[])])];
+  }
+
+  // Current lamp-position request is an automotive intent, not a continuation of
+  // comparison/product chatter. Keep latest vehicle, clear stale products/task.
+  const currentPosition=automotiveFollowupPosition(message);
+  if(currentPosition&&!currentProducts.length){
+    if(!vehicle)vehicle=latestVehicleContext(memory)||state?.vehicle||null;
+    taskIntent="fitment";
+    sourceText=message;
+    targetProducts=[];
+    exclusions=exclusionSpans(message);
   }
 
   // Current turn ALWAYS wins over inherited task/entity context.
@@ -780,18 +905,75 @@ function resolveRequestContext({message,memory,products,state}){
 
 function automotiveFollowupPosition(message){
   const q=normalize(message||"");
-  if(/\b(headlamp|lampu depan|lampu utama)\b/.test(q))return"headlamp";
-  if(/\b(foglamp|lampu kabut)\b/.test(q))return"foglamp";
-  if(/\b(lampu mundur|reverse)\b/.test(q))return"reverse";
-  if(/\b(senja|parking)\b/.test(q))return"parking";
-  if(/\b(sein depan)\b/.test(q))return"turn_front";
-  if(/\b(sein belakang)\b/.test(q))return"turn_rear";
-  if(/\b(rem|brake)\b/.test(q))return"brake";
+  if(/\b(headlamp(?:nya)?|lampu depan(?:nya)?|lampu utama(?:nya)?)\b/.test(q))return"headlamp";
+  if(/\b(foglamp(?:nya)?|lampu kabut(?:nya)?)\b/.test(q))return"foglamp";
+  if(/\b(lampu mundur(?:nya)?|mundurnya|reverse)\b/.test(q))return"reverse";
+  if(/\b(senja(?:nya)?|lampu senja(?:nya)?|parking)\b/.test(q))return"parking";
+  if(/\b(sein depan(?:nya)?)\b/.test(q))return"turn_front";
+  if(/\b(sein belakang(?:nya)?)\b/.test(q))return"turn_rear";
+  if(/\b(lampu rem(?:nya)?|remnya|brake)\b/.test(q))return"brake";
   return null;
 }
 
 function hasExplicitAutomotiveContext(ctx){
   return !!(ctx?.vehicle?.model||automotiveFollowupPosition(ctx?.currentMessage));
+}
+
+
+function positionPhrase(position){
+  return({headlamp:"headlamp",foglamp:"foglamp",reverse:"lampu mundur",parking:"lampu senja",turn_front:"sein depan",turn_rear:"sein belakang",brake:"lampu rem"})[position]||"";
+}
+function vehicleTextFromContext(ctx){
+  if(!ctx?.vehicle?.model)return"";
+  return [ctx.vehicle.brand,ctx.vehicle.model,ctx.vehicle.year].filter(Boolean).join(" ").trim();
+}
+function shouldHardGateVehicleQuery(ctx){
+  if(!ctx?.vehicle?.model)return false;
+  if(isCreativeTaskIntent(ctx?.intent)||ctx?.intent==="comparison")return false;
+  if((ctx?.products||[]).length)return false;
+  return true;
+}
+
+function runtimeVehicleResultFromContext(ctx,runtime){
+  const directId=ctx?.vehicle?.vehicle_id;
+  if(directId&&runtime?.vById?.[directId]){
+    const v=runtime.vById[directId];
+    return{entities:{products:[],vehicles:[directId],year:Number(String(ctx?.vehicle?.year||"").match(/\d{4}/)?.[0]||0)||null},intents:["vehicle_info"],facts:{vehicles:[v],fitment_vehicle_to_product:[]}};
+  }
+  const dbHit=databaseVehicleEntity(vehicleTextFromContext(ctx));
+  const vid=dbHit?.vehicle_id;
+  if(vid&&runtime?.vById?.[vid]){
+    const v=runtime.vById[vid];
+    return{entities:{products:[],vehicles:[vid],year:Number(String(ctx?.vehicle?.year||"").match(/\d{4}/)?.[0]||0)||null},intents:["vehicle_info"],facts:{vehicles:[v],fitment_vehicle_to_product:[]}};
+  }
+  return null;
+}
+
+function vehicleCoverageReply(ctx,runtime){
+  const wantedModel=normalize(ctx?.vehicle?.model||"");
+  const wantedBrand=normalize(ctx?.vehicle?.brand||"");
+  const wantedYear=Number(String(ctx?.vehicle?.year||"").match(/\d{4}/)?.[0]||0)||null;
+  if(!wantedModel)return null;
+
+  const rows=Object.values(runtime?.vById||{}).filter(v=>{
+    const i=v?.identity||{};
+    const model=normalize(i.model_source||"");
+    const brand=normalize(i.brand||"");
+    return model===wantedModel && (!wantedBrand||!brand||brand===wantedBrand);
+  });
+  if(!rows.length)return null;
+
+  const ranges=[...new Set(rows.map(v=>{
+    const y=v?.identity?.year||{};
+    if(y.start&&y.end)return y.start===y.end?String(y.start):`${y.start}-${y.end}`;
+    return y.raw||"";
+  }).filter(Boolean))];
+
+  const label=[ctx?.vehicle?.brand,ctx?.vehicle?.model,wantedYear].filter(Boolean).join(" ");
+  if(wantedYear&&ranges.length){
+    return `Data ${label} tidak tercakup persis pada database kendaraan yang tersedia. Rentang yang terverifikasi untuk model ini: ${ranges.join(", ")}. Saya tidak akan memakai rentang tahun lain sebagai fitment ${wantedYear}.`;
+  }
+  return null;
 }
 
 function mustUseDeterministicAutomotive(ctx){
@@ -888,7 +1070,28 @@ function direct(type,p){
   if(type==="product_detail"||type==="product_full"){const r=[x.name];if(x.description)r.push(`Deskripsi: ${x.description}`);if(x.master_brand)r.push(`Master brand: ${x.master_brand}`);if(x.subbrand)r.push(`Subbrand: ${x.subbrand}`);if(x.category)r.push(`Kategori: ${x.category}`);if(x.features?.length){r.push("Fitur:",...x.features.slice(0,type==="product_full"?24:10).map(v=>`- ${v}`));}const specs=Object.entries(x.specifications||{});if(specs.length)r.push("Spesifikasi:",...specs.slice(0,type==="product_full"?50:14).map(([k,v])=>`- ${k}: ${v}`));if(x.function)r.push(`Fungsi: ${x.function}`);if(x.application)r.push(`Aplikasi: ${x.application}`);if(x.socket)r.push(`Socket: ${x.socket}`);if(x.variants?.length)r.push(`Varian: ${x.variants.join(", ")}`);if(x.price)r.push(`Harga: ${x.price}`);if(x.stock!=="")r.push(`Stok: ${x.stock}`);return r.join("\n");}
   return null;
 }
-function compare(products){const ps=products.slice(0,4).map(productPayload),r=[`Perbandingan ${ps.map(x=>x.sku||x.name).join(" vs ")}:`];for(const p of ps){r.push("",`${p.name}${p.sku?` (${p.sku})`:""}`);if(p.description)r.push(`- Deskripsi: ${p.description}`);for(const[k,v]of Object.entries(p.specifications||{}).slice(0,10))r.push(`- ${k}: ${v}`);if(p.price)r.push(`- Harga: ${p.price}`);if(p.stock!=="")r.push(`- Stok: ${p.stock}`);}r.push("","Perbandingan di atas hanya menggunakan data resmi yang tersedia.");return r.join("\n");}
+function compare(products){
+  const ps=products.slice(0,4).map(productPayload);
+  const r=[`Perbandingan ${ps.map(x=>x.sku||x.name).join(" vs ")}:`];
+
+  for(const p of ps){
+    r.push("",`${p.name}${p.sku?` (${p.sku})`:""}`);
+    if(p.function)r.push(`- Fungsi: ${p.function}`);
+    if(p.socket)r.push(`- Socket: ${Array.isArray(p.socket)?p.socket.join(" / "):p.socket}`);
+    if(Array.isArray(p.variants)&&p.variants.length)r.push(`- Varian: ${p.variants.join(", ")}`);
+
+    const specs=Object.entries(p.specifications||{})
+      .filter(([k,v])=>v!==null&&v!==undefined&&String(v).trim()!=="")
+      .slice(0,12);
+    for(const [k,v] of specs)r.push(`- ${k}: ${Array.isArray(v)?v.join(", "):v}`);
+
+    if(p.price)r.push(`- Harga: ${p.price}`);
+    if(p.stock!=="")r.push(`- Stok: ${p.stock}`);
+  }
+
+  r.push("","Perbandingan hanya menggunakan identitas, varian, fungsi, spesifikasi, harga, dan stok resmi yang tersedia. Deskripsi marketing tidak digunakan sebagai dasar perbandingan.");
+  return r.join("\\n");
+}
 function localTime(iso,tz){try{const d=iso?new Date(iso):new Date();const t=new Intl.DateTimeFormat("id-ID",{hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false,timeZone:tz||undefined}).format(d);const dt=new Intl.DateTimeFormat("id-ID",{weekday:"long",day:"numeric",month:"long",year:"numeric",timeZone:tz||undefined}).format(d);return`Sekarang pukul ${t}${tz?` (${tz})`:""}, ${dt}.`;}catch{return null;}}
 
 
@@ -1037,7 +1240,13 @@ function exactCandidatesForPosition(runtimeResult,position,socket){
 
   return out;
 }
-function detailedVehicleRecommendationReply(runtimeResult,runtime){
+function positionRowMatches(key,requested){
+  if(!requested)return true;
+  if(requested==="headlamp")return String(key||"").startsWith("headlamp_");
+  const map={parking:"parking_front",turn_front:"turn_signal_front",turn_rear:"turn_signal_rear"};
+  return key===(map[requested]||requested);
+}
+function detailedVehicleRecommendationReply(runtimeResult,runtime,requestedPosition=null){
   const vehicleId=runtimeResult?.entities?.vehicles?.[0];
   const vehicle=vehicleId?runtime?.vById?.[vehicleId]:null;
   if(!vehicle)return null;
@@ -1045,7 +1254,7 @@ function detailedVehicleRecommendationReply(runtimeResult,runtime){
   const i=vehicle.identity||{},y=i.year||{};
   const years=y.start&&y.end?(y.start===y.end?String(y.start):`${y.start}-${y.end}`):(y.raw||"");
   const title=[i.brand,i.model_source,years].filter(Boolean).join(" ");
-  const rows=lightingPositionRows(vehicle);
+  const rows=lightingPositionRows(vehicle).filter(row=>positionRowMatches(row.key,requestedPosition));
   if(!rows.length)return null;
 
   const lines=[title,""];
@@ -1417,9 +1626,28 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
       resolveComparison:q=>resolveComparisonProducts(products,q,6),
       detectIntent:q=>universalIntent(q),
       isFollowup:q=>isFollowupLike(q),
-      resolveVehicle:q=>explicitVehicleEntity(q)||currentTurnVehicleHint(q)
+      resolveVehicle:q=>explicitVehicleEntity(q)||currentTurnVehicleHint(q),
+      resolveExactProduct:q=>resolveExactProductLock(products,ainexSystem.normalizeAliases(q))?.product||null,
+      resolvePosition:q=>automotiveFollowupPosition(ainexSystem.normalizeAliases(q))
     });
-    return response(report.ok?200:503,{reply:report.ok?"AINEX self-test PASS.":"AINEX self-test menemukan regression.",route:"selftest",usedAI:false,usedWeb:false,selftest:report});
+
+    let runtimeCheck={ok:false,loaded:false,mazda2:false,rush2016:false,rush2019Exact:false,error:""};
+    try{
+      const rt=await getNexaiRuntime();
+      runtimeCheck.loaded=!!rt;
+      if(rt){
+        const m=rt.handle("Mazda MAZDA 2 2014",{});
+        const r16=rt.handle("Toyota RUSH 2016",{});
+        const r19=rt.handle("Toyota RUSH 2019",{});
+        runtimeCheck.mazda2=!!m?.entities?.vehicles?.length;
+        runtimeCheck.rush2016=!!r16?.entities?.vehicles?.length;
+        runtimeCheck.rush2019Exact=!!r19?.entities?.vehicles?.length;
+        runtimeCheck.ok=runtimeCheck.loaded&&runtimeCheck.mazda2&&runtimeCheck.rush2016&&!runtimeCheck.rush2019Exact;
+      }
+    }catch(e){runtimeCheck.error=e.message;}
+
+    const allOk=report.ok&&runtimeCheck.ok;
+    return response(allOk?200:503,{reply:allOk?"AINEX self-test + runtime PASS.":"AINEX self-test/runtime menemukan regression.",route:"selftest",usedAI:false,usedWeb:false,selftest:report,runtimeCheck});
   }
   if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,runtimeEngine:fs.existsSync(RUNTIME_ENGINE_FILE),checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
   const{fields,files}=await parseMultipartEvent(event),rawMessage=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
@@ -1481,6 +1709,53 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
     catch(e){console.warn("NEXAI runtime handle warning:",e.message);}
   }
 
+  // MOTORCYCLE AUTHORITY: known motorcycle applications must never be swallowed
+  // by the generic vehicle hard-gate.
+  const preMotorcycleReply=(!isCreativeTaskIntent(universalCtx.intent)&&universalCtx.intent!=="comparison")
+    ?motorcycleRecommendationReply(message,products)
+    :null;
+  if(preMotorcycleReply&&/\b(rekomendasi|lampu|headlamp|cocok|pakai|pake|produk)\b/i.test(message)){
+    return response(200,{reply:preMotorcycleReply,image:null,route:"motorcycle_group_recommendation",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle}});
+  }
+
+  // HARD GATE: recognized car requests never fall through to generic AI.
+  if(runtime&&shouldHardGateVehicleQuery(universalCtx)){
+    const vtext=vehicleTextFromContext(universalCtx);
+    const pos=automotiveFollowupPosition(message);
+    const verifiedVehicleResult=runtimeVehicleResultFromContext(universalCtx,runtime);
+
+    if(pos){
+      if(verifiedVehicleResult){
+        const detailed=detailedVehicleRecommendationReply(verifiedVehicleResult,runtime,pos);
+        if(detailed)return response(200,{reply:detailed,image:null,route:"vehicle_position_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+
+        const vf=verifiedVehicleResult?.facts?.vehicles?.[0];
+        const vr=runtimeVehicleReply(vf);
+        if(vr)return response(200,{reply:vr,image:null,route:"vehicle_info_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+      }
+
+      const coverage=vehicleCoverageReply(universalCtx,runtime);
+      if(coverage)return response(200,{reply:coverage,image:null,route:"vehicle_year_unverified",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+      return response(200,{reply:`Data ${vtext} untuk ${positionPhrase(pos)} belum cukup terverifikasi. Saya tidak akan menebak socket atau produk.`,image:null,route:"vehicle_position_unverified",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+    }
+
+    const asksGeneralLamp=/\b(rekomendasi|lampu|produk|cocok|pakai|pake)\b/i.test(message);
+    if(verifiedVehicleResult){
+      if(asksGeneralLamp){
+        const detailed=detailedVehicleRecommendationReply(verifiedVehicleResult,runtime);
+        if(detailed)return response(200,{reply:detailed,image:null,route:"vehicle_full_recommendation_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+      }
+
+      const vf=verifiedVehicleResult?.facts?.vehicles?.[0];
+      const vr=runtimeVehicleReply(vf);
+      if(vr)return response(200,{reply:vr,image:null,route:"vehicle_info_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+    }
+
+    const coverage=vehicleCoverageReply(universalCtx,runtime);
+    if(coverage)return response(200,{reply:coverage,image:null,route:"vehicle_year_unverified",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+    return response(200,{reply:`Data kendaraan ${vtext} belum cukup terverifikasi. Saya tidak akan menebak socket atau produk.`,image:null,route:"vehicle_data_unverified",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+  }
+
   const runtimeProductId=runtimeResult?.entities?.products?.[0]||null;
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const positiveRuntimeProduct=(runtimeProduct&&!isExcludedProduct(runtimeProduct,message))?runtimeProduct:null;
@@ -1523,16 +1798,20 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
     const targetProducts=universalCtx.products||[];
     const taskRoute={...route,type:universalCtx.intent};
     let taskMessage=hardTaskInstruction(universalCtx);
-    let ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory,image:img,explicitProducts:targetProducts});
+    const taskMemory=taskMemoryPolicy(universalCtx,memory);
+    let ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory:taskMemory,image:img,explicitProducts:targetProducts});
 
-    const contamination=replyContaminated(ai.reply,universalCtx);
-    if(contamination.bad){
-      taskMessage += `\n\nVALIDASI GAGAL: ${contamination.reason}. Tulis ulang dari nol hanya dengan FACT_FIREWALL. Jangan menyebut entitas yang dilarang atau context lama.`;
+    const contamination=replyContaminated(ai.reply,universalCtx,products);
+    const riskyClaim=unverifiedCreativeClaim(ai.reply,universalCtx);
+    if(contamination.bad||riskyClaim){
+      const why=contamination.bad?contamination.reason:`unverified_claim:${riskyClaim}`;
+      taskMessage += `\n\nVALIDASI GAGAL: ${why}. Tulis ulang dari nol hanya dengan FACT_FIREWALL. Hapus klaim teknis, kompatibilitas, kendaraan, atau marketing yang tidak eksplisit tersedia.`;
       ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory:[],image:img,explicitProducts:targetProducts});
     }
 
-    const finalCheck=replyContaminated(ai.reply,universalCtx);
-    if(finalCheck.bad){
+    const finalCheck=replyContaminated(ai.reply,universalCtx,products);
+    const finalRiskyClaim=unverifiedCreativeClaim(ai.reply,universalCtx);
+    if(finalCheck.bad||finalRiskyClaim){
       return response(200,{
         reply:"Saya menahan jawaban karena hasil generasi masih membawa konteks atau entitas yang tidak sesuai. Ulangi permintaan dengan produk/kendaraan target yang eksplisit agar saya tidak mengarang.",
         image:null,route:`task_blocked:${universalCtx.intent}`,usedAI:true,usedWeb:false,sources:[],
