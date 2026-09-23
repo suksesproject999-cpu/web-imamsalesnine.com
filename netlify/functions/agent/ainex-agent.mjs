@@ -5,7 +5,7 @@ import {pathToFileURL} from "url";
 
 const PROJECT=process.env.AINEX_FIREBASE_PROJECT||"apin-web";
 const API_KEY=process.env.AINEX_FIREBASE_API_KEY||"AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec";
-const AGENT_VERSION="3.1.0";
+const AGENT_VERSION="3.2.0";
 const MODEL=process.env.AINEX_AGENT_MODEL||process.env.NEXAI_MODEL_SMART||process.env.NEXAI_MODEL||"gpt-4.1-mini";
 const DATA_ROOT=path.resolve(path.dirname(new URL(import.meta.url).pathname),"../data");
 const RUNTIME_FILE=path.join(DATA_ROOT,"nexai_runtime_engine_v1_1.mjs");

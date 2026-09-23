@@ -4,7 +4,7 @@ const fs=require("fs");
 const path=require("path");
 const {AsyncLocalStorage}=require("async_hooks");
 
-const VERSION="3.0.0";
+const VERSION="3.2.0";
 const als=new AsyncLocalStorage();
 const DATA_ROOT=path.join(__dirname,"..","data");
 const PROJECT=process.env.AINEX_FIREBASE_PROJECT||"apin-web";
