@@ -604,6 +604,17 @@ function buildUniversalContext({message,memory,products,state}){
 }
 
 
+
+function isCreativeTaskIntent(intent){
+  return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","creative_general"].includes(intent);
+}
+function taskMemoryPolicy(ctx,memory){
+  if(!isCreativeTaskIntent(ctx?.intent))return Array.isArray(memory)?memory:[];
+  const explicitVehicle=explicitVehicleEntity(ctx?.currentMessage||"")||currentTurnVehicleHint(ctx?.currentMessage||"");
+  if(!ctx?.followup&&!explicitVehicle)return[];
+  return Array.isArray(memory)?memory:[];
+}
+
 function taskNeedsProduct(intent){
   return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison"].includes(intent);
 }
@@ -640,13 +651,35 @@ function universalTaskFacts(ctx){
   };
 }
 
+
+function resolveExactProductLock(products,message){
+  const q=normalize(message||"");
+  const tokenSet=new Set(q.split(/\s+/).map(compact).filter(Boolean));
+  let best=null;
+  for(const p of products){
+    const sku=compact(pSku(p)), name=normalize(pName(p)), cname=compact(name);
+    const aliases=[...arr(p?.alias),...arr(p?.aliases)].map(x=>({raw:normalize(x),compact:compact(x)})).filter(x=>x.compact);
+    let score=0,reason="";
+    if(sku&&tokenSet.has(sku)){score=10000+sku.length;reason="exact_sku";}
+    if(cname&&compact(q).includes(cname)&&cname.length>=5&&score<9000){score=9000+cname.length;reason="exact_name";}
+    for(const a of aliases){
+      if(tokenSet.has(a.compact)&&score<9500){score=9500+a.compact.length;reason="exact_alias";}
+      else if(a.raw&&q.includes(a.raw)&&score<9200){score=9200+a.raw.length;reason="exact_alias_phrase";}
+    }
+    if(score&&(!best||score>best.score))best={product:p,score,reason};
+  }
+  return best;
+}
+
 function explicitProductRequested(message,products){
+  const locked=resolveExactProductLock(products,message);
+  if(locked?.product)return locked.product;
   const ranked=resolvePositiveProductsGlobal(products,message,3);
   if(!ranked.length)return null;
-  const q=normalize(message);
+  const cq=compact(message);
   for(const p of ranked){
-    const sku=normalize(pSku(p)),name=normalize(pName(p));
-    if((sku&&q.includes(sku))||(name&&q.includes(name)))return p;
+    const sku=compact(pSku(p)),name=compact(pName(p));
+    if((sku&&cq.includes(sku))||(name&&cq.includes(name)))return p;
   }
   return null;
 }
@@ -674,15 +707,12 @@ function knownVehicleTokens(text){
   return names.filter(n=>new RegExp(`\\b${n}\\b`,"i").test(q));
 }
 
-function replyContaminated(reply,ctx){
-  const text=String(reply||"");
-  const low=normalize(text);
-
+function replyContaminated(reply,ctx,allProducts=[]){
+  const text=String(reply||""), low=normalize(text);
   for(const ex of ctx?.exclusions||[]){
-    const n=normalize(ex);
-    if(n&&low.includes(n))return{bad:true,reason:`excluded:${ex}`};
+    const n=normalize(ex); if(n&&low.includes(n))return{bad:true,reason:`excluded:${ex}`};
   }
-
+  const explicitVehicle=explicitVehicleEntity(ctx?.currentMessage||"")||currentTurnVehicleHint(ctx?.currentMessage||"");
   if(ctx?.vehicle?.model){
     const allowed=normalize(ctx.vehicle.model);
     for(const v of knownVehicleTokens(text)){
@@ -690,9 +720,36 @@ function replyContaminated(reply,ctx){
       const na=normalize(allowed==="expander"?"xpander":allowed==="avansa"?"avanza":allowed);
       if(nv!==na)return{bad:true,reason:`vehicle:${v}`};
     }
+  }else if(isCreativeTaskIntent(ctx?.intent)&&!ctx?.followup&&!explicitVehicle){
+    const mentioned=knownVehicleTokens(text);
+    if(mentioned.length)return{bad:true,reason:`stale_vehicle:${mentioned[0]}`};
   }
-
+  const targets=new Set((ctx?.products||[]).map(p=>compact(pSku(p)||pName(p))).filter(Boolean));
+  if(targets.size){
+    for(const p of allProducts||[]){
+      const key=compact(pSku(p)||pName(p));
+      if(!key||targets.has(key))continue;
+      const fullName=normalize(pName(p));
+      if(fullName&&fullName.length>=6&&low.includes(fullName))return{bad:true,reason:`wrong_product:${pSku(p)||pName(p)}`};
+    }
+  }
   return{bad:false};
+}
+
+function unverifiedCreativeClaim(reply,ctx){
+  if(!isCreativeTaskIntent(ctx?.intent))return null;
+  const s=normalize(reply||"");
+  const risky=[
+    ["dirancang khusus",/\bdirancang khusus\b/],
+    ["cocok untuk kendaraan",/\bcocok untuk\b.*\b(avanza|veloz|rush|xpander|pajero|brio|xenia|fortuner|stargazer)\b/],
+    ["plug-and-play",/\bplug.?and.?play\b/],
+    ["lebih aman",/\blebih aman\b/],
+    ["hemat energi",/\bhemat energi\b/],
+    ["garansi",/\bgaransi\b/],
+    ["umur pakai",/\bumur pakai\b/]
+  ];
+  for(const [label,rx] of risky)if(rx.test(s))return label;
+  return null;
 }
 
 function hardTaskInstruction(ctx){
@@ -736,9 +793,10 @@ function universalTaskInstruction(ctx){
 function resolveRequestContext({message,memory,products,state}){
   const currentVehicle=explicitVehicleEntity(message)||currentTurnVehicleHint(message)||null;
   const intent=universalIntent(message);
+  const exactLock=resolveExactProductLock(products,message);
   const currentProducts=intent==="comparison"
     ?resolveComparisonProducts(products,message,6)
-    :resolvePositiveProductsGlobal(products,message,6);
+    :(exactLock?.product?[exactLock.product]:resolvePositiveProductsGlobal(products,message,6));
   const followup=isFollowupLike(message);
   const prior=followup?latestTaskContext(memory):null;
 
@@ -792,6 +850,21 @@ function automotiveFollowupPosition(message){
 
 function hasExplicitAutomotiveContext(ctx){
   return !!(ctx?.vehicle?.model||automotiveFollowupPosition(ctx?.currentMessage));
+}
+
+
+function positionPhrase(position){
+  return({headlamp:"headlamp",foglamp:"foglamp",reverse:"lampu mundur",parking:"lampu senja",turn_front:"sein depan",turn_rear:"sein belakang",brake:"lampu rem"})[position]||"";
+}
+function vehicleTextFromContext(ctx){
+  if(!ctx?.vehicle?.model)return"";
+  return [ctx.vehicle.brand,ctx.vehicle.model,ctx.vehicle.year].filter(Boolean).join(" ").trim();
+}
+function shouldHardGateVehicleQuery(ctx){
+  if(!ctx?.vehicle?.model)return false;
+  if(isCreativeTaskIntent(ctx?.intent)||ctx?.intent==="comparison")return false;
+  if((ctx?.products||[]).length)return false;
+  return true;
 }
 
 function mustUseDeterministicAutomotive(ctx){
@@ -1417,7 +1490,9 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
       resolveComparison:q=>resolveComparisonProducts(products,q,6),
       detectIntent:q=>universalIntent(q),
       isFollowup:q=>isFollowupLike(q),
-      resolveVehicle:q=>explicitVehicleEntity(q)||currentTurnVehicleHint(q)
+      resolveVehicle:q=>explicitVehicleEntity(q)||currentTurnVehicleHint(q),
+      resolveExactProduct:q=>resolveExactProductLock(products,ainexSystem.normalizeAliases(q))?.product||null,
+      resolvePosition:q=>automotiveFollowupPosition(ainexSystem.normalizeAliases(q))
     });
     return response(report.ok?200:503,{reply:report.ok?"AINEX self-test PASS.":"AINEX self-test menemukan regression.",route:"selftest",usedAI:false,usedWeb:false,selftest:report});
   }
@@ -1481,6 +1556,33 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
     catch(e){console.warn("NEXAI runtime handle warning:",e.message);}
   }
 
+  // HARD GATE: recognized vehicle requests never fall through to generic AI.
+  if(runtime&&shouldHardGateVehicleQuery(universalCtx)){
+    const vtext=vehicleTextFromContext(universalCtx);
+    const pos=automotiveFollowupPosition(message);
+    let forcedResult=runtimeResult;
+    try{
+      if(pos){
+        forcedResult=runtime.handle(`Rekomendasi produk Nine untuk ${vtext} ${positionPhrase(pos)}`,{last_product_id:null,last_vehicle_id:null,last_intent:"fitment_vehicle_to_product"});
+      }else if(!runtimeResult?.entities?.vehicles?.length){
+        forcedResult=runtime.handle(vtext,{last_product_id:null,last_vehicle_id:null,last_intent:"vehicle_info"});
+      }
+    }catch(e){console.warn("AINEX forced vehicle resolver warning:",e.message);}
+
+    if(pos){
+      const detailed=detailedVehicleRecommendationReply(forcedResult,runtime);
+      if(detailed)return response(200,{reply:detailed,image:null,route:"vehicle_position_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+      const fr=runtimeFitmentReply(forcedResult,"vehicle",runtime);
+      if(fr)return response(200,{reply:fr,image:null,route:"vehicle_position_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+      return response(200,{reply:`Kendaraan ${vtext} sudah dikenali, tetapi data ${positionPhrase(pos)} terverifikasi belum cukup untuk rekomendasi produk. Saya tidak akan menebak dari socket atau produk lain.`,image:null,route:"vehicle_position_unverified",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+    }
+
+    const vf=forcedResult?.facts?.vehicles?.[0]||runtimeResult?.facts?.vehicles?.[0];
+    const vr=runtimeVehicleReply(vf);
+    if(vr)return response(200,{reply:vr+"\n\nSebutkan posisi lampu yang ingin dicek, misalnya headlamp, foglamp, lampu mundur, senja, sein, atau rem.",image:null,route:"vehicle_info_deterministic",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+    return response(200,{reply:`Kendaraan ${vtext} sudah dikenali. Sebutkan posisi lampu yang ingin dicek agar rekomendasi tidak ditebak.`,image:null,route:"vehicle_position_required",usedAI:false,usedWeb:false,runtime:true,state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle}});
+  }
+
   const runtimeProductId=runtimeResult?.entities?.products?.[0]||null;
   const runtimeProduct=runtimeProductFromId(products,runtimeProductId);
   const positiveRuntimeProduct=(runtimeProduct&&!isExcludedProduct(runtimeProduct,message))?runtimeProduct:null;
@@ -1523,16 +1625,20 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
     const targetProducts=universalCtx.products||[];
     const taskRoute={...route,type:universalCtx.intent};
     let taskMessage=hardTaskInstruction(universalCtx);
-    let ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory,image:img,explicitProducts:targetProducts});
+    const taskMemory=taskMemoryPolicy(universalCtx,memory);
+    let ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory:taskMemory,image:img,explicitProducts:targetProducts});
 
-    const contamination=replyContaminated(ai.reply,universalCtx);
-    if(contamination.bad){
-      taskMessage += `\n\nVALIDASI GAGAL: ${contamination.reason}. Tulis ulang dari nol hanya dengan FACT_FIREWALL. Jangan menyebut entitas yang dilarang atau context lama.`;
+    const contamination=replyContaminated(ai.reply,universalCtx,products);
+    const riskyClaim=unverifiedCreativeClaim(ai.reply,universalCtx);
+    if(contamination.bad||riskyClaim){
+      const why=contamination.bad?contamination.reason:`unverified_claim:${riskyClaim}`;
+      taskMessage += `\n\nVALIDASI GAGAL: ${why}. Tulis ulang dari nol hanya dengan FACT_FIREWALL. Hapus klaim teknis, kompatibilitas, kendaraan, atau marketing yang tidak eksplisit tersedia.`;
       ai=await callAI({products:targetProducts.length?targetProducts:products,message:taskMessage,route:taskRoute,state,memory:[],image:img,explicitProducts:targetProducts});
     }
 
-    const finalCheck=replyContaminated(ai.reply,universalCtx);
-    if(finalCheck.bad){
+    const finalCheck=replyContaminated(ai.reply,universalCtx,products);
+    const finalRiskyClaim=unverifiedCreativeClaim(ai.reply,universalCtx);
+    if(finalCheck.bad||finalRiskyClaim){
       return response(200,{
         reply:"Saya menahan jawaban karena hasil generasi masih membawa konteks atau entitas yang tidak sesuai. Ulangi permintaan dengan produk/kendaraan target yang eksplisit agar saya tidak mengarang.",
         image:null,route:`task_blocked:${universalCtx.intent}`,usedAI:true,usedWeb:false,sources:[],

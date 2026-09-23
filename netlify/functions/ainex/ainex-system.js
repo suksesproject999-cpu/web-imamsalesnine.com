@@ -286,7 +286,7 @@ function recordResponse(body,statusCode){
   Promise.resolve().then(()=>persistTrace(body,statusCode)).catch(()=>{});
 }
 
-function runSelfTests({products,resolveComparison,detectIntent,isFollowup,resolveVehicle}){
+function runSelfTests({products,resolveComparison,detectIntent,isFollowup,resolveVehicle,resolveExactProduct,resolvePosition}){
   const results=[];
   for(const tc of regressionDB.cases||[]){
     let pass=false,actual=null;
@@ -307,6 +307,12 @@ function runSelfTests({products,resolveComparison,detectIntent,isFollowup,resolv
       }else if(tc.type==="vehicle"){
         actual=resolveVehicle(tc.input);
         pass=norm(actual?.model)===norm(tc.expected);
+      }else if(tc.type==="exact_product"){
+        actual=typeof resolveExactProduct==="function"?resolveExactProduct(tc.input):null;
+        pass=compact(actual?.sku||actual?.kode||"")===compact(tc.expected_sku);
+      }else if(tc.type==="position"){
+        actual=typeof resolvePosition==="function"?resolvePosition(tc.input):null;
+        pass=norm(actual)===norm(tc.expected);
       }
     }catch(e){actual=`ERROR:${e.message}`;pass=false;}
     results.push({id:tc.id,type:tc.type,pass,actual});
