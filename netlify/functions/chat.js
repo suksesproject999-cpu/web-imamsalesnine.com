@@ -238,7 +238,7 @@ function unifiedProducts(liveProducts){
       return (
         (sku && ps && sku === ps) ||
         (name && pn && name === pn)
-      );
+      ));
     }) || null;
   }
 
@@ -613,7 +613,9 @@ function hardTaskInstruction(ctx){
     "4. Jangan menyebut produk yang masuk EXCLUDE.",
     "5. Jangan membawa kendaraan atau produk dari percakapan lama yang berbeda.",
     "6. Untuk materi kreatif, boleh kreatif pada gaya bahasa dan struktur, tetapi FAKTA tetap harus berasal dari FACT_FIREWALL.",
-    "7. Jika fakta penting tidak tersedia, tulis secara netral tanpa mengisinya dengan asumsi."
+    "7. Jika fakta penting tidak tersedia, tulis secara netral tanpa mengisinya dengan asumsi.",
+    "8. DILARANG menulis 'dirancang khusus untuk kendaraan X', 'cocok untuk kendaraan X', 'plug-and-play', 'lebih aman', 'lebih terang', 'hemat energi', 'garansi kualitas', atau klaim teknis/marketing sejenis kecuali eksplisit ada di FACT_FIREWALL.",
+    "9. Jangan pernah mengubah klasifikasi motor menjadi mobil atau mobil menjadi motor hanya karena socket sama."
   ].join("\n");
 }
 function shouldUseUniversalTaskRoute(ctx){
@@ -632,6 +634,82 @@ function universalTaskInstruction(ctx){
     ctx?.sourceText&&ctx.sourceText!==ctx.currentMessage?`KONTEKS_TUGAS_SEBELUMNYA: ${ctx.sourceText}`:"",
     "ATURAN: pesan terbaru selalu menang. Jangan memakai kendaraan, produk, atau tugas lama yang bertentangan dengan pesan terbaru. Produk yang masuk EXCLUDE dilarang dijadikan target. Jika follow-up pendek, lanjutkan task aktif yang paling baru."
   ].filter(Boolean).join("\n");
+}
+
+function resolveRequestContext({message,memory,products,state}){
+  const currentVehicle=explicitVehicleEntity(message)||currentTurnVehicleHint(message)||null;
+  const currentProducts=resolvePositiveProductsGlobal(products,message,6);
+  const intent=universalIntent(message);
+  const followup=isFollowupLike(message);
+  const prior=followup?latestTaskContext(memory):null;
+
+  let vehicle=currentVehicle;
+  let taskIntent=intent;
+  let sourceText=message;
+  let targetProducts=currentProducts;
+  let exclusions=exclusionSpans(message);
+
+  if(followup){
+    if(!vehicle&&prior?.vehicle)vehicle=prior.vehicle;
+    if(taskIntent==="general"&&prior?.intent)taskIntent=prior.intent;
+    if(!targetProducts.length&&prior?.sourceText)targetProducts=resolvePositiveProductsGlobal(products,prior.sourceText,6);
+    if(prior?.sourceText)sourceText=prior.sourceText;
+    exclusions=[...new Set([...exclusions,...(prior?.exclusions||[])])];
+  }
+
+  // Current turn ALWAYS wins over inherited task/entity context.
+  if(currentVehicle)vehicle=currentVehicle;
+  if(currentProducts.length)targetProducts=currentProducts;
+  if(intent!=="general")taskIntent=intent;
+
+  return{
+    intent:taskIntent,
+    currentIntent:intent,
+    followup,
+    sourceText,
+    currentMessage:message,
+    vehicle,
+    products:targetProducts,
+    exclusions,
+    priorTask:prior
+  };
+}
+
+function automotiveFollowupPosition(message){
+  const q=normalize(message||"");
+  if(/\b(headlamp|lampu depan|lampu utama)\b/.test(q))return"headlamp";
+  if(/\b(foglamp|lampu kabut)\b/.test(q))return"foglamp";
+  if(/\b(lampu mundur|reverse)\b/.test(q))return"reverse";
+  if(/\b(senja|parking)\b/.test(q))return"parking";
+  if(/\b(sein depan)\b/.test(q))return"turn_front";
+  if(/\b(sein belakang)\b/.test(q))return"turn_rear";
+  if(/\b(rem|brake)\b/.test(q))return"brake";
+  return null;
+}
+
+function hasExplicitAutomotiveContext(ctx){
+  return !!(ctx?.vehicle?.model||automotiveFollowupPosition(ctx?.currentMessage));
+}
+
+function mustUseDeterministicAutomotive(ctx){
+  return ["recommendation","fitment"].includes(ctx?.intent) ||
+    /\b(rekomendasi|cocok|pakai apa|pake apa|tipe apa|type apa|bi[\s-]?led)\b/i.test(ctx?.currentMessage||"") ||
+    (!!automotiveFollowupPosition(ctx?.currentMessage)&&!!ctx?.vehicle?.model);
+}
+
+function comparisonGuard(ctx){
+  if(ctx?.intent!=="comparison")return{ok:true};
+  if((ctx?.products||[]).length>=2)return{ok:true};
+  return{ok:false,reply:"Untuk perbandingan yang akurat, sebutkan minimal dua produk Nine yang ingin dibandingkan."};
+}
+
+function taskSafetyGuard(ctx){
+  const c=comparisonGuard(ctx);
+  if(!c.ok)return c;
+  if(taskNeedsProduct(ctx?.intent)&&!(ctx?.products||[]).length){
+    return{ok:false,reply:"Produk target belum berhasil saya identifikasi dengan aman. Sebutkan nama atau SKU produk yang ingin dipakai."};
+  }
+  return{ok:true};
 }
 function classify(message,hasProduct){
   const m=normalize(message),f={
@@ -1240,7 +1318,7 @@ exports.handler=async event=>{
   if(route.type==="local_time"){const r=localTime(fieldValue(fields,"clientTime",""),fieldValue(fields,"clientTimezone",""));if(r)return response(200,{reply:r,image:null,route:"local_time",usedAI:false,usedWeb:false});}
 
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
-  const universalCtx=buildUniversalContext({message,memory,products,state});
+  const universalCtx=resolveRequestContext({message,memory,products,state});
   const currentExplicitTaskProduct=explicitProductRequested(message,products);
   if(currentExplicitTaskProduct)universalCtx.products=[currentExplicitTaskProduct];
   const currentVehicleHint=currentTurnVehicleHint(message)||universalCtx.vehicle;
@@ -1262,7 +1340,7 @@ exports.handler=async event=>{
   }
 
   const agentVehicleRecommendationRequest=agentControl.enabled===true&&!shouldUseUniversalTaskRoute(universalCtx)&&(
-    (
+    mustUseDeterministicAutomotive(universalCtx) || (
       /\b(rekomendasi|cocok|pilih|carikan|pakai apa|tipe apa|type apa)\b/i.test(message) ||
       /\bbi[\s-]?led\b/i.test(message) ||
       /\bsekalian\b|\bsekaligus\b/i.test(message)
@@ -1307,6 +1385,11 @@ exports.handler=async event=>{
 
   const currentVehicleId=runtimeResult?.entities?.vehicles?.[0]||null;
   const currentVehicleIsCar=!!(currentVehicleId&&runtime&&typeof runtime.isCarVehicle==="function"&&runtime.isCarVehicle(currentVehicleId));
+
+  const globalTaskGuard=taskSafetyGuard(universalCtx);
+  if(!globalTaskGuard.ok){
+    return response(200,{reply:globalTaskGuard.reply,image:null,route:`guard:${universalCtx.intent}`,usedAI:false,usedWeb:false,sources:[],state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle}});
+  }
 
   if(shouldUseUniversalTaskRoute(universalCtx)){
     const taskCheck=validateUniversalTaskContext(universalCtx,products);
@@ -1386,11 +1469,11 @@ exports.handler=async event=>{
   }
   if(explicit[0])state.activeProduct={name:pName(explicit[0]),sku:pSku(explicit[0])};
 
-  if(route.type==="compare"&&explicit.length>=2)return response(200,{reply:compare(explicit),image:null,route:"compare",usedAI:false,usedWeb:false,products:explicit.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
+  if(route.type==="compare"&&universalCtx.products.length>=2)return response(200,{reply:compare(universalCtx.products.slice(0,4)),image:null,route:"compare",usedAI:false,usedWeb:false,products:universalCtx.products.slice(0,4).map(productPayload),state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle}});
 
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
-  if(directRoutes.has(route.type)&&product&&!agentVehicleRecommendationRequest)return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
-  if(directRoutes.has(route.type)&&!product&&!agentVehicleRecommendationRequest)return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
+  if(directRoutes.has(route.type)&&product&&!agentVehicleRecommendationRequest&&!mustUseDeterministicAutomotive(universalCtx))return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
+  if(directRoutes.has(route.type)&&!product&&!agentVehicleRecommendationRequest&&!mustUseDeterministicAutomotive(universalCtx))return response(200,{reply:"Produk Nine yang dimaksud belum berhasil saya identifikasi. Sebutkan nama atau SKU produknya.",image:null,route:"product_not_identified",usedAI:false,usedWeb:false});
 
   if(route.type==="fitment"&&(runtimeProductId||runtimeResult?.entities?.vehicles?.length)&&!agentComplexRecommendation){
     return response(200,{reply:"Data fitment terverifikasi belum cukup untuk rekomendasi tambahan. Sebutkan produk, kendaraan, dan tahun yang lebih spesifik.",image:null,route:"fitment_no_ai_fallback",usedAI:false,usedWeb:false,runtime:true});

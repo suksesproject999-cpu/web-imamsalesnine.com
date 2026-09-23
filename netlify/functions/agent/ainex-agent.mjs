@@ -443,6 +443,7 @@ function eligibleForClass(productId,klass,source){
   if(klass==="car"&&["curated_small_bulb","headlamp_family"].includes(source))return true;
 
   // Unknown classification must never leak via generic socket match.
+  // Cross-class socket similarity is NEVER sufficient evidence.
   return false;
 }
 
@@ -500,7 +501,7 @@ function exactCandidatesForCar(socket,position){
       seen.add(x.product_id);
       out.push({product_id:x.product_id,name:x.name,sku:x.sku||"",socket:target,source:"curated_small_bulb"});
     }
-    return out.slice(0,8);
+    return out.slice(0,6);
   }
 
   // Headlamp/foglamp car families explicitly curated.
@@ -534,7 +535,7 @@ function exactCandidatesForCar(socket,position){
     out.push({product_id:productId,name:entry.name||c.canonical_name,sku:entry.sku||"",socket:target,source:"car_classification"});
   }
 
-  return out.slice(0,8);
+  return out.slice(0,6);
 }
 
 function vehiclePositions(match){
@@ -596,6 +597,18 @@ function biledProducts(ctx){
   return out.slice(0,16);
 }
 
+
+function requestedPositionFromTurn(message){
+  const q=norm(message||"");
+  if(/\b(headlamp|lampu depan|lampu utama)\b/.test(q))return["headlamp_low","headlamp_high","headlamp_combined"];
+  if(/\b(foglamp|lampu kabut)\b/.test(q))return["foglamp"];
+  if(/\b(lampu mundur|reverse)\b/.test(q))return["reverse"];
+  if(/\b(senja|parking)\b/.test(q))return["parking_front"];
+  if(/\b(sein depan)\b/.test(q))return["turn_signal_front"];
+  if(/\b(sein belakang)\b/.test(q))return["turn_signal_rear"];
+  if(/\b(rem|brake)\b/.test(q))return["brake"];
+  return[];
+}
 function deterministicPack(ctx){
   const lock=lockedVehicle(ctx);
   const mctx=resolveMotorcycleContext(ctx.message)||resolveMotorcycleContext([lock?.brand,lock?.model].filter(Boolean).join(" "));
@@ -621,7 +634,8 @@ function deterministicPack(ctx){
     };
   }
   const allPositions=vehiclePositions(match);
-  const wanted=requestedPositions(ctx.message);
+  const turnWanted=requestedPositionFromTurn(ctx.message);
+  const wanted=turnWanted.length?turnWanted:requestedPositions(ctx.message);
   const filtered=wanted.length
     ?allPositions.filter(p=>wanted.includes(p.key))
     :allPositions;
@@ -855,7 +869,7 @@ export async function runAinexAgent(ctx={}){
 
   const conflict=contextConflict(ctx);
   if(conflict){
-    ctx={...ctx,conversationContext:{...(ctx.conversationContext||{}),vehicle:conflict.current}};
+    ctx={...ctx,conversationContext:{...(ctx.conversationContext||{}),vehicle:conflict.current},memory:(ctx.memory||[]).filter(x=>x?.role!=="user"||!explicitVehicleFromText(x?.content||"")||norm(explicitVehicleFromText(x.content)?.model)===norm(conflict.current?.model))};
   }
 
   const pack=deterministicPack(ctx);
