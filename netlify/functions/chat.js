@@ -401,8 +401,9 @@ function universalIntent(message){
 function isFollowupLike(message){
   const m=normalize(message||"");
   if(!m)return false;
-  if(m.split(/\s+/).length<=7&&/^(kalau|kalo|terus|lanjut|buat|bikin|bisa|boleh|gas|oke|ok|yang|versi|sekarang|nah|untuk|trus)\b/.test(m))return true;
-  return /^(kalau|kalo)\b|\b(yang tadi|produk tadi|mobil tadi|motor tadi|lanjutkan|versi lain|yang itu|yang ini)\b/.test(m);
+  if(m.split(/\s+/).length<=7&&/^(kalau|kalo|terus|lanjut|buat|bikin|bisa|boleh|gas|oke|ok|yang|versi|sekarang|nah|untuk|trus|bedanya|jawab|jelaskan|gimana|bagaimana)\b/.test(m))return true;
+  if(/\b(headlampnya|foglampnya|mundurnya|senjanya|seinnya|remnya|lampunya)\b/.test(m))return true;
+  return /^(kalau|kalo)\b|\b(yang tadi|produk tadi|mobil tadi|motor tadi|kendaraan tadi|lanjutkan|versi lain|yang itu|yang ini)\b/.test(m);
 }
 
 function explicitVehicleEntity(message){
@@ -453,6 +454,89 @@ function resolvePositiveProductsGlobal(products,message,limit=6){
   return resolveProducts(products,message,Math.max(limit,10))
     .filter(p=>!isExcludedProduct(p,message))
     .slice(0,limit);
+}
+
+function explicitProductMentionScore(product,message){
+  const q=normalize(message||"");
+  const qSpace=` ${q.replace(/[-_/]+/g," ")} `;
+  const qTokens=new Set(q.split(/\s+/).map(compact).filter(Boolean));
+  let score=0;
+
+  const vals=[
+    pSku(product),
+    pName(product),
+    ...arr(product?.alias),
+    ...arr(product?.aliases)
+  ].filter(Boolean);
+
+  for(const raw of vals){
+    const n=normalize(raw);
+    const spaced=n.replace(/[-_/]+/g," ").replace(/\s+/g," ").trim();
+    const c=compact(raw);
+    if(!c)continue;
+
+    if(qTokens.has(c))score=Math.max(score,120000+c.length);
+    if(spaced&&qSpace.includes(` ${spaced} `))score=Math.max(score,110000+spaced.length);
+
+    const skuCompact=compact(pSku(product));
+    if(skuCompact&&c===skuCompact&&qTokens.has(skuCompact))score=Math.max(score,140000+skuCompact.length);
+  }
+  return score;
+}
+
+function resolveExplicitMentionProducts(products,message,limit=8){
+  const ranked=products
+    .map(product=>({product,score:explicitProductMentionScore(product,message)}))
+    .filter(x=>x.score>0&&!isExcludedProduct(x.product,message))
+    .sort((a,b)=>b.score-a.score);
+
+  const out=[],seen=new Set();
+  for(const x of ranked){
+    const key=compact(pSku(x.product)||pName(x.product));
+    if(!key||seen.has(key))continue;
+    seen.add(key);out.push(x.product);
+    if(out.length>=limit)break;
+  }
+  return out;
+}
+
+function cleanComparisonSide(text){
+  return String(text||"")
+    .replace(/\b(beda|bedanya|perbedaan|bandingkan|bandingin|compare|mending|lebih bagus|apa|gimana|bagaimana|yang mana|mana)\b/gi," ")
+    .replace(/\s+/g," ").trim();
+}
+
+function resolveComparisonProducts(products,message,limit=4){
+  const explicit=resolveExplicitMentionProducts(products,message,limit);
+  if(explicit.length>=2)return explicit.slice(0,limit);
+
+  const raw=String(message||"");
+  const parts=raw.split(/\s+(?:vs|versus|dengan|dan|sama|atau)\s+/i).map(cleanComparisonSide).filter(Boolean);
+  const out=[],seen=new Set();
+
+  for(const part of parts){
+    const hit=resolveProducts(products,part,1)[0];
+    if(!hit||isExcludedProduct(hit,message))continue;
+    const key=compact(pSku(hit)||pName(hit));
+    if(!key||seen.has(key))continue;
+    seen.add(key);out.push(hit);
+    if(out.length>=limit)break;
+  }
+
+  if(out.length>=2)return out;
+  return explicit.slice(0,limit);
+}
+
+
+function latestVehicleContext(memory){
+  const rows=(Array.isArray(memory)?memory:[])
+    .filter(x=>x?.role==="user"&&typeof x.content==="string")
+    .slice(-16).reverse();
+  for(const x of rows){
+    const v=explicitVehicleEntity(x.content)||currentTurnVehicleHint(x.content);
+    if(v?.model)return v;
+  }
+  return null;
 }
 
 function latestTaskContext(memory){
@@ -619,7 +703,7 @@ function hardTaskInstruction(ctx){
   ].join("\n");
 }
 function shouldUseUniversalTaskRoute(ctx){
-  return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","comparison","creative_general"].includes(ctx?.intent);
+  return ["landing_page","storyboard","video_prompt","image_prompt","copywriting","caption","creative_general"].includes(ctx?.intent);
 }
 
 function universalTaskInstruction(ctx){
@@ -638,8 +722,10 @@ function universalTaskInstruction(ctx){
 
 function resolveRequestContext({message,memory,products,state}){
   const currentVehicle=explicitVehicleEntity(message)||currentTurnVehicleHint(message)||null;
-  const currentProducts=resolvePositiveProductsGlobal(products,message,6);
   const intent=universalIntent(message);
+  const currentProducts=intent==="comparison"
+    ?resolveComparisonProducts(products,message,6)
+    :resolvePositiveProductsGlobal(products,message,6);
   const followup=isFollowupLike(message);
   const prior=followup?latestTaskContext(memory):null;
 
@@ -650,9 +736,13 @@ function resolveRequestContext({message,memory,products,state}){
   let exclusions=exclusionSpans(message);
 
   if(followup){
-    if(!vehicle&&prior?.vehicle)vehicle=prior.vehicle;
+    if(!vehicle)vehicle=prior?.vehicle||latestVehicleContext(memory)||state?.vehicle||null;
     if(taskIntent==="general"&&prior?.intent)taskIntent=prior.intent;
-    if(!targetProducts.length&&prior?.sourceText)targetProducts=resolvePositiveProductsGlobal(products,prior.sourceText,6);
+    if(!targetProducts.length&&prior?.sourceText){
+      targetProducts=prior.intent==="comparison"
+        ?resolveComparisonProducts(products,prior.sourceText,6)
+        :resolvePositiveProductsGlobal(products,prior.sourceText,6);
+    }
     if(prior?.sourceText)sourceText=prior.sourceText;
     exclusions=[...new Set([...exclusions,...(prior?.exclusions||[])])];
   }
@@ -1320,7 +1410,11 @@ exports.handler=async event=>{
   const state=buildState(memory,productMemory),active=activeProduct(products,state);
   const universalCtx=resolveRequestContext({message,memory,products,state});
   const currentExplicitTaskProduct=explicitProductRequested(message,products);
-  if(currentExplicitTaskProduct)universalCtx.products=[currentExplicitTaskProduct];
+  if(currentExplicitTaskProduct&&universalCtx.intent!=="comparison")universalCtx.products=[currentExplicitTaskProduct];
+  if(universalCtx.intent==="comparison"){
+    const pair=resolveComparisonProducts(products,message,6);
+    if(pair.length>=2)universalCtx.products=pair;
+  }
   const currentVehicleHint=currentTurnVehicleHint(message)||universalCtx.vehicle;
   if(currentVehicleHint){
     state.vehicle={model:currentVehicleHint.model};
@@ -1469,7 +1563,10 @@ exports.handler=async event=>{
   }
   if(explicit[0])state.activeProduct={name:pName(explicit[0]),sku:pSku(explicit[0])};
 
-  if(route.type==="compare"&&universalCtx.products.length>=2)return response(200,{reply:compare(universalCtx.products.slice(0,4)),image:null,route:"compare",usedAI:false,usedWeb:false,products:universalCtx.products.slice(0,4).map(productPayload),state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle}});
+  if((route.type==="compare"||universalCtx.intent==="comparison")&&universalCtx.products.length>=2){
+    const compared=universalCtx.products.slice(0,4);
+    return response(200,{reply:compare(compared),image:null,route:"compare",usedAI:false,usedWeb:false,products:compared.map(productPayload),state:{activeProduct:state.activeProduct,vehicle:universalCtx.vehicle||state.vehicle,activeTask:{intent:"comparison",sourceText:universalCtx.sourceText}}});
+  }
 
   const directRoutes=new Set(["product_price","product_stock","product_photo","product_gallery","product_photo_spec","product_spec","product_features","product_description","product_variant","catalog_page","product_detail","product_full"]);
   if(directRoutes.has(route.type)&&product&&!agentVehicleRecommendationRequest&&!mustUseDeterministicAutomotive(universalCtx))return response(200,{reply:withLifecycleNotice(direct(route.type,product),product),image:null,route:route.type,usedAI:false,usedWeb:false,product:{...productPayload(product),lifecycle:productLifecycle},state:{activeProduct:{name:pName(product),nama:pName(product),sku:pSku(product),gambar:pImage(product)},vehicle:state.vehicle}});
