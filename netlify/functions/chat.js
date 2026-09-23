@@ -6,6 +6,19 @@ const {pathToFileURL}=require("url");
 const {Readable}=require("stream");
 const {formidable}=require("formidable");
 
+let ainexSystem={
+  VERSION:"off",
+  normalizeAliases:v=>String(v||""),
+  runRequest:(seed,fn)=>fn(),
+  updateRequestMeta:()=>{},
+  buildStateMachine:()=>null,
+  applyAnswerContract:b=>b,
+  recordResponse:()=>{},
+  runSelfTests:()=>({version:"off",ok:false,passed:0,failed:0,total:0,results:[]})
+};
+try{ainexSystem=require("./ainex/ainex-system.js");}
+catch(e){console.warn("AINEX system sidecar warning:",e.message);}
+
 const PRODUCT_REMOTE_URL=process.env.NEXAI_PRODUCT_JSON_URL||"https://imamsalesnine.com/produk.json";
 const MODEL_FAST=process.env.NEXAI_MODEL_FAST||process.env.NEXAI_MODEL||"gpt-4.1-mini";
 const MODEL_SMART=process.env.NEXAI_MODEL_SMART||process.env.NEXAI_MODEL||"gpt-4.1-mini";
@@ -1392,14 +1405,26 @@ function normalizeResponseBody(body){
   if(typeof body.reply!=="string")return body;
   return{...body,reply:normalizeReplyFormatting(body.reply)};
 }
-function response(statusCode,body){const normalizedBody=normalizeResponseBody(body);return{statusCode,headers:{"Content-Type":"application/json","Cache-Control":"no-store"},body:JSON.stringify(normalizedBody)};}
+function response(statusCode,body){const normalizedBody=normalizeResponseBody(body);const contracted=ainexSystem.applyAnswerContract(normalizedBody);ainexSystem.recordResponse(contracted,statusCode);return{statusCode,headers:{"Content-Type":"application/json","Cache-Control":"no-store","X-AINEX-Version":ainexSystem.VERSION||"off"},body:JSON.stringify(contracted)};}
 
-exports.handler=async event=>{
+exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"",path:event?.path||""},async()=>{
  try{
   const liveProducts=await loadProducts();
   const products=unifiedProducts(liveProducts);
+  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.selftest||"")==="1"){
+    const report=ainexSystem.runSelfTests({
+      products,
+      resolveComparison:q=>resolveComparisonProducts(products,q,6),
+      detectIntent:q=>universalIntent(q),
+      isFollowup:q=>isFollowupLike(q),
+      resolveVehicle:q=>explicitVehicleEntity(q)||currentTurnVehicleHint(q)
+    });
+    return response(report.ok?200:503,{reply:report.ok?"AINEX self-test PASS.":"AINEX self-test menemukan regression.",route:"selftest",usedAI:false,usedWeb:false,selftest:report});
+  }
   if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,runtimeEngine:fs.existsSync(RUNTIME_ENGINE_FILE),checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
-  const{fields,files}=await parseMultipartEvent(event),message=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
+  const{fields,files}=await parseMultipartEvent(event),rawMessage=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
+  const message=ainexSystem.normalizeAliases(rawMessage);
+  ainexSystem.updateRequestMeta({message:rawMessage,normalized_message:message});
   if(!message&&!img)return response(400,{reply:"Pesan kosong.",image:null});
   const explicit=resolvePositiveProductsGlobal(products,message,4),route=classify(message,explicit.length>0);
   if(route.type==="business_profile"){const r=businessReply(message);if(r)return response(200,{reply:r,image:null,route:"business_profile",usedAI:false,usedWeb:false});}
@@ -1415,6 +1440,9 @@ exports.handler=async event=>{
     const pair=resolveComparisonProducts(products,message,6);
     if(pair.length>=2)universalCtx.products=pair;
   }
+  const ainexState=ainexSystem.buildStateMachine({message,ctx:universalCtx,state,memory});
+  state.context_version="3.0";
+  state.ainex=ainexState;
   const currentVehicleHint=currentTurnVehicleHint(message)||universalCtx.vehicle;
   if(currentVehicleHint){
     state.vehicle={model:currentVehicleHint.model};
@@ -1432,6 +1460,7 @@ exports.handler=async event=>{
     try{agentControl=await agentModule.getAinexAgentControl();}
     catch(e){console.warn("AINEX agent control warning:",e.message);}
   }
+  ainexSystem.updateRequestMeta({mode:agentControl.enabled?agentControl.mode:"off",agent_enabled:agentControl.enabled===true});
 
   const agentVehicleRecommendationRequest=agentControl.enabled===true&&!shouldUseUniversalTaskRoute(universalCtx)&&(
     mustUseDeterministicAutomotive(universalCtx) || (
@@ -1593,6 +1622,8 @@ exports.handler=async event=>{
         lastProductName:state.activeProduct?.nama||null,
         vehicle:universalCtx.vehicle||state.vehicle||null,
         activeTask:{intent:universalCtx.intent,sourceText:universalCtx.sourceText,exclusions:universalCtx.exclusions||[]},
+        stateMachine:ainexState||null,
+        confidence:ainexState?.confidence||null,
         recentUserText:state.recentUserText||[],
         memory
       },
@@ -1607,5 +1638,5 @@ exports.handler=async event=>{
   const ai=await callAI({products,message,route,state,memory,image:img,explicitProducts:explicit});
   let generated=null;if(route.type==="creative_image"&&PUBLIC_IMAGE_ENABLED)generated=await generateImage(message);
   return response(200,{reply:ai.reply,image:generated,route:route.type,usedAI:true,usedWeb:ai.usedWeb,sources:ai.sources,agent:agentResult?{used:!!agentResult.used,mode:agentResult.mode||"off",request_id:agentResult.request_id||null,tools:agentResult.tools||[],duration_ms:agentResult.duration_ms||0,fallback:!!agentResult.fallback,reason:agentResult.reason||null}:null,state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
- }catch(e){console.error("NEXAI V13 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data NEXAI sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message});}
-};
+ }catch(e){console.error("AINEX V3 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data AINEX sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message,route:"runtime_error"});}
+});

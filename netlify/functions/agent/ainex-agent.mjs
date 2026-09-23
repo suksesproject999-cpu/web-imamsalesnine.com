@@ -5,6 +5,7 @@ import {pathToFileURL} from "url";
 
 const PROJECT=process.env.AINEX_FIREBASE_PROJECT||"apin-web";
 const API_KEY=process.env.AINEX_FIREBASE_API_KEY||"AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec";
+const AGENT_VERSION="3.0.0";
 const MODEL=process.env.AINEX_AGENT_MODEL||process.env.NEXAI_MODEL_SMART||process.env.NEXAI_MODEL||"gpt-4.1-mini";
 const DATA_ROOT=path.resolve(path.dirname(new URL(import.meta.url).pathname),"../data");
 const RUNTIME_FILE=path.join(DATA_ROOT,"nexai_runtime_engine_v1_1.mjs");
@@ -849,18 +850,18 @@ function mandatoryAutomotiveRecommendation(ctx){
 
 export async function getAinexAgentControl(){
   const cfg=await getConfig();
-  return {enabled:cfg.enabled===true,mode:cfg.mode||"hybrid",monitor:cfg.monitor!==false};
+  return {enabled:cfg.enabled===true,mode:cfg.mode||"hybrid",monitor:cfg.monitor!==false,version:AGENT_VERSION};
 }
 
 export async function runAinexAgent(ctx={}){
   const start=Date.now(),requestId="AG-"+String(Date.now()).slice(-8),cfg=await getConfig();
   await updateMetrics({requests:1,last_status:cfg.enabled?"STANDBY":"OFF",last_request_id:requestId,last_route:ctx.route?.type||""});
 
-  if(!cfg.enabled)return{used:false,reason:"disabled",mode:cfg.mode,request_id:requestId};
+  if(!cfg.enabled)return{used:false,reason:"disabled",mode:cfg.mode,request_id:requestId,version:AGENT_VERSION};
   const mandatoryRecommendation=mandatoryAutomotiveRecommendation(ctx);
   if(cfg.mode==="hybrid"&&!complex(ctx.message||"")&&!mandatoryRecommendation){
     await updateMetrics({bypass:1,last_status:"BYPASSED",last_request_id:requestId,last_route:ctx.route?.type||""});
-    return{used:false,reason:"simple_bypass",mode:cfg.mode,request_id:requestId};
+    return{used:false,reason:"simple_bypass",mode:cfg.mode,request_id:requestId,version:AGENT_VERSION};
   }
   if(!process.env.OPENAI_API_KEY){
     await updateMetrics({errors:1,last_status:"ERROR",last_request_id:requestId,last_route:ctx.route?.type||""});
@@ -909,7 +910,14 @@ export async function runAinexAgent(ctx={}){
       request_id:requestId,tools:[...new Set(usedTools)],duration_ms:ms,
       locked_vehicle:pack.locked_vehicle||null,
       vehicle_class:pack.vehicle_class,
-      deterministic:true
+      deterministic:true,
+      confidence:ctx?.conversationContext?.confidence||null,
+      evidence:{
+        vehicle:pack?.vehicle_record?"vehicle_database":(pack?.vehicle_class==="motorcycle"?"motorcycle_classification":"context"),
+        products:"classification+lifecycle+socket_policy",
+        factual_mode:"deterministic"
+      },
+      version:AGENT_VERSION
     };
   }
 
