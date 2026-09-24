@@ -7,6 +7,7 @@
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+<link rel="stylesheet" href="/css/promo-card-admin.css">
 
 <style>
 :root{
@@ -632,6 +633,7 @@ body{
     <button class="quick-item" onclick="closeQuickMenu();setFilter('active')"><i class="fa-solid fa-circle-check"></i><span><b>Produk Aktif</b><small>Tampilkan produk yang live.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();boot(true)"><i class="fa-solid fa-arrows-rotate"></i><span><b>Refresh Data</b><small>Sinkronkan tampilan dashboard.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();openAgentControl()"><i class="fa-solid fa-microchip"></i><span><b>AINEX Agent</b><small>Control Center, mode, monitor, dan metrics.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();openPromoCardStudio()"><i class="fa-solid fa-images"></i><span><b>Promo Card / Status WA</b><small>Pilih produk dari katalog resmi lalu preview 9:16.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();document.getElementById('seedBtn').click()"><i class="fa-solid fa-database"></i><span><b>Sinkronkan Seed</b><small>Tambahkan seed yang belum ada.</small></span></button>
   </div>
   <div class="quick-menu-foot">
@@ -703,6 +705,72 @@ body{
       </div>
     </div>
   </section>
+</div>
+
+
+<!-- PROMO CARD STUDIO — ADDITIVE, ISOLATED -->
+<div class="pc-modal" id="promoCardModal" onclick="if(event.target===this)closePromoCardStudio()">
+  <section class="pc-box">
+    <div class="pc-head">
+      <div>
+        <small>PROMO CARD STUDIO</small>
+        <h2>Status WhatsApp 9:16</h2>
+        <p>Informasi produk otomatis dari katalog resmi. Harga tidak ditampilkan.</p>
+      </div>
+      <button class="btn secondary icon" onclick="closePromoCardStudio()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+
+    <div class="pc-body">
+      <div class="pc-config">
+        <div class="pc-panel">
+          <div class="pc-panel-title"><i class="fa-solid fa-layer-group"></i> Pilih 4 Produk</div>
+          <p class="pc-help">Cari berdasarkan nama/SKU. Deskripsi, spesifikasi, dan keunggulan diambil dari data ekstraksi katalog resmi.</p>
+          <div class="pc-select-grid">
+            <label>PRODUK 1<select id="pcProduct1"></select></label>
+            <label>PRODUK 2<select id="pcProduct2"></select></label>
+            <label>PRODUK 3<select id="pcProduct3"></select></label>
+            <label>PRODUK 4<select id="pcProduct4"></select></label>
+          </div>
+        </div>
+
+        <div class="pc-panel">
+          <div class="pc-panel-title"><i class="fa-solid fa-palette"></i> Tampilan</div>
+          <div class="pc-options">
+            <label>JUDUL<input id="pcTitle" value="NINE LUXIMOS — PRODUCT SERIES"></label>
+            <label>SUBJUDUL<input id="pcSubtitle" value="Deskripsi, spesifikasi, dan keunggulan dari katalog resmi Nine."></label>
+            <label>TEMA
+              <select id="pcTheme">
+                <option value="lime">Lime Green — DNA Web</option>
+              </select>
+            </label>
+          </div>
+        </div>
+
+        <div class="pc-actions">
+          <button class="btn secondary" onclick="resetPromoCardDefaults()"><i class="fa-solid fa-rotate-left"></i> Reset</button>
+          <button class="btn" onclick="previewPromoCard()"><i class="fa-solid fa-eye"></i> Preview 9:16</button>
+        </div>
+      </div>
+
+      <div class="pc-source">
+        <i class="fa-solid fa-shield-halved"></i>
+        <div><b>Catalog-locked</b><span>Harga tidak dipakai. Fakta teks berasal dari katalog.pdf; visual menggunakan aset resmi produk yang sudah dipetakan.</span></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="pc-preview-modal" id="promoPreviewModal">
+  <div class="pc-preview-toolbar">
+    <div><b>Preview Status WA</b><span>Rasio 9:16 • tanpa scroll</span></div>
+    <div class="pc-preview-actions">
+      <button class="btn secondary" onclick="openPromoPreviewWindow()"><i class="fa-solid fa-up-right-from-square"></i> Buka Penuh</button>
+      <button class="btn secondary icon" onclick="closePromoPreview()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+  </div>
+  <div class="pc-stage">
+    <iframe id="promoPreviewFrame" sandbox="allow-popups allow-popups-to-escape-sandbox"></iframe>
+  </div>
 </div>
 
 <div id="toast" class="toast"></div>
@@ -1387,5 +1455,6 @@ boot().catch(e=>{
 });
 </script>
 
+<script src="/js/promo-card-admin.js"></script>
 </body>
 </html>
