@@ -633,7 +633,7 @@ body{
     <button class="quick-item" onclick="closeQuickMenu();setFilter('active')"><i class="fa-solid fa-circle-check"></i><span><b>Produk Aktif</b><small>Tampilkan produk yang live.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();boot(true)"><i class="fa-solid fa-arrows-rotate"></i><span><b>Refresh Data</b><small>Sinkronkan tampilan dashboard.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();openAgentControl()"><i class="fa-solid fa-microchip"></i><span><b>AINEX Agent</b><small>Control Center, mode, monitor, dan metrics.</small></span></button>
-    <button class="quick-item" onclick="closeQuickMenu();openPromoCardStudio()"><i class="fa-solid fa-images"></i><span><b>Promo Card / Status WA</b><small>Pilih produk dari katalog resmi lalu preview 9:16.</small></span></button>
+    <button class="quick-item" onclick="closeQuickMenu();openPromoCardStudio()"><i class="fa-solid fa-images"></i><span><b>Promo Card / Status WA</b><small>Pilih 2 produk dari katalog resmi lalu preview 9:16.</small></span></button>
     <button class="quick-item" onclick="closeQuickMenu();document.getElementById('seedBtn').click()"><i class="fa-solid fa-database"></i><span><b>Sinkronkan Seed</b><small>Tambahkan seed yang belum ada.</small></span></button>
   </div>
   <div class="quick-menu-foot">
@@ -723,14 +723,24 @@ body{
     <div class="pc-body">
       <div class="pc-config">
         <div class="pc-panel">
-          <div class="pc-panel-title"><i class="fa-solid fa-layer-group"></i> Pilih 4 Produk</div>
+          <div class="pc-panel-title"><i class="fa-solid fa-layer-group"></i> Pilih 2 Produk</div>
           <p class="pc-help">Cari berdasarkan nama/SKU. Deskripsi, spesifikasi, dan keunggulan diambil dari data ekstraksi katalog resmi.</p>
-          <div class="pc-select-grid">
-            <label>PRODUK 1<select id="pcProduct1"></select></label>
-            <label>PRODUK 2<select id="pcProduct2"></select></label>
-            <label>PRODUK 3<select id="pcProduct3"></select></label>
-            <label>PRODUK 4<select id="pcProduct4"></select></label>
+          <div class="pc-select-grid pc-select-grid-two">
+            <label>PRODUK KIRI
+              <div class="pc-search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="pcProduct1" list="pcCatalogList" autocomplete="off" placeholder="Cari nama / SKU produk...">
+              </div>
+            </label>
+            <label>PRODUK KANAN
+              <div class="pc-search-field">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input id="pcProduct2" list="pcCatalogList" autocomplete="off" placeholder="Cari nama / SKU produk...">
+              </div>
+            </label>
           </div>
+          <datalist id="pcCatalogList"></datalist>
+          <div class="pc-search-note"><i class="fa-solid fa-circle-info"></i> Ketik nama/SKU untuk mencari produk lalu pilih hasilnya.</div>
         </div>
 
         <div class="pc-panel">
