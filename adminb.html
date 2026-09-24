@@ -727,20 +727,28 @@ body{
           <p class="pc-help">Cari berdasarkan nama/SKU. Deskripsi, spesifikasi, dan keunggulan diambil dari data ekstraksi katalog resmi.</p>
           <div class="pc-select-grid pc-select-grid-two">
             <label>PRODUK KIRI
-              <div class="pc-search-field">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="pcProduct1" list="pcCatalogList" autocomplete="off" placeholder="Cari nama / SKU produk...">
+              <div class="pc-combo" data-combo="1">
+                <div class="pc-search-field">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input id="pcProduct1" autocomplete="off" placeholder="Cari nama / SKU produk...">
+                  <button type="button" class="pc-combo-toggle" aria-label="Buka daftar" onclick="togglePromoProductDropdown(1,event)"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div class="pc-dropdown" id="pcDropdown1"></div>
               </div>
             </label>
+
             <label>PRODUK KANAN
-              <div class="pc-search-field">
-                <i class="fa-solid fa-magnifying-glass"></i>
-                <input id="pcProduct2" list="pcCatalogList" autocomplete="off" placeholder="Cari nama / SKU produk...">
+              <div class="pc-combo" data-combo="2">
+                <div class="pc-search-field">
+                  <i class="fa-solid fa-magnifying-glass"></i>
+                  <input id="pcProduct2" autocomplete="off" placeholder="Cari nama / SKU produk...">
+                  <button type="button" class="pc-combo-toggle" aria-label="Buka daftar" onclick="togglePromoProductDropdown(2,event)"><i class="fa-solid fa-chevron-down"></i></button>
+                </div>
+                <div class="pc-dropdown" id="pcDropdown2"></div>
               </div>
             </label>
           </div>
-          <datalist id="pcCatalogList"></datalist>
-          <div class="pc-search-note"><i class="fa-solid fa-circle-info"></i> Ketik nama/SKU untuk mencari produk lalu pilih hasilnya.</div>
+          <div class="pc-search-note"><i class="fa-solid fa-circle-info"></i> Ketik untuk mencari atau buka daftar. Dropdown memiliki tinggi tetap dan dapat di-scroll.</div></div>
         </div>
 
         <div class="pc-panel">
