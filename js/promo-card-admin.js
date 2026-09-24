@@ -120,7 +120,7 @@ body{background:#050704;font-family:Inter,Arial,sans-serif}
 <footer class="footer"><div><strong>Produk Nine • Informasi katalog resmi</strong><small>Tanpa harga • fokus spesifikasi dan keunggulan.</small></div><div class="cta">imamsalesnine.com</div></footer>
 </div></main></body></html>`;
 }
-async async function previewPromoCard(){
+async function previewPromoCard(){
   try{
     await loadPromoCardCatalog();
     const raw=[1,2].map(i=>document.getElementById("pcProduct"+i)?.value||"");
