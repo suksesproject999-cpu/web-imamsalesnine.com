@@ -114,17 +114,16 @@ function resetPromoCardDefaults(showToast=true){
   if(showToast)toast("Pilihan Promo Card direset.");
 }
 function pcCard(p){
-  const specs=(p.specifications||[]).slice(0,12)
-    .map(x=>`<div class="spec"><b>${pcEsc(x.label)}</b><span>${pcEsc(x.value)}</span></div>`).join("");
-  const features=(p.features||[]).slice(0,7)
-    .map(x=>`<li>${pcEsc(x)}</li>`).join("");
+  const specs=(p.specifications||[]).slice(0,12).map(x=>`<div class="spec"><b>${pcEsc(x.label)}</b><span>${pcEsc(x.value)}</span></div>`).join("");
+  const features=(p.features||[]).slice(0,7).map(x=>`<li>${pcEsc(x)}</li>`).join("");
   const description=String(p.description||"").trim();
-
-  return `<article class="info-card">
+  const score=(description.length/90)+((p.specifications||[]).length*.72)+((p.features||[]).length*.58);
+  const density=score>10.5?" density-high":score>7.5?" density-medium":"";
+  return `<article class="info-card${density}">
     <h2>${pcEsc(p.name)}</h2>
     ${description?`<div class="section description"><h3>DESKRIPSI</h3><p>${pcEsc(description)}</p></div>`:""}
-    <div class="section"><h3>SPESIFIKASI</h3><div class="specs">${specs||"<div class='empty'>Belum ada spesifikasi terstruktur.</div>"}</div></div>
-    <div class="section"><h3>KEUNGGULAN</h3><ul>${features||"<li>Belum ada keunggulan terstruktur.</li>"}</ul></div>
+    <div class="section"><h3>SPESIFIKASI</h3><div class="specs">${specs||"<div class='empty'>Spesifikasi terstruktur belum tersedia.</div>"}</div></div>
+    <div class="section"><h3>KEUNGGULAN</h3><ul>${features||"<li>Keunggulan terstruktur belum tersedia.</li>"}</ul></div>
     <div class="watermark">Imamsalesnine.com</div>
   </article>`;
 }
@@ -155,7 +154,7 @@ body{background:#050704;font-family:Inter,Arial,sans-serif}
 .section{margin-bottom:.85vh}
 .section h3{font-size:.8vh;letter-spacing:.05em;margin-bottom:.34vh}
 .section p,.section li,.spec,.empty{font-size:.84vh;line-height:1.38;color:var(--muted)}
-.description p{font-size:.87vh;line-height:1.42}
+.description p{font-size:.88vh;line-height:1.34;display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden}
 .section ul{list-style:none}
 .section li{position:relative;padding-left:.98vh;margin-bottom:.23vh}
 .section li:before{content:"";position:absolute;left:0;top:.46em;width:.36vh;height:.36vh;border-radius:50%;background:var(--lime)}
@@ -163,7 +162,7 @@ body{background:#050704;font-family:Inter,Arial,sans-serif}
 .spec{display:grid;grid-template-columns:.78fr 1.22fr;gap:.4vh;padding:.35vh .43vh;border-radius:.5vh;background:rgba(255,255,255,.035)}
 .spec b{color:#fff}
 .watermark{position:absolute;left:1.08vh;right:1.08vh;bottom:.85vh;padding-top:.7vh;border-top:1px solid rgba(140,198,63,.18);color:rgba(185,236,107,.52);font-size:.74vh;font-weight:850;letter-spacing:.035em;text-align:right}
-</style></head><body>
+.info-card.density-medium .section p,.info-card.density-medium .section li,.info-card.density-medium .spec{font-size:.80vh;line-height:1.27}.info-card.density-high .section{margin-bottom:.48vh}.info-card.density-high .section p,.info-card.density-high .section li,.info-card.density-high .spec{font-size:.74vh;line-height:1.20}.info-card.density-high .description p{-webkit-line-clamp:3}.info-card.density-high .spec{padding:.24vh .36vh}.info-card.density-high .section li{margin-bottom:.1vh}</style></head><body>
 <main class="poster"><div class="wrap">
 <header class="top"><div class="brand">NINE AUTOSERIES</div></header>
 <section class="hero"><h1>${pcEsc(title)}</h1><p>${pcEsc(subtitle)}</p></section>
