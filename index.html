@@ -33140,7 +33140,7 @@ function translateCore(){document.documentElement.lang=lang==='en'?'en':'id';con
 let auth=null;try{auth=firebase.auth()}catch(e){console.warn('Firebase Auth unavailable',e)}
 function authError(e){const codes={'auth/email-already-in-use':'Email sudah terdaftar.','auth/invalid-email':'Format email tidak valid.','auth/weak-password':'Password minimal 6 karakter.','auth/user-not-found':'Akun tidak ditemukan.','auth/wrong-password':'Password salah.','auth/invalid-login-credentials':'Email atau password salah.','auth/operation-not-allowed':'Aktifkan provider Email/Password di Firebase Authentication.'};return codes[e?.code]||e?.message||'Terjadi kesalahan.'}
 V.openAccount=()=>{V.renderAccount();V.openModal('v17AccountModal')};
-V.renderAccount=()=>{const body=document.getElementById('v17AccountBody');if(!body)return;const u=auth?.currentUser;if(u){body.innerHTML=`<div class="v17-account-card"><strong>${esc(u.displayName||u.email||'User')}</strong><small>${esc(u.email||'')}</small></div><button class="v17-secondary" id="v17Logout"><i class="fa-solid fa-right-from-bracket"></i> ${t('logout')}</button>`;document.getElementById('v17Logout').onclick=()=>auth.signOut();}else{body.innerHTML=`<div class="v17-field"><label>Email</label><input id="v17Email" type="email" autocomplete="email"></div><div class="v17-field"><label>Password</label><input id="v17Password" type="password" autocomplete="current-password" minlength="6"></div><button class="v17-primary" id="v17Login">Masuk</button><button class="v17-secondary" id="v17Register">Daftar Akun Baru</button><div class="v17-auth-note">Akun digunakan untuk menulis ulasan dan menyimpan identitas pengguna.</div>`;document.getElementById('v17Login').onclick=async()=>{const email=document.getElementById('v17Email').value.trim(),password=document.getElementById('v17Password').value;try{await auth.signInWithEmailAndPassword(email,password);V.closeModal('v17AccountModal')}catch(e){Swal.fire({icon:'error',text:authError(e)})}};document.getElementById('v17Register').onclick=async()=>{const email=document.getElementById('v17Email').value.trim(),password=document.getElementById('v17Password').value;try{await auth.createUserWithEmailAndPassword(email,password);V.closeModal('v17AccountModal')}catch(e){Swal.fire({icon:'error',text:authError(e)})}};}};
+V.renderAccount=()=>{const body=document.getElementById('v17AccountBody');if(!body)return;const u=auth?.currentUser;if(u){body.innerHTML=`<div class="v17-account-card"><strong>${esc(u.displayName||u.email||'User')}</strong><small>${esc(u.email||'')}</small></div><button class="v17-secondary" id="v17Logout"><i class="fa-solid fa-right-from-bracket"></i> ${t('logout')}</button>`;document.getElementById('v17Logout').onclick=()=>auth.signOut();}else{body.innerHTML=`<div class="v17-field"><label>Email</label><input id="v17Email" type="email" autocomplete="email"></div><div class="v17-field"><label>Password</label><input id="v17Password" type="password" autocomplete="current-password" minlength="6"></div><button class="v17-primary" id="v17Login">Masuk</button><button class="v17-secondary" id="v17Register">Daftar Akun Baru</button><div class="v17-auth-note">Akun digunakan untuk menulis ulasan dan menyimpan identitas pengguna. Data autentikasi dikelola oleh Firebase Authentication.</div>`;document.getElementById('v17Login').onclick=async()=>{const email=document.getElementById('v17Email').value.trim(),password=document.getElementById('v17Password').value;try{await auth.signInWithEmailAndPassword(email,password);V.closeModal('v17AccountModal')}catch(e){Swal.fire({icon:'error',text:authError(e)})}};document.getElementById('v17Register').onclick=async()=>{const email=document.getElementById('v17Email').value.trim(),password=document.getElementById('v17Password').value;try{await auth.createUserWithEmailAndPassword(email,password);V.closeModal('v17AccountModal')}catch(e){Swal.fire({icon:'error',text:authError(e)})}};}};
 function paintAccountMenu(){const a=document.getElementById('v17AccountMenu');if(!a)return;const u=auth?.currentUser;a.querySelector('span:last-child').textContent=u?(u.displayName||u.email||'Akun Saya'):t('login');a.querySelector('.v17-menu-avatar').innerHTML=u?esc((u.displayName||u.email||'U').charAt(0).toUpperCase()):'<i class="fa-solid fa-user"></i>'}
 auth?.onAuthStateChanged(()=>{paintAccountMenu();V.renderAccount();renderReviewArea()});
 
@@ -33167,5 +33167,564 @@ const baseShow=window.showProduct;if(typeof baseShow==='function'){window.showPr
 
 function init(){installMenu();paintAccountMenu();translateCore();requestAnimationFrame(()=>{if(document.querySelector('#product-grid-auto .product-detail'))renderReviewArea()})}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+})();
+</script>
+
+<!-- =========================================================
+     V18 FINAL MARKETPLACE UX — REALTIME REVIEW / STABLE FLOAT / REVIEW ORDER / PAGINATION
+========================================================= -->
+<style id="v18-final-marketplace-ux-css">
+/* Floating rail: one fixed, stable position. Never shifts with sticky states or scroll sections. */
+.social-float{
+  position:fixed!important;
+  right:10px!important;
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+  transition:none!important;
+  will-change:auto!important;
+  z-index:99999!important;
+}
+body.sticky-active .social-float,
+body.v15-card-zone .social-float{
+  top:50%!important;
+  bottom:auto!important;
+  transform:translateY(-50%)!important;
+}
+@media(max-width:768px){
+  .social-float{right:9px!important;top:50%!important;gap:15px!important}
+  body.sticky-active .social-float,
+  body.v15-card-zone .social-float{top:50%!important}
+}
+
+/* Reviews belong to the decision area, immediately before product recommendations. */
+.v17-reviews.v18-review-positioned{margin:22px 0 0!important}
+
+/* Review CTA feedback */
+.v17-review-submit{position:relative;display:flex;align-items:center;justify-content:center;gap:8px}
+.v17-review-submit[disabled]{opacity:.72;cursor:wait}
+.v17-review-submit .v18-spinner{width:15px;height:15px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:v18Spin .65s linear infinite}
+@keyframes v18Spin{to{transform:rotate(360deg)}}
+
+/* Professional pagination shared by search/category/related/recent */
+.v18-pager{
+  grid-column:1/-1!important;
+  width:100%;display:flex;align-items:center;justify-content:center;gap:7px;
+  margin:20px 0 4px;padding:4px 0;clear:both;
+}
+.v18-page-btn{
+  min-width:38px;height:38px;padding:0 11px;border:1px solid #dfe6d7;border-radius:10px;
+  background:#fff;color:#485040;font-weight:800;font-size:12px;cursor:pointer;
+  display:inline-flex;align-items:center;justify-content:center;transition:.18s ease;
+}
+.v18-page-btn:hover{border-color:#8CC63F;color:#659d28}
+.v18-page-btn.active{background:#8CC63F;border-color:#8CC63F;color:#fff;box-shadow:0 6px 16px rgba(140,198,63,.22)}
+.v18-page-btn:disabled{opacity:.36;cursor:not-allowed}
+.v18-pager-info{font-size:11px;color:#858c80;margin-left:4px;white-space:nowrap}
+.v18-more-btn{
+  grid-column:1/-1!important;width:min(320px,100%);height:44px;margin:18px auto 0;border:1px solid #8CC63F;
+  background:#fff;color:#649c29;border-radius:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px
+}
+body.dark-mode .v18-page-btn,body.dark-mode .v18-more-btn{background:#171b20;color:#e8eee3;border-color:#35402e}
+@media(max-width:768px){
+  .v18-pager{gap:5px;margin-top:15px}
+  .v18-page-btn{min-width:34px;height:34px;padding:0 8px;border-radius:9px;font-size:11px}
+  .v18-pager-info{display:none}
+}
+</style>
+
+<script id="v18-final-marketplace-ux-js">
+(function(){
+'use strict';
+const V18=window.V18=window.V18||{};
+V18.selectedReviewStars=5;
+if(window.V17?.setReviewStars){const _set=window.V17.setReviewStars;window.V17.setReviewStars=function(n){V18.selectedReviewStars=Math.max(1,Math.min(5,Number(n)||5));return _set.apply(this,arguments)}}
+
+/* -------------------------
+   REVIEW POSITION
+------------------------- */
+function positionReviewSection(){
+  const detail=document.querySelector('#product-grid-auto .product-detail');
+  const review=detail?.querySelector('.v17-reviews');
+  const extra=detail?.querySelector('.product-extra');
+  const bottom=extra?.querySelector('.product-bottom');
+  if(!review||!extra||!bottom)return;
+  if(review.parentNode!==extra || review.nextElementSibling!==bottom){
+    extra.insertBefore(review,bottom);
+  }
+  review.classList.add('v18-review-positioned');
+}
+window.__v18PositionReview=positionReviewSection;
+
+/* -------------------------
+   REALTIME REVIEW SUBMIT
+   Optimistic aggregate push -> UI updates immediately.
+------------------------- */
+function setReviewButtonBusy(busy){
+  const btn=document.querySelector('.v17-review-submit');
+  if(!btn)return;
+  btn.disabled=!!busy;
+  if(busy){
+    btn.dataset.oldHtml=btn.innerHTML;
+    btn.innerHTML='<span class="v18-spinner" aria-hidden="true"></span><span>Mengirim ulasan...</span>';
+  }else if(btn.dataset.oldHtml){
+    btn.innerHTML=btn.dataset.oldHtml;
+    delete btn.dataset.oldHtml;
+  }
+}
+function ensureReviewButtonClass(){
+  const sec=document.querySelector('.v17-reviews');
+  if(!sec)return;
+  const btn=sec.querySelector('.v17-review-compose .v17-primary');
+  if(btn)btn.classList.add('v17-review-submit');
+}
+
+function syncRatingImmediately(productId,total,count){
+  try{window.__v101PushProductStats?.(productId,{ratingTotal:Number(total)||0,ratingCount:Number(count)||0})}catch(_e){}
+  const rating=count>0?Math.round((Number(total)/Number(count))*10)/10:0;
+  document.querySelectorAll(`[data-rating-product="${CSS.escape(String(productId))}"]`).forEach(el=>{
+    el.textContent=rating>0?`⭐ ${rating.toFixed(1)}`:'⭐ -';
+  });
+  /* Detail legacy aggregate text. */
+  const detail=document.querySelector('#product-grid-auto .product-detail');
+  if(detail){
+    detail.querySelectorAll('.product-live-rating,[data-detail-rating],.score-number').forEach(el=>{
+      if(el.classList.contains('score-number') && !el.closest('.review-summary')) return;
+      el.textContent=rating>0?rating.toFixed(1):'-';
+    });
+    const summary=detail.querySelector('.review-summary .score-number');
+    if(summary)summary.textContent=rating>0?rating.toFixed(1):'-';
+  }
+}
+
+if(window.V17){
+  window.V17.submitReview=async function(){
+    const authObj=(typeof auth!=='undefined'?auth:window.auth);
+    const user=authObj?.currentUser;
+    if(!user){window.V17.openAccount?.();return;}
+    const text=document.getElementById('v17ReviewText')?.value.trim();
+    if(!text||text.length<3){Swal.fire({icon:'info',text:'Tulis ulasan minimal 3 karakter.'});return;}
+    const productId=String((typeof reviewProductId!=='undefined'&&reviewProductId)||window.reviewProductId||((typeof currentProduct!=='undefined'&&currentProduct?.id)||window.currentProduct?.id)||'');
+    if(!productId)return;
+    const stars=Math.max(1,Math.min(5,Number(window.V18?.selectedReviewStars||document.querySelectorAll('.v17-stars button.active').length||5)));
+    const dbObj=(typeof db!=='undefined'?db:window.db);
+    const reviewRef=dbObj.collection('ulasan_produk').doc(`${user.uid}_${productId}`);
+    const statsRef=dbObj.collection('statistik_produk').doc(productId);
+    setReviewButtonBusy(true);
+    try{
+      const aggregate=await dbObj.runTransaction(async tx=>{
+        const oldSnap=await tx.get(reviewRef);
+        const statsSnap=await tx.get(statsRef);
+        const old=oldSnap.exists?(oldSnap.data()||{}):null;
+        const stats=statsSnap.exists?(statsSnap.data()||{}):{};
+        let total=Math.max(0,Number(stats.ratingTotal)||0);
+        let count=Math.max(0,Number(stats.ratingCount)||0);
+        if(old){
+          const oldR=Math.max(1,Math.min(5,Number(old.rating)||5));
+          total=Math.max(0,total-oldR)+stars;
+        }else{
+          total+=stars;count+=1;
+        }
+        const FV=firebase.firestore.FieldValue;
+        tx.set(reviewRef,{productId,uid:user.uid,displayName:user.displayName||user.email?.split('@')[0]||'Pengguna',rating:stars,text,updatedAt:FV.serverTimestamp(),createdAt:old?.createdAt||FV.serverTimestamp()},{merge:true});
+        tx.set(statsRef,{ratingTotal:total,ratingCount:count},{merge:true});
+        return {total,count};
+      });
+      /* First paint immediately, before any alert/network reconciliation. */
+      syncRatingImmediately(productId,aggregate.total,aggregate.count);
+      const area=document.getElementById('v17ReviewText');if(area)area.value='';
+      setReviewButtonBusy(false);
+      Swal.fire({icon:'success',title:'Ulasan berhasil disimpan.',confirmButtonColor:'#8CC63F',timer:1250,showConfirmButton:false});
+      /* Server reconciliation happens in background, never blocks user feedback. */
+      setTimeout(()=>{try{window.__v101RefreshProductStats?.(productId)}catch(_e){}},0);
+    }catch(e){
+      console.error(e);setReviewButtonBusy(false);
+      Swal.fire({icon:'error',title:'Ulasan gagal disimpan',text:e?.code==='permission-denied'?'Firestore Rules belum mengizinkan ulasan untuk user login.':(e?.message||'Silakan coba lagi.')});
+    }
+  };
+}
+
+/* -------------------------
+   PAGINATION ENGINE
+------------------------- */
+const pagerStore=new Map();
+function escHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function hydrate(container){
+  requestAnimationFrame(()=>{
+    try{window.updateAllProductBadges?.()}catch(_e){}
+    try{window.__hydrateRealtimeProductStats?.(container)}catch(_e){}
+  });
+}
+function pageSizeFor(type){
+  const mobile=matchMedia('(max-width:768px)').matches;
+  if(type==='related'||type==='recent')return mobile?4:6;
+  return mobile?8:12;
+}
+function pageButtons(key,current,totalPages,totalItems){
+  if(totalPages<=1)return '';
+  const nums=[];
+  const start=Math.max(1,Math.min(current-1,totalPages-2));
+  const end=Math.min(totalPages,start+2);
+  for(let i=start;i<=end;i++)nums.push(i);
+  return `<nav class="v18-pager" aria-label="Navigasi halaman produk">
+    <button class="v18-page-btn" ${current<=1?'disabled':''} onclick="V18.go('${key}',${current-1})" aria-label="Halaman sebelumnya">‹</button>
+    ${nums.map(n=>`<button class="v18-page-btn ${n===current?'active':''}" onclick="V18.go('${key}',${n})" aria-current="${n===current?'page':'false'}">${n}</button>`).join('')}
+    <button class="v18-page-btn" ${current>=totalPages?'disabled':''} onclick="V18.go('${key}',${current+1})" aria-label="Halaman berikutnya">›</button>
+    <span class="v18-pager-info">${totalItems} produk</span>
+  </nav>`;
+}
+function renderPage(key,scroll){
+  const state=pagerStore.get(key);if(!state)return;
+  const {container,items,type}=state;
+  const size=pageSizeFor(type),pages=Math.max(1,Math.ceil(items.length/size));
+  state.page=Math.max(1,Math.min(state.page||1,pages));
+  const start=(state.page-1)*size,slice=items.slice(start,start+size);
+  if(!slice.length){container.innerHTML='<div class="empty-state"><h3>Produk tidak ditemukan</h3></div>';return;}
+  const renderer=window.renderMarketplaceCard;
+  container.innerHTML=slice.map(p=>typeof renderer==='function'?renderer(p):'').join('')+pageButtons(key,state.page,pages,items.length);
+  container.classList.add('v15-unified-grid');
+  hydrate(container);
+  if(scroll){
+    const header=document.querySelector('.header');
+    const y=container.getBoundingClientRect().top+scrollY-(header?.offsetHeight||0)-12;
+    window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+  }
+}
+function registerPager(container,items,type,key){
+  if(!container)return;
+  const arr=Array.isArray(items)?items:[];
+  pagerStore.set(key,{container,items:arr,type,page:1});
+  renderPage(key,false);
+}
+V18.go=function(key,page){const s=pagerStore.get(key);if(!s)return;s.page=page;renderPage(key,true)};
+
+/* Every product surface goes through the same paging engine. */
+window.renderProductList=function(data,containerId='category-products'){
+  const c=document.getElementById(containerId);registerPager(c,data,'catalog',`list:${containerId}`);
+};
+try{renderProductList=window.renderProductList}catch(_e){}
+window.renderCategorySearchResults=function(products){registerPager(document.getElementById('category-products'),products,'catalog','category')};
+try{renderCategorySearchResults=window.renderCategorySearchResults}catch(_e){}
+window.tampilkanHasil=function(products){
+  const c=document.getElementById('product-grid-auto');if(!c)return;
+  c.classList.remove('category-mode','page-detail','page-cart','page-checkout');c.classList.add('search-product-mode');
+  registerPager(c,products,'catalog','search');
+};
+try{tampilkanHasil=window.tampilkanHasil}catch(_e){}
+window.renderRelated=function(product){
+  const box=document.getElementById('relatedProducts');if(!box||!product)return;
+  let source=[];try{source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:(window.allProducts||[])}catch(_e){source=window.allProducts||[]}
+  const related=source.filter(p=>p.kategori===product.kategori&&String(p.id)!==String(product.id));
+  registerPager(box,related,'related',`related:${product.id}`);
+};
+try{renderRelated=window.renderRelated}catch(_e){}
+window.renderRecent=function(){
+  const box=document.getElementById('recentProducts');if(!box)return;
+  let recent=[];try{recent=JSON.parse(localStorage.getItem('recentProducts')||'[]')}catch(_e){}
+  let source=[];try{source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:(window.allProducts||[])}catch(_e){source=window.allProducts||[]}
+  const fresh=(Array.isArray(recent)?recent:[]).map(old=>source.find(p=>String(p.id)===String(old.id))||old).filter(Boolean);
+  registerPager(box,fresh,'recent','recent');
+};
+try{renderRecent=window.renderRecent}catch(_e){}
+
+/* Re-apply review position & button state after detail rendering/auth redraw. */
+const oldShow=window.showProduct;
+if(typeof oldShow==='function'&&!oldShow.__v18UX){
+  const wrapped=async function(){
+    const out=await oldShow.apply(this,arguments);
+    requestAnimationFrame(()=>{
+      positionReviewSection();ensureReviewButtonClass();
+      let p=null;try{p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct}catch(_e){p=window.currentProduct}
+      if(p){window.renderRelated?.(p);window.renderRecent?.();}
+    });
+    return out;
+  };
+  wrapped.__v18UX=true;window.showProduct=wrapped;try{showProduct=wrapped}catch(_e){}
+}
+
+/* V17 may redraw review compose after auth state changes. Keep position/feedback intact. */
+const mo=new MutationObserver(()=>{
+  if(document.querySelector('#product-grid-auto .v17-reviews')){positionReviewSection();ensureReviewButtonClass();}
+});
+function startV18Observer(){const root=document.getElementById('product-grid-auto');if(root)mo.observe(root,{childList:true,subtree:true});}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',startV18Observer,{once:true});else startV18Observer();
+
+requestAnimationFrame(()=>{positionReviewSection();ensureReviewButtonClass()});
+})();
+</script>
+
+<!-- =========================================================
+     V19 FINAL MOBILE STABILITY — REVIEW ISOLATION + SCROLL GUARD
+========================================================= -->
+<style id="v19-mobile-stability-css">
+html,body{
+  min-height:100%;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior-y:auto;
+}
+body:not(.v19-scroll-locked){
+  overflow-y:auto!important;
+  touch-action:auto!important;
+}
+#product-grid-auto,main,.product-section{
+  touch-action:pan-y pinch-zoom;
+}
+.v17-review-submit.v19-busy{
+  pointer-events:none!important;
+  opacity:.72!important;
+}
+.v17-review-submit .v19-spinner{
+  width:15px;height:15px;border:2px solid rgba(255,255,255,.42);
+  border-top-color:#fff;border-radius:50%;display:inline-block;
+  animation:v19spin .62s linear infinite;flex:0 0 auto;
+}
+@keyframes v19spin{to{transform:rotate(360deg)}}
+</style>
+<script id="v19-mobile-stability-js">
+(function(){
+'use strict';
+
+/* ---------------------------------------------------------
+   ONE SOURCE OF TRUTH FOR SCROLL LOCK
+   Old modules may set body.style.overflow='hidden'. This
+   guard guarantees it is released whenever no blocking UI
+   is actually open.
+--------------------------------------------------------- */
+const body=document.body;
+const html=document.documentElement;
+let lastKnownY=window.scrollY||0;
+let guardTimer=0;
+
+function cssVisible(el){
+  if(!el) return false;
+  const cs=getComputedStyle(el);
+  return cs.display!=='none' && cs.visibility!=='hidden' && Number(cs.opacity||1)!==0;
+}
+function aiBlocks(){
+  const m=document.getElementById('aiModal');
+  if(!cssVisible(m)) return false;
+  return !m.classList.contains('nexai-minimized') && !m.classList.contains('is-minimized');
+}
+function commentBlocks(){
+  const m=document.getElementById('commentModal');
+  return cssVisible(m) && !m.classList.contains('is-closing');
+}
+function purchaseBlocks(){
+  const m=document.getElementById('purchaseSheet');
+  if(!m) return false;
+  const cs=getComputedStyle(m);
+  return cs.display!=='none' && (m.classList.contains('show')||m.classList.contains('active')||m.classList.contains('open')||m.getAttribute('aria-hidden')==='false');
+}
+function v17Blocks(){
+  return [...document.querySelectorAll('.v17-modal.show')].some(cssVisible);
+}
+function sweetAlertBlocks(){
+  const c=document.querySelector('.swal2-container');
+  return !!(c && cssVisible(c));
+}
+function hasBlockingUI(){
+  return aiBlocks()||commentBlocks()||purchaseBlocks()||v17Blocks()||sweetAlertBlocks();
+}
+function unlockHard(){
+  body.classList.remove('v19-scroll-locked');
+  html.classList.remove('v19-scroll-locked');
+  body.style.removeProperty('overflow');
+  body.style.removeProperty('overflow-y');
+  body.style.removeProperty('position');
+  body.style.removeProperty('top');
+  body.style.removeProperty('width');
+  body.style.removeProperty('height');
+  body.style.removeProperty('touch-action');
+  html.style.removeProperty('overflow');
+  html.style.removeProperty('overflow-y');
+  html.style.removeProperty('touch-action');
+}
+function reconcileScrollLock(){
+  if(hasBlockingUI()){
+    body.classList.add('v19-scroll-locked');
+    html.classList.add('v19-scroll-locked');
+    return;
+  }
+  const wasFixed=getComputedStyle(body).position==='fixed';
+  const top=parseInt(body.style.top||'0',10)||0;
+  unlockHard();
+  if(wasFixed && top<0){
+    const y=Math.abs(top);
+    requestAnimationFrame(()=>window.scrollTo(0,y));
+  }
+}
+window.__v19ReconcileScroll=reconcileScrollLock;
+
+/* Track safe position but never while body is intentionally fixed. */
+window.addEventListener('scroll',()=>{if(!hasBlockingUI())lastKnownY=window.scrollY||0},{passive:true});
+
+/* Any close/gesture completion gets a double-frame safety release. */
+function scheduleGuard(delay=0){
+  clearTimeout(guardTimer);
+  guardTimer=setTimeout(()=>{
+    requestAnimationFrame(()=>requestAnimationFrame(reconcileScrollLock));
+  },delay);
+}
+['pointerup','pointercancel','touchend','touchcancel','transitionend','animationend'].forEach(type=>{
+  document.addEventListener(type,()=>scheduleGuard(type.includes('transition')||type.includes('animation')?20:0),true);
+});
+window.addEventListener('pageshow',()=>scheduleGuard(0));
+window.addEventListener('hashchange',()=>scheduleGuard(0));
+window.addEventListener('popstate',()=>scheduleGuard(0));
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)scheduleGuard(0)});
+
+/* Patch V17 modal methods so they cannot leak a body lock. */
+if(window.V17){
+  const oldOpen=window.V17.openModal;
+  const oldClose=window.V17.closeModal;
+  window.V17.openModal=function(){
+    const out=oldOpen?.apply(this,arguments);
+    body.classList.add('v19-scroll-locked');
+    return out;
+  };
+  window.V17.closeModal=function(){
+    const out=oldClose?.apply(this,arguments);
+    scheduleGuard(10);
+    return out;
+  };
+}
+
+/* Patch common sheet closers without changing their animation logic. */
+['closeAI','closeComment','closePurchaseSheet','closeBuySheet'].forEach(name=>{
+  const fn=window[name];
+  if(typeof fn==='function'&&!fn.__v19Guarded){
+    const wrapped=function(){const out=fn.apply(this,arguments);scheduleGuard(320);return out};
+    wrapped.__v19Guarded=true;
+    try{window[name]=wrapped}catch(_e){}
+    try{eval(name+'=wrapped')}catch(_e){}
+  }
+});
+
+/* Periodic low-cost recovery for Android WebView edge cases. */
+setInterval(()=>{
+  if(!hasBlockingUI() && (body.style.overflow==='hidden'||html.style.overflow==='hidden'||body.classList.contains('v19-scroll-locked'))){
+    reconcileScrollLock();
+  }
+},1200);
+
+/* ---------------------------------------------------------
+   REVIEW SUBMIT: AUTH-SAFE + FULLY ISOLATED
+   Never opens Account modal when Firebase already has a user.
+--------------------------------------------------------- */
+function getAuthUser(){
+  try{return firebase?.auth?.().currentUser||null}catch(_e){return null}
+}
+function getCurrentProductId(){
+  try{
+    const p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct;
+    return String(p?.id||'');
+  }catch(_e){return String(window.currentProduct?.id||'')}
+}
+function setBusy(btn,busy){
+  if(!btn)return;
+  btn.disabled=!!busy;
+  btn.classList.toggle('v19-busy',!!busy);
+  if(busy){
+    if(!btn.dataset.v19Label)btn.dataset.v19Label=btn.innerHTML;
+    btn.innerHTML='<span class="v19-spinner" aria-hidden="true"></span><span>Mengirim ulasan...</span>';
+  }else if(btn.dataset.v19Label){
+    btn.innerHTML=btn.dataset.v19Label;
+    delete btn.dataset.v19Label;
+  }
+}
+function pushRating(productId,total,count){
+  const t=Number(total)||0,c=Number(count)||0;
+  try{window.__v101PushProductStats?.(productId,{ratingTotal:t,ratingCount:c})}catch(_e){}
+  const rating=c>0?Math.round((t/c)*10)/10:0;
+  const safe=window.CSS?.escape?CSS.escape(String(productId)):String(productId).replace(/[^a-zA-Z0-9_-]/g,'\\$&');
+  document.querySelectorAll(`[data-rating-product="${safe}"]`).forEach(el=>el.textContent=rating?`⭐ ${rating.toFixed(1)}`:'⭐ -');
+  const detail=document.querySelector('#product-grid-auto .product-detail');
+  if(detail){
+    detail.querySelectorAll('.product-live-rating,[data-detail-rating]').forEach(el=>el.textContent=rating?rating.toFixed(1):'-');
+    detail.querySelectorAll('.rating-summary,.product-rating-summary').forEach(el=>{
+      const n=el.querySelector('.score-number');if(n)n.textContent=rating?rating.toFixed(1):'-';
+    });
+  }
+}
+
+if(window.V17){
+  window.V17.submitReview=async function(){
+    const btn=document.querySelector('.v17-review-compose .v17-primary');
+    if(btn?.disabled)return;
+
+    /* Firebase Auth is authoritative; do not depend on private V17 closure state. */
+    let user=getAuthUser();
+    if(!user){
+      await new Promise(resolve=>{
+        let done=false;
+        let off=null;
+        try{off=firebase.auth().onAuthStateChanged(u=>{if(done)return;done=true;user=u||null;off?.();resolve()})}catch(_e){resolve()}
+        setTimeout(()=>{if(done)return;done=true;off?.();resolve()},450);
+      });
+    }
+    if(!user){
+      Swal.fire({icon:'info',title:'Silakan masuk terlebih dahulu',text:'Login diperlukan untuk mengirim ulasan.',confirmButtonColor:'#8CC63F'});
+      return;
+    }
+
+    const field=document.getElementById('v17ReviewText');
+    const text=field?.value.trim()||'';
+    if(text.length<3){Swal.fire({icon:'info',text:'Tulis ulasan minimal 3 karakter.',confirmButtonColor:'#8CC63F'});return;}
+    const productId=getCurrentProductId();
+    if(!productId){Swal.fire({icon:'error',text:'Produk tidak ditemukan. Silakan buka ulang detail produk.'});return;}
+    const stars=Math.max(1,Math.min(5,Number(window.V18?.selectedReviewStars)||document.querySelectorAll('.v17-stars button.active').length||5));
+    let dbObj=null;try{dbObj=(typeof db!=='undefined'&&db)||window.db}catch(_e){dbObj=window.db}
+    if(!dbObj){Swal.fire({icon:'error',text:'Database belum siap. Silakan coba lagi.'});return;}
+
+    setBusy(btn,true);
+    try{
+      const reviewRef=dbObj.collection('ulasan_produk').doc(`${user.uid}_${productId}`);
+      const statsRef=dbObj.collection('statistik_produk').doc(productId);
+      const result=await dbObj.runTransaction(async tx=>{
+        const oldSnap=await tx.get(reviewRef);
+        const statsSnap=await tx.get(statsRef);
+        const old=oldSnap.exists?(oldSnap.data()||{}):null;
+        const stats=statsSnap.exists?(statsSnap.data()||{}):{};
+        let total=Math.max(0,Number(stats.ratingTotal)||0);
+        let count=Math.max(0,Number(stats.ratingCount)||0);
+        if(old){
+          const prev=Math.max(1,Math.min(5,Number(old.rating)||5));
+          total=Math.max(0,total-prev)+stars;
+        }else{total+=stars;count+=1;}
+        const FV=firebase.firestore.FieldValue;
+        tx.set(reviewRef,{productId,uid:user.uid,displayName:user.displayName||user.email?.split('@')[0]||'Pengguna',rating:stars,text,updatedAt:FV.serverTimestamp(),createdAt:old?.createdAt||FV.serverTimestamp()},{merge:true});
+        tx.set(statsRef,{ratingTotal:total,ratingCount:count},{merge:true});
+        return {total,count};
+      });
+
+      /* Immediate paint before any secondary request or alert. */
+      pushRating(productId,result.total,result.count);
+      if(field)field.value='';
+      setBusy(btn,false);
+      Swal.fire({icon:'success',title:'Ulasan berhasil dikirim',timer:1050,showConfirmButton:false});
+      setTimeout(()=>{try{window.__v101RefreshProductStats?.(productId)}catch(_e){}},0);
+    }catch(err){
+      console.error('Review submit failed',err);
+      setBusy(btn,false);
+      Swal.fire({icon:'error',title:'Ulasan gagal dikirim',text:err?.code==='permission-denied'?'Izin Firestore untuk ulasan belum tersedia.':(err?.message||'Silakan coba lagi.'),confirmButtonColor:'#8CC63F'});
+    }finally{
+      scheduleGuard(0);
+    }
+  };
+}
+
+/* Capture click only for the real review submit button. Prevent any stale
+   delegated account handler from seeing the same event. */
+document.addEventListener('click',function(e){
+  const btn=e.target.closest?.('.v17-review-compose .v17-primary');
+  if(!btn)return;
+  e.preventDefault();
+  e.stopPropagation();
+  e.stopImmediatePropagation();
+  window.V17?.submitReview?.();
+},true);
+
+/* Initial safety. */
+scheduleGuard(0);
 })();
 </script>
