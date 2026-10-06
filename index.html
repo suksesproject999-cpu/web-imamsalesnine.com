@@ -32,7 +32,7 @@ href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
 <meta name="author" content="Imam Sales">
 <meta name="theme-color" content="#25D366">
 <meta name="nexai-hybrid-version" content="2026.09-final">
-<meta name="nexai-ui-version" content="2026.09-v15.4-manual-input-focus">
+<meta name="nexai-ui-version" content="2026.10-production-v17">
 
 <link rel="icon" href="favicon.png">
 <script type="application/ld+json">
@@ -15559,7 +15559,7 @@ img{max-width:100%;}
 
 
 
-<meta name="nexai-ui-version" content="2026.09-v15.4-manual-input-focus">
+<meta name="nexai-ui-version" content="2026.10-production-v17">
 
 <script>
 /* NEXAI V13 — one-time clean migration */
@@ -31717,374 +31717,9 @@ else installFinalAISheet();
      V12 FINAL CARD CONSISTENCY + EXPLICIT WARRANTY LABEL
      Search / Category / Related / Recent = identical hierarchy.
 ========================================================= -->
-<style id="v12-final-card-consistency-style">
-/* Neutralize older surface-specific card geometry. */
-#product-grid-auto.search-product-mode .marketplace-card.v11-unified-card,
-#category-products .marketplace-card.v11-unified-card,
-#promo-direct-products .marketplace-card.v11-unified-card,
-#relatedProducts .marketplace-card.v11-unified-card,
-#recentProducts .marketplace-card.v11-unified-card{
-  width:100% !important; min-width:0 !important; height:100% !important;
-  margin:0 !important; padding:0 !important;
-  display:flex !important; flex-direction:column !important;
-}
-#product-grid-auto.search-product-mode .marketplace-card.v11-unified-card .marketplace-image-wrap,
-#category-products .marketplace-card.v11-unified-card .marketplace-image-wrap,
-#promo-direct-products .marketplace-card.v11-unified-card .marketplace-image-wrap,
-#relatedProducts .marketplace-card.v11-unified-card .marketplace-image-wrap,
-#recentProducts .marketplace-card.v11-unified-card .marketplace-image-wrap{
-  width:100% !important; aspect-ratio:1/1 !important; height:auto !important;
-  margin:0 !important; padding:0 !important;
-}
-#product-grid-auto.search-product-mode .marketplace-card.v11-unified-card .product-card-body,
-#category-products .marketplace-card.v11-unified-card .product-card-body,
-#promo-direct-products .marketplace-card.v11-unified-card .product-card-body,
-#relatedProducts .marketplace-card.v11-unified-card .product-card-body,
-#recentProducts .marketplace-card.v11-unified-card .product-card-body{
-  flex:1 1 auto !important; width:100% !important; min-width:0 !important;
-  padding:10px 11px 12px !important; display:flex !important;
-  flex-direction:column !important; align-items:stretch !important;
-}
-/* Fixed information rhythm keeps CTA aligned between cards. */
-.marketplace-card.v11-unified-card .product-brand{order:1 !important;margin:0 0 5px !important;}
-.marketplace-card.v11-unified-card .marketplace-product-name{order:2 !important;margin:0 !important;}
-.marketplace-card.v11-unified-card .marketplace-price{order:3 !important;margin-top:8px !important;}
-.marketplace-card.v11-unified-card .v12-trust-block{order:4 !important;margin-top:8px !important;min-height:50px !important;}
-.marketplace-card.v11-unified-card .product-voucher-info{order:5 !important;margin-top:7px !important;align-self:flex-start !important;}
-.marketplace-card.v11-unified-card .marketplace-buy-now{order:6 !important;margin-top:auto !important;transform:none !important;}
-.marketplace-card.v11-unified-card .v12-trust-line{
-  width:100% !important; min-width:0 !important; display:flex !important;
-  align-items:center !important; gap:5px !important; min-height:23px !important;
-  overflow:hidden !important;
-}
-.marketplace-card.v11-unified-card .v12-trust-line + .v12-trust-line{margin-top:4px !important;}
-.marketplace-card.v11-unified-card .product-rating,
-.marketplace-card.v11-unified-card .v12-warranty-badge{
-  min-height:22px !important; display:inline-flex !important; align-items:center !important;
-  justify-content:center !important; padding:3px 7px !important; border-radius:6px !important;
-  white-space:nowrap !important; line-height:1 !important; font-size:9.5px !important;
-  font-weight:700 !important; flex:0 0 auto !important;
-}
-.marketplace-card.v11-unified-card .product-rating{
-  border:1px solid #f1d98a !important;background:#fff9e7 !important;color:#5c522d !important;
-}
-.marketplace-card.v11-unified-card .v12-warranty-badge{
-  border:1px solid #dfeccb !important;background:#f6faef !important;color:#5d852d !important;
-}
-.marketplace-card.v11-unified-card .v12-warranty-badge i{color:#8CC63F !important;margin-right:4px !important;}
-.marketplace-card.v11-unified-card .product-sold,
-.marketplace-card.v11-unified-card .product-views{
-  min-width:0 !important; overflow:hidden !important; text-overflow:ellipsis !important;
-  font-size:9.5px !important; white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .marketplace-buy-now{
-  width:100% !important; min-height:40px !important; padding:0 32px !important;
-  display:flex !important; align-items:center !important; justify-content:center !important;
-  text-align:center !important;
-}
-.marketplace-card.v11-unified-card .marketplace-buy-now>span{
-  width:100% !important; display:block !important; text-align:center !important;
-  white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .marketplace-buy-now>i{
-  position:absolute !important; left:13px !important; top:50% !important;
-  transform:translateY(-50%) !important;
-}
-@media(max-width:390px){
- .marketplace-card.v11-unified-card .product-rating,
- .marketplace-card.v11-unified-card .v12-warranty-badge,
- .marketplace-card.v11-unified-card .product-sold,
- .marketplace-card.v11-unified-card .product-views{font-size:8.7px !important;}
- .marketplace-card.v11-unified-card .v12-trust-line{gap:4px !important;}
-}
-</style>
-<script id="v12-final-card-consistency-js">
-(function(){
-'use strict';
-function esc(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function escA(v){return esc(v).replace(/"/g,'&quot;')}
-function warrantyRaw(p){
- const g=p?.garansi;
- if(g&&typeof g==='object'){const v=String(g.lama??g.durasi??g.label??'').trim();if(v)return v}
- if(typeof g==='string'&&g.trim())return g.trim();
- return String(p?.warranty??p?.garansi_lama??'').trim();
-}
-function warrantyText(p){
- const raw=warrantyRaw(p); if(!raw)return '';
- return /^garansi\b/i.test(raw)?raw:`Garansi ${raw}`;
-}
-function card(p){
- const price=Number(p?.harga?.promo??p?.harga?.normal??0), normal=Number(p?.harga?.normal??0);
- const discounted=normal>price&&price>0, discount=discounted?Math.round((1-price/normal)*100):0;
- const id=escA(p?.id), name=esc(p?.nama||'Produk'), nameA=escA(p?.nama||'Produk');
- const image=escA(p?.gambar||'images/no-image.png'), brand=esc(p?.brand||''), warranty=warrantyText(p);
- return `<div class="product-card marketplace-card v11-unified-card v12-final-card" data-product-id="${id}" data-product-name="${nameA}" onclick="openProductWithTransition(this,this.dataset.productName)">
- <span class="product-badge-placeholder" data-badge-product="${id}"></span>${discounted?`<span class="marketplace-discount-badge">-${discount}%</span>`:''}
- <div class="marketplace-image-wrap"><img src="${image}" alt="${nameA}" loading="lazy" onerror="this.src='images/no-image.png'"></div>
- <div class="product-card-body">
-  <small class="product-brand">${brand}</small><h3 class="marketplace-product-name" title="${nameA}">${name}</h3>
-  <div class="marketplace-price"><span>${price.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>${discounted?`<span class="marketplace-price-old">${normal.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>`:''}</div>
-  <div class="v12-trust-block" aria-label="Informasi kepercayaan produk">
-   <div class="v12-trust-line"><span class="product-rating" data-rating-product="${id}">⭐ -</span><span class="product-sold" data-sold-product="${id}">0 terjual</span></div>
-   <div class="v12-trust-line"><span class="product-views" data-view-product="${id}"><i class="fa-regular fa-eye" aria-hidden="true"></i> 0 dilihat</span>${warranty?`<span class="v12-warranty-badge"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>${esc(warranty)}</span>`:''}</div>
-  </div>
-  <span class="product-voucher-info"><i class="fa-solid fa-ticket" aria-hidden="true"></i><span>Voucher tersedia</span></span>
-  <button type="button" class="marketplace-buy-now" aria-label="Beli ${nameA} sekarang" onclick="buyNowFromCard(event,'${id}')"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Beli Sekarang</span></button>
- </div></div>`;
-}
-window.renderMarketplaceCard=card; try{renderMarketplaceCard=card}catch(e){}
-window.renderProductList=function(data,containerId='category-products'){
- const list=document.getElementById(containerId); if(!list)return; const items=Array.isArray(data)?data:[];
- if(!items.length){list.innerHTML='<div class="empty-state"><h3><i class="fa-regular fa-face-frown"></i> Produk tidak ditemukan</h3><p>Coba kata kunci lain.</p></div>';return}
- list.innerHTML=items.map(card).join(''); requestAnimationFrame(()=>{window.updateAllProductBadges?.();window.__hydrateRealtimeProductStats?.(list)})
-}; try{renderProductList=window.renderProductList}catch(e){}
-/* Detail uses the same explicit warranty language. */
-function syncDetailWarranty(){
- const root=document.querySelector('#product-grid-auto .product-detail'); if(!root)return;
- const p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct; if(!p)return;
- const label=warrantyText(p); if(!label)return;
- root.querySelectorAll('.product-highlights span').forEach(el=>{if(el.querySelector('.fa-shield-halved')){el.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=''}); const i=el.querySelector('i'); el.innerHTML=''; if(i)el.appendChild(i); el.appendChild(document.createTextNode(' '+label));}});
-}
-const baseShow=window.showProduct;
-if(typeof baseShow==='function') window.showProduct=async function(){const out=await baseShow.apply(this,arguments);requestAnimationFrame(syncDetailWarranty);return out};
-window.__syncDetailWarranty=syncDetailWarranty;
-})();
-</script>
-
-
-
 <!-- =========================================================
      V14 FINAL POLISH — CARD CONSISTENCY + RATING COMMIT SYNC
 ========================================================= -->
-<style id="v14-final-card-rating-polish">
-/* Final card geometry: same physical component on every product surface. */
-#product-grid-auto.search-product-mode .marketplace-card.v13-unified-card,
-#category-products .marketplace-card.v13-unified-card,
-#promo-direct-products .marketplace-card.v13-unified-card,
-#relatedProducts .marketplace-card.v13-unified-card,
-#recentProducts .marketplace-card.v13-unified-card{
-    box-sizing:border-box !important;
-    min-width:0 !important;
-    width:100% !important;
-    height:100% !important;
-}
-
-.marketplace-card.v13-unified-card .product-card-body{
-    box-sizing:border-box !important;
-    width:100% !important;
-    min-width:0 !important;
-    padding:9px 9px 10px !important;
-}
-
-/* Trust rows never clip on narrow 2-column mobile cards. */
-.marketplace-card.v13-unified-card .v13-trust-block{
-    width:100% !important;
-    min-width:0 !important;
-    min-height:52px !important;
-    overflow:visible !important;
-}
-.marketplace-card.v13-unified-card .v13-trust-line{
-    display:grid !important;
-    grid-template-columns:auto minmax(0,1fr) !important;
-    align-items:center !important;
-    column-gap:5px !important;
-    width:100% !important;
-    min-width:0 !important;
-    overflow:visible !important;
-}
-.marketplace-card.v13-unified-card .product-rating{
-    flex:none !important;
-    max-width:none !important;
-}
-.marketplace-card.v13-unified-card .product-sold{
-    min-width:0 !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v13-unified-card .product-views{
-    min-width:0 !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v13-unified-card .v13-warranty-badge{
-    justify-self:start !important;
-    width:auto !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    padding:3px 5px !important;
-    overflow:visible !important;
-    text-overflow:clip !important;
-    white-space:nowrap !important;
-    font-size:8px !important;
-    letter-spacing:-.01em !important;
-}
-.marketplace-card.v13-unified-card .v13-warranty-badge i{
-    margin-right:3px !important;
-}
-
-/* Voucher + CTA occupy predictable rows, so buttons align across cards. */
-.marketplace-card.v13-unified-card .product-voucher-info{
-    max-width:100% !important;
-    box-sizing:border-box !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v13-unified-card .marketplace-buy-now{
-    box-sizing:border-box !important;
-    width:100% !important;
-    max-width:100% !important;
-    min-width:0 !important;
-    height:38px !important;
-    min-height:38px !important;
-    padding:0 12px !important;
-    overflow:hidden !important;
-}
-.marketplace-card.v13-unified-card .marketplace-buy-now > span{
-    width:100% !important;
-    max-width:100% !important;
-    overflow:hidden !important;
-    text-overflow:clip !important;
-    white-space:nowrap !important;
-    text-align:center !important;
-}
-.marketplace-card.v13-unified-card .marketplace-buy-now > i{
-    left:10px !important;
-}
-
-@media(max-width:390px){
-    .marketplace-card.v13-unified-card .product-card-body{padding:8px !important;}
-    .marketplace-card.v13-unified-card .product-rating,
-    .marketplace-card.v13-unified-card .product-sold,
-    .marketplace-card.v13-unified-card .product-views{font-size:8px !important;}
-    .marketplace-card.v13-unified-card .v13-warranty-badge{font-size:7.4px !important;padding:3px 4px !important;}
-    .marketplace-card.v13-unified-card .marketplace-buy-now{font-size:10px !important;padding:0 10px !important;}
-    .marketplace-card.v13-unified-card .marketplace-buy-now > i{left:8px !important;}
-}
-
-/* Product detail warranty wording stays explicit. */
-.product-detail .product-highlights .v13-detail-warranty{
-    overflow:visible !important;
-    text-overflow:clip !important;
-    white-space:nowrap !important;
-}
-</style>
-
-<script id="v14-final-rating-commit-sync">
-(function(){
-'use strict';
-
-function fmtRating(total,count){
-    total=Number(total)||0;
-    count=Number(count)||0;
-    if(count<=0) return 0;
-    return Math.min(5,Math.max(0,Math.round((total/count)*10)/10));
-}
-
-function paintCommittedRating(productId,total,count){
-    const rating=fmtRating(total,count);
-    const id=String(productId);
-
-    document.querySelectorAll(`[data-rating-product="${CSS.escape(id)}"]`).forEach(el=>{
-        el.textContent=count>0?`⭐ ${rating.toFixed(1)}`:'⭐ -';
-    });
-    document.querySelectorAll(`[data-detail-rating="${CSS.escape(id)}"]`).forEach(el=>{
-        el.textContent=count>0?`⭐ ${rating.toFixed(1)} Rating`:'⭐ - Rating';
-    });
-    document.querySelectorAll(`[data-detail-rating-badge="${CSS.escape(id)}"]`).forEach(el=>{
-        el.innerHTML=`<i class="fa-solid fa-star"></i> ${count>0?rating.toFixed(1):'-'} Rating`;
-    });
-
-    window.__v101PushProductStats?.(id,{ratingTotal:Number(total)||0,ratingCount:Number(count)||0});
-}
-
-function setStars(productId,value){
-    const stars=document.querySelectorAll(`#rating-stars-${CSS.escape(String(productId))} .fa-star`);
-    stars.forEach(star=>{
-        const n=Number(star.dataset.star)||0;
-        star.classList.toggle('selected',n<=Number(value||0));
-    });
-}
-
-/* Selection feedback remains immediate. */
-window.selectProductRating=function(productId,rating){
-    rating=Number(rating);
-    if(!Number.isInteger(rating)||rating<1||rating>5) return;
-    setStars(productId,rating);
-    localStorage.setItem(`selected_rating_${productId}`,String(rating));
-};
-try{selectProductRating=window.selectProductRating}catch(_e){}
-
-/* Final submit path returns the authoritative new aggregate from the same transaction. */
-window.confirmProductRating=async function(productId){
-    const selected=Number(localStorage.getItem(`selected_rating_${productId}`));
-    if(!Number.isInteger(selected)||selected<1||selected>5){
-        await Swal.fire({icon:'warning',title:'Pilih Rating',text:'Silakan pilih 1 sampai 5 bintang terlebih dahulu.',confirmButtonColor:'#8CC63F'});
-        return;
-    }
-
-    const ratedKey=`rated_product_${productId}`;
-    if(localStorage.getItem(ratedKey)){
-        await Swal.fire({icon:'info',title:'Sudah Memberikan Rating',text:'Kamu sudah memberikan rating untuk produk ini.',confirmButtonText:'OK',confirmButtonColor:'#8CC63F'});
-        return;
-    }
-
-    try{
-        const ref=db.collection('statistik_produk').doc(String(productId));
-        const committed=await db.runTransaction(async tx=>{
-            const snap=await tx.get(ref);
-            const data=snap.exists?(snap.data()||{}):{};
-            const oldTotal=Math.max(0,Number(data.ratingTotal)||0);
-            const oldCount=Math.max(0,Number(data.ratingCount)||0);
-            const newTotal=oldTotal+selected;
-            const newCount=oldCount+1;
-            const payload={ratingTotal:newTotal,ratingCount:newCount};
-            if(snap.exists) tx.update(ref,payload);
-            else tx.set(ref,Object.assign({terjual:0,views:0},payload),{merge:true});
-            return payload;
-        });
-
-        localStorage.setItem(ratedKey,'1');
-        localStorage.removeItem(`selected_rating_${productId}`);
-
-        /* Update detail + every visible card immediately from committed values. */
-        paintCommittedRating(productId,committed.ratingTotal,committed.ratingCount);
-
-        /* Then reconcile with server snapshot; UI never waits for it. */
-        window.__v101RefreshProductStats?.(productId);
-
-        await Swal.fire({icon:'success',title:'Rating Berhasil!',text:`Rating ${selected} bintang berhasil disimpan.`,confirmButtonText:'Mantap!',confirmButtonColor:'#8CC63F'});
-
-        /* Keep the user's submitted stars visible as confirmation on this detail page. */
-        setStars(productId,selected);
-    }catch(error){
-        console.error('Gagal mengirim rating produk:',error);
-        await Swal.fire({icon:'error',title:'Rating Gagal',text:'Rating belum berhasil dikirim. Silakan coba lagi.',confirmButtonText:'Coba Lagi',confirmButtonColor:'#8CC63F'});
-    }
-};
-try{confirmProductRating=window.confirmProductRating}catch(_e){}
-
-/* When opening another product, do not leak a previous unsent star state. */
-const oldShow=window.showProduct;
-if(typeof oldShow==='function'&&!oldShow.__v14RatingState){
-    const wrapped=async function(){
-        const out=await oldShow.apply(this,arguments);
-        requestAnimationFrame(()=>{
-            const p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct;
-            if(!p) return;
-            const pending=Number(localStorage.getItem(`selected_rating_${p.id}`));
-            setStars(p.id,Number.isInteger(pending)&&pending>=1&&pending<=5?pending:0);
-        });
-        return out;
-    };
-    wrapped.__v14RatingState=true;
-    window.showProduct=wrapped;
-    try{showProduct=wrapped}catch(_e){}
-}
-})();
-</script>
-
 </body>
 </html>
 
@@ -32620,167 +32255,6 @@ window.openAllPromoProducts=async function(){
      V9 STRICT REALTIME PRODUCT STATS + SHOPEE CARD STRUCTURE
      2026-10-06
 ========================================================= -->
-<style id="v9-strict-realtime-shopee-card">
-/* Shopee-like information hierarchy: image -> title -> price -> voucher -> trust stats -> CTA */
-.marketplace-card.v9-shopee-card{
-    background:#fff !important;
-    border:1px solid #ededed !important;
-    border-radius:10px !important;
-    overflow:hidden !important;
-    box-shadow:0 2px 8px rgba(0,0,0,.055) !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-image-wrap{
-    width:100% !important;
-    aspect-ratio:1/1 !important;
-    border-radius:0 !important;
-    overflow:hidden !important;
-    background:#fff !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-image-wrap img{
-    width:100% !important;
-    height:100% !important;
-    object-fit:contain !important;
-    display:block !important;
-}
-.marketplace-card.v9-shopee-card .product-card-body{
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    padding:10px 10px 11px !important;
-    min-width:0 !important;
-}
-.marketplace-card.v9-shopee-card .product-brand{
-    order:1 !important;
-    margin:0 0 3px !important;
-    color:#777 !important;
-    font-size:10px !important;
-    line-height:1.2 !important;
-    text-transform:uppercase !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-product-name{
-    order:2 !important;
-    display:block !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    min-height:1.36em !important;
-    max-height:1.36em !important;
-    margin:0 !important;
-    color:#222 !important;
-    font-size:13px !important;
-    font-weight:600 !important;
-    line-height:1.36 !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-price{
-    order:3 !important;
-    margin:7px 0 0 !important;
-    color:#8CC63F !important;
-    font-size:18px !important;
-    line-height:1.2 !important;
-    font-weight:800 !important;
-    display:flex !important;
-    align-items:baseline !important;
-    flex-wrap:wrap !important;
-    gap:4px 6px !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-price-old{
-    color:#999 !important;
-    font-size:10.5px !important;
-    font-weight:500 !important;
-    text-decoration:line-through !important;
-}
-.marketplace-card.v9-shopee-card .product-voucher-info{
-    order:4 !important;
-    margin:7px 0 0 !important;
-    padding:3px 7px !important;
-    width:max-content !important;
-    max-width:100% !important;
-    border-radius:4px !important;
-    font-size:9.5px !important;
-    line-height:1.2 !important;
-}
-.marketplace-card.v9-shopee-card .product-meta{
-    order:5 !important;
-    display:grid !important;
-    grid-template-columns:auto auto 1fr !important;
-    align-items:center !important;
-    column-gap:5px !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:18px !important;
-    margin:8px 0 0 !important;
-    overflow:hidden !important;
-}
-.marketplace-card.v9-shopee-card .product-meta .meta-divider{display:none !important}
-.marketplace-card.v9-shopee-card .product-rating,
-.marketplace-card.v9-shopee-card .product-sold,
-.marketplace-card.v9-shopee-card .product-views{
-    min-width:0 !important;
-    margin:0 !important;
-    padding:0 !important;
-    font-size:9.5px !important;
-    line-height:1.2 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v9-shopee-card .product-rating{color:#333 !important}
-.marketplace-card.v9-shopee-card .product-sold{color:#555 !important}
-.marketplace-card.v9-shopee-card .product-views{
-    justify-self:end !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    color:#777 !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-buy-now{
-    order:6 !important;
-    position:relative !important;
-    display:grid !important;
-    place-items:center !important;
-    width:100% !important;
-    min-height:36px !important;
-    margin:9px 0 0 !important;
-    padding:0 34px !important;
-    border-radius:8px !important;
-    text-align:center !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-buy-now > span{
-    position:absolute !important;
-    left:50% !important;
-    top:50% !important;
-    transform:translate(-50%,-50%) !important;
-    width:max-content !important;
-    max-width:calc(100% - 54px) !important;
-    margin:0 !important;
-    padding:0 !important;
-    text-align:center !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v9-shopee-card .marketplace-buy-now > i{
-    position:absolute !important;
-    left:12px !important;
-    top:50% !important;
-    margin:0 !important;
-    transform:translateY(-50%) !important;
-}
-@media(max-width:768px){
-    .marketplace-card.v9-shopee-card .product-card-body{padding:8px 8px 9px !important}
-    .marketplace-card.v9-shopee-card .marketplace-product-name{font-size:12px !important;min-height:1.36em !important;max-height:1.36em !important}
-    .marketplace-card.v9-shopee-card .marketplace-price{font-size:16px !important;margin-top:6px !important}
-    .marketplace-card.v9-shopee-card .marketplace-price-old{font-size:9.5px !important}
-    .marketplace-card.v9-shopee-card .product-voucher-info{font-size:8.8px !important;margin-top:6px !important}
-    .marketplace-card.v9-shopee-card .product-meta{column-gap:4px !important;margin-top:7px !important}
-    .marketplace-card.v9-shopee-card .product-rating,
-    .marketplace-card.v9-shopee-card .product-sold,
-    .marketplace-card.v9-shopee-card .product-views{font-size:8.7px !important}
-    .marketplace-card.v9-shopee-card .marketplace-buy-now{min-height:34px !important;padding:0 30px !important;font-size:10.5px !important}
-    .marketplace-card.v9-shopee-card .marketplace-buy-now > i{left:11px !important}
-}
-body.dark-mode .marketplace-card.v9-shopee-card{background:#151a20 !important;border-color:#2b3138 !important}
-body.dark-mode .marketplace-card.v9-shopee-card .marketplace-product-name{color:#f1f1f1 !important}
-</style>
 <script id="v10-light-realtime-product-stats">
 (function(){
 'use strict';
@@ -33076,826 +32550,16 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
      V11 FINAL UNIFIED MARKETPLACE CARD
      Search + Category + Related + Recent use one component.
 ========================================================= -->
-<style id="v11-unified-marketplace-card-style">
-/* One visual component across every product-list surface. */
-#category-products,
-#product-grid-auto.search-product-mode,
-#promo-direct-products,
-#relatedProducts,
-#recentProducts{
-    align-items:stretch !important;
-}
-
-.marketplace-card.v11-unified-card{
-    height:100% !important;
-    min-width:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    background:#fff !important;
-    border:1px solid #ececec !important;
-    border-radius:14px !important;
-    overflow:hidden !important;
-    box-shadow:0 3px 12px rgba(0,0,0,.065) !important;
-}
-.marketplace-card.v11-unified-card .marketplace-image-wrap{
-    width:100% !important;
-    aspect-ratio:1/1 !important;
-    background:#fff !important;
-    flex:0 0 auto !important;
-}
-.marketplace-card.v11-unified-card .marketplace-image-wrap img{
-    width:100% !important;
-    height:100% !important;
-    display:block !important;
-    object-fit:contain !important;
-}
-.marketplace-card.v11-unified-card .product-card-body{
-    flex:1 1 auto !important;
-    min-width:0 !important;
-    padding:10px 11px 12px !important;
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    gap:0 !important;
-}
-.marketplace-card.v11-unified-card .product-brand{
-    display:block !important;
-    margin:0 0 5px !important;
-    color:#777 !important;
-    font-size:10px !important;
-    line-height:1.2 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v11-unified-card .marketplace-product-name{
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:1.35em !important;
-    margin:0 !important;
-    color:#242424 !important;
-    font-size:13px !important;
-    font-weight:700 !important;
-    line-height:1.35 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v11-unified-card .marketplace-price{
-    margin:8px 0 0 !important;
-    display:flex !important;
-    align-items:baseline !important;
-    flex-wrap:wrap !important;
-    gap:5px !important;
-    color:#8CC63F !important;
-    font-size:16px !important;
-    font-weight:800 !important;
-    line-height:1.25 !important;
-}
-.marketplace-card.v11-unified-card .marketplace-price-old{
-    color:#999 !important;
-    font-size:10px !important;
-    font-weight:500 !important;
-    text-decoration:line-through !important;
-}
-
-/* Trust row: rating is a real pill; sold/views remain compact. */
-.marketplace-card.v11-unified-card .product-meta{
-    width:100% !important;
-    min-width:0 !important;
-    margin:8px 0 0 !important;
-    display:flex !important;
-    align-items:center !important;
-    flex-wrap:wrap !important;
-    gap:5px !important;
-    min-height:24px !important;
-    overflow:visible !important;
-}
-.marketplace-card.v11-unified-card .product-rating{
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    min-height:22px !important;
-    padding:3px 7px !important;
-    border:1px solid #f1d98a !important;
-    border-radius:6px !important;
-    background:#fff9e7 !important;
-    color:#5c522d !important;
-    font-size:9.5px !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .product-sold,
-.marketplace-card.v11-unified-card .product-views{
-    display:inline-flex !important;
-    align-items:center !important;
-    gap:3px !important;
-    color:#6f6f6f !important;
-    font-size:9.5px !important;
-    font-weight:500 !important;
-    line-height:1.2 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .product-views i{
-    color:#8CC63F !important;
-}
-
-/* Trust/offer pills. */
-.marketplace-card.v11-unified-card .v11-trust-row{
-    width:100% !important;
-    margin-top:8px !important;
-    display:flex !important;
-    align-items:center !important;
-    flex-wrap:wrap !important;
-    gap:5px !important;
-}
-.marketplace-card.v11-unified-card .v11-warranty-badge,
-.marketplace-card.v11-unified-card .product-voucher-info{
-    min-height:23px !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    gap:5px !important;
-    margin:0 !important;
-    padding:4px 7px !important;
-    border-radius:6px !important;
-    font-size:9px !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .v11-warranty-badge{
-    border:1px solid #dfeccb !important;
-    background:#f6faef !important;
-    color:#5d852d !important;
-}
-.marketplace-card.v11-unified-card .v11-warranty-badge i,
-.marketplace-card.v11-unified-card .product-voucher-info i{
-    color:#8CC63F !important;
-}
-.marketplace-card.v11-unified-card .product-voucher-info{
-    background:#EEF8DF !important;
-    color:#5A8E1C !important;
-}
-
-/* CTA: optical true center. */
-.marketplace-card.v11-unified-card .marketplace-buy-now{
-    position:relative !important;
-    width:100% !important;
-    min-height:38px !important;
-    margin:10px 0 0 !important;
-    padding:0 34px !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    border:0 !important;
-    border-radius:10px !important;
-    background:#8CC63F !important;
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
-    font-size:11px !important;
-    font-weight:800 !important;
-    line-height:1 !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v11-unified-card .marketplace-buy-now > span{
-    display:block !important;
-    width:100% !important;
-    text-align:center !important;
-    line-height:1 !important;
-}
-.marketplace-card.v11-unified-card .marketplace-buy-now > i{
-    position:absolute !important;
-    left:13px !important;
-    top:50% !important;
-    transform:translateY(-50%) !important;
-    margin:0 !important;
-    font-size:11px !important;
-}
-
-/* Related and Recent now match category/search layout on mobile. */
-@media(max-width:768px){
-    #category-products,
-    #product-grid-auto.search-product-mode,
-    #promo-direct-products,
-    #relatedProducts,
-    #recentProducts{
-        display:grid !important;
-        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-        gap:10px !important;
-        width:100% !important;
-    }
-    #relatedProducts .marketplace-card,
-    #recentProducts .marketplace-card{
-        width:100% !important;
-        min-width:0 !important;
-        margin:0 !important;
-    }
-}
-
-@media(min-width:769px){
-    #relatedProducts,
-    #recentProducts{
-        grid-template-columns:repeat(auto-fill,minmax(220px,1fr)) !important;
-        gap:18px !important;
-    }
-    .marketplace-card.v11-unified-card .product-card-body{
-        padding:13px 14px 14px !important;
-    }
-    .marketplace-card.v11-unified-card .marketplace-product-name{font-size:14px !important;}
-    .marketplace-card.v11-unified-card .marketplace-price{font-size:18px !important;}
-    .marketplace-card.v11-unified-card .product-rating,
-    .marketplace-card.v11-unified-card .product-sold,
-    .marketplace-card.v11-unified-card .product-views{font-size:10px !important;}
-    .marketplace-card.v11-unified-card .v11-warranty-badge,
-    .marketplace-card.v11-unified-card .product-voucher-info{font-size:9.5px !important;}
-}
-
-body.dark-mode .marketplace-card.v11-unified-card{
-    background:#181818 !important;
-    border-color:#2b2b2b !important;
-}
-body.dark-mode .marketplace-card.v11-unified-card .marketplace-product-name{color:#f4f4f4 !important;}
-body.dark-mode .marketplace-card.v11-unified-card .product-brand,
-body.dark-mode .marketplace-card.v11-unified-card .product-sold,
-body.dark-mode .marketplace-card.v11-unified-card .product-views{color:#bdbdbd !important;}
-</style>
-
-<script id="v11-unified-marketplace-card-js">
-(function(){
-'use strict';
-
-function escAttr(value){
-    return String(value ?? '')
-        .replace(/&/g,'&amp;')
-        .replace(/"/g,'&quot;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;');
-}
-function escText(value){
-    return String(value ?? '')
-        .replace(/&/g,'&amp;')
-        .replace(/</g,'&lt;')
-        .replace(/>/g,'&gt;');
-}
-function warrantyLabel(product){
-    const g=product?.garansi;
-    if(g && typeof g==='object'){
-        const value=String(g.lama ?? g.durasi ?? g.label ?? '').trim();
-        if(value) return value;
-    }
-    if(typeof g==='string' && g.trim()) return g.trim();
-    const alt=String(product?.warranty ?? product?.garansi_lama ?? '').trim();
-    return alt || '';
-}
-
-function unifiedCard(product){
-    const harga=Number(product?.harga?.promo ?? product?.harga?.normal ?? 0);
-    const normal=Number(product?.harga?.normal ?? 0);
-    const discounted=normal>harga && harga>0;
-    const discount=discounted?Math.round((1-harga/normal)*100):0;
-    const warranty=warrantyLabel(product);
-    const id=escAttr(product?.id);
-    const name=escText(product?.nama || 'Produk');
-    const image=escAttr(product?.gambar || 'images/no-image.png');
-    const brand=escText(product?.brand || '');
-    const productNameAttr=escAttr(product?.nama || 'Produk');
-
-    return `
-    <div class="product-card marketplace-card v11-unified-card"
-         data-product-id="${id}"
-         data-product-name="${productNameAttr}"
-         onclick="openProductWithTransition(this,this.dataset.productName)">
-
-        <span class="product-badge-placeholder" data-badge-product="${id}"></span>
-        ${discounted?`<span class="marketplace-discount-badge">-${discount}%</span>`:''}
-
-        <div class="marketplace-image-wrap">
-            <img src="${image}" alt="${name}" loading="lazy" onerror="this.src='images/no-image.png'">
-        </div>
-
-        <div class="product-card-body">
-            <small class="product-brand">${brand}</small>
-            <h3 class="marketplace-product-name" title="${productNameAttr}">${name}</h3>
-
-            <div class="marketplace-price">
-                <span>${harga.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>
-                ${discounted?`<span class="marketplace-price-old">${normal.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>`:''}
-            </div>
-
-            <div class="product-meta" aria-label="Kepercayaan produk">
-                <span class="product-rating" data-rating-product="${id}">⭐ -</span>
-                <span class="product-sold" data-sold-product="${id}">0 terjual</span>
-                <span class="product-views" data-view-product="${id}" aria-label="Jumlah dilihat">
-                    <i class="fa-regular fa-eye" aria-hidden="true"></i> 0 dilihat
-                </span>
-            </div>
-
-            <div class="v11-trust-row">
-                ${warranty?`<span class="v11-warranty-badge"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><span>${escText(warranty)}</span></span>`:''}
-                <span class="product-voucher-info"><i class="fa-solid fa-ticket" aria-hidden="true"></i><span>Voucher tersedia</span></span>
-            </div>
-
-            <button type="button" class="marketplace-buy-now"
-                    aria-label="Beli ${productNameAttr} sekarang"
-                    onclick="buyNowFromCard(event,'${id}')">
-                <i class="fa-solid fa-bolt" aria-hidden="true"></i>
-                <span>Beli Sekarang</span>
-            </button>
-        </div>
-    </div>`;
-}
-
-/* Replace the single card renderer used by category/search/related/recent. */
-window.renderMarketplaceCard=unifiedCard;
-try{ renderMarketplaceCard=unifiedCard; }catch(_e){}
-
-/* Replace product-list renderer so all search/category/promo-list cards use the same component. */
-window.renderProductList=function(data,containerId='category-products'){
-    const list=document.getElementById(containerId);
-    if(!list) return;
-    const items=Array.isArray(data)?data:[];
-    if(!items.length){
-        list.innerHTML='<div class="empty-state"><h3><i class="fa-regular fa-face-frown"></i> Produk tidak ditemukan</h3><p>Coba kata kunci lain.</p></div>';
-        return;
-    }
-    list.innerHTML=items.map(unifiedCard).join('');
-    requestAnimationFrame(()=>{
-        if(typeof window.updateAllProductBadges==='function') window.updateAllProductBadges();
-        if(typeof window.__hydrateRealtimeProductStats==='function') window.__hydrateRealtimeProductStats(list);
-    });
-};
-try{ renderProductList=window.renderProductList; }catch(_e){}
-
-/* Re-render current related/recent surfaces with the same component when present. */
-window.__renderUnifiedCardSurface=function(container,items){
-    if(!container) return;
-    container.innerHTML=(Array.isArray(items)?items:[]).map(unifiedCard).join('');
-    requestAnimationFrame(()=>{
-        if(typeof window.updateAllProductBadges==='function') window.updateAllProductBadges();
-        if(typeof window.__hydrateRealtimeProductStats==='function') window.__hydrateRealtimeProductStats(container);
-    });
-};
-
-/* Ensure existing cards on initial boot also inherit final trust layout. */
-function upgradeExisting(){
-    document.querySelectorAll('.marketplace-card[data-product-id]').forEach(card=>{
-        if(card.classList.contains('v11-unified-card')) return;
-        const id=String(card.dataset.productId||'');
-        const source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:window.allProducts;
-        const product=Array.isArray(source)?source.find(p=>String(p.id)===id):null;
-        if(product){
-            const wrap=document.createElement('div');
-            wrap.innerHTML=unifiedCard(product).trim();
-            const fresh=wrap.firstElementChild;
-            if(fresh) card.replaceWith(fresh);
-        }
-    });
-    window.__hydrateRealtimeProductStats?.(document);
-}
-if(document.readyState==='loading') document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(upgradeExisting),{once:true});
-else requestAnimationFrame(upgradeExisting);
-})();
-</script>
-
-
 <!-- =========================================================
      V13 FINAL — ONE CARD COMPONENT + STRICT RATING SYNC
      Search / Category / Related / Recent use identical markup.
 ========================================================= -->
-<style id="v13-final-unified-card-style">
-/* ----- identical grid behavior across every product surface ----- */
-#product-grid-auto.search-product-mode,
-#category-products,
-#promo-direct-products,
-#relatedProducts,
-#recentProducts{
-    align-items:stretch !important;
-}
-
-@media(max-width:768px){
-    #product-grid-auto.search-product-mode,
-    #category-products,
-    #promo-direct-products,
-    #relatedProducts,
-    #recentProducts{
-        display:grid !important;
-        grid-template-columns:repeat(2,minmax(0,1fr)) !important;
-        gap:10px !important;
-        width:100% !important;
-    }
-}
-
-@media(min-width:769px){
-    #category-products,
-    #promo-direct-products,
-    #relatedProducts,
-    #recentProducts{
-        display:grid !important;
-        grid-template-columns:repeat(auto-fill,minmax(220px,1fr)) !important;
-        gap:18px !important;
-    }
-}
-
-/* ----- one physical card ----- */
-.marketplace-card.v13-unified-card{
-    position:relative !important;
-    width:100% !important;
-    min-width:0 !important;
-    height:100% !important;
-    margin:0 !important;
-    display:flex !important;
-    flex-direction:column !important;
-    overflow:hidden !important;
-    border:1px solid #ececec !important;
-    border-radius:12px !important;
-    background:#fff !important;
-    box-shadow:0 2px 10px rgba(0,0,0,.07) !important;
-    transform:none !important;
-}
-.marketplace-card.v13-unified-card .marketplace-image-wrap{
-    width:100% !important;
-    aspect-ratio:1/1 !important;
-    flex:0 0 auto !important;
-    background:#fff !important;
-}
-.marketplace-card.v13-unified-card .marketplace-image-wrap img{
-    width:100% !important;
-    height:100% !important;
-    object-fit:contain !important;
-}
-.marketplace-card.v13-unified-card .product-card-body{
-    display:flex !important;
-    flex-direction:column !important;
-    align-items:stretch !important;
-    flex:1 1 auto !important;
-    min-width:0 !important;
-    padding:9px 9px 10px !important;
-}
-.marketplace-card.v13-unified-card .product-brand{
-    order:1 !important;
-    display:block !important;
-    margin:0 0 3px !important;
-    color:#777 !important;
-    font-size:9.5px !important;
-    line-height:1.2 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v13-unified-card .marketplace-product-name{
-    order:2 !important;
-    display:block !important;
-    width:100% !important;
-    min-width:0 !important;
-    min-height:1.35em !important;
-    max-height:1.35em !important;
-    margin:0 !important;
-    color:#222 !important;
-    font-size:12px !important;
-    font-weight:700 !important;
-    line-height:1.35 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-    -webkit-line-clamp:1 !important;
-    -webkit-box-orient:initial !important;
-}
-.marketplace-card.v13-unified-card .marketplace-price{
-    order:3 !important;
-    display:flex !important;
-    align-items:baseline !important;
-    flex-wrap:wrap !important;
-    gap:5px !important;
-    min-height:24px !important;
-    margin:7px 0 0 !important;
-    color:#79b933 !important;
-    font-size:16px !important;
-    font-weight:800 !important;
-    line-height:1.2 !important;
-}
-.marketplace-card.v13-unified-card .marketplace-price-old{
-    color:#999 !important;
-    font-size:9px !important;
-    font-weight:500 !important;
-    text-decoration:line-through !important;
-}
-
-/* ----- trust block: stable 2-row composition ----- */
-.marketplace-card.v13-unified-card .v13-trust-block{
-    order:4 !important;
-    width:100% !important;
-    min-height:50px !important;
-    margin-top:7px !important;
-}
-.marketplace-card.v13-unified-card .v13-trust-line{
-    width:100% !important;
-    min-width:0 !important;
-    min-height:22px !important;
-    display:flex !important;
-    align-items:center !important;
-    gap:5px !important;
-    overflow:hidden !important;
-}
-.marketplace-card.v13-unified-card .v13-trust-line + .v13-trust-line{
-    margin-top:4px !important;
-}
-.marketplace-card.v13-unified-card .product-rating,
-.marketplace-card.v13-unified-card .v13-warranty-badge{
-    min-height:22px !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    flex:0 0 auto !important;
-    padding:3px 6px !important;
-    border-radius:6px !important;
-    font-size:8.8px !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v13-unified-card .product-rating{
-    border:1px solid #f0d88b !important;
-    background:#fff9e8 !important;
-    color:#5e532c !important;
-}
-.marketplace-card.v13-unified-card .v13-warranty-badge{
-    max-width:55% !important;
-    border:1px solid #dcebc7 !important;
-    background:#f5faed !important;
-    color:#5d852d !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v13-unified-card .v13-warranty-badge i{
-    flex:0 0 auto !important;
-    margin-right:4px !important;
-    color:#8CC63F !important;
-}
-.marketplace-card.v13-unified-card .product-sold,
-.marketplace-card.v13-unified-card .product-views{
-    min-width:0 !important;
-    color:#777 !important;
-    font-size:8.8px !important;
-    line-height:1.2 !important;
-    white-space:nowrap !important;
-    overflow:hidden !important;
-    text-overflow:ellipsis !important;
-}
-.marketplace-card.v13-unified-card .product-views{
-    display:inline-flex !important;
-    align-items:center !important;
-    gap:3px !important;
-}
-.marketplace-card.v13-unified-card .product-views i{
-    flex:0 0 auto !important;
-    color:#8CC63F !important;
-}
-
-.marketplace-card.v13-unified-card .product-voucher-info{
-    order:5 !important;
-    align-self:flex-start !important;
-    min-height:22px !important;
-    margin:7px 0 0 !important;
-    padding:4px 7px !important;
-    display:inline-flex !important;
-    align-items:center !important;
-    gap:5px !important;
-    border-radius:6px !important;
-    background:#EEF8DF !important;
-    color:#5A8E1C !important;
-    font-size:8.8px !important;
-    font-weight:700 !important;
-    line-height:1 !important;
-    white-space:nowrap !important;
-}
-.marketplace-card.v13-unified-card .product-voucher-info i{color:#8CC63F !important;}
-
-/* ----- CTA: exactly identical across all surfaces ----- */
-.marketplace-card.v13-unified-card .marketplace-buy-now{
-    order:6 !important;
-    position:relative !important;
-    width:100% !important;
-    height:38px !important;
-    min-height:38px !important;
-    margin:9px 0 0 !important;
-    padding:0 32px !important;
-    display:flex !important;
-    align-items:center !important;
-    justify-content:center !important;
-    border:0 !important;
-    border-radius:9px !important;
-    background:#8CC63F !important;
-    color:#fff !important;
-    -webkit-text-fill-color:#fff !important;
-    font-size:10.5px !important;
-    font-weight:800 !important;
-    line-height:1 !important;
-    text-align:center !important;
-    white-space:nowrap !important;
-    box-sizing:border-box !important;
-}
-.marketplace-card.v13-unified-card .marketplace-buy-now > span{
-    width:100% !important;
-    display:block !important;
-    text-align:center !important;
-    line-height:1 !important;
-}
-.marketplace-card.v13-unified-card .marketplace-buy-now > i{
-    position:absolute !important;
-    left:12px !important;
-    top:50% !important;
-    transform:translateY(-50%) !important;
-    margin:0 !important;
-    font-size:10px !important;
-}
-
-/* Detail warranty wording matches cards. */
-.product-detail .product-highlights .v13-detail-warranty{
-    white-space:nowrap !important;
-}
-
-body.dark-mode .marketplace-card.v13-unified-card{
-    background:#181818 !important;
-    border-color:#2b2b2b !important;
-}
-body.dark-mode .marketplace-card.v13-unified-card .marketplace-product-name{color:#f4f4f4 !important;}
-body.dark-mode .marketplace-card.v13-unified-card .product-brand,
-body.dark-mode .marketplace-card.v13-unified-card .product-sold,
-body.dark-mode .marketplace-card.v13-unified-card .product-views{color:#bcbcbc !important;}
-</style>
-
-<script id="v13-final-unified-card-rating-sync-js">
-(function(){
-'use strict';
-function eText(v){return String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function eAttr(v){return eText(v).replace(/"/g,'&quot;')}
-function warrantyRaw(p){
-    const g=p?.garansi;
-    if(g&&typeof g==='object'){
-        const x=String(g.lama??g.durasi??g.label??'').trim();
-        if(x)return x;
-    }
-    if(typeof g==='string'&&g.trim())return g.trim();
-    return String(p?.warranty??p?.garansi_lama??'').trim();
-}
-function warrantyText(p){
-    const raw=warrantyRaw(p);
-    if(!raw)return '';
-    return /^garansi\b/i.test(raw)?raw:`Garansi ${raw}`;
-}
-function finalCard(p){
-    const price=Number(p?.harga?.promo??p?.harga?.normal??0);
-    const normal=Number(p?.harga?.normal??0);
-    const discounted=normal>price&&price>0;
-    const discount=discounted?Math.round((1-price/normal)*100):0;
-    const id=eAttr(p?.id);
-    const name=eText(p?.nama||'Produk');
-    const nameA=eAttr(p?.nama||'Produk');
-    const image=eAttr(p?.gambar||'images/no-image.png');
-    const brand=eText(p?.brand||'');
-    const warranty=warrantyText(p);
-    return `<div class="product-card marketplace-card v13-unified-card" data-product-id="${id}" data-product-name="${nameA}" onclick="openProductWithTransition(this,this.dataset.productName)">
-        <span class="product-badge-placeholder" data-badge-product="${id}"></span>
-        ${discounted?`<span class="marketplace-discount-badge">-${discount}%</span>`:''}
-        <div class="marketplace-image-wrap"><img src="${image}" alt="${nameA}" loading="lazy" onerror="this.src='images/no-image.png'"></div>
-        <div class="product-card-body">
-            <small class="product-brand">${brand}</small>
-            <h3 class="marketplace-product-name" title="${nameA}">${name}</h3>
-            <div class="marketplace-price"><span>${price.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>${discounted?`<span class="marketplace-price-old">${normal.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>`:''}</div>
-            <div class="v13-trust-block" aria-label="Informasi kepercayaan produk">
-                <div class="v13-trust-line"><span class="product-rating" data-rating-product="${id}">⭐ -</span><span class="product-sold" data-sold-product="${id}">0 terjual</span></div>
-                <div class="v13-trust-line"><span class="product-views" data-view-product="${id}"><i class="fa-regular fa-eye" aria-hidden="true"></i> 0 dilihat</span>${warranty?`<span class="v13-warranty-badge"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>${eText(warranty)}</span>`:''}</div>
-            </div>
-            <span class="product-voucher-info"><i class="fa-solid fa-ticket" aria-hidden="true"></i><span>Voucher tersedia</span></span>
-            <button type="button" class="marketplace-buy-now" aria-label="Beli ${nameA} sekarang" onclick="buyNowFromCard(event,'${id}')"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>Beli Sekarang</span></button>
-        </div>
-    </div>`;
-}
-function hydrate(root){
-    requestAnimationFrame(()=>{
-        window.updateAllProductBadges?.();
-        window.__hydrateRealtimeProductStats?.(root||document);
-    });
-}
-function renderSurface(container,items){
-    if(!container)return;
-    const products=Array.isArray(items)?items:[];
-    if(!products.length){
-        container.innerHTML='<div class="empty-state"><h3><i class="fa-regular fa-face-frown"></i> Produk tidak ditemukan</h3><p>Coba kata kunci lain.</p></div>';
-        return;
-    }
-    container.innerHTML=products.map(finalCard).join('');
-    hydrate(container);
-}
-
-window.renderMarketplaceCard=finalCard;
-try{renderMarketplaceCard=finalCard}catch(_e){}
-
-window.renderProductList=function(data,containerId='category-products'){
-    renderSurface(document.getElementById(containerId),data);
-};
-try{renderProductList=window.renderProductList}catch(_e){}
-
-window.renderCategorySearchResults=function(products){
-    renderSurface(document.getElementById('category-products'),products);
-};
-try{renderCategorySearchResults=window.renderCategorySearchResults}catch(_e){}
-
-/* Search root uses the exact same renderer too. */
-window.tampilkanHasil=function(products){
-    const container=document.getElementById('product-grid-auto');
-    if(!container)return;
-    container.classList.remove('category-mode');
-    container.classList.add('search-product-mode');
-    renderSurface(container,products);
-    requestAnimationFrame(()=>container.scrollIntoView({behavior:'smooth',block:'start'}));
-};
-try{tampilkanHasil=window.tampilkanHasil}catch(_e){}
-
-window.renderRelated=function(product){
-    const box=document.getElementById('relatedProducts');
-    if(!box)return;
-    const source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:window.allProducts||[];
-    const related=source.filter(p=>p.kategori===product.kategori&&String(p.id)!==String(product.id)).slice(0,8);
-    renderSurface(box,related);
-};
-try{renderRelated=window.renderRelated}catch(_e){}
-
-window.renderRecent=function(){
-    const box=document.getElementById('recentProducts');
-    if(!box)return;
-    let recent=[];
-    try{recent=JSON.parse(localStorage.getItem('recentProducts')||'[]')}catch(_e){}
-    const source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:window.allProducts||[];
-    const fresh=(Array.isArray(recent)?recent:[]).map(old=>source.find(p=>String(p.id)===String(old.id))||old).slice(0,8);
-    renderSurface(box,fresh);
-};
-try{renderRecent=window.renderRecent}catch(_e){}
-
-function syncDetailWarranty(){
-    const root=document.querySelector('#product-grid-auto .product-detail');
-    if(!root)return;
-    const p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct;
-    if(!p)return;
-    const label=warrantyText(p);
-    if(!label)return;
-    root.querySelectorAll('.product-highlights span').forEach(el=>{
-        if(!el.querySelector('.fa-shield-halved'))return;
-        el.classList.add('v13-detail-warranty');
-        el.innerHTML=`<i class="fa-solid fa-shield-halved"></i> ${eText(label)}`;
-    });
-}
-const oldShow=window.showProduct;
-if(typeof oldShow==='function'){
-    window.showProduct=async function(){
-        const out=await oldShow.apply(this,arguments);
-        requestAnimationFrame(()=>{syncDetailWarranty();hydrate(document.querySelector('#product-grid-auto')||document)});
-        return out;
-    };
-    try{showProduct=window.showProduct}catch(_e){}
-}
-
-/* Safety bridge: any successful rating write can force an authoritative refresh. */
-const oldSubmit=window.submitProductRating;
-if(typeof oldSubmit==='function'&&!oldSubmit.__v13Wrapped){
-    const wrapped=async function(productId,rating){
-        const out=await oldSubmit.apply(this,arguments);
-        await window.__v101RefreshProductStats?.(productId);
-        hydrate(document);
-        return out;
-    };
-    wrapped.__v13Wrapped=true;
-    window.submitProductRating=wrapped;
-    try{submitProductRating=wrapped}catch(_e){}
-}
-
-/* Repaint any currently visible product surface with final markup. */
-requestAnimationFrame(()=>{
-    document.querySelectorAll('.marketplace-card[data-product-id]').forEach(card=>{
-        if(card.classList.contains('v13-unified-card'))return;
-        const source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:window.allProducts||[];
-        const p=source.find(x=>String(x.id)===String(card.dataset.productId));
-        if(!p)return;
-        const holder=document.createElement('div');
-        holder.innerHTML=finalCard(p).trim();
-        if(holder.firstElementChild)card.replaceWith(holder.firstElementChild);
-    });
-    hydrate(document);
-    syncDetailWarranty();
-});
-})();
-</script>
-
 <!-- =========================================================
-     V15 HARD RESET — ONE CARD / ONE GRID / ONE RATING STATE
+     PRODUCTION V17 — ONE CARD / ONE GRID / ONE RATING STATE
      This block MUST stay last. It intentionally wins over all
      earlier marketplace experiments without changing core data.
 ========================================================= -->
-<style id="v15-hard-reset-marketplace">
+<style id="production-marketplace-v17">
 :root{--v15-green:#8CC63F;--v15-text:#222;--v15-muted:#747474;--v15-line:#ececec}
 
 /* ONE GRID for search / category / related / recent / promo lists */
@@ -34075,9 +32739,136 @@ body.dark-mode .marketplace-card.v15-card .marketplace-product-name{color:#f4f4f
 body.dark-mode .marketplace-card.v15-card .product-brand,
 body.dark-mode .marketplace-card.v15-card .product-sold,
 body.dark-mode .marketplace-card.v15-card .product-views{color:#bdbdbd!important}
+
+/* Production visual polish: badges + clean CTA */
+
+/* Reserve a compact status strip so badges never cover product photography. */
+.marketplace-card.v15-card{
+  padding-top:28px!important;
+}
+
+.marketplace-card.v15-card .product-badge-placeholder{
+  position:absolute!important;
+  top:6px!important;
+  left:8px!important;
+  right:auto!important;
+  width:auto!important;
+  height:20px!important;
+  min-height:20px!important;
+  display:flex!important;
+  align-items:center!important;
+  z-index:6!important;
+  margin:0!important;
+  padding:0!important;
+  pointer-events:none!important;
+}
+
+/* Kill all legacy badge geometry inside unified marketplace cards. */
+.marketplace-card.v15-card .product-badge-placeholder .badge,
+.marketplace-card.v15-card .product-badge-placeholder .badge.new,
+.marketplace-card.v15-card .product-badge-placeholder .badge.promo,
+.marketplace-card.v15-card .product-badge-placeholder .badge.best,
+.marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
+  position:static!important;
+  inset:auto!important;
+  transform:none!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:0!important;
+  max-width:108px!important;
+  height:20px!important;
+  min-height:20px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  border:0!important;
+  border-radius:999px!important;
+  font-size:7.8px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  letter-spacing:.01em!important;
+  white-space:nowrap!important;
+  overflow:hidden!important;
+  text-overflow:ellipsis!important;
+  box-shadow:none!important;
+}
+
+.marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
+  background:#f6a20b!important;
+}
+.marketplace-card.v15-card .product-badge-placeholder .badge.best{
+  background:#f39c12!important;
+}
+.marketplace-card.v15-card .product-badge-placeholder .badge.promo{
+  background:#e84c3d!important;
+}
+.marketplace-card.v15-card .product-badge-placeholder .badge.new{
+  background:#1abc9c!important;
+}
+
+/* Discount shares the same reserved strip; never covers the photo. */
+.marketplace-card.v15-card .marketplace-discount-badge{
+  position:absolute!important;
+  top:6px!important;
+  right:8px!important;
+  left:auto!important;
+  z-index:6!important;
+  display:inline-flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  width:auto!important;
+  min-width:34px!important;
+  height:20px!important;
+  min-height:20px!important;
+  margin:0!important;
+  padding:0 7px!important;
+  border-radius:7px!important;
+  font-size:8px!important;
+  line-height:1!important;
+  font-weight:800!important;
+  box-shadow:none!important;
+}
+
+/* Clean marketplace CTA: text only, visually and mathematically centered. */
+.marketplace-card.v15-card .marketplace-buy-now{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:0!important;
+  padding:0 10px!important;
+  text-align:center!important;
+}
+.marketplace-card.v15-card .marketplace-buy-now>i,
+.marketplace-card.v15-card .marketplace-buy-now .fa-bolt{
+  display:none!important;
+}
+.marketplace-card.v15-card .marketplace-buy-now>span{
+  display:block!important;
+  width:100%!important;
+  margin:0!important;
+  padding:0!important;
+  text-align:center!important;
+  line-height:1!important;
+}
+
+@media(max-width:390px){
+  .marketplace-card.v15-card{padding-top:26px!important}
+  .marketplace-card.v15-card .product-badge-placeholder{top:5px!important;left:7px!important;height:18px!important;min-height:18px!important}
+  .marketplace-card.v15-card .product-badge-placeholder .badge,
+  .marketplace-card.v15-card .product-badge-placeholder .badge.new,
+  .marketplace-card.v15-card .product-badge-placeholder .badge.promo,
+  .marketplace-card.v15-card .product-badge-placeholder .badge.best,
+  .marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
+    height:18px!important;min-height:18px!important;padding:0 6px!important;font-size:7px!important;max-width:92px!important;
+  }
+  .marketplace-card.v15-card .marketplace-discount-badge{
+    top:5px!important;right:7px!important;height:18px!important;min-height:18px!important;padding:0 6px!important;font-size:7.3px!important;
+  }
+}
 </style>
 
-<script id="v15-hard-reset-marketplace-js">
+<script id="production-marketplace-v17-js">
 (function(){
 'use strict';
 const escText=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
@@ -34109,7 +32900,7 @@ function cardHTML(p){
   return `<article class="product-card marketplace-card v15-card" data-product-id="${id}" data-product-name="${nameA}" onclick="openProductWithTransition(this,this.dataset.productName)">
     <span class="product-badge-placeholder" data-badge-product="${id}"></span>
     ${discounted?`<span class="marketplace-discount-badge">-${discount}%</span>`:''}
-    <div class="marketplace-image-wrap"><img src="${image}" alt="${nameA}" loading="lazy" onerror="this.src='images/no-image.png'"></div>
+    <div class="marketplace-image-wrap"><img src="${image}" alt="${nameA}" loading="lazy" decoding="async" onerror="this.src='images/no-image.png'"></div>
     <div class="product-card-body">
       <small class="product-brand">${brand}</small>
       <h3 class="marketplace-product-name" title="${nameA}">${name}</h3>
@@ -34269,136 +33060,31 @@ function repaintExisting(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(repaintExisting),{once:true});
 else requestAnimationFrame(repaintExisting);
+
+/* Product-level SEO: keep one dynamic Product JSON-LD in sync with the active detail. */
+function syncProductStructuredData(p){
+  if(!p)return;
+  let node=document.getElementById('dynamic-product-jsonld');
+  if(!node){node=document.createElement('script');node.type='application/ld+json';node.id='dynamic-product-jsonld';document.head.appendChild(node);}
+  const price=Number(p?.harga?.promo??p?.harga?.normal??0);
+  const normal=Number(p?.harga?.normal??0);
+  const stock=Number(p?.stok?.qty);
+  const data={
+    '@context':'https://schema.org','@type':'Product',
+    name:String(p?.nama||'Produk'),
+    image:p?.gambar?[String(p.gambar)]:undefined,
+    description:String(p?.deskripsi||''),
+    brand:p?.brand?{'@type':'Brand',name:String(p.brand)}:undefined,
+    offers:{'@type':'Offer',priceCurrency:'IDR',price:String(price||normal||0),url:location.href,availability:(Number.isFinite(stock)&&stock<=0)?'https://schema.org/OutOfStock':'https://schema.org/InStock'}
+  };
+  Object.keys(data).forEach(k=>data[k]===undefined&&delete data[k]);
+  node.textContent=JSON.stringify(data);
+}
+const seoShow=window.showProduct;
+if(typeof seoShow==='function'&&!seoShow.__prodSeo){
+  const seoWrapped=async function(){const out=await seoShow.apply(this,arguments);let p=null;try{p=(typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct}catch(_e){p=window.currentProduct}syncProductStructuredData(p);return out};
+  seoWrapped.__prodSeo=true;window.showProduct=seoWrapped;try{showProduct=seoWrapped}catch(_e){}
+}
 })();
 </script>
 
-<!-- =========================================================
-     V16 FINAL VISUAL POLISH — BADGE STRIP + CLEAN CTA
-     Scope only: marketplace card status badges + Buy Now CTA.
-========================================================= -->
-<style id="v16-badge-cta-polish">
-/* Reserve a compact status strip so badges never cover product photography. */
-.marketplace-card.v15-card{
-  padding-top:28px!important;
-}
-
-.marketplace-card.v15-card .product-badge-placeholder{
-  position:absolute!important;
-  top:6px!important;
-  left:8px!important;
-  right:auto!important;
-  width:auto!important;
-  height:20px!important;
-  min-height:20px!important;
-  display:flex!important;
-  align-items:center!important;
-  z-index:6!important;
-  margin:0!important;
-  padding:0!important;
-  pointer-events:none!important;
-}
-
-/* Kill all legacy badge geometry inside unified marketplace cards. */
-.marketplace-card.v15-card .product-badge-placeholder .badge,
-.marketplace-card.v15-card .product-badge-placeholder .badge.new,
-.marketplace-card.v15-card .product-badge-placeholder .badge.promo,
-.marketplace-card.v15-card .product-badge-placeholder .badge.best,
-.marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
-  position:static!important;
-  inset:auto!important;
-  transform:none!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:auto!important;
-  min-width:0!important;
-  max-width:108px!important;
-  height:20px!important;
-  min-height:20px!important;
-  margin:0!important;
-  padding:0 7px!important;
-  border:0!important;
-  border-radius:999px!important;
-  font-size:7.8px!important;
-  line-height:1!important;
-  font-weight:800!important;
-  letter-spacing:.01em!important;
-  white-space:nowrap!important;
-  overflow:hidden!important;
-  text-overflow:ellipsis!important;
-  box-shadow:none!important;
-}
-
-.marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
-  background:#f6a20b!important;
-}
-.marketplace-card.v15-card .product-badge-placeholder .badge.best{
-  background:#f39c12!important;
-}
-.marketplace-card.v15-card .product-badge-placeholder .badge.promo{
-  background:#e84c3d!important;
-}
-.marketplace-card.v15-card .product-badge-placeholder .badge.new{
-  background:#1abc9c!important;
-}
-
-/* Discount shares the same reserved strip; never covers the photo. */
-.marketplace-card.v15-card .marketplace-discount-badge{
-  position:absolute!important;
-  top:6px!important;
-  right:8px!important;
-  left:auto!important;
-  z-index:6!important;
-  display:inline-flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  width:auto!important;
-  min-width:34px!important;
-  height:20px!important;
-  min-height:20px!important;
-  margin:0!important;
-  padding:0 7px!important;
-  border-radius:7px!important;
-  font-size:8px!important;
-  line-height:1!important;
-  font-weight:800!important;
-  box-shadow:none!important;
-}
-
-/* Clean marketplace CTA: text only, visually and mathematically centered. */
-.marketplace-card.v15-card .marketplace-buy-now{
-  display:flex!important;
-  align-items:center!important;
-  justify-content:center!important;
-  gap:0!important;
-  padding:0 10px!important;
-  text-align:center!important;
-}
-.marketplace-card.v15-card .marketplace-buy-now>i,
-.marketplace-card.v15-card .marketplace-buy-now .fa-bolt{
-  display:none!important;
-}
-.marketplace-card.v15-card .marketplace-buy-now>span{
-  display:block!important;
-  width:100%!important;
-  margin:0!important;
-  padding:0!important;
-  text-align:center!important;
-  line-height:1!important;
-}
-
-@media(max-width:390px){
-  .marketplace-card.v15-card{padding-top:26px!important}
-  .marketplace-card.v15-card .product-badge-placeholder{top:5px!important;left:7px!important;height:18px!important;min-height:18px!important}
-  .marketplace-card.v15-card .product-badge-placeholder .badge,
-  .marketplace-card.v15-card .product-badge-placeholder .badge.new,
-  .marketplace-card.v15-card .product-badge-placeholder .badge.promo,
-  .marketplace-card.v15-card .product-badge-placeholder .badge.best,
-  .marketplace-card.v15-card .product-badge-placeholder .badge.best-selling{
-    height:18px!important;min-height:18px!important;padding:0 6px!important;font-size:7px!important;max-width:92px!important;
-  }
-  .marketplace-card.v15-card .marketplace-discount-badge{
-    top:5px!important;right:7px!important;height:18px!important;min-height:18px!important;padding:0 6px!important;font-size:7.3px!important;
-  }
-}
-</style>
