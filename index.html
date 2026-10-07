@@ -34114,7 +34114,7 @@ function installRenderHooks(){wrapAfter('showProduct',()=>$('#product-grid-auto'
 function auth(){try{return firebase.auth()}catch(_e){return null}}
 function closeMenu(){const m=$('#topMenu'),o=$('#menuOverlay'),b=$('#menuBtn');m?.classList.remove('show','active');o?.classList.remove('show');b?.classList.remove('active');b?.setAttribute('aria-expanded','false');document.body.classList.remove('menu-open','v24-menu-open','v25-menu-open','v26-menu-open','v27-menu-open','v29-menu-open')}
 function menuItem(title,sub,action,href='#'){return `<a class="v29-menu-row" href="${href}" data-v29="${action}"><span class="v29-row-copy"><strong>${title}</strong>${sub?`<small>${sub}</small>`:''}</span><i class="fa-solid fa-chevron-right v29-chevron"></i></a>`}
-function renderMenu(){const m=$('#topMenu');if(!m)return;const L=currentLang(),u=auth()?.currentUser,dark=document.body.classList.contains('dark-mode');m.className='top-menu v29-drawer';m.dataset.v17='1';m.innerHTML=`<div class="v29-drawer-inner"><div class="v29-drawer-head"><div class="v29-drawer-brand"><span class="v29-drawer-logo">n</span><span><strong>Imam Sales</strong><small>Nine Autoseries</small></span></div><button class="v29-close" type="button" data-v29="close" aria-label="Close">×</button></div><div class="v29-lang-wrap"><div class="v29-lang-seg"><button class="v29-lang-btn ${L==='id'?'active':''}" data-lang="id">ID</button><button class="v29-lang-btn ${L==='en'?'active':''}" data-lang="en">EN</button></div></div><div class="v29-menu-scroll"><div class="v29-menu-list">${menuItem(T('Beranda','Home'),T('Kembali ke halaman utama','Back to homepage'),'home')}${menuItem('Shopping Mall',T('Jelajahi seluruh katalog','Browse the full catalog'),'mall','#shoppingMallHero')}${menuItem('AI Assistant',T('Tanya produk & rekomendasi','Ask about products'),'ai')}${menuItem(T('Keranjang','Cart'),T('Lihat produk pilihan Anda','View your selected items'),'cart')}<span class="v29-section-label">${T('Akun & Pesanan','Account & Orders')}</span>${menuItem(u?T('Akun Saya','My Account'):T('Masuk / Daftar','Sign In / Register'),u?(u.email||''):T('Akses fitur pelanggan','Access customer features'),'account')}${menuItem(T('Lacak Pesanan','Track Order'),T('Lacak dengan nomor AWB','Track with an AWB number'),'track')}<span class="v29-section-label">${T('Layanan','Services')}</span>${menuItem('Member VVIP',T('Keuntungan member eksklusif','Exclusive member benefits'),'vip','/vip/')}${menuItem(T('Konsultasi Produk','Product Consultation'),T('Bantuan memilih produk','Help choosing products'),'consult','https://wa.me/6282210109369')}${menuItem('Legal',T('Kebijakan & ketentuan','Policies & terms'),'legal','legal.html')}${menuItem(dark?T('Mode Terang','Light Mode'):T('Mode Gelap','Dark Mode'),T('Atur tampilan website','Change website appearance'),'theme')}</div></div><div class="v29-drawer-foot"><span>© Nine Autoseries</span><a href="/login.html?target=product">Admin</a></div></div>`}
+function renderMenu(){const m=$('#topMenu');if(!m)return;const L=currentLang(),u=auth()?.currentUser,dark=document.body.classList.contains('dark-mode');m.className='top-menu v29-drawer';m.dataset.v17='1';m.innerHTML=`<div class="v29-drawer-inner"><div class="v29-drawer-head"><div class="v29-drawer-brand"><span class="v29-drawer-logo">n</span><span><strong>Imam Sales</strong><small>Nine Autoseries</small></span></div><button class="v29-close" type="button" data-v29="close" aria-label="Close">×</button></div><div class="v29-lang-wrap"><div class="v29-lang-seg"><button class="v29-lang-btn ${L==='id'?'active':''}" data-lang="id">ID</button><button class="v29-lang-btn ${L==='en'?'active':''}" data-lang="en">EN</button></div></div><div class="v29-menu-scroll"><div class="v29-menu-list">${menuItem(T('Beranda','Home'),T('Kembali ke halaman utama','Back to homepage'),'home')}${menuItem('Shopping Mall',T('Jelajahi seluruh katalog','Browse the full catalog'),'mall','#shoppingMallHero')}${menuItem('AI Assistant',T('Tanya produk & rekomendasi','Ask about products'),'ai')}${menuItem(T('Keranjang','Cart'),T('Lihat produk pilihan Anda','View your selected items'),'cart')}<span class="v29-section-label">${T('Akun & Pesanan','Account & Orders')}</span>${menuItem(u?(u.displayName||u.email?.split('@')[0]||T('Akun Saya','My Account')):T('Masuk / Daftar','Sign In / Register'),u?(u.email||T('Akun aktif','Active account')):T('Akses fitur pelanggan','Access customer features'),'account')}${menuItem(T('Lacak Pesanan','Track Order'),T('Lacak dengan nomor AWB','Track with an AWB number'),'track')}<span class="v29-section-label">${T('Layanan','Services')}</span>${menuItem('Member VVIP',T('Keuntungan member eksklusif','Exclusive member benefits'),'vip','/vip/')}${menuItem(T('Konsultasi Produk','Product Consultation'),T('Bantuan memilih produk','Help choosing products'),'consult','https://wa.me/6282210109369')}${menuItem('Legal',T('Kebijakan & ketentuan','Policies & terms'),'legal','legal.html')}${menuItem(dark?T('Mode Terang','Light Mode'):T('Mode Gelap','Dark Mode'),T('Atur tampilan website','Change website appearance'),'theme')}</div></div><div class="v29-drawer-foot"><span>© Nine Autoseries</span><a href="/login.html?target=product">Admin</a></div></div>`}
 function openMenu(){renderMenu();const m=$('#topMenu'),o=$('#menuOverlay'),b=$('#menuBtn');o?.classList.add('v29-overlay','show');m?.classList.add('show');b?.classList.add('active');b?.setAttribute('aria-expanded','true');document.body.classList.add('v29-menu-open')}
 function toggleMenu(e){e?.preventDefault();e?.stopPropagation();e?.stopImmediatePropagation();$('#topMenu')?.classList.contains('show')?closeMenu():openMenu()}
 function closeAccount(){const m=$('#v17AccountModal');m?.classList.remove('show','v29-ready');m?.setAttribute('aria-hidden','true');document.body.classList.remove('v29-modal-open');document.body.style.overflow='';try{window.__v19ScrollGuard?.()}catch(_e){}}
@@ -34124,18 +34124,14 @@ function topAuth(){return `<div class="v29-auth-top"><div class="v29-auth-brand"
 function wireAuthTop(){ $('#v29AuthClose')?.addEventListener('click',closeAccount);$('#v29AuthLang')?.addEventListener('change',e=>setLanguage(e.target.value,true)) }
 function eye(btn,input){$('#'+btn)?.addEventListener('click',()=>{const i=$('#'+input);if(!i)return;i.type=i.type==='password'?'text':'password';$('#'+btn).innerHTML=`<i class="fa-regular ${i.type==='password'?'fa-eye':'fa-eye-slash'}"></i>`})}
 
-/* V31 GOOGLE AUTH — mobile redirect, desktop popup, clean return handling */
+/* V33 GOOGLE AUTH FINAL — official Firebase config + popup-first production flow
+   Only Google Auth is changed here. Other marketplace features remain untouched. */
 function googleProvider(){
   const provider=new firebase.auth.GoogleAuthProvider();
   provider.setCustomParameters({prompt:'select_account'});
+  provider.addScope('profile');
+  provider.addScope('email');
   return provider;
-}
-function mobileGoogleAuth(){
-  try{
-    if(navigator.userAgentData && typeof navigator.userAgentData.mobile==='boolean') return navigator.userAgentData.mobile;
-  }catch(_e){}
-  return /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(navigator.userAgent||'') ||
-         (window.matchMedia?.('(pointer: coarse)').matches && Math.min(innerWidth||9999,innerHeight||9999)<1024);
 }
 function googleAuthError(e){
   const c=e?.code||'';
@@ -34143,61 +34139,71 @@ function googleAuthError(e){
   if(c==='auth/operation-not-allowed') return T('Login Google belum aktif di Firebase Authentication.','Google sign-in is not enabled in Firebase Authentication.');
   if(c==='auth/network-request-failed') return T('Koneksi ke Google gagal. Periksa internet lalu coba lagi.','Could not connect to Google. Check your internet connection and try again.');
   if(c==='auth/account-exists-with-different-credential') return T('Email ini sudah terdaftar dengan metode login lain. Masuk dengan metode tersebut terlebih dahulu.','This email is already registered with another sign-in method. Sign in with that method first.');
+  if(c==='auth/popup-blocked') return T('Browser memblokir jendela login Google. Izinkan pop-up untuk situs ini lalu coba lagi.','Your browser blocked the Google sign-in window. Allow pop-ups for this site and try again.');
+  if(c==='auth/popup-closed-by-user'||c==='auth/cancelled-popup-request') return '';
   return human(e);
 }
-async function beginGoogleRedirect(){
-  const a=auth(); if(!a) throw new Error('Firebase Authentication unavailable');
+function setGoogleBusy(busy){
+  const btn=$('#v29Google');
+  if(!btn)return;
+  if(busy){
+    if(!btn.dataset.label)btn.dataset.label=btn.innerHTML;
+    btn.dataset.busy='1';btn.disabled=true;
+    btn.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${T('Menghubungkan ke Google...','Connecting to Google...')}`;
+  }else{
+    btn.dataset.busy='0';btn.disabled=false;
+    if(btn.dataset.label){btn.innerHTML=btn.dataset.label;delete btn.dataset.label}
+  }
+}
+async function persistAuth(a){
   try{await a.setPersistence(firebase.auth.Auth.Persistence.LOCAL)}catch(_e){}
-  sessionStorage.setItem('nineGoogleRedirectPending','1');
-  await a.signInWithRedirect(googleProvider());
+}
+async function completeGoogleAuth(user,{silent=false}={}){
+  if(!user)return false;
+  try{sessionStorage.removeItem('nineGoogleRedirectPending');sessionStorage.removeItem('nineGoogleRedirectStartedAt')}catch(_e){}
+  try{await user.reload()}catch(_e){}
+  const a=auth();const fresh=a?.currentUser||user;
+  closeAccount();
+  renderMenu();
+  document.dispatchEvent(new CustomEvent('nine:authchange',{detail:{uid:fresh?.uid||'',provider:'google'}}));
+  if(!silent&&window.Swal?.fire){
+    Swal.fire({icon:'success',title:T('Login berhasil','Signed in successfully'),text:T('Akun Google berhasil terhubung.','Your Google account is now connected.'),timer:1100,showConfirmButton:false});
+  }
+  return true;
 }
 async function googleSignIn(){
   const btn=$('#v29Google');
-  if(btn?.dataset.busy==='1') return;
-  const old=btn?.innerHTML;
-  if(btn){btn.dataset.busy='1';btn.disabled=true;btn.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${T('Menghubungkan ke Google...','Connecting to Google...')}`;}
+  if(btn?.dataset.busy==='1')return;
+  setGoogleBusy(true);
   try{
-    const a=auth(); if(!a) throw new Error('Firebase Authentication unavailable');
-    if(mobileGoogleAuth()){
-      await beginGoogleRedirect();
-      return;
-    }
-    try{
-      await a.signInWithPopup(googleProvider());
-      closeAccount();
-    }catch(e){
-      const code=e?.code||'';
-      if(code==='auth/popup-blocked' || code==='auth/cancelled-popup-request'){
-        await beginGoogleRedirect();
-        return;
-      }
-      if(code==='auth/popup-closed-by-user') return;
-      throw e;
-    }
+    const a=auth();if(!a)throw new Error('Firebase Authentication unavailable');
+    await persistAuth(a);
+    /* Popup is the reliable Firebase option when the app is hosted outside Firebase Hosting.
+       On mobile Chrome this may appear as a full-screen Google account chooser. */
+    const result=await a.signInWithPopup(googleProvider());
+    if(result?.user)await completeGoogleAuth(result.user);
   }catch(e){
-    alertBox('error','Google',googleAuthError(e));
+    const code=e?.code||'';
+    if(code==='auth/popup-closed-by-user'||code==='auth/cancelled-popup-request')return;
+    const msg=googleAuthError(e);
+    if(msg)alertBox('error','Google',msg);
   }finally{
-    if(btn && document.contains(btn)){
-      btn.dataset.busy='0';btn.disabled=false;btn.innerHTML=old||'<i class="fa-brands fa-google"></i> Google';
-    }
+    setGoogleBusy(false);
   }
 }
 async function resolveGoogleRedirect(){
-  const a=auth(); if(!a?.getRedirectResult) return;
-  const pending=sessionStorage.getItem('nineGoogleRedirectPending')==='1';
+  /* Cleanup compatibility for users returning from an older V31/V32 redirect attempt.
+     V33 does not start new redirects. */
+  const a=auth();if(!a?.getRedirectResult)return;
   try{
+    await persistAuth(a);
     const result=await a.getRedirectResult();
-    sessionStorage.removeItem('nineGoogleRedirectPending');
-    if(result?.user){
-      closeAccount();
-      renderMenu();
-      if(window.Swal?.fire) Swal.fire({icon:'success',title:T('Login berhasil','Signed in successfully'),text:T('Akun Google berhasil terhubung.','Your Google account is now connected.'),timer:1200,showConfirmButton:false});
-    }
+    if(result?.user)await completeGoogleAuth(result.user,{silent:true});
   }catch(e){
-    sessionStorage.removeItem('nineGoogleRedirectPending');
     const code=e?.code||'';
-    if(code==='auth/popup-closed-by-user' || code==='auth/cancelled-popup-request') return;
-    if(pending) alertBox('error','Google',googleAuthError(e));
+    if(code!=='auth/popup-closed-by-user'&&code!=='auth/cancelled-popup-request')console.warn('Legacy Google redirect cleanup:',e);
+  }finally{
+    try{sessionStorage.removeItem('nineGoogleRedirectPending');sessionStorage.removeItem('nineGoogleRedirectStartedAt')}catch(_e){}
   }
 }
 
@@ -34212,7 +34218,7 @@ function setLanguage(l,fromAuth=false){const v=l==='en'?'en':'id';if(currentLang
 function delegate(e){const lb=e.target.closest?.('.v29-lang-btn');if(lb){e.preventDefault();setLanguage(lb.dataset.lang);return}const a=e.target.closest?.('[data-v29]');if(!a)return;const k=a.dataset.v29;if(k==='close'){e.preventDefault();closeMenu()}else if(k==='theme'){e.preventDefault();toggleTheme()}else if(k==='account'){e.preventDefault();openAccount()}else if(k==='track'){e.preventDefault();closeMenu();setTimeout(()=>window.V17?.openTracking?.(),0)}else if(k==='cart'){e.preventDefault();closeMenu();setTimeout(()=>window.goCart?.(),0)}else if(k==='ai'){e.preventDefault();closeMenu();setTimeout(()=>{try{window.openAI?.()}catch(_e){window.openNexaiHybrid?.()}},0)}else if(k==='home'){e.preventDefault();closeMenu();try{window.showPage?.('home')}catch(_e){}location.hash=''}else if(k==='mall'||k==='vip'||k==='consult'||k==='legal')closeMenu()}
 function patchSwal(){if(!window.Swal?.fire||window.Swal.fire.__v29)return;const f=window.Swal.fire.bind(window.Swal);const w=function(a,...r){if(currentLang()==='en'&&a&&typeof a==='object'){a={...a};for(const k of ['title','text','confirmButtonText','cancelButtonText','denyButtonText','footer'])if(typeof a[k]==='string')a[k]=translateString(a[k])}return f(a,...r)};w.__v29=1;window.Swal.fire=w}
 function boot(){const m=$('#topMenu'),oldO=$('#menuOverlay'),oldB=$('#menuBtn');if(!m||!oldB)return;const b=oldB.cloneNode(true);oldB.replaceWith(b);let o=oldO;if(oldO){o=oldO.cloneNode(true);oldO.replaceWith(o)}o?.classList.add('v29-overlay');renderMenu();b.addEventListener('click',toggleMenu,true);o?.addEventListener('click',e=>{e.preventDefault();closeMenu()},true);m.addEventListener('click',delegate,true);document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();closeAccount()}});const am=$('#v17AccountModal');am?.classList.add('v29-account');am?.addEventListener('click',e=>{if(e.target===am)closeAccount()},true);if(window.V17){window.V17.renderAccount=renderAccount;window.V17.openAccount=openAccount;window.V17.closeDrawer=closeMenu;window.V17.setLanguage=setLanguage;const legacyOpen=window.V17.openModal;window.V17.openModal=function(id){if(id==='v17AccountModal')return openAccount();const out=legacyOpen?.apply(this,arguments);requestAnimationFrame(()=>{const root=document.getElementById(id);if(root)registerRoot(root)});return out}}
-  installRenderHooks();patchSwal();syncThemeFromStorage();tuneImages(document);indexDocumentIncremental(document.body);observeDynamic();const commentBtn=$('#btnComment');commentBtn?.addEventListener('click',()=>requestAnimationFrame(()=>{const cm=$('#commentModal');if(cm)registerRoot(cm)}),true);try{auth()?.onAuthStateChanged(()=>{renderMenu();if(am?.classList.contains('show'))renderAccount()})}catch(_e){}resolveGoogleRedirect();window.V29={setLanguage,renderMenu,openMenu,closeMenu,translateRoot:registerRoot,applyAll};}
+  installRenderHooks();patchSwal();syncThemeFromStorage();tuneImages(document);indexDocumentIncremental(document.body);observeDynamic();const commentBtn=$('#btnComment');commentBtn?.addEventListener('click',()=>requestAnimationFrame(()=>{const cm=$('#commentModal');if(cm)registerRoot(cm)}),true);try{auth()?.onAuthStateChanged(u=>{renderMenu();if(am?.classList.contains('show'))renderAccount();if(u&&sessionStorage.getItem('nineGoogleRedirectPending')==='1')completeGoogleAuth(u,{silent:true})})}catch(_e){}resolveGoogleRedirect();window.V29={setLanguage,renderMenu,openMenu,closeMenu,translateRoot:registerRoot,applyAll};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
