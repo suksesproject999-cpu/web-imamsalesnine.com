@@ -34123,7 +34123,85 @@ function alertBox(icon,title,text){return window.Swal?Swal.fire({icon,title,text
 function topAuth(){return `<div class="v29-auth-top"><div class="v29-auth-brand"><span class="v29-auth-mark">n</span><span><strong>Imam Sales</strong><small>Nine Autoseries</small></span></div><div class="v29-auth-tools"><select id="v29AuthLang" class="v29-auth-lang"><option value="id" ${currentLang()==='id'?'selected':''}>ID</option><option value="en" ${currentLang()==='en'?'selected':''}>EN</option></select><button type="button" class="v29-auth-close" id="v29AuthClose">×</button></div></div>`}
 function wireAuthTop(){ $('#v29AuthClose')?.addEventListener('click',closeAccount);$('#v29AuthLang')?.addEventListener('change',e=>setLanguage(e.target.value,true)) }
 function eye(btn,input){$('#'+btn)?.addEventListener('click',()=>{const i=$('#'+input);if(!i)return;i.type=i.type==='password'?'text':'password';$('#'+btn).innerHTML=`<i class="fa-regular ${i.type==='password'?'fa-eye':'fa-eye-slash'}"></i>`})}
-function renderLogin(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-shield-halved"></i>${T('Akun pelanggan','Customer account')}</span><h2 class="v29-title">${T('Selamat datang kembali','Welcome back')}</h2><p class="v29-sub">${T('Masuk untuk ulasan, riwayat akun, dan pengalaman belanja yang lebih personal.','Sign in for reviews, account history, and a more personalized shopping experience.')}</p><div class="v29-field"><label>Email</label><input id="v29Email" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><div class="v29-inwrap"><input id="v29Pass" class="v29-input v29-pass" type="password" autocomplete="current-password" minlength="6" placeholder="••••••••"><button type="button" id="v29Eye" class="v29-eye"><i class="fa-regular fa-eye"></i></button></div></div><div class="v29-meta"><button type="button" id="v29Forgot" class="v29-link">${T('Lupa Password?','Forgot Password?')}</button></div><button type="button" id="v29Login" class="v29-primary">${T('Masuk','Sign In')}</button><div class="v29-div">${T('atau masuk dengan','or continue with')}</div><button type="button" id="v29Google" class="v29-google"><i class="fa-brands fa-google"></i> Google</button><div class="v29-switch">${T('Belum punya akun?','Don’t have an account?')} <button type="button" id="v29ToReg">${T('Daftar Sekarang','Register Now')}</button></div></div>`;wireAuthTop();eye('v29Eye','v29Pass');$('#v29Login')?.addEventListener('click',async()=>{const email=$('#v29Email')?.value.trim(),p=$('#v29Pass')?.value||'';if(!email||!p)return alertBox('info',T('Data belum lengkap','Incomplete information'),T('Isi email dan password.','Enter your email and password.'));try{await auth()?.signInWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Login gagal','Sign in failed'),human(e))}});$('#v29Forgot')?.addEventListener('click',async()=>{const email=$('#v29Email')?.value.trim();if(!email)return alertBox('info',T('Masukkan email','Enter your email'),T('Isi email terlebih dahulu.','Enter your email first.'));try{await auth()?.sendPasswordResetEmail(email);alertBox('success',T('Email terkirim','Email sent'),T('Link reset password sudah dikirim.','A password reset link has been sent.'))}catch(e){alertBox('error',T('Gagal','Failed'),human(e))}});$('#v29Google')?.addEventListener('click',async()=>{try{await auth()?.signInWithPopup(new firebase.auth.GoogleAuthProvider());closeAccount()}catch(e){if(e?.code==='auth/popup-blocked'){try{await auth()?.signInWithRedirect(new firebase.auth.GoogleAuthProvider())}catch(er){alertBox('error','Google',human(er))}}else alertBox('error','Google',human(e))}});$('#v29ToReg')?.addEventListener('click',()=>renderRegister(body))}
+
+/* V31 GOOGLE AUTH — mobile redirect, desktop popup, clean return handling */
+function googleProvider(){
+  const provider=new firebase.auth.GoogleAuthProvider();
+  provider.setCustomParameters({prompt:'select_account'});
+  return provider;
+}
+function mobileGoogleAuth(){
+  try{
+    if(navigator.userAgentData && typeof navigator.userAgentData.mobile==='boolean') return navigator.userAgentData.mobile;
+  }catch(_e){}
+  return /Android|iPhone|iPad|iPod|Mobile|IEMobile|Opera Mini/i.test(navigator.userAgent||'') ||
+         (window.matchMedia?.('(pointer: coarse)').matches && Math.min(innerWidth||9999,innerHeight||9999)<1024);
+}
+function googleAuthError(e){
+  const c=e?.code||'';
+  if(c==='auth/unauthorized-domain') return T('Domain website belum diizinkan di Firebase Authentication.','This website domain is not authorized in Firebase Authentication.');
+  if(c==='auth/operation-not-allowed') return T('Login Google belum aktif di Firebase Authentication.','Google sign-in is not enabled in Firebase Authentication.');
+  if(c==='auth/network-request-failed') return T('Koneksi ke Google gagal. Periksa internet lalu coba lagi.','Could not connect to Google. Check your internet connection and try again.');
+  if(c==='auth/account-exists-with-different-credential') return T('Email ini sudah terdaftar dengan metode login lain. Masuk dengan metode tersebut terlebih dahulu.','This email is already registered with another sign-in method. Sign in with that method first.');
+  return human(e);
+}
+async function beginGoogleRedirect(){
+  const a=auth(); if(!a) throw new Error('Firebase Authentication unavailable');
+  try{await a.setPersistence(firebase.auth.Auth.Persistence.LOCAL)}catch(_e){}
+  sessionStorage.setItem('nineGoogleRedirectPending','1');
+  await a.signInWithRedirect(googleProvider());
+}
+async function googleSignIn(){
+  const btn=$('#v29Google');
+  if(btn?.dataset.busy==='1') return;
+  const old=btn?.innerHTML;
+  if(btn){btn.dataset.busy='1';btn.disabled=true;btn.innerHTML=`<i class="fa-solid fa-circle-notch fa-spin"></i> ${T('Menghubungkan ke Google...','Connecting to Google...')}`;}
+  try{
+    const a=auth(); if(!a) throw new Error('Firebase Authentication unavailable');
+    if(mobileGoogleAuth()){
+      await beginGoogleRedirect();
+      return;
+    }
+    try{
+      await a.signInWithPopup(googleProvider());
+      closeAccount();
+    }catch(e){
+      const code=e?.code||'';
+      if(code==='auth/popup-blocked' || code==='auth/cancelled-popup-request'){
+        await beginGoogleRedirect();
+        return;
+      }
+      if(code==='auth/popup-closed-by-user') return;
+      throw e;
+    }
+  }catch(e){
+    alertBox('error','Google',googleAuthError(e));
+  }finally{
+    if(btn && document.contains(btn)){
+      btn.dataset.busy='0';btn.disabled=false;btn.innerHTML=old||'<i class="fa-brands fa-google"></i> Google';
+    }
+  }
+}
+async function resolveGoogleRedirect(){
+  const a=auth(); if(!a?.getRedirectResult) return;
+  const pending=sessionStorage.getItem('nineGoogleRedirectPending')==='1';
+  try{
+    const result=await a.getRedirectResult();
+    sessionStorage.removeItem('nineGoogleRedirectPending');
+    if(result?.user){
+      closeAccount();
+      renderMenu();
+      if(window.Swal?.fire) Swal.fire({icon:'success',title:T('Login berhasil','Signed in successfully'),text:T('Akun Google berhasil terhubung.','Your Google account is now connected.'),timer:1200,showConfirmButton:false});
+    }
+  }catch(e){
+    sessionStorage.removeItem('nineGoogleRedirectPending');
+    const code=e?.code||'';
+    if(code==='auth/popup-closed-by-user' || code==='auth/cancelled-popup-request') return;
+    if(pending) alertBox('error','Google',googleAuthError(e));
+  }
+}
+
+function renderLogin(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-shield-halved"></i>${T('Akun pelanggan','Customer account')}</span><h2 class="v29-title">${T('Selamat datang kembali','Welcome back')}</h2><p class="v29-sub">${T('Masuk untuk ulasan, riwayat akun, dan pengalaman belanja yang lebih personal.','Sign in for reviews, account history, and a more personalized shopping experience.')}</p><div class="v29-field"><label>Email</label><input id="v29Email" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><div class="v29-inwrap"><input id="v29Pass" class="v29-input v29-pass" type="password" autocomplete="current-password" minlength="6" placeholder="••••••••"><button type="button" id="v29Eye" class="v29-eye"><i class="fa-regular fa-eye"></i></button></div></div><div class="v29-meta"><button type="button" id="v29Forgot" class="v29-link">${T('Lupa Password?','Forgot Password?')}</button></div><button type="button" id="v29Login" class="v29-primary">${T('Masuk','Sign In')}</button><div class="v29-div">${T('atau masuk dengan','or continue with')}</div><button type="button" id="v29Google" class="v29-google"><i class="fa-brands fa-google"></i> Google</button><div class="v29-switch">${T('Belum punya akun?','Don’t have an account?')} <button type="button" id="v29ToReg">${T('Daftar Sekarang','Register Now')}</button></div></div>`;wireAuthTop();eye('v29Eye','v29Pass');$('#v29Login')?.addEventListener('click',async()=>{const email=$('#v29Email')?.value.trim(),p=$('#v29Pass')?.value||'';if(!email||!p)return alertBox('info',T('Data belum lengkap','Incomplete information'),T('Isi email dan password.','Enter your email and password.'));try{await auth()?.signInWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Login gagal','Sign in failed'),human(e))}});$('#v29Forgot')?.addEventListener('click',async()=>{const email=$('#v29Email')?.value.trim();if(!email)return alertBox('info',T('Masukkan email','Enter your email'),T('Isi email terlebih dahulu.','Enter your email first.'));try{await auth()?.sendPasswordResetEmail(email);alertBox('success',T('Email terkirim','Email sent'),T('Link reset password sudah dikirim.','A password reset link has been sent.'))}catch(e){alertBox('error',T('Gagal','Failed'),human(e))}});$('#v29Google')?.addEventListener('click',async()=>{await googleSignIn()});$('#v29ToReg')?.addEventListener('click',()=>renderRegister(body))}
 function renderRegister(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-user-plus"></i>${T('Buat akun','Create account')}</span><h2 class="v29-title">${T('Daftar akun baru','Create your account')}</h2><p class="v29-sub">${T('Buat akun untuk menulis ulasan dan menggunakan fitur pelanggan.','Create an account to post reviews and use customer features.')}</p><div class="v29-field"><label>Email</label><input id="v29RegEmail" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><input id="v29RegPass" class="v29-input" type="password" autocomplete="new-password" minlength="6" placeholder="${T('Minimal 6 karakter','At least 6 characters')}"></div><button type="button" id="v29Register" class="v29-primary">${T('Daftar Akun','Create Account')}</button><div class="v29-switch">${T('Sudah punya akun?','Already have an account?')} <button type="button" id="v29ToLogin">${T('Masuk','Sign In')}</button></div></div>`;wireAuthTop();$('#v29ToLogin')?.addEventListener('click',()=>renderLogin(body));$('#v29Register')?.addEventListener('click',async()=>{const email=$('#v29RegEmail')?.value.trim(),p=$('#v29RegPass')?.value||'';if(!email||p.length<6)return alertBox('info',T('Data belum valid','Invalid information'),T('Gunakan email valid dan password minimal 6 karakter.','Use a valid email and a password of at least 6 characters.'));try{await auth()?.createUserWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Pendaftaran gagal','Registration failed'),human(e))}})}
 function renderProfile(body,u){const n=u.displayName||u.email?.split('@')[0]||'User';body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Akun Anda terhubung dengan pengalaman marketplace Imam Sales Nine.','Your account is connected to the Imam Sales Nine marketplace.')}</p><div class="v29-profile"><div class="v29-avatar">${esc(n.charAt(0).toUpperCase())}</div><div><strong>${esc(n)}</strong><small>${esc(u.email||'')}</small></div></div><button type="button" id="v29Logout" class="v29-secondary"><i class="fa-solid fa-right-from-bracket"></i>${T('Keluar','Sign Out')}</button></div>`;wireAuthTop();$('#v29Logout')?.addEventListener('click',async()=>{try{await auth()?.signOut();renderAccount()}catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}})}
 function renderAccount(){const body=$('#v17AccountBody');if(!body)return;const u=auth()?.currentUser;u?renderProfile(body,u):renderLogin(body);registerRoot(body)}
@@ -34134,7 +34212,7 @@ function setLanguage(l,fromAuth=false){const v=l==='en'?'en':'id';if(currentLang
 function delegate(e){const lb=e.target.closest?.('.v29-lang-btn');if(lb){e.preventDefault();setLanguage(lb.dataset.lang);return}const a=e.target.closest?.('[data-v29]');if(!a)return;const k=a.dataset.v29;if(k==='close'){e.preventDefault();closeMenu()}else if(k==='theme'){e.preventDefault();toggleTheme()}else if(k==='account'){e.preventDefault();openAccount()}else if(k==='track'){e.preventDefault();closeMenu();setTimeout(()=>window.V17?.openTracking?.(),0)}else if(k==='cart'){e.preventDefault();closeMenu();setTimeout(()=>window.goCart?.(),0)}else if(k==='ai'){e.preventDefault();closeMenu();setTimeout(()=>{try{window.openAI?.()}catch(_e){window.openNexaiHybrid?.()}},0)}else if(k==='home'){e.preventDefault();closeMenu();try{window.showPage?.('home')}catch(_e){}location.hash=''}else if(k==='mall'||k==='vip'||k==='consult'||k==='legal')closeMenu()}
 function patchSwal(){if(!window.Swal?.fire||window.Swal.fire.__v29)return;const f=window.Swal.fire.bind(window.Swal);const w=function(a,...r){if(currentLang()==='en'&&a&&typeof a==='object'){a={...a};for(const k of ['title','text','confirmButtonText','cancelButtonText','denyButtonText','footer'])if(typeof a[k]==='string')a[k]=translateString(a[k])}return f(a,...r)};w.__v29=1;window.Swal.fire=w}
 function boot(){const m=$('#topMenu'),oldO=$('#menuOverlay'),oldB=$('#menuBtn');if(!m||!oldB)return;const b=oldB.cloneNode(true);oldB.replaceWith(b);let o=oldO;if(oldO){o=oldO.cloneNode(true);oldO.replaceWith(o)}o?.classList.add('v29-overlay');renderMenu();b.addEventListener('click',toggleMenu,true);o?.addEventListener('click',e=>{e.preventDefault();closeMenu()},true);m.addEventListener('click',delegate,true);document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeMenu();closeAccount()}});const am=$('#v17AccountModal');am?.classList.add('v29-account');am?.addEventListener('click',e=>{if(e.target===am)closeAccount()},true);if(window.V17){window.V17.renderAccount=renderAccount;window.V17.openAccount=openAccount;window.V17.closeDrawer=closeMenu;window.V17.setLanguage=setLanguage;const legacyOpen=window.V17.openModal;window.V17.openModal=function(id){if(id==='v17AccountModal')return openAccount();const out=legacyOpen?.apply(this,arguments);requestAnimationFrame(()=>{const root=document.getElementById(id);if(root)registerRoot(root)});return out}}
-  installRenderHooks();patchSwal();syncThemeFromStorage();tuneImages(document);indexDocumentIncremental(document.body);observeDynamic();const commentBtn=$('#btnComment');commentBtn?.addEventListener('click',()=>requestAnimationFrame(()=>{const cm=$('#commentModal');if(cm)registerRoot(cm)}),true);try{auth()?.onAuthStateChanged(()=>{renderMenu();if(am?.classList.contains('show'))renderAccount()})}catch(_e){}window.V29={setLanguage,renderMenu,openMenu,closeMenu,translateRoot:registerRoot,applyAll};}
+  installRenderHooks();patchSwal();syncThemeFromStorage();tuneImages(document);indexDocumentIncremental(document.body);observeDynamic();const commentBtn=$('#btnComment');commentBtn?.addEventListener('click',()=>requestAnimationFrame(()=>{const cm=$('#commentModal');if(cm)registerRoot(cm)}),true);try{auth()?.onAuthStateChanged(()=>{renderMenu();if(am?.classList.contains('show'))renderAccount()})}catch(_e){}resolveGoogleRedirect();window.V29={setLanguage,renderMenu,openMenu,closeMenu,translateRoot:registerRoot,applyAll};}
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
