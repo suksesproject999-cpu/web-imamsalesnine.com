@@ -18371,83 +18371,7 @@ pageContainer.classList.add(
 
             </div>
             
-            <div class="voucher-section">
 
-    <div class="voucher-header">
-
-        <h3>
-
-            <i class="fa-solid fa-ticket"></i>
-
-            Voucher
-
-            <span class="voucher-count">
-                ${vouchers.length} Voucher
-            </span>
-
-        </h3>
-
-    </div>
-    
-    
-    <div class="voucher-rules">
-
-    <div class="voucher-rules-title">
-
-        <i class="fa-solid fa-circle-info"></i>
-
-        Aturan Penggunaan Voucher
-
-    </div>
-
-    <ul>
-
-        <li>
-            Maksimal
-            <strong>1 voucher produk</strong>
-            dalam 1 pesanan.
-        </li>
-
-        <li>
-            Voucher
-            <strong>Belanja</strong>
-            dan
-            <strong>Diskon Produk</strong>
-            tidak dapat digunakan bersamaan.
-        </li>
-
-        <li>
-            Maksimal
-            <strong>1 voucher ongkir</strong>
-            dalam 1 pesanan.
-        </li>
-
-        <li>
-            Voucher produk +
-            voucher ongkir
-            <strong>boleh digunakan bersamaan.</strong>
-        </li>
-
-        <li>
-            Syarat minimal belanja mengikuti
-            ketentuan masing-masing voucher.
-        </li>
-
-    </ul>
-
-</div>
-    
-    
-    
-
-
-    <div class="voucher-slider">
-
-        ${renderVoucherCards()}
-
-    </div>
-
-</div>
 
     </div>
 
@@ -32250,6 +32174,95 @@ body.dark-mode .v37-menu-icon{background:#222d1a;color:#9bd455}
 })();
 </script>
 
+
+<!-- =========================================================
+     V38 CART / VOUCHER / CHECKOUT VARIANT PRO
+     Scope: cart, voucher center, voucher terms, checkout edit variant
+========================================================= -->
+<style id="v38-cart-checkout-pro-css">
+:root{--v38-green:#8CC63F;--v38-green-dark:#5f9226;--v38-ink:#20231f;--v38-muted:#858b82;--v38-line:#e7ebe3;--v38-soft:#f7faf3;--v38-danger:#ff515d}
+#product-grid-auto.page-cart,#product-grid-auto.page-checkout{padding-bottom:110px!important}
+.cart-page{max-width:980px!important;margin:0 auto!important;padding:14px 14px 120px!important}
+.cart-header{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;margin:4px 0 14px!important;padding:0 2px!important}
+.cart-header h2{font-size:clamp(22px,5vw,30px)!important;margin:0!important;letter-spacing:-.03em!important}.cart-header p{font-size:12px!important;color:#8b9189!important;margin:4px 0 0!important}
+.cart-header .btn.secondary{background:#f3f5f1!important;color:#5b6158!important;border:1px solid #e5e9e2!important;box-shadow:none!important;padding:10px 13px!important;border-radius:14px!important}
+.cart-layout{display:grid!important;grid-template-columns:minmax(0,1fr) 320px!important;gap:16px!important;align-items:start!important}.cart-products{min-width:0!important}
+.cart-item{position:relative!important;display:grid!important;grid-template-columns:116px minmax(0,1fr) auto!important;gap:14px!important;align-items:center!important;padding:18px!important;margin:0 0 12px!important;background:#fff!important;border:1px solid #e8ebe5!important;border-radius:22px!important;box-shadow:0 10px 28px rgba(25,38,18,.055)!important;overflow:hidden!important}
+.cart-item:before{content:"NINE AUTOSERIES";position:absolute;left:18px;top:12px;font-size:9px;letter-spacing:.12em;font-weight:800;color:#9aa391}.cart-image{margin-top:14px!important;width:116px!important;height:116px!important;border-radius:16px!important;overflow:hidden!important;border:1px solid #eef0eb!important;background:#fafbf9!important}.cart-image img{width:100%!important;height:100%!important;object-fit:contain!important}.cart-info{min-width:0!important;padding-top:12px!important}.cart-info h3{font-size:14px!important;line-height:1.4!important;margin:0 0 5px!important;display:-webkit-box!important;-webkit-line-clamp:2!important;-webkit-box-orient:vertical!important;overflow:hidden!important}.cart-brand{font-size:10px!important;color:#8b9189!important;text-transform:uppercase!important;letter-spacing:.04em!important;margin:0 0 9px!important}.cart-info p:not(.cart-brand){display:inline-flex!important;align-items:center!important;gap:5px!important;margin:3px 6px 3px 0!important;padding:7px 9px!important;border-radius:10px!important;background:#f7f9f5!important;font-size:11px!important;color:#596056!important}.cart-side{display:flex!important;flex-direction:column!important;align-items:flex-end!important;gap:9px!important;min-width:112px!important}.cart-qty{display:grid!important;grid-template-columns:34px 38px 34px!important;height:36px!important;border:1px solid #dfe4da!important;border-radius:11px!important;overflow:hidden!important;background:#fff!important}.cart-qty button,.cart-qty span{display:grid!important;place-items:center!important;border:0!important;background:#fff!important;font-size:15px!important;font-weight:700!important}.cart-total{font-size:15px!important;font-weight:800!important;color:var(--v38-green-dark)!important;white-space:nowrap!important}.cart-delete{border:0!important;background:transparent!important;color:#9a9f98!important;font-size:10px!important;padding:5px!important}.cart-delete i{margin-right:4px!important}
+.cart-summary{position:sticky!important;top:150px!important;padding:18px!important;border-radius:22px!important;background:#fff!important;border:1px solid #e8ebe5!important;box-shadow:0 12px 32px rgba(25,38,18,.06)!important}.cart-summary h3{font-size:17px!important;margin:0 0 14px!important}.summary-row{font-size:11px!important;padding:7px 0!important;gap:10px!important}.summary-row strong{font-size:11px!important}.summary-row.total{margin-top:8px!important;padding-top:13px!important;border-top:1px dashed #dce2d7!important}.summary-row.total strong{font-size:15px!important;color:#20231f!important}.cart-summary>.btn{width:100%!important;margin-top:10px!important;border-radius:15px!important;min-height:48px!important}
+.v38-voucher-entry{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 14px;margin:10px 0 6px;border:1px solid #dfeaca;border-radius:15px;background:linear-gradient(135deg,#fbfff7,#f3fae9);cursor:pointer}.v38-voucher-entry-left{display:flex;align-items:center;gap:10px;min-width:0}.v38-voucher-entry-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#e9f6d8;color:#6ca72e;flex:0 0 auto}.v38-voucher-entry b{display:block;font-size:12px}.v38-voucher-entry small{display:block;margin-top:2px;font-size:9.5px;color:#8b9189}.v38-voucher-entry i.fa-chevron-right{color:#8CC63F}
+.v38-cart-bottom{display:none}
+
+/* Checkout summary cards */
+.checkout-form{max-width:840px!important;margin:0 auto!important;padding:14px 14px 120px!important}.checkout-form>h2{font-size:clamp(24px,5vw,32px)!important;letter-spacing:-.03em!important}.checkout-form .form-card{border-radius:22px!important;border:1px solid #e7ebe3!important;box-shadow:0 10px 28px rgba(25,38,18,.045)!important;padding:18px!important}.checkout-form .form-card h3{font-size:16px!important}
+#checkout-summary .summary-item{position:relative!important;display:grid!important;grid-template-columns:64px minmax(0,1fr) auto!important;gap:12px!important;padding:12px!important;margin:0 0 10px!important;border:1px solid #e8ebe5!important;border-radius:16px!important;background:#fff!important;line-height:1.35!important}
+.v38-checkout-thumb{width:64px;height:64px;border-radius:12px;object-fit:contain;border:1px solid #edf0ea;background:#fafbf9}.v38-checkout-copy{min-width:0}.v38-checkout-name{font-size:12px;font-weight:800;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.v38-checkout-meta{font-size:10px;color:#777f74;margin-top:5px}.v38-checkout-sub{font-size:12px;color:#639b27;font-weight:800;margin-top:6px}.v38-edit-variant{align-self:center;border:1px solid #dfe7d6;background:#f8fbf4;color:#61952a;border-radius:999px;padding:8px 10px;font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer}
+
+/* Shared modal */
+.v38-overlay{position:fixed;inset:0;z-index:10000060;background:rgba(14,17,13,.52);display:none;align-items:flex-end;justify-content:center;padding:0;overscroll-behavior:contain}.v38-overlay.show{display:flex}.v38-sheet{width:min(100%,680px);max-height:min(88vh,820px);background:#fff;border-radius:28px 28px 0 0;box-shadow:0 -24px 70px rgba(0,0,0,.22);overflow:hidden;display:flex;flex-direction:column;animation:v38Up .26s cubic-bezier(.2,.8,.2,1)}@keyframes v38Up{from{transform:translateY(24px);opacity:.4}to{transform:none;opacity:1}}.v38-grab{width:54px;height:5px;border-radius:999px;background:#ccd1ca;margin:10px auto 2px}.v38-sheet-head{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 18px;border-bottom:1px solid #edf0ea}.v38-sheet-head h3{font-size:18px;margin:0;font-weight:800}.v38-x{width:42px;height:42px;border:0;border-radius:50%;background:#f3f5f1;font-size:26px;line-height:1;color:#5f655d}.v38-body{padding:16px 18px 20px;overflow:auto;-webkit-overflow-scrolling:touch}.v38-sheet-foot{padding:12px 18px max(14px,env(safe-area-inset-bottom));border-top:1px solid #edf0ea;background:#fff}.v38-primary{width:100%;height:52px;border:0;border-radius:15px;background:#8CC63F;color:#fff;font-weight:800;font-size:15px}
+
+/* Voucher center */
+.v38-code-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px;margin-bottom:14px}.v38-code-row input{height:48px;border:1px solid #dfe4dc;border-radius:13px;padding:0 13px;font:inherit;font-size:12px;outline:none}.v38-code-row input:focus{border-color:#8CC63F;box-shadow:0 0 0 4px rgba(140,198,63,.1)}.v38-code-row button{border:0;border-radius:13px;padding:0 18px;background:#20231f;color:#fff;font-weight:800;font-size:11px}.v38-vouchers{display:grid;gap:11px}.v38-ticket{position:relative;display:grid;grid-template-columns:76px minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid #e4e8e0;border-radius:18px;background:#fff;overflow:hidden}.v38-ticket.active{border-color:#9dcc61;background:#fbfff7}.v38-ticket-logo{height:72px;border-right:1px dashed #d9ded5;display:grid;place-items:center;color:#70a936;font-size:25px}.v38-ticket-main{min-width:0}.v38-ticket-main b{display:block;font-size:13px}.v38-ticket-main p{font-size:10px;color:#6f766c;margin:4px 0}.v38-ticket-main small{font-size:9px;color:#9aa095}.v38-ticket-progress{height:4px;border-radius:999px;background:#eef1ec;margin:7px 0 4px;overflow:hidden}.v38-ticket-progress span{display:block;height:100%;width:35%;background:linear-gradient(90deg,#8CC63F,#d3e948)}.v38-ticket-actions{display:flex;flex-direction:column;gap:7px;align-items:flex-end}.v38-ticket-actions button{border:0;border-radius:10px;padding:8px 10px;font-size:9px;font-weight:800;white-space:nowrap}.v38-use{background:#8CC63F;color:#fff}.v38-terms-btn{background:#f1f4ee;color:#687064}.v38-ticket.active .v38-use{background:#26311e}.v38-recommend{position:absolute;right:0;top:0;background:#8CC63F;color:#fff;font-size:8px;font-weight:800;padding:4px 8px;border-radius:0 0 0 9px}
+
+/* Voucher terms */
+.v38-terms-hero{display:flex;align-items:center;gap:14px;padding:15px;border-radius:17px;background:linear-gradient(135deg,#f4faeb,#fbfff8);border:1px solid #dfeaca;margin-bottom:18px}.v38-terms-ico{width:58px;height:58px;border-radius:16px;display:grid;place-items:center;background:#fff;color:#76ad3c;font-size:25px;box-shadow:0 7px 18px rgba(80,120,40,.08)}.v38-terms-hero b{display:block;font-size:16px}.v38-terms-hero span{font-size:10px;color:#788072}.v38-term-section{padding:12px 0;border-bottom:1px solid #edf0ea}.v38-term-section:last-child{border-bottom:0}.v38-term-section strong{font-size:12px;display:block;margin-bottom:5px}.v38-term-section p{font-size:11px;line-height:1.55;color:#656c63;margin:0}
+
+/* Variant edit */
+.v38-product-top{display:grid;grid-template-columns:96px minmax(0,1fr);gap:14px;align-items:center;padding-bottom:15px;border-bottom:1px solid #edf0ea}.v38-product-top img{width:96px;height:96px;object-fit:contain;border-radius:16px;border:1px solid #edf0ea;background:#fafbf9}.v38-product-top h4{font-size:13px;line-height:1.35;margin:0 0 6px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.v38-price{font-size:20px;font-weight:800;color:#639b27}.v38-stock{font-size:10px;color:#8d938a;margin-top:3px}.v38-label{font-size:12px;font-weight:800;margin:16px 0 9px}.v38-variants{display:flex;flex-wrap:wrap;gap:8px}.v38-variant{border:1px solid #dfe4dc;background:#fff;border-radius:12px;padding:10px 13px;font-size:11px;font-weight:700}.v38-variant.active{border-color:#8CC63F;background:#f0f8e5;color:#639b27}.v38-qty-row{display:flex;align-items:center;justify-content:space-between;gap:12px}.v38-qty{display:grid;grid-template-columns:42px 52px 42px;height:42px;border:1px solid #dfe4dc;border-radius:12px;overflow:hidden}.v38-qty button,.v38-qty span{display:grid;place-items:center;border:0;background:#fff;font-weight:800}
+
+body.dark-mode .cart-item,body.dark-mode .cart-summary,body.dark-mode .checkout-form .form-card,body.dark-mode #checkout-summary .summary-item,body.dark-mode .v38-sheet,body.dark-mode .v38-sheet-foot,body.dark-mode .v38-ticket{background:#171b20!important;border-color:#2b332b!important;color:#f1f3ef!important}body.dark-mode .v38-voucher-entry,body.dark-mode .v38-terms-hero{background:#172017!important;border-color:#31402d!important}body.dark-mode .v38-code-row input,body.dark-mode .v38-variant,body.dark-mode .v38-qty button,body.dark-mode .v38-qty span{background:#11151a;color:#f2f3ef;border-color:#333b34}body.dark-mode .v38-ticket-main p,body.dark-mode .v38-ticket-main small,body.dark-mode .v38-term-section p,body.dark-mode .v38-checkout-meta{color:#aeb5aa!important}
+@media(max-width:760px){.cart-page{padding:10px 10px 96px!important}.cart-layout{grid-template-columns:1fr!important}.cart-summary{position:static!important}.cart-item{grid-template-columns:92px minmax(0,1fr)!important;padding:16px 14px!important}.cart-image{width:92px!important;height:92px!important}.cart-side{grid-column:1/-1!important;display:grid!important;grid-template-columns:auto 1fr auto!important;align-items:center!important;min-width:0!important;padding-top:8px!important;border-top:1px solid #f0f2ee!important}.cart-total{justify-self:center!important}.cart-delete{justify-self:end!important}.v38-ticket{grid-template-columns:58px minmax(0,1fr) auto;padding:11px}.v38-ticket-logo{height:64px}.checkout-form{padding:10px 10px 96px!important}}
+@media(max-width:380px){.cart-item{grid-template-columns:78px minmax(0,1fr)!important}.cart-image{width:78px!important;height:78px!important}.v38-ticket{grid-template-columns:48px minmax(0,1fr)!important}.v38-ticket-actions{grid-column:2;flex-direction:row;justify-content:flex-start;align-items:center}.v38-ticket-logo{grid-row:1/3}.v38-product-top{grid-template-columns:82px minmax(0,1fr)}.v38-product-top img{width:82px;height:82px}}
+</style>
+
+<div id="v38VoucherModal" class="v38-overlay" aria-hidden="true"><section class="v38-sheet"><div class="v38-grab"></div><div class="v38-sheet-head"><h3>Voucher Nine</h3><button class="v38-x" data-v38-close="v38VoucherModal">×</button></div><div class="v38-body"><div class="v38-code-row"><input id="v38VoucherCode" placeholder="Masukkan kode voucher"><button id="v38ApplyCode">Pakai</button></div><div id="v38VoucherList" class="v38-vouchers"></div></div><div class="v38-sheet-foot"><button class="v38-primary" data-v38-close="v38VoucherModal">Selesai</button></div></section></div>
+<div id="v38TermsModal" class="v38-overlay" aria-hidden="true"><section class="v38-sheet"><div class="v38-grab"></div><div class="v38-sheet-head"><h3>Syarat & Ketentuan</h3><button class="v38-x" data-v38-close="v38TermsModal">×</button></div><div id="v38TermsBody" class="v38-body"></div><div class="v38-sheet-foot"><button class="v38-primary" data-v38-close="v38TermsModal">OK</button></div></section></div>
+<div id="v38VariantModal" class="v38-overlay" aria-hidden="true"><section class="v38-sheet"><div class="v38-grab"></div><div class="v38-sheet-head"><h3>Ubah Varian</h3><button class="v38-x" data-v38-close="v38VariantModal">×</button></div><div id="v38VariantBody" class="v38-body"></div><div class="v38-sheet-foot"><button id="v38VariantConfirm" class="v38-primary">Konfirmasi</button></div></section></div>
+
+<script id="v38-cart-checkout-pro-js">
+(function(){
+'use strict';
+const V=window.V38=window.V38||{};
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const money=n=>typeof window.formatRupiah==='function'?window.formatRupiah(Number(n)||0):'Rp '+(Number(n)||0).toLocaleString('id-ID');
+const getProduct=id=>{try{return (window.allProducts||allProducts||[]).find(p=>String(p.id)===String(id))||null}catch(_){return null}};
+function open(id){const el=document.getElementById(id);if(!el)return;el.classList.add('show');el.setAttribute('aria-hidden','false');document.documentElement.style.overflow='hidden';}
+function close(id){const el=document.getElementById(id);if(!el)return;el.classList.remove('show');el.setAttribute('aria-hidden','true');if(!document.querySelector('.v38-overlay.show'))document.documentElement.style.overflow='';}
+document.addEventListener('click',e=>{const c=e.target.closest('[data-v38-close]');if(c){close(c.dataset.v38Close);return}const ov=e.target.classList?.contains('v38-overlay')?e.target:null;if(ov)close(ov.id)});
+
+function selectedVouchers(){try{return typeof getSelectedVouchers==='function'?getSelectedVouchers():{}}catch(_){return{}}}
+function saveV(obj){try{if(typeof saveSelectedVouchers==='function')saveSelectedVouchers(obj)}catch(_){}}
+function cartSubtotal(){try{return (window.cart||cart||[]).reduce((s,i)=>s+(Number(i.harga)||0)*(Number(i.qty)||0),0)}catch(_){return 0}}
+function voucherValue(v){return v.type==='product_percent'?`${v.discount}%`:money(v.discount)}
+function eligible(v){return cartSubtotal()>=Number(v.min||0) && (!v.expired || new Date()<=new Date(v.expired+'T23:59:59'))}
+function renderVoucherList(){const box=document.getElementById('v38VoucherList');if(!box||!Array.isArray(window.vouchers||vouchers))return;const list=window.vouchers||vouchers;const sel=selectedVouchers();box.innerHTML=list.map((v,i)=>{const slot=v.type==='shipping_fixed'?'shipping':'product';const active=sel?.[slot]?.id===v.id;const ok=eligible(v);return `<article class="v38-ticket ${active?'active':''}">${i===0?'<span class="v38-recommend">Rekomendasi</span>':''}<div class="v38-ticket-logo"><i class="fa-solid ${esc(v.icon||'fa-ticket')}"></i></div><div class="v38-ticket-main"><b>${esc(v.name)} · ${voucherValue(v)}</b><p>${esc(v.description||'')} · Min. ${money(v.min)}</p><div class="v38-ticket-progress"><span style="width:${Math.min(100,Math.max(8,cartSubtotal()/Math.max(1,Number(v.min||1))*100))}%"></span></div><small>${v.expired?'Hingga '+new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tanpa batas waktu'} · ${esc(v.limit||'')}</small></div><div class="v38-ticket-actions"><button class="v38-use" data-v38-use="${esc(v.id)}" ${ok?'':'disabled'}>${active?'Dipilih':ok?'Gunakan':'Belum cukup'}</button><button class="v38-terms-btn" data-v38-terms="${esc(v.id)}">S&K</button></div></article>`}).join('')}
+V.openVoucher=function(){renderVoucherList();open('v38VoucherModal')};
+V.useVoucher=function(id){const list=window.vouchers||vouchers||[];const v=list.find(x=>x.id===id);if(!v)return;if(!eligible(v)){Swal.fire({icon:'info',title:'Voucher belum dapat digunakan',text:`Minimum belanja ${money(v.min)}.`});return}const selected=selectedVouchers();const slot=v.type==='shipping_fixed'?'shipping':'product';if(selected?.[slot]?.id===v.id)delete selected[slot];else selected[slot]=v;saveV(selected);try{window.restoreVoucherUI?.()}catch(_){}renderVoucherList();refreshCartOrCheckout();};
+V.openTerms=function(id){const list=window.vouchers||vouchers||[];const v=list.find(x=>x.id===id);if(!v)return;const body=document.getElementById('v38TermsBody');body.innerHTML=`<div class="v38-terms-hero"><div class="v38-terms-ico"><i class="fa-solid ${esc(v.icon||'fa-ticket')}"></i></div><div><b>${esc(v.name)} · ${voucherValue(v)}</b><span>Min. belanja ${money(v.min)}${v.maxDiscount?` · Maks. ${money(v.maxDiscount)}`:''}</span></div></div><div class="v38-term-section"><strong>Aturan Penggunaan Voucher</strong><p>Dalam 1 pesanan maksimal digunakan 1 voucher produk dan 1 voucher ongkir. Voucher Belanja dan Diskon Produk tidak dapat digunakan bersamaan. Voucher produk dan voucher ongkir dapat digunakan bersamaan apabila masing-masing memenuhi syarat minimum transaksi. Syarat minimum belanja mengikuti ketentuan setiap voucher.</p></div><div class="v38-term-section"><strong>Masa Berlaku</strong><p>${v.expired?'Berlaku hingga '+new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'Tidak dibatasi'}.</p></div><div class="v38-term-section"><strong>Promosi</strong><p>${esc(v.description||'Voucher promosi.')} Minimum transaksi ${money(v.min)}.</p></div><div class="v38-term-section"><strong>Produk</strong><p>Berlaku untuk produk yang memenuhi ketentuan voucher dan masih aktif di katalog.</p></div><div class="v38-term-section"><strong>Metode Pembayaran</strong><p>Berlaku pada metode pembayaran yang dikonfirmasi admin saat pemrosesan pesanan.</p></div><div class="v38-term-section"><strong>Jasa Kirim</strong><p>Dapat digunakan bersama layanan pengiriman yang tersedia; voucher ongkir mengikuti jenis voucher dan syarat transaksi.</p></div><div class="v38-term-section"><strong>Platform</strong><p>Berlaku untuk transaksi yang dibuat melalui Imamsalesfr.</p></div><div class="v38-term-section"><strong>S&K</strong><p>${esc(v.limit||'Satu voucher per transaksi.')} Voucher tidak dapat diuangkan dan penggunaan mengikuti stok serta ketentuan promosi yang berlaku.</p></div>`;open('v38TermsModal')};
+
+document.addEventListener('click',e=>{const u=e.target.closest('[data-v38-use]');if(u){V.useVoucher(u.dataset.v38Use);return}const t=e.target.closest('[data-v38-terms]');if(t){V.openTerms(t.dataset.v38Terms);return}});
+document.getElementById('v38ApplyCode')?.addEventListener('click',()=>{const code=document.getElementById('v38VoucherCode')?.value.trim().toUpperCase();const list=window.vouchers||vouchers||[];const v=list.find(x=>String(x.id).toUpperCase()===code);if(!v){Swal.fire({icon:'info',text:'Kode voucher tidak ditemukan.'});return}V.useVoucher(v.id)});
+
+function selectedVoucherText(){const s=selectedVouchers();const names=[s.product?.id,s.shipping?.id].filter(Boolean);return names.length?names.join(' + '):'Pilih voucher yang tersedia'}
+function enhanceCart(){if((window.currentPage||'')!=='cart')return;const page=document.querySelector('#product-grid-auto .cart-page');if(!page)return;page.querySelectorAll('.v38-voucher-entry').forEach(x=>x.remove());const summary=page.querySelector('.cart-summary');if(summary){const node=document.createElement('button');node.type='button';node.className='v38-voucher-entry';node.innerHTML=`<span class="v38-voucher-entry-left"><span class="v38-voucher-entry-icon"><i class="fa-solid fa-ticket"></i></span><span><b>Voucher & Promo</b><small>${esc(selectedVoucherText())}</small></span></span><i class="fa-solid fa-chevron-right"></i>`;node.onclick=V.openVoucher;const h=summary.querySelector('h3');h?.insertAdjacentElement('afterend',node)}
+}
+const baseRenderCart=window.renderCart;
+if(typeof baseRenderCart==='function'){window.renderCart=function(){const out=baseRenderCart.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(enhanceCart));return out}}
+
+function buildCheckoutSummary(){const box=document.getElementById('checkout-summary');if(!box)return;const items=window.cart||cart||[];const sum=typeof getCartSummary==='function'?getCartSummary():{subtotal:0,productDiscount:0,shippingDiscount:0,totalBayar:0,totalItem:0};box.innerHTML=items.map((item,index)=>`<article class="summary-item" data-v38-index="${index}"><img class="v38-checkout-thumb" src="${esc(item.gambar||'')}" alt=""><div class="v38-checkout-copy"><div class="v38-checkout-name">${esc(item.nama||'Produk')}</div><div class="v38-checkout-meta">Varian: ${esc(item.varian||'-')} · Qty ${Number(item.qty)||1}</div><div class="v38-checkout-sub">${money((Number(item.harga)||0)*(Number(item.qty)||1))}</div></div><button type="button" class="v38-edit-variant" data-v38-edit="${index}">Ubah</button></article>`).join('')+`<div class="v38-voucher-entry" role="button" tabindex="0" data-v38-open-voucher><span class="v38-voucher-entry-left"><span class="v38-voucher-entry-icon"><i class="fa-solid fa-ticket"></i></span><span><b>Voucher & Promo</b><small>${esc(selectedVoucherText())}</small></span></span><i class="fa-solid fa-chevron-right"></i></div><div class="summary-row"><span>Jumlah Item</span><strong>${sum.totalItem||0}</strong></div><div class="summary-row"><span>Subtotal Produk</span><strong>${money(sum.subtotal)}</strong></div><div class="summary-row"><span>Diskon Produk</span><strong>- ${money(sum.productDiscount)}</strong></div><div class="summary-row"><span>Diskon Ongkir</span><strong>- ${money(sum.shippingDiscount)}</strong></div><div class="summary-row"><span>Ongkos Kirim</span><strong>Dihitung Admin</strong></div><div class="summary-row total"><span><strong>Total Belanja</strong></span><strong>${money(sum.totalBayar)}</strong></div>`;box.querySelector('[data-v38-open-voucher]')?.addEventListener('click',V.openVoucher);box.querySelectorAll('[data-v38-edit]').forEach(b=>b.onclick=()=>V.openVariant(Number(b.dataset.v38Edit)))}
+function enhanceCheckout(){if((window.currentPage||'')!=='checkout')return;buildCheckoutSummary()}
+const baseCheckout=window.checkoutForm;
+if(typeof baseCheckout==='function'){window.checkoutForm=function(){const out=baseCheckout.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(enhanceCheckout));return out}}
+function refreshCartOrCheckout(){if((window.currentPage||'')==='checkout')buildCheckoutSummary();else if((window.currentPage||'')==='cart')window.renderCart?.()}
+
+let editIndex=-1,editVariant='',editQty=1;
+V.openVariant=function(index){const items=window.cart||cart||[];const item=items[index];if(!item)return;const p=getProduct(item.id)||{};editIndex=index;editVariant=item.varian||p.varian?.[0]||'Default';editQty=Math.max(1,Number(item.qty)||1);const vars=Array.isArray(p.varian)&&p.varian.length?p.varian:[editVariant];const stock=Number(p?.stok?.qty ?? p?.stok ?? 0);document.getElementById('v38VariantBody').innerHTML=`<div class="v38-product-top"><img src="${esc(item.gambar||p.gambar||'')}" alt=""><div><h4>${esc(item.nama||p.nama||'Produk')}</h4><div class="v38-price">${money(item.harga||p?.harga?.promo||p?.harga?.normal)}</div><div class="v38-stock">Stok: ${Number.isFinite(stock)?stock:'-'}</div></div></div><div class="v38-label">Pilih Varian</div><div class="v38-variants">${vars.map(v=>`<button type="button" class="v38-variant ${String(v)===String(editVariant)?'active':''}" data-v38-var="${esc(v)}">${esc(v)}</button>`).join('')}</div><div class="v38-label">Jumlah</div><div class="v38-qty-row"><span>Qty produk</span><div class="v38-qty"><button type="button" data-v38-minus>−</button><span id="v38QtyValue">${editQty}</span><button type="button" data-v38-plus>+</button></div></div>`;const body=document.getElementById('v38VariantBody');body.querySelectorAll('[data-v38-var]').forEach(b=>b.onclick=()=>{editVariant=b.dataset.v38Var;body.querySelectorAll('.v38-variant').forEach(x=>x.classList.toggle('active',x===b))});body.querySelector('[data-v38-minus]').onclick=()=>{editQty=Math.max(1,editQty-1);document.getElementById('v38QtyValue').textContent=editQty};body.querySelector('[data-v38-plus]').onclick=()=>{editQty+=1;document.getElementById('v38QtyValue').textContent=editQty};open('v38VariantModal')};
+document.getElementById('v38VariantConfirm')?.addEventListener('click',()=>{const items=window.cart||cart||[];if(editIndex<0||!items[editIndex])return;items[editIndex].varian=editVariant;items[editIndex].qty=editQty;try{saveCart()}catch(_){localStorage.setItem('cart',JSON.stringify(items))}close('v38VariantModal');buildCheckoutSummary();try{updateCartCount?.()}catch(_){}});
+
+requestAnimationFrame(()=>{if((window.currentPage||'')==='cart')enhanceCart();if((window.currentPage||'')==='checkout')enhanceCheckout()});
+})();
+</script>
+
 </body>
 </html>
 
@@ -35138,5 +35151,846 @@ body.dark-mode .purchase-info .v36-purchase-save{
   });
 
   window.V36={centerFloatingRail,paintPurchasePromo};
+})();
+</script>
+
+<!-- =========================================================
+     V39 CART PREMIUM + EXPLICIT VOUCHER / VARIANT TRIGGERS
+     Scope locked to cart, voucher UX, checkout variant trigger.
+========================================================= -->
+<style id="v39-cart-premium-css">
+:root{
+  --v39-green:#8CC63F;
+  --v39-green-dark:#5e9527;
+  --v39-ink:#20231f;
+  --v39-muted:#7f877c;
+  --v39-soft:#f6faef;
+  --v39-line:#e6ebe1;
+}
+
+/* Premium cart shell */
+#product-grid-auto.page-cart .cart-page{
+  max-width:1040px!important;
+  padding-top:10px!important;
+}
+#product-grid-auto.page-cart .cart-header{
+  padding:14px 16px!important;
+  border:1px solid var(--v39-line)!important;
+  border-radius:22px!important;
+  background:linear-gradient(135deg,#ffffff 0%,#fbfff7 100%)!important;
+  box-shadow:0 12px 34px rgba(33,52,22,.055)!important;
+  margin-bottom:14px!important;
+}
+#product-grid-auto.page-cart .cart-header h2{
+  display:flex!important;
+  align-items:center!important;
+  gap:9px!important;
+}
+#product-grid-auto.page-cart .cart-header h2 i{
+  width:38px!important;
+  height:38px!important;
+  border-radius:12px!important;
+  display:grid!important;
+  place-items:center!important;
+  background:#edf8df!important;
+  color:var(--v39-green-dark)!important;
+  font-size:17px!important;
+}
+
+/* Voucher CTA is intentionally visible BEFORE the product list. */
+.v39-cart-voucher-hero{
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  padding:14px 15px;
+  margin:0 0 12px;
+  border:1px solid #dceac9;
+  border-radius:18px;
+  background:linear-gradient(135deg,#fbfff7,#f0f9e4);
+  box-shadow:0 8px 24px rgba(91,136,42,.06);
+  cursor:pointer;
+  text-align:left;
+}
+.v39-cart-voucher-main{display:flex;align-items:center;gap:11px;min-width:0}
+.v39-cart-voucher-icon{
+  flex:0 0 42px;width:42px;height:42px;border-radius:13px;
+  display:grid;place-items:center;background:#8CC63F;color:#fff;font-size:17px;
+  box-shadow:0 7px 16px rgba(140,198,63,.22)
+}
+.v39-cart-voucher-copy{min-width:0}
+.v39-cart-voucher-copy strong{display:block;font-size:13px;color:var(--v39-ink);line-height:1.25}
+.v39-cart-voucher-copy small{display:block;margin-top:3px;color:#7b8576;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.v39-cart-voucher-action{display:flex;align-items:center;gap:7px;color:var(--v39-green-dark);font-size:10px;font-weight:800;white-space:nowrap}
+
+/* More premium product card hierarchy */
+#product-grid-auto.page-cart .cart-item{
+  border-radius:24px!important;
+  padding:48px 18px 16px!important;
+  box-shadow:0 12px 34px rgba(26,40,18,.06)!important;
+  border:1px solid #e6ebe2!important;
+}
+#product-grid-auto.page-cart .cart-item:before{display:none!important}
+.v39-store-row{
+  position:absolute;left:16px;right:16px;top:12px;height:27px;
+  display:flex;align-items:center;justify-content:space-between;gap:8px;
+  border-bottom:1px solid #eff2ec;padding-bottom:8px;
+}
+.v39-store-name{display:flex;align-items:center;gap:7px;font-size:9.5px;font-weight:900;letter-spacing:.05em;color:#626b5e;text-transform:uppercase}
+.v39-store-name i{color:var(--v39-green-dark);font-size:12px}
+.v39-official{font-size:8.5px;font-weight:800;color:var(--v39-green-dark);background:#edf8df;border-radius:999px;padding:4px 7px}
+
+/* Explicit variant trigger */
+.v39-variant-trigger{
+  display:inline-flex!important;
+  align-items:center!important;
+  gap:7px!important;
+  margin:7px 6px 3px 0!important;
+  padding:8px 10px!important;
+  border:1px solid #dfe8d6!important;
+  border-radius:11px!important;
+  background:#f8fcf3!important;
+  color:#4d5b45!important;
+  font-size:10.5px!important;
+  font-weight:800!important;
+  cursor:pointer!important;
+  max-width:100%!important;
+}
+.v39-variant-trigger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:155px}
+.v39-variant-trigger i{color:var(--v39-green-dark);font-size:9px;flex:0 0 auto}
+.v39-variant-trigger .v39-ubah{color:var(--v39-green-dark);font-size:9px}
+
+/* Hide old passive variant chip only after real button is injected */
+.cart-item.v39-enhanced .cart-info p.v39-old-variant{display:none!important}
+
+/* Product image gets an intentional premium frame */
+#product-grid-auto.page-cart .cart-image{
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.8),0 6px 18px rgba(30,45,20,.04)!important;
+}
+
+/* Cart bottom row is cleaner and easier to scan */
+#product-grid-auto.page-cart .cart-side{
+  justify-content:center!important;
+}
+#product-grid-auto.page-cart .cart-total{
+  padding:6px 9px!important;
+  border-radius:10px!important;
+  background:#f3faea!important;
+}
+
+/* Make checkout action more visually anchored */
+#product-grid-auto.page-cart .cart-summary .btn:not(.secondary),
+#product-grid-auto.page-cart .cart-summary button[onclick*="checkout"]{
+  min-height:50px!important;
+  border-radius:15px!important;
+  font-weight:900!important;
+  letter-spacing:-.01em!important;
+}
+
+/* V38 modal polish, no behavior changes */
+#v38VoucherModal .v38-sheet,#v38VariantModal .v38-sheet,#v38TermsModal .v38-sheet{
+  border-radius:30px 30px 0 0!important;
+}
+#v38VoucherModal .v38-sheet-head h3,#v38VariantModal .v38-sheet-head h3,#v38TermsModal .v38-sheet-head h3{
+  letter-spacing:-.025em!important;
+}
+#v38VariantModal .v38-primary{
+  box-shadow:0 12px 26px rgba(140,198,63,.22)!important;
+}
+
+/* Checkout edit action is explicit, not vague */
+.v38-edit-variant{
+  display:inline-flex!important;align-items:center!important;gap:5px!important;
+  padding:8px 11px!important;
+}
+.v38-edit-variant:before{content:"\f044";font-family:"Font Awesome 6 Free";font-weight:900;font-size:9px}
+
+body.dark-mode .v39-cart-voucher-hero,
+body.dark-mode #product-grid-auto.page-cart .cart-header,
+body.dark-mode .v39-variant-trigger{
+  background:#182019!important;border-color:#30402d!important;color:#eef2ea!important;
+}
+body.dark-mode .v39-cart-voucher-copy strong,
+body.dark-mode .v39-store-name{color:#eef2ea!important}
+
+@media(max-width:760px){
+  #product-grid-auto.page-cart .cart-page{padding:10px 10px 112px!important}
+  #product-grid-auto.page-cart .cart-header{padding:13px!important;border-radius:19px!important}
+  #product-grid-auto.page-cart .cart-header .btn.secondary{padding:9px 10px!important;font-size:10px!important}
+  #product-grid-auto.page-cart .cart-item{
+    grid-template-columns:96px minmax(0,1fr)!important;
+    gap:12px!important;
+    padding:48px 14px 14px!important;
+  }
+  #product-grid-auto.page-cart .cart-image{width:96px!important;height:96px!important;margin-top:0!important}
+  #product-grid-auto.page-cart .cart-info{padding-top:0!important}
+  #product-grid-auto.page-cart .cart-side{
+    grid-column:1/-1!important;
+    display:grid!important;
+    grid-template-columns:auto 1fr auto!important;
+    align-items:center!important;
+    gap:10px!important;
+    width:100%!important;
+    padding-top:12px!important;
+    margin-top:4px!important;
+    border-top:1px solid #edf1e9!important;
+  }
+  #product-grid-auto.page-cart .cart-side .cart-total{justify-self:center!important}
+  #product-grid-auto.page-cart .cart-delete{justify-self:end!important}
+  .v39-cart-voucher-hero{padding:12px 13px;border-radius:16px}
+  .v39-cart-voucher-action span{display:none}
+  .v39-variant-trigger span{max-width:120px}
+}
+
+@media(max-width:360px){
+  #product-grid-auto.page-cart .cart-header{align-items:flex-start!important}
+  #product-grid-auto.page-cart .cart-header h2{font-size:20px!important}
+  #product-grid-auto.page-cart .cart-item{grid-template-columns:82px minmax(0,1fr)!important;padding-left:12px!important;padding-right:12px!important}
+  #product-grid-auto.page-cart .cart-image{width:82px!important;height:82px!important}
+  .v39-variant-trigger span{max-width:92px}
+}
+</style>
+
+<script id="v39-cart-premium-js">
+(function(){
+'use strict';
+if(window.__V39_CART_PREMIUM__) return;
+window.__V39_CART_PREMIUM__=true;
+
+const V38=window.V38||{};
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function pageNow(){try{return typeof currentPage!=='undefined'?currentPage:window.currentPage}catch(_){return window.currentPage}}
+function itemsNow(){try{return window.cart||cart||[]}catch(_){return window.cart||[]}}
+function selectedVoucherText(){
+  try{
+    const s=typeof getSelectedVouchers==='function'?getSelectedVouchers():JSON.parse(localStorage.getItem('selectedVouchers')||'{}');
+    const names=[s?.product?.id,s?.shipping?.id].filter(Boolean);
+    return names.length?names.join(' + '):'Pilih voucher terbaik untuk pesanan Anda';
+  }catch(_){return 'Pilih voucher terbaik untuk pesanan Anda'}
+}
+function openVoucher(){
+  if(typeof V38.openVoucher==='function') return V38.openVoucher();
+  document.getElementById('v38VoucherModal')?.classList.add('show');
+}
+function openVariant(index){
+  if(typeof V38.openVariant==='function') return V38.openVariant(index);
+}
+
+function enhanceCart(){
+  if(pageNow()!=='cart') return;
+  const page=document.querySelector('#product-grid-auto .cart-page');
+  if(!page) return;
+  const products=page.querySelector('.cart-products');
+  const list=page.querySelector('#cart-list');
+  if(products && list && !products.querySelector('.v39-cart-voucher-hero')){
+    const voucher=document.createElement('button');
+    voucher.type='button';
+    voucher.className='v39-cart-voucher-hero';
+    voucher.innerHTML=`<span class="v39-cart-voucher-main"><span class="v39-cart-voucher-icon"><i class="fa-solid fa-ticket"></i></span><span class="v39-cart-voucher-copy"><strong>Voucher Nine & Promo</strong><small>${esc(selectedVoucherText())}</small></span></span><span class="v39-cart-voucher-action"><span>Lihat Voucher</span><i class="fa-solid fa-chevron-right"></i></span>`;
+    voucher.addEventListener('click',openVoucher);
+    products.insertBefore(voucher,list);
+  }
+
+  const items=itemsNow();
+  page.querySelectorAll('#cart-list .cart-item').forEach((card,index)=>{
+    card.classList.add('v39-enhanced');
+    if(!card.querySelector('.v39-store-row')){
+      const store=document.createElement('div');
+      store.className='v39-store-row';
+      store.innerHTML='<span class="v39-store-name"><i class="fa-solid fa-store"></i> Nine Autoseries</span><span class="v39-official">Official Store</span>';
+      card.prepend(store);
+    }
+    const info=card.querySelector('.cart-info');
+    if(!info) return;
+    const item=items[index]||{};
+    const paragraphs=[...info.querySelectorAll('p:not(.cart-brand)')];
+    const variantP=paragraphs.find(p=>/varian/i.test(p.textContent||''));
+    if(variantP) variantP.classList.add('v39-old-variant');
+    if(!info.querySelector('.v39-variant-trigger')){
+      const btn=document.createElement('button');
+      btn.type='button';
+      btn.className='v39-variant-trigger';
+      btn.setAttribute('aria-label','Ubah varian produk');
+      btn.innerHTML=`<i class="fa-solid fa-layer-group"></i><span>Varian: ${esc(item.varian||'-')}</span><b class="v39-ubah">Ubah</b><i class="fa-solid fa-chevron-right"></i>`;
+      btn.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openVariant(index)});
+      const brand=info.querySelector('.cart-brand');
+      if(brand) brand.insertAdjacentElement('afterend',btn); else info.appendChild(btn);
+    }
+  });
+}
+
+/* Keep cart refreshed after V38 variant confirmation. */
+const confirm=document.getElementById('v38VariantConfirm');
+if(confirm){
+  confirm.addEventListener('click',()=>{
+    if(pageNow()==='cart') setTimeout(()=>{try{window.renderCart?.()}catch(_){}},0);
+  });
+}
+
+/* Strengthen checkout wording if V38 already renders its edit buttons. */
+function enhanceCheckout(){
+  if(pageNow()!=='checkout') return;
+  document.querySelectorAll('#checkout-summary .v38-edit-variant').forEach(btn=>{
+    btn.textContent='Ubah Varian';
+  });
+}
+
+const baseRenderCart=window.renderCart;
+if(typeof baseRenderCart==='function'&&!baseRenderCart.__v39){
+  const wrapped=function(){
+    const out=baseRenderCart.apply(this,arguments);
+    requestAnimationFrame(()=>requestAnimationFrame(enhanceCart));
+    return out;
+  };
+  wrapped.__v39=true;
+  window.renderCart=wrapped;
+  try{renderCart=wrapped}catch(_){}
+}
+const baseCheckout=window.checkoutForm;
+if(typeof baseCheckout==='function'&&!baseCheckout.__v39){
+  const wrapped=function(){
+    const out=baseCheckout.apply(this,arguments);
+    requestAnimationFrame(()=>requestAnimationFrame(enhanceCheckout));
+    return out;
+  };
+  wrapped.__v39=true;
+  window.checkoutForm=wrapped;
+  try{checkoutForm=wrapped}catch(_){}
+}
+
+/* V41 stability: mutation fallback disabled. Cart/checkout render wrappers are authoritative. */
+
+requestAnimationFrame(()=>{
+  if(pageNow()==='cart') enhanceCart();
+  if(pageNow()==='checkout') enhanceCheckout();
+});
+})();
+</script>
+
+<!-- =========================================================
+     V40 CART / CHECKOUT UX FINAL
+     Scope only: cart, checkout, voucher, terms, variant sheets
+========================================================= -->
+<style id="v40-cart-checkout-ux-css">
+/* Neutral storefront branding */
+#product-grid-auto.page-cart .cart-item:before{content:""!important;display:none!important}
+#product-grid-auto.page-cart .v39-store-row{padding:0 0 8px!important;margin:0 0 10px!important;border-bottom:1px solid #eef1eb!important}
+#product-grid-auto.page-cart .v39-store-name{font-size:10px!important;letter-spacing:.03em!important;text-transform:none!important;color:#667061!important}
+#product-grid-auto.page-cart .v39-official{display:none!important}
+
+/* Remove legacy full voucher panels: one compact entry opens the voucher sheet */
+#product-grid-auto .v17-voucher-panel{display:none!important}
+
+/* Compact premium cart */
+#product-grid-auto.page-cart .cart-page{padding-top:10px!important}
+#product-grid-auto.page-cart .cart-header{margin-bottom:10px!important}
+#product-grid-auto.page-cart .cart-layout{gap:12px!important}
+#product-grid-auto.page-cart .v39-cart-voucher-hero{margin:0 0 10px!important;padding:12px 14px!important;border-radius:17px!important;box-shadow:0 8px 22px rgba(83,120,45,.06)!important}
+#product-grid-auto.page-cart .cart-item{padding:14px!important;margin-bottom:10px!important;border-radius:20px!important;gap:12px!important}
+#product-grid-auto.page-cart .cart-image{margin-top:0!important}
+#product-grid-auto.page-cart .cart-info{padding-top:0!important}
+#product-grid-auto.page-cart .cart-info h3{margin-bottom:4px!important}
+#product-grid-auto.page-cart .cart-brand{margin-bottom:6px!important}
+#product-grid-auto.page-cart .v39-variant-trigger{margin:5px 0!important;min-height:38px!important;padding:8px 10px!important}
+#product-grid-auto.page-cart .cart-info p:not(.cart-brand){padding:6px 8px!important;margin:2px 4px 2px 0!important}
+#product-grid-auto.page-cart .cart-summary{padding:15px!important;border-radius:20px!important}
+#product-grid-auto.page-cart .cart-summary h3{margin-bottom:8px!important}
+#product-grid-auto.page-cart .summary-row{padding:5px 0!important}
+#product-grid-auto.page-cart .v38-voucher-entry{margin:7px 0!important;padding:10px 11px!important}
+
+/* Compact checkout */
+#product-grid-auto.page-checkout .checkout-form{padding-top:10px!important}
+#product-grid-auto.page-checkout .checkout-form .form-card{padding:14px!important;border-radius:19px!important;margin-bottom:11px!important}
+#product-grid-auto.page-checkout #checkout-summary .summary-item{padding:10px!important;margin-bottom:8px!important;border-radius:14px!important;grid-template-columns:58px minmax(0,1fr) auto!important}
+#product-grid-auto.page-checkout .v38-checkout-thumb{width:58px!important;height:58px!important}
+#product-grid-auto.page-checkout .v38-voucher-entry{margin:8px 0 6px!important;padding:10px 11px!important}
+#product-grid-auto.page-checkout .summary-row{padding:5px 0!important}
+
+/* Variant labels must always be visible */
+#v38VariantModal .v38-variants{gap:7px!important}
+#v38VariantModal .v38-variant{display:inline-flex!important;align-items:center!important;justify-content:center!important;min-height:42px!important;min-width:76px!important;width:auto!important;max-width:100%!important;padding:9px 13px!important;color:#292d27!important;background:#fff!important;border:1px solid #dce2d8!important;opacity:1!important;visibility:visible!important;text-indent:0!important;font-size:11px!important;line-height:1.2!important;white-space:normal!important;overflow-wrap:anywhere!important}
+#v38VariantModal .v38-variant.active{color:#5f9226!important;background:#f0f8e5!important;border-color:#8CC63F!important;box-shadow:0 0 0 2px rgba(140,198,63,.08)!important}
+body.dark-mode #v38VariantModal .v38-variant{color:#eef2ea!important;background:#11151a!important;border-color:#343b34!important}
+body.dark-mode #v38VariantModal .v38-variant.active{color:#b9e47d!important;background:#1c2918!important;border-color:#8CC63F!important}
+
+/* Sheets: smoother drag feedback */
+.v38-sheet{touch-action:pan-y;will-change:transform}
+.v38-sheet.v40-dragging{transition:none!important;animation:none!important}
+.v38-sheet.v40-return{transition:transform .22s cubic-bezier(.2,.8,.2,1)!important}
+.v38-overlay.v40-closing{background:rgba(14,17,13,0)!important;transition:background .2s ease!important}
+
+/* Voucher selected state + savings visibility */
+.v38-ticket.active{box-shadow:0 0 0 2px rgba(140,198,63,.10)!important}
+.v38-ticket.active .v38-use{background:#5f9226!important}
+.v40-saving{color:#5f9226!important;font-weight:800!important}
+
+@media(max-width:600px){
+  #product-grid-auto.page-cart .cart-page{padding-left:10px!important;padding-right:10px!important}
+  #product-grid-auto.page-cart .cart-item{grid-template-columns:92px minmax(0,1fr)!important;padding:12px!important}
+  #product-grid-auto.page-cart .cart-image{width:92px!important;height:92px!important}
+  #product-grid-auto.page-cart .cart-side{grid-column:1/-1!important;display:grid!important;grid-template-columns:auto 1fr auto!important;align-items:center!important;gap:10px!important;padding-top:9px!important;border-top:1px solid #eef1eb!important;min-width:0!important}
+  #product-grid-auto.page-cart .cart-total{justify-self:center!important}
+  #product-grid-auto.page-cart .cart-delete{justify-self:end!important}
+  #v38VoucherModal .v38-body,#v38TermsModal .v38-body,#v38VariantModal .v38-body{padding:13px 14px 16px!important}
+  .v38-sheet-head{padding:11px 14px!important}
+  .v38-sheet-foot{padding:10px 14px max(12px,env(safe-area-inset-bottom))!important}
+  .v38-ticket{grid-template-columns:54px minmax(0,1fr) auto!important;gap:9px!important;padding:10px!important}
+  .v38-ticket-logo{height:58px!important;font-size:21px!important}
+}
+</style>
+<script id="v40-cart-checkout-ux-js">
+(function(){
+'use strict';
+if(window.__V40_CART_CHECKOUT_UX__) return;
+window.__V40_CART_CHECKOUT_UX__=true;
+const V=window.V38=window.V38||{};
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const money=n=>typeof window.formatRupiah==='function'?window.formatRupiah(Number(n)||0):'Rp '+(Number(n)||0).toLocaleString('id-ID');
+function pageNow(){try{return typeof currentPage!=='undefined'?currentPage:window.currentPage}catch(_){return window.currentPage}}
+function itemsNow(){try{return window.cart||cart||[]}catch(_){return window.cart||[]}}
+function vouchersNow(){try{return window.vouchers||vouchers||[]}catch(_){return window.vouchers||[]}}
+function selectedNow(){try{return typeof getSelectedVouchers==='function'?getSelectedVouchers():JSON.parse(localStorage.getItem('selectedVouchers')||'{}')}catch(_){return{}}}
+function saveSelected(s){try{if(typeof saveSelectedVouchers==='function')saveSelectedVouchers(s);else localStorage.setItem('selectedVouchers',JSON.stringify(s))}catch(_){}}
+function subtotal(){return itemsNow().reduce((s,i)=>s+(Number(i.harga)||0)*(Number(i.qty)||0),0)}
+function eligible(v){return subtotal()>=Number(v?.min||0)&&(!v?.expired||new Date()<=new Date(v.expired+'T23:59:59'))}
+function slotOf(v){return v?.type==='shipping_fixed'?'shipping':'product'}
+function selectedLabel(){const s=selectedNow();const a=[s.product,s.shipping].filter(Boolean);return a.length?a.map(v=>v.name||v.id).join(' + '):'Pilih voucher untuk pesanan Anda'}
+function discountLabel(){try{const s=getCartSummary();const total=(Number(s.productDiscount)||0)+(Number(s.shippingDiscount)||0);return total>0?'Hemat '+money(total):selectedLabel()}catch(_){return selectedLabel()}}
+
+/* Branding cleanup */
+function cleanBranding(){
+  document.querySelectorAll('.v39-store-row').forEach(el=>el.remove());
+  document.querySelectorAll('.v39-official').forEach(el=>el.remove());
+  document.querySelectorAll('.v39-cart-voucher-copy strong').forEach(el=>el.textContent='Voucher & Promo');
+  const title=document.querySelector('#v38VoucherModal .v38-sheet-head h3');if(title)title.textContent='Voucher & Promo';
+  document.querySelectorAll('.v38-term-section p').forEach(el=>{el.innerHTML=el.innerHTML.replace(/Nine Autoseries/gi,'produk yang tersedia').replace(/Imamsalesnine\.com/gi,'Imamsalesfr')});
+}
+
+/* One source of truth for voucher selection. Selecting applies immediately. */
+V.useVoucher=function(id){
+  const v=vouchersNow().find(x=>String(x.id)===String(id));if(!v)return;
+  if(!eligible(v)){window.Swal?.fire({icon:'info',title:'Voucher belum dapat digunakan',text:'Minimum belanja '+money(v.min)+'.'});return}
+  const selected=selectedNow(),slot=slotOf(v);
+  if(selected?.[slot]?.id===v.id) delete selected[slot]; else selected[slot]=v;
+  saveSelected(selected);
+  try{window.restoreVoucherUI?.()}catch(_){}
+  try{window.V38?.renderVoucherList?.()}catch(_){}
+  refreshVisible();
+};
+
+/* Rebuild voucher cards so button state always reflects stored selection. */
+function renderVoucherList(){
+  const box=document.getElementById('v38VoucherList');if(!box)return;
+  const list=vouchersNow(),sel=selectedNow();
+  box.innerHTML=list.map((v,i)=>{const active=sel?.[slotOf(v)]?.id===v.id,ok=eligible(v);const value=v.type==='product_percent'?v.discount+'%':money(v.discount);return `<article class="v38-ticket ${active?'active':''}">${i===0?'<span class="v38-recommend">Rekomendasi</span>':''}<div class="v38-ticket-logo"><i class="fa-solid ${esc(v.icon||'fa-ticket')}"></i></div><div class="v38-ticket-main"><b>${esc(v.name)} · ${esc(value)}</b><p>${esc(v.description||'')} · Min. ${money(v.min)}</p><div class="v38-ticket-progress"><span style="width:${Math.min(100,Math.max(8,subtotal()/Math.max(1,Number(v.min||1))*100))}%"></span></div><small>${v.expired?'Hingga '+new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tanpa batas waktu'} · ${esc(v.limit||'')}</small></div><div class="v38-ticket-actions"><button class="v38-use" data-v38-use="${esc(v.id)}" ${ok?'':'disabled'}>${active?'Dipilih':ok?'Gunakan':'Belum cukup'}</button><button class="v38-terms-btn" data-v38-terms="${esc(v.id)}">S&K</button></div></article>`}).join('');
+}
+V.renderVoucherList=renderVoucherList;
+const oldOpenVoucher=V.openVoucher;
+V.openVoucher=function(){renderVoucherList();cleanBranding();if(typeof oldOpenVoucher==='function')oldOpenVoucher();renderVoucherList();cleanBranding()};
+
+/* Compact cart summary + checkout summary refresh */
+function refreshCartVoucherEntry(){
+  document.querySelectorAll('.v39-cart-voucher-copy small,.v38-voucher-entry small').forEach(el=>el.textContent=discountLabel());
+}
+function compactSummary(){
+  const root=document.querySelector('#product-grid-auto');if(!root)return;
+  root.querySelectorAll('.v17-voucher-panel').forEach(el=>el.remove());
+  refreshCartVoucherEntry();cleanBranding();
+}
+function refreshVisible(){
+  const p=pageNow();
+  if(p==='cart'){try{window.renderCart?.()}catch(_){};requestAnimationFrame(()=>{compactSummary();enhanceCart()})}
+  else if(p==='checkout'){try{buildCheckoutV40()}catch(_){};requestAnimationFrame(compactSummary)}
+  else compactSummary();
+  renderVoucherList();
+}
+
+/* Cart enhancements are idempotent after every render. */
+function enhanceCart(){
+  if(pageNow()!=='cart')return;
+  const page=document.querySelector('#product-grid-auto .cart-page');if(!page)return;
+  const products=page.querySelector('.cart-products'),list=page.querySelector('#cart-list');
+  if(products&&list){
+    let hero=products.querySelector('.v39-cart-voucher-hero');
+    if(!hero){hero=document.createElement('button');hero.type='button';hero.className='v39-cart-voucher-hero';products.insertBefore(hero,list)}
+    hero.innerHTML=`<span class="v39-cart-voucher-main"><span class="v39-cart-voucher-icon"><i class="fa-solid fa-ticket"></i></span><span class="v39-cart-voucher-copy"><strong>Voucher & Promo</strong><small>${esc(discountLabel())}</small></span></span><span class="v39-cart-voucher-action"><span>Pilih</span><i class="fa-solid fa-chevron-right"></i></span>`;
+    hero.onclick=V.openVoucher;
+  }
+  const items=itemsNow();
+  page.querySelectorAll('#cart-list .cart-item').forEach((card,index)=>{
+    card.classList.add('v39-enhanced');
+    card.querySelector('.v39-store-row')?.remove();
+    const info=card.querySelector('.cart-info');if(!info)return;const item=items[index]||{};
+    [...info.querySelectorAll('p:not(.cart-brand)')].filter(p=>/varian/i.test(p.textContent||'')).forEach(p=>p.classList.add('v39-old-variant'));
+    let btn=info.querySelector('.v39-variant-trigger');if(!btn){btn=document.createElement('button');btn.type='button';btn.className='v39-variant-trigger';const brand=info.querySelector('.cart-brand');brand?brand.insertAdjacentElement('afterend',btn):info.appendChild(btn)}
+    btn.innerHTML=`<i class="fa-solid fa-layer-group"></i><span>Varian: ${esc(item.varian||'-')}</span><b class="v39-ubah">Ubah</b><i class="fa-solid fa-chevron-right"></i>`;
+    btn.onclick=e=>{e.preventDefault();e.stopPropagation();V.openVariant?.(index)};
+  });
+  compactSummary();
+}
+
+/* Checkout: only one compact voucher row, never the full 3-card legacy panel. */
+function buildCheckoutV40(){
+  const box=document.getElementById('checkout-summary');if(!box)return;
+  const items=itemsNow();const sum=typeof getCartSummary==='function'?getCartSummary():{subtotal:0,productDiscount:0,shippingDiscount:0,totalBayar:0,totalItem:0};
+  const discount=(Number(sum.productDiscount)||0)+(Number(sum.shippingDiscount)||0);
+  box.innerHTML=items.map((item,index)=>`<article class="summary-item"><img class="v38-checkout-thumb" src="${esc(item.gambar||'')}" alt=""><div class="v38-checkout-copy"><div class="v38-checkout-name">${esc(item.nama||'Produk')}</div><div class="v38-checkout-meta">Varian: ${esc(item.varian||'-')} · Qty ${Number(item.qty)||1}</div><div class="v38-checkout-sub">${money((Number(item.harga)||0)*(Number(item.qty)||1))}</div></div><button type="button" class="v38-edit-variant" data-v40-edit="${index}">Ubah Varian</button></article>`).join('')+`<button type="button" class="v38-voucher-entry" data-v40-voucher><span class="v38-voucher-entry-left"><span class="v38-voucher-entry-icon"><i class="fa-solid fa-ticket"></i></span><span><b>Voucher & Promo</b><small>${esc(discountLabel())}</small></span></span><i class="fa-solid fa-chevron-right"></i></button><div class="summary-row"><span>Jumlah Item</span><strong>${sum.totalItem||0}</strong></div><div class="summary-row"><span>Subtotal Produk</span><strong>${money(sum.subtotal)}</strong></div>${discount>0?`<div class="summary-row v40-saving"><span>Total Diskon</span><strong>- ${money(discount)}</strong></div>`:''}<div class="summary-row"><span>Ongkos Kirim</span><strong>Dihitung Admin</strong></div><div class="summary-row total"><span><strong>Total Belanja</strong></span><strong>${money(sum.totalBayar)}</strong></div>`;
+  box.querySelector('[data-v40-voucher]')?.addEventListener('click',V.openVoucher);
+  box.querySelectorAll('[data-v40-edit]').forEach(b=>b.onclick=()=>V.openVariant?.(Number(b.dataset.v40Edit)));
+  document.querySelectorAll('.v17-voucher-panel').forEach(el=>el.remove());
+}
+
+/* Fix variant labels from product data and keep text visible. */
+const oldOpenVariant=V.openVariant;
+V.openVariant=function(index){
+  if(typeof oldOpenVariant==='function')oldOpenVariant(index);
+  requestAnimationFrame(()=>{
+    const body=document.getElementById('v38VariantBody');if(!body)return;
+    const item=itemsNow()[index]||{};
+    let vars=[];try{const p=(window.allProducts||allProducts||[]).find(x=>String(x.id)===String(item.id))||{};vars=Array.isArray(p.varian)?p.varian:[]}catch(_){}
+    const buttons=[...body.querySelectorAll('.v38-variant')];
+    buttons.forEach((b,i)=>{const value=String(b.dataset.v38Var||vars[i]||'').trim();if(value){b.textContent=value;b.setAttribute('aria-label','Pilih varian '+value);b.style.color='';}});
+    cleanBranding();
+  });
+};
+
+/* Swipe-to-close for all V38 bottom sheets. Drag from grab/header; body can start drag only at scroll top. */
+function installSwipe(overlay){
+  if(!overlay||overlay.dataset.v40Swipe)return;
+  overlay.dataset.v40Swipe='1';
+  const sheet=overlay.querySelector('.v38-sheet');
+  if(!sheet)return;
+  const zone=sheet.querySelector('.v38-grab,.v38-sheet-head');
+  if(!zone)return;
+  let active=false,startY=0,lastY=0,pid=null;
+  const yOf=e=>e.touches?.[0]?.clientY ?? e.changedTouches?.[0]?.clientY ?? e.clientY ?? 0;
+  const begin=e=>{
+    if(e.type==='pointerdown' && e.pointerType==='mouse')return;
+    if(e.target.closest?.('button,a,input,select,textarea'))return;
+    active=true; startY=lastY=yOf(e); pid=e.pointerId??null;
+    sheet.classList.remove('v40-return'); sheet.classList.add('v40-dragging');
+    if(pid!=null && zone.setPointerCapture){try{zone.setPointerCapture(pid)}catch(_){}}
+  };
+  const move=e=>{
+    if(!active)return;
+    const y=yOf(e),dy=Math.max(0,y-startY); lastY=y;
+    if(dy<2)return;
+    sheet.style.transform=`translate3d(0,${dy}px,0)`;
+    if(e.cancelable)e.preventDefault();
+  };
+  const finish=()=>{
+    if(!active)return; active=false;
+    const dy=Math.max(0,lastY-startY);
+    sheet.classList.remove('v40-dragging');
+    if(dy>Math.min(145,sheet.offsetHeight*.20)){
+      overlay.classList.add('v40-closing');
+      sheet.style.transition='transform .22s cubic-bezier(.2,.8,.2,1)';
+      sheet.style.transform='translate3d(0,105%,0)';
+      setTimeout(()=>{
+        overlay.classList.remove('show','v40-closing');
+        overlay.setAttribute('aria-hidden','true');
+        sheet.style.transition=''; sheet.style.transform='';
+        if(!document.querySelector('.v38-overlay.show'))document.documentElement.style.overflow='';
+      },225);
+    }else{
+      sheet.classList.add('v40-return');
+      sheet.style.transform='translate3d(0,0,0)';
+      setTimeout(()=>{sheet.classList.remove('v40-return');sheet.style.transform='';},225);
+    }
+  };
+  if(window.PointerEvent){
+    zone.addEventListener('pointerdown',begin,{passive:true});
+    zone.addEventListener('pointermove',move,{passive:false});
+    zone.addEventListener('pointerup',finish,{passive:true});
+    zone.addEventListener('pointercancel',finish,{passive:true});
+  }else{
+    zone.addEventListener('touchstart',begin,{passive:true});
+    zone.addEventListener('touchmove',move,{passive:false});
+    zone.addEventListener('touchend',finish,{passive:true});
+    zone.addEventListener('touchcancel',finish,{passive:true});
+  }
+}
+document.querySelectorAll('.v38-overlay').forEach(installSwipe);
+
+/* Re-wrap late renderers once, then mutation fallback. */
+const baseCart=window.renderCart;if(typeof baseCart==='function'&&!baseCart.__v40){const f=function(){const out=baseCart.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(enhanceCart));return out};f.__v40=true;window.renderCart=f;try{renderCart=f}catch(_){}}
+const baseCheckout=window.checkoutForm;if(typeof baseCheckout==='function'&&!baseCheckout.__v40){const f=function(){const out=baseCheckout.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(()=>{buildCheckoutV40();compactSummary()}));return out};f.__v40=true;window.checkoutForm=f;try{checkoutForm=f}catch(_){}}
+
+/* V41 stability: V40 mutation re-render loop disabled. renderCart/checkout wrappers and explicit refreshes remain authoritative. */
+requestAnimationFrame(()=>{document.querySelectorAll('.v38-overlay').forEach(installSwipe);cleanBranding();if(pageNow()==='cart')enhanceCart();if(pageNow()==='checkout'){buildCheckoutV40();compactSummary()}});
+})();
+</script>
+
+<!-- =========================================================
+     V41 SHEET STABILITY FINAL
+     Scope locked: sheet stability, qty stepper, cart branding
+========================================================= -->
+<style id="v41-sheet-stability-css">
+/* Hide storefront label inside product card; identity remains in site header */
+#product-grid-auto.page-cart .v39-store-row{display:none!important}
+
+/* Explicit, touch-friendly quantity stepper inside Ubah Varian */
+#v38VariantModal .v38-qty{
+  display:grid!important;grid-template-columns:48px 62px 48px!important;
+  width:158px!important;height:46px!important;border:1px solid #dce3d8!important;
+  border-radius:14px!important;overflow:hidden!important;background:#fff!important;
+}
+#v38VariantModal .v38-qty button,#v38VariantModal .v38-qty span{
+  display:grid!important;place-items:center!important;min-width:0!important;height:46px!important;
+  margin:0!important;padding:0!important;border:0!important;background:#fff!important;
+  color:#252a23!important;font-size:22px!important;font-weight:900!important;line-height:1!important;
+  opacity:1!important;visibility:visible!important;box-shadow:none!important;
+}
+#v38VariantModal .v38-qty span{font-size:16px!important;border-left:1px solid #edf0ea!important;border-right:1px solid #edf0ea!important}
+#v38VariantModal .v38-qty button:active{background:#eef8e3!important;color:#639b27!important}
+#v38VariantModal .v38-qty-row{align-items:center!important;gap:12px!important}
+body.dark-mode #v38VariantModal .v38-qty,body.dark-mode #v38VariantModal .v38-qty button,body.dark-mode #v38VariantModal .v38-qty span{background:#11151a!important;color:#f3f5f1!important;border-color:#343b34!important}
+
+/* GPU-stable sheets: no flashing/jumping during user interaction */
+.v38-overlay{overscroll-behavior:contain!important}
+.v38-sheet{transform:translate3d(0,0,0);backface-visibility:hidden;-webkit-backface-visibility:hidden;contain:layout paint style}
+.v38-sheet:not(.v40-dragging):not(.v40-return){will-change:auto!important}
+.v38-sheet button,.v38-sheet input,.v38-sheet select,.v38-sheet textarea{touch-action:manipulation!important}
+</style>
+<script id="v41-sheet-stability-js">
+(function(){
+'use strict';
+if(window.__V41_SHEET_STABILITY__)return;window.__V41_SHEET_STABILITY__=true;
+const V=window.V38=window.V38||{};
+function closeOthers(except){
+ document.querySelectorAll('.v38-overlay.show').forEach(o=>{
+  if(o.id===except)return;
+  o.classList.remove('show','v40-closing');o.setAttribute('aria-hidden','true');
+  const s=o.querySelector('.v38-sheet');if(s){s.classList.remove('v40-dragging','v40-return');s.style.transform='';s.style.transition=''}
+ });
+}
+function safeOpen(id,fn,args){closeOthers(id);return typeof fn==='function'?fn.apply(V,args||[]):undefined}
+const ov=V.openVoucher;if(typeof ov==='function')V.openVoucher=function(){return safeOpen('v38VoucherModal',ov,arguments)};
+const ot=V.openTerms;if(typeof ot==='function')V.openTerms=function(){return safeOpen('v38TermsModal',ot,arguments)};
+const ovar=V.openVariant;if(typeof ovar==='function')V.openVariant=function(){return safeOpen('v38VariantModal',ovar,arguments)};
+
+/* Ensure qty buttons remain visible even after dynamic modal re-render. */
+const ensureQty=()=>{
+ const q=document.querySelector('#v38VariantModal .v38-qty');if(!q)return;
+ const minus=q.querySelector('[data-v38-minus]'),plus=q.querySelector('[data-v38-plus]');
+ if(minus){minus.textContent='−';minus.setAttribute('aria-label','Kurangi jumlah')}
+ if(plus){plus.textContent='+';plus.setAttribute('aria-label','Tambah jumlah')}
+};
+const body=document.getElementById('v38VariantBody');if(body)new MutationObserver(()=>requestAnimationFrame(ensureQty)).observe(body,{childList:true,subtree:true});
+document.addEventListener('click',e=>{if(e.target.closest('#v38VariantModal [data-v38-minus],#v38VariantModal [data-v38-plus]'))requestAnimationFrame(ensureQty)},true);
+requestAnimationFrame(ensureQty);
+})();
+</script>
+
+
+
+
+
+<!-- =========================================================
+     V43 CART QTY + SHEET ROOT FIX FINAL
+     Scope locked: cart +/- and V38 sheet swipe-close only.
+========================================================= -->
+<style id="v43-cart-sheet-rootfix-css">
+/* Cart quantity taps update in-place; never animate/rerender the page. */
+#product-grid-auto.page-cart .cart-qty,
+#product-grid-auto.page-cart .cart-qty button,
+#product-grid-auto.page-cart .cart-qty span,
+#product-grid-auto.page-cart .cart-total,
+#product-grid-auto.page-cart .cart-summary .summary-row strong,
+#product-grid-auto.page-cart .v39-cart-voucher-copy small{
+  animation:none!important;
+  transition:none!important;
+}
+#product-grid-auto.page-cart .cart-qty button{
+  touch-action:manipulation!important;
+  -webkit-tap-highlight-color:transparent!important;
+}
+
+/* One calm sheet compositor. Opening never flashes; only the sheet moves during drag. */
+.v38-overlay.show{display:flex!important}
+.v38-overlay.show .v38-sheet{
+  animation:none!important;
+  opacity:1!important;
+  transform:translate3d(0,0,0)!important;
+}
+.v38-grab,.v38-sheet-head{
+  touch-action:none!important;
+  -webkit-user-select:none!important;
+  user-select:none!important;
+}
+.v38-sheet.v43-dragging{
+  transition:none!important;
+  will-change:transform!important;
+}
+.v38-sheet.v43-snap{
+  transition:transform .28s cubic-bezier(.16,1,.3,1)!important;
+  will-change:transform!important;
+}
+.v38-sheet button,.v38-sheet input,.v38-sheet select,.v38-sheet textarea{
+  touch-action:manipulation!important;
+}
+</style>
+<script id="v43-cart-sheet-rootfix-js">
+(function(){
+'use strict';
+if(window.__V43_CART_SHEET_ROOTFIX__)return;
+window.__V43_CART_SHEET_ROOTFIX__=true;
+
+const money=n=>typeof window.formatRupiah==='function'
+  ? window.formatRupiah(Number(n)||0)
+  : 'Rp '+(Number(n)||0).toLocaleString('id-ID');
+function itemsNow(){
+  try{return Array.isArray(window.cart)?window.cart:(Array.isArray(cart)?cart:[])}catch(_){return []}
+}
+function saveCartNow(items){
+  try{if(typeof saveCart==='function'){saveCart();return}}catch(_){ }
+  try{localStorage.setItem('cart',JSON.stringify(items))}catch(_){ }
+}
+function summaryNow(){
+  try{return typeof getCartSummary==='function'?getCartSummary():null}catch(_){return null}
+}
+function setSummary(label,value){
+  const root=document.querySelector('#product-grid-auto .cart-summary');
+  if(!root)return;
+  [...root.querySelectorAll('.summary-row')].forEach(row=>{
+    const left=row.querySelector('span');
+    if(!left||left.textContent.trim().toLowerCase()!==String(label).toLowerCase())return;
+    const out=row.querySelector('strong:last-child');
+    if(out)out.textContent=value;
+  });
+}
+function syncCartNumbers(index){
+  const items=itemsNow(), item=items[index];
+  if(!item)return;
+  const card=document.querySelectorAll('#cart-list .cart-item')[index];
+  if(card){
+    const q=card.querySelector('.cart-qty span');
+    const total=card.querySelector('.cart-total');
+    if(q)q.textContent=String(Math.max(1,Number(item.qty)||1));
+    if(total)total.textContent=money((Number(item.harga)||0)*(Number(item.qty)||1));
+  }
+  const sum=summaryNow();
+  if(sum){
+    setSummary('Jumlah Produk',String(items.length));
+    setSummary('Subtotal',money(sum.subtotal));
+    setSummary('Voucher Produk',sum.productVoucherName||'-');
+    setSummary('Diskon Produk','- '+money(sum.productDiscount));
+    setSummary('Voucher Ongkir',sum.shippingVoucherName||'-');
+    setSummary('Diskon Ongkir','- '+money(sum.shippingDiscount));
+    setSummary('Total Belanja',money(sum.totalBayar));
+    const saved=Math.max(0,(Number(sum.productDiscount)||0)+(Number(sum.shippingDiscount)||0));
+    document.querySelectorAll('.v39-cart-voucher-copy small,.v38-voucher-entry small').forEach(el=>{
+      el.textContent=saved>0?'Hemat '+money(saved):'Pilih voucher yang tersedia';
+    });
+  }
+  try{window.updateCartCount?.()}catch(_){ }
+}
+
+/* Authoritative cart quantity function. Inline onclick calls only this function. */
+window.changeCartQty=function(index,change){
+  index=Number(index);change=Number(change)||0;
+  const items=itemsNow(),item=items[index];
+  if(!item)return;
+  const old=Math.max(1,Number(item.qty)||1);
+  const next=Math.max(1,old+change);
+  if(next===old)return;
+  item.qty=next;
+  saveCartNow(items);
+  syncCartNumbers(index);
+};
+try{changeCartQty=window.changeCartQty}catch(_){ }
+
+/* ---------------- Same simple physics pattern as the proven purchase/AI sheets ---------------- */
+function closeSheet(overlay,sheet){
+  if(!overlay||!sheet)return;
+  overlay.classList.remove('show');
+  overlay.setAttribute('aria-hidden','true');
+  sheet.classList.remove('v43-dragging','v43-snap');
+  sheet.style.transform='';
+  sheet.style.transition='';
+  sheet.style.willChange='';
+  if(!document.querySelector('.v38-overlay.show'))document.documentElement.style.overflow='';
+}
+function resetSheet(overlay){
+  const sheet=overlay?.querySelector('.v38-sheet');
+  if(!sheet)return;
+  sheet.classList.remove('v43-dragging','v43-snap');
+  sheet.style.transform='';sheet.style.transition='';sheet.style.willChange='';
+}
+function bindSwipe(overlay){
+  if(!overlay||overlay.dataset.v43Swipe==='1')return;
+  overlay.dataset.v43Swipe='1';
+  const sheet=overlay.querySelector('.v38-sheet');
+  if(!sheet)return;
+  const zones=[sheet.querySelector('.v38-grab'),sheet.querySelector('.v38-sheet-head')].filter(Boolean);
+  let active=false,startY=0,lastY=0,startedAt=0;
+  const begin=(y,target)=>{
+    if(!overlay.classList.contains('show'))return;
+    if(target?.closest?.('button,a,input,select,textarea,label'))return;
+    active=true;startY=lastY=y;startedAt=performance.now();
+    sheet.classList.remove('v43-snap');sheet.classList.add('v43-dragging');
+    sheet.style.transition='none';sheet.style.willChange='transform';
+  };
+  const move=(y,e)=>{
+    if(!active)return;
+    lastY=y;
+    const dy=Math.max(0,y-startY);
+    if(dy>0){
+      sheet.style.setProperty('transform','translate3d(0,'+dy+'px,0)','important');
+      if(e?.cancelable)e.preventDefault();
+    }
+  };
+  const end=()=>{
+    if(!active)return;
+    active=false;
+    const dy=Math.max(0,lastY-startY);
+    const dt=Math.max(1,performance.now()-startedAt);
+    const velocity=dy/dt;
+    sheet.classList.remove('v43-dragging');
+    sheet.classList.add('v43-snap');
+    sheet.style.transition='transform .28s cubic-bezier(.16,1,.3,1)';
+    if(dy>Math.min(145,sheet.offsetHeight*.20)||velocity>.62){
+      sheet.style.setProperty('transform','translate3d(0,105%,0)','important');
+      setTimeout(()=>closeSheet(overlay,sheet),275);
+    }else{
+      sheet.style.setProperty('transform','translate3d(0,0,0)','important');
+      setTimeout(()=>resetSheet(overlay),285);
+    }
+  };
+  const useTouch='ontouchstart' in window;
+  zones.forEach(zone=>{
+    if(useTouch){
+      zone.addEventListener('touchstart',e=>begin(e.touches[0].clientY,e.target),{passive:true});
+      zone.addEventListener('touchmove',e=>move(e.touches[0].clientY,e),{passive:false});
+      zone.addEventListener('touchend',end,{passive:true});
+      zone.addEventListener('touchcancel',end,{passive:true});
+    }else{
+      let pid=null;
+      zone.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse')return;pid=e.pointerId;begin(e.clientY,e.target);try{zone.setPointerCapture(pid)}catch(_){ }},{passive:true});
+      zone.addEventListener('pointermove',e=>{if(pid!==e.pointerId)return;move(e.clientY,e)},{passive:false});
+      zone.addEventListener('pointerup',e=>{if(pid!==e.pointerId)return;pid=null;end()},{passive:true});
+      zone.addEventListener('pointercancel',e=>{if(pid!==e.pointerId)return;pid=null;end()},{passive:true});
+    }
+  });
+}
+function bindAll(){document.querySelectorAll('.v38-overlay').forEach(bindSwipe)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bindAll,{once:true});else bindAll();
+
+/* Ensure every open starts from a pristine transform state. */
+const V=window.V38=window.V38||{};
+['openVoucher','openTerms','openVariant'].forEach(name=>{
+  const old=V[name];
+  if(typeof old!=='function'||old.__v43)return;
+  const wrapped=function(){
+    const out=old.apply(this,arguments);
+    requestAnimationFrame(()=>{
+      bindAll();
+      document.querySelectorAll('.v38-overlay.show').forEach(resetSheet);
+    });
+    return out;
+  };
+  wrapped.__v43=true;V[name]=wrapped;
+});
 })();
 </script>
