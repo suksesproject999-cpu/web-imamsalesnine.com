@@ -32263,6 +32263,50 @@ requestAnimationFrame(()=>{if((window.currentPage||'')==='cart')enhanceCart();if
 })();
 </script>
 
+
+
+<!-- =========================================================
+     V46 REVIEW MEDIA MOUNT FIX
+     Root fix: attach media uploader after legacy review compose re-renders.
+     Isolated to review media lifecycle only.
+========================================================= -->
+<style id="v46-review-media-mountfix-css">
+.v17-review-compose .v45-media-uploader{display:block!important;visibility:visible!important;opacity:1!important}
+.v17-review-compose .v45-add-media{display:inline-flex!important}
+</style>
+<script id="v46-review-media-mountfix-js">
+(function(){
+'use strict';
+if(window.__V46_REVIEW_MEDIA_MOUNTFIX__)return;
+window.__V46_REVIEW_MEDIA_MOUNTFIX__=true;
+let scheduled=false,lastCompose=null;
+function user(){try{return firebase.auth().currentUser}catch(_){return null}}
+function mount(){
+  scheduled=false;
+  const compose=document.querySelector('#product-grid-auto .v17-review-compose');
+  if(!compose||!user())return;
+  if(compose.querySelector('.v45-media-uploader')){lastCompose=compose;return}
+  compose.removeAttribute('data-v45');
+  try{window.V45Review?.enhanceCompose?.()}catch(e){console.warn('V46 media mount failed',e)}
+  lastCompose=compose;
+}
+function schedule(){if(scheduled)return;scheduled=true;requestAnimationFrame(()=>setTimeout(mount,0))}
+function startObserver(){
+  const root=document.getElementById('product-grid-auto');if(!root)return;
+  const mo=new MutationObserver(muts=>{
+    for(const m of muts){if(m.type!=='childList')continue;const c=document.querySelector('#product-grid-auto .v17-review-compose');if(c&&(c!==lastCompose||!c.querySelector('.v45-media-uploader'))){schedule();break}}
+  });
+  mo.observe(root,{childList:true,subtree:true});
+  window.__V46_REVIEW_MEDIA_OBSERVER__=mo;
+}
+try{firebase.auth().onAuthStateChanged(()=>{setTimeout(schedule,40);setTimeout(schedule,220)})}catch(_){}
+window.addEventListener('hashchange',()=>{setTimeout(schedule,60);setTimeout(schedule,260)});
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{startObserver();schedule();setTimeout(schedule,260)},{once:true});
+else{startObserver();schedule();setTimeout(schedule,260)}
+})();
+</script>
+
+
 </body>
 </html>
 
@@ -36143,6 +36187,8 @@ async function deletePaths(paths){const storage=getStorage();if(!storage)return;
 async function preloadExisting(pid){
   const user=authUser(),db=dbObj();if(!user||!db)return;try{const snap=await db.collection('ulasan_produk').doc(`${user.uid}_${pid}`).get(),d=snap.exists?(snap.data()||{}):{};const media=Array.isArray(d.media)?d.media:[];selected=media.map(m=>({...m,local:false,preview:m.thumbUrl||m.posterUrl||m.url||''}));renderPreview()}catch(_){}
 }
+V.enhanceCompose=enhanceCompose;
+V.handleFiles=onFiles;
 function enhanceCompose(){
   const compose=document.querySelector('.v17-review-compose');if(!compose||compose.dataset.v45==='1')return;const user=authUser();if(!user)return;compose.dataset.v45='1';compose.classList.add('v45-media-ready');
   const submit=compose.querySelector('.v17-primary');if(!submit)return;
