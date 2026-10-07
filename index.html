@@ -32307,6 +32307,108 @@ else{startObserver();schedule();setTimeout(schedule,260)}
 </script>
 
 
+
+
+<!-- V47: voucher eligibility sync only -->
+<script id="v47-voucher-eligibility-sync-js">
+(function(){
+'use strict';
+if(window.__V47_VOUCHER_ELIGIBILITY_SYNC__) return;
+window.__V47_VOUCHER_ELIGIBILITY_SYNC__=true;
+
+function cartSubtotal(){
+  try{
+    const items=window.cart || (typeof cart!=='undefined'?cart:[]) || [];
+    return items.reduce((sum,item)=>sum+(Number(item?.harga)||0)*(Number(item?.qty)||0),0);
+  }catch(_){return 0}
+}
+function voucherEligible(v,subtotal){
+  if(!v) return false;
+  const expired=!!(v.expired && new Date()>new Date(String(v.expired)+'T23:59:59'));
+  return !expired && subtotal>=Number(v.min||0);
+}
+function readSelected(){
+  try{return typeof getSelectedVouchers==='function'?(getSelectedVouchers()||{}):JSON.parse(localStorage.getItem('selectedVouchers')||'{}')}catch(_){return {}}
+}
+function writeSelected(sel){
+  try{
+    if(typeof saveSelectedVouchers==='function') saveSelectedVouchers(sel);
+    else localStorage.setItem('selectedVouchers',JSON.stringify(sel));
+  }catch(_){}
+}
+function sanitizeSelectedVouchers(){
+  const subtotal=cartSubtotal();
+  const current=readSelected();
+  const next={...current};
+  let changed=false;
+  ['product','shipping'].forEach(slot=>{
+    if(next[slot] && !voucherEligible(next[slot],subtotal)){
+      delete next[slot];
+      changed=true;
+    }
+  });
+  if(changed){
+    writeSelected(next);
+    try{window.restoreVoucherUI?.()}catch(_){}
+  }
+  return {selected:next,changed,subtotal};
+}
+window.__v47SanitizeSelectedVouchers=sanitizeSelectedVouchers;
+
+/* Make every summary calculation start from valid voucher state only. */
+try{
+  const original=(typeof getCartSummary==='function'?getCartSummary:window.getCartSummary);
+  if(typeof original==='function' && !original.__v47Wrapped){
+    const wrapped=function(){sanitizeSelectedVouchers();return original.apply(this,arguments)};
+    wrapped.__v47Wrapped=true;
+    window.getCartSummary=wrapped;
+    try{getCartSummary=wrapped}catch(_){}
+  }
+}catch(_){}
+
+/* Voucher sheet must never show an ineligible voucher as selected. */
+const V=window.V38=window.V38||{};
+if(typeof V.renderVoucherList==='function' && !V.renderVoucherList.__v47Wrapped){
+  const original=V.renderVoucherList;
+  const wrapped=function(){sanitizeSelectedVouchers();return original.apply(this,arguments)};
+  wrapped.__v47Wrapped=true;
+  V.renderVoucherList=wrapped;
+}
+if(typeof V.openVoucher==='function' && !V.openVoucher.__v47Wrapped){
+  const original=V.openVoucher;
+  const wrapped=function(){sanitizeSelectedVouchers();const out=original.apply(this,arguments);setTimeout(()=>{try{V.renderVoucherList?.()}catch(_){}},0);return out};
+  wrapped.__v47Wrapped=true;
+  V.openVoucher=wrapped;
+}
+
+/* If cart value changes while the page is open, clean stale labels immediately. */
+function syncVisibleVoucherCopy(){
+  const state=sanitizeSelectedVouchers();
+  if(!state.changed) return;
+  try{
+    if((window.currentPage||'')==='cart') window.renderCart?.();
+    else if((window.currentPage||'')==='checkout') window.__v40BuildCheckout?.();
+  }catch(_){}
+  requestAnimationFrame(()=>{
+    try{V.renderVoucherList?.()}catch(_){}
+    document.querySelectorAll('.v38-voucher-entry small,.v39-cart-voucher-copy small').forEach(el=>{
+      const s=readSelected();
+      const names=[s.product,s.shipping].filter(Boolean).map(v=>v.name||v.id);
+      el.textContent=names.length?names.join(' + '):'Pilih voucher untuk pesanan Anda';
+    });
+  });
+}
+
+/* Quantity/variant changes already fire clicks; this only reconciles voucher state after them. */
+document.addEventListener('click',function(e){
+  if(e.target.closest('.cart-qty button,.qty-control button,.v38-qty button,.v41-qty-stepper button,.v39-variant-trigger,.v38-edit-variant,[data-v40-edit]')){
+    setTimeout(syncVisibleVoucherCopy,0);
+  }
+},false);
+
+setTimeout(syncVisibleVoucherCopy,0);
+})();
+</script>
 </body>
 </html>
 
