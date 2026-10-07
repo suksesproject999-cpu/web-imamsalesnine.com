@@ -32052,6 +32052,204 @@ V.trackAwb=async function(){buildUI();const awb=cleanAwb(awbInput()?.value),c=co
 const init=()=>{buildUI()};if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
+
+
+<!-- =========================================================
+     V37 PREMIUM ENGAGEMENT — STATS / MALL THEMES / LIKE / MENU ICONS / WHATSAPP
+     Scope intentionally limited. V36 mobile stability, product detail,
+     purchase promo, auth, tracking and marketplace logic remain untouched.
+========================================================= -->
+<style id="v37-premium-engagement-css">
+/* A. Responsive stats: fixed geometry prevents counter-induced layout shift. */
+.stats{
+  grid-template-columns:repeat(3,minmax(0,1fr))!important;
+  gap:clamp(6px,2.2vw,22px)!important;
+  padding:clamp(34px,7vw,70px) clamp(10px,3vw,24px)!important;
+  align-items:stretch!important;
+  overflow:hidden!important;
+}
+.stats .stat{
+  min-width:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:8px!important;
+  padding:clamp(10px,2.5vw,20px) 4px!important;
+  border-radius:18px;
+}
+.stats .stat h2{
+  width:100%!important;
+  min-width:0!important;
+  margin:0!important;
+  display:flex!important;
+  align-items:center!important;
+  justify-content:center!important;
+  gap:clamp(4px,1vw,9px)!important;
+  font-size:clamp(18px,5.7vw,42px)!important;
+  line-height:1!important;
+  white-space:nowrap!important;
+  letter-spacing:-.035em!important;
+  font-variant-numeric:tabular-nums!important;
+}
+.stats .stat h2 i{
+  flex:0 0 auto!important;
+  font-size:.72em!important;
+}
+.stats .stat .counter{
+  display:inline-block!important;
+  min-width:3.9ch!important;
+  text-align:center!important;
+  font-variant-numeric:tabular-nums!important;
+  contain:layout paint!important;
+}
+.stats .stat p{
+  margin:0!important;
+  max-width:100%!important;
+  font-size:clamp(11px,3.2vw,18px)!important;
+  line-height:1.25!important;
+  text-align:center!important;
+  white-space:normal!important;
+}
+@media(max-width:360px){
+  .stats{gap:4px!important;padding-left:6px!important;padding-right:6px!important}
+  .stats .stat{padding-left:1px!important;padding-right:1px!important}
+  .stats .stat h2{font-size:clamp(16px,5.3vw,20px)!important;gap:3px!important}
+  .stats .stat p{font-size:10.5px!important}
+}
+
+/* B. Shopping Mall premium themes — background only, zero layout movement. */
+#shoppingMallHero{
+  transition:background 1.15s ease,box-shadow 1.15s ease,border-color 1.15s ease!important;
+  border:1px solid rgba(140,198,63,.08);
+  isolation:isolate;
+}
+#shoppingMallHero .mall-glow,
+#shoppingMallHero .mall-pattern{
+  transition:opacity 1.1s ease,background 1.1s ease,filter 1.1s ease!important;
+}
+body:not(.dark-mode) #shoppingMallHero.v37-theme-0{background:linear-gradient(135deg,#fff,#f9fff4 45%,#eef9e6 100%)!important;box-shadow:0 18px 42px rgba(0,0,0,.08)!important}
+body:not(.dark-mode) #shoppingMallHero.v37-theme-1{background:linear-gradient(135deg,#fbfff7,#f1f9e8 42%,#ffffff 100%)!important;box-shadow:0 18px 46px rgba(112,157,53,.12)!important}
+body:not(.dark-mode) #shoppingMallHero.v37-theme-2{background:linear-gradient(145deg,#ffffff,#f5f7f2 48%,#eaf6dd 100%)!important;box-shadow:0 20px 48px rgba(37,54,28,.10)!important}
+body:not(.dark-mode) #shoppingMallHero.v37-theme-3{background:linear-gradient(130deg,#f7ffeF,#ffffff 50%,#f0f8e8 100%)!important;box-shadow:0 18px 48px rgba(140,198,63,.14)!important}
+#shoppingMallHero.v37-theme-1 .mall-glow{opacity:.25!important}
+#shoppingMallHero.v37-theme-2 .mall-glow{opacity:.11!important}
+#shoppingMallHero.v37-theme-3 .mall-glow{opacity:.22!important}
+#shoppingMallHero.v37-theme-1 .mall-pattern{opacity:.42!important}
+#shoppingMallHero.v37-theme-2 .mall-pattern{opacity:.28!important;background-size:28px 28px!important}
+#shoppingMallHero.v37-theme-3 .mall-pattern{opacity:.50!important;background-size:18px 18px!important}
+body.dark-mode #shoppingMallHero.v37-theme-0,
+body.dark-mode #shoppingMallHero.v37-theme-2{background:linear-gradient(135deg,#171b15,#20271b 48%,#11150f)!important}
+body.dark-mode #shoppingMallHero.v37-theme-1,
+body.dark-mode #shoppingMallHero.v37-theme-3{background:linear-gradient(135deg,#141713,#222b1a 52%,#151914)!important}
+
+/* C. Premium attention micro-interaction, short-lived and non-layout-shifting. */
+#btnLike.v37-spectrum,
+#btnWhatsApp.v37-spectrum{
+  border-radius:50%;
+  will-change:filter;
+  animation:v37Spectrum 2.15s ease-in-out 0s 3;
+}
+@keyframes v37Spectrum{
+  0%,100%{filter:drop-shadow(0 0 0 rgba(140,198,63,0))}
+  22%{filter:drop-shadow(0 0 7px rgba(140,198,63,.9)) drop-shadow(0 0 14px rgba(255,255,255,.45))}
+  48%{filter:drop-shadow(0 0 11px rgba(255,63,95,.72)) drop-shadow(0 0 20px rgba(140,198,63,.42))}
+  72%{filter:drop-shadow(0 0 8px rgba(140,198,63,.76))}
+}
+#btnWhatsApp{color:#25D366!important}
+.v37-wa-label{font-size:10px!important;font-weight:800!important;letter-spacing:.02em}
+
+/* D. Hamburger icon column restored, compact and aligned. */
+#topMenu.v29-drawer .v29-menu-row{
+  grid-template-columns:38px minmax(0,1fr) 18px!important;
+  gap:10px!important;
+}
+.v37-menu-icon{
+  width:34px;height:34px;border-radius:10px;
+  display:grid;place-items:center;
+  background:#f1f8e8;color:#79ad31;
+  font-size:14px;flex:0 0 34px;
+}
+body.dark-mode .v37-menu-icon{background:#222d1a;color:#9bd455}
+@media(max-width:360px){
+  #topMenu.v29-drawer .v29-menu-row{grid-template-columns:34px minmax(0,1fr) 16px!important;gap:8px!important}
+  .v37-menu-icon{width:31px;height:31px;font-size:13px}
+}
+
+@media(prefers-reduced-motion:reduce){
+  #shoppingMallHero,#shoppingMallHero .mall-glow,#shoppingMallHero .mall-pattern{transition:none!important}
+  #btnLike.v37-spectrum,#btnWhatsApp.v37-spectrum{animation:none!important}
+}
+</style>
+
+<script id="v37-premium-engagement-js">
+(function(){
+  'use strict';
+
+  /* 1. Stabilize stats counter presentation without replacing business values. */
+  document.querySelectorAll('.stats .counter').forEach(el=>{
+    el.style.fontVariantNumeric='tabular-nums';
+    el.setAttribute('aria-live','off');
+  });
+
+  /* 2. Theme rotation runs only while Shopping Mall is visible. */
+  const mall=document.getElementById('shoppingMallHero');
+  let themeIndex=0,themeTimer=0,mallVisible=false;
+  const themes=['v37-theme-0','v37-theme-1','v37-theme-2','v37-theme-3'];
+  function applyTheme(i){
+    if(!mall)return;
+    themes.forEach(c=>mall.classList.remove(c));
+    mall.classList.add(themes[i%themes.length]);
+  }
+  function stopMall(){if(themeTimer){clearInterval(themeTimer);themeTimer=0}}
+  function startMall(){
+    if(!mall||themeTimer||!mallVisible||document.hidden||matchMedia('(prefers-reduced-motion: reduce)').matches)return;
+    themeTimer=setInterval(()=>{themeIndex=(themeIndex+1)%themes.length;applyTheme(themeIndex)},5600);
+  }
+  if(mall){
+    applyTheme(0);
+    if('IntersectionObserver'in window){
+      const io=new IntersectionObserver(es=>{mallVisible=!!es[0]?.isIntersecting;mallVisible?startMall():stopMall()},{threshold:.08});
+      io.observe(mall);
+    }else{mallVisible=true;startMall()}
+    document.addEventListener('visibilitychange',()=>document.hidden?stopMall():startMall());
+  }
+
+  /* 3. LIKE attention: visual notice only. Existing click remains authoritative. */
+  const like=document.getElementById('btnLike');
+  function attention(el,key,delay){
+    if(!el)return;
+    let seen=false;try{seen=sessionStorage.getItem(key)==='1'}catch(_e){}
+    if(seen)return;
+    setTimeout(()=>{
+      el.classList.add('v37-spectrum');
+      setTimeout(()=>el.classList.remove('v37-spectrum'),6900);
+      try{sessionStorage.setItem(key,'1')}catch(_e){}
+    },delay);
+  }
+  attention(like,'v37LikeAttention',1300);
+  like?.addEventListener('click',()=>like.classList.remove('v37-spectrum'),{passive:true});
+
+  /* 4. WhatsApp floating item — insert only once, immediately under Share. */
+  const share=document.getElementById('btnShare')?.closest('.social-item');
+  const rail=document.querySelector('.social-float');
+  if(share&&rail&&!document.getElementById('btnWhatsApp')){
+    const item=document.createElement('div');
+    item.className='social-item v37-wa-item';
+    item.innerHTML='<i id="btnWhatsApp" class="fa-brands fa-whatsapp action-icon" role="button" tabindex="0" aria-label="WhatsApp"></i><span class="v37-wa-label">WA</span>';
+    share.insertAdjacentElement('afterend',item);
+    const wa=item.querySelector('#btnWhatsApp');
+    const go=()=>window.open('https://wa.me/6282210109369','_blank','noopener');
+    wa.addEventListener('click',go);
+    wa.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();go()}});
+    attention(wa,'v37WhatsappAttention',2600);
+    /* V36 centers based on rail height. Trigger a viewport resize event after insertion. */
+    requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')));
+    setTimeout(()=>window.dispatchEvent(new Event('resize')),120);
+  }
+})();
+</script>
+
 </body>
 </html>
 
@@ -34193,7 +34391,7 @@ function wrapAfter(name,getRoot){const f=window[name];if(typeof f!=='function'||
 function installRenderHooks(){wrapAfter('showProduct',()=>$('#product-grid-auto'));wrapAfter('renderCart',()=>$('#product-grid-auto'));wrapAfter('checkoutForm',()=>$('#product-grid-auto'));wrapAfter('renderProductList',()=>$('#product-grid-auto'));wrapAfter('renderRelated',()=>$('#relatedProducts'));wrapAfter('renderRecent',()=>$('#recentProducts'));wrapAfter('renderPromoSlider',()=>$('#promoSliderTrack'));wrapAfter('openAllPromoProducts',()=>$('#product-grid-auto'));wrapAfter('showPage',()=>$('#product-grid-auto')||document.querySelector('main'));wrapAfter('openAI',()=>$('#aiModal'));wrapAfter('openNexaiHybrid',()=>$('#aiModal'))}
 function auth(){try{return firebase.auth()}catch(_e){return null}}
 function closeMenu(){const m=$('#topMenu'),o=$('#menuOverlay'),b=$('#menuBtn');m?.classList.remove('show','active');o?.classList.remove('show');b?.classList.remove('active');b?.setAttribute('aria-expanded','false');document.body.classList.remove('menu-open','v24-menu-open','v25-menu-open','v26-menu-open','v27-menu-open','v29-menu-open')}
-function menuItem(title,sub,action,href='#'){return `<a class="v29-menu-row" href="${href}" data-v29="${action}"><span class="v29-row-copy"><strong>${title}</strong>${sub?`<small>${sub}</small>`:''}</span><i class="fa-solid fa-chevron-right v29-chevron"></i></a>`}
+function menuItem(title,sub,action,href='#'){const icons={home:'fa-house',mall:'fa-store',ai:'fa-robot',cart:'fa-cart-shopping',account:'fa-user',track:'fa-truck-fast',vip:'fa-crown',consult:'fa-headset',legal:'fa-scale-balanced',theme:'fa-circle-half-stroke'};const icon=icons[action]||'fa-circle';return `<a class="v29-menu-row" href="${href}" data-v29="${action}"><span class="v37-menu-icon"><i class="fa-solid ${icon}"></i></span><span class="v29-row-copy"><strong>${title}</strong>${sub?`<small>${sub}</small>`:''}</span><i class="fa-solid fa-chevron-right v29-chevron"></i></a>`}
 function renderMenu(){const m=$('#topMenu');if(!m)return;const L=currentLang(),u=auth()?.currentUser,dark=document.body.classList.contains('dark-mode');m.className='top-menu v29-drawer';m.dataset.v17='1';m.innerHTML=`<div class="v29-drawer-inner"><div class="v29-drawer-head"><div class="v29-drawer-brand"><span class="v29-drawer-logo">n</span><span><strong>Imam Sales</strong><small>Nine Autoseries</small></span></div><button class="v29-close" type="button" data-v29="close" aria-label="Close">×</button></div><div class="v29-lang-wrap"><div class="v29-lang-seg"><button class="v29-lang-btn ${L==='id'?'active':''}" data-lang="id">ID</button><button class="v29-lang-btn ${L==='en'?'active':''}" data-lang="en">EN</button></div></div><div class="v29-menu-scroll"><div class="v29-menu-list">${menuItem(T('Beranda','Home'),T('Kembali ke halaman utama','Back to homepage'),'home')}${menuItem('Shopping Mall',T('Jelajahi seluruh katalog','Browse the full catalog'),'mall','#shoppingMallHero')}${menuItem('AI Assistant',T('Tanya produk & rekomendasi','Ask about products'),'ai')}${menuItem(T('Keranjang','Cart'),T('Lihat produk pilihan Anda','View your selected items'),'cart')}<span class="v29-section-label">${T('Akun & Pesanan','Account & Orders')}</span>${menuItem(u?(u.displayName||u.email?.split('@')[0]||T('Akun Saya','My Account')):T('Masuk / Daftar','Sign In / Register'),u?(u.email||T('Akun aktif','Active account')):T('Akses fitur pelanggan','Access customer features'),'account')}${menuItem(T('Lacak Pesanan','Track Order'),T('Lacak dengan nomor AWB','Track with an AWB number'),'track')}<span class="v29-section-label">${T('Layanan','Services')}</span>${menuItem('Member VVIP',T('Keuntungan member eksklusif','Exclusive member benefits'),'vip','/vip/')}${menuItem(T('Konsultasi Produk','Product Consultation'),T('Bantuan memilih produk','Help choosing products'),'consult','https://wa.me/6282210109369')}${menuItem('Legal',T('Kebijakan & ketentuan','Policies & terms'),'legal','legal.html')}${menuItem(dark?T('Mode Terang','Light Mode'):T('Mode Gelap','Dark Mode'),T('Atur tampilan website','Change website appearance'),'theme')}</div></div><div class="v29-drawer-foot"><span>© Nine Autoseries</span><a href="/login.html?target=product">Admin</a></div></div>`}
 function openMenu(){renderMenu();const m=$('#topMenu'),o=$('#menuOverlay'),b=$('#menuBtn');o?.classList.add('v29-overlay','show');m?.classList.add('show');b?.classList.add('active');b?.setAttribute('aria-expanded','true');document.body.classList.add('v29-menu-open')}
 function toggleMenu(e){e?.preventDefault();e?.stopPropagation();e?.stopImmediatePropagation();$('#topMenu')?.classList.contains('show')?closeMenu():openMenu()}
