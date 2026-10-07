@@ -34302,3 +34302,643 @@ function boot(){const m=$('#topMenu'),oldO=$('#menuOverlay'),oldB=$('#menuBtn');
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
 })();
 </script>
+
+<!-- =========================================================
+     V35 MOBILE STABILITY + PREMIUM PRODUCT DETAIL FINAL
+     Scope: viewport stability, fixed social rail, product detail density,
+     sticky promo context. No auth/tracking/data-flow changes.
+========================================================= -->
+<style id="v35-mobile-detail-final-css">
+/* ---------- 1. GLOBAL VIEWPORT HARDENING ---------- */
+html{
+  width:100%;
+  max-width:100%;
+  overflow-x:hidden!important;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+}
+body{
+  width:100%;
+  max-width:100%;
+  min-width:0!important;
+  overflow-x:hidden!important;
+  position:relative;
+}
+*,*::before,*::after{box-sizing:border-box}
+img,video,canvas,svg,iframe{max-width:100%}
+#product-grid-auto,#category-products,#promo-direct-products,
+.product-detail,.product-header,.gallery-column,.gallery-main,.product-info,
+.product-options,.product-extra,.product-bottom,.section,.container,.main-container{
+  min-width:0!important;
+  max-width:100%!important;
+}
+/* Do not let long dynamic text/AWB/product names force the viewport wider. */
+.product-detail *, .marketplace-card *, .v17-modal *, .purchase-sheet *, .sticky-checkout *{
+  overflow-wrap:anywhere;
+  word-break:normal;
+}
+/* Older browsers simply ignore these; modern browsers get stronger horizontal containment. */
+@supports (overscroll-behavior-x:none){
+  html,body{overscroll-behavior-x:none}
+}
+
+/* ---------- 2. MOBILE FLOATING RAIL: TRUE FIXED, NO SCROLL TRANSFORM ---------- */
+@media(max-width:768px){
+  .social-float,
+  body.sticky-active .social-float,
+  body.v15-card-zone .social-float{
+    position:fixed!important;
+    top:122px!important;
+    right:7px!important;
+    bottom:auto!important;
+    left:auto!important;
+    margin:0!important;
+    transform:none!important;
+    -webkit-transform:none!important;
+    transition:none!important;
+    animation:none!important;
+    gap:11px!important;
+    width:54px!important;
+    max-width:54px!important;
+    z-index:99999!important;
+    will-change:auto!important;
+    -webkit-backface-visibility:hidden;
+    backface-visibility:hidden;
+  }
+  @supports (right:env(safe-area-inset-right)){
+    .social-float,
+    body.sticky-active .social-float,
+    body.v15-card-zone .social-float{
+      right:calc(7px + env(safe-area-inset-right))!important;
+      top:calc(122px + env(safe-area-inset-top))!important;
+    }
+  }
+  .social-float .social-item{
+    width:54px!important;
+    max-width:54px!important;
+    min-width:0!important;
+    transform:none!important;
+    margin:0!important;
+  }
+  .social-float .action-icon{
+    font-size:36px!important;
+    transform:none;
+    transition:opacity .12s ease!important;
+  }
+  .social-float .action-icon:active{transform:none!important;opacity:.72}
+  .social-float .social-item span{font-size:11px!important;margin-top:3px!important}
+}
+@media(max-width:360px), (max-height:600px){
+  .social-float,
+  body.sticky-active .social-float,
+  body.v15-card-zone .social-float{top:108px!important;gap:7px!important;width:46px!important;max-width:46px!important}
+  .social-float .social-item{width:46px!important;max-width:46px!important}
+  .social-float .action-icon{font-size:30px!important}
+  .social-float .social-item span{font-size:9px!important}
+}
+
+/* ---------- 3. PRODUCT DETAIL: PREMIUM INFORMATION ARCHITECTURE ---------- */
+.product-detail{
+  border:1px solid rgba(140,198,63,.10);
+}
+.product-info h4{
+  letter-spacing:.02em;
+}
+.price-area{
+  position:relative;
+}
+
+@media(max-width:768px){
+  .product-detail{
+    width:100%!important;
+    margin:10px auto 0!important;
+    padding:12px!important;
+    border-radius:18px!important;
+    box-shadow:0 8px 28px rgba(20,30,15,.055)!important;
+  }
+  .product-header{gap:13px!important}
+  .gallery-main{
+    border-radius:16px!important;
+    border-color:#e7ebe3!important;
+    box-shadow:0 5px 18px rgba(0,0,0,.035);
+  }
+  .gallery-main > #mainProductImage{
+    width:100%!important;
+    height:calc(100vw - 54px)!important;
+    min-height:250px!important;
+    max-height:440px!important;
+    aspect-ratio:auto!important;
+    object-fit:contain!important;
+  }
+  .gallery-thumb{
+    gap:7px!important;
+    padding:8px 6px 9px!important;
+  }
+  .gallery-thumb img{
+    flex:0 0 58px!important;
+    width:58px!important;
+    height:58px!important;
+    border-radius:11px!important;
+  }
+
+  .product-info{gap:9px!important;padding:0 2px!important}
+  .back-products{margin:2px 0 3px!important}
+  .back-products button{
+    font-size:15px!important;
+    padding:7px 2px!important;
+    line-height:1.2!important;
+  }
+  .product-title{
+    padding:0 48px 0 0!important;
+    min-height:0!important;
+    margin:0!important;
+  }
+  .detail-product-badge{
+    justify-content:flex-start!important;
+    margin:0 0 7px!important;
+  }
+  .detail-product-badge .badge{
+    font-size:10px!important;
+    padding:7px 12px!important;
+    border-radius:999px!important;
+  }
+  .product-title h2{
+    text-align:left!important;
+    font-size:23px!important;
+    line-height:1.22!important;
+    letter-spacing:-.015em!important;
+    margin:0!important;
+  }
+  .wishlist-btn{
+    position:absolute!important;
+    top:24px!important;
+    right:0!important;
+    width:42px!important;
+    height:42px!important;
+    box-shadow:0 4px 14px rgba(0,0,0,.06)!important;
+  }
+  .product-detail-meta{
+    justify-content:flex-start!important;
+    gap:6px!important;
+    margin-top:7px!important;
+    font-size:12.5px!important;
+    color:#565b53!important;
+  }
+  .product-detail-meta .meta-divider{font-size:10px!important}
+  .product-info h4{
+    width:max-content;
+    max-width:100%;
+    font-size:12px!important;
+    padding:6px 10px!important;
+    border-radius:999px!important;
+    background:#f2f8e9!important;
+    margin:2px 0 0!important;
+  }
+
+  .price-area{
+    display:grid!important;
+    grid-template-columns:minmax(0,1fr) auto!important;
+    grid-template-areas:
+      "label label"
+      "price old"
+      "save save"!important;
+    align-items:end!important;
+    column-gap:10px!important;
+    row-gap:6px!important;
+    padding:13px 14px!important;
+    margin-top:2px!important;
+    border:1px solid #e5eddc!important;
+    border-radius:16px!important;
+    background:linear-gradient(145deg,#fbfef8 0%,#f4f9ed 100%)!important;
+  }
+  .price-label{
+    grid-area:label!important;
+    padding:6px 10px!important;
+    font-size:10px!important;
+    line-height:1!important;
+  }
+  .price{
+    grid-area:price!important;
+    font-size:34px!important;
+    line-height:1.05!important;
+    white-space:nowrap!important;
+  }
+  .old-price{
+    grid-area:old!important;
+    justify-content:flex-end!important;
+    gap:6px!important;
+    font-size:12px!important;
+    white-space:nowrap!important;
+    padding-bottom:3px!important;
+  }
+  .discount-badge{font-size:11px!important;padding:4px 7px!important}
+  .save-price{
+    grid-area:save!important;
+    font-size:12.5px!important;
+    margin:0!important;
+  }
+
+  .product-highlights{
+    display:grid!important;
+    grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:7px!important;
+    margin:1px 0 0!important;
+  }
+  .product-highlights span{
+    min-width:0!important;
+    min-height:39px!important;
+    padding:8px 9px!important;
+    border:1px solid #e6eddf!important;
+    border-radius:12px!important;
+    background:#f8fbf4!important;
+    font-size:11.5px!important;
+    line-height:1.2!important;
+    justify-content:flex-start!important;
+  }
+  .product-highlights span i{flex:0 0 auto}
+
+  .product-options{
+    gap:12px!important;
+    padding-top:13px!important;
+    margin-top:3px!important;
+  }
+  .option-group{gap:8px!important}
+  .option-group label{font-size:14px!important}
+  .variant-buttons{gap:7px!important}
+  .variant-btn{
+    padding:9px 13px!important;
+    font-size:12px!important;
+    border-radius:12px!important;
+    min-height:40px!important;
+  }
+
+  .product-extra{gap:10px!important;margin-top:3px!important}
+  .product-description-box,
+  .info-accordion{
+    margin-bottom:0!important;
+    border-radius:14px!important;
+    box-shadow:none!important;
+  }
+  .product-description-box{padding:14px!important}
+  .info-section-header h3{font-size:15px!important;margin-bottom:8px!important}
+  .description-content p{font-size:12.5px!important;line-height:1.65!important}
+  .info-accordion-header{padding:13px 14px!important;font-size:13px!important;min-height:48px!important}
+  .info-accordion-content{padding-left:14px!important;padding-right:14px!important;font-size:12.5px!important}
+  .info-accordion.open .info-accordion-content{padding-bottom:14px!important}
+
+  .product-bottom{margin-top:18px!important;gap:22px!important}
+  .product-bottom section h2{font-size:19px!important;margin-bottom:12px!important}
+  .review-card{padding:15px!important;gap:16px!important;border-radius:16px!important}
+  .score-number{font-size:46px!important}
+  .v17-reviews{margin-top:12px!important;padding:15px!important;border-radius:16px!important}
+}
+
+@media(max-width:360px){
+  .product-detail{padding:9px!important}
+  .gallery-main > #mainProductImage{height:calc(100vw - 38px)!important;min-height:220px!important}
+  .product-title h2{font-size:20px!important}
+  .price-area{padding:11px!important;column-gap:6px!important}
+  .price{font-size:29px!important}
+  .old-price{font-size:10.5px!important}
+  .product-highlights{grid-template-columns:1fr 1fr!important;gap:6px!important}
+  .product-highlights span{font-size:10.5px!important;padding:7px!important}
+  .variant-btn{padding:8px 10px!important;font-size:11px!important;min-height:37px!important}
+}
+
+/* ---------- 4. STICKY CHECKOUT PROMO CONTEXT ---------- */
+.v35-sticky-promo{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:6px;
+  margin-top:5px;
+}
+.v35-sticky-discount{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:22px;
+  padding:3px 7px;
+  border-radius:7px;
+  background:#fff0f0;
+  color:#d92c2c;
+  font-size:10px;
+  font-weight:800;
+  line-height:1;
+}
+.v35-sticky-save{
+  font-size:10px;
+  font-weight:700;
+  color:#e44747;
+  line-height:1.25;
+}
+@media(max-width:768px){
+  .sticky-checkout{
+    left:8px!important;
+    right:8px!important;
+    width:auto!important;
+    max-width:calc(100% - 16px)!important;
+    padding:12px 12px calc(12px + env(safe-area-inset-bottom))!important;
+    border-radius:20px!important;
+    -webkit-backdrop-filter:none!important;
+    backdrop-filter:none!important;
+  }
+  .sticky-info{min-width:0!important;flex:1 1 auto!important}
+  .sticky-info #stickyName{
+    display:block!important;
+    max-width:100%!important;
+    white-space:nowrap!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+  }
+  .v35-sticky-promo{gap:5px!important;margin-top:4px!important}
+  .sticky-actions{gap:8px!important}
+  .sticky-icon-btn{width:48px!important;height:48px!important;border-radius:14px!important}
+  .sticky-buy-btn{height:48px!important;border-radius:14px!important;font-size:15px!important}
+}
+
+/* Dark surfaces preserve the existing theme while keeping new blocks readable. */
+body.dark-mode .price-area{background:#171c14!important;border-color:#314025!important}
+body.dark-mode .product-highlights span{background:#171c14!important;border-color:#314025!important}
+body.dark-mode .product-info h4{background:#1c2616!important}
+body.dark-mode .v35-sticky-discount{background:#3a1d1f!important;color:#ff8d94!important}
+body.dark-mode .v35-sticky-save{color:#ff8d94!important}
+
+/* Keep accessibility preference respected. */
+@media(prefers-reduced-motion:reduce){
+  .social-float,.social-float *{transition:none!important;animation:none!important}
+}
+</style>
+
+<script id="v35-mobile-detail-final-js">
+(function(){
+  'use strict';
+  function currentProductSafe(){
+    try{
+      if(typeof currentProduct!=='undefined' && currentProduct) return currentProduct;
+    }catch(_e){}
+    return window.currentProduct||null;
+  }
+  function qtySafe(){
+    try{
+      if(typeof selectedQty!=='undefined' && Number(selectedQty)>0) return Number(selectedQty);
+    }catch(_e){}
+    const q=Number(document.getElementById('stickyQty')?.textContent||1);
+    return Number.isFinite(q)&&q>0?q:1;
+  }
+  function money(n){
+    try{return 'Rp '+Math.max(0,Number(n)||0).toLocaleString('id-ID')}catch(_e){return 'Rp '+(Number(n)||0)}
+  }
+  function syncStickyPromo(){
+    const sticky=document.getElementById('stickyCheckout');
+    const info=sticky?.querySelector('.sticky-info');
+    if(!info)return;
+    const p=currentProductSafe();
+    if(!p)return;
+    let row=info.querySelector('.v35-sticky-promo');
+    const promo=Number(p?.harga?.promo||p?.harga?.normal||0);
+    const normal=Number(p?.harga?.normal||promo);
+    if(!(normal>promo&&promo>0)){
+      row?.remove();
+      return;
+    }
+    if(!row){
+      row=document.createElement('div');
+      row.className='v35-sticky-promo';
+      row.innerHTML='<span class="v35-sticky-discount"></span><span class="v35-sticky-save"></span>';
+      const box=info.querySelector('.sticky-price-box');
+      if(box?.nextSibling)info.insertBefore(row,box.nextSibling);else info.appendChild(row);
+    }
+    const pct=Math.max(1,Math.round((1-(promo/normal))*100));
+    const qty=qtySafe();
+    row.querySelector('.v35-sticky-discount').textContent='-'+pct+'%';
+    row.querySelector('.v35-sticky-save').textContent='Hemat '+money((normal-promo)*qty);
+  }
+
+  /* Hook only presentation refreshes; commerce logic remains the original V34 code. */
+  const oldUpdate=window.updateStickySummary;
+  if(typeof oldUpdate==='function'&&!oldUpdate.__v35Promo){
+    const wrapped=function(){
+      const out=oldUpdate.apply(this,arguments);
+      syncStickyPromo();
+      return out;
+    };
+    wrapped.__v35Promo=true;
+    window.updateStickySummary=wrapped;
+    try{updateStickySummary=wrapped}catch(_e){}
+  }
+
+  const oldShow=window.showProduct;
+  if(typeof oldShow==='function'&&!oldShow.__v35Detail){
+    const wrappedShow=async function(){
+      const out=await oldShow.apply(this,arguments);
+      requestAnimationFrame(syncStickyPromo);
+      return out;
+    };
+    wrappedShow.__v35Detail=true;
+    window.showProduct=wrappedShow;
+    try{showProduct=wrappedShow}catch(_e){}
+  }
+
+  /* When older code mutates the visible qty text directly, keep savings in sync. */
+  let qtyObserver=null;
+  function watchStickyQty(){
+    qtyObserver?.disconnect?.();
+    const q=document.getElementById('stickyQty');
+    if(!q)return;
+    qtyObserver=new MutationObserver(syncStickyPromo);
+    qtyObserver.observe(q,{childList:true,characterData:true,subtree:true});
+    syncStickyPromo();
+  }
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',()=>requestAnimationFrame(watchStickyQty),{once:true});
+  }else requestAnimationFrame(watchStickyQty);
+
+  /* Reattach only after detail navigation; no global mutation scanning. */
+  const root=document.getElementById('product-grid-auto');
+  if(root && 'MutationObserver' in window){
+    let raf=0;
+    const obs=new MutationObserver(()=>{
+      cancelAnimationFrame(raf);
+      raf=requestAnimationFrame(()=>{watchStickyQty();syncStickyPromo()});
+    });
+    obs.observe(root,{childList:true});
+  }
+})();
+</script>
+
+<!-- =========================================================
+     V36 FINAL — CENTERED FLOAT RAIL + PURCHASE SHEET PROMO
+     Scope only: visual vertical centering for fixed right rail and
+     promo context inside Buy Now / Add to Cart purchase sheet.
+========================================================= -->
+<style id="v36-float-purchase-final-css">
+/* Keep the V35 fixed rail mechanics; only its vertical anchor is recalculated by JS. */
+@media (max-width:768px){
+  .social-float,
+  body.sticky-active .social-float,
+  body.v15-card-zone .social-float{
+    bottom:auto!important;
+    transform:none!important;
+    -webkit-transform:none!important;
+    margin:0!important;
+  }
+}
+
+/* Compact marketplace-style promo information inside the purchase sheet. */
+.purchase-info .v36-purchase-promo{
+  display:flex;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:7px;
+  margin-top:7px;
+}
+.purchase-info .v36-purchase-discount{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-height:24px;
+  padding:4px 8px;
+  border-radius:8px;
+  background:#fff0f1;
+  color:#e12f3c;
+  border:1px solid rgba(225,47,60,.10);
+  font-size:11px;
+  font-weight:800;
+  line-height:1;
+  white-space:nowrap;
+}
+.purchase-info .v36-purchase-save{
+  display:inline-flex;
+  align-items:center;
+  min-height:24px;
+  padding:4px 8px;
+  border-radius:8px;
+  background:#f3f9ea;
+  color:#5d8f24;
+  border:1px solid rgba(140,198,63,.20);
+  font-size:11px;
+  font-weight:800;
+  line-height:1.2;
+  white-space:nowrap;
+}
+@media(max-width:360px){
+  .purchase-info .v36-purchase-promo{gap:5px;margin-top:5px}
+  .purchase-info .v36-purchase-discount,
+  .purchase-info .v36-purchase-save{font-size:10px;padding:4px 6px;min-height:22px}
+}
+body.dark-mode .purchase-info .v36-purchase-discount{
+  background:#3a1d22;
+  color:#ff919a;
+  border-color:#5d2a31;
+}
+body.dark-mode .purchase-info .v36-purchase-save{
+  background:#1d2916;
+  color:#9ed85a;
+  border-color:#334627;
+}
+</style>
+
+<script id="v36-float-purchase-final-js">
+(function(){
+  'use strict';
+
+  /* ---------- A. TRUE VISUAL-VIEWPORT CENTERING, WITHOUT SCROLL TRANSFORMS ---------- */
+  let centerRaf=0;
+  function centerFloatingRail(){
+    const rail=document.querySelector('.social-float');
+    if(!rail || window.innerWidth>768) return;
+    cancelAnimationFrame(centerRaf);
+    centerRaf=requestAnimationFrame(()=>{
+      const vv=window.visualViewport;
+      const viewportH=(vv&&Number(vv.height))||window.innerHeight||document.documentElement.clientHeight||0;
+      const viewportTop=(vv&&Number(vv.offsetTop))||0;
+      const railH=rail.getBoundingClientRect().height||0;
+      if(!viewportH||!railH)return;
+      /* Exact center of the visible mobile viewport, with a tiny safe clamp. */
+      const safeTop=Math.max(6,Math.round(viewportTop+(viewportH-railH)/2));
+      rail.style.setProperty('top',safeTop+'px','important');
+      rail.style.setProperty('bottom','auto','important');
+      rail.style.setProperty('transform','none','important');
+      rail.style.setProperty('-webkit-transform','none','important');
+    });
+  }
+
+  function scheduleRailCenter(){
+    centerFloatingRail();
+    setTimeout(centerFloatingRail,80);
+    setTimeout(centerFloatingRail,240);
+  }
+
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',scheduleRailCenter,{once:true});
+  }else scheduleRailCenter();
+  window.addEventListener('resize',scheduleRailCenter,{passive:true});
+  window.addEventListener('orientationchange',()=>setTimeout(scheduleRailCenter,120),{passive:true});
+  window.addEventListener('pageshow',scheduleRailCenter,{passive:true});
+  /* Resize only, deliberately no visualViewport scroll listener: avoids rail jitter while scrolling. */
+  try{window.visualViewport?.addEventListener('resize',scheduleRailCenter,{passive:true})}catch(_e){}
+
+  /* ---------- B. PROMO CONTEXT INSIDE BUY / CART PURCHASE SHEET ---------- */
+  function currentProductSafe(){
+    try{if(typeof currentProduct!=='undefined'&&currentProduct)return currentProduct}catch(_e){}
+    return window.currentProduct||null;
+  }
+  function qtySafe(){
+    try{if(typeof selectedQty!=='undefined'&&Number(selectedQty)>0)return Number(selectedQty)}catch(_e){}
+    const q=Number(document.getElementById('purchaseQtyInput')?.value||1);
+    return Number.isFinite(q)&&q>0?q:1;
+  }
+  function money(n){
+    try{return 'Rp '+Math.max(0,Number(n)||0).toLocaleString('id-ID')}catch(_e){return 'Rp '+Math.max(0,Number(n)||0)}
+  }
+  function currentLang(){
+    try{return localStorage.getItem('nineLanguage')==='en'?'en':'id'}catch(_e){return'id'}
+  }
+  function paintPurchasePromo(){
+    const info=document.querySelector('#purchaseContent .purchase-info');
+    if(!info)return;
+    const p=currentProductSafe();
+    if(!p)return;
+    const promo=Number(p?.harga?.promo||p?.harga?.normal||0);
+    const normal=Number(p?.harga?.normal||promo);
+    let row=info.querySelector('.v36-purchase-promo');
+    if(!(normal>promo&&promo>0)){
+      row?.remove();
+      return;
+    }
+    if(!row){
+      row=document.createElement('div');
+      row.className='v36-purchase-promo';
+      row.innerHTML='<span class="v36-purchase-discount"></span><span class="v36-purchase-save"></span>';
+      const price=info.querySelector('.purchase-price');
+      if(price?.nextSibling) info.insertBefore(row,price.nextSibling); else info.appendChild(row);
+    }
+    const pct=Math.max(1,Math.round((1-(promo/normal))*100));
+    const save=Math.max(0,(normal-promo)*qtySafe());
+    row.querySelector('.v36-purchase-discount').textContent='-'+pct+'%';
+    row.querySelector('.v36-purchase-save').textContent=(currentLang()==='en'?'Save ':'Hemat ')+money(save);
+  }
+
+  const oldRender=window.renderPurchaseSheet;
+  if(typeof oldRender==='function'&&!oldRender.__v36Promo){
+    const wrapped=function(){
+      const out=oldRender.apply(this,arguments);
+      paintPurchasePromo();
+      return out;
+    };
+    wrapped.__v36Promo=true;
+    window.renderPurchaseSheet=wrapped;
+    try{renderPurchaseSheet=wrapped}catch(_e){}
+  }
+
+  /* If purchase sheet is already open when language changes, repaint just this promo row. */
+  document.addEventListener('nine:languagechange',()=>{
+    if(document.getElementById('purchaseSheet')?.classList.contains('show')){
+      requestAnimationFrame(paintPurchasePromo);
+    }
+  });
+
+  window.V36={centerFloatingRail,paintPurchasePromo};
+})();
+</script>
