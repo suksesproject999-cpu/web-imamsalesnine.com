@@ -20071,9 +20071,15 @@ localStorage.setItem(
 JSON.stringify(wishlist)
 );
 
-showProduct(
-allProducts.find(p=>p.id===id).nama
-);
+// V54: Wishlist changes must never re-open product detail or increment views.
+const active = allProducts.find(p=>String(p.id)===String(id));
+if(currentProduct && active && String(currentProduct.id)===String(id)){
+  document.querySelectorAll('#product-grid-auto .product-detail .wishlist-btn').forEach(btn=>{
+    btn.textContent=wishlist.some(x=>String(x)===String(id))?'❤️':'🤍';
+    btn.setAttribute('aria-pressed',String(wishlist.some(x=>String(x)===String(id))));
+  });
+}
+document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{id,added:wishlist.some(x=>String(x)===String(id))}}));
 
 }
 
@@ -20152,7 +20158,7 @@ currentProduct = product;
 // Catat view asli setiap kali halaman detail produk dibuka.
 // Tidak memblokir render detail jika jaringan/Firestore sedang lambat.
 Promise.resolve()
-    .then(() => incrementProductView(product.id))
+    .then(() => window.V54Views ? window.V54Views.visit(product.id) : incrementProductView(product.id))
     .then((views) => {
         if(Number.isFinite(Number(views))){
             product.views = Number(views);
@@ -32774,6 +32780,150 @@ if(root&&window.MutationObserver)new MutationObserver(schedule).observe(root,{ch
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
 })();
 </script>
+<!-- V54: Favorites + Global View Listener + Floating Search; sales logic untouched -->
+<style id="v54-styles">
+#v54-favorites{display:none;position:fixed;inset:0;z-index:2147482000;background:var(--bg-color,#f7f8f6);color:inherit;overflow-y:auto;overscroll-behavior:contain;padding:env(safe-area-inset-top) 12px 35px}
+#v54-favorites.v54-open{display:block}
+#v54-favorites .v54-header{position:sticky;top:0;z-index:3;display:flex;align-items:center;gap:12px;background:var(--bg-color,#fff);padding:16px 8px;border-bottom:1px solid #dfe6d9}
+#v54-favorites .v54-back{border:0;background:#8cc63f;color:#14200d;border-radius:11px;padding:10px 14px;font-weight:700}
+#v54-favorites .v54-title{font-size:19px;font-weight:800}
+#v54-favorites .v54-grid{max-width:1000px;margin:18px auto;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+#v54-favorites .v54-grid>.marketplace-card{min-width:0}
+#v54-favorites .v54-empty{text-align:center;padding:65px 18px;grid-column:1/-1;color:#7b8475}
+@media(min-width:720px){#v54-favorites .v54-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+body.dark-mode #v54-favorites{background:#121716;color:#eef4eb}body.dark-mode #v54-favorites .v54-header{background:#171e1a;border-color:#354232}
+.v54-menu-fav .v54-fav-count{margin-left:auto;font-size:11px;font-weight:800;background:#eef9e1;color:#3c7417;border-radius:99px;padding:3px 8px}
+.v54-search-item{position:relative}.v54-search-item .v54-search-btn{border:0;background:none;color:inherit;cursor:pointer;font-size:19px;padding:2px}
+#v54-search-pop{display:none;position:fixed;right:68px;z-index:2147480000;width:min(74vw,340px);background:#fff;border:1px solid #dfe7d9;border-radius:16px;padding:7px;box-shadow:0 9px 30px #0003;align-items:center;gap:6px}
+#v54-search-pop.v54-visible{display:flex}#v54-search-pop input{min-width:0;flex:1;padding:9px 6px;border:0;outline:0;background:transparent;color:#202820;font-size:14px}#v54-search-pop button{border:0;background:transparent;padding:6px;cursor:pointer;color:#555}
+body.dark-mode #v54-search-pop{background:#1e2720;border-color:#354232}body.dark-mode #v54-search-pop input{color:#fff}
+</style>
+<div id="v54-favorites" role="dialog" aria-modal="true" aria-label="Produk Favorit"><div class="v54-header"><button type="button" class="v54-back" id="v54-fav-back">← Kembali</button><span class="v54-title" id="v54-fav-title">♡ Produk Favorit</span></div><div class="v54-grid" id="v54-fav-grid"></div></div>
+<div id="v54-search-pop"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="v54-search-input" type="search" placeholder="Cari produk Nine..." autocomplete="off" aria-label="Cari produk"><button type="button" id="v54-search-close" aria-label="Tutup pencarian">✕</button></div>
+<script id="v54-features-js">
+(function(){'use strict';
+const $=s=>document.querySelector(s);
+const lang=()=>localStorage.getItem('nine_language')==='en'||document.documentElement.lang==='en';
+const txt=(a,b)=>lang()?b:a;
+const key=id=>String(id);
+const favorites=()=>{try{return JSON.parse(localStorage.getItem('wishlist')||'[]').map(key)}catch(_){return []}};
+function products(){try{return typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:[]}catch(_){return []}}
+function syncWishlist(){try{wishlist=JSON.parse(localStorage.getItem('wishlist')||'[]')}catch(_){}}
+function favRender(){const list=favorites(),items=products().filter(p=>list.includes(key(p.id))),grid=$('#v54-fav-grid');if(!grid)return;
+ $('#v54-fav-title').textContent=txt('♡ Produk Favorit','♡ Favorite Products')+' ('+items.length+')';
+ grid.innerHTML=items.length?items.map(p=>typeof renderMarketplaceCard==='function'?renderMarketplaceCard(p):'').join(''):'<div class="v54-empty"><i class="fa-regular fa-heart" style="font-size:38px"></i><h3>'+txt('Belum ada produk favorit','No favorite products yet')+'</h3><p>'+txt('Tekan ikon hati pada detail produk untuk menyimpannya.','Tap the heart on a product to save it.')+'</p></div>';
+ if(items.length){requestAnimationFrame(()=>{try{items.forEach(p=>{if(typeof updateProductSold==='function')updateProductSold(p.id);if(typeof updateProductRating==='function')updateProductRating(p.id)});if(typeof updateAllProductBadges==='function')updateAllProductBadges()}catch(e){console.warn('V54 favorites badges',e)}})}
+}
+function openFav(){try{window.V29?.closeMenu?.()}catch(_){}syncWishlist();favRender();$('#v54-favorites').classList.add('v54-open');document.body.style.overflow='hidden'}
+function closeFav(){$('#v54-favorites').classList.remove('v54-open');document.body.style.overflow=''}
+$('#v54-fav-back').addEventListener('click',closeFav);
+$('#v54-fav-grid').addEventListener('click',e=>{const a=e.target.closest('a,button,[onclick]');if(!a)return;const wasWish=a.matches('.wishlist-btn')||a.closest('.wishlist-btn');if(wasWish){e.preventDefault();e.stopPropagation();const raw=a.getAttribute('onclick')||'';const m=raw.match(/toggleWishlist\(([^)]+)\)/);if(m){try{toggleWishlist(JSON.parse(m[1]))}catch(_){toggleWishlist(m[1].replace(/["']/g,''))}}syncWishlist();favRender();return}closeFav()},true);
+document.addEventListener('nine:wishlistchange',()=>{if($('#v54-favorites').classList.contains('v54-open'))favRender();menuFav()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeFav();searchClose()}});
+function menuFav(){const menu=$('#topMenu .v29-menu-list');if(!menu)return;let row=menu.querySelector('.v54-menu-fav');if(!row){row=document.createElement('a');row.className='v29-menu-row v54-menu-fav';row.href='#favorites';row.innerHTML='<span class="v37-menu-icon"><i class="fa-solid fa-heart"></i></span><span class="v29-row-copy"><strong></strong><small></small></span><span class="v54-fav-count"></span><i class="fa-solid fa-chevron-right v29-chevron"></i>';const account=menu.querySelector('[data-v29="account"]');(account||menu.firstChild).insertAdjacentElement('afterend',row);row.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openFav()},true)}row.querySelector('strong').textContent=txt('Produk Favorit','Favorite Products');row.querySelector('small').textContent=txt('Lihat produk yang disimpan','View saved products');row.querySelector('.v54-fav-count').textContent=favorites().length}
+const menu=$('#topMenu');if(menu){new MutationObserver(()=>{if(!menu.querySelector('.v54-menu-fav'))menuFav()}).observe(menu,{childList:true,subtree:false});menuFav()}
+// Counter uses Firestore's global document and live snapshot; avoid repeat visits in one session (30 min per product).
+let unsubscribe=null,activeId=null;
+function listen(id){if(activeId===key(id))return;unsubscribe?.();activeId=key(id);try{const ref=db.collection('statistik_produk').doc(key(id));unsubscribe=ref.onSnapshot(s=>{const n=Number(s.data()?.views);if(!Number.isFinite(n))return;const p=products().find(p=>key(p.id)===key(id));if(p)p.views=n;const el=$('#product-grid-auto .product-detail .v49-detail-views');if(el){const compact=n>=1000000?(n/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'JT':n>=1000?(n/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'RB':String(n);const icon=el.querySelector('i,svg');if(icon){el.replaceChildren(icon,document.createTextNode(' '+compact+' dilihat'))}else el.textContent=compact+' dilihat';el.title=n.toLocaleString('id-ID')+' kali dilihat'}},e=>console.warn('V54 realtime views listener:',e))}catch(e){console.warn('V54 views:',e)}}
+window.V54Views={async visit(id){listen(id);let prior=0;const k='nine_v54_view_'+key(id);try{prior=Number(sessionStorage.getItem(k)||0)}catch(_){}if(Date.now()-prior<12000)return null;try{try{sessionStorage.setItem(k,String(Date.now()))}catch(_){}const ref=db.collection('statistik_produk').doc(key(id));await ref.set({views:firebase.firestore.FieldValue.increment(1),lastViewedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});try{sessionStorage.setItem(k,String(Date.now()))}catch(_){}return null}catch(e){console.warn('V54 view write:',e);return null}}};
+function searchClose(){$('#v54-search-pop')?.classList.remove('v54-visible')}
+function installSearch(){const wa=$('#btnWhatsApp')?.closest('.social-item');if(!wa||$('#v54-search-rail'))return;const item=document.createElement('div');item.id='v54-search-rail';item.className='social-item v54-search-item';item.innerHTML='<button type="button" class="v54-search-btn" aria-label="Cari produk"><i class="fa-solid fa-magnifying-glass action-icon"></i></button><span class="v37-wa-label">Cari</span>';wa.insertAdjacentElement('afterend',item);const btn=item.querySelector('button');btn.addEventListener('click',()=>{const pop=$('#v54-search-pop');const rect=btn.getBoundingClientRect();pop.style.top=Math.max(12,Math.min(innerHeight-65,rect.top-6))+'px';pop.classList.toggle('v54-visible');if(pop.classList.contains('v54-visible'))$('#v54-search-input').blur()});requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')))}
+$('#v54-search-close').addEventListener('click',searchClose);
+let searchTimer;$('#v54-search-input').addEventListener('input',e=>{clearTimeout(searchTimer);searchTimer=setTimeout(()=>{const original=$('#searchInput');if(original){original.value=e.target.value;original.dispatchEvent(new Event('input',{bubbles:true}));if(e.target.value.trim()){searchClose();document.activeElement?.blur?.();requestAnimationFrame(()=>{const target=$('#product-grid-auto');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});});}}else if(typeof tampilkanHasil==='function'){const q=e.target.value.toLowerCase();tampilkanHasil(products().filter(p=>[p.nama,p.brand,p.kategori].some(v=>String(v||'').toLowerCase().includes(q))))}},110)});
+const railObserver=new MutationObserver(()=>{if($('#btnWhatsApp')&&!$('#v54-search-rail'))installSearch()});railObserver.observe(document.body,{childList:true,subtree:true});installSearch();
+window.V54={openFavorites:openFav,closeFavorites:closeFav};
+})();
+</script>
+
+<!-- V56 SCOPE ONLY: consistent global views + floating search interaction -->
+<style id="v56-search-css">
+#v54-search-pop{display:flex!important;visibility:hidden!important;opacity:0!important;pointer-events:none!important;transform:translateX(38px) scaleX(.86)!important;transform-origin:right center!important;transition:transform .34s cubic-bezier(.22,1,.36,1),opacity .27s ease,visibility 0s linear .34s!important;will-change:transform,opacity;max-width:calc(100vw - 86px)!important}
+#v54-search-pop.v54-visible{visibility:visible!important;opacity:1!important;pointer-events:auto!important;transform:translateX(0) scaleX(1)!important;transition:transform .38s cubic-bezier(.22,1,.36,1),opacity .27s ease,visibility 0s!important}
+#v54-search-pop input{font-size:16px!important}
+#v54-search-pop.v56-typing{box-shadow:0 10px 30px #0003!important}
+@media(prefers-reduced-motion:reduce){#v54-search-pop{transition:none!important}}
+</style>
+
+<!-- V57 FLOATING SEARCH ONLY: fixed dimensions and icon-aligned animation -->
+<style id="v57-floating-search-only-css">
+#v54-search-pop{box-sizing:border-box!important;height:50px!important;min-height:50px!important;max-height:50px!important;flex-wrap:nowrap!important;overflow:hidden!important;align-items:center!important;line-height:normal!important;transform-origin:right center!important;}
+#v54-search-pop input{box-sizing:border-box!important;height:38px!important;min-height:38px!important;max-height:38px!important;line-height:normal!important;margin:0!important;flex:1 1 auto!important;}
+#v54-search-pop>i,#v54-search-pop>button{flex:0 0 auto!important;}
+</style>
+<script id="v56-sync-search-js">
+(function(){'use strict';
+const $=s=>document.querySelector(s),pop=$('#v54-search-pop'),old=$('#v54-search-input'),main=$('#searchInput');
+// V57: one floating search controller, preserving the established main search engine.
+if(pop&&old&&main){
+ const inp=old.cloneNode(true);old.replaceWith(inp); // remove V56 listeners without changing main search
+ const rail=$('#v54-search-rail'),btn=rail?.querySelector('.v54-search-btn');
+ const placeholder=()=>{inp.placeholder=main.getAttribute('placeholder')||main.placeholder||''};placeholder();
+ new MutationObserver(placeholder).observe(main,{attributes:true,attributeFilter:['placeholder']});
+ const syncFromMain=()=>{if(inp.value!==main.value)inp.value=main.value};syncFromMain();
+ main.addEventListener('input',syncFromMain);
+ let timer=0,composing=false,submitted=false;
+ function align(){
+   if(!pop.classList.contains('v54-visible'))return;
+   const r=btn?.getBoundingClientRect();if(!r)return;
+   // Stay aligned with the Search icon; only clamp when the keyboard physically hides that row.
+   const vv=window.visualViewport,visibleBottom=vv?(vv.offsetTop+vv.height):innerHeight;
+   const visibleTop=vv?vv.offsetTop:0;
+   const height=pop.getBoundingClientRect().height||48;
+   const desired=r.top+(r.height-height)/2;
+   const top=Math.max(visibleTop+6,Math.min(desired,visibleBottom-height-6));
+   pop.style.top=Math.round(top)+'px';
+ }
+ function close(){clearTimeout(timer);pop.classList.remove('v54-visible','v56-typing');inp.blur();}
+ function commit(){
+   clearTimeout(timer);if(composing||submitted)return;
+   const query=inp.value.trim();if(!query)return;
+   submitted=true;
+   main.value=inp.value;
+   main.dispatchEvent(new Event('input',{bubbles:true})); // same results as Shopping Mall search
+   // Wait for the existing result cards to render before scrolling and closing.
+   requestAnimationFrame(()=>requestAnimationFrame(()=>{
+     const target=$('#product-grid-auto');if(target)target.scrollIntoView({behavior:'smooth',block:'start'});
+     close();submitted=false;
+   }));
+ }
+ inp.addEventListener('input',()=>{
+   submitted=false;clearTimeout(timer);main.value=inp.value; // two-way text sync, no early navigation
+   pop.classList.add('v56-typing');
+   if(!inp.value.trim()){
+     main.dispatchEvent(new Event('input',{bubbles:true}));pop.classList.remove('v56-typing');return;
+   }
+   if(!composing)timer=setTimeout(commit,950);
+ });
+ inp.addEventListener('compositionstart',()=>{composing=true;clearTimeout(timer)});
+ inp.addEventListener('compositionend',()=>{composing=false;clearTimeout(timer);timer=setTimeout(commit,950)});
+ inp.addEventListener('keydown',e=>{
+   if(e.key==='Enter'){e.preventDefault();composing=false;commit()}
+   if(e.key==='Escape'){e.preventDefault();close()}
+ });
+ // Never auto-commit on blur: mobile keyboard opening/closing must not submit a partial query.
+ inp.addEventListener('blur',()=>{pop.classList.remove('v56-typing')});
+ btn?.addEventListener('click',()=>{syncFromMain();requestAnimationFrame(align)},false);
+ window.visualViewport?.addEventListener('resize',()=>requestAnimationFrame(align),{passive:true});
+ window.visualViewport?.addEventListener('scroll',()=>requestAnimationFrame(align),{passive:true});
+ window.addEventListener('resize',()=>requestAnimationFrame(align),{passive:true});
+ window.addEventListener('scroll',()=>{if(pop.classList.contains('v54-visible'))requestAnimationFrame(align)},{passive:true});
+ // The V54 close button already removes the open class; cancel pending commits too.
+ $('#v54-search-close')?.addEventListener('click',()=>{clearTimeout(timer);inp.blur()});
+ document.addEventListener('pointerdown',e=>{
+   if(pop.classList.contains('v54-visible')&&!pop.contains(e.target)&&!rail?.contains(e.target))clearTimeout(timer);
+ },true);
+}
+ // A single global Firestore listener per product, shared by cards and active detail.
+ const subscriptions=new Map(),latest=new Map();const fmt=n=>n>=10000000?Math.floor(n/1e6)+'JT+':n>=1e6?(n/1e6).toLocaleString('id-ID',{maximumFractionDigits:1})+'JT':n>=10000?Math.floor(n/1000)+'RB+':n>=1000?(n/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'RB':String(n);
+ function currentId(){try{return typeof currentProduct!=='undefined'&&currentProduct?.id!=null?String(currentProduct.id):null}catch(_){return null}}
+ function paint(id,n){if(!Number.isFinite(n))return;n=Math.max(0,Math.floor(n));latest.set(id,n);try{const p=allProducts.find(x=>String(x.id)===id);if(p)p.views=n}catch(_){}document.querySelectorAll('[data-view-product]').forEach(el=>{if(el.getAttribute('data-view-product')!==id)return;const span=el.querySelector('span');if(span)span.textContent=fmt(n)+' dilihat';else el.textContent=fmt(n)+' dilihat'});if(currentId()===id){const detail=$('#product-grid-auto .product-detail .v49-detail-views');if(detail){const span=detail.querySelector('span');if(span)span.textContent=fmt(n)+' dilihat';else{const icon=detail.querySelector('i,svg');if(icon)detail.replaceChildren(icon,document.createTextNode(' '+fmt(n)+' dilihat'));else detail.textContent=fmt(n)+' dilihat'}detail.title=n.toLocaleString('id-ID')+' kali dilihat'}}}
+ function subscribe(id){if(subscriptions.has(id))return;try{if(typeof db==='undefined'||!db)return;const stop=db.collection('statistik_produk').doc(id).onSnapshot(s=>{const v=s.data()?.views;if(v!==undefined&&Number.isFinite(Number(v)))paint(id,Number(v))},err=>{console.warn('V56 global views:',id,err.code||err.message)});subscriptions.set(id,stop)}catch(e){console.warn('V56 views init',e)}}
+ let scanTimer=0;function scan(){scanTimer=0;const ids=new Set();document.querySelectorAll('[data-view-product]').forEach(el=>ids.add(el.getAttribute('data-view-product')));const active=currentId();if(active)ids.add(active);ids.forEach(id=>{if(id){subscribe(id);if(latest.has(id))paint(id,latest.get(id))}});for(const [id,stop] of subscriptions){if(!ids.has(id)){stop();subscriptions.delete(id)}}}
+ const root=$('#product-grid-auto'),fav=$('#v54-fav-grid');function schedule(){if(!scanTimer)scanTimer=setTimeout(scan,180)};
+ if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});if(fav)new MutationObserver(schedule).observe(fav,{childList:true,subtree:true});schedule();
+ // Keep view counting logic from V54/V55 unchanged; this layer only syncs displayed data.
+})();
+</script>
 </body>
 </html>
 
@@ -37151,5 +37301,40 @@ let lock=false;function schedule(){if(lock)return;lock=true;requestAnimationFram
 const root=document.getElementById('product-grid-auto');
 if(root&&window.MutationObserver)new MutationObserver(schedule).observe(root,{childList:true,subtree:true,characterData:true});
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule,{once:true});else schedule();
+})();
+</script>
+
+<!-- V55 SCOPE-ONLY PATCH: wishlist feedback, views realtime UI, floating search, favorites scroll -->
+<style id="v55-scope-css">
+#v54-favorites{z-index:900!important;top:var(--v55-header-offset,0px)!important;bottom:0!important;inset-inline:0!important;height:auto!important;overscroll-behavior:contain!important;scroll-padding-top:0!important}
+#v54-favorites .v54-header{top:0!important;z-index:5!important;background:var(--bg-color,#fff)!important}
+#v54-favorites .v54-grid{position:relative;z-index:1}
+#v54-favorites .marketplace-card{isolation:isolate}
+#v54-search-pop{z-index:2147480000!important}
+#product-grid-auto{scroll-margin-top:var(--v55-header-offset,120px)}
+#v55-wish-toast{position:fixed;left:50%;bottom:max(84px,calc(env(safe-area-inset-bottom) + 72px));transform:translate(-50%,18px);opacity:0;pointer-events:none;z-index:2147483000;background:#222c1e;color:#fff;border:1px solid #547c34;box-shadow:0 10px 32px #0003;border-radius:14px;padding:12px 16px;display:flex;align-items:center;gap:9px;max-width:calc(100vw - 34px);min-width:210px;font-size:12px;font-weight:700;transition:opacity .18s,transform .18s}
+#v55-wish-toast.v55-show{opacity:1;transform:translate(-50%,0)}
+</style>
+<div id="v55-wish-toast" role="status" aria-live="polite"></div>
+<script id="v55-scope-js">
+(function(){'use strict';
+const $=s=>document.querySelector(s);
+const pop=$('#v54-search-pop'),inp=$('#v54-search-input'),original=$('#searchInput');
+if(inp&&original){inp.placeholder=original.getAttribute('placeholder')||original.placeholder;const sync=()=>{inp.placeholder=original.getAttribute('placeholder')||original.placeholder};new MutationObserver(sync).observe(original,{attributes:true,attributeFilter:['placeholder']});}
+// Keep site header above favorites while the overlay scrolls inside its own viewport.
+function headerOffset(){const fav=$('#v54-favorites');if(!fav)return;const candidates=['header','.site-header','#mainHeader','.navbar','#topNav','#topMenu','.top-header'];let h=0;for(const sel of candidates){const el=$(sel);if(!el||el===fav||fav.contains(el))continue;const rect=el.getBoundingClientRect();const cs=getComputedStyle(el);if((cs.position==='fixed'||cs.position==='sticky')&&rect.top<=2&&rect.bottom>h&&rect.bottom<innerHeight*.4)h=rect.bottom;}fav.style.setProperty('--v55-header-offset',Math.max(0,Math.round(h))+'px');document.documentElement.style.setProperty('--v55-header-offset',Math.max(0,Math.round(h+10))+'px');}
+window.addEventListener('resize',headerOffset,{passive:true});document.addEventListener('click',e=>{if(e.target.closest('.v54-menu-fav'))requestAnimationFrame(headerOffset)},true);headerOffset();
+// Wishlist feedback: event emitted only on successful local save/remove.
+let toastTimer;document.addEventListener('nine:wishlistchange',e=>{const added=!!e.detail?.added,toast=$('#v55-wish-toast');if(!toast)return;toast.textContent=(added?'❤️  Ditambahkan ke Produk Favorit':'♡  Dihapus dari Produk Favorit');toast.classList.add('v55-show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('v55-show'),1900)});
+// Search opens without focus or keyboard. Existing search input handles the actual query.
+document.addEventListener('click',e=>{if(e.target.closest('#v54-search-rail .v54-search-btn')){inp?.blur();headerOffset();}},true);
+// Subscribe globally to active product and sync views into detail and cards.
+let active='',stop=null;const format=n=>n>=10000000?Math.floor(n/1000000)+'JT+':n>=1000000?(n/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'JT':n>=10000?Math.floor(n/1000)+'RB+':n>=1000?(n/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'RB':String(n);
+function paint(id,n){n=Math.max(0,Math.floor(Number(n)||0));try{const p=typeof allProducts!=='undefined'&&allProducts.find(x=>String(x.id)===String(id));if(p)p.views=n;}catch(_){}const detail=$('#product-grid-auto .product-detail');if(detail){const el=detail.querySelector('.v49-detail-views');if(el){const icon=el.querySelector('i,svg');if(icon)el.replaceChildren(icon,document.createTextNode(' '+format(n)+' dilihat'));else el.textContent=format(n)+' dilihat';el.title=n.toLocaleString('id-ID')+' kali dilihat';}}document.querySelectorAll('[data-view-product]').forEach(el=>{if(el.getAttribute('data-view-product')!==String(id))return;const t=el.querySelector('span');if(t)t.textContent=format(n)+' dilihat';else el.textContent=format(n)+' dilihat';});}
+function attach(id){id=String(id);if(active===id)return;stop?.();active=id;try{if(typeof db==='undefined'||!db)return;stop=db.collection('statistik_produk').doc(id).onSnapshot(s=>{const data=s.data()||{};if(data.views!==undefined)paint(id,data.views)},err=>{console.warn('V55 views subscription:',err.code||err.message);});}catch(err){console.warn('V55 views initialization:',err)}}
+// Called by V54Views.visit before write. Monitor active product without changing sales.
+if(window.V54Views?.visit){const prior=window.V54Views.visit.bind(window.V54Views);window.V54Views.visit=function(id){attach(id);return prior(id).catch(err=>{console.warn('V55 view write:',err);return null})};}
+// Synchronize placeholder even after language switching and DOM re-render.
+const fav=$('#v54-favorites');if(fav){new MutationObserver(()=>{if(fav.classList.contains('v54-open'))headerOffset()}).observe(fav,{attributes:true,attributeFilter:['class']});}
 })();
 </script>
