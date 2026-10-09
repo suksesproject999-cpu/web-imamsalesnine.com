@@ -19068,10 +19068,8 @@ loadProductsFromCms().catch(err => {
 
 document.getElementById("searchInput").addEventListener("input", function(){
     const keyword = this.value.trim().toLowerCase();
-    if(keyword === ""){
-        renderCategories();
-        return;
-    }
+    // NINE PREMIUM: clearing the search never navigates to categories.
+    if(keyword === "") return;
     const hasil = fuse ? fuse.search(keyword) : [];
     tampilkanHasil(hasil.map(item => item.item));
 });
@@ -34520,12 +34518,12 @@ if(pop&&old&&main){
    submitted=false;clearTimeout(timer);main.value=inp.value; // two-way text sync, no early navigation
    pop.classList.add('v56-typing');
    if(!inp.value.trim()){
-     main.dispatchEvent(new Event('input',{bubbles:true}));pop.classList.remove('v56-typing');return;
+     pop.classList.remove('v56-typing');return;
    }
-   if(!composing)timer=setTimeout(commit,950);
+   if(!composing)timer=setTimeout(()=>{if(inp.value.trim().length>=2)commit()},1350);
  });
  inp.addEventListener('compositionstart',()=>{composing=true;clearTimeout(timer)});
- inp.addEventListener('compositionend',()=>{composing=false;clearTimeout(timer);timer=setTimeout(commit,950)});
+ inp.addEventListener('compositionend',()=>{composing=false;clearTimeout(timer);timer=setTimeout(()=>{if(inp.value.trim().length>=2)commit()},1350)});
  inp.addEventListener('keydown',e=>{
    if(e.key==='Enter'){e.preventDefault();composing=false;commit()}
    if(e.key==='Escape'){e.preventDefault();close()}
@@ -34552,6 +34550,117 @@ if(pop&&old&&main){
  const root=$('#product-grid-auto'),fav=$('#v54-fav-grid');function schedule(){if(!scanTimer)scanTimer=setTimeout(scan,180)};
  if(root)new MutationObserver(schedule).observe(root,{childList:true,subtree:true});if(fav)new MutationObserver(schedule).observe(fav,{childList:true,subtree:true});schedule();
  // Keep view counting logic from V54/V55 unchanged; this layer only syncs displayed data.
+})();
+</script>
+
+<!-- NINE FINAL PREMIUM | UI polish + account-scoped Firestore wishlist -->
+<style id="nine-final-premium-style">
+/* Prevent persistent mobile touch glow without removing keyboard focus outlines. */
+.v39-variant-trigger,.v38-edit-variant,#v38VariantModal button,.v38-variant,[class*="variant-trigger"]{-webkit-tap-highlight-color:transparent!important;touch-action:manipulation}
+.v39-variant-trigger:focus:not(:focus-visible),.v38-edit-variant:focus:not(:focus-visible),#v38VariantModal button:focus:not(:focus-visible){outline:none!important;box-shadow:none!important}
+/* Consistent lime brand colors for both floating search and WhatsApp. */
+#btnWhatsApp,#v54-search-rail .v54-search-btn,#v54-search-rail .action-icon{color:#91c83e!important}
+/* Equal height sheet, independent of number of options; scrolling stays inside. */
+#v38VariantModal .v38-sheet{height:min(78dvh,680px)!important;max-height:min(78dvh,680px)!important;min-height:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+#v38VariantModal .v38-sheet-head,#v38VariantModal .v38-sheet-foot{flex:0 0 auto!important}
+#v38VariantModal .v38-body{flex:1 1 auto!important;min-height:0!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch}
+#v38VariantModal .v38-variants{display:flex!important;flex-wrap:wrap!important;align-content:flex-start!important}
+/* Other existing purchase sheets: equal bounded panel height without touching their actions. */
+#buySheet .sheet-content,#cartSheet .sheet-content{max-height:78dvh;overflow-y:auto}
+/* Animated spectrum: only ten minutes, cheap opacity/transform composite. */
+@keyframes ninePremiumSpectrum{0%,100%{filter:drop-shadow(0 0 1px currentColor);transform:scale(1)}25%{filter:drop-shadow(0 0 8px currentColor);transform:scale(1.08)}50%{filter:drop-shadow(0 0 14px currentColor);transform:scale(.97)}75%{filter:drop-shadow(0 0 5px currentColor);transform:scale(1.05)}}
+#btnLike.nine-spectrum-10m,#btnWhatsApp.nine-spectrum-10m{animation:ninePremiumSpectrum 2.2s ease-in-out infinite!important;will-change:transform}
+@media(prefers-reduced-motion:reduce){#btnLike.nine-spectrum-10m,#btnWhatsApp.nine-spectrum-10m{animation:none!important}}
+</style>
+<script id="nine-final-premium-script">
+(function(){'use strict';
+// Dismiss stale pointer focus when opening a variant sheet, without disabling keyboard focus.
+document.addEventListener('click',function(e){
+ const trigger=e.target.closest('.v39-variant-trigger,.v38-edit-variant,[data-v38-edit]');
+ if(trigger&&e.detail>0)requestAnimationFrame(()=>{try{trigger.blur()}catch(_){}});
+},true);
+// Spectrum expires ten minutes after this page load (and is not continuously restarted).
+const spectrumStart=Date.now(),spectrumEnd=spectrumStart+600000;
+function spectrum(){if(Date.now()>=spectrumEnd)return;['btnLike','btnWhatsApp'].forEach(id=>document.getElementById(id)?.classList.add('nine-spectrum-10m'))}
+spectrum();const spectrumObserver=new MutationObserver(spectrum);spectrumObserver.observe(document.body,{childList:true,subtree:true});
+setTimeout(()=>{spectrumObserver.disconnect();document.querySelectorAll('.nine-spectrum-10m').forEach(el=>el.classList.remove('nine-spectrum-10m'))},600000);
+// Auth-scoped wishlist: Firestore is authoritative. Anonymous wishlist remains local only.
+// Data model: users/{uid}/wishlist/{encoded product id}. Never store an auth token in localStorage.
+let uid=null,stop=null,ready=false,epoch=0;
+const key='nine_wishlist_migrated_v1_';
+const auth=()=>{try{return firebase.auth()}catch(_){return null}};
+const store=()=>{try{return firebase.firestore()}catch(_){return null}};
+const norm=v=>String(v);
+const docId=v=>encodeURIComponent(norm(v)).replace(/%/g,'_');
+const collection=u=>store().collection('users').doc(u).collection('wishlist');
+function readLocal(){try{const a=JSON.parse(localStorage.getItem('wishlist')||'[]');return Array.isArray(a)?a:[]}catch(_){return []}}
+function syncUI(){
+ try{document.querySelectorAll('#product-grid-auto .product-detail .wishlist-btn').forEach(btn=>{
+   if(typeof currentProduct==='undefined'||!currentProduct)return;
+   const active=wishlist.some(x=>norm(x)===norm(currentProduct.id));btn.textContent=active?'❤️':'🤍';btn.setAttribute('aria-pressed',String(active));
+ });}catch(_){}
+ document.dispatchEvent(new CustomEvent('nine:wishlistcloudsync'));
+}
+function apply(ids){
+ try{wishlist=ids.slice();localStorage.setItem('wishlist',JSON.stringify(ids));syncUI()}catch(e){console.warn('Nine wishlist sync:',e)}
+}
+function notifyError(e){console.warn('Nine Firestore wishlist:',e);try{if(typeof Swal!=='undefined')Swal.fire({icon:'error',title:'Wishlist belum tersimpan',text:e?.code==='permission-denied'?'Periksa Firestore Security Rules untuk users/{uid}/wishlist.':'Periksa koneksi lalu coba lagi.'})}catch(_){}}
+async function start(user){
+ const token=++epoch;ready=false;if(stop){stop();stop=null}
+ const previous=uid;uid=user?.uid||null;
+ if(!uid){apply([]);return}
+ const ref=collection(uid);
+ // Only migrate legacy local data once, and only if the old data belonged to the first signed-in account.
+ // Never auto-merge a previous account's wishlist into another account.
+ const lastOwner=localStorage.getItem('nine_wishlist_last_owner');
+ const legacy=previous===null&&(!lastOwner||lastOwner===uid)?readLocal():[];
+ localStorage.setItem('nine_wishlist_last_owner',uid);
+ const marker=key+uid;
+ try{
+  const snap=await ref.get();if(token!==epoch)return;
+  if(!localStorage.getItem(marker)&&legacy.length&&snap.empty){
+   const batch=store().batch();legacy.forEach(id=>batch.set(ref.doc(docId(id)),{productId:norm(id),createdAt:firebase.firestore.FieldValue.serverTimestamp()}));
+   await batch.commit();if(token!==epoch)return;
+  }
+  localStorage.setItem(marker,'1');
+  stop=ref.onSnapshot(snapshot=>{if(token!==epoch)return;ready=true;apply(snapshot.docs.map(d=>d.data()?.productId||decodeURIComponent(d.id.replace(/_/g,'%'))))},e=>{ready=false;notifyError(e)});
+ }catch(e){if(token===epoch)notifyError(e)}
+}
+// Replace only the original wishlist toggle, preserving its event and rendering behavior.
+// This is called after the legacy script has declared toggleWishlist.
+const legacyToggle=window.toggleWishlist;
+if(typeof legacyToggle==='function'){
+ const cloudToggle=function(id){
+  const user=auth()?.currentUser;
+  if(!user){try{window.V17?.openAccount?.()}catch(_){};return}
+  if(!ready||uid!==user.uid){try{if(typeof Swal!=='undefined')Swal.fire({icon:'info',text:'Wishlist sedang disinkronkan, coba sebentar lagi.'})}catch(_){};return}
+  const exists=wishlist.some(x=>norm(x)===norm(id));
+  const ref=collection(user.uid).doc(docId(id));
+  // Preserve immediate visual feedback while Firestore synchronizes.
+  legacyToggle(id);
+  const operation=exists?ref.delete():ref.set({productId:norm(id),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+  operation.catch(e=>{notifyError(e); /* Snapshot will restore server truth on next refresh. */ref.get().then(()=>{}).catch(()=>{})});
+ };
+ window.toggleWishlist=cloudToggle;try{toggleWishlist=cloudToggle}catch(_){}
+}
+// Firebase Auth SDK is loaded later in this HTML. Register only after it exists.
+let wishlistAuthSubscribed=false;
+function bootWishlistAuth(){
+ if(wishlistAuthSubscribed)return;
+ const instance=auth();
+ if(!instance||typeof instance.onAuthStateChanged!=='function')return;
+ try{
+  instance.onAuthStateChanged(start, e=>{ready=false;notifyError(e)});
+  wishlistAuthSubscribed=true;
+ }catch(e){console.warn('Nine wishlist auth:',e)}
+}
+bootWishlistAuth();
+if(!wishlistAuthSubscribed){
+ // The load event runs after the later firebase-auth.js script and account initialization.
+ if(document.readyState==='complete')bootWishlistAuth();
+ else window.addEventListener('load',bootWishlistAuth,{once:true});
+}
+
 })();
 </script>
 </body>
