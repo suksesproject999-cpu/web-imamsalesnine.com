@@ -38001,11 +38001,42 @@ function enhanceCart(){
   });
 }
 
-/* Keep cart refreshed after V38 variant confirmation. */
+/* NINE FIX: update cart details in place after variant confirmation.
+   Rebuilding the whole cart caused a visible flash on mobile. */
 const confirm=document.getElementById('v38VariantConfirm');
 if(confirm){
+  let editedIndex=-1;
+  document.addEventListener('click',e=>{
+    const trigger=e.target.closest('#cart-list .v39-variant-trigger');
+    if(trigger){editedIndex=Array.from(document.querySelectorAll('#cart-list .cart-item')).indexOf(trigger.closest('.cart-item'));}
+  },true);
   confirm.addEventListener('click',()=>{
-    if(pageNow()==='cart') setTimeout(()=>{try{window.renderCart?.()}catch(_){}},0);
+    if(pageNow()!=='cart'||editedIndex<0)return;
+    const index=editedIndex;
+    requestAnimationFrame(()=>{
+      const items=window.cart||[];
+      const item=items[index];
+      const card=document.querySelectorAll('#cart-list .cart-item')[index];
+      if(!item||!card)return;
+      const variant=card.querySelector('.v39-variant-trigger span');
+      if(variant)variant.textContent='Varian: '+(item.varian||'-');
+      const oldVariant=card.querySelector('.v39-old-variant');
+      if(oldVariant){const strong=oldVariant.querySelector('strong');if(strong){while(strong.nextSibling)strong.nextSibling.remove();oldVariant.appendChild(document.createTextNode(' '+(item.varian||'-')));}}
+      const qty=card.querySelector('.cart-qty span');
+      if(qty)qty.textContent=String(item.qty||1);
+      const total=card.querySelector('.cart-total');
+      if(total)total.textContent=(Number(item.harga||0)*Number(item.qty||1)).toLocaleString('id-ID',{style:'currency',currency:'IDR'});
+      const summary=typeof getCartSummary==='function'?getCartSummary():null;
+      if(summary){
+        const money=n=>(Number(n)||0).toLocaleString('id-ID',{style:'currency',currency:'IDR'});
+        const values={'Subtotal':money(summary.subtotal),'Diskon Produk':'- '+money(summary.productDiscount),'Diskon Ongkir':'- '+money(summary.shippingDiscount),'Total Belanja':money(summary.totalBayar)};
+        document.querySelectorAll('#product-grid-auto .cart-summary .summary-row').forEach(row=>{
+          const label=row.querySelector('span')?.textContent.trim();
+          const target=row.querySelector('strong:last-child');
+          if(target&&Object.prototype.hasOwnProperty.call(values,label))target.textContent=values[label];
+        });
+      }
+    });
   });
 }
 
