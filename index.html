@@ -21606,7 +21606,7 @@ RIGHT COLUMN
 class="wishlist-btn"
 onclick="toggleWishlist(${product.id})">
 
-${wishlist.includes(product.id) ? "❤️" : "🤍"}
+${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}
 
 </button>
 
@@ -22836,6 +22836,17 @@ if(sticky){
 
 
 function saveCart() {
+  // NINE: merge identical SKU + variant, preserving first row order.
+  const seen = new Map();
+  for (let i=0; i<cart.length; i++) {
+    const item=cart[i];
+    const k=String(item.id)+'\u0000'+String(item.varian ?? '-');
+    if (seen.has(k)) {
+      const original=cart[seen.get(k)];
+      original.qty=(Number(original.qty)||0)+(Number(item.qty)||0);
+      cart.splice(i--,1);
+    } else seen.set(k,i);
+  }
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartCount();
 }
@@ -33728,7 +33739,46 @@ function refreshCartOrCheckout(){if((window.currentPage||'')==='checkout')buildC
 
 let editIndex=-1,editVariant='',editQty=1;
 V.openVariant=function(index){const items=window.cart||cart||[];const item=items[index];if(!item)return;const p=getProduct(item.id)||{};editIndex=index;editVariant=item.varian||p.varian?.[0]||'Default';editQty=Math.max(1,Number(item.qty)||1);const vars=Array.isArray(p.varian)&&p.varian.length?p.varian:[editVariant];const stock=Number(p?.stok?.qty ?? p?.stok ?? 0);document.getElementById('v38VariantBody').innerHTML=`<div class="v38-product-top"><img src="${esc(item.gambar||p.gambar||'')}" alt=""><div><h4>${esc(item.nama||p.nama||'Produk')}</h4><div class="v38-price">${money(item.harga||p?.harga?.promo||p?.harga?.normal)}</div><div class="v38-stock">Stok: ${Number.isFinite(stock)?stock:'-'}</div></div></div><div class="v38-label">Pilih Varian</div><div class="v38-variants">${vars.map(v=>`<button type="button" class="v38-variant ${String(v)===String(editVariant)?'active':''}" data-v38-var="${esc(v)}">${esc(v)}</button>`).join('')}</div><div class="v38-label">Jumlah</div><div class="v38-qty-row"><span>Qty produk</span><div class="v38-qty"><button type="button" data-v38-minus>−</button><span id="v38QtyValue">${editQty}</span><button type="button" data-v38-plus>+</button></div></div>`;const body=document.getElementById('v38VariantBody');body.querySelectorAll('[data-v38-var]').forEach(b=>b.onclick=()=>{editVariant=b.dataset.v38Var;body.querySelectorAll('.v38-variant').forEach(x=>x.classList.toggle('active',x===b))});body.querySelector('[data-v38-minus]').onclick=()=>{editQty=Math.max(1,editQty-1);document.getElementById('v38QtyValue').textContent=editQty};body.querySelector('[data-v38-plus]').onclick=()=>{editQty+=1;document.getElementById('v38QtyValue').textContent=editQty};open('v38VariantModal')};
-document.getElementById('v38VariantConfirm')?.addEventListener('click',()=>{const items=window.cart||cart||[];if(editIndex<0||!items[editIndex])return;items[editIndex].varian=editVariant;items[editIndex].qty=editQty;try{saveCart()}catch(_){localStorage.setItem('cart',JSON.stringify(items))}close('v38VariantModal');buildCheckoutSummary();try{updateCartCount?.()}catch(_){}});
+document.getElementById('v38VariantConfirm')?.addEventListener('click',()=>{
+ const items=window.cart||cart||[];
+ if(editIndex<0||!items[editIndex])return;
+ const index=editIndex;
+ items[index].varian=editVariant;
+ items[index].qty=editQty;
+ const before=items.length;
+ try{saveCart()}catch(_){localStorage.setItem('cart',JSON.stringify(items))}
+ close('v38VariantModal');
+ if((window.currentPage||currentPage)==='cart'){
+   // Keep existing card nodes for a smooth confirmation when no rows merge.
+   if(items.length!==before){
+     const y=window.scrollY;
+     window.renderCart?.();
+     requestAnimationFrame(()=>window.scrollTo({top:y,behavior:'instant'}));
+   }else{
+     const card=document.querySelectorAll('#cart-list .cart-item')[index];
+     const item=items[index];
+     if(card&&item){
+       const label=card.querySelector('.v39-variant-trigger span');
+       if(label)label.textContent='Varian: '+(item.varian||'-');
+       const old=card.querySelector('.v39-old-variant');
+       if(old){const strong=old.querySelector('strong');if(strong){old.replaceChildren(strong,document.createTextNode(' '+(item.varian||'-')))}else old.textContent='Varian: '+(item.varian||'-');}
+       const qty=card.querySelector('.cart-qty span');
+       if(qty)qty.textContent=String(item.qty||1);
+       const total=card.querySelector('.cart-total');
+       if(total)total.textContent=money((Number(item.harga)||0)*(Number(item.qty)||1));
+     }
+     const sum=typeof getCartSummary==='function'?getCartSummary():null;
+     if(sum){document.querySelectorAll('#product-grid-auto .cart-summary .summary-row').forEach(row=>{
+       const label=row.querySelector('span')?.textContent.trim();
+       const out=row.lastElementChild;
+       if(!out||out.tagName!=='STRONG')return;
+       const values={'Subtotal':money(sum.subtotal),'Total Belanja':money(sum.totalBayar),'Jumlah Produk':String(items.length),'Voucher Produk':sum.productVoucherName||'-','Diskon Produk':'- '+money(sum.productDiscount),'Voucher Ongkir':sum.shippingVoucherName||'-','Diskon Ongkir':'- '+money(sum.shippingDiscount)};
+       if(Object.prototype.hasOwnProperty.call(values,label))out.textContent=values[label];
+     });}
+   }
+ }else buildCheckoutSummary();
+ try{updateCartCount?.()}catch(_){}
+});
 
 requestAnimationFrame(()=>{if((window.currentPage||'')==='cart')enhanceCart();if((window.currentPage||'')==='checkout')enhanceCheckout()});
 })();
@@ -34431,7 +34481,7 @@ function favRender(){const list=favorites(),items=products().filter(p=>list.incl
 function openFav(){try{window.V29?.closeMenu?.()}catch(_){}syncWishlist();favRender();$('#v54-favorites').classList.add('v54-open');document.body.style.overflow='hidden'}
 function closeFav(){$('#v54-favorites').classList.remove('v54-open');document.body.style.overflow=''}
 $('#v54-fav-back').addEventListener('click',closeFav);
-$('#v54-fav-grid').addEventListener('click',e=>{const a=e.target.closest('a,button,[onclick]');if(!a)return;const wasWish=a.matches('.wishlist-btn')||a.closest('.wishlist-btn');if(wasWish){e.preventDefault();e.stopPropagation();const raw=a.getAttribute('onclick')||'';const m=raw.match(/toggleWishlist\(([^)]+)\)/);if(m){try{toggleWishlist(JSON.parse(m[1]))}catch(_){toggleWishlist(m[1].replace(/["']/g,''))}}syncWishlist();favRender();return}closeFav()},true);
+$('#v54-fav-grid').addEventListener('click',e=>{const a=e.target.closest('a,button,[onclick]');if(!a)return;const wasWish=a.matches('.wishlist-btn')||a.closest('.wishlist-btn');if(wasWish){e.preventDefault();e.stopPropagation();const raw=a.getAttribute('onclick')||'';const m=raw.match(/toggleWishlist\(([^)]+)\)/);if(m){try{toggleWishlist(JSON.parse(m[1]))}catch(_){toggleWishlist(m[1].replace(/["']/g,''))}}return}closeFav()},true);
 document.addEventListener('nine:wishlistchange',()=>{if($('#v54-favorites').classList.contains('v54-open'))favRender();menuFav()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){closeFav();searchClose()}});
 function menuFav(){const menu=$('#topMenu .v29-menu-list');if(!menu)return;let row=menu.querySelector('.v54-menu-fav');if(!row){row=document.createElement('a');row.className='v29-menu-row v54-menu-fav';row.href='#favorites';row.innerHTML='<span class="v37-menu-icon"><i class="fa-solid fa-heart"></i></span><span class="v29-row-copy"><strong></strong><small></small></span><span class="v54-fav-count"></span><i class="fa-solid fa-chevron-right v29-chevron"></i>';const account=menu.querySelector('[data-v29="account"]');(account||menu.firstChild).insertAdjacentElement('afterend',row);row.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();openFav()},true)}row.querySelector('strong').textContent=txt('Produk Favorit','Favorite Products');row.querySelector('small').textContent=txt('Lihat produk yang disimpan','View saved products');row.querySelector('.v54-fav-count').textContent=favorites().length}
@@ -34587,6 +34637,7 @@ setTimeout(()=>{spectrumObserver.disconnect();document.querySelectorAll('.nine-s
 // Auth-scoped wishlist: Firestore is authoritative. Anonymous wishlist remains local only.
 // Data model: users/{uid}/wishlist/{encoded product id}. Never store an auth token in localStorage.
 let uid=null,stop=null,ready=false,epoch=0;
+const wishlistPending=new Map();
 const key='nine_wishlist_migrated_v1_';
 const auth=()=>{try{return firebase.auth()}catch(_){return null}};
 const store=()=>{try{return firebase.firestore()}catch(_){return null}};
@@ -34600,6 +34651,7 @@ function syncUI(){
    const active=wishlist.some(x=>norm(x)===norm(currentProduct.id));btn.textContent=active?'❤️':'🤍';btn.setAttribute('aria-pressed',String(active));
  });}catch(_){}
  document.dispatchEvent(new CustomEvent('nine:wishlistcloudsync'));
+ document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{syncOnly:true}}));
 }
 function apply(ids){
  try{wishlist=ids.slice();localStorage.setItem('wishlist',JSON.stringify(ids));syncUI()}catch(e){console.warn('Nine wishlist sync:',e)}
@@ -34607,7 +34659,7 @@ function apply(ids){
 function notifyError(e){console.warn('Nine Firestore wishlist:',e);try{if(typeof Swal!=='undefined')Swal.fire({icon:'error',title:'Wishlist belum tersimpan',text:e?.code==='permission-denied'?'Periksa Firestore Security Rules untuk users/{uid}/wishlist.':'Periksa koneksi lalu coba lagi.'})}catch(_){}}
 async function start(user){
  const token=++epoch;ready=false;if(stop){stop();stop=null}
- const previous=uid;uid=user?.uid||null;
+ const previous=uid;uid=user?.uid||null;wishlistPending.clear();
  if(!uid){apply([]);return}
  const ref=collection(uid);
  // Only migrate legacy local data once, and only if the old data belonged to the first signed-in account.
@@ -34623,7 +34675,15 @@ async function start(user){
    await batch.commit();if(token!==epoch)return;
   }
   localStorage.setItem(marker,'1');
-  stop=ref.onSnapshot(snapshot=>{if(token!==epoch)return;ready=true;apply(snapshot.docs.map(d=>d.data()?.productId||decodeURIComponent(d.id.replace(/_/g,'%'))))},e=>{ready=false;notifyError(e)});
+  stop=ref.onSnapshot(snapshot=>{
+   if(token!==epoch)return;
+   ready=true;
+   const serverIds=snapshot.docs.map(d=>d.data()?.productId||decodeURIComponent(d.id.replace(/_/g,'%')));
+   // Keep the user's latest click authoritative while a write is in flight.
+   const effective=serverIds.filter(id=>!wishlistPending.has(norm(id)));
+   for(const [id,entry] of wishlistPending)if(entry.desired)effective.push(id);
+   apply([...new Set(effective.map(norm))]);
+  },e=>{ready=false;notifyError(e)});
  }catch(e){if(token===epoch)notifyError(e)}
 }
 // Replace only the original wishlist toggle, preserving its event and rendering behavior.
@@ -34634,12 +34694,44 @@ if(typeof legacyToggle==='function'){
   const user=auth()?.currentUser;
   if(!user){try{window.V17?.openAccount?.()}catch(_){};return}
   if(!ready||uid!==user.uid){try{if(typeof Swal!=='undefined')Swal.fire({icon:'info',text:'Wishlist sedang disinkronkan, coba sebentar lagi.'})}catch(_){};return}
-  const exists=wishlist.some(x=>norm(x)===norm(id));
+  const keyId=norm(id);
+  const exists=wishlist.some(x=>norm(x)===keyId);
+  const desired=!exists;
   const ref=collection(user.uid).doc(docId(id));
-  // Preserve immediate visual feedback while Firestore synchronizes.
-  legacyToggle(id);
-  const operation=exists?ref.delete():ref.set({productId:norm(id),updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
-  operation.catch(e=>{notifyError(e); /* Snapshot will restore server truth on next refresh. */ref.get().then(()=>{}).catch(()=>{})});
+  const token=epoch;
+  const previous=wishlistPending.get(keyId);
+  // Serialize repeated clicks for the same product so older writes cannot win.
+  const previousJob=previous?.job||Promise.resolve();
+  const next=exists?wishlist.filter(x=>norm(x)!==keyId):[...wishlist,keyId];
+  const job=previousJob.catch(()=>{}).then(()=>desired
+   ?ref.set({productId:keyId,updatedAt:firebase.firestore.FieldValue.serverTimestamp()})
+   :ref.delete());
+  wishlistPending.set(keyId,{desired,job});
+  apply(next);
+  document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{id:keyId,added:desired}}));
+  job.then(()=>{
+    if(token!==epoch)return;
+    if(wishlistPending.get(keyId)?.job===job){
+      wishlistPending.delete(keyId);
+      // Server listener remains authoritative for persistence.
+    }
+  }).catch(e=>{
+    if(token!==epoch)return;
+    if(wishlistPending.get(keyId)?.job===job){
+      wishlistPending.delete(keyId);
+      notifyError(e);
+      collection(user.uid).get().then(snapshot=>{
+        if(token!==epoch)return;
+        const ids=snapshot.docs.map(d=>d.data()?.productId);
+        for(const [pid,pending] of wishlistPending){
+          const i=ids.findIndex(v=>norm(v)===pid);
+          if(pending.desired&&i<0)ids.push(pid);
+          if(!pending.desired&&i>=0)ids.splice(i,1);
+        }
+        apply(ids);
+      }).catch(()=>{});
+    }
+  });
  };
  window.toggleWishlist=cloudToggle;try{toggleWishlist=cloudToggle}catch(_){}
 }
@@ -38110,45 +38202,7 @@ function enhanceCart(){
   });
 }
 
-/* NINE FIX: update cart details in place after variant confirmation.
-   Rebuilding the whole cart caused a visible flash on mobile. */
-const confirm=document.getElementById('v38VariantConfirm');
-if(confirm){
-  let editedIndex=-1;
-  document.addEventListener('click',e=>{
-    const trigger=e.target.closest('#cart-list .v39-variant-trigger');
-    if(trigger){editedIndex=Array.from(document.querySelectorAll('#cart-list .cart-item')).indexOf(trigger.closest('.cart-item'));}
-  },true);
-  confirm.addEventListener('click',()=>{
-    if(pageNow()!=='cart'||editedIndex<0)return;
-    const index=editedIndex;
-    requestAnimationFrame(()=>{
-      const items=window.cart||[];
-      const item=items[index];
-      const card=document.querySelectorAll('#cart-list .cart-item')[index];
-      if(!item||!card)return;
-      const variant=card.querySelector('.v39-variant-trigger span');
-      if(variant)variant.textContent='Varian: '+(item.varian||'-');
-      const oldVariant=card.querySelector('.v39-old-variant');
-      if(oldVariant){const strong=oldVariant.querySelector('strong');if(strong){while(strong.nextSibling)strong.nextSibling.remove();oldVariant.appendChild(document.createTextNode(' '+(item.varian||'-')));}}
-      const qty=card.querySelector('.cart-qty span');
-      if(qty)qty.textContent=String(item.qty||1);
-      const total=card.querySelector('.cart-total');
-      if(total)total.textContent=(Number(item.harga||0)*Number(item.qty||1)).toLocaleString('id-ID',{style:'currency',currency:'IDR'});
-      const summary=typeof getCartSummary==='function'?getCartSummary():null;
-      if(summary){
-        const money=n=>(Number(n)||0).toLocaleString('id-ID',{style:'currency',currency:'IDR'});
-        const values={'Subtotal':money(summary.subtotal),'Diskon Produk':'- '+money(summary.productDiscount),'Diskon Ongkir':'- '+money(summary.shippingDiscount),'Total Belanja':money(summary.totalBayar)};
-        document.querySelectorAll('#product-grid-auto .cart-summary .summary-row').forEach(row=>{
-          const label=row.querySelector('span')?.textContent.trim();
-          const target=row.querySelector('strong:last-child');
-          if(target&&Object.prototype.hasOwnProperty.call(values,label))target.textContent=values[label];
-        });
-      }
-    });
-  });
-}
-
+/* NINE: variant confirmation is synchronized in V38's authoritative handler above. */
 /* Strengthen checkout wording if V38 already renders its edit buttons. */
 function enhanceCheckout(){
   if(pageNow()!=='checkout') return;
@@ -38647,8 +38701,8 @@ function setSummary(label,value){
   [...root.querySelectorAll('.summary-row')].forEach(row=>{
     const left=row.querySelector('span');
     if(!left||left.textContent.trim().toLowerCase()!==String(label).toLowerCase())return;
-    const out=row.querySelector('strong:last-child');
-    if(out)out.textContent=value;
+    const out=row.lastElementChild;
+    if(out&&out.tagName==='STRONG')out.textContent=value;
   });
 }
 function syncCartNumbers(index){
@@ -39605,7 +39659,7 @@ if(inp&&original){inp.placeholder=original.getAttribute('placeholder')||original
 function headerOffset(){const fav=$('#v54-favorites');if(!fav)return;const candidates=['header','.site-header','#mainHeader','.navbar','#topNav','#topMenu','.top-header'];let h=0;for(const sel of candidates){const el=$(sel);if(!el||el===fav||fav.contains(el))continue;const rect=el.getBoundingClientRect();const cs=getComputedStyle(el);if((cs.position==='fixed'||cs.position==='sticky')&&rect.top<=2&&rect.bottom>h&&rect.bottom<innerHeight*.4)h=rect.bottom;}fav.style.setProperty('--v55-header-offset',Math.max(0,Math.round(h))+'px');document.documentElement.style.setProperty('--v55-header-offset',Math.max(0,Math.round(h+10))+'px');}
 window.addEventListener('resize',headerOffset,{passive:true});document.addEventListener('click',e=>{if(e.target.closest('.v54-menu-fav'))requestAnimationFrame(headerOffset)},true);headerOffset();
 // Wishlist feedback: event emitted only on successful local save/remove.
-let toastTimer;document.addEventListener('nine:wishlistchange',e=>{const added=!!e.detail?.added,toast=$('#v55-wish-toast');if(!toast)return;toast.textContent=(added?'❤️  Ditambahkan ke Produk Favorit':'♡  Dihapus dari Produk Favorit');toast.classList.add('v55-show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('v55-show'),1900)});
+let toastTimer;document.addEventListener('nine:wishlistchange',e=>{if(e.detail?.syncOnly)return;const added=!!e.detail?.added,toast=$('#v55-wish-toast');if(!toast)return;toast.textContent=(added?'❤️  Ditambahkan ke Produk Favorit':'♡  Dihapus dari Produk Favorit');toast.classList.add('v55-show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>toast.classList.remove('v55-show'),1900)});
 // Search opens without focus or keyboard. Existing search input handles the actual query.
 document.addEventListener('click',e=>{if(e.target.closest('#v54-search-rail .v54-search-btn')){inp?.blur();headerOffset();}},true);
 // Subscribe globally to active product and sync views into detail and cards.
