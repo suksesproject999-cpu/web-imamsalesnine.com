@@ -17976,6 +17976,8 @@ Kirim
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
 <!-- NINE TAGLINE JS 06 | Firebase / data | https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js -->
 <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<!-- Firebase App Check - compat SDK matching Firebase 8.10.1 -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app-check.js"></script>
 <!-- NINE TAGLINE JS 07 | Firebase / data | const firebaseConfig = { apiKey: "AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec", authDomain: "apin-w -->
 
 
@@ -17995,6 +17997,24 @@ Kirim
   
   
 firebase.initializeApp(firebaseConfig);
+
+/* NINE SECURITY - FIREBASE APP CHECK
+   Masukkan reCAPTCHA Enterprise SITE KEY (public key) dari Firebase Console
+   > App Check > Imamsalesnine > provider settings.
+   Jangan masukkan secret key atau service-account key di HTML.
+   App Check hanya aktif setelah SITE KEY valid diisi.
+*/
+const NINE_RECAPTCHA_ENTERPRISE_SITE_KEY = "6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M"; // ISI SITE KEY reCAPTCHA Enterprise
+if (NINE_RECAPTCHA_ENTERPRISE_SITE_KEY.trim()) {
+  try {
+    firebase.appCheck().activate(NINE_RECAPTCHA_ENTERPRISE_SITE_KEY, true);
+    console.info("[Nine] Firebase App Check activated");
+  } catch (error) {
+    console.error("[Nine] Firebase App Check initialization failed", error);
+  }
+} else {
+  console.warn("[Nine] App Check belum aktif: isi NINE_RECAPTCHA_ENTERPRISE_SITE_KEY sebelum mengaktifkan enforcement.");
+}
 
 const db = firebase.firestore();
   
