@@ -795,9 +795,9 @@ body{
 
 <script src="/js/auth.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app-check.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
 <script>
 const firebaseConfig={
@@ -817,7 +817,7 @@ if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
    Initialize before Firestore requests and listeners. */
 const NINE_RECAPTCHA_ENTERPRISE_SITE_KEY = "6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M";
 try {
-  firebase.appCheck().activate(NINE_RECAPTCHA_ENTERPRISE_SITE_KEY, true);
+  firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider(NINE_RECAPTCHA_ENTERPRISE_SITE_KEY), true);
   console.info("[Nine Admin] Firebase App Check activated");
 } catch (error) {
   console.error("[Nine Admin] Firebase App Check initialization failed", error);
