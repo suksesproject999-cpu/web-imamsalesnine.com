@@ -18135,6 +18135,8 @@ body:has(#product-grid-auto .cart-page) .social-float,body:has(#product-grid-aut
 .nf-voucher-row{min-height:54px!important}.nf-bottom-row{min-height:70px!important}
 @media(max-width:430px){#product-grid-auto .cart-page #cart-list .cart-item{grid-template-columns:21px 82px minmax(0,1fr)!important;gap:8px!important;padding:12px 9px!important}#product-grid-auto .cart-page #cart-list .cart-item .cart-image{width:82px!important;height:82px!important}#product-grid-auto .cart-page #cart-list .cart-item .cart-total{font-size:13px!important}#product-grid-auto .cart-page #cart-list .cart-item .cart-qty button{width:27px!important;height:28px!important}#product-grid-auto .cart-page #cart-list .cart-item .cart-qty span{width:24px!important} .nf-bottom-row{gap:5px!important;padding:9px!important}}
 </style>
+
+
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
@@ -38069,5 +38071,80 @@ body.dark-mode #checkout-summary .v38-voucher-entry small{color:#b9e08c!importan
 #product-grid-auto .cart-page.n4-ready #cart-list{visibility:visible!important}
 </style>
 <style id="nine-cart-route-visibility">body:not(:has(#product-grid-auto .cart-page)) .nf-cart-footer,body:not(:has(#product-grid-auto .checkout-form)) .nf-checkout-footer{display:none!important}</style>
+
+<style id="nine-desktop-layout-v16-clean">
+/* Desktop browser / desktop-site mode only. Existing mobile and interaction code untouched. */
+@media (min-width: 900px) {
+ #product-grid-auto.page-cart,#product-grid-auto.page-checkout{width:100%!important;max-width:none!important}
+ #product-grid-auto.page-cart .cart-page{width:min(100% - 48px,1180px)!important;max-width:1180px!important;margin:0 auto!important;padding:90px 0 175px!important}
+ #product-grid-auto.page-cart #cart-list{width:100%!important;max-width:100%!important;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:18px!important;align-items:stretch!important}
+ #product-grid-auto.page-cart #cart-list .cart-item.n4-card{width:100%!important;min-width:0!important;margin:0!important;align-self:stretch!important}
+ #product-grid-auto.page-cart .n4-main{grid-template-columns:25px 126px minmax(0,1fr)!important;gap:14px!important;padding:8px 18px 24px!important;min-height:176px!important}
+ #product-grid-auto.page-cart .n4-main>.cart-image{width:126px!important;height:130px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info h3{font-size:17px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side{display:grid!important;grid-template-columns:1fr!important;gap:9px!important;justify-items:start!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side>.cart-qty{grid-row:1!important;grid-column:1!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side>.cart-total{grid-row:2!important;grid-column:1!important;font-size:17px!important}
+ #product-grid-auto.page-cart .n4-head{height:48px!important}
+ #product-grid-auto.page-cart .n4-edit{font-size:13px!important}
+ #product-grid-auto.page-cart .nf-more-section{width:100%!important;max-width:100%!important;margin:28px auto 0!important}
+ #product-grid-auto.page-cart .nf-more-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:14px!important}
+ #product-grid-auto.page-cart .nf-more-grid>.product-card{width:100%!important;min-width:0!important}
+ #product-grid-auto .checkout-form{width:min(100% - 48px,1180px)!important;max-width:1180px!important;margin:0 auto!important;padding:90px 0 190px!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;gap:18px 24px!important;align-content:start!important;align-items:start!important}
+ #product-grid-auto .checkout-form>.nf-header{grid-column:1/-1!important}
+ #product-grid-auto .checkout-form>.nf-address-card{grid-column:1!important;grid-row:auto!important;min-width:0!important;margin:0!important}
+ #product-grid-auto .checkout-form>.form-card{grid-column:1!important;grid-row:auto!important;min-width:0!important;width:100%!important;margin:0!important}
+ #product-grid-auto .checkout-form>.form-card:has(#checkout-summary){grid-column:2!important;grid-row:1 / span 6!important;position:sticky!important;top:88px!important}
+ .nf-cart-footer,.nf-checkout-footer{width:min(calc(100% - 48px),1180px)!important;max-width:1180px!important;left:50%!important;right:auto!important;transform:translateX(-50%)!important;border-radius:18px 18px 0 0!important}
+}
+@media (min-width:900px) and (max-width:1100px){
+ #product-grid-auto.page-cart .cart-page,#product-grid-auto .checkout-form{width:calc(100% - 32px)!important}
+ #product-grid-auto.page-cart #cart-list{grid-template-columns:1fr!important}
+ #product-grid-auto.page-cart .n4-main{grid-template-columns:25px 140px minmax(0,1fr)!important}
+ #product-grid-auto.page-cart .n4-main>.cart-image{width:140px!important;height:140px!important}
+ #product-grid-auto.page-cart .nf-more-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+}
+</style>
+
+<style id="nine-desktop-site-readable-v17">
+/* Desktop-site on phones commonly exposes a ~980 CSS-pixel layout viewport.
+   Increase component density/readability there without touching native mobile. */
+@media (min-width:900px) and (max-width:1100px) {
+ #product-grid-auto.page-cart .cart-page{padding-top:74px!important}
+ #product-grid-auto.page-cart #cart-list{gap:20px!important}
+ #product-grid-auto.page-cart #cart-list .cart-item.n4-card{border-radius:20px!important}
+ #product-grid-auto.page-cart .n4-head{height:54px!important;padding-right:18px!important}
+ #product-grid-auto.page-cart .n4-edit{font-size:16px!important;min-width:76px!important;padding:10px 14px!important}
+ #product-grid-auto.page-cart .n4-main{grid-template-columns:30px 172px minmax(0,1fr)!important;gap:22px!important;padding:10px 24px 26px!important;min-height:204px!important}
+ #product-grid-auto.page-cart .n4-main>.cart-image{width:172px!important;height:172px!important}
+ #product-grid-auto.page-cart .n4-main>.nf-item-select{width:24px!important;height:24px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info{gap:12px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info h3{font-size:20px!important;line-height:1.4!important}
+ #product-grid-auto.page-cart .n4-variant .v39-variant-trigger{font-size:16px!important;padding:10px 12px!important;min-height:42px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side>.cart-total{font-size:20px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side>.cart-qty{font-size:17px!important}
+ #product-grid-auto.page-cart .n4-main .cart-info .cart-side>.cart-qty button{min-width:38px!important;min-height:38px!important;font-size:18px!important}
+ #product-grid-auto.page-cart .nf-header{min-height:64px!important}
+ #product-grid-auto.page-cart .nf-header>strong{font-size:22px!important}
+ #product-grid-auto.page-cart .nf-cart-edit{font-size:18px!important}
+ #product-grid-auto.page-cart .nf-more-head h3{font-size:21px!important}
+ #product-grid-auto.page-cart .nf-more-grid{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ #product-grid-auto.page-cart .nf-more-grid .product-card{font-size:15px!important}
+ .nf-cart-footer,.nf-checkout-footer{width:calc(100% - 32px)!important}
+ .nf-cart-footer .nf-bottom-row,.nf-checkout-footer .nf-bottom-row{min-height:72px!important;padding:13px 20px!important}
+ .nf-cart-footer .nf-all,.nf-checkout-footer .nf-terms{font-size:16px!important}
+ .nf-cart-footer .nf-totals strong,.nf-checkout-footer .nf-totals strong{font-size:20px!important}
+ .nf-cart-footer .nf-totals small,.nf-checkout-footer .nf-totals small{font-size:14px!important}
+ .nf-cart-footer .nf-primary,.nf-checkout-footer .nf-primary{font-size:18px!important;min-height:52px!important;padding:13px 20px!important}
+ .nf-sheet{width:min(calc(100% - 48px),760px)!important;max-height:88dvh!important;padding:24px 26px calc(30px + env(safe-area-inset-bottom,0px))!important}
+ .nf-sheet-head h3{font-size:22px!important}
+ .nf-sheet-head button{font-size:30px!important;min-width:40px!important;min-height:40px!important}
+ .nf-line{font-size:17px!important;padding:16px 0!important;line-height:1.5!important}
+ .nf-terms-content{font-size:16px!important;line-height:1.65!important}
+ #product-grid-auto .checkout-form{grid-template-columns:1fr!important;gap:18px!important;padding-top:76px!important}
+ #product-grid-auto .checkout-form>.nf-header,#product-grid-auto .checkout-form>.nf-address-card,#product-grid-auto .checkout-form>.form-card,#product-grid-auto .checkout-form>.form-card:has(#checkout-summary){grid-column:1!important;grid-row:auto!important;position:static!important;top:auto!important}
+ #product-grid-auto .checkout-form .form-card,#product-grid-auto .checkout-form .nf-address-card{font-size:17px!important}
+}
+</style>
 </body>
 </html>
