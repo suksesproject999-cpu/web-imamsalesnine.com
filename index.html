@@ -27965,7 +27965,10 @@ function goCart(){
         if(typeof window.setProductRootMode === "function") window.setProductRootMode("cart");
         renderCart();
     }
-    root.scrollIntoView({behavior:"smooth", block:"start"});
+    // Avoid scrolling the whole document through distant sections: that feels like
+    // the cart is thrown into place on mobile. Navigation is immediate; cards
+    // remain stable without a second animated layout pass.
+    root.scrollIntoView({behavior:"auto", block:"start"});
 }
 
 
@@ -36424,7 +36427,7 @@ function renderLogin(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<sp
 function renderRegister(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-user-plus"></i>${T('Buat akun','Create account')}</span><h2 class="v29-title">${T('Daftar akun baru','Create your account')}</h2><p class="v29-sub">${T('Buat akun untuk menulis ulasan dan menggunakan fitur pelanggan.','Create an account to post reviews and use customer features.')}</p><div class="v29-field"><label>Email</label><input id="v29RegEmail" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><input id="v29RegPass" class="v29-input" type="password" autocomplete="new-password" minlength="6" placeholder="${T('Minimal 6 karakter','At least 6 characters')}"></div><button type="button" id="v29Register" class="v29-primary">${T('Daftar Akun','Create Account')}</button><div class="v29-switch">${T('Sudah punya akun?','Already have an account?')} <button type="button" id="v29ToLogin">${T('Masuk','Sign In')}</button></div></div>`;wireAuthTop();$('#v29ToLogin')?.addEventListener('click',()=>renderLogin(body));$('#v29Register')?.addEventListener('click',async()=>{const email=$('#v29RegEmail')?.value.trim(),p=$('#v29RegPass')?.value||'';if(!email||p.length<6)return alertBox('info',T('Data belum valid','Invalid information'),T('Gunakan email valid dan password minimal 6 karakter.','Use a valid email and a password of at least 6 characters.'));try{await auth()?.createUserWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Pendaftaran gagal','Registration failed'),human(e))}})}
 function renderProfile(body,u){const n=u.displayName||u.email?.split('@')[0]||'User';body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Akun Anda terhubung dengan pengalaman marketplace Imam Sales Nine.','Your account is connected to the Imam Sales Nine marketplace.')}</p><div class="v29-profile"><div class="v29-avatar">${esc(n.charAt(0).toUpperCase())}</div><div><strong>${esc(n)}</strong><small>${esc(u.email||'')}</small></div></div><button type="button" id="v29Logout" class="v29-secondary"><i class="fa-solid fa-right-from-bracket"></i>${T('Keluar','Sign Out')}</button></div>`;wireAuthTop();$('#v29Logout')?.addEventListener('click',async()=>{try{await auth()?.signOut();renderAccount()}catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}})}
 function renderAccount(){const body=$('#v17AccountBody');if(!body)return;const u=auth()?.currentUser;u?renderProfile(body,u):renderLogin(body);registerRoot(body)}
-function openAccount(){closeMenu();const m=$('#v17AccountModal');if(!m)return;m.classList.remove('v24-account-modal','v25-account-modal','v26-account');m.classList.add('v29-account');m.classList.remove('show','v29-ready');renderAccount();m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';m.classList.add('show','v29-ready')}
+function openAccount(){closeMenu();const m=$('#v17AccountModal');if(!m)return;m.classList.remove('v24-account-modal','v25-account-modal','v26-account');m.classList.add('v29-account');if(m.classList.contains('show')&&m.classList.contains('v29-ready'))return;renderAccount();m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';m.classList.add('show','v29-ready')}
 function syncThemeFromStorage(){const saved=localStorage.getItem('theme');document.body.classList.toggle('dark-mode',saved==='dark')}
 function toggleTheme(){closeMenu();const dark=!document.body.classList.contains('dark-mode');document.body.classList.toggle('dark-mode',dark);localStorage.setItem('theme',dark?'dark':'light');requestAnimationFrame(renderMenu)}
 function setLanguage(l,fromAuth=false){const v=l==='en'?'en':'id';if(currentLang()===v&&!fromAuth){closeMenu();return}closeMenu();localStorage.setItem(langKey,v);document.documentElement.lang=v==='en'?'en':'id';renderMenu();if($('#v17AccountModal')?.classList.contains('show'))renderAccount();applyAll();indexDocumentIncremental(document.body);document.dispatchEvent(new CustomEvent('nine:languagechange',{detail:{lang:v}}))}
@@ -37536,40 +37539,7 @@ const fav=$('#v54-favorites');if(fav){new MutationObserver(()=>{if(fav.classList
 })();
 </script>
 
-<!-- NINE | CHECKOUT SESSION GUARD | login wajib sepanjang checkout -->
-<script>
-(function(){
-'use strict';
-let pendingCheckout=false, lastUid=null, authReady=false;
-function user(){try{return window.firebase&&firebase.auth&&firebase.auth().currentUser}catch(_){return null}}
-function checkoutActive(){try{return currentPage==='checkout'}catch(_){return false}}
-function account(){try{window.V17?.openAccount?.()}catch(e){console.warn('Nine account modal:',e)}}
-function warn(){try{Swal.fire({icon:'warning',title:'Login diperlukan',text:'Silakan masuk ke akun Anda untuk melanjutkan checkout.'})}catch(_){}}
-function returnCart(){try{if(typeof window.renderCart==='function')window.renderCart();else if(typeof renderCart==='function')renderCart()}catch(e){console.warn('Nine checkout guard cart:',e)}}
-function requireUser(){if(user())return true;pendingCheckout=true;if(checkoutActive())returnCart();account();return false}
-function install(){
- if(typeof window.checkoutForm==='function'&&!window.checkoutForm.__nineSessionGuard){
-  const original=window.checkoutForm;
-  const secured=function(){if(!requireUser())return;pendingCheckout=false;return original.apply(this,arguments)};
-  secured.__nineSessionGuard=true;window.checkoutForm=secured;
-  try{checkoutForm=secured}catch(_){}
- }
- if(typeof window.sendWhatsAppOrder==='function'&&!window.sendWhatsAppOrder.__nineSessionGuard){
-  const original=window.sendWhatsAppOrder;
-  const secured=function(){if(!requireUser())return;return original.apply(this,arguments)};
-  secured.__nineSessionGuard=true;window.sendWhatsAppOrder=secured;
-  try{sendWhatsAppOrder=secured}catch(_){}
- }
-}
-install();
-try{firebase.auth().onAuthStateChanged(function(u){
- const uid=u?.uid||null;
- if(!u&&checkoutActive()){pendingCheckout=true;returnCart();warn();account()}
- if(u&&pendingCheckout){pendingCheckout=false;queueMicrotask(function(){install();try{window.checkoutForm()}catch(e){console.warn('Nine checkout resume:',e)}})}
- lastUid=uid;authReady=true;
-})}catch(e){console.warn('Nine checkout auth observer:',e)}
-})();
-</script>
+<!-- Checkout authentication: native checkoutForm guard only; duplicate guard removed. -->
 
 <style id="nine-final-cart-checkout-css">
 #product-grid-auto.page-cart,#product-grid-auto.page-checkout{padding-top:0!important}
@@ -37711,6 +37681,12 @@ function begin(items,mode){if(window.__nineCheckoutSession)restore();window.__ni
 window.__nineStartDirectCheckout=items=>begin(items,'direct');
 const oldSave=window.saveCart;
 if(typeof oldSave==='function')window.saveCart=function(){if(window.__nineCheckoutSession)return;return oldSave.apply(this,arguments)};
+const oldRenderCategories=window.renderCategories;
+if(typeof oldRenderCategories==='function')window.renderCategories=function(){
+ document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(el=>el.remove());
+ cartEditMode=false;selectedReady=false;
+ return oldRenderCategories.apply(this,arguments);
+};
 const oldRenderCart=window.renderCart;
 if(typeof oldRenderCart==='function')window.renderCart=function(){
  // Single cart-entry boundary: never persist editing state across page visits.
@@ -37729,9 +37705,11 @@ if(typeof oldCheckout==='function')window.checkoutForm=function(){
  // Otherwise an unauthenticated tap changes cart/session state behind the login modal.
  const authUser=window.firebase?.auth?.()?.currentUser;
  if(!authUser){
-   // Delegate the login prompt exactly once to the existing checkout guard.
+   // Native checkout guard already uses V17; avoid invoking the legacy wrapper chain.
    if(window.__nineCheckoutSession)restore();
-   return oldCheckout.apply(this,arguments);
+   const modal=document.getElementById('v17AccountModal');
+   if(!modal?.classList.contains('show'))window.V17?.openAccount?.();
+   return;
  }
  if(!window.__nineCheckoutSession){
    const items=chosen();
@@ -37865,15 +37843,20 @@ function removeSelectedCart(){
  });
 }
 function cartFavoriteSelected(){
- const items=chosen();if(!items.length)return;
- try{
-  const saved=JSON.parse(localStorage.getItem('wishlist')||'[]');
-  const ids=new Set((Array.isArray(saved)?saved:[]).map(String));
-  items.forEach(item=>{if(item.id!=null)ids.add(String(item.id))});
-  localStorage.setItem('wishlist',JSON.stringify([...ids]));
-  document.dispatchEvent(new Event('nine:wishlistchange'));
-  Swal.fire({icon:'success',text:'Produk terpilih berhasil disimpan ke favorit.',timer:1400,showConfirmButton:false});
- }catch(e){Swal.fire({icon:'error',text:'Gagal menyimpan favorit. Silakan coba lagi.'})}
+ const items=chosen();
+ if(!items.length)return;
+ // Single wishlist owner: use the existing Firebase-aware toggle, never write
+ // localStorage and emit a second event from the cart.
+ const user=window.firebase?.auth?.()?.currentUser;
+ if(!user){window.V17?.openAccount?.();return}
+ const existing=new Set((Array.isArray(wishlist)?wishlist:[]).map(String));
+ for(const item of items){
+  if(item.id==null)continue;
+  const id=String(item.id);
+  if(existing.has(id))continue;
+  existing.add(id);
+  if(typeof window.toggleWishlist==='function')window.toggleWishlist(item.id);
+ }
 }
 // NINE V4: isolated card component; no DOM repositioning on quantity/header updates.
 let cartEnhancing=false;
@@ -37895,7 +37878,7 @@ function enhanceCart(){
   root.querySelectorAll('.v39-cart-voucher-hero,.v38-voucher-entry,.v17-voucher-panel').forEach(el=>el.remove());
   document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(x=>x.remove());
   root.querySelectorAll('.nf-header').forEach(x=>x.remove());
-  const head=header('Keranjang Saya ('+cartNow().length+')',()=>{cartEditMode=false;closeCartActionPanels(root);restore();renderCategories()});
+  const head=header('Keranjang Saya ('+cartNow().length+')',()=>{cartEditMode=false;selectedReady=false;closeCartActionPanels(root);restore();document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(el=>el.remove());renderCategories()});
   head.insertAdjacentHTML('beforeend','<button type="button" class="nf-cart-edit">'+(cartEditMode?'Selesai':'Ubah')+'</button><button type="button" class="nf-cart-chat" aria-label="WhatsApp"><i class="fa-regular fa-comments"></i></button>');
   head.querySelector('.nf-cart-edit').onclick=()=>{
    cartEditMode=!cartEditMode;closeCartActionPanels(root);
