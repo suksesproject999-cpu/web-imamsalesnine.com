@@ -38005,6 +38005,36 @@ setInterval(()=>{
  const next=localStorage.getItem('selectedVouchers')||'';
  if(next!==lastVoucher){lastVoucher=next;refreshV4()}
 },450);
+// V10: footer belongs to its route, never to the catalog/search/product detail.
+// Observe the actual route root instead of relying on navigation handlers.
+function reconcileCartRoute(){
+ const host=document.getElementById('product-grid-auto');
+ const cartActive=!!host?.querySelector('.cart-page');
+ const checkoutActive=!!host?.querySelector('.checkout-form');
+ if(!cartActive){document.querySelectorAll('.nf-cart-footer').forEach(el=>el.remove());cartEditMode=false;selectedReady=false;}
+ if(!checkoutActive)document.querySelectorAll('.nf-checkout-footer').forEach(el=>el.remove());
+}
+const routeHost=document.getElementById('product-grid-auto');
+if(routeHost){
+ let routeQueued=false;
+ const routeObserver=new MutationObserver(()=>{
+  if(routeQueued)return;
+  routeQueued=true;
+  queueMicrotask(()=>{routeQueued=false;reconcileCartRoute()});
+ });
+ routeObserver.observe(routeHost,{childList:true,attributes:true,attributeFilter:['class'],subtree:false});
+}
+// Hide a stale sticky immediately when a navigation action begins.
+document.addEventListener('click',event=>{
+ const cartFooter=document.querySelector('.nf-cart-footer');
+ if(!cartFooter)return;
+ const target=event.target;
+ if(!(target instanceof Element))return;
+ if(target.closest('.nf-cart-footer,.nf-header,.n4-edit,.n4-actions,.v39-variant-trigger,.cart-qty,.nf-item-select'))return;
+ if(target.closest('.cart-image,.cart-info h3,.nf-more-products,.search-box,.search-container,#searchInput,[onclick*="showProduct"],[onclick*="search"]')){
+  cartFooter.remove();
+ }
+},true);
 const grid=document.getElementById('product-grid-auto');
 if(grid?.querySelector('.cart-page'))enhanceCart();
 if(grid?.querySelector('.checkout-form'))enhanceCheckout();
@@ -38037,6 +38067,23 @@ body.dark-mode #checkout-summary .v38-voucher-entry small{color:#b9e08c!importan
 /* Cart cards remain hidden only until the same synchronous cart component pass completes. */
 #product-grid-auto .cart-page:not(.n4-ready) #cart-list{visibility:hidden!important}
 #product-grid-auto .cart-page.n4-ready #cart-list{visibility:visible!important}
+</style>
+<style id="nine-v10-cart-price-and-route-clean">
+/* One deterministic price row for every cart item, regardless of amount or title length. */
+#product-grid-auto.page-cart .n4-main .cart-side{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ justify-items:start!important;align-items:start!important;row-gap:8px!important;
+}
+#product-grid-auto.page-cart .n4-main .cart-qty{grid-row:1!important;order:unset!important;justify-self:start!important}
+#product-grid-auto.page-cart .n4-main .cart-total{
+ grid-row:2!important;order:unset!important;justify-self:start!important;
+ display:inline-flex!important;max-width:100%!important;min-height:30px!important;
+ align-items:center!important;white-space:nowrap!important;
+ padding:5px 9px!important;box-sizing:border-box!important;
+}
+/* The sticky bars are scoped to their own view, including fast route transitions. */
+body:not(:has(#product-grid-auto .cart-page)) .nf-cart-footer,
+body:not(:has(#product-grid-auto .checkout-form)) .nf-checkout-footer{display:none!important}
 </style>
 </body>
 </html>
