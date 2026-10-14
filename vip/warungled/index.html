@@ -2201,6 +2201,13 @@ style="padding:12px;"
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
+
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+
+
+	
+
 <script>
 
 const firebaseConfig = {
@@ -2214,6 +2221,23 @@ const firebaseConfig = {
 };
 
 firebase.initializeApp(firebaseConfig);
+
+
+
+// Firebase App Check - reCAPTCHA Enterprise (sinkron dengan website utama)
+const VIP_RECAPTCHA_ENTERPRISE_SITE_KEY = "6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M";
+try {
+  firebase.appCheck().activate(
+    new firebase.appCheck.ReCaptchaEnterpriseProvider(VIP_RECAPTCHA_ENTERPRISE_SITE_KEY),
+    true
+  );
+  console.info("[VIP] Firebase App Check activated");
+} catch (error) {
+  console.error("[VIP] Firebase App Check initialization failed", error);
+}
+
+
+	
 
 const db = firebase.firestore();
 
