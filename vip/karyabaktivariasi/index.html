@@ -1,9 +1,1842 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIP Dashboard</title>
 
+
+<style>
+
+:root{
+
+--navy:#0f2d6b;
+--navy-dark:#081c4f;
+
+--primary:#1976d2;
+--primary-hover:#1565c0;
+
+--success:#4caf50;
+--warning:#ff9800;
+--danger:#f44336;
+
+--bg:#eceff3;
+--surface:#ffffff;
+
+--border:#d6dbe3;
+
+--text:#2d3748;
+--text-light:#718096;
+
+--shadow:
+0 2px 10px rgba(0,0,0,.08);
+
+--radius:10px;
+
+}
+
+body{
+
+margin:0;
+
+font-family:
+"Segoe UI",
+sans-serif;
+
+background:var(--bg);
+
+color:var(--text);
+
+overflow:hidden;
+
+}
+
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 20px;
+}
+
+/* MENU */
+.menu-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
+}
+
+.menu-bar button,
+.menu-bar a {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: white;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+/* CARD */
+.card{
+
+background:white;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+padding:20px;
+
+margin:0;
+
+max-width:none;
+
+box-shadow:var(--shadow);
+
+color:var(--text);
+
+}
+
+.card h1{
+
+font-size:28px;
+
+font-weight:600;
+
+margin-bottom:10px;
+
+}
+
+.card p{
+
+  max-width: 550px;
+
+  margin: 0 auto;
+
+  line-height: 1.6;
+
+  font-size: 18px;
+
+}
+
+.badge{
+
+background:#e3f2fd;
+
+color:#1976d2;
+
+padding:6px 12px;
+
+font-size:12px;
+
+border-radius:4px;
+
+}
+
+#live-clock{
+
+  margin-top: 15px;
+
+  opacity: .8;
+
+  font-size: 14px;
+
+}
+
+.announcement-bar{
+
+  margin: 30px auto 0;
+
+  max-width: 550px;
+
+  background: #22c55e;
+
+  padding: 18px;
+
+  border-radius: 999px;
+
+  font-size: 18px;
+
+}
+
+/* SEARCH */
+.search-box{
+
+position:relative;
+
+max-width:450px;
+
+}
+
+.search-box input{
+
+width:100%;
+
+height:38px;
+
+padding:0 12px;
+
+border:1px solid #cfd8dc;
+
+border-radius:4px;
+
+font-size:13px;
+
+background:white;
+
+box-sizing:border-box;
+
+}
+
+.dropdown{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:white;
+  color:#111;
+  border:1px solid #ddd;
+  border-radius:8px;
+  max-height:250px;
+  overflow-y:auto;
+  z-index:9999;
+}
+
+.dropdown div{
+
+padding:10px 12px;
+
+color:#111;
+
+background:white;
+
+border-bottom:1px solid #eee;
+
+cursor:pointer;
+
+}
+
+.dropdown div:hover{
+
+background:#f3f4f6;
+
+}
+
+/* CART */
+#cart-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.cart-item{
+
+background:white;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+padding:12px;
+
+margin-top:10px;
+
+color:var(--text);
+
+}
+
+.cart-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cart-row input {
+  width: 60px;
+  text-align: center;
+}
+
+.cart-row select {
+  border-radius: 6px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  background: rgba(0,0,0,0.3);
+}
+
+.subtotal {
+  font-size: 13px;
+  margin-top: 5px;
+  color: #22c55e;
+}
+/* =====================================
+🤖 IMAMGPT SCOPED UI
+NO COLLISION VERSION
+===================================== */
+
+.imam-ai-container{
+
+width:100%;
+
+height:75vh;
+
+min-height:550px;
+
+max-height:800px;
+
+display:flex;
+
+flex-direction:column;
+
+background:
+linear-gradient(
+180deg,
+#081226,
+#0b1324
+);
+
+border-radius:20px;
+
+overflow:hidden;
+
+border:
+1px solid rgba(255,255,255,.06);
+
+box-shadow:
+0 10px 35px rgba(0,0,0,.35);
+
+box-sizing:border-box;
+
+}
+
+/* HEADER */
+
+.imam-ai-header{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:18px 20px;
+
+font-size:22px;
+
+font-weight:700;
+
+color:white;
+
+background:
+linear-gradient(
+90deg,
+rgba(17,24,39,.98),
+rgba(15,23,42,.98)
+);
+
+border-bottom:
+1px solid rgba(255,255,255,.05);
+
+flex-shrink:0;
+
+}
+
+/* CHAT AREA */
+
+#imam-chat-box{
+
+  flex:1;
+
+  overflow-y:auto;
+
+  padding:20px;
+
+  scroll-behavior:smooth;
+  
+  min-height:0;
+
+
+}
+
+/* USER */
+
+.imam-user-msg{
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  margin-left:auto;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  box-shadow:
+  0 6px 18px rgba(37,99,235,.35);
+
+  word-break:break-word;
+
+}
+
+/* AI */
+
+.imam-ai-msg{
+
+  background:
+  rgba(30,41,59,.95);
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  border:
+  1px solid rgba(255,255,255,.04);
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,.25);
+
+  word-break:break-word;
+
+}
+
+/* IMAGE */
+
+.imam-ai-msg img{
+
+  width:100%;
+
+  margin-top:14px;
+
+  border-radius:18px;
+
+  display:block;
+
+}
+
+/* INPUT */
+
+.imam-chat-input-wrap{
+
+display:flex;
+
+align-items:flex-end;
+
+gap:12px;
+
+padding:16px;
+
+background:
+rgba(17,24,39,.98);
+
+border-top:
+1px solid rgba(255,255,255,.05);
+
+flex-shrink:0;
+
+}
+
+/* TEXTAREA */
+#imam-ai-input{
+
+flex:1;
+
+min-height:55px;
+
+max-height:140px;
+
+overflow-y:auto;
+
+border:none;
+
+outline:none;
+
+border-radius:16px;
+
+padding:14px 16px;
+
+background:
+rgba(30,41,59,.95);
+
+color:white;
+
+resize:none;
+
+font-size:14px;
+
+line-height:1.5;
+
+box-sizing:border-box;
+
+}
+
+/* BUTTON */
+
+.imam-chat-input-wrap button{
+
+width:58px;
+
+height:58px;
+
+border:none;
+
+border-radius:16px;
+
+background:
+linear-gradient(
+135deg,
+#22c55e,
+#16a34a
+);
+
+color:white;
+
+font-size:22px;
+
+cursor:pointer;
+
+flex-shrink:0;
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.imam-ai-container{
+
+height:70vh;
+
+min-height:500px;
+
+border-radius:16px;
+
+}
+
+.imam-ai-header{
+
+font-size:18px;
+
+padding:16px;
+
+}
+
+#imam-chat-box{
+
+padding:14px;
+
+}
+
+}
+  
+
+
+/* =========================
+TYPING ANIMATION
+========================= */
+
+.typing{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+}
+
+.typing span{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:white;
+
+  opacity:.5;
+
+  animation:bounce 1s infinite;
+
+}
+
+.typing span:nth-child(2){
+
+  animation-delay:.2s;
+
+}
+
+.typing span:nth-child(3){
+
+  animation-delay:.4s;
+
+}
+
+@keyframes bounce{
+
+  0%,100%{
+
+    transform:translateY(0);
+
+    opacity:.3;
+
+  }
+
+  50%{
+
+    transform:translateY(-4px);
+
+    opacity:1;
+
+  }
+
+}
+
+.ai-action{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:14px;
+
+}
+
+.copy-btn,
+.download-btn{
+
+  border:none;
+
+  background:#1e293b;
+
+  color:white;
+
+  padding:10px 14px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-size:13px;
+
+  transition:.2s;
+
+}
+
+.copy-btn:hover,
+.download-btn:hover{
+
+  transform:translateY(-2px);
+
+  background:#334155;
+
+}
+
+.image-upload-wrap{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+}
+
+.image-upload-wrap input{
+
+  color:white;
+
+  font-size:13px;
+
+}
+
+.upload-btn{
+
+  width:58px;
+
+  height:58px;
+
+  border-radius:16px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:
+  rgba(255,255,255,.08);
+
+  cursor:pointer;
+
+  font-size:24px;
+
+  flex-shrink:0;
+
+}
+
+#preview-box{
+
+  padding:
+  12px 18px 0 18px;
+
+}
+
+#preview-box img{
+
+  width:90px;
+
+  border-radius:14px;
+
+  margin-top:8px;
+
+  display:block;
+
+  box-shadow:
+  0 6px 20px rgba(0,0,0,.25);
+
+}
+
+.preview-card{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+  rgba(255,255,255,.05);
+
+  padding:10px;
+
+  border-radius:16px;
+
+  width:fit-content;
+
+}
+
+.preview-card img{
+
+  width:70px;
+
+  height:70px;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+}
+
+.vip-layout{
+
+display:flex;
+
+height:100vh;
+
+background:var(--bg);
+
+overflow:hidden;
+
+}
+
+.sidebar{
+
+width:60px;
+
+background:
+linear-gradient(
+180deg,
+#0f2d6b,
+#081c4f
+);
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+padding-top:6px;
+
+gap:6px;
+
+flex-shrink:0;
+
+box-shadow:
+2px 0 8px rgba(0,0,0,.15);
+
+}
+
+.sidebar-btn{
+
+width:44px;
+height:44px;
+
+border:none;
+
+background:transparent;
+
+color:white;
+
+font-size:20px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.sidebar-btn:hover{
+
+background:
+rgba(255,255,255,.12);
+
+}
+
+.sidebar-btn.active{
+
+background:#e91e63;
+
+}
+
+.main-wrapper{
+
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+.topbar{
+
+height:34px;
+
+background:#f3f3f3;
+
+display:flex;
+
+align-items:center;
+
+border-bottom:
+1px solid #d0d0d0;
+
+padding:0;
+
+margin:0;
+
+border-radius:0;
+
+}
+
+.erp-tabs{
+
+display:flex;
+
+height:100%;
+
+}
+
+.tab{
+
+height:40px;
+
+padding:0 12px;
+
+display:flex;
+
+align-items:center;
+
+font-size:14px;
+
+background:#d9d9d9;
+
+border-right:1px solid #bdbdbd;
+
+cursor:pointer;
+
+}
+
+.tab.active{
+
+background:#ec407a;
+
+color:white;
+
+font-weight:600;
+
+}
+
+#main-content{
+
+flex:1;
+
+padding:12px;
+
+overflow:auto;
+
+}
+
+.erp-order{
+
+background:white;
+
+border-radius:8px;
+
+border:1px solid var(--border);
+
+box-shadow:var(--shadow);
+
+height:calc(100vh - 120px);
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+.erp-section{
+
+padding:12px;
+
+border-bottom:
+1px solid #e5e7eb;
+
+background:white;
+
+}
+
+.erp-form-row{
+
+display:grid;
+
+grid-template-columns:
+
+1fr
+220px
+220px
+220px;
+
+gap:12px;
+
+align-items:end;
+
+}
+
+.erp-form-group input,
+.erp-form-group select{
+
+height:34px;
+
+border:
+1px solid #cfd8dc;
+
+border-radius:4px;
+
+padding:0 10px;
+
+font-size:13px;
+
+background:white;
+
+}
+
+.erp-form-group input:focus,
+.erp-form-group select:focus{
+
+outline:none;
+
+border-color:#2196f3;
+
+}
+
+.dropdown{
+
+background:white;
+
+border:
+1px solid #d7dce3;
+
+box-shadow:
+0 3px 8px rgba(0,0,0,.12);
+
+border-radius:4px;
+
+}
+
+.erp-table{
+
+width:100%;
+
+min-width:850px;
+
+border-collapse:collapse;
+
+font-size:14px;
+
+background:white;
+
+}
+
+.erp-table th{
+
+background:#5e738a;
+
+color:white;
+
+padding:8px;
+
+font-size:13px;
+
+font-weight:600;
+
+text-align:center;
+
+position:sticky;
+
+top:0;
+
+z-index:2;
+
+}
+
+.erp-table td{
+
+padding:10px 8px;
+
+color:#2d3748;
+
+font-weight:500;
+
+vertical-align:middle;
+
+}
+
+.erp-table tbody tr:hover{
+
+background:#f7fafc;
+
+}
+
+.btn-order{
+
+background:#1976d2;
+color:white;
+
+border:none;
+
+padding:10px 16px;
+
+border-radius:4px;
+
+}
+
+.btn-new{
+
+background:#4caf50;
+color:white;
+
+}
+
+.btn-cancel{
+
+background:#f44336;
+color:white;
+
+}
+
+.btn-draft{
+
+background:#607d8b;
+color:white;
+
+}
+
+.btn-order,
+.btn-new,
+.btn-cancel,
+.btn-draft{
+
+border:none;
+
+cursor:pointer;
+
+height:38px;
+
+padding:0 16px;
+
+border-radius:4px;
+
+font-size:13px;
+
+font-weight:600;
+
+}
+
+.floating-menu{
+  
+display:none;
+
+position:fixed;
+
+left:65px;
+
+top:100px;
+
+width:300px;
+
+background:white;
+
+border-radius:8px;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,.15);
+
+padding:12px;
+
+z-index:9999;
+
+}
+
+.erp-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(3,1fr);
+
+gap:10px;
+
+}
+
+.erp-grid div{
+
+background:#e8f5e9;
+
+border:
+1px solid #c8e6c9;
+
+padding:18px;
+
+border-radius:6px;
+
+text-align:center;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.erp-grid div:hover{
+
+background:#dcedc8;
+
+transform:translateY(-2px);
+
+}
+
+
+
+.badge-red{
+
+position:absolute;
+
+top:4px;
+
+right:4px;
+
+background:#f44336;
+
+color:white;
+
+font-size:10px;
+
+padding:2px 5px;
+
+border-radius:999px;
+
+}
+
+.unit-btn{
+  
+width:60px;
+
+text-align:center;
+
+height:34px;
+
+padding:0 12px;
+
+border:
+1px solid #cfd8dc;
+
+background:white;
+
+border-radius:4px;
+
+cursor:pointer;
+
+}
+
+.btn-delete{
+
+background:#f44336;
+
+color:white;
+
+border:none;
+
+width:34px;
+
+height:34px;
+
+padding:0;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+border-radius:4px;
+
+cursor:pointer;
+
+font-size:16px;
+
+line-height:1;
+
+}
+
+.erp-form-group{
+
+display:flex;
+
+flex-direction:column;
+
+gap:6px;
+
+}
+
+.erp-form-group label{
+
+font-size:12px;
+
+font-weight:600;
+
+color:#555;
+
+}
+
+.erp-table-empty{
+
+height:600px;
+
+}
+
+.erp-section{
+
+overflow-x:auto;
+
+}
+
+.erp-action{
+
+display:flex;
+
+gap:8px;
+
+margin-right:auto;
+
+}
+
+.erp-action button{
+
+height:42px;
+
+padding:0 14px;
+
+white-space:nowrap;
+
+min-width:120px;
+
+}
+
+.tab{
+
+height:40px;
+
+padding:0 12px;
+
+font-size:14px;
+
+}
+
+
+.sum-row{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:12px 14px;
+
+border-bottom:1px solid #ddd;
+
+font-size:14px;
+
+}
+
+.sum-row.total{
+
+background:#4caf50;
+
+color:white;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
+.erp-table-area{
+
+height:500px;
+
+overflow-y:auto;
+
+overflow-x:auto;
+
+background:white;
+
+border-top:1px solid #ddd;
+
+border-bottom:1px solid #ddd;
+
+}
+
+.erp-summary{
+
+width:280px;
+
+min-width:280px;
+
+margin-left:auto;
+
+border:1px solid #ddd;
+
+background:white;
+
+border-radius:6px;
+
+overflow:hidden;
+
+flex-shrink:0;
+
+}
+
+
+.erp-footer-area{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-end;
+
+padding:15px;
+
+gap:20px;
+
+flex-direction:row;
+
+}
+
+.erp-table td:nth-child(4){
+
+text-align:center;
+
+}
+
+.erp-table td:nth-child(4) input{
+
+width:140px;
+
+text-align:center;
+
+box-sizing:border-box;
+
+}
+
+.erp-table td:nth-child(5){
+
+text-align:right;
+
+padding-right:15px;
+
+font-weight:600;
+
+white-space:nowrap;
+
+}
+
+.erp-table input{
+
+height:32px;
+
+font-size:14px;
+
+font-weight:500;
+
+box-sizing:border-box;
+
+}
+
+.erp-table td:first-child{
+
+min-width:260px;
+
+white-space:nowrap;
+
+}
+
+.erp-table td:nth-child(2) input{
+
+width:60px;
+
+text-align:center;
+
+}
+
+.erp-table td:last-child{
+
+text-align:center;
+
+vertical-align:middle;
+
+}
+
+.erp-table td:last-child .btn-delete{
+
+margin:auto;
+
+}
+
+@media(max-width:768px){
+
+.erp-footer-area{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.erp-summary{
+
+width:100%;
+
+min-width:unset;
+
+}
+
+.erp-action{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:8px;
+
+width:100%;
+
+}
+
+.erp-action button{
+
+min-width:unset;
+
+}
+
+}
+
+.erp-table td:nth-child(6){
+    white-space:nowrap;
+    font-weight:700;
+}
+
+.btn-klaim{
+    background:#ff9800;
+}
+
+.info-card{
+
+background:white;
+
+padding:15px;
+
+border-radius:8px;
+
+margin-bottom:15px;
+
+border-left:4px solid #2196f3;
+
+}
+
+.info-important{
+
+border-left:4px solid #f44336;
+
+background:#fff5f5;
+
+}
+
+.info-title{
+
+font-size:12px;
+
+font-weight:700;
+
+margin-bottom:8px;
+
+color:#666;
+
+}
+
+.info-date{
+
+font-size:11px;
+
+color:#999;
+
+margin-bottom:10px;
+
+}
+
+.info-content{
+
+line-height:1.7;
+
+margin-bottom:10px;
+
+}
+
+.info-image{
+
+width:100%;
+
+border-radius:8px;
+
+margin-top:10px;
+
+margin-bottom:10px;
+
+}
+
+.info-actions{
+
+display:flex;
+
+gap:10px;
+
+flex-wrap:wrap;
+
+}
+
+.info-btn{
+
+background:#1976d2;
+
+color:white;
+
+padding:8px 12px;
+
+border-radius:6px;
+
+text-decoration:none;
+
+font-size:12px;
+
+}
+
+
+</style>
+
+</head>
+
+<body>
+
+<div class="vip-layout">
+
+    <aside class="sidebar">
+
+<button
+class="sidebar-btn active"
+onclick="setActive(this);openTab('dashboard')"
+title="Dashboard"
+>
+🏠
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);togglePenjualan()"
+title="Penjualan"
+>
+🛒
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('pricelist')"
+title="Pricelist"
+>
+💰
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('katalog')"
+title="Katalog"
+>
+📄
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('ai')"
+title="ImamGPT"
+>
+🤖
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('info')"
+title="Informasi"
+style="position:relative;"
+>
+
+📢
+
+<span
+id="info-badge"
+class="badge-red"
+style="display:none;"
+>
+0
+</span>
+
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);goHistoryOrder()"
+title="History Order"
+>
+📦
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);goHistoryKlaim()"
+title="History Klaim"
+>
+🔁
+</button>
+
+</aside>
+
+
+<div
+id="floating-menu"
+class="floating-menu"
+>
+
+<div class="erp-grid">
+
+<div onclick="openMenu('order')">
+📋
+<br>
+Pesanan
+</div>
+
+<div onclick="openMenu('pengiriman')">
+🚚
+<br>
+Pengiriman
+</div>
+
+<div onclick="openMenu('retur')">
+↩️
+<br>
+Retur
+</div>
+
+<div onclick="openMenu('klaim')">
+♻️
+<br>
+Klaim
+</div>
+
+<div>
+🎯
+<br>
+Target
+</div>
+
+<div>
+📍
+<br>
+Checkin
+</div>
+
+</div>
+
+</div>
+
+    <main class="main-wrapper">
+
+        <div class="topbar">
+
+<div
+class="erp-tabs"
+id="erp-tabs"
+></div>
+
+</div>
+
+        <div
+id="main-content"
+style="padding:12px;"
+></div>
+        
+    </main>
+
+</div>
+
+<script src="/js/auth.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+
+<script>
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",
+  authDomain: "apin-web.firebaseapp.com",
+  projectId: "apin-web",
+  storageBucket: "apin-web.firebasestorage.app",
+  messagingSenderId: "733140414417",
+  appId: "1:733140414417:web:b6967fd053ac462b2ffaf0",
+  measurementId: "G-6ZN6TQ1YVE"
+};
+
+firebase.initializeApp(firebaseConfig);
+
+const db = firebase.firestore();
+
+db.collection("info_distributor")
+.onSnapshot(snap=>{
+
+const badge =
+document.getElementById(
+"info-badge"
+);
+
+if(badge){
+
+badge.innerText = snap.size;
+
+if(snap.size > 0){
+
+badge.style.display =
+"inline-block";
+
+}else{
+
+badge.style.display =
+"none";
+
+}
+
+}
+
+});
+
+function updateActivity(){
+
+  db.collection("aktivitas_vip")
+  .doc("KARYA BAKTI VARIASI")
+  .set({
+
+    nama:"KARYA BAKTI VARIASI",
+
+    last_active:
+    firebase.firestore
+    .FieldValue
+    .serverTimestamp()
+
+  });
+
+}
+
+</script>
+
+<script>
   
 const URL =
 "https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec";
 
-const VIP_NAME = window.__VIP_CONTEXT.nama;
+const VIP_NAME = "KARYA BAKTI VARIASI";
 
 let invoiceNo = "";
 let waktuOrder = "";
@@ -25,7 +1858,7 @@ order : "Pesanan Penjualan",
 klaim : "Klaim Barang",
 pengiriman : "Pengiriman",
 retur : "Retur",
-ai : "Imam AI"
+ai : "ImamGPT"
 
 };
 
@@ -71,7 +1904,7 @@ cart = orderCart;
 
 const draft =
 localStorage.getItem(
-window.VIPStorage.key("draftOrder")
+"draftOrder"
 );
 
 if(
@@ -96,7 +1929,7 @@ if(
     }catch(e){
 
       localStorage.removeItem(
-        window.VIPStorage.key("draftOrder")
+        "draftOrder"
       );
 
     }
@@ -104,7 +1937,7 @@ if(
   }else{
 
     localStorage.removeItem(
-      window.VIPStorage.key("draftOrder")
+      "draftOrder"
     );
 
   }
@@ -113,10 +1946,10 @@ if(
 
 
 invoiceNo =
-localStorage.getItem(window.VIPStorage.key("invoiceNo")) || invoiceNo;
+localStorage.getItem("invoiceNo") || invoiceNo;
 
 waktuOrder =
-localStorage.getItem(window.VIPStorage.key("waktuOrder")) || waktuOrder;
+localStorage.getItem("waktuOrder") || waktuOrder;
   
   const today =
 
@@ -266,40 +2099,29 @@ Data Baru
 class="btn-cancel"
 onclick="batalOrder()"
 >
-<i class="fa-solid fa-xmark"></i>
-<span class="btn-label">
+❌ <span class="btn-label">
 Batal
 </span>
 </button>
-
-
-
 
 
 <button
 class="btn-draft"
 onclick="simpanDraft()"
 >
-<i class="fa-solid fa-floppy-disk"></i>
-<span class="btn-label">
+💾 <span class="btn-label">
 Simpan Draft
 </span>
 </button>
-
-
-
 
 <button
 class="btn-order"
 onclick="kirimWA()"
 >
-<i class="fa-solid fa-paper-plane"></i>
-<span class="btn-label">
+🚀 <span class="btn-label">
 Kirim Order
 </span>
 </button>
-
-
 
 </div>
 
@@ -346,7 +2168,7 @@ cart = klaimCart;
 
 const draft =
 localStorage.getItem(
-window.VIPStorage.key("draftKlaim")
+"draftKlaim"
 );
 
 if(
@@ -369,7 +2191,7 @@ if(
 }catch(e){
 
   localStorage.removeItem(
-    window.VIPStorage.key("draftKlaim")
+    "draftKlaim"
   );
 
 }
@@ -377,7 +2199,7 @@ if(
   }else{
 
     localStorage.removeItem(
-      window.VIPStorage.key("draftKlaim")
+      "draftKlaim"
     );
 
   }
@@ -386,10 +2208,10 @@ if(
 
 
 klaimNo =
-localStorage.getItem(window.VIPStorage.key("klaimNo")) || klaimNo;
+localStorage.getItem("klaimNo") || klaimNo;
 
 waktuKlaim =
-localStorage.getItem(window.VIPStorage.key("waktuKlaim")) || waktuKlaim;
+localStorage.getItem("waktuKlaim") || waktuKlaim;
   
   const today =
 
@@ -561,56 +2383,40 @@ resize:none;
 
 <div class="erp-action">
 
-
 <button 
 class="btn-new"
 onclick="orderBaru()"
 >
-<i class="fa-solid fa-plus"></i>
-<span class="btn-label">
+➕ <span class="btn-label">
 Data Baru
 </span>
 </button>
-
-
-
 
 <button
 class="btn-cancel"
 onclick="batalOrder()"
 >
-<i class="fa-solid fa-xmark"></i>
-<span class="btn-label">
+❌ <span class="btn-label">
 Batal
 </span>
 </button>
-
-
-
 
 
 <button
 class="btn-draft"
 onclick="simpanDraft()"
 >
-<i class="fa-solid fa-floppy-disk"></i>
-<span class="btn-label">
+💾 <span class="btn-label">
 Simpan Draft
 </span>
 </button>
-
-
-
 
 <button
 class="btn-order btn-klaim"
 onclick="kirimKlaim()"
 >
-<i class="fa-solid fa-rotate"></i>
-Kirim Klaim
+♻️ Kirim Klaim
 </button>
-
-
 
 </div>
 
@@ -699,12 +2505,9 @@ if(
   kosong = window.isKosong(item);
 }
 
-  
-div.innerHTML = kosong
-    ? '<i class="fa-solid fa-circle-xmark"></i> ' + item + ' (Stok Habis)'
-    : '<i class="fa-solid fa-circle-check"></i> ' + item;
-
-
+  div.innerText = kosong 
+    ? "❌ " + item + " (Stok Habis)" 
+    : "🟢 " + item;
 
   if(kosong){
     div.style.color = "#888";
@@ -881,18 +2684,15 @@ ${formatRupiah(total)}
 
 <td>
 
-
 <button
 onclick="hapus(${i})"
 class="btn-delete"
 title="Hapus"
 >
 
-<i class="fa-solid fa-trash-can"></i>
+🗑
 
 </button>
-
-
 
 </td>
 
@@ -1074,9 +2874,9 @@ if(mode==="order"){
 orderCart = [];
 cart = orderCart;
 
-localStorage.removeItem(window.VIPStorage.key("invoiceNo"));
-localStorage.removeItem(window.VIPStorage.key("waktuOrder"));
-localStorage.removeItem(window.VIPStorage.key("draftOrder"));
+localStorage.removeItem("invoiceNo");
+localStorage.removeItem("waktuOrder");
+localStorage.removeItem("draftOrder");
 
 invoiceNo = "";
 waktuOrder = "";
@@ -1090,9 +2890,9 @@ renderOrder();
 klaimCart = [];
 cart = klaimCart;
 
-localStorage.removeItem(window.VIPStorage.key("klaimNo"));
-localStorage.removeItem(window.VIPStorage.key("waktuKlaim"));
-localStorage.removeItem(window.VIPStorage.key("draftKlaim"));
+localStorage.removeItem("klaimNo");
+localStorage.removeItem("waktuKlaim");
+localStorage.removeItem("draftKlaim");
 
 klaimNo = "";
 waktuKlaim = "";
@@ -1118,9 +2918,9 @@ if(mode==="order"){
 orderCart = [];
 cart = orderCart;
 
-localStorage.removeItem(window.VIPStorage.key("invoiceNo"));
-localStorage.removeItem(window.VIPStorage.key("waktuOrder"));
-localStorage.removeItem(window.VIPStorage.key("draftOrder"));
+localStorage.removeItem("invoiceNo");
+localStorage.removeItem("waktuOrder");
+localStorage.removeItem("draftOrder");
 
 invoiceNo = "";
 waktuOrder = "";
@@ -1134,9 +2934,9 @@ renderOrder();
 klaimCart = [];
 cart = klaimCart;
 
-localStorage.removeItem(window.VIPStorage.key("klaimNo"));
-localStorage.removeItem(window.VIPStorage.key("waktuKlaim"));
-localStorage.removeItem(window.VIPStorage.key("draftKlaim"));
+localStorage.removeItem("klaimNo");
+localStorage.removeItem("waktuKlaim");
+localStorage.removeItem("draftKlaim");
 
 klaimNo = "";
 waktuKlaim = "";
@@ -1198,7 +2998,7 @@ invoiceNo;
   // 🔥 kirim hanya yang tersedia
   let pesan =
 
-`📋 ORDER ${window.__VIP_CONTEXT.nama}
+`📋 ORDER KARYA BAKTI VARIASI
 
 Invoice : ${invoiceId}
 
@@ -1264,7 +3064,7 @@ Grand Total : ${formatRupiah(grandTotal)}
     method:"POST",
     mode:"no-cors",
     body: JSON.stringify({
-      nama:window.__VIP_CONTEXT.nama,
+      nama:"KARYA BAKTI VARIASI",
       order: pesan,
       status:"order"
     })
@@ -1277,11 +3077,10 @@ Grand Total : ${formatRupiah(grandTotal)}
 db.collection("invoice")
 .doc(invoiceId)
 .set({
-  vipId: window.__VIP_CONTEXT.vipId,
 
   invoice: invoiceId,
 
-  nama: window.__VIP_CONTEXT.nama,
+  nama: "KARYA BAKTI VARIASI",
 
   type: "order",
 
@@ -1321,9 +3120,8 @@ let itemText =
 `Total ${formatRupiah(total)}`;
 
   db.collection("pesanan").add({
-  vipId: window.__VIP_CONTEXT.vipId,
 
-  nama:window.__VIP_CONTEXT.nama,
+  nama:"KARYA BAKTI VARIASI",
 
   produk:item.nama,
 
@@ -1363,15 +3161,15 @@ encodeURIComponent(pesan)
 );
 
 localStorage.removeItem(
-window.VIPStorage.key("invoiceNo")
+"invoiceNo"
 );
 
 localStorage.removeItem(
-window.VIPStorage.key("waktuOrder")
+"waktuOrder"
 );
 
 localStorage.removeItem(
-window.VIPStorage.key("draftOrder")
+"draftOrder"
 );
 
 invoiceNo = "";
@@ -1404,7 +3202,7 @@ function kirimKlaim(){
 
   let pesan =
 
-`♻️ KLAIM ${window.__VIP_CONTEXT.nama}
+`♻️ KLAIM KARYA BAKTI VARIASI
 
 Invoice : ${invoiceId}
 
@@ -1465,7 +3263,7 @@ ${ket}
     method:"POST",
     mode:"no-cors",
     body: JSON.stringify({
-      nama:window.__VIP_CONTEXT.nama,
+      nama:"KARYA BAKTI VARIASI",
       order: pesan,
       status:"klaim"
     })
@@ -1478,11 +3276,10 @@ ${ket}
 db.collection("invoice")
 .doc(invoiceId)
 .set({
-  vipId: window.__VIP_CONTEXT.vipId,
 
   invoice: invoiceId,
 
-  nama: window.__VIP_CONTEXT.nama,
+  nama: "KARYA BAKTI VARIASI",
 
   type: "klaim",
 
@@ -1525,9 +3322,8 @@ let itemText =
 `Total ${formatRupiah(total)}`;
 
   db.collection("pesanan").add({
-  vipId: window.__VIP_CONTEXT.vipId,
 
-  nama:window.__VIP_CONTEXT.nama,
+  nama:"KARYA BAKTI VARIASI",
 
   produk:item.nama,
 
@@ -1566,9 +3362,9 @@ let itemText =
 encodeURIComponent(pesan)
 );
 
-localStorage.removeItem(window.VIPStorage.key("klaimNo"));
-localStorage.removeItem(window.VIPStorage.key("waktuKlaim"));
-localStorage.removeItem(window.VIPStorage.key("draftKlaim"));
+localStorage.removeItem("klaimNo");
+localStorage.removeItem("waktuKlaim");
+localStorage.removeItem("draftKlaim");
 
 klaimNo = "";
 waktuKlaim = "";
@@ -1584,7 +3380,7 @@ renderKlaim();
 
 // HISTORY
 function goHistory(){
-  window.location.href="/vip/history.html";
+  window.location.href="/vip/karyabaktivariasi/history.html";
 }
 
 // AUTO LOAD
@@ -1604,11 +3400,8 @@ document.getElementById("live-clock");
 
 if(!clock) return;
 
-
-clock.innerHTML =
-    '<i class="fa-solid fa-clock"></i> ' +
-    new Date().toLocaleString("id-ID");
-
+clock.innerText =
+"🕒 " + new Date().toLocaleString("id-ID");
 
 }
 
@@ -1723,7 +3516,7 @@ new FormData();
 
 formData.append(
   "vip",
-  window.__VIP_CONTEXT.nama
+  "KARYA BAKTI VARIASI"
 );
 
 formData.append(
@@ -1846,28 +3639,23 @@ if(loadingBubble){
 
   <div class="ai-action">
 
-    
-<button
-    onclick="copyAI(this)"
-    class="copy-btn"
->
-    <i class="fa-solid fa-copy"></i> Copy
-</button>
-
-
+    <button
+      onclick="copyAI(this)"
+      class="copy-btn"
+    >
+      📋 Copy
+    </button>
 
     ${
       data.image
       ?
       `
-      
-<button
-    onclick="downloadImage('${data.image}')"
-    class="download-btn"
->
-    <i class="fa-solid fa-download"></i> Download
-</button>
-
+      <button
+        onclick="downloadImage('${data.image}')"
+        class="download-btn"
+      >
+        📥 Download
+      </button>
       `
       :
       ""
@@ -1995,16 +3783,13 @@ function copyAI(btn){
 
   navigator.clipboard.writeText(text);
 
-  
-btn.innerHTML = '<i class="fa-solid fa-check"></i> Copied';
+  btn.innerText = "✅ Copied";
 
-setTimeout(() => {
+  setTimeout(() => {
 
-    btn.innerHTML = '<i class="fa-solid fa-copy"></i> Copy';
+    btn.innerText = "📋 Copy";
 
-}, 2000);
-
-
+  }, 1500);
 
 }
 
@@ -2055,12 +3840,9 @@ opacity:.8;
 ">
 </div>
 
-
 <h1>
-Selamat Datang, ${window.__VIP_CONTEXT.nama} <i class="fa-solid fa-lock"></i>
+Selamat Datang, KARYA BAKTI VARIASI 🔒
 </h1>
-
-
 
 <p>
 
@@ -2085,11 +3867,13 @@ Loading...
 }
 
 function goHistoryOrder(){
-    window.location.href="/vip/history.html?type=order";
+window.location.href =
+"/vip/karyabaktivariasi/history?type=order";
 }
 
 function goHistoryKlaim(){
-    window.location.href="/vip/history.html?type=klaim";
+window.location.href =
+"/vip/karyabaktivariasi/history?type=klaim";
 }
 
 
@@ -2284,7 +4068,7 @@ menu.style.display==="block"
 
 function renderInfo(){
   
-  const VIP_NAME = window.__VIP_CONTEXT.nama;
+  const VIP_NAME = "KARYA BAKTI VARIASI";
 
   setTabTitle("Informasi");
 
@@ -2292,19 +4076,15 @@ function renderInfo(){
     "main-content"
   ).innerHTML = `
 
-  
-  
-<div class="card">
+  <div class="card">
 
-    <h2><i class="fa-solid fa-circle-info"></i> Informasi</h2>
+    <h2>📢 Informasi</h2>
 
     <div id="info-list">
-        Loading...
+      Loading...
     </div>
 
-</div>
-
-
+  </div>
 
   `;
 
@@ -2357,20 +4137,17 @@ ${d.prioritas==="high"
 :""}
 ">
 
-
 <div class="info-title">
 
 ${
 d.prioritas==="high"
 ?
-'<i class="fa-solid fa-triangle-exclamation"></i> PENTING'
+"🚨 PENTING"
 :
-'<i class="fa-solid fa-circle-info"></i> INFORMASI'
+"📢 INFORMASI"
 }
 
 </div>
-
-
 
 <h3>
 ${d.title}
@@ -2460,13 +4237,9 @@ document.getElementById(
 
 <div class="imam-ai-container">
 
-
 <div class="imam-ai-header">
-<i class="fa-solid fa-wand-magic-sparkles"></i>
-Imam AI Assistant
+🤖 ImamGPT Assistant
 </div>
-
-
 
 <div id="imam-chat-box"></div>
 
@@ -2474,15 +4247,12 @@ Imam AI Assistant
 
 <div class="imam-chat-input-wrap">
 
-
 <label
 for="image-upload"
 class="upload-btn"
 >
-<i class="fa-solid fa-image"></i>
+🖼️
 </label>
-
-
 
 <input
 type="file"
@@ -2491,21 +4261,18 @@ accept="image/*"
 hidden
 >
 
-
 <textarea
 id="imam-ai-input"
-placeholder="Tanya Imam AI..."
+placeholder="Tanya ImamGPT..."
 ></textarea>
 
 <button onclick="tanyaAI()">
-<i class="fa-solid fa-paper-plane"></i>
+🚀
 </button>
 
 </div>
 
 </div>
-
-
 
 `;
 
@@ -2521,15 +4288,14 @@ chatBox.innerHTML = `
 
 <div class="imam-ai-msg">
 
-👋 Halo Distributor.
+👋 Halo Karya bakti variasi.
 
-Saya Imam AI .
+Saya ImamGPT.
 
 Saya bisa membantu:
 
 • Info tentang produk nine autoseries
 • Info sales nine autoseries
-• Info syarat menjadi mitra nine autoseries
 • Informasi umum lainnya
 
 Silakan ketik pertanyaan Anda.
@@ -2573,14 +4339,11 @@ document.getElementById(
 
 <div class="card">
 
-
-<h2><i class="fa-solid fa-truck-fast"></i> Pengiriman</h2>
+<h2>🚚 Pengiriman</h2>
 
 <div id="pengiriman-list">
 Loading...
 </div>
-
-
 
 </div>
 
@@ -2600,14 +4363,11 @@ document.getElementById(
 
 <div class="card">
 
-
-<h2><i class="fa-solid fa-arrow-rotate-left"></i> Retur</h2>
+<h2>↩️ Retur</h2>
 
 <div id="retur-list">
 Loading...
 </div>
-
-
 
 </div>
 
@@ -2652,12 +4412,9 @@ object-fit:cover;
 border-radius:12px;
 ">
 
-
 <div style="flex:1;">
-<i class="fa-solid fa-paperclip"></i> ${uploadedFile.name}
+📎 ${uploadedFile.name}
 </div>
-
-
 
 <button
 onclick="removeUpload()"
@@ -2768,14 +4525,14 @@ function simpanDraft(){
  if(mode==="order"){
 
    localStorage.setItem(
-     window.VIPStorage.key("draftOrder"),
+     "draftOrder",
      JSON.stringify(orderCart)
    );
 
  }else{
 
    localStorage.setItem(
-     window.VIPStorage.key("draftKlaim"),
+     "draftKlaim",
      JSON.stringify(klaimCart)
    );
 
@@ -2839,14 +4596,14 @@ function autoSaveDraft(){
  if(mode==="order"){
 
    localStorage.setItem(
-     window.VIPStorage.key("draftOrder"),
+     "draftOrder",
      JSON.stringify(orderCart)
    );
 
  }else{
 
    localStorage.setItem(
-     window.VIPStorage.key("draftKlaim"),
+     "draftKlaim",
      JSON.stringify(klaimCart)
    );
 
@@ -2962,10 +4719,10 @@ menu.style.display="none";
 function generateOrderInfo(){
 
   const savedInvoice =
-  localStorage.getItem(window.VIPStorage.key("invoiceNo"));
+  localStorage.getItem("invoiceNo");
 
   const savedWaktu =
-  localStorage.getItem(window.VIPStorage.key("waktuOrder"));
+  localStorage.getItem("waktuOrder");
 
   if(savedInvoice){
 
@@ -2989,12 +4746,12 @@ function generateOrderInfo(){
     now.toLocaleString("id-ID");
 
   localStorage.setItem(
-    window.VIPStorage.key("invoiceNo"),
+    "invoiceNo",
     invoiceNo
   );
 
   localStorage.setItem(
-    window.VIPStorage.key("waktuOrder"),
+    "waktuOrder",
     waktuOrder
   );
 
@@ -3016,12 +4773,12 @@ function generateKlaimInfo(){
     now.toLocaleString("id-ID");
 
   localStorage.setItem(
-    window.VIPStorage.key("klaimNo"),
+    "klaimNo",
     klaimNo
   );
 
   localStorage.setItem(
-    window.VIPStorage.key("waktuKlaim"),
+    "waktuKlaim",
     waktuKlaim
   );
 
@@ -3062,3 +4819,12 @@ showPage("dashboard");
   
 
 
+</script>
+
+<script src="/announcement.js"></script>
+
+ <!-- 🔥 SCRIPT PALING BAWAH -->
+  <script src="/vip/global.js"></script>
+
+</body>
+</html>
