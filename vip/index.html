@@ -1,860 +1,2034 @@
 <!DOCTYPE html>
 <html lang="id">
-
 <head>
-
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Member VVIP | Imam_salesfr • Nine Autoseries</title>
-
-<meta name="description" content="Halaman akses resmi Member VVIP Nine Autoseries.">
-
-<meta name="theme-color" content="#8CC63F">
-
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<link rel="preconnect" href="https://fonts.googleapis.com">
-
-<link rel="preconnect"
-href="https://fonts.gstatic.com"
-crossorigin>
-
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap"
-rel="stylesheet">
-
-<link rel="stylesheet" href="style.css">
+<title>VIP Dashboard</title>
 
 
 <style>
-  
-  
- /* ======================================================
-   VVIP PAGE
-   Imam_salesfr • Nine Autoseries
-====================================================== */
 
-*{
-margin:0;
-padding:0;
-box-sizing:border-box;
-font-family:"Poppins",sans-serif;
-}
+:root{
 
-html{
-scroll-behavior:smooth;
+--navy:#0f2d6b;
+--navy-dark:#081c4f;
+
+--primary:#1976d2;
+--primary-hover:#1565c0;
+
+--success:#8CC63F;
+--warning:#ff9800;
+--danger:#f44336;
+
+--bg:#eceff3;
+--surface:#ffffff;
+
+--border:#d6dbe3;
+
+--text:#2d3748;
+--text-light:#718096;
+
+--shadow:
+0 2px 10px rgba(0,0,0,.08);
+
+--radius:10px;
+
 }
 
 body{
 
-background:#f7f7f7;
-color:#222;
-overflow-x:hidden;
+margin:0;
 
-}
+font-family:
+"Segoe UI",
+sans-serif;
 
+background:var(--bg);
 
-/* ======================================================
-HEADER
-====================================================== */
-
-.header{
-
-position:fixed;
-
-top:0;
-left:0;
-
-width:100%;
-
-z-index:999;
-
-background:rgba(17,17,17,.75);
-
-backdrop-filter:blur(18px);
-
-border-bottom:1px solid rgba(255,255,255,.08);
-
-transition:.35s;
-
-}
-
-.navbar{
-
-max-width:1200px;
-
-margin:auto;
-
-padding:16px 22px;
-
-display:flex;
-
-justify-content:space-between;
-
-align-items:center;
-
-}
-
-.logo{
-
-text-decoration:none;
-
-display:flex;
-
-align-items:center;
-
-}
-
-.brand-text{
-
-display:flex;
-
-flex-direction:column;
-
-border-left:4px solid #8CC63F;
-
-padding-left:14px;
-
-}
-
-.main-brand{
-
-font-size:2rem;
-
-font-weight:800;
-
-color:#fff;
-
-line-height:1.1;
-
-}
-
-.sub-brand{
-
-margin-top:4px;
-
-font-size:.92rem;
-
-font-weight:600;
-
-color:#8CC63F;
-
-}
-
-.back-btn{
-
-display:flex;
-
-align-items:center;
-
-gap:10px;
-
-padding:12px 18px;
-
-background:#8CC63F;
-
-color:#fff;
-
-text-decoration:none;
-
-font-weight:700;
-
-border-radius:14px;
-
-transition:.25s;
-
-}
-
-.back-btn:hover{
-
-transform:translateY(-2px);
-
-box-shadow:0 12px 30px rgba(140,198,63,.25);
-
-}
-
-
-/* ======================================================
-HERO
-====================================================== */
-
-.hero-vvip{
-
-position:relative;
+color:var(--text);
 
 overflow:hidden;
 
-padding:170px 20px 100px;
-
-text-align:center;
-
-background:
-
-linear-gradient(
-180deg,
-#ffffff,
-#eef8df
-);
-
 }
 
-.hero-glow{
-
-position:absolute;
-
-width:360px;
-
-height:360px;
-
-background:#8CC63F;
-
-border-radius:50%;
-
-filter:blur(140px);
-
-opacity:.16;
-
-top:-120px;
-
-left:50%;
-
-transform:translateX(-50%);
-
+/* HEADER */
+.header {
+  text-align: center;
+  padding: 20px;
 }
 
-.hero-pattern{
-
-position:absolute;
-
-inset:0;
-
-background-image:
-
-radial-gradient(
-rgba(0,0,0,.04) 1px,
-transparent 1px
-);
-
-background-size:22px 22px;
-
+/* MENU */
+.menu-bar {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 15px;
 }
 
-.hero-content{
-
-position:relative;
-
-z-index:2;
-
-max-width:760px;
-
-margin:auto;
-
-animation:fadeUp .8s ease;
-
+.menu-bar button,
+.menu-bar a {
+  background: rgba(255,255,255,0.08);
+  border: none;
+  padding: 10px 14px;
+  border-radius: 12px;
+  color: white;
+  font-size: 13px;
+  text-decoration: none;
 }
 
-.hero-badge{
+/* CARD */
+.card{
 
-display:inline-flex;
+background:white;
 
-align-items:center;
+border:1px solid var(--border);
 
-gap:10px;
-
-padding:10px 18px;
-
-background:#fff;
-
-border-radius:999px;
-
-border:1px solid #e7e7e7;
-
-font-weight:700;
-
-color:#5A8E1C;
-
-margin-bottom:25px;
-
-box-shadow:0 10px 25px rgba(0,0,0,.05);
-
-}
-
-.hero-badge i{
-
-color:#8CC63F;
-
-}
-
-.hero-content h1{
-
-font-size:52px;
-
-font-weight:800;
-
-line-height:1.2;
-
-margin-bottom:20px;
-
-}
-
-.hero-content p{
-
-font-size:17px;
-
-line-height:1.9;
-
-color:#666;
-
-}
-
-
-/* ======================================================
-CARD
-====================================================== */
-
-.vvip-section{
-
-padding:0 20px;
-
-margin-top:-50px;
-
-position:relative;
-
-z-index:10;
-
-}
-
-.vvip-card{
-
-max-width:760px;
-
-margin:auto;
-
-background:#fff;
-
-border-radius:28px;
-
-padding:45px;
-
-border:1px solid #ececec;
-
-box-shadow:
-
-0 20px 50px rgba(0,0,0,.08);
-
-text-align:center;
-
-animation:fadeUp .9s ease;
-
-}
-
-.card-icon{
-
-width:90px;
-
-height:90px;
-
-margin:auto auto 25px;
-
-border-radius:50%;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-background:#EEF8DF;
-
-font-size:42px;
-
-color:#8CC63F;
-
-}
-
-.vvip-card h2{
-
-font-size:34px;
-
-margin-bottom:18px;
-
-}
-
-.vvip-card p{
-
-font-size:16px;
-
-line-height:1.9;
-
-color:#666;
-
-}
-
-
-/* ======================================================
-BENEFIT
-====================================================== */
-
-.benefit-grid{
-
-margin:35px 0;
-
-display:grid;
-
-grid-template-columns:repeat(2,1fr);
-
-gap:16px;
-
-}
-
-.benefit{
-
-display:flex;
-
-align-items:center;
-
-gap:12px;
-
-padding:18px;
-
-background:#f8faf8;
-
-border:1px solid #ececec;
-
-border-radius:18px;
-
-transition:.25s;
-
-}
-
-.benefit:hover{
-
-transform:translateY(-3px);
-
-border-color:#8CC63F;
-
-background:#EEF8DF;
-
-}
-
-.benefit i{
-
-font-size:20px;
-
-color:#8CC63F;
-
-}
-
-.benefit span{
-
-font-weight:700;
-
-}
-
-
-/* ======================================================
-BUTTON
-====================================================== */
-
-.btn-whatsapp{
-
-display:inline-flex;
-
-justify-content:center;
-
-align-items:center;
-
-gap:12px;
-
-width:100%;
-
-height:58px;
-
-background:#8CC63F;
-
-color:#fff;
-
-text-decoration:none;
-
-font-size:17px;
-
-font-weight:700;
-
-border-radius:18px;
-
-transition:.25s;
-
-}
-
-.btn-whatsapp:hover{
-
-transform:translateY(-2px);
-
-box-shadow:
-
-0 15px 35px rgba(140,198,63,.25);
-
-}
-
-
-/* ======================================================
-INFO
-====================================================== */
-
-.info-section{
-
-max-width:1100px;
-
-margin:70px auto;
-
-padding:0 20px;
-
-display:grid;
-
-grid-template-columns:1fr 1fr;
-
-gap:24px;
-
-}
-
-.info-box{
-
-background:#fff;
-
-padding:30px;
-
-border-radius:22px;
-
-display:flex;
-
-gap:20px;
-
-border:1px solid #ececec;
-
-box-shadow:0 12px 30px rgba(0,0,0,.06);
-
-transition:.25s;
-
-}
-
-.info-box:hover{
-
-transform:translateY(-4px);
-
-}
-
-.info-icon{
-
-width:70px;
-
-height:70px;
-
-background:#EEF8DF;
-
-border-radius:18px;
-
-display:flex;
-
-justify-content:center;
-
-align-items:center;
-
-font-size:28px;
-
-color:#8CC63F;
-
-flex-shrink:0;
-
-}
-
-.info-box h3{
-
-margin-bottom:12px;
-
-font-size:22px;
-
-}
-
-.info-box p{
-
-line-height:1.8;
-
-color:#666;
-
-}
-
-
-/* ======================================================
-FAQ
-====================================================== */
-
-.faq-section{
-
-max-width:900px;
-
-margin:80px auto;
-
-padding:0 20px;
-
-}
-
-.faq-section h2{
-
-text-align:center;
-
-font-size:36px;
-
-margin-bottom:30px;
-
-}
-
-details{
-
-background:#fff;
-
-margin-bottom:16px;
+border-radius:8px;
 
 padding:20px;
 
-border-radius:18px;
+margin:0;
 
-border:1px solid #ececec;
+max-width:none;
 
-box-shadow:0 8px 20px rgba(0,0,0,.05);
+box-shadow:var(--shadow);
 
-}
-
-summary{
-
-cursor:pointer;
-
-font-weight:700;
-
-font-size:17px;
+color:var(--text);
 
 }
 
-details p{
-
-margin-top:16px;
-
-line-height:1.8;
-
-color:#666;
-
-}
-
-
-/* ======================================================
-FOOTER
-====================================================== */
-
-footer{
-
-margin-top:90px;
-
-background:#111;
-
-padding:70px 20px;
-
-text-align:center;
-
-color:#fff;
-
-}
-
-.footer-brand h3{
-
-font-size:2rem;
-
-margin-bottom:8px;
-
-}
-
-.footer-role{
-
-color:#8CC63F;
-
-font-weight:600;
-
-}
-
-.footer-divider{
-
-width:90px;
-
-height:4px;
-
-background:#8CC63F;
-
-margin:28px auto;
-
-border-radius:999px;
-
-}
-
-.footer-tagline{
-
-color:#bbb;
-
-margin-bottom:12px;
-
-}
-
-.footer-copy{
-
-color:#777;
-
-font-size:.95rem;
-
-}
-
-
-/* ======================================================
-ANIMATION
-====================================================== */
-
-@keyframes fadeUp{
-
-from{
-
-opacity:0;
-
-transform:translateY(30px);
-
-}
-
-to{
-
-opacity:1;
-
-transform:none;
-
-}
-
-}
-
-
-/* ======================================================
-RESPONSIVE
-====================================================== */
-
-@media(max-width:768px){
-
-.navbar{
-
-padding:14px 18px;
-
-}
-
-.main-brand{
-
-font-size:1.55rem;
-
-}
-
-.sub-brand{
-
-font-size:.8rem;
-
-}
-
-.back-btn span{
-
-display:none;
-
-}
-
-.back-btn{
-
-width:46px;
-
-height:46px;
-
-padding:0;
-
-justify-content:center;
-
-border-radius:14px;
-
-}
-
-.hero-vvip{
-
-padding:140px 18px 70px;
-
-}
-
-.hero-content h1{
-
-font-size:34px;
-
-}
-
-.hero-content p{
-
-font-size:15px;
-
-}
-
-.vvip-card{
-
-padding:28px;
-
-}
-
-.vvip-card h2{
+.card h1{
 
 font-size:28px;
 
-}
-
-.benefit-grid{
-
-grid-template-columns:1fr;
-
-}
-
-.info-section{
-
-grid-template-columns:1fr;
-
-}
-
-.info-box{
-
-flex-direction:column;
-
-text-align:center;
-
-align-items:center;
-
-}
-
-.info-icon{
+font-weight:600;
 
 margin-bottom:10px;
 
 }
 
-.faq-section h2{
+.card p{
 
-font-size:28px;
+  max-width: 550px;
+
+  margin: 0 auto;
+
+  line-height: 1.6;
+
+  font-size: 18px;
 
 }
 
-} 
+.badge{
+
+background:#e3f2fd;
+
+color:#1976d2;
+
+padding:6px 12px;
+
+font-size:12px;
+
+border-radius:4px;
+
+}
+
+#live-clock{
+
+  margin-top: 15px;
+
+  opacity: .8;
+
+  font-size: 14px;
+
+}
+
+.announcement-bar{
+
+  margin: 30px auto 0;
+
+  max-width: 550px;
+
+  background: #8CC63F;
+
+  padding: 18px;
+
+  border-radius: 999px;
+
+  font-size: 18px;
+
+}
+
+/* SEARCH */
+.search-box{
+
+position:relative;
+
+max-width:450px;
+
+}
+
+.search-box input{
+
+width:100%;
+
+height:38px;
+
+padding:0 12px;
+
+border:1px solid #cfd8dc;
+
+border-radius:4px;
+
+font-size:13px;
+
+background:white;
+
+box-sizing:border-box;
+
+}
+
+.dropdown{
+  position:absolute;
+  top:100%;
+  left:0;
+  width:100%;
+  background:white;
+  color:#111;
+  border:1px solid #ddd;
+  border-radius:8px;
+  max-height:250px;
+  overflow-y:auto;
+  z-index:9999;
+}
+
+.dropdown div{
+
+padding:10px 12px;
+
+color:#111;
+
+background:white;
+
+border-bottom:1px solid #eee;
+
+cursor:pointer;
+
+}
+
+.dropdown div:hover{
+
+background:#f3f4f6;
+
+}
+
+/* CART */
+#cart-list {
+  max-height: 250px;
+  overflow-y: auto;
+}
+
+.cart-item{
+
+background:white;
+
+border:1px solid var(--border);
+
+border-radius:8px;
+
+padding:12px;
+
+margin-top:10px;
+
+color:var(--text);
+
+}
+
+.cart-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.cart-row input {
+  width: 60px;
+  text-align: center;
+}
+
+.cart-row select {
+  border-radius: 6px;
+}
+
+/* FOOTER */
+.footer {
+  text-align: center;
+  padding: 10px;
+  font-size: 12px;
+  background: rgba(0,0,0,0.3);
+}
+
+.subtotal {
+  font-size: 13px;
+  margin-top: 5px;
+  color: #8CC63F;
+}
+/* =====================================
+🤖 IMAMGPT SCOPED UI
+NO COLLISION VERSION
+===================================== */
+
+.imam-ai-container{
+
+width:100%;
+
+height:75vh;
+
+min-height:550px;
+
+max-height:800px;
+
+display:flex;
+
+flex-direction:column;
+
+background:
+linear-gradient(
+180deg,
+#081226,
+#0b1324
+);
+
+border-radius:20px;
+
+overflow:hidden;
+
+border:
+1px solid rgba(255,255,255,.06);
+
+box-shadow:
+0 10px 35px rgba(0,0,0,.35);
+
+box-sizing:border-box;
+
+}
+
+/* HEADER */
+
+.imam-ai-header{
+
+display:flex;
+
+align-items:center;
+
+gap:12px;
+
+padding:18px 20px;
+
+font-size:22px;
+
+font-weight:700;
+
+color:white;
+
+background:
+linear-gradient(
+90deg,
+rgba(17,24,39,.98),
+rgba(15,23,42,.98)
+);
+
+border-bottom:
+1px solid rgba(255,255,255,.05);
+
+flex-shrink:0;
+
+}
+
+/* CHAT AREA */
+
+#imam-chat-box{
+
+  flex:1;
+
+  overflow-y:auto;
+
+  padding:20px;
+
+  scroll-behavior:smooth;
   
+  min-height:0;
+
+
+}
+
+/* USER */
+
+.imam-user-msg{
+
+  background:
+  linear-gradient(
+    135deg,
+    #2563eb,
+    #1d4ed8
+  );
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  margin-left:auto;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  box-shadow:
+  0 6px 18px rgba(37,99,235,.35);
+
+  word-break:break-word;
+
+}
+
+/* AI */
+
+.imam-ai-msg{
+
+  background:
+  rgba(30,41,59,.95);
+
+  color:white;
+
+  padding:14px 18px;
+
+  border-radius:20px;
+
+  margin:14px 0;
+
+  width:fit-content;
+
+  max-width:82%;
+
+  line-height:1.7;
+
+  font-size:14px;
+
+  border:
+  1px solid rgba(255,255,255,.04);
+
+  box-shadow:
+  0 6px 18px rgba(0,0,0,.25);
+
+  word-break:break-word;
+
+}
+
+/* IMAGE */
+
+.imam-ai-msg img{
+
+  width:100%;
+
+  margin-top:14px;
+
+  border-radius:18px;
+
+  display:block;
+
+}
+
+/* INPUT */
+
+.imam-chat-input-wrap{
+
+display:flex;
+
+align-items:flex-end;
+
+gap:12px;
+
+padding:16px;
+
+background:
+rgba(17,24,39,.98);
+
+border-top:
+1px solid rgba(255,255,255,.05);
+
+flex-shrink:0;
+
+}
+
+/* TEXTAREA */
+#imam-ai-input{
+
+flex:1;
+
+min-height:55px;
+
+max-height:140px;
+
+overflow-y:auto;
+
+border:none;
+
+outline:none;
+
+border-radius:16px;
+
+padding:14px 16px;
+
+background:
+rgba(30,41,59,.95);
+
+color:white;
+
+resize:none;
+
+font-size:14px;
+
+line-height:1.5;
+
+box-sizing:border-box;
+
+}
+
+/* BUTTON */
+
+.imam-chat-input-wrap button{
+
+width:58px;
+
+height:58px;
+
+border:none;
+
+border-radius:16px;
+
+background:
+linear-gradient(
+135deg,
+#8CC63F;
+#8CC63F;
+);
+
+color:white;
+
+font-size:22px;
+
+cursor:pointer;
+
+flex-shrink:0;
+
+}
+
+/* MOBILE */
+
+@media(max-width:768px){
+
+.imam-ai-container{
+
+height:70vh;
+
+min-height:500px;
+
+border-radius:16px;
+
+}
+
+.imam-ai-header{
+
+font-size:18px;
+
+padding:16px;
+
+}
+
+#imam-chat-box{
+
+padding:14px;
+
+}
+
+}
   
+
+
+/* =========================
+TYPING ANIMATION
+========================= */
+
+.typing{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:6px;
+
+}
+
+.typing span{
+
+  width:8px;
+
+  height:8px;
+
+  border-radius:50%;
+
+  background:white;
+
+  opacity:.5;
+
+  animation:bounce 1s infinite;
+
+}
+
+.typing span:nth-child(2){
+
+  animation-delay:.2s;
+
+}
+
+.typing span:nth-child(3){
+
+  animation-delay:.4s;
+
+}
+
+@keyframes bounce{
+
+  0%,100%{
+
+    transform:translateY(0);
+
+    opacity:.3;
+
+  }
+
+  50%{
+
+    transform:translateY(-4px);
+
+    opacity:1;
+
+  }
+
+}
+
+.ai-action{
+
+  display:flex;
+
+  gap:10px;
+
+  margin-top:14px;
+
+}
+
+.copy-btn,
+.download-btn{
+
+  border:none;
+
+  background:#1e293b;
+
+  color:white;
+
+  padding:10px 14px;
+
+  border-radius:12px;
+
+  cursor:pointer;
+
+  font-size:13px;
+
+  transition:.2s;
+
+}
+
+.copy-btn:hover,
+.download-btn:hover{
+
+  transform:translateY(-2px);
+
+  background:#334155;
+
+}
+
+.image-upload-wrap{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:10px;
+
+  margin-bottom:12px;
+
+}
+
+.image-upload-wrap input{
+
+  color:white;
+
+  font-size:13px;
+
+}
+
+.upload-btn{
+
+  width:58px;
+
+  height:58px;
+
+  border-radius:16px;
+
+  display:flex;
+
+  align-items:center;
+
+  justify-content:center;
+
+  background:
+  rgba(255,255,255,.08);
+
+  cursor:pointer;
+
+  font-size:24px;
+
+  flex-shrink:0;
+
+}
+
+#preview-box{
+
+  padding:
+  12px 18px 0 18px;
+
+}
+
+#preview-box img{
+
+  width:90px;
+
+  border-radius:14px;
+
+  margin-top:8px;
+
+  display:block;
+
+  box-shadow:
+  0 6px 20px rgba(0,0,0,.25);
+
+}
+
+.preview-card{
+
+  display:flex;
+
+  align-items:center;
+
+  gap:12px;
+
+  background:
+  rgba(255,255,255,.05);
+
+  padding:10px;
+
+  border-radius:16px;
+
+  width:fit-content;
+
+}
+
+.preview-card img{
+
+  width:70px;
+
+  height:70px;
+
+  object-fit:cover;
+
+  border-radius:12px;
+
+}
+
+.vip-layout{
+
+display:flex;
+
+height:100vh;
+
+background:var(--bg);
+
+overflow:hidden;
+
+}
+
+.sidebar{
+
+width:60px;
+
+background:
+linear-gradient(
+180deg,
+#0f2d6b,
+#081c4f
+);
+
+display:flex;
+
+flex-direction:column;
+
+align-items:center;
+
+padding-top:6px;
+
+gap:6px;
+
+flex-shrink:0;
+
+box-shadow:
+2px 0 8px rgba(0,0,0,.15);
+
+}
+
+.sidebar-btn{
+
+width:44px;
+height:44px;
+
+border:none;
+
+background:transparent;
+
+color:white;
+
+font-size:20px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.sidebar-btn:hover{
+
+background:
+rgba(255,255,255,.12);
+
+}
+
+.sidebar-btn.active{
+
+background:#e91e63;
+
+}
+
+.main-wrapper{
+
+flex:1;
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+.topbar{
+
+height:34px;
+
+background:#f3f3f3;
+
+display:flex;
+
+align-items:center;
+
+border-bottom:
+1px solid #d0d0d0;
+
+padding:0;
+
+margin:0;
+
+border-radius:0;
+
+}
+
+.erp-tabs{
+
+display:flex;
+
+height:100%;
+
+}
+
+.tab{
+
+height:40px;
+
+padding:0 12px;
+
+display:flex;
+
+align-items:center;
+
+font-size:14px;
+
+background:#d9d9d9;
+
+border-right:1px solid #bdbdbd;
+
+cursor:pointer;
+
+}
+
+.tab.active{
+
+background:#ec407a;
+
+color:white;
+
+font-weight:600;
+
+}
+
+#main-content{
+
+flex:1;
+
+padding:12px;
+
+overflow:auto;
+
+}
+
+.erp-order{
+
+background:white;
+
+border-radius:8px;
+
+border:1px solid var(--border);
+
+box-shadow:var(--shadow);
+
+height:calc(100vh - 120px);
+
+display:flex;
+
+flex-direction:column;
+
+overflow:hidden;
+
+}
+
+.erp-section{
+
+padding:12px;
+
+border-bottom:
+1px solid #e5e7eb;
+
+background:white;
+
+}
+
+.erp-form-row{
+
+display:grid;
+
+grid-template-columns:
+
+1fr
+220px
+220px
+220px;
+
+gap:12px;
+
+align-items:end;
+
+}
+
+.erp-form-group input,
+.erp-form-group select{
+
+height:34px;
+
+border:
+1px solid #cfd8dc;
+
+border-radius:4px;
+
+padding:0 10px;
+
+font-size:13px;
+
+background:white;
+
+}
+
+.erp-form-group input:focus,
+.erp-form-group select:focus{
+
+outline:none;
+
+border-color:#2196f3;
+
+}
+
+.dropdown{
+
+background:white;
+
+border:
+1px solid #d7dce3;
+
+box-shadow:
+0 3px 8px rgba(0,0,0,.12);
+
+border-radius:4px;
+
+}
+
+.erp-table{
+
+width:100%;
+
+min-width:850px;
+
+border-collapse:collapse;
+
+font-size:14px;
+
+background:white;
+
+}
+
+.erp-table th{
+
+background:#5e738a;
+
+color:white;
+
+padding:8px;
+
+font-size:13px;
+
+font-weight:600;
+
+text-align:center;
+
+position:sticky;
+
+top:0;
+
+z-index:2;
+
+}
+
+.erp-table td{
+
+padding:10px 8px;
+
+color:#2d3748;
+
+font-weight:500;
+
+vertical-align:middle;
+
+}
+
+.erp-table tbody tr:hover{
+
+background:#f7fafc;
+
+}
+
+.btn-order{
+
+background:#1976d2;
+color:white;
+
+border:none;
+
+padding:10px 16px;
+
+border-radius:4px;
+
+}
+
+.btn-new{
+
+background:#8CC63F;
+color:white;
+
+}
+
+.btn-cancel{
+
+background:#f44336;
+color:white;
+
+}
+
+.btn-draft{
+
+background:#607d8b;
+color:white;
+
+}
+
+.btn-order,
+.btn-new,
+.btn-cancel,
+.btn-draft{
+
+border:none;
+
+cursor:pointer;
+
+height:38px;
+
+padding:0 16px;
+
+border-radius:4px;
+
+font-size:13px;
+
+font-weight:600;
+
+}
+
+.floating-menu{
   
+display:none;
+
+position:fixed;
+
+left:65px;
+
+top:100px;
+
+width:300px;
+
+background:white;
+
+border-radius:8px;
+
+box-shadow:
+0 5px 20px rgba(0,0,0,.15);
+
+padding:12px;
+
+z-index:9999;
+
+}
+
+.erp-grid{
+
+display:grid;
+
+grid-template-columns:
+repeat(3,1fr);
+
+gap:10px;
+
+}
+
+.erp-grid div{
+
+background:#e8f5e9;
+
+border:
+1px solid #c8e6c9;
+
+padding:18px;
+
+border-radius:6px;
+
+text-align:center;
+
+cursor:pointer;
+
+transition:.2s;
+
+}
+
+.erp-grid div:hover{
+
+background:#dcedc8;
+
+transform:translateY(-2px);
+
+}
+
+
+
+.badge-red{
+
+position:absolute;
+
+top:4px;
+
+right:4px;
+
+background:#f44336;
+
+color:white;
+
+font-size:10px;
+
+padding:2px 5px;
+
+border-radius:999px;
+
+}
+
+.unit-btn{
   
-  
-  
-  
-  
-  
+width:60px;
+
+text-align:center;
+
+height:34px;
+
+padding:0 12px;
+
+border:
+1px solid #cfd8dc;
+
+background:white;
+
+border-radius:4px;
+
+cursor:pointer;
+
+}
+
+.btn-delete{
+
+background:#f44336;
+
+color:white;
+
+border:none;
+
+width:34px;
+
+height:34px;
+
+padding:0;
+
+display:flex;
+
+align-items:center;
+
+justify-content:center;
+
+border-radius:4px;
+
+cursor:pointer;
+
+font-size:16px;
+
+line-height:1;
+
+}
+
+.erp-form-group{
+
+display:flex;
+
+flex-direction:column;
+
+gap:6px;
+
+}
+
+.erp-form-group label{
+
+font-size:12px;
+
+font-weight:600;
+
+color:#555;
+
+}
+
+.erp-table-empty{
+
+height:600px;
+
+}
+
+.erp-section{
+
+overflow-x:auto;
+
+}
+
+.erp-action{
+
+display:flex;
+
+gap:8px;
+
+margin-right:auto;
+
+}
+
+.erp-action button{
+
+height:42px;
+
+padding:0 14px;
+
+white-space:nowrap;
+
+min-width:120px;
+
+}
+
+.tab{
+
+height:40px;
+
+padding:0 12px;
+
+font-size:14px;
+
+}
+
+
+.sum-row{
+
+display:flex;
+
+justify-content:space-between;
+
+padding:12px 14px;
+
+border-bottom:1px solid #ddd;
+
+font-size:14px;
+
+}
+
+.sum-row.total{
+
+background:#8CC63F;
+
+color:white;
+
+font-size:20px;
+
+font-weight:bold;
+
+}
+
+.erp-table-area{
+
+height:500px;
+
+overflow-y:auto;
+
+overflow-x:auto;
+
+background:white;
+
+border-top:1px solid #ddd;
+
+border-bottom:1px solid #ddd;
+
+}
+
+.erp-summary{
+
+width:280px;
+
+min-width:280px;
+
+margin-left:auto;
+
+border:1px solid #ddd;
+
+background:white;
+
+border-radius:6px;
+
+overflow:hidden;
+
+flex-shrink:0;
+
+}
+
+
+.erp-footer-area{
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:flex-end;
+
+padding:15px;
+
+gap:20px;
+
+flex-direction:row;
+
+}
+
+.erp-table td:nth-child(4){
+
+text-align:center;
+
+}
+
+.erp-table td:nth-child(4) input{
+
+width:140px;
+
+text-align:center;
+
+box-sizing:border-box;
+
+}
+
+.erp-table td:nth-child(5){
+
+text-align:right;
+
+padding-right:15px;
+
+font-weight:600;
+
+white-space:nowrap;
+
+}
+
+.erp-table input{
+
+height:32px;
+
+font-size:14px;
+
+font-weight:500;
+
+box-sizing:border-box;
+
+}
+
+.erp-table td:first-child{
+
+min-width:260px;
+
+white-space:nowrap;
+
+}
+
+.erp-table td:nth-child(2) input{
+
+width:60px;
+
+text-align:center;
+
+}
+
+.erp-table td:last-child{
+
+text-align:center;
+
+vertical-align:middle;
+
+}
+
+.erp-table td:last-child .btn-delete{
+
+margin:auto;
+
+}
+
+@media(max-width:768px){
+
+.erp-footer-area{
+
+flex-direction:column;
+
+align-items:stretch;
+
+}
+
+.erp-summary{
+
+width:100%;
+
+min-width:unset;
+
+}
+
+.erp-action{
+
+display:grid;
+
+grid-template-columns:1fr 1fr;
+
+gap:8px;
+
+width:100%;
+
+}
+
+.erp-action button{
+
+min-width:unset;
+
+}
+
+}
+
+.erp-table td:nth-child(6){
+    white-space:nowrap;
+    font-weight:700;
+}
+
+.btn-klaim{
+    background:#ff9800;
+}
+
+.info-card{
+
+background:white;
+
+padding:15px;
+
+border-radius:8px;
+
+margin-bottom:15px;
+
+border-left:4px solid #8CC63F;
+
+}
+
+.info-important{
+
+border-left:4px solid #f44336;
+
+background:#fff5f5;
+
+}
+
+.info-title{
+
+font-size:12px;
+
+font-weight:700;
+
+margin-bottom:8px;
+
+color:#666;
+
+}
+
+.info-date{
+
+font-size:11px;
+
+color:#999;
+
+margin-bottom:10px;
+
+}
+
+.info-content{
+
+line-height:1.7;
+
+margin-bottom:10px;
+
+}
+
+.info-image{
+
+width:100%;
+
+border-radius:8px;
+
+margin-top:10px;
+
+margin-bottom:10px;
+
+}
+
+.info-actions{
+
+display:flex;
+
+gap:10px;
+
+flex-wrap:wrap;
+
+}
+
+.info-btn{
+
+background:#8CC63F;
+
+color:white;
+
+padding:8px 12px;
+
+border-radius:6px;
+
+text-decoration:none;
+
+font-size:12px;
+
+}
+
+
+
+
+/* =========================================
+   FLOATING MENU
+   SINKRON DENGAN SIDEBAR NAVY + PINK
+   ========================================= */
+
+.erp-grid > div {
+    background: #FFFFFF;
+
+    color: #293548;
+
+    border: 1px solid #D9E1EA;
+    border-radius: 12px;
+
+    box-shadow:
+        0 3px 10px rgba(18, 53, 116, 0.08);
+
+    transition:
+        background 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+/* =========================
+   ICON
+   ========================= */
+
+.erp-grid > div i {
+    color: #8CC63F; !important;
+
+    font-size: 25px;
+
+    margin-bottom: 8px;
+
+    filter:
+        drop-shadow(0 0 4px rgba(175, 255, 0, 0.35));
+
+    transition:
+        color 0.25s ease,
+        filter 0.25s ease,
+        transform 0.25s ease;
+}
+
+
+/* =========================
+   TEXT
+   ========================= */
+
+.erp-grid > div {
+    font-weight: 500;
+}
+
+
+/* =========================
+   HOVER
+   ========================= */
+
+.erp-grid > div:hover {
+    background: #123574;
+
+    color: #FFFFFF;
+
+    border-color: #123574;
+
+    box-shadow:
+        0 7px 20px rgba(18, 53, 116, 0.25);
+
+    transform: translateY(-2px);
+}
+
+
+/* ICON SAAT HOVER */
+
+.erp-grid > div:hover i {
+    color: #8CC63F; !important;
+
+    filter:
+        drop-shadow(0 0 8px rgba(175, 255, 0, 0.75));
+
+    transform: scale(1.08);
+}
+
+
+/* =========================
+   ACTIVE / SELECTED
+   ========================= */
+
+.erp-grid > div.active {
+    background: #EF2B6B;
+
+    color: #FFFFFF;
+
+    border-color: #EF2B6B;
+
+    box-shadow:
+        0 7px 20px rgba(239, 43, 107, 0.25);
+}
+
+
+.erp-grid > div.active i {
+    color: #FFFFFF !important;
+
+    filter:
+        drop-shadow(0 0 6px rgba(255, 255, 255, 0.35));
+}
+
+
+
+
+/* =========================================
+   IMAMGPT — INPUT AREA
+   NAVY + PINK + LIME
+   ========================================= */
+
+
+/* AREA INPUT */
+
+.imam-ai-header + * {
+    box-sizing: border-box;
+}
+
+
+/* TEXTAREA */
+
+#imam-ai-input {
+    background: #1B2639 !important;
+    color: #FFFFFF !important;
+
+    border: 1px solid rgba(175, 255, 0, 0.08) !important;
+    border-radius: 20px;
+
+    outline: none;
+
+    transition:
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        background 0.25s ease;
+}
+
+
+/* PLACEHOLDER */
+
+#imam-ai-input::placeholder {
+    color: #8D96A5;
+    opacity: 1;
+}
+
+
+/* FOCUS */
+
+#imam-ai-input:focus {
+    background: #202D43 !important;
+
+    border-color: rgba(175, 255, 0, 0.40) !important;
+
+    box-shadow:
+        0 0 0 2px rgba(175, 255, 0, 0.06),
+        0 0 15px rgba(175, 255, 0, 0.08);
+}
+
+
+/* =========================================
+   UPLOAD BUTTON
+   ========================================= */
+
+.upload-btn {
+    background: #1B2639 !important;
+
+    color: #8CC63F; !important;
+
+    border: 1px solid rgba(175, 255, 0, 0.08);
+
+    border-radius: 20px;
+
+    transition:
+        background 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+/* UPLOAD ICON */
+
+.upload-btn i {
+    color: #8CC63F; !important;
+
+    filter:
+        drop-shadow(0 0 4px rgba(175, 255, 0, 0.30));
+
+    transition: all 0.25s ease;
+}
+
+
+/* UPLOAD HOVER */
+
+.upload-btn:hover {
+    background: #25344B !important;
+
+    border-color:
+        rgba(175, 255, 0, 0.30);
+
+    box-shadow:
+        0 0 14px rgba(175, 255, 0, 0.08);
+
+    transform: translateY(-1px);
+}
+
+.upload-btn:hover i {
+    color: #8CC63F; !important;
+
+    filter:
+        drop-shadow(0 0 7px rgba(175, 255, 0, 0.65));
+}
+
+
+/* =========================================
+   SEND BUTTON
+   ========================================= */
+
+.imam-ai-header ~ button,
+#imam-ai-input + button {
+    background: #8CC63F; !important;
+
+    color: #0B1209 !important;
+
+    border: none;
+
+    border-radius: 20px;
+
+    transition:
+        background 0.25s ease,
+        box-shadow 0.25s ease,
+        transform 0.2s ease;
+}
+
+
+/* SEND ICON */
+
+.imam-ai-header ~ button i,
+#imam-ai-input + button i {
+    color: #0B1209 !important;
+
+    font-size: 22px;
+
+    transition:
+        transform 0.25s ease;
+}
+
+
+/* SEND HOVER */
+
+.imam-ai-header ~ button:hover,
+#imam-ai-input + button:hover {
+    background: #8CC63F; !important;
+
+    box-shadow:
+        0 0 18px rgba(175, 255, 0, 0.30);
+
+    transform: translateY(-1px);
+}
+
+
+/* ICON HOVER */
+
+.imam-ai-header ~ button:hover i,
+#imam-ai-input + button:hover i {
+    transform: translateX(2px) rotate(-3deg);
+}
+
+
+/* =========================================
+   DISABLED
+   ========================================= */
+
+.imam-ai-header ~ button:disabled,
+#imam-ai-input + button:disabled {
+    background: #3A4350 !important;
+
+    color: #747D89 !important;
+
+    box-shadow: none;
+
+    cursor: not-allowed;
+
+    transform: none;
+}
+
+.imam-ai-header ~ button:disabled i,
+#imam-ai-input + button:disabled i {
+    color: #747D89 !important;
+
+    filter: none;
+
+    transform: none;
+}
+
+
+
+
+.card h2 i {
+    color: #8CC63F;
+    margin-right: 8px;
+    font-size: 22px;
+}
+
+.info-title i {
+    color: #8CC63F;
+    margin-right: 6px;
+}
+
+.info-title i.fa-triangle-exclamation {
+    color: #f44336;
+}
+
+
+
+/* =================================
+   SIDEBAR TOOLTIP / BADGE
+================================= */
+
+.sidebar-btn{
+  position:relative;
+}
+
+/* badge dari attribute title */
+.sidebar-btn::after{
+  content:attr(title);
+
+  position:absolute;
+
+  left:calc(100% + 10px);
+  top:50%;
+
+  transform:
+    translateY(-50%)
+    translateX(-5px);
+
+  background:#fff8d8;
+  color:#3f3a20;
+
+  border:1px solid #e4d88f;
+
+  padding:7px 12px;
+
+  border-radius:6px;
+
+  font-family:Arial,sans-serif;
+  font-size:12px;
+  font-weight:500;
+
+  line-height:1;
+
+  white-space:nowrap;
+
+  box-shadow:
+    0 4px 14px rgba(0,0,0,.15);
+
+  opacity:0;
+  visibility:hidden;
+
+  pointer-events:none;
+
+  z-index:99999;
+
+  transition:
+    opacity .18s ease,
+    transform .18s ease;
+}
+
+
+/* segitiga */
+
+.sidebar-btn::before{
+  content:"";
+
+  position:absolute;
+
+  left:calc(100% + 4px);
+  top:50%;
+
+  transform:translateY(-50%);
+
+  border-top:6px solid transparent;
+  border-bottom:6px solid transparent;
+  border-right:6px solid #e4d88f;
+
+  opacity:0;
+  visibility:hidden;
+
+  z-index:99999;
+
+  transition:
+    opacity .18s ease;
+}
+
+
+/* hover */
+
+.sidebar-btn:hover::after{
+  opacity:1;
+  visibility:visible;
+
+  transform:
+    translateY(-50%)
+    translateX(0);
+}
+
+.sidebar-btn:hover::before{
+  opacity:1;
+  visibility:visible;
+}
+
+	
+
+
 </style>
+
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" >
 
 
 
@@ -863,342 +2037,178 @@ font-size:28px;
 <body>
 
 
-<!-- ===========================
-HEADER
-=========================== -->
+<div class="vip-layout">
 
-<header class="header">
+<aside class="sidebar">
 
-<nav class="navbar">
+<button
+class="sidebar-btn active"
+onclick="setActive(this);openTab('dashboard')"
+title="Dashboard"
+>
+<i class="fa-solid fa-house"></i>
+</button>
 
-<a href="../index.html" class="logo">
+<button
+class="sidebar-btn"
+onclick="setActive(this);togglePenjualan()"
+title="Penjualan"
+>
+<i class="fa-solid fa-cart-flatbed"></i>
+</button>
 
-<div class="brand-text">
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('pricelist')"
+title="Pricelist"
+>
+<i class="fa-solid fa-tags"></i>
+</button>
 
-<div class="main-brand">
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('katalog')"
+title="Katalog"
+>
+<i class="fa-solid fa-table-cells-large"></i>
+</button>
 
-Imam_salesfr
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('ai')"
+title="Imam AI"
+>
+<i class="fa-solid fa-wand-magic-sparkles"></i>
+</button>
 
+<button
+class="sidebar-btn"
+onclick="setActive(this);openTab('info')"
+title="Informasi"
+style="position:relative;"
+>
+
+<i class="fa-solid fa-circle-info"></i>
+
+<span
+id="info-badge"
+class="badge-red"
+style="display:none;"
+>
+0
+</span>
+
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);goHistoryOrder()"
+title="History Order"
+>
+<i class="fa-solid fa-clock-rotate-left"></i>
+</button>
+
+<button
+class="sidebar-btn"
+onclick="setActive(this);goHistoryKlaim()"
+title="History Klaim"
+>
+<i class="fa-solid fa-arrow-rotate-left"></i>
+</button>
+
+</aside>
+
+
+<div
+id="floating-menu"
+class="floating-menu"
+>
+
+<div class="erp-grid">
+
+<div onclick="openMenu('order')">
+<i class="fa-solid fa-file-invoice"></i>
+<br>
+Pesanan
 </div>
 
-<div class="sub-brand">
-
-Sales Representative • Nine Autoseries
-
+<div onclick="openMenu('pengiriman')">
+<i class="fa-solid fa-truck-fast"></i>
+<br>
+Pengiriman
 </div>
 
+<div onclick="openMenu('retur')">
+<i class="fa-solid fa-box-open"></i>
+<br>
+Retur
 </div>
 
-</a>
-
-<a href="../index.html" class="back-btn">
-
-<i class="fa-solid fa-arrow-left"></i>
-
-<span>Kembali</span>
-
-</a>
-
-</nav>
-
-</header>
-
-
-
-<!-- ===========================
-HERO
-=========================== -->
-
-<section class="hero-vvip">
-
-<div class="hero-glow"></div>
-
-<div class="hero-pattern"></div>
-
-<div class="hero-content">
-
-<div class="hero-badge">
-
-<i class="fa-solid fa-crown"></i>
-
-Member VVIP
-
-</div>
-
-<h1>
-
-Akses Khusus Pelanggan
-
-</h1>
-
-<p>
-
-Terima kasih telah menjadi bagian dari Nine Autoseries.
-
-Halaman ini diperuntukkan khusus bagi pelanggan yang memperoleh akses resmi melalui Imam_salesfr.
-
-</p>
-
-</div>
-
-</section>
-
-
-
-<!-- ===========================
-CARD
-=========================== -->
-
-<section class="vvip-section">
-
-<div class="vvip-card">
-
-<div class="card-icon">
-
-<i class="fa-solid fa-shield-halved"></i>
-
-</div>
-
-<h2>
-
-Verifikasi Akses
-
-</h2>
-
-<p>
-
-Silakan gunakan akses resmi yang telah diberikan kepada Anda.
-
-Jika mengalami kendala atau membutuhkan informasi lebih lanjut, hubungi Admin melalui WhatsApp.
-
-</p>
-
-<div class="benefit-grid">
-
-<div class="benefit">
-
-<i class="fa-solid fa-circle-check"></i>
-
-<span>Garansi Resmi</span>
-
-</div>
-
-<div class="benefit">
-
-<i class="fa-solid fa-headset"></i>
-
-<span>Prioritas Support</span>
-
-</div>
-
-<div class="benefit">
-
-<i class="fa-solid fa-gift"></i>
-
-<span>Promo Eksklusif</span>
-
-</div>
-
-<div class="benefit">
-
-<i class="fa-solid fa-bolt"></i>
-
-<span>Update Produk</span>
-
-</div>
-
-</div>
-
-<a
-href="https://wa.me/6282210109369"
-target="_blank"
-class="btn-whatsapp">
-
-<i class="fa-brands fa-whatsapp"></i>
-
-Hubungi Admin
-
-</a>
-
-</div>
-
-</section>
-
-
-
-<!-- ===========================
-INFO
-=========================== -->
-
-<section class="info-section">
-
-<div class="info-box">
-
-<div class="info-icon">
-
-<i class="fa-solid fa-lock"></i>
-
+<div onclick="openMenu('klaim')">
+<i class="fa-solid fa-arrows-rotate"></i>
+<br>
+Klaim
 </div>
 
 <div>
-
-<h3>
-
-Mengapa Halaman Ini Bersifat Khusus?
-
-</h3>
-
-<p>
-
-Halaman ini dibuat sebagai pusat layanan pelanggan resmi Imam_salesfr.
-
-Semua informasi mengenai promo, layanan prioritas, serta akses Member VVIP hanya diberikan melalui halaman ini.
-
-</p>
-
-</div>
-
-</div>
-
-<div class="info-box">
-
-<div class="info-icon">
-
-<i class="fa-solid fa-user-shield"></i>
-
+<i class="fa-solid fa-bullseye"></i>
+<br>
+Target
 </div>
 
 <div>
-
-<h3>
-
-Keamanan Data
-
-</h3>
-
-<p>
-
-Kami menjaga kerahasiaan informasi pelanggan dan hanya menggunakan data sesuai kebutuhan layanan Nine Autoseries.
-
-</p>
+<i class="fa-solid fa-location-crosshairs"></i>
+<br>
+Checkin
+</div>
 
 </div>
 
 </div>
 
-</section>
 
 
+    <main class="main-wrapper">
 
-<!-- ===========================
-FAQ
-=========================== -->
+        <div class="topbar">
 
-<section class="faq-section">
-
-<h2>
-
-Pertanyaan Umum
-
-</h2>
-
-<details>
-
-<summary>
-
-Apa itu Member VVIP?
-
-</summary>
-
-<p>
-
-Program layanan prioritas yang diberikan kepada pelanggan tertentu berdasarkan ketentuan Nine Autoseries.
-
-</p>
-
-</details>
-
-<details>
-
-<summary>
-
-Bagaimana cara mendapatkan akses?
-
-</summary>
-
-<p>
-
-Silakan hubungi Imam_salesfr melalui WhatsApp untuk memperoleh informasi lebih lanjut mengenai akses VVIP.
-
-</p>
-
-</details>
-
-<details>
-
-<summary>
-
-Apakah layanan ini resmi?
-
-</summary>
-
-<p>
-
-Ya.
-
-Seluruh layanan pada halaman ini merupakan bagian dari layanan resmi Nine Autoseries.
-
-</p>
-
-</details>
-
-</section>
-
-
-
-<!-- ===========================
-FOOTER
-=========================== -->
-
-<footer>
-
-<div class="footer-brand">
-
-<h3>
-
-Imam_salesfr
-
-</h3>
-
-<div class="footer-role">
-
-Sales Representative • Nine Autoseries
+<div
+class="erp-tabs"
+id="erp-tabs"
+></div>
 
 </div>
 
+        <div
+id="main-content"
+style="padding:12px;"
+></div>
+        
+    </main>
+
 </div>
 
-<div class="footer-divider"></div>
 
-<p class="footer-tagline">
+<!-- Folder-based auth replaced with server-verified VIP gate. -->
 
-Layanan Resmi • Produk Original • Garansi Resmi
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
-</p>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
-<p class="footer-copy">
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
-© 2026 Imam_salesfr • Nine Autoseries
+<!-- deferred original inline script 0 -->
 
-All Rights Reserved.
+<!-- deferred original inline script 1 -->
 
-</p>
+<!-- Deferred until after VIP sign-in: /announcement.js -->
 
-</footer>
+ <!-- 🔥 SCRIPT PALING BAWAH -->
+  <!-- Deferred until after VIP sign-in: /vip/global.js -->
 
-
-
-<script src="vvip.js"></script>
-
+<div id="vip-gate" role="status" style="position:fixed;inset:0;z-index:2147483647;background:#111827;color:white;display:flex;align-items:center;justify-content:center;font:16px sans-serif;padding:24px;text-align:center">Memverifikasi sesi VIP…</div>
+<script src="/vip/js/bootstrap.js"></script>
 </body>
 </html>

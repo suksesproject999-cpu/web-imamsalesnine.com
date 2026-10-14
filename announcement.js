@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", loadAnnouncement);
+
 
 function loadAnnouncement() {
 
@@ -28,7 +28,14 @@ function loadAnnouncement() {
 
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function startAnnouncement() {
+    if (window.__vipAnnouncementStarted) return;
+    window.__vipAnnouncementStarted = true;
     loadAnnouncement();
     setInterval(loadAnnouncement, 30000);
-});
+}
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", startAnnouncement, { once: true });
+} else {
+    startAnnouncement();
+}
