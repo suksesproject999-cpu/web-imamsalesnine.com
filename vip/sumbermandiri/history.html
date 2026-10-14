@@ -1248,7 +1248,7 @@ margin-top:15px;
 
     opacity:1;
     visibility:visible;
-	}
+}
     
     
 
@@ -1461,9 +1461,6 @@ margin-top:15px;
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
-
-
-
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
 
@@ -1472,17 +1469,18 @@ margin-top:15px;
   const firebaseConfig = {
     apiKey: "AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",
     authDomain: "apin-web.firebaseapp.com",
-    projectId: "apin-web"
+    projectId: "apin-web",
+    storageBucket: "apin-web.firebasestorage.app",
+    messagingSenderId: "733140414417",
+    appId: "1:733140414417:web:b6967fd053ac462b2ffaf0",
+    measurementId: "G-6ZN6TQ1YVE"
   };
 
   if (!firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
 
-
-
-
- // Firebase App Check - reCAPTCHA Enterprise (sinkron dengan website utama)
+// Firebase App Check - reCAPTCHA Enterprise (sinkron dengan website utama)
 const VIP_RECAPTCHA_ENTERPRISE_SITE_KEY = "6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M";
 try {
   firebase.appCheck().activate(
@@ -1493,9 +1491,6 @@ try {
 } catch (error) {
   console.error("[VIP] Firebase App Check initialization failed", error);
 }
-
-
-	
 
   const db = firebase.firestore();
 
@@ -1547,239 +1542,141 @@ try {
   }
 
 
+  // History: single-field invoice query, sorted locally to avoid composite-index dependency.
+  // Keep VIP_NAME consistent with the dashboard's saved invoice.nama.
+  let historyRequestId = 0;
+  function historyMessage(message, color = "#64748b") {
+    const cell = document.createElement("td");
+    cell.colSpan = 6;
+    cell.style.cssText = "padding:18px;text-align:center;white-space:normal;color:" + color;
+    cell.textContent = message;
+    const tr = document.createElement("tr");
+    tr.appendChild(cell);
+    document.getElementById("historyBody").replaceChildren(tr);
+  }
+
+  function historyDate(value) {
+    if (!value) return null;
+    if (typeof value.toDate === "function") return value.toDate();
+    if (typeof value === "number") return new Date(value);
+    return null;
+  }
+
   async function loadData(useDateFilter = true) {
-
+    const requestId = ++historyRequestId;
     const dateFilter = document.getElementById("filterDate").value;
-
     const statusFilter = document.getElementById("filterStatus").value;
-
     const typeFilter = document.getElementById("filterType").value;
-
-    const keyword = document
-        .getElementById("searchBox")
-        .value
-        .toLowerCase()
-        .trim();
-
-    const tbody = document.getElementById("historyBody");
+    const keyword = document.getElementById("searchBox").value.toLowerCase().trim();
 
     if (unsubscribe) {
-        unsubscribe();
-        unsubscribe = null;
+      unsubscribe();
+      unsubscribe = null;
     }
+    historyMessage("Memuat history...");
 
-    tbody.innerHTML = "";
+    const updateTotals = (totals) => {
+      for (const [key, value] of Object.entries(totals)) {
+        document.getElementById("sum-" + key).textContent = value;
+      }
+    };
+    updateTotals({total:0, pending:0, sebagian:0, proses:0, ready:0});
 
+    // Avoid composite index (nama + waktu); Firestore still applies rules/App Check.
     unsubscribe = db.collection("invoice")
-        .where("nama", "==", "SUMBER MANDIRI PONTIANAK")
-        .orderBy("waktu", "desc")
-        .onSnapshot(async (snapshot) => {
-
-            console.log("RENDER HISTORY :", snapshot.size);
-
-            let totalDoc = 0;
-            let totalPending = 0;
-            let totalSebagian = 0;
-            let totalProses = 0;
-            let totalReady = 0;
-
-            const rows = [];
-
-            for (const doc of snapshot.docs) {
-
-                const d = doc.data();
-
-                const docType = (d.type || "").toLowerCase();
-
-                if (
-                    typeFilter !== "all" &&
-                    docType !== typeFilter
-                ) continue;
-
-                if (
-                    keyword &&
-                    !(d.invoice || "")
-                    .toLowerCase()
-                    .includes(keyword)
-                ) continue;
-
-                if (
-                    useDateFilter &&
-                    dateFilter &&
-                    !isToday(dateFilter)
-                ) {
-
-                    const tanggalDoc =
-                        d.waktu
-                            ? d.waktu
-                                  .toDate()
-                                  .toISOString()
-                                  .split("T")[0]
-                            : "";
-
-                    if (tanggalDoc !== dateFilter)
-                        continue;
-                }
-
-                const detailSnap = await db
-                    .collection("pesanan")
-                    .where("invoice", "==", d.invoice)
-                    .get();
-
-                let pending = 0;
-                let proses = 0;
-                let ready = 0;
-
-                detailSnap.forEach(itemDoc => {
-
-                    const status =
-                        (itemDoc.data().status || "pending")
-                        .toLowerCase();
-
-                    if (status === "pending") {
-
-                        pending++;
-
-                    } else if (status === "proses") {
-
-                        proses++;
-
-                    } else if (status === "ready") {
-
-                        ready++;
-
-                    }
-
-                });
-
-                let finalStatus = "pending";
-
-                if (
-                    ready === detailSnap.size &&
-                    detailSnap.size > 0
-                ) {
-
-                    finalStatus = "ready";
-
-                } else if (
-                    pending === detailSnap.size
-                ) {
-
-                    finalStatus = "pending";
-
-                } else if (
-                    proses === detailSnap.size
-                ) {
-
-                    finalStatus = "proses";
-
-                } else {
-
-                    finalStatus = "sebagian";
-
-                }
-
-                if (
-                    statusFilter !== "all" &&
-                    finalStatus !== statusFilter
-                ) continue;
-
-                totalDoc++;
-
-                if (finalStatus === "pending") {
-
-                    totalPending++;
-
-                } else if (finalStatus === "sebagian") {
-
-                    totalSebagian++;
-
-                } else if (finalStatus === "proses") {
-
-                    totalProses++;
-
-                } else if (finalStatus === "ready") {
-
-                    totalReady++;
-
-                }
-
-                const waktu =
-                    d.waktu
-                        ? d.waktu
-                              .toDate()
-                              .toLocaleDateString("id-ID")
-                        : "-";
-
-                rows.push(`
-<tr
-class="row-${finalStatus}"
-onclick="openInvoiceTab('${d.invoice}')">
-
-<td>${d.invoice || "-"}</td>
-
-<td>${waktu}</td>
-
-<td>${d.type || "-"}</td>
-
-<td>${d.total_item || 0}</td>
-
-<td>
-Rp ${(d.total || 0).toLocaleString("id-ID")}
-</td>
-
-<td>
-
-<span class="badge badge-${finalStatus}">
-
-${d.request_delete
-? "DELETE REQUEST"
-: finalStatus.toUpperCase()}
-
-</span>
-
-</td>
-
-</tr>
-`);
-
-            }
-
-            if (rows.length === 0) {
-
-                tbody.innerHTML = `
-<tr>
-<td colspan="6" class="erp-table-empty">
-Tidak ada dokumen
-</td>
-</tr>
-`;
-
-            } else {
-
-                tbody.innerHTML = rows.join("");
-
-            }
-
-            document.getElementById("sum-total").innerText = totalDoc;
-            document.getElementById("sum-pending").innerText = totalPending;
-            document.getElementById("sum-sebagian").innerText = totalSebagian;
-            document.getElementById("sum-proses").innerText = totalProses;
-            document.getElementById("sum-ready").innerText = totalReady;
-
-        }, (err) => {
-
-            console.error("LOAD HISTORY ERROR :", err);
-
+      .where("nama", "==", VIP_NAME)
+      .onSnapshot(async (snapshot) => {
+        if (requestId !== historyRequestId) return;
+        const docs = snapshot.docs.slice().sort((a,b) => {
+          const da = a.data(), dbb = b.data();
+          const ta = historyDate(da.waktu)?.getTime() || Number(da.created_at) || 0;
+          const tb = historyDate(dbb.waktu)?.getTime() || Number(dbb.created_at) || 0;
+          return tb - ta;
         });
+        const rows = [];
+        const totals = {total:0, pending:0, sebagian:0, proses:0, ready:0};
+        let detailErrors = 0;
+        for (const doc of docs) {
+          if (requestId !== historyRequestId) return;
+          const d = doc.data();
+          const invoiceId = d.invoice || doc.id;
+          if (typeFilter !== "all" && String(d.type || "").toLowerCase() !== typeFilter) continue;
+          if (keyword && !String(invoiceId).toLowerCase().includes(keyword)) continue;
+          const dt = historyDate(d.waktu) || historyDate(d.created_at);
+          if (useDateFilter && dateFilter && !isToday(dateFilter)) {
+            if (!dt || [dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-') !== dateFilter) continue;
+          }
 
-}
-
-
-
-
-
-
+          let finalStatus = String(d.status || "pending").toLowerCase();
+          if (!["pending","proses","ready","sebagian"].includes(finalStatus)) finalStatus = "pending";
+          try {
+            // Use invoice AND VIP name to match invoice-detail access scope.
+            const details = await db.collection("pesanan")
+              .where("invoice", "==", invoiceId)
+              .where("nama", "==", VIP_NAME).get();
+            if (requestId !== historyRequestId) return;
+            if (!details.empty) {
+              let pending=0, proses=0, ready=0;
+              details.forEach(item => {
+                const st = String(item.data().status || "pending").toLowerCase();
+                if (st === "ready") ready++;
+                else if (st === "proses") proses++;
+                else pending++;
+              });
+              finalStatus = ready === details.size ? "ready" : pending === details.size ? "pending" : proses === details.size ? "proses" : "sebagian";
+            }
+          } catch (error) {
+            // Do not hide invoice headers when a detail query fails.
+            detailErrors++;
+            console.error("[VIP History] Detail query failed", invoiceId, error);
+          }
+          if (statusFilter !== "all" && finalStatus !== statusFilter) continue;
+          totals.total++;
+          totals[finalStatus]++;
+          const tr = document.createElement("tr");
+          tr.className = "row-" + finalStatus;
+          tr.style.cursor = "pointer";
+          tr.addEventListener("click", () => openInvoiceTab(invoiceId));
+          const cells = [invoiceId, dt ? dt.toLocaleDateString("id-ID") : "-", d.type || "-", d.total_item || 0, "Rp " + Number(d.total || 0).toLocaleString("id-ID")];
+          for (const val of cells) {
+            const td = document.createElement("td");
+            td.textContent = String(val);
+            tr.appendChild(td);
+          }
+          const td = document.createElement("td");
+          const badge = document.createElement("span");
+          badge.className = "badge badge-" + finalStatus;
+          badge.textContent = d.request_delete ? "DELETE REQUEST" : finalStatus.toUpperCase();
+          td.appendChild(badge);
+          tr.appendChild(td);
+          rows.push(tr);
+        }
+        if (requestId !== historyRequestId) return;
+        updateTotals(totals);
+        if (rows.length) {
+          document.getElementById("historyBody").replaceChildren(...rows);
+        } else {
+          historyMessage(snapshot.empty ? "Tidak ada invoice untuk VIP ini." : "Tidak ada dokumen yang cocok dengan filter.");
+        }
+        if (detailErrors) {
+          console.warn("[VIP History] " + detailErrors + " detail query(s) failed; showing invoice header status as fallback.");
+          const warning = document.createElement("div");
+          warning.style.cssText = "padding:10px 15px;color:#92400e;background:#fffbeb;font-size:13px";
+          warning.textContent = "Sebagian status mungkin belum diperbarui karena detail pesanan gagal dimuat (" + detailErrors + "). Periksa izin/index Firestore.";
+          const area = document.querySelector(".erp-table-area");
+          area.querySelectorAll(".vip-history-warning").forEach(el=>el.remove());
+          warning.className = "vip-history-warning";
+          area.prepend(warning);
+        } else {
+          document.querySelectorAll(".vip-history-warning").forEach(el=>el.remove());
+        }
+      }, (err) => {
+        if (requestId !== historyRequestId) return;
+        console.error("[VIP History] Invoice query failed", err);
+        const code = err && err.code ? err.code : "unknown";
+        historyMessage("Gagal membaca invoice (" + code + "). Periksa App Check, Firestore Rules, atau index di Firebase Console.", "#b91c1c");
+      });
+  }
 
 
   // ================= FAKTUR =================
@@ -1806,7 +1703,7 @@ Tidak ada dokumen
     const inv =
     invoiceDoc.data();
 
-    if (inv.nama !== "SUMBER MANDIRI PONTIANAK") {
+    if (inv.nama !== VIP_NAME) {
 
       alert("Akses ditolak");
 
