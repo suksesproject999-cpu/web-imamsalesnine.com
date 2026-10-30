@@ -19450,7 +19450,7 @@ box-shadow:0 0 8px #35d04b;
 
 <span id="onlineCount">
 
-100
+–
 
 </span>
 
@@ -27209,6 +27209,7 @@ db.collection("online_user")
 
 setInterval(async()=>{
 
+    if(document.hidden) return;
     try{
 
         await db
@@ -27831,48 +27832,30 @@ renderRating();
 
 
 // =====================================
-// REALTIME ONLINE VISITOR
+// REALTIME ONLINE VISITOR — hitung ulang setiap 10 detik
 // =====================================
-
-db.collection("online_user")
-
-.onSnapshot((snap)=>{
-
+let onlineVisitorSnapshot = null;
+function renderOnlineVisitors(){
+    const counter = document.getElementById("onlineCount");
+    if(!counter || !onlineVisitorSnapshot) return;
+    const cutoff = Date.now() - 60000;
     let online = 0;
-
-    const now = Date.now();
-
-    snap.forEach(doc=>{
-
-        const data = doc.data();
-
-        if(!data.last_seen) return;
-
-        const last =
-        data.last_seen.toDate().getTime();
-
-        const diff =
-        now - last;
-
-        // dianggap online jika update < 60 detik
-        if(diff <= 60000){
-
-            online++;
-
-        }
-
+    onlineVisitorSnapshot.forEach(doc=>{
+        const ts = doc.data().last_seen;
+        const ms = ts && typeof ts.toMillis === "function" ? ts.toMillis() : 0;
+        if(ms >= cutoff && ms <= Date.now() + 10000) online++;
     });
-
-    document
-    .getElementById("onlineCount")
-    .innerText = online;
-
+    counter.textContent = String(online);
+}
+db.collection("online_user").onSnapshot(snap=>{
+    onlineVisitorSnapshot = snap;
+    renderOnlineVisitors();
+},err=>{
+    console.warn("[Nine Online] Gagal membaca pengunjung:",err.code||err.message);
+    const counter = document.getElementById("onlineCount");
+    if(counter) counter.textContent = "–";
 });
-
-
-
-
-
+setInterval(renderOnlineVisitors,10000);
 
 let rating = 5;
 
@@ -34562,7 +34545,7 @@ function enhance(){
  if(!gallery.querySelector('#ninePresenceToast')){
   const el=document.createElement('div');el.id='ninePresenceToast';el.className='nine-presence-toast';
   el.setAttribute('role','status');el.setAttribute('aria-live','polite');
-  el.innerHTML='<span class="nine-presence-icon"><i class="fa-solid fa-eye"></i></span><span class="nine-presence-copy"></span>';
+  el.innerHTML='<span class="nine-presence-icon"><i class="fa-solid fa-user"></i></span><span class="nine-presence-copy"></span>';
   gallery.appendChild(el);
  }
   if(info.dataset.v48!=='1'){
