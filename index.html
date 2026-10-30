@@ -18137,6 +18137,47 @@ body:has(#product-grid-auto .cart-page) .social-float,body:has(#product-grid-aut
 </style>
 
 
+<style>
+/* NEXAI SUBBRAND HORIZONTAL CAROUSEL */
+#product-grid-auto:has(.nex-brand-carousel){
+  display:block !important;
+  width:100%;
+  min-width:0;
+}
+.nex-brand-carousel{width:100%;min-width:0;position:relative}
+.nex-brand-track{
+  display:flex;flex-wrap:nowrap;gap:18px;
+  overflow-x:auto;overflow-y:hidden;
+  scroll-snap-type:x mandatory;scroll-padding-inline:4px;
+  scroll-behavior:smooth;overscroll-behavior-x:contain;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;padding:12px 4px 22px;
+}
+.nex-brand-track::-webkit-scrollbar{display:none}
+.nex-brand-track > .product-card{
+  flex:0 0 calc((100% - 36px)/3);
+  min-width:0;scroll-snap-align:start;
+  height:auto;min-height:220px;
+}
+.nex-brand-controls{display:flex;justify-content:center;gap:14px;margin-top:6px}
+.nex-brand-controls button{
+  width:43px;height:43px;border:1px solid #dceacb;
+  background:#fff;color:#76ad30;border-radius:50%;
+  font-size:22px;font-weight:700;cursor:pointer;
+  box-shadow:0 4px 14px rgba(0,0,0,.06);
+}
+.nex-brand-controls button:hover{background:#8CC63F;color:#fff}
+@media(max-width:768px){
+  .nex-brand-track{gap:14px;padding:10px 4px 18px}
+  .nex-brand-track > .product-card{
+    flex:0 0 78%;min-height:235px;
+  }
+  .nex-brand-controls{gap:18px}
+}
+@media(min-width:769px) and (max-width:1050px){
+  .nex-brand-track > .product-card{flex-basis:calc((100% - 18px)/2)}
+}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
@@ -20331,13 +20372,24 @@ pageContainer.classList.remove(
 
   });
   
+  html = `
+  <div class="nex-brand-carousel">
+    <div class="nex-brand-track" id="nexBrandTrack">${html}</div>
+    <div class="nex-brand-controls">
+      <button type="button" aria-label="Geser subbrand ke kiri" onclick="nexSlideBrands(-1)">&#10094;</button>
+      <button type="button" aria-label="Geser subbrand ke kanan" onclick="nexSlideBrands(1)">&#10095;</button>
+    </div>
+  </div>`;
   renderPage(html, false);
-  
-  
-
 }
 
-
+function nexSlideBrands(direction){
+  const track = document.getElementById("nexBrandTrack");
+  if(!track) return;
+  const card = track.querySelector(".product-card");
+  const step = card ? card.getBoundingClientRect().width + 18 : track.clientWidth * .85;
+  track.scrollBy({left: direction * step, behavior:"smooth"});
+}
 
 function formatTanggalVoucher(tanggal){
 
