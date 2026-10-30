@@ -34479,7 +34479,7 @@ setTimeout(syncVisibleVoucherCopy,0);
 const V=window.V48=window.V48||{};
 const PRESENCE_TTL=75000, HEARTBEAT=25000;
 let unsubscribe=null,heartbeat=null,sessionProduct=null,lastCount=0,toastTimer=null,lastShown=0;
-const sessionId=(()=>{try{let x=sessionStorage.getItem('nine_presence_id');if(!x){x=(crypto.randomUUID?crypto.randomUUID():String(Date.now())+Math.random().toString(36).slice(2));sessionStorage.setItem('nine_presence_id',x)}return x}catch(_){return String(Date.now())+Math.random().toString(36).slice(2)}})();
+let activeSession=null,runToken=0,authWait=null;
 function getDb(){try{return (typeof db!=='undefined'&&db)||window.db||firebase.firestore()}catch(_){return null}}
 function getProduct(){try{return (typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct||null}catch(_){return window.currentProduct||null}}
 function isEN(){try{return (window.lang||lang)==='en'}catch(_){return false}}
@@ -34495,33 +34495,66 @@ function showCount(count){
  clearTimeout(toastTimer);toastTimer=setTimeout(hide,3800);
 }
 function stopPresence(){
- hide();if(unsubscribe){try{unsubscribe()}catch(_){ }unsubscribe=null}
+ ++runToken;hide();
+ if(unsubscribe){try{unsubscribe()}catch(_){ }unsubscribe=null}
  if(heartbeat){clearInterval(heartbeat);heartbeat=null}
- const old=sessionProduct;sessionProduct=null;lastCount=0;
- if(old){const d=getDb();try{d?.collection('product_presence').doc(old).collection('sessions').doc(sessionId).delete().catch(()=>{})}catch(_){}}
+ const old=activeSession;activeSession=null;sessionProduct=null;lastCount=0;
+ if(old){try{getDb()?.collection('product_presence').doc(old.pid).collection('sessions').doc(old.uid).delete().catch(e=>console.warn('[Nine Presence] Gagal hapus sesi:',e.code||e.message))}catch(_){}}
 }
-function startPresence(pid){
- pid=String(pid||'');if(!pid)return;
+async function getIdentity(){
+ const auth=firebase.auth();
+ if(auth.currentUser)return auth.currentUser;
+ if(!authWait){
+   authWait=new Promise((resolve,reject)=>{
+     const timer=setTimeout(()=>{off();reject(new Error('Auth initialization timeout'))},10000);
+     const off=auth.onAuthStateChanged(user=>{clearTimeout(timer);off();resolve(user)},error=>{clearTimeout(timer);off();reject(error)});
+   }).then(async user=>user||((await auth.signInAnonymously()).user)).finally(()=>{authWait=null});
+ }
+ return authWait;
+}
+async function startPresence(pid){
+ pid=String(pid||'');if(!pid||document.hidden)return;
  if(sessionProduct===pid)return;
- stopPresence();
- const d=getDb();if(!d)return;
- sessionProduct=pid;
- const sessions=d.collection('product_presence').doc(pid).collection('sessions');
- const mine=sessions.doc(sessionId);
- function touch(){if(document.hidden||sessionProduct!==pid)return;mine.set({updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true}).catch(()=>{})}
- touch();heartbeat=setInterval(touch,HEARTBEAT);
- unsubscribe=sessions.onSnapshot(snap=>{
-   if(sessionProduct!==pid)return;
-   const cutoff=Date.now()-PRESENCE_TTL;
-   const ids=new Set();
-   snap.forEach(doc=>{const ts=doc.data()?.updatedAt?.toMillis?.();if(ts&&ts>=cutoff)ids.add(doc.id)});
-   const count=ids.size;
-   if(count>=2&&count!==lastCount)showCount(count);
-   lastCount=count;
- },()=>{hide()});
+ stopPresence();sessionProduct=pid;
+ const token=runToken;
+ try{
+   const user=await getIdentity();
+   if(token!==runToken||sessionProduct!==pid||document.hidden)return;
+   const d=getDb();if(!d||!user)throw new Error('Firebase belum siap');
+   const sessions=d.collection('product_presence').doc(pid).collection('sessions');
+   const mine=sessions.doc(user.uid);
+   activeSession={pid,uid:user.uid};
+   async function touch(){
+     if(token!==runToken||document.hidden||sessionProduct!==pid)return;
+     try{await mine.set({updatedAt:firebase.firestore.FieldValue.serverTimestamp()})}
+     catch(e){console.warn('[Nine Presence] Gagal mencatat sesi:',e.code||e.message)}
+   }
+   await touch();
+   if(token!==runToken)return;
+   heartbeat=setInterval(touch,HEARTBEAT);
+   unsubscribe=sessions.onSnapshot(snap=>{
+     if(token!==runToken||document.hidden)return;
+     const cutoff=Date.now()-PRESENCE_TTL;
+     const ids=new Set();
+     snap.forEach(doc=>{const ts=doc.data()?.updatedAt?.toMillis?.();if(ts&&ts>=cutoff)ids.add(doc.id)});
+     const count=ids.size;
+     if(count>=2&&(count!==lastCount||Date.now()-lastShown>=30000))showCount(count);
+     if(count<2)hide();
+     lastCount=count;
+   },e=>{hide();console.warn('[Nine Presence] Listener gagal:',e.code||e.message)});
+ }catch(e){console.warn('[Nine Presence] Gagal mulai:',e.code||e.message)}
 }
-document.addEventListener('visibilitychange',()=>{if(document.hidden){hide()}else if(sessionProduct){const pid=sessionProduct;stopPresence();startPresence(pid)}});
+document.addEventListener('visibilitychange',()=>{
+ if(document.hidden){stopPresence()}
+ else{const p=getProduct();if(document.querySelector('#product-grid-auto .product-detail')&&p?.id)startPresence(p.id)}
+});
 window.addEventListener('pagehide',stopPresence);
+try{firebase.auth().onAuthStateChanged(user=>{
+ if(activeSession&&user&&activeSession.uid!==user.uid){
+   stopPresence();const p=getProduct();
+   if(p?.id&&document.querySelector('#product-grid-auto .product-detail'))startPresence(p.id);
+ }
+})}catch(_){}
 function voucherButton(){const b=document.createElement('button');b.type='button';b.className='v48-voucher-btn';b.innerHTML='<i class="fa-solid fa-ticket"></i><span>Voucher</span><i class="fa-solid fa-chevron-right" style="font-size:9px"></i>';b.addEventListener('click',()=>{try{if(window.V38?.openVoucher)return window.V38.openVoucher();if(window.V40?.openVoucher)return window.V40.openVoucher()}catch(_){};try{document.querySelector('[data-v40-voucher],[data-v38-open-voucher],.v38-voucher-entry')?.click()}catch(_){}});return b}
 function enhance(){
  const detail=document.querySelector('#product-grid-auto .product-detail');if(!detail)return;
@@ -34541,6 +34574,18 @@ function enhance(){
  if(pid)startPresence(pid);
 }
 V.enhance=enhance;
+const presenceRoot=document.getElementById('product-grid-auto');
+if(presenceRoot){
+ let pending=false;
+ new MutationObserver(()=>{
+   if(pending)return;pending=true;
+   requestAnimationFrame(()=>{pending=false;
+     const detail=presenceRoot.querySelector('.product-detail');
+     if(!detail){if(sessionProduct)stopPresence();return}
+     if(!detail.querySelector('#ninePresenceToast'))enhance();
+   });
+ }).observe(presenceRoot,{childList:true,subtree:false});
+}
 const baseShow=window.showProduct;
 if(typeof baseShow==='function'&&!baseShow.__ninePresence){
  const wrapped=async function(){const out=await baseShow.apply(this,arguments);requestAnimationFrame(()=>requestAnimationFrame(enhance));return out};
