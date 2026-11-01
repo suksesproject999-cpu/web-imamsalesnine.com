@@ -15902,13 +15902,7 @@ body.dark-mode .cart-item,body.dark-mode .cart-summary,body.dark-mode .checkout-
 #product-grid-auto .description-content p{font-size:13px!important;line-height:1.6!important}
 #product-grid-auto .info-accordion-header{min-height:54px!important;padding:0 14px!important;font-size:13px!important}
 
-/* Premium product-photo presence toast: replaces legacy activity notification. */
-#product-grid-auto .gallery-main{position:relative}
-.nine-presence-toast{position:absolute;left:clamp(10px,3%,18px);bottom:clamp(12px,4%,22px);z-index:8;display:flex;align-items:center;gap:8px;max-width:min(82%,310px);padding:9px 12px;border-radius:12px;background:rgba(20,25,24,.84);border:1px solid rgba(255,255,255,.16);box-shadow:0 8px 28px rgba(0,0,0,.18);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);color:#fff;opacity:0;transform:translateY(22px);pointer-events:none;transition:opacity .38s ease,transform .38s cubic-bezier(.2,.8,.2,1)}
-.nine-presence-toast.show{opacity:1;transform:translateY(0)}
-.nine-presence-icon{display:grid;place-items:center;flex:0 0 23px;width:23px;height:23px;border-radius:8px;background:rgba(140,198,63,.18);color:#a9e56c;font-size:11px}
-.nine-presence-copy{font-size:clamp(10px,2.6vw,12px);line-height:1.35;font-weight:600;letter-spacing:.01em}
-@media(prefers-reduced-motion:reduce){.nine-presence-toast{transition:none;transform:none}}
+
 
 body.dark-mode .v48-price-voucher-row{background:#171b20;border-color:#2d352b;box-shadow:none}
 body.dark-mode .v48-voucher-btn{background:#1b2618;border-color:#354a2b;color:#a6d56c}
@@ -34529,16 +34523,11 @@ let activeSession=null,runToken=0,authWait=null;
 function getDb(){try{return (typeof db!=='undefined'&&db)||window.db||firebase.firestore()}catch(_){return null}}
 function getProduct(){try{return (typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct||null}catch(_){return window.currentProduct||null}}
 function isEN(){try{return (window.lang||lang)==='en'}catch(_){return false}}
-function bubble(){return document.getElementById('ninePresenceToast')}
-function hide(){const el=bubble();if(el)el.classList.remove('show');clearTimeout(toastTimer)}
+function hide(){document.dispatchEvent(new CustomEvent('nine:toast-presence',{detail:{productId:sessionProduct,count:0}}))}
 function showCount(count){
- if(count<2||document.hidden)return;
- const now=Date.now();if(now-lastShown<14000)return;
- const el=bubble();if(!el)return;
- const txt=el.querySelector('.nine-presence-copy');
- if(txt)txt.textContent=isEN()?count+' people are viewing this product':count+' orang sedang melihat produk ini';
- lastShown=now;el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
- clearTimeout(toastTimer);toastTimer=setTimeout(hide,3800);
+ if(count<2||document.hidden||!sessionProduct)return;
+ lastShown=Date.now();
+ document.dispatchEvent(new CustomEvent('nine:toast-presence',{detail:{productId:sessionProduct,count}}));
 }
 function stopPresence(){
  ++runToken;hide();
@@ -34605,12 +34594,6 @@ function voucherButton(){const b=document.createElement('button');b.type='button
 function enhance(){
  const detail=document.querySelector('#product-grid-auto .product-detail');if(!detail)return;
  const info=detail.querySelector('.product-info'),gallery=detail.querySelector('.gallery-main');if(!info||!gallery)return;
- if(!gallery.querySelector('#ninePresenceToast')){
-  const el=document.createElement('div');el.id='ninePresenceToast';el.className='nine-presence-toast';
-  el.setAttribute('role','status');el.setAttribute('aria-live','polite');
-  el.innerHTML='<span class="nine-presence-icon"><i class="fa-solid fa-user"></i></span><span class="nine-presence-copy"></span>';
-  gallery.appendChild(el);
- }
   if(info.dataset.v48!=='1'){
     info.dataset.v48='1';const price=info.querySelector(':scope > .price-area'),title=info.querySelector(':scope > .product-title'),high=info.querySelector(':scope > .product-highlights');
     if(price&&!price.closest('.v48-price-voucher-row')){const row=document.createElement('div');row.className='v48-price-voucher-row';price.parentNode.insertBefore(row,price);row.appendChild(price);row.appendChild(voucherButton())}
@@ -38341,25 +38324,13 @@ body.dark-mode #checkout-summary .v38-voucher-entry small{color:#b9e08c!importan
 'use strict';
 const TYPES={cart:['fa-cart-shopping','Seseorang menambahkan produk ini ke keranjang'],favorite:['fa-heart','Seseorang menambahkan produk ini ke favorit'],checkout:['fa-credit-card','Seseorang memulai checkout produk ini'],order:['fa-bag-shopping','Seseorang mengirim pesanan produk ini']};
 const TTL=120000;
-let currentId='',off=null,queue=[],busy=false,known=new Set(),ready=false,token=0;
+let currentId='',off=null,known=new Set(),ready=false,token=0;
 function db(){try{return firebase.firestore()}catch(_){return null}}
 function user(){try{return firebase.auth().currentUser}catch(_){return null}}
 function activeId(){try{return String(currentProduct?.id||'')}catch(_){return ''}}
-function toast(){return document.getElementById('ninePresenceToast')}
 function display(evt){
- const el=toast();if(!el||document.hidden||activeId()!==String(evt.productId))return;
- const config=TYPES[evt.type];if(!config)return;
- const icon=el.querySelector('.nine-presence-icon');
- if(icon)icon.innerHTML='<i class="fa-solid '+config[0]+'" aria-hidden="true"></i>';
- const copy=el.querySelector('.nine-presence-copy');if(copy)copy.textContent=config[1];
- el.classList.remove('show');void el.offsetWidth;el.classList.add('show');
- setTimeout(()=>{el.classList.remove('show');setTimeout(next,450)},4300);
-}
-function next(){
- if(busy||!queue.length)return;
- if(document.hidden||!toast()){queue=[];return}
- busy=true;const item=queue.shift();display(item);
- setTimeout(()=>{busy=false;next()},4900);
+ const config=TYPES[evt.type];if(!config||document.hidden||activeId()!==String(evt.productId))return;
+ document.dispatchEvent(new CustomEvent('nine:toast-activity',{detail:{productId:evt.productId,type:evt.type,icon:config[0],text:config[1]}}));
 }
 async function emit(type,ids){
  if(!TYPES[type]||!Array.isArray(ids))return;
@@ -38375,10 +38346,10 @@ async function emit(type,ids){
 document.addEventListener('nine:productactivity',e=>{const x=e.detail||{};void emit(x.type,x.ids)});
 document.addEventListener('nine:wishlistchange',e=>{if(e.detail?.added)void emit('favorite',[String(e.detail.id)])});
 function watch(){
- const pid=activeId(),el=toast();
+ const pid=activeId();
  if(pid===currentId&&off)return;
- if(off){off();off=null}currentId=pid;known.clear();queue=[];ready=false;++token;
- if(!pid||!el||!/^[A-Za-z0-9_-]{1,120}$/.test(pid)||!user()||!db())return;
+ if(off){off();off=null}currentId=pid;known.clear();ready=false;++token;
+ if(!pid||!/^[A-Za-z0-9_-]{1,120}$/.test(pid)||!user()||!db())return;
  const mine=token;
  off=db().collection('product_activity').doc(pid).collection('events').orderBy('createdAt','desc').limit(20).onSnapshot(snap=>{
   if(mine!==token||activeId()!==pid)return;
@@ -38390,181 +38361,170 @@ function watch(){
    known.add(doc.id);
   });
   if(!ready){ready=true;return}
-  fresh.reverse().forEach(x=>queue.push(x));
-  if(queue.length>8)queue=queue.slice(-8);
-  next();
+  fresh.reverse().forEach(display);
  },e=>console.warn('[Nine Activity] Listener gagal:',e.code||e.message));
 }
 setInterval(watch,1300);
-document.addEventListener('visibilitychange',()=>{if(document.hidden){queue=[];if(off){off();off=null}currentId=''}else watch()});
+document.addEventListener('visibilitychange',()=>{if(document.hidden){if(off){off();off=null}currentId=''}else watch()});
 })();
 </script>
 
 
-<!-- NEXAI UNIFIED TOAST FINAL: single visual surface and sequential real reviews -->
-<style id="nexai-unified-toast-style">
-/* The existing presence/activity engines keep running; only their old surface is hidden. */
-#product-grid-auto .nine-presence-toast{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
-.marketplace-image-wrap,.product-image-wrap,.gallery-main{position:relative!important}
-.nexai-unified-toast{position:absolute!important;left:clamp(7px,3%,15px)!important;bottom:clamp(9px,3%,16px)!important;z-index:25!important;display:flex!important;align-items:center!important;gap:7px!important;width:max-content!important;max-width:min(85%,440px)!important;min-height:28px!important;padding:6px 12px!important;border-radius:999px!important;background:rgba(255,255,255,.96)!important;color:#252525!important;border:1px solid rgba(30,30,30,.10)!important;box-shadow:0 5px 15px rgba(0,0,0,.12)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:clamp(10px,2.2vw,12px)!important;font-weight:600!important;line-height:1.3!important;opacity:0!important;visibility:hidden!important;transform:translateY(12px)!important;transition:opacity .35s ease,transform .35s ease,visibility .35s!important;pointer-events:none!important}
-.nexai-unified-toast.show{opacity:1!important;visibility:visible!important;transform:translateY(0)!important}
-.nexai-unified-toast i{flex:none;color:#83ba38;font-size:12px}
-.nexai-unified-toast span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#product-grid-auto .gallery-main>.nexai-unified-toast{bottom:calc(var(--nexai-thumbnail-height, 90px) + 12px)!important;max-width:min(82%,430px)!important}
-@media(max-width:600px){.nexai-unified-toast{padding:5px 9px!important;font-size:10px!important;max-width:84%!important;min-height:25px!important}}
-@media(prefers-reduced-motion:reduce){.nexai-unified-toast{transition:none!important;transform:none!important}}
+<!-- NEXAI TOAST STACK V2: one renderer; no legacy toast overlays -->
+<style id="nexai-toast-stack-v2-style">
+.marketplace-image-wrap,.product-image-wrap,#product-grid-auto .gallery-main{position:relative!important}
+.nexai-toast-stack{position:absolute;left:clamp(7px,3%,14px);bottom:clamp(9px,3%,15px);z-index:28;display:flex;flex-direction:column;justify-content:flex-end;align-items:flex-start;gap:6px;width:max-content;max-width:84%;pointer-events:none;overflow:visible}
+#product-grid-auto .gallery-main>.nexai-toast-stack{bottom:calc(var(--nexai-thumbnail-height, 0px) + 12px);max-width:82%}
+.nexai-stack-item{display:flex;align-items:center;gap:7px;box-sizing:border-box;max-width:100%;min-height:26px;padding:6px 11px;border-radius:999px;background:rgba(255,255,255,.97);border:1px solid rgba(20,20,20,.1);box-shadow:0 4px 14px rgba(0,0,0,.14);color:#262626;font-family:inherit;font-weight:600;line-height:1.3;opacity:1;transform:translateY(0);transition:transform .36s ease,opacity .36s ease}
+.nexai-stack-item.enter{opacity:0;transform:translateY(22px)}
+.nexai-stack-item.exit{opacity:0;transform:translateY(-16px)}
+.nexai-stack-item i{flex:none;color:#83b93e;font-size:12px}
+.nexai-stack-item span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;font-size:clamp(10px,2.2vw,12px);font-weight:600;line-height:1.3}
+@media(max-width:600px){.nexai-toast-stack{gap:4px;max-width:85%}.nexai-stack-item{padding:5px 8px;min-height:24px}.nexai-stack-item span{font-size:10px}}
+@media(prefers-reduced-motion:reduce){.nexai-stack-item{transition:none;transform:none!important}}
 </style>
-<script id="nexai-unified-toast-script">
+<script id="nexai-toast-stack-v2-script">
 (function(){
 'use strict';
 const valid=x=>/^[A-Za-z0-9_-]{1,120}$/.test(String(x||''));
-const cache=new Map(),pending=new Map(),cursor=new Map(),events=[],viewUnsubs=new Map();
-const FRESH=45000,INTERVAL=5500,SHOW=4100;
-let busy=false,turn=0,lastId='',lastHost=null,legacyObserver=null;
+const cache=new Map(),pending=new Map(),cursor=new Map(),live=new Map(),queues=new Map(),lastPush=new Map();
+const MAX=3,REFRESH=45000,ROTATE=3200,LIFE=12500;
+let activeDetail='',lastCard=0,cardTurn=0,cardBusy=false;
 function db(){try{return firebase.firestore()}catch(_){return null}}
-function productId(el){
- const card=el.closest('[data-product-id]');
- if(card&&valid(card.dataset.productId))return String(card.dataset.productId);
+function pid(el){
+ const c=el.closest('[data-product-id]');
+ if(c&&valid(c.dataset.productId))return String(c.dataset.productId);
  if(el.closest('.gallery-main')){try{const id=String(currentProduct?.id||'');return valid(id)?id:''}catch(_){}}
  return '';
 }
-function imageHost(el){return el.matches('.gallery-main')?el:el.querySelector('.marketplace-image-wrap,.product-image-wrap')}
-function detailHost(){
+function host(c){return c.matches('.gallery-main')?c:c.querySelector('.marketplace-image-wrap,.product-image-wrap')}
+function detail(){
  const h=document.querySelector('#product-grid-auto .product-detail .gallery-main');
- return h&&h.getBoundingClientRect().width>75&&h.getBoundingClientRect().top<innerHeight&&h.getBoundingClientRect().bottom>0&&productId(h)?h:null;
+ if(!h||!pid(h))return null;
+ const r=h.getBoundingClientRect();return r.width>80&&r.top<innerHeight&&r.bottom>0?h:null;
 }
-function cards(){
- const seen=new Set(),result=[];
+function visibleCards(){
+ const seen=new Set(),arr=[];
  document.querySelectorAll('.marketplace-card[data-product-id],.product-card[data-product-id]').forEach(c=>{
-  const h=imageHost(c),id=productId(c);if(!h||!id||seen.has(h))return;seen.add(h);
-  const r=h.getBoundingClientRect();
-  if(r.width>70&&r.height>70&&r.top<innerHeight*.85&&r.bottom>innerHeight*.12&&r.left<innerWidth&&r.right>0)result.push(h);
- });
- return result;
+  const h=host(c);if(!h||seen.has(h)||!pid(h))return;
+  seen.add(h);const r=h.getBoundingClientRect();
+  if(r.width>70&&r.height>70&&r.top<innerHeight*.88&&r.bottom>innerHeight*.1&&r.left<innerWidth&&r.right>0)arr.push(h);
+ });return arr;
 }
-function surface(h){
- let el=h.querySelector(':scope > .nexai-unified-toast');
- if(!el){el=document.createElement('div');el.className='nexai-unified-toast';el.setAttribute('aria-hidden','true');el.innerHTML='<i class="fa-solid fa-eye"></i><span></span>';h.appendChild(el)}
+function anchor(h){
+ if(!h.matches('.gallery-main'))return;
+ const img=h.querySelector('#mainProductImage');
+ if(!img)return;
+ const g=h.getBoundingClientRect(),r=img.getBoundingClientRect();
+ h.style.setProperty('--nexai-thumbnail-height',Math.max(0,g.bottom-r.bottom)+'px');
+}
+function stack(h){
+ let el=h.querySelector(':scope > .nexai-toast-stack');
+ if(!el){el=document.createElement('div');el.className='nexai-toast-stack';el.setAttribute('aria-live','off');h.appendChild(el)}
  return el;
 }
+function push(h,id,item){
+ if(!h||!h.isConnected||pid(h)!==id||document.hidden)return;
+ const key=id+'|'+item.icon+'|'+item.text;
+ const previous=lastPush.get(key)||0;
+ if(Date.now()-previous<9000)return;
+ lastPush.set(key,Date.now());
+ anchor(h);
+ const root=stack(h);
+ const node=document.createElement('div');node.className='nexai-stack-item enter';
+ const i=document.createElement('i');i.className='fa-solid '+item.icon;
+ const t=document.createElement('span');t.textContent=item.text;
+ node.append(i,t);node.dataset.icon=item.icon;node.dataset.pid=id;
+ root.appendChild(node);
+ requestAnimationFrame(()=>requestAnimationFrame(()=>node.classList.remove('enter')));
+ while(root.children.length>MAX){
+  const old=root.firstElementChild;
+  old.classList.add('exit');
+  old.remove(); // CSS transition for remaining items is preserved by flex reflow
+ }
+ setTimeout(()=>{if(node.isConnected){node.classList.add('exit');setTimeout(()=>node.remove(),360)}},LIFE);
+}
 function reviewText(d){return [d.text,d.review,d.comment,d.ulasan,d.komentar,d.content,d.message].find(v=>typeof v==='string'&&v.trim())?.trim()||''}
-async function allReviews(d,id){
- let arr=[],last=null;
- // Pagination is necessary: a single .limit(50) misses older genuine reviews.
+async function reviews(d,id){
+ const docs=[];let last=null;
  for(let page=0;page<200;page++){
   let q=d.collection('ulasan_produk').where('productId','==',id).orderBy(firebase.firestore.FieldPath.documentId()).limit(100);
   if(last)q=q.startAfter(last);
-  const snap=await q.get();
-  if(snap.empty)break;
-  arr.push(...snap.docs);
-  last=snap.docs[snap.docs.length-1];
+  const snap=await q.get();if(snap.empty)break;
+  docs.push(...snap.docs);last=snap.docs[snap.docs.length-1];
   if(snap.size<100)break;
  }
- arr.sort((a,b)=>(a.data()?.createdAt?.toMillis?.()||0)-(b.data()?.createdAt?.toMillis?.()||0)||a.id.localeCompare(b.id));
- return arr.map(x=>reviewText(x.data()||{})).filter(Boolean);
+ docs.sort((a,b)=>(a.data()?.createdAt?.toMillis?.()||0)-(b.data()?.createdAt?.toMillis?.()||0)||a.id.localeCompare(b.id));
+ return docs.map(x=>reviewText(x.data()||{})).filter(Boolean);
 }
-async function load(id,force){
+async function load(id){
  const old=cache.get(id);
- if(!force&&old&&Date.now()-old.time<FRESH)return old;
+ if(old&&Date.now()-old.time<REFRESH)return old;
  if(pending.has(id))return pending.get(id);
  const task=(async()=>{
   const d=db();if(!d)return old||null;
-  const [r,v]=await Promise.allSettled([allReviews(d,id),d.collection('statistik_produk').doc(id).get()]);
+  const [r,v]=await Promise.allSettled([reviews(d,id),d.collection('statistik_produk').doc(id).get()]);
   const data={reviews:r.status==='fulfilled'?r.value:(old?.reviews||[]),views:old?.views||0,time:Date.now()};
   if(v.status==='fulfilled'&&v.value.exists){
-   const n=Number(v.value.data()?.views);
-   if(Number.isFinite(n))data.views=Math.max(0,Math.floor(n));
+   const n=Number(v.value.data()?.views);if(Number.isFinite(n))data.views=Math.max(0,Math.floor(n));
   }
-  const live=window.__nineLiveViewCounts?.get(id);
-  if(Number.isFinite(live))data.views=live;
+  const fresh=window.__nineLiveViewCounts?.get(id);
+  if(Number.isFinite(fresh))data.views=fresh;
   cache.set(id,data);return data;
  })().finally(()=>pending.delete(id));
  pending.set(id,task);return task;
 }
-function pick(id,data){
+function nextItem(id,data){
  if(!data)return null;
- const index=cursor.get(id)||0;
  const count=data.reviews.length;
- // Each review is shown in a fixed sequence before restarting.
- const cycle=count?count+1:1;
- const n=index%cycle;
+ const index=cursor.get(id)||0;
+ const n=index%(count+1);
  cursor.set(id,index+1);
- if(count&&n<count)return {icon:'fa-comment-dots',text:count+' ulasan: "'+data.reviews[n].slice(0,140)+'"'};
- return data.views>0?{icon:'fa-eye',text:data.views.toLocaleString('id-ID')+' kali dilihat'}:null;
+ if(n<count)return {icon:'fa-comment-dots',text:count+' ulasan: "'+data.reviews[n].slice(0,140)+'"'};
+ if(data.views>0)return {icon:'fa-eye',text:data.views.toLocaleString('id-ID')+' kali dilihat'};
+ return null;
 }
-function paint(h,item,id){
- // Anchor to the bottom-left INSIDE the main image, not the thumbnail strip.
- if(h.matches('.gallery-main')){
-  const image=h.querySelector(':scope > #mainProductImage');
-  if(image){
-   const galleryRect=h.getBoundingClientRect(),imageRect=image.getBoundingClientRect();
-   const thumbnailHeight=Math.max(0,galleryRect.bottom-imageRect.bottom);
-   h.style.setProperty('--nexai-thumbnail-height',thumbnailHeight+'px');
-  }
- }
- document.querySelectorAll('.nexai-unified-toast.show').forEach(e=>e.classList.remove('show'));
- const el=surface(h);
- el.querySelector('i').className='fa-solid '+item.icon;
- el.querySelector('span').textContent=item.text;
- el.dataset.pid=id;el.dataset.kind=item.icon;
- void el.offsetWidth;el.classList.add('show');
- setTimeout(()=>{if(el.isConnected)el.classList.remove('show')},SHOW);
+async function addRegular(h){
+ const id=pid(h);if(!id)return;
+ const data=await load(id);if(!h.isConnected||pid(h)!==id)return;
+ const item=nextItem(id,data);if(item)push(h,id,item);
 }
-function recordLegacy(){
- const legacy=document.getElementById('ninePresenceToast');
- if(!legacy||legacy===legacyObserver?.target)return;
- legacyObserver?.observer.disconnect();
- const observer=new MutationObserver(()=>{
-  if(!legacy.classList.contains('show'))return;
-  const id=productId(legacy.closest('.gallery-main')||legacy);
-  const msg=legacy.querySelector('.nine-presence-copy')?.textContent?.trim();
-  const icon=legacy.querySelector('.nine-presence-icon i')?.className||'';
-  if(!id||!msg)return;
-  // Dedupe same event within the short original animation window.
-  const key=id+'|'+msg;
-  if(events.some(e=>e.key===key&&Date.now()-e.time<6000))return;
-  events.push({id,text:msg,icon:icon.includes('cart')?'fa-cart-shopping':icon.includes('heart')?'fa-heart':icon.includes('user')?'fa-user':'fa-bell',time:Date.now(),key});
-  if(events.length>15)events.shift();
- });
- observer.observe(legacy,{attributes:true,attributeFilter:['class'],subtree:true,characterData:true,childList:true});
- legacyObserver={observer,target:legacy};
+function activity(e){
+ const x=e.detail||{},id=String(x.productId||'');
+ if(!valid(id)||!x.text)return;
+ const h=detail();
+ if(h&&pid(h)===id)push(h,id,{icon:x.icon||'fa-bell',text:String(x.text)});
 }
-async function tick(){
- recordLegacy();
- if(busy||document.hidden)return;
- const detail=detailHost(),available=cards();
- const hosts=detail?[detail,...available]:available;
- if(!hosts.length)return;
- busy=true;
- try{
-  const h=hosts[turn++%hosts.length],id=productId(h);
-  if(!id)return;
-  const eventIndex=events.findIndex(e=>e.id===id&&Date.now()-e.time<20000);
-  if(eventIndex>=0){
-   const evt=events.splice(eventIndex,1)[0];
-   if(h.isConnected&&productId(h)===id)paint(h,evt,id);
-   return;
-  }
-  const data=await load(id,false);
-  if(!h.isConnected||productId(h)!==id)return;
-  const item=pick(id,data);
-  if(item)paint(h,item,id);
- }finally{busy=false}
+function presence(e){
+ const x=e.detail||{},id=String(x.productId||''),count=Number(x.count);
+ if(!valid(id)||!Number.isFinite(count)||count<2)return;
+ const h=detail();
+ if(h&&pid(h)===id)push(h,id,{icon:'fa-user',text:count+' orang sedang melihat produk ini'});
 }
+document.addEventListener('nine:toast-activity',activity);
+document.addEventListener('nine:toast-presence',presence);
 document.addEventListener('nine:views-updated',e=>{
  const id=String(e.detail?.productId||''),n=Number(e.detail?.views);
  if(!valid(id)||!Number.isFinite(n))return;
  const rec=cache.get(id);if(rec)rec.views=Math.max(0,Math.floor(n));
- document.querySelectorAll('.nexai-unified-toast.show').forEach(el=>{
-  if(el.dataset.pid===id&&el.dataset.kind==='fa-eye')el.querySelector('span').textContent=Math.max(0,Math.floor(n)).toLocaleString('id-ID')+' kali dilihat';
+ document.querySelectorAll('.nexai-stack-item[data-icon="fa-eye"]').forEach(el=>{
+  if(el.dataset.pid===id)el.querySelector('span').textContent=Math.max(0,Math.floor(n)).toLocaleString('id-ID')+' kali dilihat';
  });
 });
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)void tick()});
-function init(){setInterval(tick,INTERVAL);setInterval(recordLegacy,1000);setTimeout(tick,1800)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
+async function tick(){
+ if(document.hidden)return;
+ const d=detail(),cards=visibleCards();
+ if(d){const id=pid(d);if(activeDetail!==id){activeDetail=id;cursor.delete(id)}await addRegular(d)}
+ else activeDetail='';
+ if(cards.length&&!cardBusy){
+  cardBusy=true;try{await addRegular(cards[cardTurn++%cards.length])}finally{cardBusy=false}
+ }
+}
+function start(){setTimeout(tick,1100);setInterval(tick,ROTATE)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script>
-<!-- END NEXAI UNIFIED TOAST -->
+<!-- END NEXAI TOAST STACK V2 -->
 
 </body>
 </html>
