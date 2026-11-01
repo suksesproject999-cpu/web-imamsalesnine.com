@@ -18180,6 +18180,65 @@ body:has(#product-grid-auto .cart-page) .social-float,body:has(#product-grid-aut
   .nex-brand-track > .product-card{flex-basis:calc((100% - 18px)/2)}
 }
 </style>
+
+<!-- NEXAI CONTENT GUARD START: pembatasan salin biasa, bukan DRM -->
+<style id="nexai-content-guard-style">
+/* Teks presentasi tidak dapat diseleksi secara biasa. */
+body :not(input):not(textarea):not(select):not(option):not([contenteditable="true"]):not([contenteditable=""]){
+  -webkit-user-select:none;
+  user-select:none;
+  -webkit-touch-callout:none;
+}
+input,textarea,select,[contenteditable],[role="textbox"]{
+  -webkit-user-select:text!important;
+  user-select:text!important;
+  -webkit-touch-callout:default!important;
+}
+img{
+  -webkit-user-drag:none;
+  user-drag:none;
+  -webkit-touch-callout:none;
+}
+</style>
+<script id="nexai-content-guard-script">
+(function(){
+  'use strict';
+  function editable(node){
+    var el=node&&node.nodeType===1?node:node&&node.parentElement;
+    return !!(el&&el.closest('input,textarea,select,option,[contenteditable],[role="textbox"]'));
+  }
+  function exempt(node){
+    var el=node&&node.nodeType===1?node:node&&node.parentElement;
+    return !!(el&&el.closest('[data-allow-copy],.order-number,.order-id,.nomor-pesanan,a[href^="tel:"],a[href^="mailto:"],a[href*="wa.me"],a[href*="whatsapp.com"]'));
+  }
+  function protectedArea(node){
+    return !editable(node)&&!exempt(node);
+  }
+  document.addEventListener('copy',function(e){
+    if(protectedArea(e.target))e.preventDefault();
+  },true);
+  document.addEventListener('cut',function(e){
+    if(protectedArea(e.target))e.preventDefault();
+  },true);
+  document.addEventListener('contextmenu',function(e){
+    if(protectedArea(e.target))e.preventDefault();
+  },true);
+  document.addEventListener('dragstart',function(e){
+    var el=e.target&&e.target.nodeType===1?e.target:e.target.parentElement;
+    if(el&&el.closest('img')&&!exempt(el))e.preventDefault();
+  },true);
+  document.addEventListener('keydown',function(e){
+    if(!protectedArea(e.target)||e.altKey)return;
+    var key=(e.key||'').toLowerCase();
+    if((e.ctrlKey||e.metaKey)&&(key==='c'||key==='x'))e.preventDefault();
+  },true);
+  document.addEventListener('selectstart',function(e){
+    if(protectedArea(e.target))e.preventDefault();
+  },true);
+})();
+</script>
+<!-- NEXAI CONTENT GUARD END -->
+
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
