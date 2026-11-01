@@ -38401,130 +38401,170 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){queue=[];i
 </script>
 
 
-<!-- NEXAI REAL DATA CARD + DETAIL TOAST v1 -->
-<style id="nexai-real-toast-style">
-.marketplace-image-wrap,.gallery-main,.product-card .product-image-wrap{position:relative!important}
-.nexai-real-toast{position:absolute;left:8px;bottom:9px;z-index:12;display:flex;align-items:center;gap:6px;max-width:calc(100% - 16px);width:max-content;min-height:26px;padding:5px 9px;border-radius:999px;background:rgba(250,250,250,.96);border:1px solid rgba(35,35,35,.11);color:#252525;box-shadow:0 3px 10px rgba(0,0,0,.13);font-size:clamp(9px,2.2vw,11px);font-weight:600;line-height:1.25;opacity:0;transform:translateY(13px);transition:opacity .35s ease,transform .35s ease;pointer-events:none;overflow:hidden}
-.nexai-real-toast.show{opacity:1;transform:translateY(0)}
-.nexai-real-toast i{color:#70a82d;flex:none}
-.nexai-real-toast span{overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0}
-.gallery-main>.nexai-real-toast{left:12px;bottom:62px;max-width:calc(100% - 24px);font-size:12px;padding:8px 11px}
-@media(max-width:600px){.marketplace-image-wrap>.nexai-real-toast{font-size:9px;padding:4px 7px;min-height:24px}.gallery-main>.nexai-real-toast{font-size:11px}}
-@media(prefers-reduced-motion:reduce){.nexai-real-toast{transition:none;transform:none}}
+<!-- NEXAI UNIFIED TOAST FINAL: single visual surface and sequential real reviews -->
+<style id="nexai-unified-toast-style">
+/* The existing presence/activity engines keep running; only their old surface is hidden. */
+#product-grid-auto .nine-presence-toast{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+.marketplace-image-wrap,.product-image-wrap,.gallery-main{position:relative!important}
+.nexai-unified-toast{position:absolute!important;left:clamp(7px,3%,15px)!important;bottom:clamp(9px,3%,16px)!important;z-index:25!important;display:flex!important;align-items:center!important;gap:7px!important;width:max-content!important;max-width:min(85%,440px)!important;min-height:28px!important;padding:6px 12px!important;border-radius:999px!important;background:rgba(255,255,255,.96)!important;color:#252525!important;border:1px solid rgba(30,30,30,.10)!important;box-shadow:0 5px 15px rgba(0,0,0,.12)!important;backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);font-size:clamp(10px,2.2vw,12px)!important;font-weight:600!important;line-height:1.3!important;opacity:0!important;visibility:hidden!important;transform:translateY(12px)!important;transition:opacity .35s ease,transform .35s ease,visibility .35s!important;pointer-events:none!important}
+.nexai-unified-toast.show{opacity:1!important;visibility:visible!important;transform:translateY(0)!important}
+.nexai-unified-toast i{flex:none;color:#83ba38;font-size:12px}
+.nexai-unified-toast span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#product-grid-auto .gallery-main>.nexai-unified-toast{bottom:calc(var(--nexai-thumbnail-height, 90px) + 12px)!important;max-width:min(82%,430px)!important}
+@media(max-width:600px){.nexai-unified-toast{padding:5px 9px!important;font-size:10px!important;max-width:84%!important;min-height:25px!important}}
+@media(prefers-reduced-motion:reduce){.nexai-unified-toast{transition:none!important;transform:none!important}}
 </style>
-<script id="nexai-real-toast-script">
+<script id="nexai-unified-toast-script">
 (function(){
 'use strict';
-const CACHE_MS=90000,WAIT=5500,PAUSE=1300;
-const cached=new Map(),pending=new Map();
-let current=null,step=0,last=0,detailLast=0,started=false;
-const valid=id=>/^[A-Za-z0-9_-]{1,120}$/.test(String(id||''));
-function database(){try{return firebase.firestore()}catch(_){return null}}
-function pid(el){
+const valid=x=>/^[A-Za-z0-9_-]{1,120}$/.test(String(x||''));
+const cache=new Map(),pending=new Map(),cursor=new Map(),events=[],viewUnsubs=new Map();
+const FRESH=45000,INTERVAL=5500,SHOW=4100;
+let busy=false,turn=0,lastId='',lastHost=null,legacyObserver=null;
+function db(){try{return firebase.firestore()}catch(_){return null}}
+function productId(el){
  const card=el.closest('[data-product-id]');
- if(card&&valid(card.getAttribute('data-product-id')))return String(card.getAttribute('data-product-id'));
+ if(card&&valid(card.dataset.productId))return String(card.dataset.productId);
  if(el.closest('.gallery-main')){try{const id=String(currentProduct?.id||'');return valid(id)?id:''}catch(_){}}
  return '';
 }
-function host(el){return el.querySelector('.marketplace-image-wrap,.product-image-wrap')|| (el.matches('.gallery-main')?el:null)}
-function bubble(h){
- let b=h.querySelector(':scope > .nexai-real-toast');
- if(!b){b=document.createElement('div');b.className='nexai-real-toast';b.setAttribute('aria-hidden','true');b.innerHTML='<i class="fa-solid fa-comment-dots"></i><span></span>';h.appendChild(b)}
- return b;
+function imageHost(el){return el.matches('.gallery-main')?el:el.querySelector('.marketplace-image-wrap,.product-image-wrap')}
+function detailHost(){
+ const h=document.querySelector('#product-grid-auto .product-detail .gallery-main');
+ return h&&h.getBoundingClientRect().width>75&&h.getBoundingClientRect().top<innerHeight&&h.getBoundingClientRect().bottom>0&&productId(h)?h:null;
 }
-function textReview(d){
- const fields=[d.text,d.review,d.comment,d.ulasan,d.komentar,d.content,d.message];
- return fields.find(v=>typeof v==='string'&&v.trim())?.trim()||'';
+function cards(){
+ const seen=new Set(),result=[];
+ document.querySelectorAll('.marketplace-card[data-product-id],.product-card[data-product-id]').forEach(c=>{
+  const h=imageHost(c),id=productId(c);if(!h||!id||seen.has(h))return;seen.add(h);
+  const r=h.getBoundingClientRect();
+  if(r.width>70&&r.height>70&&r.top<innerHeight*.85&&r.bottom>innerHeight*.12&&r.left<innerWidth&&r.right>0)result.push(h);
+ });
+ return result;
 }
-async function load(id){
- const old=cached.get(id);if(old&&Date.now()-old.time<CACHE_MS){const live=window.__nineLiveViewCounts?.get(id);if(Number.isFinite(live))old.data.views=live;return old.data;}
+function surface(h){
+ let el=h.querySelector(':scope > .nexai-unified-toast');
+ if(!el){el=document.createElement('div');el.className='nexai-unified-toast';el.setAttribute('aria-hidden','true');el.innerHTML='<i class="fa-solid fa-eye"></i><span></span>';h.appendChild(el)}
+ return el;
+}
+function reviewText(d){return [d.text,d.review,d.comment,d.ulasan,d.komentar,d.content,d.message].find(v=>typeof v==='string'&&v.trim())?.trim()||''}
+async function allReviews(d,id){
+ let arr=[],last=null;
+ // Pagination is necessary: a single .limit(50) misses older genuine reviews.
+ for(let page=0;page<200;page++){
+  let q=d.collection('ulasan_produk').where('productId','==',id).orderBy(firebase.firestore.FieldPath.documentId()).limit(100);
+  if(last)q=q.startAfter(last);
+  const snap=await q.get();
+  if(snap.empty)break;
+  arr.push(...snap.docs);
+  last=snap.docs[snap.docs.length-1];
+  if(snap.size<100)break;
+ }
+ arr.sort((a,b)=>(a.data()?.createdAt?.toMillis?.()||0)-(b.data()?.createdAt?.toMillis?.()||0)||a.id.localeCompare(b.id));
+ return arr.map(x=>reviewText(x.data()||{})).filter(Boolean);
+}
+async function load(id,force){
+ const old=cache.get(id);
+ if(!force&&old&&Date.now()-old.time<FRESH)return old;
  if(pending.has(id))return pending.get(id);
  const task=(async()=>{
-  const db=database();if(!db)return null;
-  const result={views:0,reviews:0,quote:''};
-  const reads=await Promise.allSettled([
-    db.collection('statistik_produk').doc(id).get(),
-    db.collection('ulasan_produk').where('productId','==',id).limit(50).get()
-  ]);
-  if(reads[0].status==='fulfilled'){
-   const doc=reads[0].value;
-   const n=Number(doc.exists?(doc.data()||{}).views:0);
-   if(Number.isFinite(n)&&n>0)result.views=Math.floor(n);
+  const d=db();if(!d)return old||null;
+  const [r,v]=await Promise.allSettled([allReviews(d,id),d.collection('statistik_produk').doc(id).get()]);
+  const data={reviews:r.status==='fulfilled'?r.value:(old?.reviews||[]),views:old?.views||0,time:Date.now()};
+  if(v.status==='fulfilled'&&v.value.exists){
+   const n=Number(v.value.data()?.views);
+   if(Number.isFinite(n))data.views=Math.max(0,Math.floor(n));
   }
-  if(reads[1].status==='fulfilled'){
-   const docs=reads[1].value.docs;
-   result.reviews=docs.length;
-   const usable=docs.map(x=>x.data()||{}).filter(x=>textReview(x));
-   usable.sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
-   if(usable.length)result.quote=textReview(usable[0]).slice(0,95);
-  }
-  if(reads.every(x=>x.status==='rejected'))return null;
-  const live=window.__nineLiveViewCounts?.get(id);if(Number.isFinite(live))result.views=live;cached.set(id,{time:Date.now(),data:result});
-  return result;
+  const live=window.__nineLiveViewCounts?.get(id);
+  if(Number.isFinite(live))data.views=live;
+  cache.set(id,data);return data;
  })().finally(()=>pending.delete(id));
  pending.set(id,task);return task;
 }
-function items(data){
- if(!data)return [];
- const arr=[];
- if(data.reviews>0&&data.quote)arr.push({icon:'fa-comment-dots',text:data.reviews+' ulasan: "'+data.quote+'"'});
- if(data.views>0)arr.push({icon:'fa-eye',text:data.views.toLocaleString('id-ID')+' kali dilihat'});
- return arr;
+function pick(id,data){
+ if(!data)return null;
+ const index=cursor.get(id)||0;
+ const count=data.reviews.length;
+ // Each review is shown in a fixed sequence before restarting.
+ const cycle=count?count+1:1;
+ const n=index%cycle;
+ cursor.set(id,index+1);
+ if(count&&n<count)return {icon:'fa-comment-dots',text:count+' ulasan: "'+data.reviews[n].slice(0,140)+'"'};
+ return data.views>0?{icon:'fa-eye',text:data.views.toLocaleString('id-ID')+' kali dilihat'}:null;
 }
-function show(h,item){
- const b=bubble(h);
- b.classList.remove('show');
- const icon=b.querySelector('i'),copy=b.querySelector('span');
- icon.className='fa-solid '+item.icon;
- copy.textContent=item.text;
- void b.offsetWidth;b.classList.add('show');
-}
-function hideOthers(except){
- document.querySelectorAll('.nexai-real-toast.show').forEach(el=>{
-  if(el.parentElement!==except)el.classList.remove('show');
- });
-}
-function eligible(){
- const cards=[...document.querySelectorAll('.marketplace-card[data-product-id],#relatedProducts .product-card[data-product-id],#recentProducts .product-card[data-product-id],.product-card[data-product-id]')];
- const seen=new Set();
- return cards.filter(c=>{
-  if(seen.has(c))return false;seen.add(c);
-  const h=host(c);if(!h||!pid(c))return false;
-  const r=h.getBoundingClientRect();
-  return r.width>65&&r.height>65&&r.top<innerHeight*.87&&r.bottom>innerHeight*.13&&r.left<innerWidth&&r.right>0;
- });
-}
-async function cycle(){
- if(document.hidden||!database())return;
- const now=Date.now();
- const detail=document.querySelector('#product-grid-auto .gallery-main');
- const detailVisible=detail&&detail.getBoundingClientRect().width>80&&detail.getBoundingClientRect().top<innerHeight*.8&&detail.getBoundingClientRect().bottom>0&&!!pid(detail);
- if(detailVisible&&now-detailLast>WAIT){
-  detailLast=now;
-  const id=pid(detail),data=await load(id);
-  if(!detail.isConnected||pid(detail)!==id)return;
-  const opts=items(data);
-  if(opts.length){const option=opts[step++%opts.length];show(detail,option);setTimeout(()=>{detail.querySelector(':scope > .nexai-real-toast')?.classList.remove('show')},4100)}
-  return;
+function paint(h,item,id){
+ // Anchor to the bottom-left INSIDE the main image, not the thumbnail strip.
+ if(h.matches('.gallery-main')){
+  const image=h.querySelector(':scope > #mainProductImage');
+  if(image){
+   const galleryRect=h.getBoundingClientRect(),imageRect=image.getBoundingClientRect();
+   const thumbnailHeight=Math.max(0,galleryRect.bottom-imageRect.bottom);
+   h.style.setProperty('--nexai-thumbnail-height',thumbnailHeight+'px');
+  }
  }
- const cards=eligible();
- if(!cards.length||now-last<WAIT)return;
- last=now;
- const c=cards[step++%cards.length],h=host(c),id=pid(c);
- if(!h||!id)return;
- const data=await load(id);
- if(!c.isConnected||pid(c)!==id)return;
- const opts=items(data);if(!opts.length)return;
- hideOthers(h);
- show(h,opts[step%opts.length]);
- setTimeout(()=>{h.querySelector(':scope > .nexai-real-toast')?.classList.remove('show')},4100);
+ document.querySelectorAll('.nexai-unified-toast.show').forEach(e=>e.classList.remove('show'));
+ const el=surface(h);
+ el.querySelector('i').className='fa-solid '+item.icon;
+ el.querySelector('span').textContent=item.text;
+ el.dataset.pid=id;el.dataset.kind=item.icon;
+ void el.offsetWidth;el.classList.add('show');
+ setTimeout(()=>{if(el.isConnected)el.classList.remove('show')},SHOW);
 }
-document.addEventListener('nine:views-updated',function(e){const id=String(e.detail?.productId||'');const n=Number(e.detail?.views);if(!valid(id)||!Number.isFinite(n))return;const record=cached.get(id);if(record)record.data.views=Math.max(0,Math.floor(n));document.querySelectorAll('.nexai-real-toast.show').forEach(b=>{const h=b.parentElement;if(pid(h)!==id)return;const i=b.querySelector('i');if(!i?.classList.contains('fa-eye'))return;const t=b.querySelector('span');if(t)t.textContent=Math.max(0,Math.floor(n)).toLocaleString('id-ID')+' kali dilihat';});});
-function start(){if(started)return;started=true;setInterval(cycle,PAUSE);setTimeout(cycle,1600)}
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
+function recordLegacy(){
+ const legacy=document.getElementById('ninePresenceToast');
+ if(!legacy||legacy===legacyObserver?.target)return;
+ legacyObserver?.observer.disconnect();
+ const observer=new MutationObserver(()=>{
+  if(!legacy.classList.contains('show'))return;
+  const id=productId(legacy.closest('.gallery-main')||legacy);
+  const msg=legacy.querySelector('.nine-presence-copy')?.textContent?.trim();
+  const icon=legacy.querySelector('.nine-presence-icon i')?.className||'';
+  if(!id||!msg)return;
+  // Dedupe same event within the short original animation window.
+  const key=id+'|'+msg;
+  if(events.some(e=>e.key===key&&Date.now()-e.time<6000))return;
+  events.push({id,text:msg,icon:icon.includes('cart')?'fa-cart-shopping':icon.includes('heart')?'fa-heart':icon.includes('user')?'fa-user':'fa-bell',time:Date.now(),key});
+  if(events.length>15)events.shift();
+ });
+ observer.observe(legacy,{attributes:true,attributeFilter:['class'],subtree:true,characterData:true,childList:true});
+ legacyObserver={observer,target:legacy};
+}
+async function tick(){
+ recordLegacy();
+ if(busy||document.hidden)return;
+ const detail=detailHost(),available=cards();
+ const hosts=detail?[detail,...available]:available;
+ if(!hosts.length)return;
+ busy=true;
+ try{
+  const h=hosts[turn++%hosts.length],id=productId(h);
+  if(!id)return;
+  const eventIndex=events.findIndex(e=>e.id===id&&Date.now()-e.time<20000);
+  if(eventIndex>=0){
+   const evt=events.splice(eventIndex,1)[0];
+   if(h.isConnected&&productId(h)===id)paint(h,evt,id);
+   return;
+  }
+  const data=await load(id,false);
+  if(!h.isConnected||productId(h)!==id)return;
+  const item=pick(id,data);
+  if(item)paint(h,item,id);
+ }finally{busy=false}
+}
+document.addEventListener('nine:views-updated',e=>{
+ const id=String(e.detail?.productId||''),n=Number(e.detail?.views);
+ if(!valid(id)||!Number.isFinite(n))return;
+ const rec=cache.get(id);if(rec)rec.views=Math.max(0,Math.floor(n));
+ document.querySelectorAll('.nexai-unified-toast.show').forEach(el=>{
+  if(el.dataset.pid===id&&el.dataset.kind==='fa-eye')el.querySelector('span').textContent=Math.max(0,Math.floor(n)).toLocaleString('id-ID')+' kali dilihat';
+ });
+});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)void tick()});
+function init(){setInterval(tick,INTERVAL);setInterval(recordLegacy,1000);setTimeout(tick,1800)}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init,{once:true});else init();
 })();
 </script>
-<!-- END NEXAI REAL DATA TOAST -->
+<!-- END NEXAI UNIFIED TOAST -->
 
 </body>
 </html>
