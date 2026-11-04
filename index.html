@@ -35474,7 +35474,7 @@ function applyStats(id,s,scope=document){
 
 function ensureWatch(id){
     id=k(id);
-    if(!id||watchers.has(id)||!window.db||!db.collection) return;
+    if(!id||watchers.has(id)||typeof db==='undefined'||!db?.collection) return;
     try{
         const unsub=db.collection('statistik_produk').doc(id).onSnapshot(doc=>{
             if(!doc.exists) return;
@@ -35617,7 +35617,7 @@ window.__v101PushProductStats=function(productId,partial){
 };
 window.__v101RefreshProductStats=async function(productId){
     const id=k(productId);
-    if(!id||!window.db||!db.collection) return null;
+    if(!id||typeof db==='undefined'||!db?.collection) return null;
     try{
         const doc=await db.collection('statistik_produk').doc(id).get({source:'server'}).catch(()=>
             db.collection('statistik_produk').doc(id).get()
