@@ -20276,6 +20276,7 @@ function normalizeCmsProduct(p){
     return x;
 }
 
+let nineCmsInitialReady = false;
 function rebuildProductUI(){
     allProducts = allProducts
         .map(normalizeCmsProduct)
@@ -20308,8 +20309,23 @@ function rebuildProductUI(){
     if(!detailIsOpen){
         renderCategories();
     }else{
-        // Pertahankan referensi data terbaru tanpa merender ulang detail.
-        currentProduct = allProducts.find(p => String(p.id) === String(currentProduct.id));
+        // Perbarui detail jika data CMS berubah, tanpa menambah view atau pindah halaman.
+        const freshProduct = allProducts.find(p => String(p.id) === String(currentProduct.id));
+        const previousSignature = JSON.stringify({
+          nama:currentProduct.nama, varian:currentProduct.varian,
+          harga:currentProduct.harga, gallery:currentProduct.gallery,
+          gambar:currentProduct.gambar, terjual:currentProduct.terjual
+        });
+        const freshSignature = JSON.stringify({
+          nama:freshProduct.nama, varian:freshProduct.varian,
+          harga:freshProduct.harga, gallery:freshProduct.gallery,
+          gambar:freshProduct.gambar, terjual:freshProduct.terjual
+        });
+        currentProduct = freshProduct;
+        if(previousSignature !== freshSignature){
+          Promise.resolve().then(() => showProduct(freshProduct.nama, {skipView:true,preserveVariant:true}))
+            .catch(err => console.warn("Gagal menyegarkan detail produk:",err));
+        }
     }
     updateCartCount();
     document.dispatchEvent(new Event('nine:products-ready'));
@@ -20320,6 +20336,7 @@ async function loadProductsFromCms(){
     if(!res.ok) throw new Error("produk.json tidak dapat dimuat");
     seedProducts = (await res.json()).map(normalizeCmsProduct);
     allProducts = seedProducts.slice();
+    if(typeof db === "undefined") nineCmsInitialReady = true;
     rebuildProductUI();
 
     // Firestore menjadi override live. Jika Firestore gagal, web tetap memakai produk.json.
@@ -20346,8 +20363,11 @@ async function loadProductsFromCms(){
         });
 
         allProducts = merged;
+        nineCmsInitialReady = true;
         rebuildProductUI();
     }, err => {
+        nineCmsInitialReady = true;
+        document.dispatchEvent(new Event("nine:products-ready"));
         console.warn("CMS Firestore tidak tersedia, memakai produk.json:", err);
     });
 }
@@ -22706,7 +22726,7 @@ function renderPage(html, autoScroll = true){
 
 
 
-async function showProduct(nama){
+async function showProduct(nama, options = {}){
   
 const productRoot = document.getElementById("product-grid-auto");
 if(productRoot){
@@ -22726,7 +22746,7 @@ currentProduct = product;
 // Catat view asli setiap kali halaman detail produk dibuka.
 // Tidak memblokir render detail jika jaringan/Firestore sedang lambat.
 Promise.resolve()
-    .then(() => window.V54Views ? window.V54Views.visit(product.id) : incrementProductView(product.id))
+    .then(() => options.skipView ? null : (window.V54Views ? window.V54Views.visit(product.id) : incrementProductView(product.id)))
     .then((views) => {
         if(Number.isFinite(Number(views))){
             product.views = Number(views);
@@ -22742,7 +22762,7 @@ Promise.resolve()
     });
 
 // Selalu sinkronkan varian terpilih dengan data yang sudah dinormalisasi.
-selectedVariant = product.varian?.[0] || "Default";
+selectedVariant = options.preserveVariant && product.varian?.includes(selectedVariant) ? selectedVariant : (product.varian?.[0] || "Default");
 selectedQty = 1;
 
 stickyClosed = false;
@@ -35740,7 +35760,10 @@ let nineDeepLinkDone = false;
 let nineDeepLinkBusy = false;
 let nineDeepLinkTimer = null;
 let nineDeepLinkAttempts = 0;
+const nineDeepLinkStartedAt = Date.now();
 function nineOpenDeepLink(){
+  // Jangan tampilkan data seed sebelum override CMS Firestore diterima.
+  if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < 9000) return;
   if(!nineDeepLinkId || nineDeepLinkDone || nineDeepLinkBusy) return;
   const product = sourceProducts().find(p => String(p.id) === String(nineDeepLinkId));
   if(!product || typeof window.showProduct !== 'function') return;
