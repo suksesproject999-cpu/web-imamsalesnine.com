@@ -22788,27 +22788,33 @@ stickyClosed = false;
 
 lastCategory = product.kategori;
 
-// Satu sumber statistik: pembacaan Firestore yang sama untuk direct link dan katalog.
-// Pada kunjungan pertama via URL, tunggu snapshot statistik sebelum HTML detail dibuat.
-// Jangan mengubah angka menjadi nol akibat race antara render awal dan cache realtime.
+// Pembukaan detail: gunakan satu pembaca statistik untuk semua jalur navigasi.
+// Pada kunjungan pertama dari share, Firebase Auth bisa belum siap; tunggu
+// status auth sebelum pembacaan server agar kegagalan awal tidak dicache sebagai 0.
 const directEntry = new URLSearchParams(location.search).get('product') === String(product.id)
     && !window.__nineFirstDirectStatsResolved;
 if(directEntry){
     window.__nineFirstDirectStatsResolved = true;
     try{
-        if(typeof window.__v101RefreshProductStats === 'function'){
-            const live = await window.__v101RefreshProductStats(product.id);
-            if(live && Number.isFinite(Number(live.terjual))){
-                product.terjual = Number(live.terjual);
-            }
-        }else if(typeof db !== 'undefined' && db && db.collection){
-            const snap = await db.collection('statistik_produk').doc(String(product.id)).get();
-            if(snap.exists && Number.isFinite(Number(snap.data().terjual))){
-                product.terjual = Number(snap.data().terjual);
+        if(typeof firebase !== 'undefined' && firebase.auth){
+            const auth = firebase.auth();
+            if(!auth.currentUser){
+                await new Promise(resolve=>{
+                    let done=false, unsub=()=>{};
+                    const finish=()=>{if(done)return;done=true;unsub();resolve();};
+                    const timer=setTimeout(finish,6500);
+                    unsub=auth.onAuthStateChanged(()=>{clearTimeout(timer);finish();},
+                        ()=>{clearTimeout(timer);finish();});
+                    if(done)unsub();
+                });
             }
         }
+        const stats=await window.getProductStats?.(product.id);
+        if(stats && Number.isFinite(Number(stats.terjual))){
+            product.terjual=Number(stats.terjual);
+        }
     }catch(error){
-        console.warn('Statistik awal belum tersedia; listener realtime akan memperbarui:',error);
+        console.warn('Statistik kunjungan awal menunggu sinkronisasi realtime:',error);
     }
 }
 const sold = Number.isFinite(Number(product.terjual)) && Number(product.terjual)>0 ? Number(product.terjual) : 0;
@@ -24472,47 +24478,16 @@ async function incrementProductView(productId){
 
 
 async function getProductSold(productId){
-
+    // Satu sumber data dengan card dan detail; hindari query lama yang
+    // mengembalikan nol saat Auth/Firestore belum siap.
     try{
-
-        const doc =
-            await db
-                .collection("statistik_produk")
-                .doc(String(productId))
-                .get();
-
-
-        if(!doc.exists){
-
-            return 0;
-
-        }
-
-
-        const data =
-            doc.data();
-
-
-        return Number(
-            data.terjual || 0
-        );
-
-
+        const stats=await window.getProductStats(productId);
+        return Number(stats?.terjual)||0;
     }catch(error){
-
-        console.error(
-            "Gagal mengambil statistik produk:",
-            error
-        );
-
+        console.warn('Statistik terjual belum tersedia:',error);
         return 0;
-
     }
-
 }
-
-
-
 
 async function getProductRating(productId){
 
@@ -35531,7 +35506,8 @@ function ensureWatch(id){
     if(!id||watchers.has(id)||!window.db||!db.collection) return;
     try{
         const unsub=db.collection('statistik_produk').doc(id).onSnapshot(doc=>{
-            const value=doc.exists?normalize(doc.data()):normalize({});
+            if(!doc.exists) return;
+            const value=normalize(doc.data());
             statsCache.set(id,value);
             applyStats(id,value,document);
         },error=>{
@@ -35640,13 +35616,15 @@ window.getProductStats=async function(productId){
     const id=k(productId);
     if(statsCache.has(id)) return {...statsCache.get(id)};
     try{
-        const doc=await db.collection('statistik_produk').doc(id).get();
-        const value=doc.exists?normalize(doc.data()):normalize({});
+        const doc=await db.collection('statistik_produk').doc(id).get({source:'server'});
+        if(!doc.exists) return normalize({});
+        const value=normalize(doc.data());
         statsCache.set(id,value);
         applyStats(id,value,document);
         return {...value};
-    }catch(_e){
-        return normalize({});
+    }catch(error){
+        console.warn('Pembacaan statistik server tertunda:',id,error?.code||error?.message||error);
+        return statsCache.has(id)?{...statsCache.get(id)}:normalize({});
     }
 };
 window.getProductSold=async productId=>(await window.getProductStats(productId)).terjual;
