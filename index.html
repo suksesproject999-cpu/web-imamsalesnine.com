@@ -16610,6 +16610,26 @@ html.v7-commerce-transition::view-transition-new(root){
 
 
 
+/* Shared product link action: card and detail, one visual language. */
+.marketplace-card.v15-card .nine-card-heading{
+  display:flex;align-items:center;justify-content:space-between;gap:5px;min-width:0;min-height:25px;
+}
+.marketplace-card.v15-card .nine-card-heading .product-brand{
+  min-width:0;flex:1 1 auto;margin-bottom:0!important;
+}
+.nine-share-btn{
+  appearance:none;-webkit-appearance:none;
+  display:inline-flex;align-items:center;justify-content:center;
+  flex:none;width:29px;height:29px;padding:0;border:1px solid #e2ecd8;
+  border-radius:50%;background:#f7fbf1;color:#62942b;
+  cursor:pointer;touch-action:manipulation;
+}
+.nine-share-btn i{font-size:12px;pointer-events:none}
+.nine-share-btn:focus-visible{outline:2px solid #8cc63f;outline-offset:2px}
+.marketplace-card.v15-card .nine-share-card{width:25px;height:25px}
+.nine-share-detail{margin-left:7px;vertical-align:middle}
+body.dark-mode .nine-share-btn{background:#24301d;color:#a9d86c;border-color:#45563a}
+
 /* Unified storefront card-grid geometry: catalogue, search, categories, related and recently viewed.
    The existing v15 card renderer and its data/event handlers remain the only card implementation. */
 @media(max-width:768px){
@@ -20280,6 +20300,7 @@ function rebuildProductUI(){
 
     renderCategories();
     updateCartCount();
+    document.dispatchEvent(new Event('nine:products-ready'));
 }
 
 async function loadProductsFromCms(){
@@ -22880,6 +22901,7 @@ onclick="toggleWishlist(${product.id})">
 ${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}
 
 </button>
+<button type="button" class="nine-share-btn nine-share-detail" data-share-product="${product.id}" aria-label="Bagikan produk" title="Bagikan produk"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button>
 
 </div>
 
@@ -23606,53 +23628,37 @@ function toggleProductInfo(button){
 
 
 
-function shareProduct(id){
-
-const product =
-allProducts.find(p=>p.id===id);
-
-if(!product) return;
-
-const url = location.href;
-
-if(navigator.share){
-
-navigator.share({
-
-title:product.nama,
-
-text:product.deskripsi,
-
-url:url
-
-}).catch(()=>{});
-
-}else{
-
-navigator.clipboard.writeText(url);
-
-Swal.fire({
-
-icon:"success",
-
-title:"Berhasil",
-
-text:"Link produk berhasil disalin.",
-
-timer:1800,
-
-showConfirmButton:false
-
-});
-
+/* Satu sistem berbagi untuk semua card dan halaman detail. */
+function productShareURL(productId){
+    const url = new URL('https://imamsalesnine.com/');
+    url.searchParams.set('product',String(productId));
+    return url.href;
 }
-
+async function shareProduct(id){
+    const product = allProducts.find(p=>String(p.id)===String(id));
+    if(!product) return;
+    const url = productShareURL(product.id);
+    const payload = {title:product.nama,text:'Lihat produk '+product.nama+' di Imam Sales Nine',url};
+    if(typeof navigator.share==='function'){
+        try{
+            await navigator.share(payload);
+            return;
+        }catch(error){
+            if(error && error.name==='AbortError') return;
+        }
+    }
+    try{
+        await navigator.clipboard.writeText(url);
+        if(window.Swal?.fire){
+            Swal.fire({icon:'success',title:'Link produk disalin',timer:1800,showConfirmButton:false});
+        }else{
+            alert('Link produk berhasil disalin.');
+        }
+    }catch(error){
+        // Fallback untuk browser yang membatasi clipboard, tanpa mengklaim sudah disalin.
+        window.prompt('Salin link produk ini:',url);
+    }
 }
-
-
-
-
-
 function renderRelated(product){
 
     const box =
@@ -24015,30 +24021,7 @@ function initLightbox(){
 
 
 
-function shareProduct(id){
 
-  const product = allProducts.find(p => p.id === id);
-  if(!product) return;
-
-  const url = location.href;
-
-  if(navigator.share){
-
-    navigator.share({
-      title: product.nama,
-      text: product.deskripsi,
-      url
-    });
-
-  }else{
-
-    navigator.clipboard.writeText(url);
-
-    alert("✅ Link produk berhasil disalin.");
-
-  }
-
-}
 
 
 
@@ -35701,7 +35684,7 @@ function cardHTML(p){
     ${discounted?`<span class="marketplace-discount-badge">-${discount}%</span>`:''}
     <div class="marketplace-image-wrap"><img src="${image}" alt="${nameA}" loading="lazy" decoding="async" onerror="this.src='images/no-image.png'"></div>
     <div class="product-card-body">
-      <small class="product-brand">${brand}</small>
+      <div class="nine-card-heading"><small class="product-brand">${brand}</small><button type="button" class="nine-share-btn nine-share-card" data-share-product="${id}" aria-label="Bagikan ${nameA}" title="Bagikan produk"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button></div>
       <h3 class="marketplace-product-name" title="${nameA}">${name}</h3>
       <div class="marketplace-price"><span>${price.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>${discounted?`<span class="marketplace-price-old">${normal.toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0})}</span>`:''}</div>
       <div class="v15-trust" aria-label="Statistik dan jaminan produk">
@@ -35728,6 +35711,64 @@ function renderSurface(container,items,emptyText='Produk tidak ditemukan'){
   container.innerHTML=list.map(cardHTML).join('');
   hydrate(container);
 }
+
+/* Tombol share tidak boleh memicu onclick card, wishlist, atau beli. */
+document.addEventListener('click',function(event){
+  const button=event.target.closest?.('button[data-share-product]');
+  if(!button)return;
+  event.preventDefault();
+  event.stopPropagation();
+  event.stopImmediatePropagation();
+  shareProduct(button.dataset.shareProduct);
+},true);
+
+/* Deep-link produk: tunggu halaman dan data siap, lalu buka detail berdasarkan ID. */
+const nineDeepLinkId = new URLSearchParams(window.location.search).get('product');
+let nineDeepLinkDone = false;
+let nineDeepLinkBusy = false;
+let nineDeepLinkTimer = null;
+let nineDeepLinkAttempts = 0;
+function nineOpenDeepLink(){
+  if(!nineDeepLinkId || nineDeepLinkDone || nineDeepLinkBusy) return;
+  const product = sourceProducts().find(p => String(p.id) === String(nineDeepLinkId));
+  if(!product || typeof window.showProduct !== 'function') return;
+  nineDeepLinkBusy = true;
+  Promise.resolve().then(() => window.showProduct(product.nama)).then(() => {
+    const detail = document.querySelector('#product-grid-auto .product-detail');
+    const active = (typeof currentProduct !== 'undefined' && currentProduct) || window.currentProduct;
+    if(detail && active && String(active.id) === String(nineDeepLinkId)){
+      nineDeepLinkDone = true;
+      if(nineDeepLinkTimer) clearInterval(nineDeepLinkTimer);
+      requestAnimationFrame(() => {
+        if(typeof window.scrollProductDetailIntoView === 'function'){
+          window.scrollProductDetailIntoView('auto');
+        }else{
+          detail.scrollIntoView({behavior:'instant',block:'start'});
+        }
+        requestAnimationFrame(() => window.scrollProductDetailIntoView?.('auto'));
+      });
+    }
+  }).catch(error => console.warn('Deep-link produk belum berhasil:',error))
+    .finally(() => { nineDeepLinkBusy = false; });
+}
+function nineStartDeepLink(){
+  if(!nineDeepLinkId || nineDeepLinkDone) return;
+  nineOpenDeepLink();
+  if(nineDeepLinkTimer) return;
+  nineDeepLinkTimer = setInterval(() => {
+    if(nineDeepLinkDone || ++nineDeepLinkAttempts > 60){
+      clearInterval(nineDeepLinkTimer);
+      nineDeepLinkTimer = null;
+      return;
+    }
+    nineOpenDeepLink();
+  }, 350);
+}
+document.addEventListener('nine:products-ready', nineStartDeepLink);
+window.addEventListener('load', nineStartDeepLink, {once:true});
+window.addEventListener('pageshow', nineStartDeepLink);
+if(document.readyState === 'complete') nineStartDeepLink();
+else document.addEventListener('DOMContentLoaded', nineStartDeepLink, {once:true});
 
 /* Single exported renderer used everywhere. */
 window.renderMarketplaceCard=cardHTML;
