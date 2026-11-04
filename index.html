@@ -20298,7 +20298,19 @@ function rebuildProductUI(){
         minMatchCharLength:2
     });
 
-    renderCategories();
+    // Jangan reset halaman detail saat snapshot CMS Firestore masuk.
+    // Snapshot awal sering tiba setelah deep link berhasil membuka produk.
+    const productRoot = document.getElementById("product-grid-auto");
+    const detailIsOpen = currentPage === "product" &&
+        !!productRoot?.querySelector(".product-detail") &&
+        !!currentProduct &&
+        allProducts.some(p => String(p.id) === String(currentProduct.id));
+    if(!detailIsOpen){
+        renderCategories();
+    }else{
+        // Pertahankan referensi data terbaru tanpa merender ulang detail.
+        currentProduct = allProducts.find(p => String(p.id) === String(currentProduct.id));
+    }
     updateCartCount();
     document.dispatchEvent(new Event('nine:products-ready'));
 }
