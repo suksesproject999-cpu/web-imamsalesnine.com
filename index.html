@@ -35788,6 +35788,18 @@ let nineDeepLinkBusy = false;
 let nineDeepLinkTimer = null;
 let nineDeepLinkAttempts = 0;
 const nineDeepLinkStartedAt = Date.now();
+async function nineRefreshInitialProductStats(id){
+  // Use the canonical statistics reader; no second statistics system.
+  // A missing/zero early read must not permanently poison the initial card.
+  for(let attempt=0;attempt<8;attempt++){
+    if(String(((typeof currentProduct!=='undefined'&&currentProduct)||window.currentProduct)?.id)!==id) return;
+    if(typeof window.__v101RefreshProductStats==='function'){
+      const stats=await window.__v101RefreshProductStats(id);
+      if(stats && Number(stats.terjual)>0) return;
+    }
+    await new Promise(resolve=>setTimeout(resolve,500+attempt*350));
+  }
+}
 function nineOpenDeepLink(){
   // Jangan tampilkan data seed sebelum override CMS Firestore diterima.
   if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < 9000) return;
@@ -35801,6 +35813,9 @@ function nineOpenDeepLink(){
     if(detail && active && String(active.id) === String(nineDeepLinkId)){
       nineDeepLinkDone = true;
       if(nineDeepLinkTimer) clearInterval(nineDeepLinkTimer);
+      // Initial direct entry: Firestore stats may still be unavailable during
+      // first paint. Refresh the same existing stats cache once Firebase is ready.
+      nineRefreshInitialProductStats(String(product.id));
       requestAnimationFrame(() => {
         if(typeof window.scrollProductDetailIntoView === 'function'){
           window.scrollProductDetailIntoView('auto');
