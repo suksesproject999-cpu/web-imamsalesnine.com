@@ -22788,35 +22788,8 @@ stickyClosed = false;
 
 lastCategory = product.kategori;
 
-// Pembukaan detail: gunakan satu pembaca statistik untuk semua jalur navigasi.
-// Pada kunjungan pertama dari share, Firebase Auth bisa belum siap; tunggu
-// status auth sebelum pembacaan server agar kegagalan awal tidak dicache sebagai 0.
-const directEntry = new URLSearchParams(location.search).get('product') === String(product.id)
-    && !window.__nineFirstDirectStatsResolved;
-if(directEntry){
-    window.__nineFirstDirectStatsResolved = true;
-    try{
-        if(typeof firebase !== 'undefined' && firebase.auth){
-            const auth = firebase.auth();
-            if(!auth.currentUser){
-                await new Promise(resolve=>{
-                    let done=false, unsub=()=>{};
-                    const finish=()=>{if(done)return;done=true;unsub();resolve();};
-                    const timer=setTimeout(finish,6500);
-                    unsub=auth.onAuthStateChanged(()=>{clearTimeout(timer);finish();},
-                        ()=>{clearTimeout(timer);finish();});
-                    if(done)unsub();
-                });
-            }
-        }
-        const stats=await window.getProductStats?.(product.id);
-        if(stats && Number.isFinite(Number(stats.terjual))){
-            product.terjual=Number(stats.terjual);
-        }
-    }catch(error){
-        console.warn('Statistik kunjungan awal menunggu sinkronisasi realtime:',error);
-    }
-}
+// Statistik detail dihidratasi melalui satu listener realtime yang sama
+// dengan card. Jangan melakukan pembacaan awal terpisah di sini.
 const sold = Number.isFinite(Number(product.terjual)) && Number(product.terjual)>0 ? Number(product.terjual) : 0;
 const ratingData = { rating: 0, count: 0 };
 
@@ -23639,7 +23612,6 @@ updateDetailProductBadge(product.id);
 
 // Hydrate real statistics without blocking first paint or navigation.
 Promise.allSettled([
-    updateDetailProductSold(product.id),
     updateDetailProductRating(product.id),
     updateDetailRatingBadge(product.id)
 ]);
@@ -23649,7 +23621,6 @@ const detailProductId = String(product.id);
 requestAnimationFrame(() => {
     if(String(currentProduct?.id)!==detailProductId) return;
     window.__hydrateRealtimeProductStats?.(document);
-    window.__v101RefreshProductStats?.(detailProductId);
 });
 
 if(!window.__productTransitionActive){
@@ -35651,7 +35622,8 @@ window.__v101RefreshProductStats=async function(productId){
         const doc=await db.collection('statistik_produk').doc(id).get({source:'server'}).catch(()=>
             db.collection('statistik_produk').doc(id).get()
         );
-        const value=doc.exists?normalize(doc.data()):normalize({});
+        if(!doc.exists) return statsCache.has(id)?Object.assign({},statsCache.get(id)):null;
+        const value=normalize(doc.data());
         statsCache.set(id,value);
         applyStats(id,value,document);
         return Object.assign({},value);
@@ -35804,6 +35776,32 @@ function nineOpenDeepLink(){
       // Initial direct entry: Firestore stats may still be unavailable during
       // first paint. Refresh the same existing stats cache once Firebase is ready.
       window.__hydrateRealtimeProductStats?.(document);
+      // Direct entry: once Firebase Auth has an actual user, read the
+      // authoritative document and paint the currently mounted detail.
+      // Do not write a fallback zero to the cache or UI.
+      const directId = String(nineDeepLinkId);
+      const reconcile = () => {
+        if(String(currentProduct?.id) !== directId) return;
+        window.__v101RefreshProductStats?.(directId);
+      };
+      if(typeof firebase !== 'undefined' && firebase.auth){
+        const auth = firebase.auth();
+        if(auth.currentUser){
+          reconcile();
+        }else{
+          let unsub = () => {};
+          unsub = auth.onAuthStateChanged(user => {
+            if(!user) return;
+            unsub();
+            reconcile();
+          }, error => {
+            unsub();
+            console.warn('Auth statistik deep link:', error);
+          });
+        }
+      }else{
+        reconcile();
+      }
       requestAnimationFrame(() => {
         if(typeof window.scrollProductDetailIntoView === 'function'){
           window.scrollProductDetailIntoView('auto');
