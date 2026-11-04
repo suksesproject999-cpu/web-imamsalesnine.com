@@ -22677,6 +22677,12 @@ document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{id,added:w
 
 
 function backToProducts(){
+  if(new URLSearchParams(location.search).has('product')){
+    const url=new URL(location.href);
+    url.searchParams.delete('product');
+    history.pushState({nineProductId:null},'',url.pathname+url.search+url.hash);
+  }
+
 
 if(lastCategory){
 
@@ -22743,6 +22749,19 @@ if(!product) return;
 
 currentProduct = product;
 
+// Navigasi detail memakai URL kanonis dan History API.
+// Ketika membuka produk lain, alamat harus ikut berubah.
+if(!window.__nineHandlingHistory){
+    const target = new URL(window.location.href);
+    target.searchParams.set('product',String(product.id));
+    const previous = new URLSearchParams(window.location.search).get('product');
+    if(previous !== String(product.id)){
+        history.pushState({nineProductId:String(product.id)},'',target.pathname+target.search+target.hash);
+    }else if(!history.state?.nineProductId){
+        history.replaceState({...(history.state||{}),nineProductId:String(product.id)},'',target.pathname+target.search+target.hash);
+    }
+}
+
 // Catat view asli setiap kali halaman detail produk dibuka.
 // Tidak memblokir render detail jika jaringan/Firestore sedang lambat.
 Promise.resolve()
@@ -22770,7 +22789,7 @@ stickyClosed = false;
 lastCategory = product.kategori;
 
 // Render detail immediately; hydrate live Firestore statistics after first paint.
-const sold = 0;
+const sold = Number.isFinite(Number(product.terjual)) && Number(product.terjual)>0 ? Number(product.terjual) : 0;
 const ratingData = { rating: 0, count: 0 };
 
 let html = `
@@ -23596,6 +23615,14 @@ Promise.allSettled([
     updateDetailProductRating(product.id),
     updateDetailRatingBadge(product.id)
 ]);
+// Setelah render, baca statistik server yang sama dengan card biasa.
+// Data harus diterapkan ke ID yang masih aktif, bukan detail yang sudah diganti.
+const detailProductId = String(product.id);
+requestAnimationFrame(() => {
+    if(String(currentProduct?.id)!==detailProductId) return;
+    window.__hydrateRealtimeProductStats?.(document);
+    window.__v101RefreshProductStats?.(detailProductId);
+});
 
 if(!window.__productTransitionActive){
     requestAnimationFrame(()=>{
@@ -35755,7 +35782,7 @@ document.addEventListener('click',function(event){
 },true);
 
 /* Deep-link produk: tunggu halaman dan data siap, lalu buka detail berdasarkan ID. */
-const nineDeepLinkId = new URLSearchParams(window.location.search).get('product');
+let nineDeepLinkId = new URLSearchParams(window.location.search).get('product');
 let nineDeepLinkDone = false;
 let nineDeepLinkBusy = false;
 let nineDeepLinkTimer = null;
@@ -35799,6 +35826,29 @@ function nineStartDeepLink(){
     nineOpenDeepLink();
   }, 350);
 }
+// Navigasi browser Back/Forward: detail harus sesuai URL, bukan state lama.
+window.addEventListener('popstate', () => {
+  const id = new URLSearchParams(location.search).get('product');
+  nineDeepLinkId = id;
+  nineDeepLinkDone = false;
+  if(nineDeepLinkTimer){clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;}
+  nineDeepLinkAttempts = 0;
+  if(id){
+    const product=sourceProducts().find(p=>String(p.id)===String(id));
+    if(product && typeof window.showProduct==='function'){
+      window.__nineHandlingHistory=true;
+      Promise.resolve(window.showProduct(product.nama,{skipView:true}))
+        .finally(()=>{window.__nineHandlingHistory=false;});
+      nineDeepLinkDone=true;
+      window.scrollProductDetailIntoView?.('auto');
+    }else{
+      nineStartDeepLink();
+    }
+  }else{
+    window.__nineHandlingHistory=true;
+    try{window.renderCategories?.();}finally{window.__nineHandlingHistory=false;}
+  }
+});
 document.addEventListener('nine:products-ready', nineStartDeepLink);
 window.addEventListener('load', nineStartDeepLink, {once:true});
 window.addEventListener('pageshow', nineStartDeepLink);
