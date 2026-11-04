@@ -4459,11 +4459,7 @@ font-size:14px;
 font-size:14px;
 }
 
-#relatedProducts,
-#recentProducts{
-grid-template-columns:1fr;
-gap:16px;
-}
+
 
 }
 
@@ -16415,6 +16411,45 @@ html.v7-commerce-transition::view-transition-new(root){
   min-width:0!important;
   align-items:stretch!important;
 }
+/* Mobile card geometry is owned here, including the detail recommendation sections. */
+@media(max-width:768px){
+  #product-grid-auto .product-bottom>section:has(> #relatedProducts),
+  #product-grid-auto .product-bottom>section:has(> #recentProducts){
+    margin-inline:-12px;
+    padding-inline:0;
+    min-width:0;
+    box-sizing:border-box;
+  }
+  #product-grid-auto .product-bottom>section:has(> #relatedProducts)>h2,
+  #product-grid-auto .product-bottom>section:has(> #recentProducts)>h2{
+    margin-inline:12px;
+  }
+  /* Cart recommendations share the same viewport-based 2-column geometry
+     as catalogue cards, regardless of the cart-page inner padding. */
+  #product-grid-auto.page-cart .nf-more-products{
+    box-sizing:border-box;
+    position:relative;
+    left:50%;
+    transform:translateX(-50%);
+    width:calc(100vw - 24px);
+    max-width:none;
+    margin:24px 0 145px;
+    padding:0;
+    border-radius:0;
+    background:transparent;
+  }
+  #product-grid-auto.page-cart .nf-more-products .nf-more-head{
+    padding-inline:2px;
+  }
+  #product-grid-auto.page-cart .nf-more-grid{
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:7px;
+    width:100%;
+    min-width:0;
+  }
+}
+
 @media(max-width:768px){
   #product-grid-auto.search-product-mode,
   #category-products,
@@ -16423,14 +16458,14 @@ html.v7-commerce-transition::view-transition-new(root){
   #recentProducts{
     display:grid!important;
     grid-template-columns:repeat(2,minmax(0,1fr))!important;
-    gap:12px!important;
+    gap:7px!important;
   }
 }
 @media(min-width:769px){
   #category-products,#promo-direct-products,#relatedProducts,#recentProducts{
     display:grid!important;
     grid-template-columns:repeat(auto-fill,minmax(220px,1fr))!important;
-    gap:18px!important;
+    gap:14px!important;
   }
 }
 
@@ -16450,7 +16485,7 @@ html.v7-commerce-transition::view-transition-new(root){
   background:#fff!important;
   color:var(--v15-text)!important;
   border:1px solid var(--v15-line)!important;
-  border-radius:14px!important;
+  border-radius:11px!important;
   box-shadow:0 3px 14px rgba(0,0,0,.065)!important;
   -webkit-tap-highlight-color:transparent!important;
 }
@@ -16469,7 +16504,7 @@ html.v7-commerce-transition::view-transition-new(root){
 .marketplace-card.v15-card .product-card-body{
   display:flex!important;flex-direction:column!important;align-items:stretch!important;
   flex:1 1 auto!important;width:100%!important;min-width:0!important;
-  padding:10px!important;margin:0!important;background:#fff!important;
+  padding:8px!important;margin:0!important;background:#fff!important;
 }
 .marketplace-card.v15-card .product-brand{
   display:block!important;width:100%!important;margin:0 0 4px!important;padding:0!important;
@@ -16479,14 +16514,14 @@ html.v7-commerce-transition::view-transition-new(root){
 .marketplace-card.v15-card .marketplace-product-name{
   display:block!important;width:100%!important;min-width:0!important;height:1.4em!important;
   min-height:1.4em!important;max-height:1.4em!important;margin:0!important;padding:0!important;
-  color:#222!important;font-size:12.5px!important;font-weight:700!important;line-height:1.4!important;
+  color:#222!important;font-size:12px!important;font-weight:700!important;line-height:1.4!important;
   white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;
   -webkit-line-clamp:unset!important;-webkit-box-orient:initial!important;
 }
 .marketplace-card.v15-card .marketplace-price{
   display:flex!important;align-items:baseline!important;flex-wrap:wrap!important;gap:5px!important;
-  width:100%!important;min-height:25px!important;margin:8px 0 0!important;padding:0!important;
-  color:var(--v15-green)!important;font-size:17px!important;font-weight:800!important;line-height:1.2!important;
+  width:100%!important;min-height:25px!important;margin:6px 0 0!important;padding:0!important;
+  color:var(--v15-green)!important;font-size:16px!important;font-weight:800!important;line-height:1.2!important;
 }
 .marketplace-card.v15-card .marketplace-price-old{
   color:#999!important;font-size:9.5px!important;font-weight:500!important;line-height:1.2!important;
@@ -16497,7 +16532,7 @@ html.v7-commerce-transition::view-transition-new(root){
 
 .marketplace-card.v15-card .v15-trust{
   display:grid!important;grid-template-rows:24px 24px!important;row-gap:4px!important;
-  width:100%!important;min-width:0!important;height:52px!important;margin:8px 0 0!important;
+  width:100%!important;min-width:0!important;height:52px!important;margin:6px 0 0!important;
 }
 .marketplace-card.v15-card .v15-trust-row{
   display:grid!important;grid-template-columns:auto minmax(0,1fr)!important;
@@ -16529,7 +16564,7 @@ html.v7-commerce-transition::view-transition-new(root){
 
 .marketplace-card.v15-card .product-voucher-info{
   display:inline-flex!important;align-items:center!important;justify-content:flex-start!important;align-self:flex-start!important;
-  max-width:100%!important;height:25px!important;min-height:25px!important;margin:8px 0 0!important;padding:0 8px!important;
+  max-width:100%!important;height:25px!important;min-height:25px!important;margin:6px 0 0!important;padding:0 8px!important;
   border:0!important;border-radius:7px!important;background:#eef8df!important;color:#5a8e1c!important;
   font-size:9px!important;font-weight:700!important;line-height:1!important;white-space:nowrap!important;
   overflow:hidden!important;text-overflow:ellipsis!important;gap:5px!important;
@@ -16542,7 +16577,7 @@ html.v7-commerce-transition::view-transition-new(root){
   appearance:none!important;-webkit-appearance:none!important;position:relative!important;
   display:flex!important;align-items:center!important;justify-content:center!important;gap:7px!important;
   width:100%!important;min-width:0!important;height:40px!important;min-height:40px!important;
-  margin:10px 0 0!important;padding:0 8px!important;border:0!important;border-radius:10px!important;
+  margin:8px 0 0!important;padding:0 8px!important;border:0!important;border-radius:10px!important;
   background:var(--v15-green)!important;color:#fff!important;-webkit-text-fill-color:#fff!important;
   font-size:11px!important;font-weight:800!important;line-height:1!important;text-align:center!important;
   white-space:nowrap!important;overflow:hidden!important;box-shadow:0 7px 18px rgba(140,198,63,.2)!important;
@@ -16564,7 +16599,7 @@ html.v7-commerce-transition::view-transition-new(root){
 
 
 @media(max-width:390px){
-  .marketplace-card.v15-card .product-card-body{padding:8px!important}
+  .marketplace-card.v15-card .product-card-body{padding:7px!important}
   .marketplace-card.v15-card .marketplace-product-name{font-size:11.5px!important}
   .marketplace-card.v15-card .marketplace-price{font-size:15px!important}
   .marketplace-card.v15-card .product-rating{font-size:8px!important;padding:0 5px!important}
@@ -16574,6 +16609,35 @@ html.v7-commerce-transition::view-transition-new(root){
 }
 
 
+
+/* Unified storefront card-grid geometry: catalogue, search, categories, related and recently viewed.
+   The existing v15 card renderer and its data/event handlers remain the only card implementation. */
+@media(max-width:768px){
+  #product:has(#category-products),
+  #product:has(#promo-direct-products),
+  #product:has(#product-grid-auto.search-product-mode),
+  #product:has(#relatedProducts),
+  #product:has(#recentProducts){
+    padding-left:7px;
+    padding-right:7px;
+  }
+  #product-grid-auto.search-product-mode,
+  #category-products,
+  #promo-direct-products,
+  #relatedProducts,
+  #recentProducts{
+    gap:7px!important;
+    padding-left:0!important;
+    padding-right:0!important;
+  }
+}
+@media(min-width:769px) and (max-width:1100px){
+  #product-grid-auto.search-product-mode,
+  #category-products,#promo-direct-products,#relatedProducts,#recentProducts{
+    grid-template-columns:repeat(auto-fill,minmax(205px,1fr))!important;
+    gap:14px!important;
+  }
+}
 
 body.v15-card-zone #stickyCheckout{
   opacity:0!important;pointer-events:none!important;transform:translate3d(0,125%,0)!important;
@@ -38216,7 +38280,7 @@ if(grid?.querySelector('.checkout-form'))enhanceCheckout();
 </script>
 
 <style id="nine-v5-polish-css">
-.nf-more-grid>.product-card{display:block;min-width:0;width:100%;max-width:100%;overflow:hidden}
+.nf-more-grid>.product-card{min-width:0;width:100%;max-width:100%;overflow:hidden}
 .nf-more-grid .product-card-body{min-width:0}
 .nf-more-grid .marketplace-product-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nf-shipping-note{font-size:12px;color:#697267;line-height:1.55;margin:14px 0 0}
@@ -38382,6 +38446,8 @@ document.addEventListener('visibilitychange',()=>{if(document.hidden){if(off){of
 .nexai-stack-item span{display:block;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;min-width:0;font-size:clamp(10px,2.2vw,12px);font-weight:600;line-height:1.3}
 @media(max-width:600px){.nexai-toast-stack{gap:4px;max-width:85%}.nexai-stack-item{padding:5px 8px;min-height:24px}.nexai-stack-item span{font-size:10px}}
 @media(prefers-reduced-motion:reduce){.nexai-stack-item{transition:none;transform:none!important}}
+
+
 </style>
 <script id="nexai-toast-stack-v2-script">
 (function(){
