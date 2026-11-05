@@ -16,7 +16,11 @@ const response = (statusCode, data) => ({
 
 exports.handler = async (event) => {
   try {
-    const store = getStore(STORE);
+    const store = getStore({
+  name: STORE,
+  siteID: process.env.NETLIFY_SITE_ID,
+  token: process.env.NETLIFY_BLOBS_TOKEN
+});
 
     if (event.httpMethod === "GET") {
       const saved = await store.get(KEY, { type: "json" });
