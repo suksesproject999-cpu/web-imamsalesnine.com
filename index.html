@@ -18317,6 +18317,158 @@ img{
 </script>
 <!-- NEXAI CONTENT GUARD END -->
 
+<style id="nine-detail-clean-styles">
+
+/* NINE DETAIL — satu sistem layout terisolasi, tanpa mengubah halaman katalog */
+body:has(.nine-detail-shell){overflow:hidden!important}
+body:has(.nine-detail-shell)>.header,body:has(.nine-detail-shell) .social-float{display:none!important}
+body:has(.nine-detail-shell) #product-grid-auto{position:fixed!important;inset:0!important;z-index:1005!important;overflow:hidden!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;background:#f5f5f5!important}
+.nine-detail-shell{height:100dvh;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#f5f5f5;color:#222;font-family:Arial,sans-serif;padding-bottom:90px}
+.nine-detail-shell *{box-sizing:border-box}
+.nine-detail-shell .nine-detail-topbar{height:54px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between;padding:0 12px;background:#fff;border-bottom:1px solid #eee}
+.nine-detail-topbar strong{font-size:15px;font-weight:600}
+.nine-detail-topbar button{width:40px;height:40px;display:grid;place-items:center;border:0;background:transparent;color:#222;font-size:19px;cursor:pointer}
+.nine-detail-shell .product-detail{width:100%;max-width:1120px;margin:0 auto!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;background:transparent}
+.nine-detail-shell .product-header{display:block!important}
+.nine-detail-shell .gallery-column{position:static!important;width:100%;background:#fff}
+.nine-detail-shell .gallery-main{border:0!important;border-radius:0!important;position:relative;overflow:hidden;background:#fff}
+.nine-detail-shell .gallery-main img{width:100%;max-height:540px;aspect-ratio:1/1;object-fit:contain;display:block;cursor:zoom-in}
+.nine-gallery-count{position:absolute;right:12px;bottom:12px;border-radius:20px;padding:5px 10px;font-size:11px;color:white;background:rgba(0,0,0,.55)}
+.nine-detail-shell .gallery-thumb{padding:8px 12px!important;gap:7px;display:flex;overflow-x:auto}
+.nine-detail-shell .gallery-thumb img{width:52px!important;height:52px!important;flex:0 0 52px!important;border-radius:5px!important;object-fit:contain}
+.nine-detail-shell .product-info{position:static!important;display:block!important;padding:0 12px 12px!important;background:#fff}
+.nine-price-row{display:flex;align-items:center;gap:8px;min-width:0;padding-top:12px}
+.nine-detail-shell .price{font-size:clamp(23px,6vw,30px)!important;font-weight:750!important;color:#ee4d2d!important;white-space:nowrap;letter-spacing:-.6px}
+.nine-voucher{display:inline-flex;align-items:center;gap:4px;border:1px solid #ee4d2d;border-radius:3px;color:#ee4d2d;font-size:10px;white-space:nowrap;padding:3px 5px}
+.nine-detail-shell .wishlist-btn{position:static!important;margin-left:auto;flex:0 0 34px;width:34px!important;height:34px!important;border-radius:50%;background:#fafafa;border:0;font-size:18px}
+.nine-detail-shell .product-title{min-height:0!important;padding:0!important;margin-top:7px}
+.nine-detail-shell .product-title h2{font-size:15px!important;font-weight:500!important;line-height:1.45!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
+.nine-subprice{display:flex;align-items:center;gap:12px;margin:7px 0 10px;font-size:11px;color:#888}
+.nine-subprice .detail-product-sold{margin-left:auto}
+.nine-detail-shell .product-highlights{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;margin:0!important;padding:10px 0!important;border-top:1px solid #f0f0f0}
+.nine-detail-shell .product-highlights span{min-width:0!important;display:flex!important;flex-direction:column;gap:4px!important;align-items:center;justify-content:center;text-align:center;padding:0 2px!important;border-radius:0!important;background:none!important;border-right:1px solid #eee;font-weight:400!important}
+.nine-detail-shell .product-highlights span:last-child{border-right:0}
+.nine-detail-shell .product-highlights i{font-size:14px;color:#ee4d2d}
+.nine-detail-shell .product-highlights small{font-size:9px;line-height:1.2;white-space:normal;overflow-wrap:anywhere;color:#555}
+.nine-detail-divider{height:8px;margin:12px -12px;background:#f5f5f5}
+.nine-detail-shell .product-options{margin:0!important;padding:10px 0!important;border:0!important;gap:0!important}
+.nine-detail-shell .option-group{gap:10px}
+.nine-detail-shell .option-group label{font-size:13px}
+.nine-detail-shell .variant-buttons{gap:7px}
+.nine-detail-shell .variant-btn{border-radius:5px!important;font-size:12px!important;padding:8px 11px!important}
+.nine-detail-shell .variant-btn.active{background:#fff!important;color:#ee4d2d!important;border-color:#ee4d2d!important;box-shadow:none!important}
+.nine-detail-link{width:100%;height:44px;display:flex;align-items:center;justify-content:space-between;border:0;background:#fff;font-size:14px;color:#222;cursor:pointer}
+.nine-detail-link i{font-size:12px;color:#888}
+.nine-review-heading{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nine-review-heading strong{font-size:16px;font-weight:600}
+.nine-review-heading strong i{color:#ffb400}
+.nine-review-heading button{border:0;background:transparent;color:#ee4d2d;font-size:12px;cursor:pointer}
+.nine-review-empty{font-size:12px!important;line-height:1.5!important;color:#888!important;padding:16px 0!important}
+.nine-store-identity{display:flex;align-items:center;gap:9px;min-width:0}
+.nine-store-avatar{flex:0 0 46px;width:46px;height:46px;display:grid;place-items:center;border:1px solid #ddd;border-radius:50%;color:#8cc63f;font-size:19px}
+.nine-store-identity>div{flex:1;min-width:0}
+.nine-store-identity strong{display:block;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nine-store-identity small{display:block;margin-top:5px;font-size:10px;color:#888}
+.nine-store-identity>button{padding:7px 9px;border:1px solid #ee4d2d;color:#ee4d2d;background:#fff;border-radius:3px;font-size:11px;cursor:pointer}
+.nine-store-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));margin-top:16px}
+.nine-store-stats>div{display:flex;flex-direction:column;align-items:center;gap:5px;border-right:1px solid #eee}
+.nine-store-stats>div:last-child{border-right:0}
+.nine-store-stats strong{font-size:13px;color:#ee4d2d}
+.nine-store-stats small{font-size:10px;color:#888}
+.nine-section-head{font-size:14px;font-weight:600;margin-bottom:10px}
+.nine-description-text{font-size:12px;line-height:1.7;color:#444;white-space:pre-line;display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden}
+.nine-description-text.expanded{display:block}
+#nineDescToggle{border:0;background:none;color:#ee4d2d;font-size:12px;margin-top:8px;padding:5px 0;cursor:pointer}
+.nine-detail-shell .product-bottom{display:block!important;margin:8px 0 0!important}
+.nine-detail-shell .product-bottom section{padding:12px;background:#fff;margin-bottom:8px}
+.nine-detail-shell .product-bottom h2{font-size:14px!important;font-weight:600!important;margin:0 0 12px!important}
+.nine-detail-shell #relatedProducts,.nine-detail-shell #recentProducts{display:flex!important;gap:9px!important;overflow-x:auto!important;scroll-snap-type:x mandatory;padding:0 0 8px!important;scrollbar-width:none}
+.nine-detail-shell #relatedProducts>.product-card,.nine-detail-shell #recentProducts>.product-card{flex:0 0 148px!important;width:148px!important;min-width:148px!important;max-width:148px!important;min-height:0!important;border-radius:5px!important;box-shadow:none!important;scroll-snap-align:start;overflow:hidden}
+.nine-detail-shell #relatedProducts .product-card img,.nine-detail-shell #recentProducts .product-card img{width:100%!important;height:145px!important;aspect-ratio:1!important;object-fit:contain!important}
+.nine-detail-shell #relatedProducts .product-card-body,.nine-detail-shell #recentProducts .product-card-body{padding:8px!important;min-height:0!important;display:block!important;overflow:hidden}
+.nine-detail-shell #relatedProducts .product-card h3,.nine-detail-shell #recentProducts .product-card h3{font-size:11px!important;line-height:1.35!important;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nine-detail-shell #relatedProducts .product-card button,.nine-detail-shell #recentProducts .product-card button{font-size:11px!important}
+.nine-spec-overlay{display:none;position:fixed;inset:0;z-index:30000;background:rgba(0,0,0,.5);align-items:flex-end;justify-content:center}
+.nine-spec-overlay.show{display:flex}
+.nine-spec-sheet{background:#fff;border-radius:16px 16px 0 0;width:100%;max-width:620px;max-height:85dvh;display:flex;flex-direction:column;animation:nineSheetIn .22s ease-out}
+@keyframes nineSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+.nine-sheet-grip{width:40px;height:4px;border-radius:8px;background:#ddd;margin:10px auto}
+.nine-sheet-head{display:flex;justify-content:space-between;align-items:center;padding:12px 16px;border-bottom:1px solid #eee;font-size:16px}
+.nine-sheet-head button{border:0;background:transparent;font-size:19px}
+.nine-spec-list{overflow-y:auto;padding:8px 16px;flex:1}
+.nine-spec-item{display:grid;grid-template-columns:38% 1fr;gap:12px;padding:13px 0;border-bottom:1px solid #eee;font-size:12px}
+.nine-spec-item span{color:#888}.nine-spec-item strong{font-weight:500;overflow-wrap:anywhere}
+.nine-spec-ok{margin:12px 16px max(12px,env(safe-area-inset-bottom));padding:13px;border:0;background:#ee4d2d;color:white;border-radius:5px;font-weight:600}
+.nine-review-page{display:none;position:fixed;inset:0;z-index:20000;background:#fff;overflow-y:auto}
+.nine-review-page.show{display:block}
+.nine-review-page header{position:sticky;top:0;z-index:2;height:54px;display:flex;align-items:center;gap:16px;padding:0 14px;border-bottom:1px solid #eee;background:#fff}
+.nine-review-page header button{border:0;background:transparent;font-size:19px}
+.nine-review-page header strong{font-size:15px}
+.nine-review-tabs{display:flex;border-bottom:1px solid #eee;padding:0 15px}
+.nine-review-tabs button{padding:15px 0;border:0;border-bottom:2px solid #ee4d2d;background:#fff;color:#ee4d2d;font-size:13px}
+.nine-review-filter{display:flex;gap:8px;flex-wrap:wrap;padding:14px;border-bottom:8px solid #f5f5f5}
+.nine-review-filter button{border:1px solid #eee;border-radius:3px;background:#f8f8f8;padding:8px 10px;font-size:11px}
+.nine-review-filter button.active{border-color:#ee4d2d;color:#ee4d2d;background:#fff6f4}
+.nine-review-page-body{padding:18px 14px;font-size:13px;color:#777}
+@media(min-width:900px){.nine-detail-shell .product-header{display:grid!important;grid-template-columns: minmax(0,480px) minmax(0,1fr)!important;align-items:start!important;gap:16px!important}.nine-detail-shell .product-info{padding:0 16px!important}.nine-detail-shell .product-bottom{max-width:1120px;margin:8px auto!important}}
+
+</style>
+
+
+
+<style id="nine-final-v27">
+/* Search header */
+.nine-search-capsule{position:relative!important;display:flex!important;align-items:center!important;min-width:0!important;isolation:isolate!important}
+#nineDetailSearchInput{display:block!important;position:relative!important;flex:1 1 0!important;min-width:0!important;width:100%!important;height:42px!important;padding:0 5px!important;margin:0!important;box-sizing:border-box!important;border:0!important;border-radius:0!important;background:transparent!important;color:#252525!important;-webkit-text-fill-color:#252525!important;font-size:14px!important;line-height:normal!important;outline:0!important;box-shadow:none!important;transform:none!important}
+#nineDetailSearchResults{position:absolute!important;top:calc(100% + 9px)!important;left:0!important;right:0!important;width:100%!important;max-height:min(56vh,420px)!important;overflow-y:auto!important;overflow-x:hidden!important;background:white!important;border:1px solid #e1e8d6!important;border-radius:14px!important;box-shadow:0 12px 30px #0002!important;z-index:99999!important;padding:5px!important;box-sizing:border-box!important}
+#nineDetailSearchResults[hidden]{display:none!important}
+#nineDetailSearchResults button{display:flex!important;flex-direction:row!important;align-items:center!important;gap:10px!important;width:100%!important;min-height:54px!important;padding:6px 8px!important;margin:0!important;text-align:left!important;white-space:normal!important;background:white!important;border:0!important;border-bottom:1px solid #eee!important;color:#252525!important;font-size:12px!important;line-height:1.3!important;cursor:pointer!important}
+#nineDetailSearchResults button img{display:block!important;position:static!important;flex:0 0 44px!important;width:44px!important;height:44px!important;object-fit:contain!important;transform:none!important}
+#nineDetailSearchResults button span{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;flex:1!important;min-width:0!important}
+.nine-detail-topbar{overflow:visible!important}
+.nine-detail-shell .nine-old-price{display:flex!important;align-items:center!important;gap:9px!important;margin:2px 0 3px!important;font-size:15px!important;color:#777!important}
+.nine-detail-shell .nine-old-price del{opacity:1!important;color:#777!important}
+.nine-detail-shell .nine-discount-percent,.nine-detail-shell .nine-saving{display:inline-flex!important;align-items:center!important;white-space:nowrap!important;border-radius:7px!important;padding:4px 8px!important;background:#fff0eb!important;color:#ee4d2d!important;font-size:12px!important;font-weight:800!important}
+.nine-detail-shell .nine-price-row{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:10px!important;margin:0 0 5px!important;padding:0!important}
+.nine-detail-shell .nine-price-row .price{margin:0!important;color:#ee4d2d!important}
+.nine-detail-shell .nine-meta-actions{display:grid!important;grid-template-columns:auto minmax(0,1fr) auto!important;align-items:center!important;column-gap:8px!important;min-height:46px!important;margin:0 0 8px!important;padding:0!important;width:100%!important}
+.nine-detail-shell .nine-meta-actions .nine-voucher{grid-column:1!important;white-space:nowrap!important;margin:0!important}
+.nine-detail-shell .nine-meta-stats{grid-column:2!important;display:flex!important;justify-content:center!important;align-items:center!important;gap:10px!important;min-width:0!important}
+.nine-detail-shell .nine-meta-stats span{font-size:clamp(10px,2.55vw,13px)!important;white-space:nowrap!important;line-height:1.3!important;margin:0!important}
+.nine-detail-shell .nine-meta-actions .wishlist-btn{grid-column:3!important;position:static!important;transform:none!important;margin:0!important;justify-self:end!important}
+.nine-detail-shell .product-title{display:block!important;margin:6px 0 9px!important;min-height:0!important}
+.nine-detail-shell .product-title h2{display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;margin:0!important;font-size:clamp(15px,3.2vw,21px)!important;line-height:1.3!important;font-weight:800!important}
+.nine-detail-shell .product-title .nine-inline-brand{display:inline!important;position:static!important;float:none!important;margin:0!important;padding:0!important;font:inherit!important;color:#719d32!important}
+.nine-detail-shell .product-highlights{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-template-rows:1fr!important;gap:5px!important}
+.nine-detail-shell .product-highlights>span{grid-row:1!important;min-width:0!important;display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:center!important;padding:7px 2px!important;gap:3px!important}
+.nine-detail-shell .product-highlights small{font-size:clamp(8px,1.7vw,10px)!important;line-height:1.2!important;text-align:center!important;white-space:normal!important;overflow-wrap:anywhere!important}
+.nine-detail-shell .variant-buttons .variant-btn,.nine-detail-shell .variant-buttons .variant-btn.active{color:#202820!important;-webkit-text-fill-color:#202820!important;text-shadow:none!important;opacity:1!important;visibility:visible!important;font-weight:700!important}
+.nine-detail-shell .variant-buttons .variant-btn.active{background:#eaf5dc!important;border-color:#8cc63f!important;color:#527d20!important;-webkit-text-fill-color:#527d20!important}
+#nineSpecOverlay .nine-spec-ok{background:#8cc63f!important;border-color:#8cc63f!important;color:white!important}
+.nine-review-page .nine-review-tabs button.active{color:#699c2c!important;border-bottom-color:#8cc63f!important}
+.nine-review-page .nine-review-filter button.active{color:#699c2c!important;background:#f1f8e8!important;border-color:#8cc63f!important}
+</style>
+
+<style id="nine-v28-search-cart-share">
+.nine-detail-shell .nine-detail-topbar{display:grid!important;grid-template-columns:36px minmax(0,1fr) 47px 42px!important;gap:7px!important;padding:0 11px!important;overflow:visible!important}
+.nine-detail-shell .nine-detail-topbar>button{width:36px!important;height:42px!important;min-width:0!important;padding:0!important;display:grid!important;place-items:center!important}
+.nine-detail-shell .nine-detail-topbar>.nine-share-btn{width:42px!important;font-size:22px!important;line-height:1!important}
+.nine-detail-shell .nine-detail-topbar>.nine-share-btn i{font-size:22px!important}
+.nine-detail-shell .nine-detail-topbar>.nine-header-cart{width:47px!important;font-size:22px!important}
+.nine-detail-shell .nine-detail-topbar>.nine-header-cart i{font-size:22px!important}
+.nine-detail-shell #nineHeaderCartCount:not([hidden]){position:absolute!important;top:0!important;right:0!important;transform:translate(15%,-15%)!important;display:flex!important;align-items:center!important;justify-content:center!important;min-width:19px!important;max-width:44px!important;width:max-content!important;height:19px!important;padding:0 5px!important;border-radius:12px!important;font-size:10px!important;line-height:1!important;font-weight:800!important;letter-spacing:-.3px!important;white-space:nowrap!important;z-index:5!important;box-sizing:border-box!important}
+.nine-detail-shell .nine-search-capsule{width:100%!important;max-width:100%!important;min-width:0!important;height:43px!important;display:flex!important;align-items:center!important;gap:9px!important;padding:0 12px!important;position:relative!important;border:1px solid #e3e8da!important;border-radius:28px!important;background:#f5f8ef!important;overflow:visible!important}
+.nine-detail-shell .nine-search-capsule>i{position:static!important;display:block!important;flex:0 0 18px!important;font-size:19px!important;color:#7d8996!important;line-height:1!important}
+.nine-detail-shell .nine-search-capsule>#nineDetailSearchInput{position:static!important;display:block!important;flex:1 1 auto!important;min-width:0!important;width:0!important;height:39px!important;max-height:39px!important;margin:0!important;padding:0!important;border:0!important;outline:0!important;box-shadow:none!important;border-radius:0!important;background:transparent!important;color:#202820!important;-webkit-text-fill-color:#202820!important;font-size:14px!important;line-height:39px!important;letter-spacing:normal!important;text-align:left!important;opacity:1!important;transform:none!important}
+.nine-detail-shell .nine-search-capsule>#nineDetailSearchInput::placeholder{color:#999!important;-webkit-text-fill-color:#999!important;opacity:1!important}
+.nine-detail-shell .nine-search-capsule>#nineDetailSearchResults{position:absolute!important;top:calc(100% + 6px)!important;left:0!important;right:0!important;width:100%!important;min-width:0!important;max-height:50dvh!important;overflow-x:hidden!important;overflow-y:auto!important;z-index:999999!important;box-sizing:border-box!important;background:#fff!important;border:1px solid #dce7d1!important;border-radius:14px!important;padding:5px!important;box-shadow:0 15px 30px #0003!important;contain:layout style!important}
+.nine-detail-shell .nine-search-capsule>#nineDetailSearchResults[hidden]{display:none!important}
+.nine-detail-shell #nineDetailSearchResults button{display:flex!important;position:relative!important;float:none!important;align-items:center!important;gap:9px!important;width:100%!important;height:auto!important;min-height:55px!important;padding:5px!important;margin:0!important;border:0!important;border-bottom:1px solid #eee!important;border-radius:0!important;background:#fff!important;color:#222!important;text-align:left!important;transform:none!important;white-space:normal!important;overflow:hidden!important}
+.nine-detail-shell #nineDetailSearchResults button img{position:static!important;display:block!important;flex:0 0 44px!important;width:44px!important;height:44px!important;max-width:44px!important;object-fit:contain!important;margin:0!important;transform:none!important}
+.nine-detail-shell #nineDetailSearchResults button span{position:static!important;display:-webkit-box!important;flex:1 1 auto!important;min-width:0!important;max-width:100%!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;color:#222!important;font-size:12px!important;line-height:1.4!important;white-space:normal!important;word-break:break-word!important;transform:none!important}
+.nine-detail-shell #nineDetailSearchResults .nine-no-results{padding:12px!important;color:#666!important;font-size:12px!important}
+@media(max-width:360px){.nine-detail-shell .nine-detail-topbar{grid-template-columns:30px minmax(0,1fr) 42px 38px!important;gap:4px!important;padding:0 6px!important}}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
@@ -22794,608 +22946,84 @@ const sold = Number.isFinite(Number(product.terjual)) && Number(product.terjual)
 const ratingData = { rating: 0, count: 0 };
 
 let html = `
-
-<div class="product-detail">
-
-<!-- =========================
-HEADER
-========================= -->
-
-<div class="product-header">
-
-<!-- =========================
-LEFT COLUMN
-========================= -->
-
-<div class="gallery-column">
-
-<div class="gallery-main">
-
-<img
-id="mainProductImage"
-class="lightbox-image"
-src="${product.gambar}"
-alt="${product.nama}"
-loading="lazy"
-onclick="openLightbox()"
-onerror="this.src='images/no-image.png'">
-
-<div class="gallery-thumb">
-
-<img
-class="active"
-src="${product.gambar}"
-onclick="changeGallery(this)">
-
-${(product.gallery||[]).map(img=>`
-
-<img
-src="${img}"
-onclick="changeGallery(this)">
-
-`).join("")}
-
-</div>
-
-</div>
-
-</div>
-
-<!-- =========================
-RIGHT COLUMN
-========================= -->
-
-<div class="product-info">
-
-<div class="back-products">
-
-<button onclick="backToProducts()">
-
-← Kembali ke Produk
-
-</button>
-
-</div>
-
-<div class="product-title">
-
-<div
-    class="detail-product-badge"
-    data-detail-badge="${product.id}"
-></div>
-
-<h2>${product.nama}</h2>
-
-
-
-<div class="product-detail-meta">
-
-    <span
-        data-detail-rating="${product.id}"
-    >
-        ${
-            ratingData.count > 0
-                ? `⭐ ${ratingData.rating.toFixed(1)} Rating`
-                : "⭐ - Rating"
-        }
-    </span>
-
-    <span class="meta-divider">•</span>
-
-    <span
-        class="detail-product-sold"
-        data-detail-sold="${product.id}"
-    >
-        ${formatProductSold(sold)} terjual
-    </span>
-
-</div>
-
-
-<div class="product-rating-action">
-
-    <p>
-        Beri rating produk ini
-    </p>
-
-    <div class="rating-stars" id="rating-stars-${product.id}">
-
-    <i
-        class="fa-solid fa-star"
-        data-star="1"
-        onclick="selectProductRating(${product.id}, 1)"
-    ></i>
-
-    <i
-        class="fa-solid fa-star"
-        data-star="2"
-        onclick="selectProductRating(${product.id}, 2)"
-    ></i>
-
-    <i
-        class="fa-solid fa-star"
-        data-star="3"
-        onclick="selectProductRating(${product.id}, 3)"
-    ></i>
-
-    <i
-        class="fa-solid fa-star"
-        data-star="4"
-        onclick="selectProductRating(${product.id}, 4)"
-    ></i>
-
-    <i
-        class="fa-solid fa-star"
-        data-star="5"
-        onclick="selectProductRating(${product.id}, 5)"
-    ></i>
-
-</div>
-
-<button
-    type="button"
-    class="btn-submit-rating"
-    onclick="confirmProductRating(${product.id})"
->
-    Kirim Rating
-</button>
-
-
-
-</div>
-
-
-
-<button
-class="wishlist-btn"
-onclick="toggleWishlist(${product.id})">
-
-${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}
-
-</button>
-<button type="button" class="nine-share-btn nine-share-detail" data-share-product="${product.id}" aria-label="Bagikan produk" title="Bagikan produk"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button>
-
-</div>
-
-<h4>${product.brand || "-"}</h4>
-
-<div class="price-area">
-
-${product.harga?.promo ? `
-
-<div class="price-label">
-🔥 HARGA PROMO
-</div>
-
-` : ""}
-
-
-
-<div class="price">
-
-Rp ${(product.harga?.promo || product.harga?.normal || 0).toLocaleString("id-ID")}
-
-</div>
-
-${product.harga?.promo ? `
-
-<div class="old-price">
-
-<del>
-
-Rp ${product.harga.normal.toLocaleString("id-ID")}
-
-</del>
-
-<span class="discount-badge">
-
--${Math.round(
-(1-product.harga.promo/product.harga.normal)*100
-)}%
-
-</span>
-
-</div>
-
-<div class="save-price">
-
-Hemat Rp ${(product.harga.normal-product.harga.promo).toLocaleString("id-ID")}
-
-</div>
-
-` : ""}
-
-</div>
-
-<div class="product-highlights">
-
-<span>
-    <i class="fa-solid fa-circle-check"></i>
-
-    ${
-        product.stok?.qty === "limited edition"
-            ? `${product.stok?.status || "Ready"} • limited edition`
-            : `${product.stok?.status || "Ready"}`
-    }
-</span>
-
-<span>
-<i class="fa-solid fa-shield-halved"></i>
-${product.garansi?.lama || "-"}
-</span>
-
-<span
-    class="product-feature"
-    data-detail-rating-badge="${product.id}"
->
-    <i class="fa-solid fa-star"></i>
-    ${
-        ratingData.count > 0
-            ? ratingData.rating.toFixed(1)
-            : "-"
-    } Rating
-</span>
-
-<span>
-<i class="fa-solid fa-truck-fast"></i>
-Seluruh Indonesia
-</span>
-
-</div>
-
-
-<!-- ======================
-PRODUCT OPTIONS
-====================== -->
-
-<div class="product-options">
-
-<!-- VARIAN -->
-
-<div class="option-group">
-
-<label>
-
-<strong>Pilih Varian</strong>
-
-</label>
-
-<div
-id="variantContainer"
-class="variant-buttons sticky-trigger">
-
-${
-
-(product.varian?.length
-? product.varian
-: ["Default"])
-
-.map((v,index)=>`
-
-<button
-
-type="button"
-
-class="variant-btn ${selectedVariant===v?"active":""}"
-
-onclick="selectVariant(this,'${v}')">
-
-${v}
-
-</button>
-
-`).join("")
-
-}
-
-</div>
-
-<input
-type="hidden"
-id="varian"
-value="${selectedVariant}">
-
-</div>
-
-
-
-<!-- ======================
-PRODUCT INFORMATION
-====================== -->
-
-<div class="product-extra">
-
-
-<!-- ======================
-DESKRIPSI PRODUK
-====================== -->
-
-<div class="product-description-box">
-
-    <div class="info-section-header">
-
-        <h3>
-            Deskripsi Produk
-        </h3>
-
-    </div>
-
-    <div class="description-content">
-
-        <p>
-            ${product.deskripsi || "-"}
-        </p>
-
-    </div>
-
-</div>
-
-<!-- SPESIFIKASI -->
-
-<div class="info-accordion">
-
-    <button
-        type="button"
-        class="info-accordion-header"
-        onclick="toggleProductInfo(this)">
-
-        <span>
-            <i class="fa-solid fa-list-check"></i>
-            Spesifikasi Produk
-        </span>
-
-        <i class="fa-solid fa-chevron-down accordion-arrow"></i>
-
-    </button>
-
-    <div class="info-accordion-content">
-
-        <div class="spec-table">
-
-            ${
-
-            Object.entries(
-                product.spesifikasi || {}
-            )
-
-            .map(([k,v])=>`
-
-                <div class="spec-row">
-
-                    <div class="spec-label">
-                        ${k}
-                    </div>
-
-                    <div class="spec-value">
-                        ${v}
-                    </div>
-
-                </div>
-
-            `).join("")
-
-            }
-
+<div class="nine-detail-shell" id="nineDetailShell">
+  <div class="nine-detail-topbar">
+    <button type="button" onclick="backToProducts()" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
+    <div class="nine-search-capsule"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="nineDetailSearchInput" type="search" autocomplete="off" placeholder="Cari lampu LED, Projector, Foglamp..." aria-label="Cari produk"><div id="nineDetailSearchResults" class="nine-detail-search-results" role="listbox" hidden></div></div>
+    <button type="button" class="nine-header-cart" onclick="goCart()" aria-label="Keranjang"><i class="fa-solid fa-cart-shopping"></i><span id="nineHeaderCartCount" hidden></span></button>
+    <button type="button" class="nine-share-btn" data-share-product="${product.id}" aria-label="Bagikan produk"><i class="fa-solid fa-share-nodes"></i></button>
+  </div>
+  <div class="product-detail">
+    <div class="product-header">
+      <div class="gallery-column">
+        <div class="gallery-main">
+          <img id="mainProductImage" src="${product.gambar}" alt="${product.nama}" onclick="openLightbox()" onerror="this.src='images/no-image.png'">
+          <span class="nine-gallery-count">1 / ${(product.gallery||[]).length+1}</span>
         </div>
-
+        <div class="gallery-thumb">
+          <img class="active" src="${product.gambar}" alt="Foto utama" onclick="changeGallery(this)">
+          ${(product.gallery||[]).map((img,i)=>`<img src="${img}" alt="Foto ${i+2}" onclick="changeGallery(this)" onerror="this.style.display='none'">`).join("")}
+        </div>
+      </div>
+      <div class="product-info">
+        <div class="nine-old-price">${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<del>Rp ${product.harga.normal.toLocaleString("id-ID")}</del><span class="nine-discount-percent">-${Math.round((1-product.harga.promo/product.harga.normal)*100)}%</span>` : ""}</div>
+        <div class="nine-price-row">
+          <div class="price">Rp ${(product.harga?.promo || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-product.harga.promo).toLocaleString("id-ID")}</span>` : ""}
+        </div><div class="nine-meta-actions">
+          ${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<button type="button" class="nine-voucher" onclick="nineOpenOriginalVoucher()"><i class="fa-solid fa-ticket"></i> Voucher</button>` : ""}
+          <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${Number(product.views||0).toLocaleString("id-ID")} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(sold)} terjual</span></div><button class="wishlist-btn" onclick="toggleWishlist(${product.id})" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
+        <div class="product-title"><h2>${product.brand ? `<span class="nine-inline-brand">${product.brand}</span> ` : ""}${product.nama}</h2></div>
+        <div class="product-highlights">
+          <span><i class="fa-solid fa-circle-check"></i><small>${product.stok?.status || "Ready"}</small></span>
+          <span data-detail-rating-badge="${product.id}"><i class="fa-solid fa-star"></i><small>Rating —</small></span>
+          <span><i class="fa-solid fa-shield-halved"></i><small>${product.garansi?.lama || "Garansi"}</small></span>
+          <span><i class="fa-solid fa-truck-fast"></i><small>Seluruh Indonesia</small></span>
+        </div>
+        <div class="nine-detail-divider"></div>
+        <div class="product-options">
+          <div class="option-group">
+            <label>Pilih Varian</label>
+            <div id="variantContainer" class="variant-buttons sticky-trigger">
+              ${(product.varian?.length?product.varian:["Default"]).map((v,i)=>{const name=String(typeof v==="string"?v:(v?.nama||v?.name||v?.label||v?.warna||v?.value||"")).trim()||`Varian ${i+1}`;return `<button type="button" class="variant-btn ${selectedVariant===name?"active":""}" onclick='selectVariant(this,${JSON.stringify(name).replace(/'/g,"&#39;")})'>${name}</button>`}).join("")}
+            </div>
+            <input type="hidden" id="varian" value="${selectedVariant}">
+          </div>
+        </div>
+        <button type="button" class="nine-detail-link" onclick="nineOpenSpecs()"><span>Spesifikasi Produk</span><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="nine-detail-divider"></div>
+        <section class="nine-review-section">
+          <div class="nine-review-heading"><strong><span data-detail-rating="${product.id}">—</span> <span id="nineReviewCount"></span></strong><button type="button" onclick="nineOpenReviews()">Lihat Semua <i class="fa-solid fa-chevron-right"></i></button></div>
+          <details class="nine-review-composer"><summary>Tulis Ulasan Produk <i class="fa-solid fa-chevron-down"></i></summary><div class="nine-review-form"><div class="nine-review-stars" id="nineReviewStars">${[1,2,3,4,5].map(n=>`<button type="button" onclick="nineSetReviewStars(${n})" aria-label="${n} bintang">★</button>`).join("")}</div><textarea id="v17ReviewText" placeholder="Bagikan pengalaman menggunakan produk ini..." rows="3"></textarea><button type="button" onclick="nineSubmitDetailReview(this)">Kirim Ulasan</button></div></details><div id="nineReviewPreview" class="nine-review-preview"></div>
+        </section>
+        <div class="nine-detail-divider"></div>
+        <div class="nine-store">
+          <div class="nine-store-identity"><span class="nine-store-avatar"><i class="fa-solid fa-store"></i></span><div><strong>IMAMSALESNINE.COM</strong><small data-nine-store-presence aria-live="polite">Status aktivitas belum tersedia</small></div><button type="button" onclick="nineVisitStore()">Kunjungi</button></div>
+          <div class="nine-store-stats"><div><strong data-nine-store-rating>—</strong><small>Penilaian</small></div><div><strong>${allProducts.length}</strong><small>Produk</small></div><div><strong>—</strong><small>Chat Dibalas</small></div></div>
+        </div>
+        <div class="nine-detail-divider"></div>
+        <section class="nine-description"><div class="nine-section-head">Deskripsi Produk</div><div class="nine-description-text" id="nineDescription">${product.deskripsi || "Belum ada deskripsi."}</div><button type="button" id="nineDescToggle" onclick="nineToggleDescription()">Selengkapnya <i class="fa-solid fa-chevron-down"></i></button></section>
+      </div>
     </div>
-
-</div>
-
-<!-- GARANSI -->
-
-<div class="info-accordion">
-
-    <button
-        type="button"
-        class="info-accordion-header"
-        onclick="toggleProductInfo(this)">
-
-        <span>
-            <i class="fa-solid fa-shield-halved"></i>
-            Garansi
-        </span>
-
-        <i class="fa-solid fa-chevron-down accordion-arrow"></i>
-
-    </button>
-
-    <div class="info-accordion-content">
-
-        <p>
-            ${product.garansi?.lama || "-"}
-        </p>
-
+    <div class="product-bottom">
+      <section><h2>Produk Lain dari Toko Ini</h2><div id="relatedProducts" class="product-grid"></div></section>
+      <section><h2>Terakhir Dilihat</h2><div id="recentProducts" class="product-grid"></div></section><section class="nine-all-products" id="nineAllProductsSection"><h2>Semua Produk</h2><div id="nineAllProductsGrid"></div><nav id="nineAllPagination" aria-label="Halaman produk"></nav><button type="button" id="nineAllBackTop" onclick="document.getElementById('nineAllProductsSection')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Kembali ke Semua Produk"><i class="fa-solid fa-arrow-up"></i></button></section>
     </div>
-
-</div>
-
-<!-- PENGIRIMAN -->
-
-<div class="info-accordion">
-
-    <button
-        type="button"
-        class="info-accordion-header"
-        onclick="toggleProductInfo(this)">
-
-        <span>
-            <i class="fa-solid fa-truck-fast"></i>
-            Pengiriman
-        </span>
-
-        <i class="fa-solid fa-chevron-down accordion-arrow"></i>
-
-    </button>
-
-    <div class="info-accordion-content">
-
-        <p>
-            Dikirim dari gudang Distributor resmi
-            Nine Autoseries di kota anda.
-            Melayani pengiriman ke seluruh Indonesia.
-        </p>
-
+  </div>
+  <div class="nine-spec-overlay" id="nineSpecOverlay" onclick="if(event.target===this)nineCloseSpecs()">
+    <div class="nine-spec-sheet" role="dialog" aria-modal="true" aria-label="Spesifikasi Produk">
+      <div class="nine-sheet-grip"></div>
+      <div class="nine-sheet-head"><strong>Spesifikasi Produk</strong><button onclick="nineCloseSpecs()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button></div>
+      <div class="nine-spec-list">${Object.entries(product.spesifikasi||{}).map(([k,v])=>`<div class="nine-spec-item"><span>${k}</span><strong>${v}</strong></div>`).join("") || '<p>Spesifikasi belum tersedia.</p>'}</div>
+      <button class="nine-spec-ok" onclick="nineCloseSpecs()">OK</button>
     </div>
-
+  </div>
+  <div class="nine-review-page" id="nineReviewPage" aria-hidden="true">
+    <header><button type="button" class="nine-reviews-back-v29" onclick="nineCloseReviews()" aria-label="Kembali ke detail produk"><i class="fa-solid fa-arrow-left" aria-hidden="true"></i></button><strong>Penilaian &amp; Ulasan</strong></header>
+    <div class="nine-review-tabs"><button class="active">Penilaian Produk</button></div>
+    <div class="nine-review-filter"><button class="active" onclick="nineFilterReview(this)">Semua</button><button onclick="nineFilterReview(this)">Dengan Foto/Video</button>${[5,4,3,2,1].map(x=>`<button onclick="nineFilterReview(this)">${x} Bintang</button>`).join("")}</div>
+    <div class="nine-review-page-body" id="nineReviewFullList"><p>Memuat ulasan...</p></div>
+  </div>
 </div>
-
-<!-- KEUNGGULAN -->
-<div class="info-accordion">
-
-    <button
-        type="button"
-        class="info-accordion-header"
-        onclick="toggleProductInfo(this)">
-
-        <span>
-            <i class="fa-solid fa-circle-check"></i>
-            Keunggulan Produk
-        </span>
-
-        <i class="fa-solid fa-chevron-down accordion-arrow"></i>
-
-    </button>
-
-    <div class="info-accordion-content">
-
-        <ul class="feature-list">
-
-            <li>✔ Produk Original</li>
-
-<li>✔ Garansi Resmi</li>
-
-<li>✔ Packing Aman</li>
-
-<li>✔ Support After Sales</li>
-
-<li>✔ Respon Admin Cepat</li>
-
-        </ul>
-
-    </div>
-
-</div>
-
-
-<!-- =====================================
-PRODUCT BOTTOM
-===================================== -->
-
-<div class="product-bottom">
-
-<!-- REVIEW -->
-
-<section class="review-summary">
-
-<h2>
-
-⭐ Rating Produk
-
-</h2>
-
-<div class="review-card">
-
-<div class="review-score">
-
-<div class="score-number">
-
-4.9
-
-</div>
-
-<div class="score-stars">
-
-★★★★★
-
-</div>
-
-<div class="score-text">
-
-Berdasarkan ribuan pelanggan
-
-</div>
-
-</div>
-
-<div class="review-progress">
-
-<div class="progress-item">
-
-<span>★★★★★</span>
-
-<div class="progress-bar">
-
-<div style="width:92%"></div>
-
-</div>
-
-</div>
-
-<div class="progress-item">
-
-<span>★★★★☆</span>
-
-<div class="progress-bar">
-
-<div style="width:6%"></div>
-
-</div>
-
-</div>
-
-<div class="progress-item">
-
-<span>★★★☆☆</span>
-
-<div class="progress-bar">
-
-<div style="width:2%"></div>
-
-</div>
-
-</div>
-
-</div>
-
-</div>
-
-</section>
-
-<!-- RELATED -->
-
-<section>
-
-<h2>
-    <i class="fa-solid fa-layer-group"></i>
-    Produk Terkait
-</h2>
-
-<div
-id="relatedProducts"
-class="product-grid">
-
-</div>
-
-</section>
-
-<!-- RECENT -->
-
-<section>
-
-<h2>
-    <i class="fa-solid fa-clock-rotate-left"></i>
-    Terakhir Dilihat
-</h2>
-
-<div
-id="recentProducts"
-class="product-grid">
-
-</div>
-
-</section>
-
 <!-- =======================================
 STICKY CHECKOUT
 ======================================= -->
@@ -23607,6 +23235,9 @@ initStickyCheckout();
 renderRelated(product);
 
 saveRecent(product);
+nineRenderAllProducts(1);
+nineLoadReviews(product.id);
+nineSyncHeaderCart();
 
 updateDetailProductBadge(product.id);
 
@@ -23733,7 +23364,7 @@ function renderRelated(product){
             p.kategori === product.kategori &&
             p.id !== product.id
         )
-        .slice(0, 8);
+        ;
 
 
     box.innerHTML = "";
@@ -23753,7 +23384,7 @@ function renderRelated(product){
     related.forEach(item => {
 
         box.innerHTML +=
-            renderMarketplaceCard(item);
+            window.nineCompactCard ? window.nineCompactCard(item) : renderMarketplaceCard(item);
 
     });
 
@@ -23819,11 +23450,8 @@ function saveRecent(product){
 
 
     // ==========================================
-    // MAKSIMAL 6
+    // Simpan riwayat tanpa pembatas halaman buatan.
     // ==========================================
-
-    recent =
-        recent.slice(0, 8);
 
 
     // ==========================================
@@ -23881,7 +23509,7 @@ function renderRecent(){
     recent.forEach(item => {
 
         box.innerHTML +=
-            renderMarketplaceCard(item);
+            window.nineCompactCard ? window.nineCompactCard(item) : renderMarketplaceCard(item);
 
     });
     
@@ -24120,6 +23748,9 @@ function selectVariant(btn,value){
     .forEach(b=>b.classList.remove("active"));
 
     btn.classList.add("active");
+    btn.textContent=String(value||btn.textContent||"Varian").trim();
+    btn.style.setProperty("color","#527d20","important");
+    btn.style.setProperty("-webkit-text-fill-color","#527d20","important");
 
     document
     .getElementById("varian")
@@ -24161,6 +23792,7 @@ function saveCart() {
   }
   localStorage.setItem("cart", JSON.stringify(cart));
   updateCartCount();
+  window.nineSyncHeaderCart?.();
 }
 
 
@@ -34794,7 +34426,7 @@ function menuFav(){const menu=$('#topMenu .v29-menu-list');if(!menu)return;let r
 const menu=$('#topMenu');if(menu){new MutationObserver(()=>{if(!menu.querySelector('.v54-menu-fav'))menuFav()}).observe(menu,{childList:true,subtree:false});menuFav()}
 // Counter uses Firestore's global document and live snapshot; avoid repeat visits in one session (30 min per product).
 let unsubscribe=null,activeId=null;
-function listen(id){if(activeId===key(id))return;unsubscribe?.();activeId=key(id);try{const ref=db.collection('statistik_produk').doc(key(id));unsubscribe=ref.onSnapshot(s=>{const n=Number(s.data()?.views);if(!Number.isFinite(n))return;const p=products().find(p=>key(p.id)===key(id));if(p)p.views=n;const el=$('#product-grid-auto .product-detail .v49-detail-views');if(el){const compact=n>=1000000?(n/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'JT':n>=1000?(n/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'RB':String(n);const icon=el.querySelector('i,svg');if(icon){el.replaceChildren(icon,document.createTextNode(' '+compact+' dilihat'))}else el.textContent=compact+' dilihat';el.title=n.toLocaleString('id-ID')+' kali dilihat'}},e=>console.warn('V54 realtime views listener:',e))}catch(e){console.warn('V54 views:',e)}}
+function listen(id){if(activeId===key(id))return;unsubscribe?.();activeId=key(id);try{const ref=db.collection('statistik_produk').doc(key(id));unsubscribe=ref.onSnapshot(s=>{const n=Number(s.data()?.views);if(!Number.isFinite(n))return;const p=products().find(p=>key(p.id)===key(id));if(p)p.views=n;document.querySelectorAll('.nine-detail-views[data-detail-views="'+key(id)+'"]').forEach(node=>{node.textContent=n.toLocaleString('id-ID')+' dilihat'});const el=$('#product-grid-auto .product-detail .v49-detail-views');if(el){const compact=n>=1000000?(n/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'JT':n>=1000?(n/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'RB':String(n);const icon=el.querySelector('i,svg');if(icon){el.replaceChildren(icon,document.createTextNode(' '+compact+' dilihat'))}else el.textContent=compact+' dilihat';el.title=n.toLocaleString('id-ID')+' kali dilihat'}},e=>console.warn('V54 realtime views listener:',e))}catch(e){console.warn('V54 views:',e)}}
 window.V54Views={async visit(id){listen(id);let prior=0;const k='nine_v54_view_'+key(id);try{prior=Number(sessionStorage.getItem(k)||0)}catch(_){}if(Date.now()-prior<12000)return null;try{try{sessionStorage.setItem(k,String(Date.now()))}catch(_){}const ref=db.collection('statistik_produk').doc(key(id));await ref.set({views:firebase.firestore.FieldValue.increment(1),lastViewedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});try{sessionStorage.setItem(k,String(Date.now()))}catch(_){}return null}catch(e){console.warn('V54 view write:',e);return null}}};
 function searchClose(){$('#v54-search-pop')?.classList.remove('v54-visible')}
 function installSearch(){const wa=$('#btnWhatsApp')?.closest('.social-item');if(!wa||$('#v54-search-rail'))return;const item=document.createElement('div');item.id='v54-search-rail';item.className='social-item v54-search-item';item.innerHTML='<button type="button" class="v54-search-btn" aria-label="Cari produk"><i class="fa-solid fa-magnifying-glass action-icon"></i></button><span class="v37-wa-label">Cari</span>';wa.insertAdjacentElement('afterend',item);const btn=item.querySelector('button');btn.addEventListener('click',()=>{const pop=$('#v54-search-pop');const rect=btn.getBoundingClientRect();pop.style.top=Math.max(12,Math.min(innerHeight-65,rect.top-6))+'px';pop.classList.toggle('v54-visible');if(pop.classList.contains('v54-visible'))$('#v54-search-input').blur()});requestAnimationFrame(()=>window.dispatchEvent(new Event('resize')))}
@@ -38772,6 +38404,446 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 })();
 </script>
 <!-- END NEXAI TOAST STACK V2 -->
+
+<script id="nine-detail-clean-behavior">
+
+function nineOpenSpecs(){document.getElementById("nineSpecOverlay")?.classList.add("show")}
+function nineCloseSpecs(){document.getElementById("nineSpecOverlay")?.classList.remove("show")}
+function nineOpenReviews(){const p=document.getElementById("nineReviewPage");if(p){p.classList.add("show");p.setAttribute("aria-hidden","false")}}
+function nineCloseReviews(){const p=document.getElementById("nineReviewPage");if(p){p.classList.remove("show");p.setAttribute("aria-hidden","true")}}
+function nineFilterReview(button){button.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("active"));button.classList.add("active")}
+function nineToggleDescription(){const el=document.getElementById("nineDescription");const btn=document.getElementById("nineDescToggle");if(!el||!btn)return;el.classList.toggle("expanded");btn.textContent=el.classList.contains("expanded")?"Lebih Sedikit":"Selengkapnya"}
+function nineVisitStore(){backToProducts();window.scrollTo({top:0,behavior:"instant"})}
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){nineCloseSpecs();nineCloseReviews()}});
+
+</script>
+
+<style id="nine-final-structured-style">
+/* Scoped detail-only presentation; legacy storefront functions remain intact. */
+.nine-detail-shell{--nine-lime:#8cc63f;scrollbar-width:thin}
+.nine-detail-shell .nine-detail-topbar{gap:9px;justify-content:flex-start}
+.nine-detail-shell .nine-detail-topbar>button{flex-shrink:0}
+.nine-search-capsule{display:flex;flex:1;min-width:0;max-width:480px;height:36px;border:1px solid #e3e8da;background:#f5f8ef;border-radius:30px;overflow:hidden;align-items:center}
+.nine-search-capsule select{flex:1;min-width:0;border:0;background:transparent;padding:0 10px;font-size:12px;color:#333;outline:none}
+.nine-search-capsule button{width:42px;height:100%;border:0;background:transparent;color:#527d19;font-size:17px}
+.nine-header-cart{position:relative}
+#nineHeaderCartCount:not([hidden]){position:absolute;right:-3px;top:-5px;background:#8cc63f;color:#fff;font-size:10px;min-width:16px;height:16px;border-radius:9px;display:grid;place-items:center}
+.nine-detail-shell .nine-old-price{font-size:12px;color:#999;min-height:14px;margin-top:6px}
+.nine-detail-shell .nine-old-price:empty{display:none}
+.nine-detail-shell .nine-subprice{justify-content:flex-start}
+.nine-detail-shell .nine-subprice .detail-product-sold{margin-left:0}
+.nine-detail-shell .product-highlights{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important}
+.nine-detail-shell .product-highlights>span{width:auto!important;min-width:0!important;max-width:none!important;margin:0!important;flex:initial!important;display:flex!important;flex-direction:column!important;padding:7px 2px!important;border-radius:0!important;background:#fff!important;border-right:1px solid #edf1e7!important}
+.nine-detail-shell .product-highlights i{color:#8cc63f!important}
+.nine-detail-shell .product-highlights small{font-size:9px!important;line-height:1.3!important}
+.nine-detail-shell .variant-btn.active{color:#618e24!important;border-color:#8cc63f!important}
+.nine-detail-shell .nine-review-heading button,.nine-detail-shell #nineDescToggle,.nine-detail-shell .nine-store-identity>button{color:#679a23!important}
+.nine-detail-shell .nine-store-identity>button{border-color:#8cc63f!important}
+.nine-detail-shell .nine-store-stats strong{color:#679a23!important}
+.nine-detail-shell .nine-description-text{white-space:pre-wrap!important;overflow-wrap:anywhere}
+.nine-detail-shell #relatedProducts,.nine-detail-shell #recentProducts{display:flex!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;gap:10px!important;max-width:100%;width:100%;padding:4px 0 12px!important}
+.nine-detail-shell #relatedProducts>.product-card,.nine-detail-shell #recentProducts>.product-card,.nine-detail-shell #relatedProducts>* ,.nine-detail-shell #recentProducts>*{flex:0 0 clamp(145px,42vw,205px)!important;width:clamp(145px,42vw,205px)!important;max-width:205px!important;min-width:0!important;scroll-snap-align:start}
+.nine-detail-shell #relatedProducts .pagination,.nine-detail-shell #recentProducts .pagination{display:none!important}
+.nine-detail-shell #relatedProducts .product-card,.nine-detail-shell #recentProducts .product-card{overflow:hidden}
+.nine-detail-shell .nine-all-products{scroll-margin-top:62px;position:relative}
+#nineAllProductsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;align-items:stretch}
+#nineAllProductsGrid>*{width:100%!important;min-width:0!important;max-width:100%!important;overflow:hidden}
+.nine-compact-card{border:1px solid #e6e9e1;border-radius:9px;background:#fff;cursor:pointer;overflow:hidden;display:flex;flex-direction:column;box-shadow:none}
+.nine-compact-card>img{display:block;width:100%;aspect-ratio:1/1;object-fit:contain;background:#fff}
+.nine-compact-body{padding:8px;display:flex;flex-direction:column;gap:8px;min-width:0}
+.nine-compact-title{font-size:12px;font-weight:600;line-height:1.35;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.nine-compact-body>strong{color:#8cc63f;font-size:14px}
+.nine-detail-shell #relatedProducts>.nine-compact-card,.nine-detail-shell #recentProducts>.nine-compact-card{flex:0 0 clamp(140px,42vw,185px)!important;width:clamp(140px,42vw,185px)!important;max-width:185px!important}
+#nineAllPagination{display:flex;gap:7px;justify-content:center;align-items:center;flex-wrap:wrap;padding:18px 0}
+#nineAllPagination button{border:1px solid #dce7cd;background:#fff;color:#4c681d;border-radius:9px;min-width:35px;height:36px;padding:0 9px;font-weight:600}
+#nineAllPagination button.active{background:#8cc63f;border-color:#8cc63f;color:#fff}
+#nineAllBackTop{display:none;position:sticky;bottom:100px;margin-left:auto;background:#8cc63f;color:#fff;border:0;border-radius:50%;width:40px;height:40px;z-index:20;box-shadow:0 3px 12px #0002}
+#nineAllBackTop.show{display:block}
+.nine-review-composer{border:1px solid #e8efdf;border-radius:9px;margin:12px 0;padding:0 12px}
+.nine-review-composer summary{list-style:none;display:flex;justify-content:space-between;align-items:center;padding:12px 0;cursor:pointer;font-size:13px;font-weight:600}
+.nine-review-composer summary::-webkit-details-marker{display:none}
+.nine-review-form{display:flex;flex-direction:column;gap:9px;padding:5px 0 13px}
+.nine-review-stars{display:flex;gap:6px}
+.nine-review-stars button{font-size:25px;color:#bbb;border:0;background:none;padding:0}
+.nine-review-stars button.selected{color:#ffb400}
+.nine-review-form textarea{width:100%;min-height:80px;padding:10px;border:1px solid #ddd;border-radius:8px;resize:vertical;font:inherit}
+.nine-review-form>button{border:0;border-radius:8px;background:#8cc63f;color:white;padding:11px;font-weight:700}
+.nine-review-preview article,.nine-review-page-body article{padding:12px 0;border-bottom:1px solid #eee;font-size:12px;line-height:1.5}
+.nine-review-preview article strong,.nine-review-page-body article strong{display:block;font-size:13px}
+.nine-review-preview article .stars,.nine-review-page-body article .stars{color:#ffb400}
+.nine-review-preview article p,.nine-review-page-body article p{margin:5px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.nine-detail-shell .nine-review-filter{display:flex!important;flex-wrap:wrap!important;gap:7px!important}
+.nine-detail-shell .nine-review-filter button{color:#333!important;background:#fff!important;border:1px solid #ddd!important;border-radius:7px!important;opacity:1!important;padding:9px 11px!important}
+.nine-detail-shell .nine-review-filter button.active{color:#598a1b!important;border-color:#8cc63f!important;background:#f3f9e9!important}
+.nine-detail-shell .nine-spec-sheet{touch-action:pan-y}
+.nine-detail-shell .nine-voucher{cursor:pointer;background:#fff}
+@media(min-width:900px){#nineAllProductsGrid{grid-template-columns:repeat(5,minmax(0,1fr))}}
+</style>
+
+<script id="nine-final-structured-behavior">
+(function(){
+'use strict';
+let allPage=1,reviewRows=[],activeFilter='Semua';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+window.nineDetailSearch=function(){const v=document.getElementById('nineSearchCategory')?.value||'';if(typeof backToProducts==='function')backToProducts();setTimeout(()=>{const el=document.querySelector('input[type="search"],#searchInput');if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});} },100)};
+window.nineSyncHeaderCart=function(){const b=document.getElementById('nineHeaderCartCount');if(!b)return;let count=0;try{const c=(typeof cart!=='undefined'?cart:window.cart);if(Array.isArray(c))count=c.reduce((n,x)=>n+Math.max(1,Number(x.qty||x.quantity||1)),0);else{const badge=document.querySelector('.cart-count,.cart-badge,[data-cart-count]');count=Number(badge?.textContent)||0}}catch(e){}if(b.textContent!==String(count))b.textContent=count;b.hidden=!count};
+window.nineSetReviewStars=function(n){window.nineReviewRating=n;document.querySelectorAll('#nineReviewStars button').forEach((b,i)=>b.classList.toggle('selected',i<n))};
+window.nineSetReviewStars(5);
+window.nineCompactCard=function(p){
+ const price=p.harga?.promo||p.harga?.normal||0;
+ return '<article class="nine-compact-card" data-nine-product-id="'+esc(p.id)+'" role="button" tabindex="0"><img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+esc(p.nama)+'"><div class="nine-compact-body"><div class="nine-compact-title">'+esc(p.nama)+'</div><strong>Rp '+Number(price).toLocaleString('id-ID')+'</strong></div></article>';
+};
+document.addEventListener('click',e=>{const card=e.target.closest?.('.nine-compact-card');if(!card)return;const product=(typeof allProducts!=='undefined'?allProducts:[]).find(p=>String(p.id)===card.dataset.nineProductId);if(product&&typeof showProduct==='function')showProduct(product.nama) });
+document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const card=e.target.closest?.('.nine-compact-card');if(card)card.click()});
+window.nineRenderAllProducts=function(page){
+ const root=document.getElementById('nineAllProductsGrid'),nav=document.getElementById('nineAllPagination');if(!root||!nav)return;
+ const data=typeof allProducts!=='undefined'?allProducts:[];const max=Math.max(1,Math.ceil(data.length/10));allPage=Math.max(1,Math.min(max,page));
+ const slice=data.slice((allPage-1)*10,allPage*10);
+ root.innerHTML=slice.map(p=>window.nineCompactCard?window.nineCompactCard(p):'').join('');
+ let nums=[];for(let i=Math.max(1,allPage-2);i<=Math.min(max,allPage+2);i++)nums.push(i);
+ nav.innerHTML=(allPage>1?'<button data-page="'+(allPage-1)+'" aria-label="Sebelumnya">‹</button>':'')+nums.map(i=>'<button class="'+(i===allPage?'active':'')+'" data-page="'+i+'">'+i+'</button>').join('')+(allPage<max?'<button data-page="'+(allPage+1)+'" aria-label="Berikutnya">›</button>':'');
+ nav.querySelectorAll('button').forEach(b=>b.addEventListener('click',()=>{window.nineRenderAllProducts(Number(b.dataset.page));document.getElementById('nineAllProductsSection')?.scrollIntoView({behavior:'smooth',block:'start'})}));
+ try{updateAllProductBadges?.();slice.forEach(p=>{updateProductSold?.(p.id);updateProductRating?.(p.id)})}catch(e){}
+};
+window.nineSubmitDetailReview=async function(button){
+ const product=typeof currentProduct!=='undefined'?currentProduct:window.currentProduct;
+ const user=(typeof auth!=='undefined'?auth:window.auth)?.currentUser;
+ if(!product)return;
+ if(!user){if(window.V17?.openAccount)window.V17.openAccount();else if(typeof Swal!=='undefined')Swal.fire({icon:'info',text:'Silakan masuk untuk memberikan ulasan.'});return;}
+ const area=document.getElementById('v17ReviewText'),value=area?.value?.trim()||'';
+ if(value.length<3){if(typeof Swal!=='undefined')Swal.fire({icon:'info',text:'Tulis ulasan minimal 3 karakter.'});return;}
+ const database=typeof db!=='undefined'?db:window.db;
+ if(!database){if(typeof Swal!=='undefined')Swal.fire({icon:'error',text:'Koneksi database belum tersedia.'});return;}
+ const productId=String(product.id),rating=Math.max(1,Math.min(5,Number(window.nineReviewRating)||5));
+ button.disabled=true;
+ try{
+  await database.runTransaction(async tx=>{
+   const reviewRef=database.collection('ulasan_produk').doc(user.uid+'_'+productId);
+   const statsRef=database.collection('statistik_produk').doc(productId);
+   const [oldSnap,statsSnap]=await Promise.all([tx.get(reviewRef),tx.get(statsRef)]);
+   const old=oldSnap.exists?(oldSnap.data()||{}):null,stats=statsSnap.exists?(statsSnap.data()||{}):{};
+   let total=Math.max(0,Number(stats.ratingTotal)||0),count=Math.max(0,Number(stats.ratingCount)||0);
+   if(old)total=Math.max(0,total-Math.max(1,Math.min(5,Number(old.rating)||5)))+rating;
+   else{total+=rating;count++}
+   const stamp=firebase.firestore.FieldValue.serverTimestamp();
+   tx.set(reviewRef,{productId,uid:user.uid,displayName:user.displayName||user.email?.split('@')[0]||'Pengguna',rating,text:value,updatedAt:stamp,createdAt:old?.createdAt||stamp},{merge:true});
+   tx.set(statsRef,{ratingTotal:total,ratingCount:count},{merge:true});
+  });
+  area.value='';
+  document.querySelector('.nine-review-composer')?.removeAttribute('open');
+  await window.nineLoadReviews(productId);
+  await window.__v101RefreshProductStats?.(productId);
+  if(typeof Swal!=='undefined')Swal.fire({icon:'success',text:'Ulasan berhasil dikirim.'});
+ }catch(error){console.error('Gagal mengirim ulasan:',error);if(typeof Swal!=='undefined')Swal.fire({icon:'error',text:'Ulasan gagal dikirim. Periksa koneksi atau izin akun.'});}
+ finally{button.disabled=false}
+};
+function reviewHTML(r){const date=r.createdAt?.toDate?.()?.toLocaleDateString('id-ID')||'';return '<article><strong>'+esc(r.displayName||'Pengguna')+'</strong><span class="stars">'+('★'.repeat(Math.max(1,Math.min(5,Number(r.rating)||5))))+'</span> <small>'+esc(date)+'</small><p>'+esc(r.text||r.review||r.comment||r.ulasan||'')+'</p></article>'}
+window.nineLoadReviews=async function(id){
+ const preview=document.getElementById('nineReviewPreview'),full=document.getElementById('nineReviewFullList');if(!preview||!full)return;preview.innerHTML='<p class="nine-review-empty">Memuat ulasan...</p>';full.innerHTML='';
+ try{
+ const firestore=(typeof db!=='undefined'?db:window.db)||window.firebase?.firestore?.();
+ if(!firestore)return;
+ const snap=await firestore.collection('ulasan_produk').where('productId','==',String(id)).get();
+ if(String((typeof currentProduct!=='undefined'?currentProduct?.id:window.currentProduct?.id))!==String(id))return;
+ reviewRows=snap.docs.map(x=>x.data()).filter(x=>x.text||x.review||x.comment||x.ulasan).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
+ const count=document.getElementById('nineReviewCount');if(count)count.textContent='('+snap.size+')';
+ preview.innerHTML=reviewRows.length?reviewRows.slice(0,3).map(reviewHTML).join(''):'<p class="nine-review-empty">Belum ada ulasan tertulis.</p>';
+ window.nineRefreshReviewFilter();
+ }catch(err){console.warn('Ulasan tidak dapat dimuat:',err);preview.innerHTML='<p class="nine-review-empty">Ulasan belum dapat dimuat.</p>'}
+};
+window.nineRefreshReviewFilter=function(){
+ const full=document.getElementById('nineReviewFullList');if(!full)return;
+ const rows=reviewRows.filter(r=>activeFilter==='Semua'||(activeFilter==='Dengan Foto/Video'&&((r.images?.length||0)>0||(r.videos?.length||0)>0))||(activeFilter.endsWith('Bintang')&&Number(r.rating)===Number(activeFilter[0])));
+ full.innerHTML=rows.length?rows.map(reviewHTML).join(''):'<p>Belum tersedia ulasan untuk filter ini.</p>';
+};
+window.nineFilterReview=function(btn){btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));btn.classList.add('active');activeFilter=btn.textContent.trim();window.nineRefreshReviewFilter()};
+const start=new WeakMap();
+document.addEventListener('touchstart',e=>{const sheet=e.target.closest?.('#nineSpecOverlay .nine-spec-sheet');if(sheet&&e.touches.length===1)start.set(sheet,{y:e.touches[0].clientY,time:Date.now()})},{passive:true});
+document.addEventListener('touchend',e=>{const sheet=e.target.closest?.('#nineSpecOverlay .nine-spec-sheet');if(!sheet)return;const st=start.get(sheet);if(st&&e.changedTouches[0].clientY-st.y>85&&Date.now()-st.time<1000){if(typeof nineCloseSpecs==='function')nineCloseSpecs()}},{passive:true});
+document.addEventListener('scroll',e=>{const shell=e.target.closest?.('.nine-detail-shell');if(!shell)return;const btn=document.getElementById('nineAllBackTop'),section=document.getElementById('nineAllProductsSection');if(btn&&section){const nearBottom=shell.scrollTop+shell.clientHeight>=shell.scrollHeight-220;btn.classList.toggle('show',nearBottom)}},true);
+const obs=new MutationObserver(mutations=>{if(mutations.some(m=>m.target?.id==='cart-count'||m.target?.closest?.('#cart-count')))window.nineSyncHeaderCart()});
+obs.observe(document.body,{subtree:true,childList:true});
+})();
+</script>
+
+<style id="nine-functional-reconciliation">
+.nine-detail-shell .product-highlights{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-flow:row!important;width:100%!important;gap:3px!important}
+.nine-detail-shell .product-highlights>span{grid-column:auto!important;display:flex!important;width:100%!important;min-width:0!important;max-width:none!important;padding:7px 1px!important;box-sizing:border-box!important}
+.nine-detail-shell .product-highlights small{font-size:9px!important;line-height:1.2!important;overflow-wrap:anywhere!important}
+.nine-detail-shell .nine-old-price{margin:2px 0 0!important;line-height:1.1!important;min-height:0!important}
+.nine-detail-shell .nine-price-row{padding-top:3px!important;flex-wrap:nowrap!important}
+.nine-detail-shell .product-title{display:flex!important;gap:7px!important;align-items:baseline!important;min-width:0}
+.nine-detail-shell .product-title h2{flex:1;min-width:0!important;margin:0!important}
+.nine-inline-brand{flex:0 0 auto;max-width:33%;font-size:10px;color:#789b3c;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nine-detail-shell .nine-subprice{margin:5px 0 9px!important;gap:12px!important}
+.nine-detail-shell #variantContainer{display:flex!important;flex-wrap:wrap!important;gap:8px!important}
+.nine-detail-shell #variantContainer .variant-btn{min-width:0!important;width:auto!important;max-width:100%!important;min-height:39px!important;height:auto!important;white-space:normal!important;overflow-wrap:anywhere!important;padding:9px 12px!important;font-size:12px!important;line-height:1.3!important}
+.nine-detail-shell #relatedProducts,.nine-detail-shell #recentProducts{display:flex!important;grid-template-columns:none!important;flex-wrap:nowrap!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity!important;width:100%!important;max-width:100%!important}
+.nine-detail-shell #relatedProducts>.nine-compact-card,.nine-detail-shell #recentProducts>.nine-compact-card{flex:0 0 44vw!important;width:44vw!important;max-width:185px!important}
+.nine-detail-shell #relatedProducts .pagination,.nine-detail-shell #recentProducts .pagination,.nine-detail-shell #relatedProducts [class*="pagination"],.nine-detail-shell #recentProducts [class*="pagination"]{display:none!important}
+.nine-detail-shell .product-bottom>.v17-reviews,.nine-detail-shell .product-bottom>.review-section,.nine-detail-shell .product-bottom>.review-summary,.nine-detail-shell .product-bottom>.reviews-section{display:none!important}
+.nine-detail-shell .nine-review-section{display:block!important}
+.nine-detail-shell .nine-search-capsule button{font-size:19px!important}
+</style>
+
+<script id="nine-functional-reconciliation-js">
+(function(){
+  'use strict';
+  function products(){try{return typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:window.allProducts||[]}catch(e){return window.allProducts||[]}}
+  function compact(p){return window.nineCompactCard?window.nineCompactCard(p):''}
+  function related(p){
+    const root=document.getElementById('relatedProducts');if(!root||!p)return;
+    const list=products().filter(x=>x.kategori===p.kategori&&String(x.id)!==String(p.id));
+    root.innerHTML=list.map(compact).join('');
+    root.scrollLeft=0;
+  }
+  function recent(){
+    const root=document.getElementById('recentProducts');if(!root)return;
+    let saved=[];try{saved=JSON.parse(localStorage.getItem('recentProducts')||'[]')}catch(e){}
+    const list=saved.map(x=>products().find(p=>String(p.id)===String(x.id))||x).filter(Boolean);
+    root.innerHTML=list.map(compact).join('');
+    root.scrollLeft=0;
+  }
+  window.renderRelated=related;window.renderRecent=recent;
+  try{renderRelated=related;renderRecent=recent}catch(e){}
+  window.nineOpenOriginalVoucher=function(){
+    if(window.V38&&typeof window.V38.openVoucher==='function'){window.V38.openVoucher();return}
+    if(typeof openVoucher==='function'){openVoucher();return}
+    const button=document.querySelector('[onclick*="openVoucher"]');if(button)button.click();
+  };
+  window.nineDetailSearch=function(){
+    const category=document.getElementById('nineSearchCategory')?.value||'';
+    if(typeof backToProducts==='function')backToProducts();
+    requestAnimationFrame(()=>{
+      const existing=document.querySelector('#searchInput,input[type="search"],.search-box input');
+      if(existing){existing.focus();existing.scrollIntoView({block:'center',behavior:'smooth'})}
+      const categoryControl=document.querySelector('#searchType,#searchCategory');
+      if(categoryControl&&category){categoryControl.value=category;categoryControl.dispatchEvent(new Event('change',{bubbles:true}))}
+    });
+  };
+  const oldShow=window.showProduct;
+  if(typeof oldShow==='function'){
+    const wrapper=function(...args){
+      const result=oldShow.apply(this,args);
+      requestAnimationFrame(()=>{
+        let p=null;try{p=typeof currentProduct!=='undefined'?currentProduct:window.currentProduct}catch(e){p=window.currentProduct}
+        if(p){related(p);recent()}
+        document.querySelectorAll('.nine-detail-shell .product-bottom > .v17-reviews,.nine-detail-shell .product-bottom > .review-summary,.nine-detail-shell .product-bottom > .reviews-section').forEach(x=>x.remove());
+      });
+      return result;
+    };
+    window.showProduct=wrapper;
+    try{showProduct=wrapper}catch(e){}
+  }
+})();
+</script>
+
+
+<script id="nine-v23-precise-behavior">
+(function(){
+ 'use strict';
+ function getProducts(){try{return typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:(window.allProducts||[])}catch(e){return window.allProducts||[]}}
+
+ // Detail search uses the same live allProducts data as the storefront.
+ const nineSearchEscape=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&#39;'}[c]));
+ document.addEventListener('input',function(e){
+  if(e.target.id!=='nineDetailSearchInput')return;
+  const panel=document.getElementById('nineDetailSearchResults');
+  if(!panel)return;
+  const q=e.target.value.trim().toLocaleLowerCase('id-ID');
+  if(!q){panel.replaceChildren();panel.hidden=true;return}
+  const found=getProducts().filter(p=>[p.nama,p.brand,p.kategori,p.subbrand,p.sku].some(v=>String(v||'').toLocaleLowerCase('id-ID').includes(q))).slice(0,12);
+  panel.innerHTML=found.length?found.map(p=>'<button type="button" data-nine-search-id="'+nineSearchEscape(p.id)+'"><img loading="lazy" src="'+nineSearchEscape(p.gambar||'')+'" alt=""><span>'+nineSearchEscape(p.nama||'')+'</span></button>').join(''):'<div class="nine-no-results">Produk tidak ditemukan.</div>';
+  panel.hidden=false;
+ });
+ document.addEventListener('click',function(e){
+  const hit=e.target.closest('[data-nine-search-id]');
+  if(hit){
+   const product=getProducts().find(p=>String(p.id)===hit.dataset.nineSearchId);
+   if(product&&typeof showProduct==='function')showProduct(product.nama);
+   const panel=document.getElementById('nineDetailSearchResults');if(panel)panel.hidden=true;
+  }else if(!e.target.closest('.nine-search-capsule')){
+   const panel=document.getElementById('nineDetailSearchResults');if(panel)panel.hidden=true;
+  }
+ });
+ // Prevent the legacy bottom-of-page review widget from being displayed in detail.
+ function hideLegacyReview(){
+  if(!document.getElementById('nineDetailShell'))return;
+  document.querySelectorAll('#product-grid-auto .v17-reviews').forEach(x=>{x.hidden=true;x.style.display='none'});
+ }
+ const root=document.getElementById('product-grid-auto');
+ if(root){new MutationObserver(hideLegacyReview).observe(root,{childList:true,subtree:true});hideLegacyReview()}
+})();
+</script>
+
+
+<script id="nine-v24-realtime-and-sheet">
+(function(){
+'use strict';
+let drag=null;
+document.addEventListener('touchstart',function(e){
+ const handle=e.target.closest?.('#nineSpecOverlay .nine-sheet-grip,#nineSpecOverlay .nine-sheet-head');
+ if(!handle||e.touches.length!==1)return;
+ const sheet=handle.closest('.nine-spec-sheet');
+ if(!sheet)return;
+ drag={sheet,start:e.touches[0].clientY,last:e.touches[0].clientY};
+},{passive:true});
+document.addEventListener('touchmove',function(e){
+ if(!drag||e.touches.length!==1)return;
+ const y=e.touches[0].clientY;
+ drag.last=y;
+ const delta=Math.max(0,y-drag.start);
+ if(delta>0){drag.sheet.style.transition='none';drag.sheet.style.transform='translateY('+delta+'px)';if(e.cancelable)e.preventDefault();}
+},{passive:false});
+document.addEventListener('touchend',function(){
+ if(!drag)return;
+ const d=drag.last-drag.start,sheet=drag.sheet;
+ sheet.style.transition='';
+ sheet.style.transform='';
+ if(d>65&&typeof nineCloseSpecs==='function')nineCloseSpecs();
+ drag=null;
+},{passive:true});
+document.addEventListener('touchcancel',function(){
+ if(drag){drag.sheet.style.transform='';drag.sheet.style.transition='';drag=null;}
+},{passive:true});
+})();
+</script>
+
+<!-- NEXAI V29: Profil toko realtime + navigasi ulasan; fitur chat tetap tidak diubah. -->
+<style id="nine-v29-shop-style">
+.nine-review-page.show{z-index:2147483000!important}
+.nine-review-page header{display:flex!important;align-items:center!important;gap:12px!important;min-height:58px!important;padding:0 16px!important;background:#fff!important}
+.nine-review-page header .nine-reviews-back-v29{display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 44px!important;width:44px!important;height:44px!important;padding:0!important;border:1px solid #e4eadc!important;border-radius:50%!important;background:#f4f9ed!important;color:#25361b!important;font-size:21px!important;opacity:1!important;visibility:visible!important;position:relative!important;z-index:5!important;cursor:pointer!important}
+.nine-review-page header .nine-reviews-back-v29:active{background:#e2f1cf!important}
+.nine-review-page header strong{font-weight:750!important;color:#202020!important}
+.nine-review-page .nine-review-tabs button{border-bottom-color:#8cc63f!important;color:#5b8c20!important}
+.nine-review-page .nine-review-filter button.active{border-color:#8cc63f!important;color:#5b8c20!important;background:#f3fae9!important}
+.nine-store [data-nine-store-presence]{display:block;line-height:1.5}
+</style>
+<script id="nine-v29-shop-script">
+(function(){
+'use strict';
+if(window.__nineV29Shop)return;
+window.__nineV29Shop=true;
+const STORE='imamsalesnine';
+const ACTIVE_MS=90000;
+const PULSE_MS=45000;
+let unsubPresence=null,unsubRatings=null,pulseTimer=null,renderTimer=null;
+let latestPresence=null;
+let storeRating=null;
+let ratingSyncTimer=null;
+const $=sel=>document.querySelector(sel);
+function database(){try{return typeof db!=='undefined'?db:firebase.firestore()}catch(_){return null}}
+function authService(){try{return firebase.auth()}catch(_){return null}}
+function whenMs(v){if(!v)return 0;if(typeof v.toMillis==='function')return v.toMillis();if(typeof v.toDate==='function')return v.toDate().getTime();return Number(v)||0}
+function statusText(){
+ if(!latestPresence)return 'Status aktivitas belum tersedia';
+ const ms=whenMs(latestPresence.lastActiveAt);
+ if(!ms)return 'Status aktivitas belum tersedia';
+ const age=Math.max(0,Date.now()-ms);
+ if(age<ACTIVE_MS)return '● Online';
+ const minutes=Math.floor(age/60000);
+ if(minutes<60)return 'Aktif '+Math.max(1,minutes)+' menit lalu';
+ const hours=Math.floor(minutes/60);
+ if(hours<24)return 'Aktif '+hours+' jam lalu';
+ return 'Aktif '+Math.floor(hours/24)+' hari lalu';
+}
+function render(){
+ document.querySelectorAll('[data-nine-store-presence]').forEach(el=>{
+  const label=statusText();
+  el.textContent=label;
+  el.style.color=label==='● Online'?'#659d24':'#858585';
+ });
+ document.querySelectorAll('[data-nine-store-rating]').forEach(el=>{
+  el.textContent=storeRating===null?'—':storeRating.toFixed(1);
+ });
+}
+function observeStore(){
+ const d=database();if(!d)return;
+ try{
+  unsubPresence=d.collection('profil_toko').doc(STORE).onSnapshot(snap=>{
+   latestPresence=snap.exists?(snap.data()||{}):null;render();
+  },e=>console.warn('Status toko tidak tersedia:',e.code||e.message));
+ }catch(e){console.warn('Presence toko:',e.message)}
+ // Source of truth: existing product statistics (ratingTotal / ratingCount).
+ // Count-weighted average prevents a product with one review equalling one with hundreds.
+ try{
+  unsubRatings=d.collection('statistik_produk').onSnapshot(snap=>{
+   let total=0,count=0;
+   snap.forEach(doc=>{
+    const x=doc.data()||{},c=Number(x.ratingCount),t=Number(x.ratingTotal);
+    if(Number.isFinite(c)&&Number.isFinite(t)&&c>0&&t>=c&&t<=5*c){
+     count+=c;total+=t;
+    }
+   });
+   storeRating=count>0?total/count:null;
+   render();
+   if(authService()?.currentUser){
+    clearTimeout(ratingSyncTimer);
+    ratingSyncTimer=setTimeout(()=>window.nineSyncShopRatingV29?.().catch(()=>{}),2500);
+   }
+  },e=>console.warn('Rating toko tidak tersedia:',e.code||e.message));
+ }catch(e){console.warn('Rating toko:',e.message)}
+}
+async function adminAuthorized(user){
+ if(!user||!database())return false;
+ try{
+  const snap=await database().collection('admin_roles').doc(user.uid).get();
+  return snap.exists&&snap.data()?.active===true;
+ }catch(_){return false}
+}
+async function startAdminPulse(user){
+ if(pulseTimer){clearInterval(pulseTimer);pulseTimer=null}
+ if(!await adminAuthorized(user))return;
+ const d=database();if(!d)return;
+ async function pulse(){
+  if(document.visibilityState!=='visible')return;
+  if(authService()?.currentUser?.uid!==user.uid)return;
+  try{
+   await d.collection('profil_toko').doc(STORE).set({
+    lastActiveAt:firebase.firestore.FieldValue.serverTimestamp(),
+    updatedBy:user.uid
+   },{merge:true});
+  }catch(e){console.warn('Heartbeat admin belum diizinkan:',e.code||e.message)}
+ }
+ await pulse();
+ pulseTimer=setInterval(pulse,PULSE_MS);
+}
+// Optional one-time historical rating cache for trusted admin; visitors never write.
+window.nineSyncShopRatingV29=async function(){
+ const user=authService()?.currentUser;
+ if(!await adminAuthorized(user))throw new Error('Hanya admin terverifikasi yang dapat menyinkronkan rating toko.');
+ const d=database();const snap=await d.collection('statistik_produk').get();
+ let total=0,count=0;
+ snap.forEach(doc=>{const x=doc.data()||{},c=Number(x.ratingCount),t=Number(x.ratingTotal);
+  if(Number.isFinite(c)&&Number.isFinite(t)&&c>0&&t>=c&&t<=5*c){count+=c;total+=t}
+ });
+ await d.collection('profil_toko').doc(STORE).set({
+  ratingTotal:total,ratingCount:count,
+  ratingAverage:count?total/count:null,
+  ratingUpdatedAt:firebase.firestore.FieldValue.serverTimestamp()
+ },{merge:true});
+ return {ratingAverage:count?total/count:null,ratingCount:count};
+};
+function boot(){
+ observeStore();
+ renderTimer=setInterval(render,30000);
+ const a=authService();
+ if(a?.onAuthStateChanged)a.onAuthStateChanged(user=>{
+  if(pulseTimer){clearInterval(pulseTimer);pulseTimer=null}
+  if(user)startAdminPulse(user);
+ });
+ document.addEventListener('visibilitychange',()=>{
+  const u=authService()?.currentUser;
+  if(u&&document.visibilityState==='visible'&&pulseTimer){/* next heartbeat updates server timestamp */ }
+ });
+ const observer=new MutationObserver(()=>render());
+ const root=$('#product-grid-auto');
+ if(root)observer.observe(root,{childList:true,subtree:false});
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot,{once:true});else boot();
+})();
+</script>
 
 </body>
 </html>
