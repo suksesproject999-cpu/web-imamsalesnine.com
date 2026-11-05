@@ -35385,79 +35385,94 @@ document.addEventListener('click',function(event){
   shareProduct(button.dataset.shareProduct);
 },true);
 
-/* Deep-link produk: tunggu halaman dan data siap, lalu buka detail berdasarkan ID. */
-let nineDeepLinkId = new URLSearchParams(window.location.search).get('product');
+/* NEXAI V30 — Deep-link produk: single deterministic route, CMS-aware. */
+let nineDeepLinkId = new URLSearchParams(location.search).get('product');
 let nineDeepLinkDone = false;
 let nineDeepLinkBusy = false;
 let nineDeepLinkTimer = null;
 let nineDeepLinkAttempts = 0;
-const nineDeepLinkStartedAt = Date.now();
-function nineOpenDeepLink(){
-  // Jangan tampilkan data seed sebelum override CMS Firestore diterima.
-  if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < 9000) return;
-  if(!nineDeepLinkId || nineDeepLinkDone || nineDeepLinkBusy) return;
-  const product = sourceProducts().find(p => String(p.id) === String(nineDeepLinkId));
+let nineDeepLinkStartedAt = Date.now();
+let nineDeepLinkNotice = null;
+function nineDeepLinkProduct(id){
+  return sourceProducts().find(p => String(p.id) === String(id));
+}
+function nineDeepLinkVisible(id){
+  const root = document.getElementById('product-grid-auto');
+  const detail = root?.querySelector('.product-detail');
+  const active = (typeof currentProduct !== 'undefined' && currentProduct) || window.currentProduct;
+  return !!(detail && active && String(active.id) === String(id));
+}
+function nineDeepLinkScroll(){
+  const detail = document.querySelector('#product-grid-auto .product-detail');
+  if(!detail) return;
+  const header = document.querySelector('header.header');
+  const headerHeight = header?.getBoundingClientRect().height || 0;
+  const y = Math.max(0,detail.getBoundingClientRect().top + window.scrollY - headerHeight - 12);
+  window.scrollTo({top:y,behavior:'instant'});
+}
+function nineDeepLinkFeedback(message){
+  if(!nineDeepLinkId) return;
+  if(!nineDeepLinkNotice){
+    nineDeepLinkNotice=document.createElement('div');
+    nineDeepLinkNotice.id='nine-deeplink-feedback';
+    nineDeepLinkNotice.setAttribute('role','status');
+    nineDeepLinkNotice.style.cssText='position:fixed;left:12px;right:12px;bottom:16px;z-index:999998;background:#172217;color:white;padding:14px 16px;border:1px solid #8CC63F;border-radius:14px;box-shadow:0 10px 30px #0005;font:600 14px/1.5 sans-serif;text-align:center';
+    document.body.appendChild(nineDeepLinkNotice);
+  }
+  nineDeepLinkNotice.textContent=message;
+}
+function nineClearDeepLinkFeedback(){
+  nineDeepLinkNotice?.remove();
+  nineDeepLinkNotice=null;
+}
+async function nineOpenDeepLink(){
+  const id = nineDeepLinkId;
+  if(!id || nineDeepLinkDone || nineDeepLinkBusy) return;
+  // Prioritaskan data CMS final. Seed boleh digunakan jika koneksi CMS lambat.
+  if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < 6000) return;
+  const product = nineDeepLinkProduct(id);
   if(!product || typeof window.showProduct !== 'function') return;
-  nineDeepLinkBusy = true;
-  Promise.resolve().then(() => window.showProduct(product.nama)).then(() => {
-    const detail = document.querySelector('#product-grid-auto .product-detail');
-    const active = (typeof currentProduct !== 'undefined' && currentProduct) || window.currentProduct;
-    if(detail && active && String(active.id) === String(nineDeepLinkId)){
-      nineDeepLinkDone = true;
-      if(nineDeepLinkTimer) clearInterval(nineDeepLinkTimer);
-      // Initial direct entry: Firestore stats may still be unavailable during
-      // first paint. Refresh the same existing stats cache once Firebase is ready.
-      window.__hydrateRealtimeProductStats?.(document);
-      // Direct entry: once Firebase Auth has an actual user, read the
-      // authoritative document and paint the currently mounted detail.
-      // Do not write a fallback zero to the cache or UI.
-      const directId = String(nineDeepLinkId);
-      const reconcile = () => {
-        if(String(currentProduct?.id) !== directId) return;
-        window.__v101RefreshProductStats?.(directId);
-      };
-      if(typeof firebase !== 'undefined' && firebase.auth){
-        const auth = firebase.auth();
-        if(auth.currentUser){
-          reconcile();
-        }else{
-          let unsub = () => {};
-          unsub = auth.onAuthStateChanged(user => {
-            if(!user) return;
-            unsub();
-            reconcile();
-          }, error => {
-            unsub();
-            console.warn('Auth statistik deep link:', error);
-          });
-        }
-      }else{
-        reconcile();
-      }
-      requestAnimationFrame(() => {
-        if(typeof window.scrollProductDetailIntoView === 'function'){
-          window.scrollProductDetailIntoView('auto');
-        }else{
-          detail.scrollIntoView({behavior:'instant',block:'start'});
-        }
-        requestAnimationFrame(() => window.scrollProductDetailIntoView?.('auto'));
-      });
-    }
-  }).catch(error => console.warn('Deep-link produk belum berhasil:',error))
-    .finally(() => { nineDeepLinkBusy = false; });
+  nineDeepLinkBusy=true;
+  try{
+    // Jangan buat history entry baru ketika membuka URL dari share.
+    window.__nineHandlingHistory=true;
+    await window.showProduct(product.nama,{skipView:true});
+    if(id !== nineDeepLinkId) return;
+    if(!nineDeepLinkVisible(id)) return;
+    nineDeepLinkDone=true;
+    nineClearDeepLinkFeedback();
+    if(nineDeepLinkTimer){clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;}
+    window.__hydrateRealtimeProductStats?.(document);
+    window.__v101RefreshProductStats?.(String(id));
+    // Font, gambar dan layout async dapat menggeser halaman; koreksi bertahap.
+    requestAnimationFrame(()=>requestAnimationFrame(nineDeepLinkScroll));
+    setTimeout(()=>{if(nineDeepLinkId===id && nineDeepLinkVisible(id)) nineDeepLinkScroll();},350);
+    setTimeout(()=>{if(nineDeepLinkId===id && nineDeepLinkVisible(id)) nineDeepLinkScroll();},1100);
+  }catch(error){
+    console.warn('Gagal membuka detail dari link produk:',error);
+  }finally{
+    window.__nineHandlingHistory=false;
+    nineDeepLinkBusy=false;
+  }
 }
 function nineStartDeepLink(){
   if(!nineDeepLinkId || nineDeepLinkDone) return;
   nineOpenDeepLink();
   if(nineDeepLinkTimer) return;
-  nineDeepLinkTimer = setInterval(() => {
-    if(nineDeepLinkDone || ++nineDeepLinkAttempts > 60){
-      clearInterval(nineDeepLinkTimer);
-      nineDeepLinkTimer = null;
-      return;
+  nineDeepLinkTimer=setInterval(()=>{
+    if(!nineDeepLinkId || nineDeepLinkDone){
+      clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;return;
     }
+    nineDeepLinkAttempts++;
     nineOpenDeepLink();
-  }, 350);
+    if(nineDeepLinkAttempts===24 && !nineDeepLinkDone){
+      nineDeepLinkFeedback('Sedang membuka detail produk. Mohon tunggu sebentar…');
+    }
+    if(nineDeepLinkAttempts>100){
+      clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;
+      nineDeepLinkFeedback('Detail produk belum ditemukan. Coba muat ulang halaman atau periksa tautannya.');
+    }
+  },300);
 }
 // Navigasi global: satu jalur untuk logo, header, dan menu hamburger.
 function nineNavigateMain(destination){
@@ -35465,6 +35480,7 @@ function nineNavigateMain(destination){
   if(destination !== 'home' && !section) return;
   // Matikan deep-link tertunda sebelum mengembalikan katalog.
   nineDeepLinkId = null;
+  nineClearDeepLinkFeedback();
   nineDeepLinkDone = true;
   nineDeepLinkAttempts = 0;
   if(nineDeepLinkTimer){clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;}
@@ -35506,22 +35522,15 @@ document.addEventListener('click',function(event){
 },true);
 // Navigasi browser Back/Forward: detail harus sesuai URL, bukan state lama.
 window.addEventListener('popstate', () => {
-  const id = new URLSearchParams(location.search).get('product');
-  nineDeepLinkId = id;
-  nineDeepLinkDone = false;
+  const id=new URLSearchParams(location.search).get('product');
+  nineDeepLinkId=id;
+  nineDeepLinkDone=false;
+  nineDeepLinkAttempts=0;
+  nineDeepLinkStartedAt=Date.now();
+  nineClearDeepLinkFeedback();
   if(nineDeepLinkTimer){clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;}
-  nineDeepLinkAttempts = 0;
   if(id){
-    const product=sourceProducts().find(p=>String(p.id)===String(id));
-    if(product && typeof window.showProduct==='function'){
-      window.__nineHandlingHistory=true;
-      Promise.resolve(window.showProduct(product.nama,{skipView:true}))
-        .finally(()=>{window.__nineHandlingHistory=false;});
-      nineDeepLinkDone=true;
-      window.scrollProductDetailIntoView?.('auto');
-    }else{
-      nineStartDeepLink();
-    }
+    nineStartDeepLink();
   }else{
     window.__nineHandlingHistory=true;
     try{window.renderCategories?.();}finally{window.__nineHandlingHistory=false;}
@@ -35530,7 +35539,7 @@ window.addEventListener('popstate', () => {
       const el=target && document.getElementById(target);
       if(el){
         const header=document.querySelector('header.header');
-        const offset=header ? header.getBoundingClientRect().height : 0;
+        const offset=header?.getBoundingClientRect().height||0;
         window.scrollTo({top:Math.max(0,el.getBoundingClientRect().top+window.scrollY-offset-8),behavior:'instant'});
       }else window.scrollTo({top:0,behavior:'instant'});
     }));
