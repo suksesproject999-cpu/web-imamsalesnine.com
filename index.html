@@ -38946,5 +38946,85 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
   schedule();
 })();
 </script>
+
+<!-- NEXAI V36: Desktop purchase dock; mobile rules remain untouched -->
+<style id="nexai-v36-desktop-purchase">
+@media (min-width: 992px) {
+  body:has(#nineDetailShell) #stickyCheckout.sticky-checkout {
+    position:fixed !important;
+    top:auto !important;
+    bottom:24px !important;
+    left:auto !important;
+    right:clamp(20px,3vw,56px) !important;
+    width:min(440px,calc(100vw - 48px)) !important;
+    max-width:440px !important;
+    margin:0 !important;
+    padding:16px !important;
+    border:1px solid #e3ebd9 !important;
+    border-radius:22px !important;
+    background:#fff !important;
+    box-shadow:0 16px 55px rgba(0,0,0,.18) !important;
+    z-index:10050 !important;
+  }
+  body:has(#nineDetailShell) #stickyCheckout.show {
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    transform:translate3d(0,0,0) !important;
+    pointer-events:auto !important;
+  }
+  body:has(#nineDetailShell) #stickyCheckout .sticky-actions {
+    display:flex !important;
+    width:100% !important;
+  }
+  body:has(#nineDetailShell) #stickyCheckout .sticky-actions-action {
+    display:flex !important;
+    width:100% !important;
+  }
+  body:has(#nineDetailShell) #stickyCheckout .sticky-cart-action-btn,
+  body:has(#nineDetailShell) #stickyCheckout .sticky-buy-action-btn {
+    min-width:0;
+    cursor:pointer;
+  }
+  body:has(#nineDetailShell) #stickyCheckout .sticky-buy-action-btn {
+    flex:1;
+  }
+}
+@media (min-width:769px) and (max-width:991px) {
+  body:has(#nineDetailShell) #stickyCheckout.show {
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    transform:translateY(0) !important;
+    pointer-events:auto !important;
+    z-index:10050 !important;
+  }
+}
+</style>
+<script id="nexai-v36-desktop-purchase-guard">
+(function(){
+  'use strict';
+  // Reuse existing purchase sheet and button handlers, no parallel checkout implementation.
+  function syncDesktopPurchase(){
+    if(window.innerWidth<=768)return;
+    const detail=document.getElementById('nineDetailShell');
+    const dock=document.getElementById('stickyCheckout');
+    if(!detail||!dock)return;
+    if(typeof window.updateStickyMode==='function' && !dock.querySelector('.sticky-actions button')){
+      window.updateStickyMode();
+    }
+    if(!dock.classList.contains('show')){
+      dock.classList.add('show');
+    }
+  }
+  const root=document.getElementById('product-grid-auto')||document.body;
+  const observer=new MutationObserver(syncDesktopPurchase);
+  observer.observe(root,{childList:true,subtree:true});
+  window.addEventListener('resize',syncDesktopPurchase,{passive:true});
+  document.addEventListener('DOMContentLoaded',syncDesktopPurchase,{once:true});
+  syncDesktopPurchase();
+})();
+</script>
+
 </body>
 </html>
