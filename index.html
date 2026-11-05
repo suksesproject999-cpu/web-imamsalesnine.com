@@ -38693,6 +38693,7 @@ document.addEventListener('touchcancel',function(){
 if(window.__nineV29Shop)return;
 window.__nineV29Shop=true;
 const STORE='imamsalesnine';
+const PRESENCE_URL='/.netlify/functions/admin-presence';
 const ACTIVE_MS=90000;
 const PULSE_MS=45000;
 let unsubPresence=null,unsubRatings=null,pulseTimer=null,renderTimer=null;
@@ -38702,7 +38703,7 @@ let ratingSyncTimer=null;
 const $=sel=>document.querySelector(sel);
 function database(){try{return typeof db!=='undefined'?db:firebase.firestore()}catch(_){return null}}
 function authService(){try{return firebase.auth()}catch(_){return null}}
-function whenMs(v){if(!v)return 0;if(typeof v.toMillis==='function')return v.toMillis();if(typeof v.toDate==='function')return v.toDate().getTime();return Number(v)||0}
+function whenMs(v){if(!v)return 0;if(typeof v.toMillis==='function')return v.toMillis();if(typeof v.toDate==='function')return v.toDate().getTime();if(typeof v==='string')return Date.parse(v)||0;return Number(v)||0}
 function statusText(){
  if(!latestPresence)return 'Status aktivitas belum tersedia';
  const ms=whenMs(latestPresence.lastActiveAt);
@@ -38725,13 +38726,22 @@ function render(){
   el.textContent=storeRating===null?'—':storeRating.toFixed(1);
  });
 }
+async function refreshPresence(){
+ try{
+  const response=await fetch(PRESENCE_URL,{method:'GET',cache:'no-store'});
+  if(!response.ok)throw new Error('HTTP '+response.status);
+  const data=await response.json();
+  if(data.success!==true)throw new Error('Respons presence tidak valid');
+  latestPresence=data.lastActiveAt?{lastActiveAt:data.lastActiveAt}:null;
+  render();
+ }catch(e){
+  console.warn('Status toko tidak tersedia:',e.message);
+  latestPresence=null;
+  render();
+ }
+}
 function observeStore(){
  const d=database();if(!d)return;
- try{
-  unsubPresence=d.collection('profil_toko').doc(STORE).onSnapshot(snap=>{
-   latestPresence=snap.exists?(snap.data()||{}):null;render();
-  },e=>console.warn('Status toko tidak tersedia:',e.code||e.message));
- }catch(e){console.warn('Presence toko:',e.message)}
  // Source of truth: existing product statistics (ratingTotal / ratingCount).
  // Count-weighted average prevents a product with one review equalling one with hundreds.
  try{
@@ -38759,23 +38769,6 @@ async function adminAuthorized(user){
   return snap.exists&&snap.data()?.active===true;
  }catch(_){return false}
 }
-async function startAdminPulse(user){
- if(pulseTimer){clearInterval(pulseTimer);pulseTimer=null}
- if(!await adminAuthorized(user))return;
- const d=database();if(!d)return;
- async function pulse(){
-  if(document.visibilityState!=='visible')return;
-  if(authService()?.currentUser?.uid!==user.uid)return;
-  try{
-   await d.collection('profil_toko').doc(STORE).set({
-    lastActiveAt:firebase.firestore.FieldValue.serverTimestamp(),
-    updatedBy:user.uid
-   },{merge:true});
-  }catch(e){console.warn('Heartbeat admin belum diizinkan:',e.code||e.message)}
- }
- await pulse();
- pulseTimer=setInterval(pulse,PULSE_MS);
-}
 // Optional one-time historical rating cache for trusted admin; visitors never write.
 window.nineSyncShopRatingV29=async function(){
  const user=authService()?.currentUser;
@@ -38794,15 +38787,13 @@ window.nineSyncShopRatingV29=async function(){
 };
 function boot(){
  observeStore();
- renderTimer=setInterval(render,30000);
- const a=authService();
- if(a?.onAuthStateChanged)a.onAuthStateChanged(user=>{
-  if(pulseTimer){clearInterval(pulseTimer);pulseTimer=null}
-  if(user)startAdminPulse(user);
- });
+ refreshPresence();
+ renderTimer=setInterval(()=>{
+  refreshPresence();
+  render();
+ },30000);
  document.addEventListener('visibilitychange',()=>{
-  const u=authService()?.currentUser;
-  if(u&&document.visibilityState==='visible'&&pulseTimer){/* next heartbeat updates server timestamp */ }
+  if(document.visibilityState==='visible')refreshPresence();
  });
  const observer=new MutationObserver(()=>render());
  const root=$('#product-grid-auto');

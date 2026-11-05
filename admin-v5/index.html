@@ -13331,5 +13331,49 @@ window.smartLoadWhatsAppGroups = async function(){
 })();
 </script>
 
+
+<!-- NEXAI ADMIN PRESENCE — hanya admin utama, tanpa Firebase service account -->
+<script>
+(function(){
+  "use strict";
+  const ENDPOINT="/.netlify/functions/admin-presence";
+  const INTERVAL=30000;
+  const IDLE_AFTER=120000;
+  let lastInteraction=Date.now();
+  let lastSent=0;
+  let sending=false;
+
+  ["pointerdown","keydown","touchstart","scroll"].forEach(function(type){
+    window.addEventListener(type,function(){lastInteraction=Date.now();},{passive:true});
+  });
+
+  async function heartbeat(){
+    if(document.visibilityState!=="visible" || sending) return;
+    if(Date.now()-lastInteraction>IDLE_AFTER) return;
+    if(Date.now()-lastSent<25000) return;
+    if(localStorage.getItem("role")!=="admin") return;
+    const token=localStorage.getItem("token");
+    if(!token) return;
+    sending=true;
+    try{
+      const res=await fetch(ENDPOINT,{
+        method:"POST",
+        headers:{"Authorization":"Bearer "+token},
+        cache:"no-store"
+      });
+      if(res.ok) lastSent=Date.now();
+    }catch(err){
+      console.warn("Admin presence belum tersambung:",err);
+    }finally{
+      sending=false;
+    }
+  }
+  document.addEventListener("visibilitychange",heartbeat);
+  window.addEventListener("focus",heartbeat);
+  setInterval(heartbeat,INTERVAL);
+  setTimeout(heartbeat,1200);
+})();
+</script>
+
 </body>
 </html>
