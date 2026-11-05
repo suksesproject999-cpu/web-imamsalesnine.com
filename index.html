@@ -18469,6 +18469,23 @@ body:has(.nine-detail-shell) #product-grid-auto{position:fixed!important;inset:0
 .nine-detail-shell #nineDetailSearchResults .nine-no-results{padding:12px!important;color:#666!important;font-size:12px!important}
 @media(max-width:360px){.nine-detail-shell .nine-detail-topbar{grid-template-columns:30px minmax(0,1fr) 42px 38px!important;gap:4px!important;padding:0 6px!important}}
 </style>
+<script>
+if(new URLSearchParams(location.search).get('product')){
+  document.documentElement.classList.add('nine-initial-product-loading');
+  // Safety timeout: never leave visitors blocked if CMS/network fails.
+  window.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>document.documentElement.classList.remove('nine-initial-product-loading'),12000);
+  },{once:true});
+}
+</script>
+<style>
+html.nine-initial-product-loading body::after{
+  content:"Membuka detail produk…";
+  position:fixed;inset:0;z-index:2147483646;
+  display:flex;align-items:center;justify-content:center;
+  background:#101510;color:#f4fff0;font:600 16px/1.5 Arial,sans-serif;
+}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
@@ -35436,7 +35453,8 @@ async function nineOpenDeepLink(){
   try{
     // Jangan buat history entry baru ketika membuka URL dari share.
     window.__nineHandlingHistory=true;
-    await window.showProduct(product.nama,{skipView:true});
+    window.__productTransitionActive=true;
+    await window.showProduct(product.nama,{skipView:false});
     if(id !== nineDeepLinkId) return;
     if(!nineDeepLinkVisible(id)) return;
     nineDeepLinkDone=true;
@@ -35444,14 +35462,16 @@ async function nineOpenDeepLink(){
     if(nineDeepLinkTimer){clearInterval(nineDeepLinkTimer);nineDeepLinkTimer=null;}
     window.__hydrateRealtimeProductStats?.(document);
     window.__v101RefreshProductStats?.(String(id));
-    // Font, gambar dan layout async dapat menggeser halaman; koreksi bertahap.
-    requestAnimationFrame(()=>requestAnimationFrame(nineDeepLinkScroll));
-    setTimeout(()=>{if(nineDeepLinkId===id && nineDeepLinkVisible(id)) nineDeepLinkScroll();},350);
-    setTimeout(()=>{if(nineDeepLinkId===id && nineDeepLinkVisible(id)) nineDeepLinkScroll();},1100);
+    // Tempatkan detail sekali sebelum membuka tirai; tanpa scroll berulang.
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{
+      nineDeepLinkScroll();
+      document.documentElement.classList.remove('nine-initial-product-loading');
+    }));
   }catch(error){
     console.warn('Gagal membuka detail dari link produk:',error);
   }finally{
     window.__nineHandlingHistory=false;
+    window.__productTransitionActive=false;
     nineDeepLinkBusy=false;
   }
 }
