@@ -23775,20 +23775,8 @@ function selectVariant(btn,value){
 
     updateStickySummary();
     
-    stickyActionMode = true;
-
-updateStickyMode();
-
-const sticky =
-document.getElementById("stickyCheckout");
-
-if(sticky){
-
-    sticky.classList.add("show");
-
-    document.body.classList.add("sticky-active");
-
-}
+    // Pilihan varian tidak mengubah mode sticky; posisi scroll yang menentukan.
+    if(typeof stickyScrollHandler==="function")stickyScrollHandler();
 
 }
 
@@ -30326,97 +30314,32 @@ let selectedQty = 1;
 let stickyActionMode = false;
 
 function initStickyCheckout(){
-
-    const sticky =
-    document.getElementById("stickyCheckout");
-
-    // Trigger sticky setelah user melewati varian
-    const stickyTrigger =
-    document.getElementById("variantContainer");
-
-    // Section Testimoni
-    const testimonial =
-    document.getElementById("testimoni");
-
-    if(
-        !sticky ||
-        !stickyTrigger ||
-        !testimonial
-    ) return;
-
     if(stickyScrollHandler){
-
-        window.removeEventListener(
-            "scroll",
-            stickyScrollHandler
-        );
-
-        window.removeEventListener(
-            "resize",
-            stickyScrollHandler
-        );
-
+        window.removeEventListener("scroll",stickyScrollHandler);
+        window.removeEventListener("resize",stickyScrollHandler);
     }
-
-    stickyScrollHandler = function(){
-
-        // User menutup sticky
-        if(stickyClosed){
-
+    const sticky=document.getElementById("stickyCheckout");
+    if(!sticky)return;
+    stickyClosed=false;
+    const update=()=>{
+        if(!sticky.isConnected || !document.getElementById("nineDetailShell") || stickyClosed){
             sticky.classList.remove("show");
             document.body.classList.remove("sticky-active");
             return;
-
         }
-
-        // Posisi varian
-        const triggerRect =
-        stickyTrigger.getBoundingClientRect();
-
-        // Posisi section testimoni
-        const testimonialRect =
-        testimonial.getBoundingClientRect();
-
-        // Sticky muncul setelah varian lewat
-        const passedVariant =
-        triggerRect.bottom < -40;
-
-        // Sticky hilang saat Testimoni mulai terlihat
-        const testimonialVisible =
-        testimonialRect.top <= 120;
-
-if(
-    passedVariant &&
-    !testimonialVisible
-){
-
-    sticky.classList.add("show");
-    document.body.classList.add("sticky-active");
-
-}else{
-
-    sticky.classList.remove("show");
-    document.body.classList.remove("sticky-active");
-
-}
-
+        const trigger=document.getElementById("variantContainer");
+        const headerHeight=document.querySelector(".nine-detail-topbar")?.getBoundingClientRect().height||0;
+        const passed=!!trigger && trigger.getBoundingClientRect().bottom < Math.max(72,headerHeight+8);
+        stickyActionMode=!passed;
+        updateStickyMode();
+        sticky.classList.add("show");
+        document.body.classList.add("sticky-active");
     };
-
-    window.addEventListener(
-        "scroll",
-        stickyScrollHandler,
-        { passive:true }
-    );
-
-    window.addEventListener(
-        "resize",
-        stickyScrollHandler
-    );
-
-    stickyScrollHandler();
-
+    stickyScrollHandler=update;
+    window.addEventListener("scroll",update,{passive:true});
+    window.addEventListener("resize",update,{passive:true});
+    requestAnimationFrame(update);
 }
-
 
 
 function stickyQtyPlus(){
@@ -30658,9 +30581,7 @@ document
 .getElementById("purchaseSheet")
 .classList.add("show");
 
-stickyActionMode = false;
-
-updateStickyMode();
+if(typeof stickyScrollHandler==="function")stickyScrollHandler();
 }
 
 
@@ -30676,9 +30597,7 @@ document
 .getElementById("purchaseSheet")
 .classList.add("show");
 
-stickyActionMode = false;
-
-updateStickyMode();
+if(typeof stickyScrollHandler==="function")stickyScrollHandler();
 
 }
 
@@ -30951,9 +30870,7 @@ function confirmAddToCart(){
 
     addToCart(currentProduct.id);
     
-    stickyActionMode = false;
-
-    updateStickyMode();
+    if(typeof stickyScrollHandler==="function")stickyScrollHandler();
 
 }
 
@@ -30966,9 +30883,7 @@ function confirmBuyNow(){
 
     stickyBuyNow();
     
-    stickyActionMode = false;
-
-    updateStickyMode();
+    if(typeof stickyScrollHandler==="function")stickyScrollHandler();
 
 }
 
@@ -34983,17 +34898,20 @@ function placeAt(element){if(!element)return;const y=Math.max(0,element.getBound
 function revealRoute(){const r=root();if(!r)return;r.classList.add('v8-route-enter');requestAnimationFrame(()=>requestAnimationFrame(()=>r.classList.add('v8-route-visible')));setTimeout(()=>r.classList.remove('v8-route-enter','v8-route-visible'),240)}
 const previousOpen=window.openProductWithTransition;
 window.openProductWithTransition=async function(card,nama){
-    const fromPromo=Boolean(card?.closest?.('#promoSliderTrack')||card?.classList?.contains('promo-mini-card'));
-    if(!fromPromo)return previousOpen?.apply(this,arguments);
-    if(!nama)return;
-    window.__productTransitionActive=true;
-    try{
-        await window.showProduct?.(nama);
-        const gallery=document.querySelector('#product-grid-auto > .product-detail .gallery-main');
-        const detail=document.querySelector('#product-grid-auto > .product-detail');
-        placeAt(gallery||detail);
-        revealRoute();
-    }finally{requestAnimationFrame(()=>{window.__productTransitionActive=false})}
+ const fromPromo=Boolean(card?.closest?.("#promoSliderTrack")||card?.classList?.contains("promo-mini-card"));
+ if(!fromPromo)return previousOpen?.apply(this,arguments);
+ if(!nama)return;
+ const source=(typeof allProducts!=="undefined"&&Array.isArray(allProducts))?allProducts:(window.allProducts||[]);
+ const product=source.find(p=>p.nama===nama);
+ if(!product)return;
+ // Render detail first; no intermediate hero, clone, veil or delayed route.
+ await window.showProduct(product.nama);
+ const detail=document.getElementById("nineDetailShell");
+ if(detail){
+  const offset=(document.querySelector(".header")?.getBoundingClientRect().height||0)+8;
+  const y=Math.max(0,detail.getBoundingClientRect().top+window.scrollY-offset);
+  window.scrollTo({top:y,behavior:"instant"});
+ }
 };
 window.openAllPromoProducts=async function(){
     const source=Array.isArray(window.allProducts)&&window.allProducts.length?window.allProducts:(typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:[]);
@@ -38441,7 +38359,22 @@ function nineCloseSpecs(){document.getElementById("nineSpecOverlay")?.classList.
 function nineOpenReviews(){const p=document.getElementById("nineReviewPage");if(p){p.classList.add("show");p.setAttribute("aria-hidden","false")}}
 function nineCloseReviews(){const p=document.getElementById("nineReviewPage");if(p){p.classList.remove("show");p.setAttribute("aria-hidden","true")}}
 function nineFilterReview(button){button.parentElement.querySelectorAll("button").forEach(b=>b.classList.remove("active"));button.classList.add("active")}
-function nineToggleDescription(){const el=document.getElementById("nineDescription");const btn=document.getElementById("nineDescToggle");if(!el||!btn)return;el.classList.toggle("expanded");btn.textContent=el.classList.contains("expanded")?"Lebih Sedikit":"Selengkapnya"}
+function nineToggleDescription(){
+ const el=document.getElementById("nineDescription"),btn=document.getElementById("nineDescToggle");
+ if(!el||!btn)return;
+ const expanded=el.classList.toggle("expanded");
+ btn.innerHTML=expanded?'Sembunyikan <i class="fa-solid fa-chevron-up" aria-hidden="true"></i>':'Selengkapnya <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>';
+ btn.setAttribute("aria-expanded",String(expanded));
+ if(!expanded){
+  const section=el.closest(".nine-description");
+  if(section){
+   const header=document.querySelector(".nine-detail-topbar");
+   const offset=(header?.getBoundingClientRect().height||65)+12;
+   const top=Math.max(0,section.getBoundingClientRect().top+window.scrollY-offset);
+   window.scrollTo({top,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"instant":"smooth"});
+  }
+ }
+}
 function nineVisitStore(){backToProducts();window.scrollTo({top:0,behavior:"instant"})}
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){nineCloseSpecs();nineCloseReviews()}});
 
@@ -38597,6 +38530,10 @@ obs.observe(document.body,{subtree:true,childList:true});
 </script>
 
 <style id="nine-functional-reconciliation">
+/* Final: tombol deskripsi tepat di tengah, tetap nyaman di mobile. */
+.nine-detail-shell #nineDescToggle{display:flex!important;align-items:center;justify-content:center;gap:8px;margin:14px auto 4px!important;width:max-content;max-width:100%;min-height:40px;padding:8px 18px!important;text-align:center!important;cursor:pointer}
+.nine-detail-shell .nine-description{scroll-margin-top:90px}
+
 .nine-detail-shell .product-highlights{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;grid-auto-flow:row!important;width:100%!important;gap:3px!important}
 .nine-detail-shell .product-highlights>span{grid-column:auto!important;display:flex!important;width:100%!important;min-width:0!important;max-width:none!important;padding:7px 1px!important;box-sizing:border-box!important}
 .nine-detail-shell .product-highlights small{font-size:9px!important;line-height:1.2!important;overflow-wrap:anywhere!important}
