@@ -23006,8 +23006,6 @@ let html = `
             <input type="hidden" id="varian" value="${selectedVariant}">
           </div>
         </div>
-        <button type="button" class="nine-detail-link" onclick="nineOpenSpecs()"><span>Spesifikasi Produk</span><i class="fa-solid fa-chevron-right"></i></button>
-        <div class="nine-detail-divider"></div>
         <section class="nine-review-section">
           <div class="nine-review-heading"><strong><span data-detail-rating="${product.id}">—</span> <span id="nineReviewCount"></span></strong><button type="button" onclick="nineOpenReviews()">Lihat Semua <i class="fa-solid fa-chevron-right"></i></button></div>
           <details class="nine-review-composer"><summary>Tulis Ulasan Produk <i class="fa-solid fa-chevron-down"></i></summary><div class="nine-review-form"><div class="nine-review-stars" id="nineReviewStars">${[1,2,3,4,5].map(n=>`<button type="button" onclick="nineSetReviewStars(${n})" aria-label="${n} bintang">★</button>`).join("")}</div><textarea id="v17ReviewText" placeholder="Bagikan pengalaman menggunakan produk ini..." rows="3"></textarea><button type="button" onclick="nineSubmitDetailReview(this)">Kirim Ulasan</button></div></details><div id="nineReviewPreview" class="nine-review-preview"></div>
@@ -23018,11 +23016,18 @@ let html = `
           <div class="nine-store-stats"><div><strong data-nine-store-rating>—</strong><small>Penilaian</small></div><div><strong>${allProducts.length}</strong><small>Produk</small></div><div><strong>—</strong><small>Chat Dibalas</small></div></div>
         </div>
         <div class="nine-detail-divider"></div>
+        <section class="nine-store-related" aria-label="Produk lain di toko ini">
+          <div class="nine-store-related-head"><h3>Produk Lain di Toko Ini</h3></div>
+          <div id="relatedProducts" class="nine-store-related-track" aria-label="Geser untuk melihat produk lain"></div>
+        </section>
+        <div class="nine-detail-divider"></div>
+        <button type="button" class="nine-detail-link" onclick="nineOpenSpecs()"><span>Spesifikasi Produk</span><i class="fa-solid fa-chevron-right"></i></button>
+        <div class="nine-detail-divider"></div>
         <section class="nine-description"><div class="nine-section-head">Deskripsi Produk</div><div class="nine-description-text" id="nineDescription">${product.deskripsi || "Belum ada deskripsi."}</div><button type="button" id="nineDescToggle" onclick="nineToggleDescription()">Selengkapnya <i class="fa-solid fa-chevron-down"></i></button></section>
       </div>
     </div>
     <div class="product-bottom">
-      <section><h2>Produk Lain dari Toko Ini</h2><div id="relatedProducts" class="product-grid"></div></section>
+      
       <section><h2>Terakhir Dilihat</h2><div id="recentProducts" class="product-grid"></div></section><section class="nine-all-products" id="nineAllProductsSection"><h2>Semua Produk</h2><div id="nineAllProductsGrid"></div><nav id="nineAllPagination" aria-label="Halaman produk"></nav><button type="button" id="nineAllBackTop" onclick="document.getElementById('nineAllProductsSection')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Kembali ke Semua Produk"><i class="fa-solid fa-arrow-up"></i></button></section>
     </div>
   </div>
@@ -23401,7 +23406,7 @@ function renderRelated(product){
     related.forEach(item => {
 
         box.innerHTML +=
-            window.nineCompactCard ? window.nineCompactCard(item) : renderMarketplaceCard(item);
+            window.nineStoreRelatedCard ? window.nineStoreRelatedCard(item) : (window.nineCompactCard ? window.nineCompactCard(item) : renderMarketplaceCard(item));
 
     });
 
@@ -35903,7 +35908,7 @@ try{tampilkanHasil=window.tampilkanHasil}catch(_e){}
 window.renderRelated=function(product){
   const box=document.getElementById('relatedProducts');if(!box||!product)return;
   let source=[];try{source=(typeof allProducts!=='undefined'&&Array.isArray(allProducts))?allProducts:(window.allProducts||[])}catch(_e){source=window.allProducts||[]}
-  const related=source.filter(p=>p.kategori===product.kategori&&String(p.id)!==String(product.id));
+  const related=source.filter(p=>p.kategori===product.kategori&&String(p.id)!==String(product.id)).slice(0,15);
   registerPager(box,related,'related',`related:${product.id}`);
 };
 try{renderRelated=window.renderRelated}catch(_e){}
@@ -38380,6 +38385,41 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){nineCloseSpecs();ni
 
 </script>
 
+<script id="nine-store-related-v36">
+(function(){
+'use strict';
+const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+window.nineStoreRelatedCard=function(p){
+const price=Number(p.harga?.promo||p.harga?.normal||0),id=esc(p.id),name=esc(p.nama||'Produk');
+return '<article class="nine-compact-card nine-store-related-card" data-nine-product-id="'+id+'" role="button" tabindex="0" aria-label="Lihat '+name+'">'+
+'<img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+name+'"><div class="nine-compact-body">'+
+'<div class="nine-compact-title" title="'+name+'">'+name+'</div>'+
+'<div class="nine-store-price-row"><strong>Rp'+(Number.isFinite(price)?price:0).toLocaleString('id-ID')+'</strong><span class="nine-store-voucher"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher</span></div>'+
+'<div class="nine-store-card-rating" data-rating-product="'+id+'">⭐ —</div>'+
+'<div class="nine-store-card-sold" data-sold-product="'+id+'">— terjual</div></div></article>';
+};
+window.nineShowAllStoreProducts=function(){
+const el=document.getElementById('nineAllProductsSection');if(el)el.scrollIntoView({behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+};
+})();
+</script>
+<style id="nine-store-related-v36-style">
+.nine-detail-shell .nine-store-related{min-width:0;padding:5px 0 8px}
+.nine-detail-shell .nine-store-related-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.nine-detail-shell .nine-store-related-head h3{font-size:15px;font-weight:700;line-height:1.35;margin:0}
+.nine-detail-shell .nine-store-related-head button{flex:0 0 auto;border:0;background:transparent;color:#679a23;font-size:12px;font-weight:600;cursor:pointer}
+.nine-detail-shell #relatedProducts{display:flex!important;flex-wrap:nowrap!important;gap:10px!important;overflow-x:auto!important;overflow-y:hidden!important;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;padding:3px 1px 10px!important;scrollbar-width:thin}
+.nine-detail-shell #relatedProducts>.nine-store-related-card{flex:0 0 clamp(145px,42vw,185px)!important;width:clamp(145px,42vw,185px)!important;max-width:185px!important;scroll-snap-align:start;min-width:0}
+.nine-detail-shell #relatedProducts .nine-compact-body{padding:9px;gap:7px;align-items:stretch}
+.nine-detail-shell #relatedProducts .nine-compact-title{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important;font-size:12px;line-height:1.5;min-width:0}
+.nine-detail-shell .nine-store-price-row{display:flex;align-items:center;justify-content:space-between;gap:4px;min-width:0}
+.nine-detail-shell .nine-store-price-row strong{font-size:13px;color:#ee4d2d;white-space:nowrap;letter-spacing:-.3px}
+.nine-detail-shell .nine-store-voucher{display:inline-flex;align-items:center;gap:3px;white-space:nowrap;color:#ee4d2d;font-size:9px;border:1px solid #f4b5a6;border-radius:3px;padding:2px 3px}
+.nine-detail-shell .nine-store-card-rating{font-size:12px;line-height:1.4;color:#333}
+.nine-detail-shell .nine-store-card-sold{font-size:11px;line-height:1.4;color:#666}
+.nine-detail-shell .nine-store-related-end{display:flex;align-items:center;justify-content:center;gap:6px;margin:8px auto 0;border:1px solid #e0e9d5;border-radius:20px;padding:8px 14px;background:#fff;color:#679a23;font-size:12px;font-weight:600;cursor:pointer}
+@media(max-width:380px){.nine-detail-shell .nine-store-price-row strong{font-size:12px}.nine-detail-shell .nine-store-voucher{font-size:8px}}
+</style>
 <style id="nine-final-structured-style">
 /* Scoped detail-only presentation; legacy storefront functions remain intact. */
 .nine-detail-shell{--nine-lime:#8cc63f;scrollbar-width:thin}
@@ -38453,7 +38493,8 @@ window.nineSetReviewStars=function(n){window.nineReviewRating=n;document.querySe
 window.nineSetReviewStars(5);
 window.nineCompactCard=function(p){
  const price=p.harga?.promo||p.harga?.normal||0;
- return '<article class="nine-compact-card" data-nine-product-id="'+esc(p.id)+'" role="button" tabindex="0"><img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+esc(p.nama)+'"><div class="nine-compact-body"><div class="nine-compact-title">'+esc(p.nama)+'</div><strong>Rp '+Number(price).toLocaleString('id-ID')+'</strong></div></article>';
+ const id=esc(p.id),name=esc(p.nama||'Produk');
+ return '<article class="nine-compact-card nine-unified-product-card" data-nine-product-id="'+id+'" role="button" tabindex="0" aria-label="Lihat '+name+'"><img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+name+'"><div class="nine-compact-body"><div class="nine-compact-title" title="'+name+'">'+name+'</div><div class="nine-store-price-row"><strong>Rp'+Number(price||0).toLocaleString('id-ID')+'</strong><span class="nine-store-voucher" aria-label="Voucher"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher</span></div><div class="nine-store-card-rating" data-rating-product="'+id+'">⭐ —</div><div class="nine-store-card-sold" data-sold-product="'+id+'">— terjual</div></div></article>';
 };
 document.addEventListener('click',e=>{const card=e.target.closest?.('.nine-compact-card');if(!card)return;const product=(typeof allProducts!=='undefined'?allProducts:[]).find(p=>String(p.id)===card.dataset.nineProductId);if(product&&typeof showProduct==='function')showProduct(product.nama) });
 document.addEventListener('keydown',e=>{if(e.key!=='Enter')return;const card=e.target.closest?.('.nine-compact-card');if(card)card.click()});
@@ -38560,9 +38601,10 @@ obs.observe(document.body,{subtree:true,childList:true});
   function compact(p){return window.nineCompactCard?window.nineCompactCard(p):''}
   function related(p){
     const root=document.getElementById('relatedProducts');if(!root||!p)return;
-    const list=products().filter(x=>x.kategori===p.kategori&&String(x.id)!==String(p.id));
-    root.innerHTML=list.map(compact).join('');
+    const list=products().filter(x=>x.kategori===p.kategori&&String(x.id)!==String(p.id)).slice(0,15);
+    root.innerHTML=list.map(compact).join('')+'<button type="button" class="nine-related-see-all" onclick="nineShowAllStoreProducts()" aria-label="Lihat semua produk toko"><span class="nine-related-see-all-icon"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></span><span>Lihat Semua</span></button>';
     root.scrollLeft=0;
+    try{list.forEach(x=>{updateProductSold?.(x.id);updateProductRating?.(x.id)})}catch(e){}
   }
   function recent(){
     const root=document.getElementById('recentProducts');if(!root)return;
@@ -38570,6 +38612,7 @@ obs.observe(document.body,{subtree:true,childList:true});
     const list=saved.map(x=>products().find(p=>String(p.id)===String(x.id))||x).filter(Boolean);
     root.innerHTML=list.map(compact).join('');
     root.scrollLeft=0;
+    try{list.forEach(x=>{updateProductSold?.(x.id);updateProductRating?.(x.id)})}catch(e){}
   }
   window.renderRelated=related;window.renderRecent=recent;
   try{renderRelated=related;renderRecent=recent}catch(e){}
@@ -39017,5 +39060,18 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
 })();
 </script>
 
+<style id="nine-unified-cards-final-v37">
+.nine-detail-shell .nine-unified-product-card .nine-compact-title{display:block!important;white-space:nowrap!important;overflow:hidden!important;text-overflow:ellipsis!important;-webkit-line-clamp:unset!important;line-height:1.5!important}
+.nine-detail-shell .nine-unified-product-card .nine-compact-body{gap:7px!important;align-items:stretch!important}
+.nine-detail-shell .nine-unified-product-card .nine-store-price-row{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:4px!important;min-width:0}
+.nine-detail-shell .nine-unified-product-card .nine-store-price-row strong{color:#ee4d2d!important;font-size:clamp(11px,3.2vw,14px)!important;white-space:nowrap;letter-spacing:-.4px}
+.nine-detail-shell .nine-unified-product-card .nine-store-voucher{display:inline-flex;align-items:center;gap:2px;font-size:9px;color:#ee4d2d;border:1px solid #f4b5a6;border-radius:3px;padding:2px 3px;white-space:nowrap;flex-shrink:0}
+.nine-detail-shell .nine-unified-product-card .nine-store-card-rating{font-size:12px;color:#333;min-height:17px}
+.nine-detail-shell .nine-unified-product-card .nine-store-card-sold{font-size:11px;color:#666;min-height:16px}
+.nine-detail-shell #relatedProducts>.nine-related-see-all{flex:0 0 125px!important;min-width:125px!important;width:125px!important;max-width:125px!important;align-self:stretch;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:10px;border:0;background:#fff;color:#888;font:inherit;font-size:12px;cursor:pointer;scroll-snap-align:end}
+.nine-detail-shell .nine-related-see-all-icon{display:grid;place-items:center;width:40px;height:40px;border:2px solid #aaa;border-radius:50%;font-size:18px}
+.nine-detail-shell .nine-store-related-head button,.nine-detail-shell .nine-store-related-end{display:none!important}
+@media(max-width:380px){.nine-detail-shell .nine-unified-product-card .nine-store-voucher{font-size:8px;padding:2px}}
+</style>
 </body>
 </html>
