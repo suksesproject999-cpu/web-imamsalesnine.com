@@ -18472,22 +18472,72 @@ body:has(.nine-detail-shell) #product-grid-auto{position:fixed!important;inset:0
 <script>
 if(new URLSearchParams(location.search).get('product')){
   document.documentElement.classList.add('nine-initial-product-loading');
-  // Safety timeout: never leave visitors blocked if CMS/network fails.
+  // Pengaman: overlay tidak boleh mengunci halaman jika jaringan gagal.
   window.addEventListener('DOMContentLoaded',()=>{
-    setTimeout(()=>document.documentElement.classList.remove('nine-initial-product-loading'),12000);
+    setTimeout(()=>document.documentElement.classList.remove('nine-initial-product-loading'),9000);
   },{once:true});
 }
 </script>
 <style>
-html.nine-initial-product-loading body::after{
-  content:"Membuka detail produk…";
+/* Loading khusus deep-link produk. Tidak mengubah loader halaman utama. */
+html.nine-initial-product-loading #pageLoader{display:none!important}
+#nineShareLoading{display:none}
+html.nine-initial-product-loading #nineShareLoading{
   position:fixed;inset:0;z-index:2147483646;
   display:flex;align-items:center;justify-content:center;
-  background:#101510;color:#f4fff0;font:600 16px/1.5 Arial,sans-serif;
+  padding:24px;background:#101711;color:#f5f8f1;
+  font-family:Arial,Helvetica,sans-serif;
+}
+.nine-share-loading-card{width:min(100%,390px);padding:26px 22px;
+  background:#19231a;border:1px solid #344431;border-radius:22px;
+  box-shadow:0 24px 70px rgba(0,0,0,.25)}
+.nine-share-loading-brand{display:flex;align-items:center;gap:12px}
+.nine-share-loading-icon{width:44px;height:44px;border-radius:13px;
+  display:grid;place-items:center;background:#2c4125;color:#9bd24f;font-size:23px}
+.nine-share-loading-name{font-size:17px;font-weight:800;letter-spacing:.2px}
+.nine-share-loading-tagline{font-size:11px;color:#afd285;margin-top:5px;line-height:1.4}
+.nine-share-loading-line{height:1px;background:#344431;margin:20px 0}
+.nine-share-loading-preview{display:flex;gap:14px;align-items:center}
+.nine-share-loading-photo{width:84px;height:84px;flex:none;border-radius:12px;
+  background:linear-gradient(110deg,#273728 8%,#354735 18%,#273728 33%);
+  background-size:220% 100%;animation:nineShareShimmer 1.35s linear infinite}
+.nine-share-loading-lines{flex:1;display:grid;gap:11px}
+.nine-share-loading-lines i{display:block;height:11px;border-radius:8px;
+  background:linear-gradient(110deg,#273728 8%,#354735 18%,#273728 33%);
+  background-size:220% 100%;animation:nineShareShimmer 1.35s linear infinite}
+.nine-share-loading-lines i:nth-child(2){width:76%}
+.nine-share-loading-lines i:nth-child(3){width:48%}
+.nine-share-loading-caption{text-align:center;font-size:13px;
+  color:#e4efda;margin:22px 0 12px}
+.nine-share-loading-track{height:3px;background:#2d3e2c;border-radius:10px;overflow:hidden}
+.nine-share-loading-track::before{content:"";display:block;width:38%;height:100%;
+  background:#8cc63f;border-radius:10px;animation:nineShareProgress 1.25s ease-in-out infinite}
+@keyframes nineShareShimmer{to{background-position-x:-220%}}
+@keyframes nineShareProgress{from{transform:translateX(-110%)}to{transform:translateX(365%)}}
+@media(prefers-reduced-motion:reduce){
+  .nine-share-loading-photo,.nine-share-loading-lines i,.nine-share-loading-track::before{animation:none}
 }
 </style>
 </head>
 <body>
+<div id="nineShareLoading" role="status" aria-live="polite" aria-label="Menyiapkan detail produk">
+  <div class="nine-share-loading-card">
+    <div class="nine-share-loading-brand">
+      <div class="nine-share-loading-icon" aria-hidden="true">✦</div>
+      <div>
+        <div class="nine-share-loading-name">IMAMSALESNINE.COM</div>
+        <div class="nine-share-loading-tagline">Belanja Otomotif, Lebih Nyaman Bersama Imam</div>
+      </div>
+    </div>
+    <div class="nine-share-loading-line"></div>
+    <div class="nine-share-loading-preview" aria-hidden="true">
+      <div class="nine-share-loading-photo"></div>
+      <div class="nine-share-loading-lines"><i></i><i></i><i></i></div>
+    </div>
+    <div class="nine-share-loading-caption">Menyiapkan detail produk...</div>
+    <div class="nine-share-loading-track" aria-hidden="true"></div>
+  </div>
+</div>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
 
 <!-- =========================================================
@@ -35477,6 +35527,7 @@ function nineNavigateMain(destination){
   if(destination !== 'home' && !section) return;
   // Matikan deep-link tertunda sebelum mengembalikan katalog.
   nineDeepLinkId = null;
+  document.documentElement.classList.remove('nine-initial-product-loading');
   nineClearDeepLinkFeedback();
   nineDeepLinkDone = true;
   nineDeepLinkAttempts = 0;
