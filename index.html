@@ -35108,7 +35108,7 @@ function polishCard(card){
     if(!card?.matches?.('.marketplace-card[data-product-id]')) return;
     card.classList.add('v9-shopee-card');
     const body=card.querySelector('.product-card-body');
-    if(body){
+    if(body && !card.classList.contains('nine-compact-card')){
         const ordered=[
             body.querySelector('.product-brand'),
             body.querySelector('.marketplace-product-name'),
@@ -35251,6 +35251,35 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 <!-- NINE TAGLINE CSS BLOCK 21 | Pencarian produk | production-marketplace-v17 -->
 
 
+<style id="nine-compact-marketplace-final">
+/* Kartu listing saja. Kartu pada halaman detail tidak disentuh. */
+.marketplace-card.nine-compact-card{font-family:Arial,Roboto,"Helvetica Neue",sans-serif!important;border-radius:12px!important}
+.marketplace-card.nine-compact-card .product-card-body{padding:9px 10px 10px!important;gap:0!important;font-family:inherit!important}
+.marketplace-card.nine-compact-card .marketplace-product-name{font-family:inherit!important;font-size:12px!important;font-weight:500!important;line-height:1.35!important;height:2.7em!important;min-height:2.7em!important;max-height:2.7em!important;white-space:normal!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:2!important;overflow:hidden!important;margin:0 0 6px!important}
+.marketplace-card.nine-compact-card .nine-compact-price{display:flex!important;align-items:center!important;gap:5px!important;min-width:0!important;flex-wrap:wrap!important;line-height:1.15!important}
+.marketplace-card.nine-compact-card .nine-compact-price strong{font:700 clamp(14px,3.9vw,21px)/1.15 Arial,Roboto,sans-serif!important;color:#ef5546!important;letter-spacing:-.35px!important}
+.marketplace-card.nine-compact-card .nine-compact-discount{font:500 10px/1.2 Arial,Roboto,sans-serif!important;padding:3px 4px!important;border-radius:4px!important;color:#e14e3d!important;background:#fff0eb!important}
+.marketplace-card.nine-compact-card .nine-compact-ticket{color:#e65c4c!important;font-size:13px!important}
+.marketplace-card.nine-compact-card .nine-compact-old{display:flex!important;align-items:center!important;flex-wrap:wrap!important;gap:6px!important;margin:5px 0 0!important;color:#888!important;font:400 10px/1.25 Arial,Roboto,sans-serif!important}
+.marketplace-card.nine-compact-card .nine-compact-old del{color:#888!important}
+.marketplace-card.nine-compact-card .nine-compact-old-empty{height:13px!important}
+.marketplace-card.nine-compact-card .nine-compact-stats{display:flex!important;align-items:center!important;gap:6px!important;min-width:0!important;flex-wrap:wrap!important;margin:8px 0 0!important;font-family:Arial,Roboto,sans-serif!important}
+.marketplace-card.nine-compact-card .nine-compact-stats .product-rating{height:22px!important;min-height:22px!important;padding:0 5px!important;font-size:10px!important;background:transparent!important;border:1px solid #eadc98!important;border-radius:4px!important;color:#333!important}
+.marketplace-card.nine-compact-card .nine-compact-stats .product-sold,.marketplace-card.nine-compact-card .nine-compact-stats .product-views{font:400 10px/1.2 Arial,Roboto,sans-serif!important;color:#666!important;white-space:nowrap!important}
+.marketplace-card.nine-compact-card .nine-compact-warranty{display:inline-flex!important;align-self:flex-start!important;margin:7px 0 0!important;font-size:9px!important;height:22px!important;min-height:22px!important}
+.marketplace-card.nine-compact-card .nine-compact-actions{display:flex!important;align-items:stretch!important;gap:7px!important;margin-top:auto!important;padding-top:9px!important;width:100%!important}
+.marketplace-card.nine-compact-card .nine-compact-actions .nine-share-card{position:static!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 34px!important;width:34px!important;height:35px!important;min-height:35px!important;margin:0!important;padding:0!important;border:1px solid #e3e8df!important;border-radius:8px!important;background:#fff!important;color:#319b60!important;box-shadow:none!important;font-size:13px!important}
+.marketplace-card.nine-compact-card .nine-compact-actions .marketplace-buy-now{display:flex!important;align-items:center!important;justify-content:center!important;flex:1 1 auto!important;width:auto!important;min-width:0!important;height:35px!important;min-height:35px!important;margin:0!important;padding:0 4px!important;border-radius:8px!important;background:#8CC63F!important;color:#fff!important;font:700 12px/1.2 Arial,Roboto,sans-serif!important;white-space:nowrap!important}
+@media(max-width:380px){.marketplace-card.nine-compact-card .nine-compact-stats{gap:4px!important}.marketplace-card.nine-compact-card .nine-compact-stats .product-sold,.marketplace-card.nine-compact-card .nine-compact-stats .product-views{font-size:9px!important}.marketplace-card.nine-compact-card .nine-compact-price strong{font-size:14px!important}}
+.marketplace-card.nine-compact-card .product-card-body{display:flex!important;flex-direction:column!important;justify-content:flex-start!important}
+.marketplace-card.nine-compact-card .nine-compact-actions{margin-top:0!important}
+.marketplace-card.nine-compact-card .marketplace-product-name{order:0!important}
+.marketplace-card.nine-compact-card .nine-compact-price{order:1!important}
+.marketplace-card.nine-compact-card .nine-compact-old{order:2!important}
+.marketplace-card.nine-compact-card .nine-compact-stats{order:3!important}
+.marketplace-card.nine-compact-card .nine-compact-warranty{order:4!important}
+.marketplace-card.nine-compact-card .nine-compact-actions{order:5!important}
+</style>
 <!-- SOURCE SECTION | SCRIPT | Existing versioned module | production-marketplace-v17-js | original line 34075 -->
 <!-- NINE TAGLINE JS 43 | Katalog / detail produk | (function(){ 'use strict'; const escText=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'& -->
 <script id="production-marketplace-v17-js">
@@ -35271,7 +35300,7 @@ function warrantyLabel(p){
   if(!raw)return '';
   return /^garansi\b/i.test(raw)?raw:`Garansi ${raw}`;
 }
-function cardHTML(p){
+function legacyMarketplaceCardHTML(p){
   const price=Number(p?.harga?.promo??p?.harga?.normal??0);
   const normal=Number(p?.harga?.normal??0);
   const discounted=normal>price&&price>0;
@@ -35299,6 +35328,31 @@ function cardHTML(p){
     </div>
   </article>`;
 }
+function cardHTML(p, preserveDetail=false){
+  if(preserveDetail)return legacyMarketplaceCardHTML(p);
+  const price=Number(p?.harga?.promo??p?.harga?.normal??0);
+  const normal=Number(p?.harga?.normal??0);
+  const discounted=normal>price&&price>0;
+  const discount=discounted?Math.round((1-price/normal)*100):0;
+  const id=escAttr(p?.id);
+  const name=escText(p?.nama||'Produk');
+  const nameA=escAttr(p?.nama||'Produk');
+  const img=escAttr(p?.gambar||'images/no-image.png');
+  const warranty=warrantyLabel(p);
+  const money=v=>Number(v).toLocaleString('id-ID',{style:'currency',currency:'IDR',minimumFractionDigits:0});
+  return `<article class="product-card marketplace-card v15-card nine-compact-card" data-product-id="${id}" data-product-name="${nameA}" onclick="openProductWithTransition(this,this.dataset.productName)">
+    <span class="product-badge-placeholder" data-badge-product="${id}"></span>
+    <div class="marketplace-image-wrap"><img src="${img}" alt="${nameA}" loading="lazy" decoding="async" onerror="this.src='images/no-image.png'"></div>
+    <div class="product-card-body">
+      <h3 class="marketplace-product-name" title="${nameA}">${name}</h3>
+      <div class="nine-compact-price"><strong>${money(price)}</strong>${discounted?`<span class="nine-compact-discount">-${discount}%</span>`:''}<span class="nine-compact-ticket" title="Voucher tersedia"><i class="fa-solid fa-ticket" aria-hidden="true"></i></span></div>
+      ${discounted?`<div class="nine-compact-old"><del>${money(normal)}</del><span>Harga sebelum diskon</span></div>`:'<div class="nine-compact-old nine-compact-old-empty"></div>'}
+      <div class="nine-compact-stats"><span class="product-rating" data-rating-product="${id}">⭐ -</span><span class="product-sold" data-sold-product="${id}">0 terjual</span><span class="product-views" data-view-product="${id}"><span>0 dilihat</span></span></div>
+      ${warranty?`<span class="v15-warranty nine-compact-warranty"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i>${escText(warranty)}</span>`:''}
+      <div class="nine-compact-actions"><button type="button" class="nine-share-btn nine-share-card" data-share-product="${id}" aria-label="Bagikan ${nameA}" title="Bagikan produk"><i class="fa-solid fa-share-nodes" aria-hidden="true"></i></button><button type="button" class="marketplace-buy-now" aria-label="Beli ${nameA} sekarang" onclick="buyNowFromCard(event,'${id}')"><span>Beli Sekarang</span></button></div>
+    </div>
+  </article>`;
+}
 function hydrate(root){
   requestAnimationFrame(()=>{
     try{window.updateAllProductBadges?.()}catch(_e){}
@@ -35311,7 +35365,7 @@ function renderSurface(container,items,emptyText='Produk tidak ditemukan'){
   markGrid(container);
   const list=Array.isArray(items)?items:[];
   if(!list.length){container.innerHTML=`<div class="empty-state"><h3>${escText(emptyText)}</h3><p>Coba kata kunci lain.</p></div>`;return;}
-  container.innerHTML=list.map(cardHTML).join('');
+  container.innerHTML=list.map(p=>cardHTML(p,container.id==='relatedProducts'||container.id==='recentProducts')).join('');
   hydrate(container);
 }
 
