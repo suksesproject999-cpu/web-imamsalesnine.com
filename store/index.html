@@ -42,7 +42,7 @@
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default}
 img{-webkit-user-drag:none;user-drag:none}
-</style>
+#storeContent img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}\n</style>
 
 <style>
 /* STORE V2 — layout padat, tanpa menambah komponen card tandingan */
@@ -252,16 +252,24 @@ document.addEventListener('click',e=>{
  const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
  const cat=e.target.closest('[data-category]');if(cat){query=cat.dataset.category.toLowerCase();$('search').value=cat.dataset.category;render();changeTab('produk')}
 });
-// Satu-satunya swipe engine: drag mengikuti jari, flick ringan, tanpa efek tap.
+// Swipe engine tunggal: area konten termasuk tombol kategori dan kartu produk.
 (function(){
  const root=$('storeContent');
  const order=['toko','produk','kategori'];
- const excluded='input,textarea,select,button,a,[contenteditable],.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]';
+ const excluded='input,textarea,select,[contenteditable],.store-vouchers,[data-horizontal-scroll]';
  const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- let g=null,animating=false,suppressClickUntil=0;
  const panel=t=>$('panel-'+t);
- const ease='cubic-bezier(.22,.78,.2,1)';
- function cleanup(){
+ let gesture=null,animating=false,blockClickUntil=0,finishTimer=null;
+ const ease='cubic-bezier(.2,.75,.2,1)';
+ function reserveHeight(from,to){
+  // Pertahankan posisi viewport saat panel tujuan lebih pendek.
+  const top=root.getBoundingClientRect().top+window.scrollY;
+  const needed=Math.max(0,window.scrollY+innerHeight-top+12);
+  const height=Math.max(from.scrollHeight,to.scrollHeight,needed);
+  root.style.minHeight=height+'px';
+  return height;
+ }
+ function clearMotion(){
   root.classList.remove('swiping');
   root.style.height='';
   for(const p of root.querySelectorAll('.panel')){
@@ -269,83 +277,96 @@ document.addEventListener('click',e=>{
    p.style.transform='';p.style.transition='';p.style.pointerEvents='';
   }
  }
- function begin(g){
+ function startMotion(g){
   const from=panel(order[g.index]),to=panel(order[g.next]);
   if(!from||!to)return false;
-  g.from=from;g.to=to;g.width=root.clientWidth||window.innerWidth;
-  g.height=Math.max(from.offsetHeight,to.scrollHeight);
-  root.style.height=g.height+'px';
+  g.from=from;g.to=to;g.width=root.clientWidth||innerWidth;
+  root.style.height=reserveHeight(from,to)+'px';
   root.classList.add('swiping');
   from.classList.add('swipe-visible','swipe-current');
   to.classList.add('swipe-visible');
   from.style.pointerEvents='none';to.style.pointerEvents='none';
   return true;
  }
- function move(dx){
-  if(!g?.from)return;
-  const width=g.width;
-  const x=Math.max(-width,Math.min(width,dx));
-  g.from.style.transform='translate3d('+x+'px,0,0)';
-  g.to.style.transform='translate3d('+(x+(g.next>g.index?width:-width))+'px,0,0)';
+ function translate(g,dx){
+  const x=Math.max(-g.width,Math.min(g.width,dx));
+  g.from.style.transform=`translate3d(${x}px,0,0)`;
+  g.to.style.transform=`translate3d(${x+(g.next>g.index?g.width:-g.width)}px,0,0)`;
  }
  function finish(commit){
-  if(!g?.from){g=null;return}
-  const state=g;g=null;animating=true;
-  const duration=reduced?0:commit?225:175;
-  const x=commit?(state.next>state.index?-state.width:state.width):0;
-  const target=x+(state.next>state.index?state.width:-state.width);
-  state.from.style.transition='transform '+duration+'ms '+ease;
-  state.to.style.transition='transform '+duration+'ms '+ease;
+  if(!gesture?.from){gesture=null;return}
+  const g=gesture;gesture=null;animating=true;
+  const duration=reduced?0:commit?210:165;
+  const x=commit?(g.next>g.index?-g.width:g.width):0;
+  const target=x+(g.next>g.index?g.width:-g.width);
+  g.from.style.transition=`transform ${duration}ms ${ease}`;
+  g.to.style.transition=`transform ${duration}ms ${ease}`;
   requestAnimationFrame(()=>{
-   state.from.style.transform='translate3d('+x+'px,0,0)';
-   state.to.style.transform='translate3d('+target+'px,0,0)';
+   g.from.style.transform=`translate3d(${x}px,0,0)`;
+   g.to.style.transform=`translate3d(${target}px,0,0)`;
   });
-  setTimeout(()=>{
-   // Indikator hijau baru berubah setelah konten sampai di tujuan.
-   if(commit)changeTab(order[state.next]);
-   cleanup();animating=false;
-  },duration+25);
+  clearTimeout(finishTimer);
+  finishTimer=setTimeout(()=>{
+   // Garis tab berpindah hanya setelah animasi selesai.
+   if(commit)changeTab(order[g.next]);
+   // Jangan biarkan tinggi panel menyusut dan melempar scroll ke atas.
+   reserveHeight(panel(order[tab]),panel(order[tab]));
+   clearMotion();
+   animating=false;
+  },duration+30);
  }
  root.addEventListener('touchstart',e=>{
-  if(animating||e.touches.length!==1||e.target.closest(excluded)){g=null;return}
-  const t=e.touches[0];
-  g={x:t.clientX,y:t.clientY,lastX:t.clientX,lastTime:performance.now(),start:performance.now(),axis:null,index:order.indexOf(tab),next:-1,dx:0,velocity:0};
+  if(animating||e.touches.length!==1||e.target.closest(excluded)){gesture=null;return}
+  const t=e.touches[0],now=performance.now();
+  gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastTime:now,start:now,axis:null,index:order.indexOf(tab),next:-1,velocity:0};
  },{passive:true});
  root.addEventListener('touchmove',e=>{
+  const g=gesture;
   if(!g||e.touches.length!==1)return;
   const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
   if(!g.axis){
-   if(Math.hypot(dx,dy)<7)return;
-   g.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
-   if(g.axis==='y'){g=null;return}
+   if(Math.hypot(dx,dy)<6)return;
+   g.axis=Math.abs(dx)>Math.abs(dy)*1.1?'x':'y';
+   if(g.axis==='y'){gesture=null;return}
    g.next=g.index+(dx<0?1:-1);
-   if(g.next<0||g.next>=order.length){g=null;return}
-   if(!begin(g)){g=null;return}
+   if(g.next<0||g.next>=order.length){gesture=null;return}
+   if(!startMotion(g)){gesture=null;return}
   }
   if(g.axis!=='x')return;
   if(e.cancelable)e.preventDefault();
   const now=performance.now(),dt=now-g.lastTime;
-  if(dt>0&&dt<100)g.velocity=(t.clientX-g.lastX)/dt;
-  g.lastX=t.clientX;g.lastTime=now;g.dx=dx;
-  move(dx);
+  if(dt>0&&dt<90)g.velocity=(t.clientX-g.lastX)/dt;
+  g.lastX=t.clientX;g.lastTime=now;
+  translate(g,dx);
  },{passive:false});
  root.addEventListener('touchend',e=>{
-  if(!g)return;
-  if(g.axis!=='x'){g=null;return}
+  const g=gesture;if(!g)return;
+  if(g.axis!=='x'){gesture=null;return}
   const t=e.changedTouches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
-  const elapsed=Math.max(1,performance.now()-g.start);
-  const toward=(g.next>g.index?-1:1);
-  const distance=dx*toward;
-  const speed=Math.max(g.velocity*toward,distance/elapsed);
-  const commit=Math.abs(dx)>Math.abs(dy)*1.12&&(distance>g.width*.24||(distance>12&&speed>.22));
-  suppressClickUntil=performance.now()+400;
+  const direction=g.next>g.index?-1:1;
+  const distance=dx*direction;
+  const speed=Math.max(g.velocity*direction,distance/Math.max(1,performance.now()-g.start));
+  const commit=Math.abs(dx)>Math.abs(dy)*1.1&&(distance>g.width*.23||(distance>12&&speed>.22));
+  blockClickUntil=performance.now()+450;
   finish(commit);
  },{passive:true});
- root.addEventListener('touchcancel',()=>{if(g?.from)finish(false);else g=null},{passive:true});
+ root.addEventListener('touchcancel',()=>{if(gesture?.from)finish(false);else gesture=null},{passive:true});
  root.addEventListener('click',e=>{
-  if(performance.now()<suppressClickUntil){e.preventDefault();e.stopImmediatePropagation()}
+  if(performance.now()<blockClickUntil){e.preventDefault();e.stopImmediatePropagation()}
  },true);
+ // Kembali ke tinggi alami ketika pengguna sudah scroll dekat atas.
+ window.addEventListener('scroll',()=>{
+  if(animating||gesture||!root.style.minHeight)return;
+  const top=root.getBoundingClientRect().top+window.scrollY;
+  if(window.scrollY<top+40)root.style.minHeight='';
+ },{passive:true});
 })();
+document.addEventListener('contextmenu',e=>{
+ if(e.target.closest('#storeContent img'))e.preventDefault();
+},true);
+document.addEventListener('selectstart',e=>{
+ if(e.target.closest('#storeContent img'))e.preventDefault();
+},true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
 document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
 $('search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
