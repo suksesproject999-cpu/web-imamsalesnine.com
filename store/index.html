@@ -244,24 +244,49 @@ document.addEventListener('click',e=>{
  const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
  const cat=e.target.closest('[data-category]');if(cat){query=cat.dataset.category.toLowerCase();$('search').value=cat.dataset.category;render();changeTab('produk')}
 });
-// Swipe antartab hanya pada konten, bukan carousel horizontal, input, atau kontrol.
+// Swipe antartab: flick pendek, axis lock, animasi ringan; tidak mengubah fitur lain.
 (function(){
  const root=$('storeContent');
  const order=['toko','produk','kategori'];
- let start=null;
+ let gesture=null,locked=false;
+ const ignored='input,textarea,select,button,a,.store-vouchers,.chips,.sortbar,[data-horizontal-scroll],[contenteditable="true"]';
  root.addEventListener('touchstart',e=>{
-  if(e.touches.length!==1||e.target.closest('input,textarea,button,a,.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]')){start=null;return}
-  const t=e.touches[0];start={x:t.clientX,y:t.clientY,time:Date.now()};
+  if(e.touches.length!==1||e.target.closest(ignored)){gesture=null;return}
+  const t=e.touches[0];
+  gesture={x:t.clientX,y:t.clientY,time:performance.now(),axis:null};
+  locked=false;
+ },{passive:true});
+ root.addEventListener('touchmove',e=>{
+  if(!gesture||e.touches.length!==1)return;
+  const t=e.touches[0],dx=t.clientX-gesture.x,dy=t.clientY-gesture.y;
+  if(!gesture.axis&&Math.max(Math.abs(dx),Math.abs(dy))>9){
+   gesture.axis=Math.abs(dx)>Math.abs(dy)*1.12?'x':'y';
+  }
  },{passive:true});
  root.addEventListener('touchend',e=>{
-  if(!start||e.changedTouches.length!==1)return;
-  const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;
-  const elapsed=Date.now()-start.time;start=null;
-  if(Math.abs(dx)<75||Math.abs(dx)<Math.abs(dy)*1.6||elapsed>1000)return;
+  if(!gesture||e.changedTouches.length!==1||locked)return;
+  const g=gesture;gesture=null;
+  if(g.axis==='y')return;
+  const t=e.changedTouches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+  const elapsed=Math.max(1,performance.now()-g.time);
+  const horizontal=Math.abs(dx)>Math.abs(dy)*1.12;
+  const flick=Math.abs(dx)>=22&&elapsed<=320&&Math.abs(dx)/elapsed>=0.16;
+  const drag=Math.abs(dx)>=42&&elapsed<=1100;
+  if(!horizontal||(!flick&&!drag))return;
   const index=order.indexOf(tab),next=index+(dx<0?1:-1);
-  if(next>=0&&next<order.length)changeTab(order[next]);
+  if(next<0||next>=order.length)return;
+  locked=true;
+  changeTab(order[next]);
+  const panel=$('panel-'+order[next]);
+  if(panel&&typeof panel.animate==='function'){
+   panel.animate([
+    {opacity:0.65,transform:'translateX('+(dx<0?'14px':'-14px')+')'},
+    {opacity:1,transform:'translateX(0)'}
+   ],{duration:190,easing:'cubic-bezier(.2,.8,.2,1)'});
+  }
+  setTimeout(()=>{locked=false},220);
  },{passive:true});
- root.addEventListener('touchcancel',()=>{start=null},{passive:true});
+ root.addEventListener('touchcancel',()=>{gesture=null;locked=false},{passive:true});
 })();
 document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
 document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
