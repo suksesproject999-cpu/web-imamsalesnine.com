@@ -34,11 +34,46 @@
 .product-meta .meta-number{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .product-meta .meta-sep{color:#ddd}
 </style>
+
+<style>
+/* STORE V2 — layout padat, tanpa menambah komponen card tandingan */
+.hero{min-height:0;padding:17px 15px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:7px}
+.hero:before{font-size:clamp(45px,10vw,95px);right:0}
+.identity{grid-column:1;grid-row:1/3;margin:0;gap:9px;min-width:0;align-items:center}
+.avatar{width:49px;height:49px;border-radius:50%;font-size:23px}
+.identity h1{font-size:clamp(14px,3.8vw,19px);line-height:1.2;overflow-wrap:anywhere;margin-bottom:4px}
+.identity p{font-size:10px;line-height:1.3;margin:0}
+.store-actions{grid-column:2;grid-row:1/3;margin:0;display:flex;flex-direction:column;gap:6px;align-self:center}
+.store-actions a,.store-actions button{font-size:11px;padding:7px 9px;border-radius:5px;text-align:center;white-space:nowrap}
+.store-actions button[aria-pressed=true]{background:#8cc63f;color:#182411}
+.store-stats{grid-column:1/-1;grid-row:3;display:flex;gap:12px;align-items:center;margin:5px 0 0;min-width:0}
+.store-stat{border:0;padding:0;text-align:left;display:flex;gap:4px;align-items:baseline}
+.store-stat strong{font-size:12px;color:#e4f6c9}
+.store-stat small{font-size:10px;color:#d7dfd3}
+.tabs{top:60px}.tab{padding:12px 6px}
+.content{padding:8px 5px 35px}.section{padding:8px 5px;border-radius:7px;margin-bottom:8px}
+.section-head{margin:6px 6px 10px}.grid{gap:5px}
+.product-card{border-radius:5px}.product-card-body{padding:6px 7px 9px;gap:5px}
+.marketplace-product-name{font-size:12px;line-height:1.25;min-height:30px}
+.marketplace-price{font-size:15px}.product-labels{gap:3px}
+.product-feature{font-size:10px}.product-meta{font-size:clamp(8px,1.95vw,10px);gap:3px}
+.marketplace-discount-badge{padding:4px 6px}
+#voucherSection{border-radius:0;padding:8px 0;background:transparent}
+#voucherSection .section-head{margin:0 12px 7px}
+.store-vouchers{padding:2px 12px 9px;gap:9px;overscroll-behavior-x:contain;scrollbar-width:none}
+.store-vouchers::-webkit-scrollbar{display:none}
+.store-voucher{min-width:245px;max-width:260px;min-height:102px;display:flex;align-items:center;gap:9px;background:white;border:1px solid #e4e4e4;border-left:4px solid #8cc63f;border-radius:4px;box-shadow:0 2px 4px #0000000a;padding:10px}
+.store-voucher .voucher-icon{font-size:21px;color:#74ad3b}
+.store-voucher b{font-size:13px;color:#292929}
+.store-voucher small{font-size:10px}
+@media(max-width:360px){.store-stats{gap:8px}.store-stat strong{font-size:11px}.store-stat small{font-size:9px}.avatar{width:43px;height:43px}}
+@media(min-width:750px){.hero{padding:23px}.store-actions{flex-direction:row}.content{padding:16px}.section{padding:12px}}
+</style>
 </head>
 <body>
 <header class="top"><div class="shell top-inner"><a class="back" href="/" aria-label="Kembali ke beranda"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input id="search" placeholder="Cari di Store Imam Sales" autocomplete="off"></label><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a class="top-btn" href="/" aria-label="Beranda"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
-<section class="hero"><div class="hero-kicker">IMAM SALES • OFFICIAL STOREFRONT</div><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p>Produk otomotif pilihan Imam Sales</p><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div></div><div class="store-actions"><a id="storeChat" href="/" title="Chat melalui website utama"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div><div class="hero-actions"><a href="#storeContent">Jelajahi Produk</a><a href="/" aria-label="Website utama">Website Utama</a></div></section>
+<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
 <nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
 <main class="content" id="storeContent">
 <section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
@@ -47,6 +82,7 @@
 </main><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
 <script>
 'use strict';
 const config={apiKey:"AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",authDomain:"apin-web.firebaseapp.com",projectId:"apin-web",storageBucket:"apin-web.firebasestorage.app",messagingSenderId:"733140414417",appId:"1:733140414417:web:b6967fd053ac462b2ffaf0"};
@@ -76,7 +112,7 @@ const active=p=>p&&p.active!==false&&p.deleted!==true;
 const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.varian:[]});
 function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
 const stats=new Map();
-function fmt(n){return Number.isFinite(Number(n))&&Number(n)>=0?Number(n).toLocaleString('id-ID'):'—'}
+function fmt(n){const x=Number(n);if(!Number.isFinite(x)||x<0)return '—';return x>=1000000?(x/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'jt':x>=10000?(x/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'rb':x.toLocaleString('id-ID')}
 function feature(p){
  const obj=p.specifications||p.spesifikasi||p.fitur||p.features;
  let parts=[];
@@ -88,6 +124,7 @@ function feature(p){
  let hash=0;for(const c of String(p.id))hash=(hash*31+c.charCodeAt(0))>>>0;
  return parts[(bucket+hash)%parts.length];
 }
+const STORE_VOUCHER_SNAPSHOT=[{"id":"BELANJA50","name":"Voucher Belanja","description":"Potongan Belanja Rp5.000","type":"product_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-tags","badge":"HOT","limit":"1 Voucher / Akun"},{"id":"DISKON10","name":"Diskon Produk 10%","description":"Diskon produk 10%","type":"product_percent","discount":10,"min":100000,"maxDiscount":500,"expired":"2026-12-31","icon":"fa-percent","badge":"PROMO","limit":"1 Voucher / Akun"},{"id":"ONGKIR5","name":"Diskon Ongkir","description":"Potongan Ongkir Rp5.000","type":"shipping_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-truck","badge":"HEMAT","limit":"1 Voucher / Akun"}];
 let activeVouchers=[];
 function validVoucher(v){
  if(!v||!v.id||!v.name)return false;
@@ -96,9 +133,15 @@ function validVoucher(v){
 }
 async function loadStoreVouchers(){
  try{
-  const response=await fetch('/store/vouchers.json',{cache:'no-store'});
-  if(!response.ok)throw Error('Daftar voucher tidak tersedia');
-  const data=await response.json();
+  let data;
+  try {
+    const response=await fetch('/store/vouchers.json',{cache:'no-store'});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    data=await response.json();
+  } catch(e) {
+    console.warn('Voucher JSON tidak tersedia, memakai salinan voucher dari paket:',e);
+    data=STORE_VOUCHER_SNAPSHOT;
+  }
   activeVouchers=Array.isArray(data)?data.filter(validVoucher):[];
   const section=$('voucherSection'),rail=$('storeVouchers');
   section.classList.toggle('hidden',!activeVouchers.length);
@@ -155,6 +198,12 @@ $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search')
   const seed=(await r.json()).map(normalize);products=seed.filter(active);render();
   if(!window.firebase)return;
   if(!firebase.apps.length)firebase.initializeApp(config);
+  // Samakan Firebase App Check reCAPTCHA Enterprise dengan website utama.
+  try {
+    if(firebase.appCheck && firebase.appCheck.ReCaptchaEnterpriseProvider){
+      firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M'),true);
+    }
+  } catch(e){console.warn('App Check Store belum aktif:',e)}
   const db=firebase.firestore();
   // Statistik sama dengan website utama: statistik_produk.
   db.collection('statistik_produk').onSnapshot(snap=>{
@@ -171,7 +220,11 @@ $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search')
   const likeRef=db.collection('interaksi_web').doc('landing');
   const userLikeRef=db.collection('user_like').doc(visitorId);
   likeRef.onSnapshot(doc=>{const x=doc.data()||{};$('storeFollowers').textContent=Number.isFinite(Number(x.like))?Number(x.like).toLocaleString('id-ID'):'—'},()=>{});
-  userLikeRef.onSnapshot(doc=>{$('storeFollow').setAttribute('aria-pressed',doc.exists&&doc.data().liked===true?'true':'false')},()=>{});
+  userLikeRef.onSnapshot(doc=>{
+    const liked=doc.exists&&doc.data().liked===true;
+    const btn=$('storeFollow');btn.setAttribute('aria-pressed',String(liked));
+    btn.innerHTML=liked?'<i class="fa-solid fa-heart"></i> Mengikuti':'<i class="fa-regular fa-heart"></i> Ikuti';
+   },e=>console.warn('Status Ikuti:',e));
   $('storeFollow').onclick=async()=>{
    const button=$('storeFollow');button.disabled=true;
    try{await db.runTransaction(async tx=>{

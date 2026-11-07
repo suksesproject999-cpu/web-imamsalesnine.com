@@ -18473,6 +18473,17 @@ body:has(.nine-detail-shell) #product-grid-auto{position:fixed!important;inset:0
 @media(max-width:360px){.nine-detail-shell .nine-detail-topbar{grid-template-columns:30px minmax(0,1fr) 42px 38px!important;gap:4px!important;padding:0 6px!important}}
 </style>
 <script>
+if(new URLSearchParams(location.search).get('product') && new URLSearchParams(location.search).get('from')==='store'){
+  document.documentElement.classList.add('nine-store-detail-pending');
+  window.addEventListener('DOMContentLoaded',()=>{
+    setTimeout(()=>{
+      if(document.documentElement.classList.contains('nine-store-detail-pending')){
+        const m=document.getElementById('nineStoreCurtainMessage');
+        if(m)m.textContent='Detail masih diproses. Periksa koneksi atau kembali ke Store.';
+      }
+    },15000);
+  },{once:true});
+}
 if(new URLSearchParams(location.search).get('product') && new URLSearchParams(location.search).get('from')!=='store'){
   document.documentElement.classList.add('nine-initial-product-loading');
   // Pengaman: overlay tidak boleh mengunci halaman jika jaringan gagal.
@@ -18521,8 +18532,22 @@ html.nine-initial-product-loading #nineShareLoading{
   .nine-share-loading-photo,.nine-share-loading-lines i,.nine-share-loading-track::before{animation:none}
 }
 </style>
+
+<style>
+/* Transisi Store → detail: beranda tidak pernah ditampilkan sebagai perantara */
+html.nine-store-detail-pending body{overflow:hidden!important}
+html.nine-store-detail-pending #nineStoreDetailCurtain{display:flex!important}
+#nineStoreDetailCurtain{display:none;position:fixed;inset:0;z-index:2147483645;background:#fff;color:#1e291b;align-items:center;justify-content:center;font:600 14px/1.5 system-ui,Arial,sans-serif;padding:24px}
+.nine-store-curtain-box{width:min(100%,420px);display:grid;gap:16px}
+.nine-store-curtain-head{display:flex;align-items:center;gap:9px;color:#416d1f}
+.nine-store-curtain-icon{width:34px;height:34px;border-radius:9px;background:#ecf7e2;display:grid;place-items:center;font-size:20px}
+.nine-store-curtain-photo{width:100%;aspect-ratio:1.4;border-radius:12px;background:linear-gradient(95deg,#f0f2ef 20%,#e1e8dc 45%,#f0f2ef 70%);background-size:200% 100%;animation:nineStoreShimmer 1.4s linear infinite}
+.nine-store-curtain-line{height:15px;width:85%;background:#eef0eb;border-radius:7px}
+.nine-store-curtain-line.short{width:52%}
+@keyframes nineStoreShimmer{to{background-position-x:-200%}}
+</style>
 </head>
-<body>
+<body><div id="nineStoreDetailCurtain" role="status" aria-live="polite"><div class="nine-store-curtain-box"><div class="nine-store-curtain-head"><span class="nine-store-curtain-icon">▣</span><span>IMAMSALESNINE.COM · Detail Produk</span></div><div class="nine-store-curtain-photo"></div><div class="nine-store-curtain-line"></div><div class="nine-store-curtain-line short"></div><small id="nineStoreCurtainMessage" style="color:#77816f;font-weight:400">Menyiapkan detail produk…</small><a href="/store/" style="font-size:12px;color:#699b33">Kembali ke Store</a></div></div>
 <div id="nineShareLoading" role="status" aria-live="polite" aria-label="Menyiapkan detail produk">
   <div class="nine-share-loading-card">
     <div class="nine-share-loading-brand">
@@ -35495,6 +35520,7 @@ async function nineOpenDeepLink(){
     // Tempatkan detail sekali sebelum membuka tirai; tanpa scroll berulang.
     requestAnimationFrame(()=>requestAnimationFrame(()=>{
       nineDeepLinkScroll();
+      document.documentElement.classList.remove('nine-store-detail-pending');
       document.documentElement.classList.remove('nine-initial-product-loading');
     }));
   }catch(error){
