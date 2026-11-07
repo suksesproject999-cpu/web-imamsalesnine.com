@@ -201,6 +201,15 @@ body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!impor
 #panel-produk>.section{padding-top:8px;margin-top:0}
 #storeContent>.panel{scroll-padding-top:0}
 </style>
+<style>
+/* Etalase kategori Store, terpisah dari kategori website utama. */
+.store-category-rail{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 3px 12px;touch-action:pan-x}
+.store-category-rail::-webkit-scrollbar{display:none}
+.store-category-rail>.product-card{flex:0 0 clamp(145px,42%,200px);scroll-snap-align:start}
+.store-category-more{flex:0 0 145px;scroll-snap-align:end;border:1px dashed #9bc979;background:#f5faef;color:#608c2e;border-radius:8px;font-weight:750;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px}
+.store-category-more i{font-size:23px}
+.store-category-empty{padding:10px;color:#888;font-size:12px}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -210,7 +219,7 @@ body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!impor
 <nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
 <div class="store-filter-dock" id="storeFilterDock" hidden><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div></div>
 <main class="content" id="storeContent">
-<section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
+<section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Brand</h2><button class="more" data-go="kategori">Kategori Store ›</button></div><div class="chips" id="categoryChips" data-horizontal-scroll></div></div><div id="storeCategoryShelves"></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
 <section class="panel" id="panel-produk"><div class="section"><span id="productCount" class="notice" hidden></span><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
 <section class="panel" id="panel-kategori"><div class="section"><div class="category-list" id="categoryList"></div></div></section>
 </main><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
@@ -224,6 +233,7 @@ const $=id=>document.getElementById(id);
 const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let products=[],sort='populer',query='',tab='toko';
+let storeCategories=[],activeStoreCategory='',activeBrand='';
 $('year').textContent=new Date().getFullYear();
 // HEADER GLOBAL: satu status untuk Toko, Produk, Kategori.
 // scrollTop masing-masing panel dan mesin swipe horizontal tetap native/asli.
@@ -421,16 +431,51 @@ function card(p){
 }
 function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
 function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
+function openStoreFilter(type,value){
+ activeStoreCategory=type==='category'?value:'';
+ activeBrand=type==='brand'?value:'';
+ query='';
+ $('search').value=value;
+ sort='populer';
+ document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));
+ render();
+ changeTab('produk');
+ $('panel-produk').scrollTop=0;
+}
 function render(){
- const filtered=products.filter(p=>[p.nama,p.brand,p.kategori,p.deskripsi].some(v=>String(v||'').toLowerCase().includes(query)));
+ const filtered=products.filter(p=>{
+  if(activeStoreCategory&&!(Array.isArray(p.storeCategories)&&p.storeCategories.includes(activeStoreCategory)))return false;
+  if(activeBrand&&String(p.brand||'').toLowerCase()!==activeBrand.toLowerCase())return false;
+  return !query||[p.nama,p.brand,p.kategori,p.deskripsi].some(v=>String(v||'').toLowerCase().includes(query));
+ });
  const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
  paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
- $('allGrid').innerHTML=filtered.length?rank(filtered,sort).map(card).join(''):'';$('productCount').textContent=filtered.length+' produk';$('storeProductCount').textContent=products.length;$('empty').classList.toggle('hidden',filtered.length!==0);
+ $('allGrid').innerHTML=filtered.length?rank(filtered,sort).map(card).join(''):'';
+ $('productCount').textContent=filtered.length+' produk';
+ $('storeProductCount').textContent=products.length;
+ $('empty').classList.toggle('hidden',filtered.length!==0);
  refreshStoreSold();
- const cats=new Map();products.forEach(p=>{const k=String(p.kategori||'Lainnya').trim();cats.set(k,(cats.get(k)||0)+1)});
- $('categoryList').innerHTML=[...cats].sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<button class="category" data-category="${esc(k)}"><span class="cat-icon"><i class="fa-solid fa-box"></i></span><span class="cat-name">${esc(k)}</span><span class="count">${n}</span><i class="fa-solid fa-chevron-right" style="color:#aaa"></i></button>`).join('');
- $('categoryChips').innerHTML=[...cats].slice(0,12).map(([k,n])=>`<button class="chip" data-category="${esc(k)}">${esc(k)} (${n})</button>`).join('');
+ const enabled=storeCategories.filter(c=>c.active!==false);
+ $('categoryList').innerHTML=enabled.map(c=>{
+  const count=products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id)).length;
+  return `<button class="category" data-store-category="${esc(c.id)}"><span class="cat-icon"><i class="fa-solid fa-tags"></i></span><span class="cat-name">${esc(c.name)}</span><span class="count">${count}</span><i class="fa-solid fa-chevron-right" style="color:#aaa"></i></button>`;
+ }).join('')||'<p class="empty">Kategori Store belum tersedia.</p>';
+ const brands=new Map();
+ products.forEach(p=>{const v=String(p.brand||'').trim();if(v)brands.set(v,(brands.get(v)||0)+1)});
+ $('categoryChips').innerHTML=[...brands].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([k,n])=>`<button class="chip" data-store-brand="${esc(k)}">${esc(k)} (${n})</button>`).join('');
+ const shelves=$('storeCategoryShelves');
+ // Jangan rebuild rail saat scroll/sentuh berlangsung: render dipanggil oleh statistik dan timer.
+ const signature=JSON.stringify(enabled.map(c=>[c.id,c.name,products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id)).map(p=>[p.id,p.nama,p.gambar,p.harga,p.terjual,p.active])]));
+ if(shelves.dataset.signature!==signature){
+  shelves.dataset.signature=signature;
+  shelves.innerHTML=enabled.map(c=>{
+   const items=products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id));
+   if(!items.length)return '';
+   return `<div class="section"><div class="section-head"><h2>${esc(c.name)}</h2><button class="more" data-store-category="${esc(c.id)}">Lihat Semua ›</button></div><div class="store-category-rail" data-horizontal-scroll>${items.map(card).join('')}<button class="store-category-more" data-store-category="${esc(c.id)}"><i class="fa-solid fa-arrow-right"></i><span>Lihat Semua</span></button></div></div>`;
+  }).join('');
+ }
 }
+
 function changeTab(t){
  if(!['toko','produk','kategori'].includes(t)||t===tab)return;
  const previous=$('panel-'+tab),next=$('panel-'+t);
@@ -447,7 +492,10 @@ document.addEventListener('click',e=>{
  const t=e.target.closest('[data-tab]');if(t){changeTab(t.dataset.tab);return}
  const go=e.target.closest('[data-go]');if(go){if(go.dataset.sort){sort=go.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));render()}changeTab(go.dataset.go);return}
  const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
- const cat=e.target.closest('[data-category]');if(cat){query=cat.dataset.category.toLowerCase();$('search').value=cat.dataset.category;render();changeTab('produk')}
+ const storeCat=e.target.closest('[data-store-category]');
+ if(storeCat){openStoreFilter('category',storeCat.dataset.storeCategory);return}
+ const brand=e.target.closest('[data-store-brand]');
+ if(brand){openStoreFilter('brand',brand.dataset.storeBrand);return}
 });
 // SATU swipe engine: panel punya scroll mandiri, tanpa window.scrollTo atau tinggi sementara.
 (function(){
@@ -549,8 +597,8 @@ document.addEventListener('contextmenu',e=>{
 },true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
 document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
-$('search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
-$('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search').focus()};
+$('search').addEventListener('input',e=>{activeStoreCategory='';activeBrand='';query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
+$('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('search').value='';render();$('search').focus()};
 (async()=>{
  try{
   const r=await fetch('/produk.json',{cache:'no-store'});if(!r.ok)throw Error('produk.json gagal dimuat');
@@ -625,6 +673,10 @@ $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search')
     }finally{followBusy=false;button.disabled=false}
   };
 
+  db.collection('store_categories').onSnapshot(snapshot=>{
+   storeCategories=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.name).localeCompare(String(b.name)));
+   render();
+  },error=>console.warn('Kategori Store belum dapat dibaca:',error));
   db.collection('cms_products').onSnapshot(snapshot=>{
    const docs=new Map();snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
    products=merge(seed,docs);render();
