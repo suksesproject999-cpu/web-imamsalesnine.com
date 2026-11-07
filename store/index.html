@@ -271,21 +271,26 @@ $('year').textContent=new Date().getFullYear();
   }
   if(g.axis!=='y')return;
   const panel=panels[tab],delta=-dy;
-  // Header global: ke atas menutup, ke bawah membuka.
-  // Saat header sudah di batas, scroll konten tetap native.
-  const canShift=delta>0?headerOffset<headerMax()-1:headerOffset>0;
-  if(canShift||g.headerGesture){
+  // Header hanya bereaksi ketika panel aktif benar-benar di posisi awal.
+  // Saat daftar masih bergulir, gerakan ke atas/bawah sepenuhnya native.
+  const atTop=panel.scrollTop<=2;
+  const canClose=delta>0&&headerOffset<headerMax()-1&&atTop;
+  const canOpen=delta<0&&headerOffset>0&&atTop;
+  if(g.headerGesture||canClose||canOpen){
    if(e.cancelable)e.preventDefault();
    shift(delta);
    g.headerGesture=true;
   }
+  // Perbarui titik sentuh meski konten yang bergulir, agar tak terjadi loncatan.
   g.x=t.clientX;g.y=t.clientY;
  },{passive:false,capture:true});
  root.addEventListener('touchend',()=>{gesture=null},{passive:true,capture:true});
  root.addEventListener('touchcancel',()=>{gesture=null},{passive:true,capture:true});
  root.addEventListener('wheel',e=>{
   const delta=e.deltaY;
-  if((delta>0&&headerOffset<headerMax()-1)||(delta<0&&headerOffset>0)){
+  const panel=panels[tab];
+  const atTop=panel.scrollTop<=2;
+  if(atTop&&((delta>0&&headerOffset<headerMax()-1)||(delta<0&&headerOffset>0))){
    if(e.cancelable)e.preventDefault();
    shift(delta);
   }
