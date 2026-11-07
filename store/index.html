@@ -38,6 +38,17 @@ const num=x=>Number(x)||0;
 const price=p=>num(p.harga?.promo??p.harga?.normal);
 const normal=p=>num(p.harga?.normal);
 const sold=p=>num(p.terjual);
+// Samakan resolusi foto dengan index utama yang berada di root domain.
+function productImageUrl(value){
+ const raw=String(value||'').trim();
+ if(!raw)return '/images/no-image.png';
+ if(/^(https?:)?\/\//i.test(raw))return raw.startsWith('//')?'https:'+raw:raw;
+ if(/^data:image\/(?:png|jpeg|jpg|webp|gif|avif);base64,/i.test(raw))return raw;
+ if(/^(?:javascript|data|blob|file):/i.test(raw))return '/images/no-image.png';
+ try{return new URL(raw,location.origin+'/').href}
+ catch{return '/images/no-image.png'}
+}
+
 const active=p=>p&&p.active!==false&&p.deleted!==true;
 const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.varian:[]});
 function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
@@ -46,7 +57,7 @@ function card(p){
  // Struktur card mengikuti renderProductList() dari index utama.
  return `<article class="product-card marketplace-card" data-product-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Lihat ${esc(p.nama)}">
  ${disc?`<span class="marketplace-discount-badge">-${disc}%</span>`:''}
- <div class="marketplace-image-wrap"><img src="${esc(p.gambar||'/images/no-image.png')}" alt="${esc(p.nama)}" loading="lazy"></div>
+ <div class="marketplace-image-wrap"><img src="${esc(productImageUrl(p.gambar))}" alt="${esc(p.nama)}" loading="lazy"></div>
  <div class="product-card-body"><small class="product-brand">${esc(p.brand||'')}</small>
  <h3 class="marketplace-product-name">${esc(p.nama)}</h3>
  <div class="product-meta"><span class="product-rating" data-rating-product="${esc(p.id)}">⭐ ${Number.isFinite(num(p.rating))&&num(p.rating)>0?num(p.rating).toFixed(1):'—'}</span><span class="product-sold" data-sold-product="${esc(p.id)}">${sold(p)?sold(p).toLocaleString('id-ID'):'0'} terjual</span></div>
