@@ -261,93 +261,104 @@ document.addEventListener('click',e=>{
  const root=$('storeContent');
  const order=['toko','produk','kategori'];
  const panel=name=>$('panel-'+name);
- const reduceMotion=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
- const ease='cubic-bezier(.22,.8,.2,1)';
- // Area horizontal mandiri tetap memiliki gesture sendiri.
  const excluded='input,textarea,select,[contenteditable="true"],.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]';
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+ const ease=t=>1-Math.pow(1-t,3);
+ const scrollMemory={toko:0,produk:null,kategori:null};
  let gesture=null,transitioning=false,blockClickUntil=0;
- let preservedHeight=0;
- const currentIndex=()=>order.indexOf(tab);
- const transform=(el,x)=>{el.style.transform='translate3d('+x+'px,0,0)'};
- function requiredHeight(){
-  // Pertahankan ruang sampai posisi viewport sekarang, termasuk saat tujuan lebih pendek.
-  const top=root.getBoundingClientRect().top+window.scrollY;
-  return Math.max(0,window.scrollY+window.innerHeight-top+8);
+ const rootTop=()=>root.getBoundingClientRect().top+window.scrollY;
+ const translate=(el,x)=>{el.style.transform=`translate3d(${x}px,0,0)`};
+ function measure(el){
+  const prev={display:el.style.display,position:el.style.position,visibility:el.style.visibility,width:el.style.width};
+  el.style.display='block';el.style.position='absolute';el.style.visibility='hidden';el.style.width='100%';
+  const height=el.scrollHeight;
+  Object.assign(el.style,prev);
+  return height;
  }
- function keepScrollSpace(){
-  const activePanel=panel(tab);
-  const needed=requiredHeight();
-  preservedHeight=Math.max(needed,activePanel?.scrollHeight||0);
-  root.style.minHeight=preservedHeight+'px';
- }
- function resetPanels(){
+ function reset(){
   root.classList.remove('swiping');
-  for(const p of root.querySelectorAll('.panel')){
-   p.classList.remove('swipe-visible','swipe-current');
-   p.style.transition='';
-   p.style.transform='';
-   p.style.pointerEvents='';
+  root.style.height='';root.style.minHeight='';
+  for(const el of root.querySelectorAll('.panel')){
+   el.classList.remove('swipe-visible','swipe-current');
+   el.style.transition='';el.style.transform='';el.style.pointerEvents='';
   }
-  root.style.height='';
-  // min-height tetap dipertahankan untuk mencegah scroll meloncat.
-  keepScrollSpace();
  }
  function prepare(g){
-  const from=panel(order[g.index]),to=panel(order[g.next]);
-  if(!from||!to)return false;
-  const width=root.clientWidth;
-  if(!width)return false;
-  g.from=from;g.to=to;g.width=width;
-  // Ukur panel tujuan sebelum mengubah layout panel aktif.
-  to.style.display='block';
-  to.style.position='absolute';
-  to.style.visibility='hidden';
-  const targetHeight=to.scrollHeight;
-  to.style.display='';to.style.position='';to.style.visibility='';
-  const height=Math.max(from.scrollHeight,targetHeight,requiredHeight(),preservedHeight);
-  root.style.height=height+'px';
-  root.style.minHeight=height+'px';
+  g.from=panel(order[g.index]);g.to=panel(order[g.next]);
+  g.width=root.clientWidth;
+  if(!g.from||!g.to||!g.width)return false;
+  g.fromHeight=g.from.scrollHeight;
+  g.toHeight=measure(g.to);
+  g.top=rootTop();
+  // Tinggi sementara hanya selama transisi, tidak ditinggalkan setelahnya.
+  const viewportNeed=Math.max(0,window.scrollY+innerHeight-g.top+2);
+  root.style.height=Math.max(g.fromHeight,g.toHeight,viewportNeed)+'px';
   root.classList.add('swiping');
-  from.classList.add('swipe-visible','swipe-current');
-  to.classList.add('swipe-visible');
-  from.style.pointerEvents='none';to.style.pointerEvents='none';
-  transform(from,0);
-  transform(to,g.next>g.index?width:-width);
+  g.from.classList.add('swipe-visible','swipe-current');
+  g.to.classList.add('swipe-visible');
+  g.from.style.pointerEvents='none';g.to.style.pointerEvents='none';
+  translate(g.from,0);
+  translate(g.to,g.next>g.index?g.width:-g.width);
   return true;
  }
  function move(g,dx){
-  if(!g.from)return;
   const x=Math.max(-g.width,Math.min(g.width,dx));
-  transform(g.from,x);
-  transform(g.to,x+(g.next>g.index?g.width:-g.width));
+  translate(g.from,x);
+  translate(g.to,x+(g.next>g.index?g.width:-g.width));
  }
  function settle(commit){
   const g=gesture;gesture=null;
   if(!g?.from)return;
   transitioning=true;
-  const duration=reduceMotion?0:(commit?215:160);
-  const offset=commit?(g.next>g.index?-g.width:g.width):0;
-  const destination=offset+(g.next>g.index?g.width:-g.width);
-  g.from.style.transition=`transform ${duration}ms ${ease}`;
-  g.to.style.transition=`transform ${duration}ms ${ease}`;
-  requestAnimationFrame(()=>{
-   transform(g.from,offset);
-   transform(g.to,destination);
-  });
-  window.setTimeout(()=>{
-   // Indikator baru diperbarui ketika transisi konten selesai.
-   if(commit)changeTab(order[g.next]);
-   resetPanels();
+  const destination=order[g.next],source=order[g.index];
+  const startScroll=window.scrollY;
+  scrollMemory[source]=startScroll;
+  const direction=g.next>g.index?1:-1;
+  const fromX=Number.isFinite(g.dx)?Math.max(-g.width,Math.min(g.width,g.dx)):0;
+  const endX=commit?-direction*g.width:0;
+  const scrollTarget=(()=>{
+   if(!commit)return startScroll;
+   const remembered=scrollMemory[destination];
+   const contentEnd=g.top+g.toHeight;
+   // Batas scroll berdasarkan panel tujuan, bukan tinggi panel asal.
+   const footer=document.querySelector('.footer');
+   const footerHeight=footer?.offsetHeight||0;
+   const maxY=Math.max(0,contentEnd+footerHeight-innerHeight);
+   // Tab belum pernah dibuka: tetap di posisi saat ini jika muat;
+   // jika jauh di bawah konten tujuan, tampilkan awal tab tujuan.
+   const desired=remembered==null?(startScroll>maxY?g.top:startScroll):remembered;
+   return Math.max(0,Math.min(maxY,desired));
+  })();
+  const duration=reduced?0:commit?300:190;
+  const began=performance.now();
+  function complete(){
+   if(commit)changeTab(destination);
+   reset();
+   // Sesuaikan ke batas nyata setelah panel tujuan kembali ke layout normal.
+   if(commit){
+    const actualMax=Math.max(0,document.documentElement.scrollHeight-innerHeight);
+    window.scrollTo({top:Math.min(scrollTarget,actualMax),behavior:'instant'});
+   }
    transitioning=false;
-  },duration+35);
+  }
+  function frame(now){
+   const t=duration?Math.min(1,(now-began)/duration):1;
+   const k=ease(t),x=fromX+(endX-fromX)*k;
+   translate(g.from,x);
+   translate(g.to,x+direction*g.width);
+   if(commit&&Math.abs(scrollTarget-startScroll)>.5){
+    window.scrollTo({top:startScroll+(scrollTarget-startScroll)*k,behavior:'instant'});
+   }
+   if(t<1)requestAnimationFrame(frame);
+   else complete();
+  }
+  requestAnimationFrame(frame);
  }
  root.addEventListener('touchstart',e=>{
-  if(transitioning||e.touches.length!==1||e.target.closest(excluded)){
-   gesture=null;return;
-  }
-  const t=e.touches[0];
-  gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastTime:performance.now(),
-   start:performance.now(),axis:null,index:currentIndex(),next:-1,dx:0,velocity:0};
+  if(transitioning||e.touches.length!==1||e.target.closest(excluded)){gesture=null;return}
+  const t=e.touches[0],now=performance.now();
+  gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastTime:now,start:now,
+   axis:null,index:order.indexOf(tab),next:-1,dx:0,velocity:0};
  },{passive:true});
  root.addEventListener('touchmove',e=>{
   const g=gesture;
@@ -356,10 +367,8 @@ document.addEventListener('click',e=>{
   if(!g.axis){
    if(Math.hypot(dx,dy)<7)return;
    if(Math.abs(dx)<=Math.abs(dy)*1.12){gesture=null;return}
-   g.axis='x';
-   g.next=g.index+(dx<0?1:-1);
-   if(g.next<0||g.next>=order.length){gesture=null;return}
-   if(!prepare(g)){gesture=null;return}
+   g.axis='x';g.next=g.index+(dx<0?1:-1);
+   if(g.next<0||g.next>=order.length||!prepare(g)){gesture=null;return}
   }
   if(e.cancelable)e.preventDefault();
   const now=performance.now(),dt=now-g.lastTime;
@@ -368,40 +377,25 @@ document.addEventListener('click',e=>{
   move(g,dx);
  },{passive:false});
  root.addEventListener('touchend',e=>{
-  const g=gesture;
-  if(!g)return;
+  const g=gesture;if(!g)return;
   if(g.axis!=='x'){gesture=null;return}
   const t=e.changedTouches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
-  const toward=g.next>g.index?-1:1;
-  const distance=dx*toward;
+  const direction=g.next>g.index?-1:1;
+  const distance=dx*direction;
   const elapsed=Math.max(1,performance.now()-g.start);
-  const speed=Math.max(g.velocity*toward,distance/elapsed);
-  const commit=Math.abs(dx)>Math.abs(dy)*1.12&&
-    (distance>g.width*.22||(distance>12&&speed>.22));
-  blockClickUntil=performance.now()+450;
-  settle(commit);
+  const speed=Math.max(g.velocity*direction,distance/elapsed);
+  const commit=Math.abs(dx)>Math.abs(dy)*1.12&&(distance>g.width*.22||(distance>12&&speed>.22));
+  g.dx=dx;blockClickUntil=performance.now()+450;settle(commit);
  },{passive:true});
- root.addEventListener('touchcancel',()=>{
-  if(gesture?.from)settle(false);else gesture=null;
- },{passive:true});
- // Jangan sampai swipe di atas tombol kategori/kartu memicu tap setelah jari dilepas.
+ root.addEventListener('touchcancel',()=>{if(gesture?.from)settle(false);else gesture=null},{passive:true});
  root.addEventListener('click',e=>{
-  if(performance.now()<blockClickUntil){
-   e.preventDefault();e.stopImmediatePropagation();
-  }
+  if(performance.now()<blockClickUntil){e.preventDefault();e.stopImmediatePropagation()}
  },true);
- // Setelah scroll kembali ke atas, ruang ekstra boleh diperkecil.
+ // Ingat scroll per tab saat pengguna menggulir normal.
  window.addEventListener('scroll',()=>{
-  if(transitioning||gesture?.from)return;
-  const top=root.getBoundingClientRect().top+window.scrollY;
-  if(window.scrollY<=top+24){
-   const h=panel(tab)?.scrollHeight||0;
-   if(h&&h<preservedHeight){
-    preservedHeight=h;root.style.minHeight=h+'px';
-   }
-  }
+  if(!transitioning&&!gesture?.from)scrollMemory[tab]=window.scrollY;
  },{passive:true});
-})();
+})();;
 // Cegah menu tekan-lama Chrome pada foto produk Store.
 document.addEventListener('contextmenu',e=>{
  if(e.target.closest('.marketplace-image-wrap img,.product-card img')){
