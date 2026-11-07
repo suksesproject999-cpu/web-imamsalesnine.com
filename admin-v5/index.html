@@ -4159,6 +4159,28 @@ body{
     
 
 
+
+<style id="warehouse-admin-style">
+#whAdminLaunch{position:fixed;right:18px;bottom:22px;z-index:1100;background:linear-gradient(135deg,#153d7a,#0b2d61);color:#fff;border:1px solid #ffffff30;border-radius:16px;padding:13px 17px;box-shadow:0 12px 35px #0b2d6140;font-weight:750}
+#whAdminLaunch i{color:#a6e34b;margin-right:7px}
+#whAdminOverlay{position:fixed;inset:0;z-index:12000;background:#081b36a8;display:none;align-items:center;justify-content:center;padding:16px}
+#whAdminOverlay.open{display:flex}
+.wh-modal{background:#f7f9fc;border-radius:20px;width:min(850px,100%);max-height:90dvh;overflow:auto;box-shadow:0 25px 80px #0005;color:#172033}
+.wh-head{background:linear-gradient(120deg,#0b2d61,#153d7a);color:white;padding:22px;display:flex;justify-content:space-between;align-items:start;gap:12px}
+.wh-head h2{margin:0 0 5px;font-size:21px}.wh-head p{margin:0;color:#d9e6fa;font-size:12px}
+.wh-close{background:#ffffff1c;color:white;border:1px solid #ffffff4d;border-radius:10px;padding:8px 12px}
+.wh-body{padding:20px}.wh-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.wh-field{display:flex;flex-direction:column;gap:6px;font-size:12px;font-weight:700}
+.wh-field input,.wh-field select{width:100%;height:42px;padding:9px 12px;border:1px solid #d5deea;border-radius:10px;background:white;color:#172033}
+.wh-wide{grid-column:1/-1}.wh-check{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+.wh-actions{display:flex;flex-wrap:wrap;gap:9px;margin:16px 0}
+.wh-primary{background:#8cc63f;color:#13220b;border:0;border-radius:10px;padding:11px 17px;font-weight:800}
+.wh-secondary{background:white;border:1px solid #d7dfeb;color:#153d7a;border-radius:10px;padding:10px 14px;font-weight:700}
+.wh-item{display:flex;justify-content:space-between;align-items:center;gap:12px;background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:9px 0}
+.wh-item strong{display:block}.wh-item small{color:#64748b}.wh-item button{margin:3px}
+#whAdminStatus{font-size:12px;color:#64748b;min-height:20px}
+@media(max-width:580px){.wh-fields{grid-template-columns:1fr}.wh-body{padding:13px}.wh-head{padding:16px}#whAdminLaunch{bottom:12px;right:12px}}
+</style>
 </head>
 
 <body>
@@ -13375,5 +13397,77 @@ window.smartLoadWhatsAppGroups = async function(){
 })();
 </script>
 
+
+<button id="whAdminLaunch" type="button" hidden><i class="fa-solid fa-warehouse"></i> Kelola Gudang</button>
+<div id="whAdminOverlay" role="dialog" aria-modal="true" aria-labelledby="whAdminTitle">
+ <div class="wh-modal">
+  <div class="wh-head"><div><h2 id="whAdminTitle"><i class="fa-solid fa-truck-fast"></i> Pusat Gudang Pengiriman</h2><p>Kelola asal pengiriman realtime untuk Store Imam Sales</p></div><button class="wh-close" id="whAdminClose" type="button" aria-label="Tutup">✕</button></div>
+  <div class="wh-body">
+   <form id="whAdminForm">
+    <input type="hidden" id="whId">
+    <div class="wh-fields">
+     <label class="wh-field">Nama gudang / distributor<input id="whName" required maxlength="100" placeholder="Contoh: Gudang Jakarta"></label>
+     <label class="wh-field">Kota / kabupaten<input id="whCity" required maxlength="90" placeholder="Contoh: Jakarta Barat"></label>
+     <label class="wh-field">Provinsi<input id="whProvince" required maxlength="90" placeholder="Contoh: DKI Jakarta"></label>
+     <label class="wh-field">Kode pos<input id="whPostal" maxlength="10" inputmode="numeric" placeholder="Opsional"></label>
+     <label class="wh-field wh-wide">Alamat operasional (internal Admin)<input id="whAddress" maxlength="250" placeholder="Opsional, tidak ditampilkan di Store"></label>
+     <label class="wh-field">Urutan tampil<input id="whOrder" type="number" min="0" max="99999" value="0"></label>
+     <div class="wh-field"><label class="wh-check"><input id="whActive" type="checkbox" checked> Gudang aktif</label><label class="wh-check"><input id="whDefault" type="checkbox"> Jadikan default pengunjung baru</label></div>
+    </div>
+    <div class="wh-actions"><button class="wh-primary" id="whSave" type="submit">Simpan Gudang</button><button class="wh-secondary" type="button" id="whReset">Form Baru</button></div>
+   </form>
+   <div id="whAdminStatus" aria-live="polite">Menunggu data...</div>
+   <div id="whAdminList"></div>
+  </div>
+ </div>
+</div>
+
+<script id="warehouse-admin-engine">
+(function(){
+ 'use strict';
+ const by=id=>document.getElementById(id);
+ const launch=by('whAdminLaunch'),overlay=by('whAdminOverlay'),form=by('whAdminForm');
+ const fields={name:'whName',city:'whCity',province:'whProvince',postal:'whPostal',address:'whAddress',order:'whOrder',active:'whActive',isDefault:'whDefault'};
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','"':'&quot;',"'":'&#39;'}[c]));
+ let collection=null,records=[],unsubscribe=null;
+ const status=t=>by('whAdminStatus').textContent=t;
+ function reset(){form.reset();by('whId').value='';by('whActive').checked=true;by('whOrder').value='0';by('whSave').textContent='Simpan Gudang'}
+ function render(){
+  by('whAdminList').innerHTML=records.length?records.map(w=>`<div class="wh-item"><div><strong>${esc(w.city||'')} · ${esc(w.name||'')}</strong><small>${esc(w.province||'')} · ${w.active===false?'Nonaktif':'Aktif'} ${w.isDefault?'· ★ Default':''} · Urutan ${Number(w.order)||0}</small></div><div><button class="wh-secondary" type="button" data-edit="${esc(w.id)}">Edit</button><button class="wh-secondary" type="button" data-toggle="${esc(w.id)}">${w.active===false?'Aktifkan':'Nonaktifkan'}</button></div></div>`).join(''):'<p>Belum ada gudang. Buat gudang DKI Jakarta dan centang Default.</p>';
+ }
+ function init(){
+  if(collection)return;
+  if(typeof db==='undefined'||!db||typeof db.collection!=='function'){status('Firestore Admin belum siap.');return}
+  collection=db.collection('store_warehouses');
+  unsubscribe=collection.onSnapshot(snap=>{records=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.city||'').localeCompare(String(b.city||'')));render();status(records.length+' gudang tersinkron realtime.');},err=>status('Gagal membaca gudang: '+err.message));
+ }
+ launch.addEventListener('click',()=>{if(localStorage.getItem('role')!=='admin'){alert('Hanya Admin yang dapat mengelola gudang.');return}overlay.classList.add('open');init()});
+ by('whAdminClose').onclick=()=>overlay.classList.remove('open');
+ overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
+ by('whReset').onclick=reset;
+ by('whAdminList').addEventListener('click',async e=>{
+  const edit=e.target.closest('[data-edit]'),toggle=e.target.closest('[data-toggle]');
+  if(edit){const w=records.find(x=>x.id===edit.dataset.edit);if(!w)return;by('whId').value=w.id;for(const [key,id] of Object.entries(fields)){const el=by(id);if(el.type==='checkbox')el.checked=!!w[key];else el.value=w[key]??''}by('whSave').textContent='Perbarui Gudang';form.scrollIntoView({block:'nearest',behavior:'smooth'})}
+  if(toggle){const w=records.find(x=>x.id===toggle.dataset.toggle);if(!w)return;try{await collection.doc(w.id).update({active:w.active===false,updatedAt:firebase.firestore.FieldValue.serverTimestamp()})}catch(err){status('Gagal mengubah status: '+err.message)}}
+ });
+ form.addEventListener('submit',async e=>{
+  e.preventDefault();if(!collection)return;
+  const id=by('whId').value, data={};
+  for(const [key,field] of Object.entries(fields)){const el=by(field);data[key]=el.type==='checkbox'?el.checked:el.value.trim()}
+  data.order=Number(data.order)||0;data.updatedAt=firebase.firestore.FieldValue.serverTimestamp();
+  const btn=by('whSave');btn.disabled=true;status('Menyimpan...');
+  try{
+   const batch=db.batch();
+   if(data.isDefault){records.filter(w=>w.isDefault&&w.id!==id).forEach(w=>batch.update(collection.doc(w.id),{isDefault:false}))}
+   const ref=id?collection.doc(id):collection.doc();
+   batch.set(ref,data,{merge:true});
+   await batch.commit();reset();status('Gudang berhasil disimpan dan disinkronkan.');
+  }catch(err){status('Gagal menyimpan: '+err.message)}
+  finally{btn.disabled=false}
+ });
+ function checkRole(){launch.hidden=localStorage.getItem('role')!=='admin'}
+ checkRole();window.addEventListener('storage',checkRole);setInterval(checkRole,3000);
+})();
+</script>
 </body>
 </html>
