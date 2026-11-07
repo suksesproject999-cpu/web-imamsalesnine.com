@@ -18473,7 +18473,7 @@ body:has(.nine-detail-shell) #product-grid-auto{position:fixed!important;inset:0
 @media(max-width:360px){.nine-detail-shell .nine-detail-topbar{grid-template-columns:30px minmax(0,1fr) 42px 38px!important;gap:4px!important;padding:0 6px!important}}
 </style>
 <script>
-if(new URLSearchParams(location.search).get('product')){
+if(new URLSearchParams(location.search).get('product') && new URLSearchParams(location.search).get('from')!=='store'){
   document.documentElement.classList.add('nine-initial-product-loading');
   // Pengaman: overlay tidak boleh mengunci halaman jika jaringan gagal.
   window.addEventListener('DOMContentLoaded',()=>{
@@ -35476,7 +35476,7 @@ async function nineOpenDeepLink(){
   const id = nineDeepLinkId;
   if(!id || nineDeepLinkDone || nineDeepLinkBusy) return;
   // Prioritaskan data CMS final. Seed boleh digunakan jika koneksi CMS lambat.
-  if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < 6000) return;
+  if(!nineCmsInitialReady && Date.now()-nineDeepLinkStartedAt < (new URLSearchParams(location.search).get('from')==='store'?900:6000)) return;
   const product = nineDeepLinkProduct(id);
   if(!product || typeof window.showProduct !== 'function') return;
   nineDeepLinkBusy=true;
