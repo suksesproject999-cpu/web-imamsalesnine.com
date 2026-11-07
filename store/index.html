@@ -14,6 +14,25 @@
 @media(min-width:750px){.content{padding:22px}.grid,.loading{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:38px}.product-card-body{padding:13px}.marketplace-product-name{font-size:14px}.banner{min-height:190px}}
 
 .store-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0 0;position:relative}.store-stat{border:1px solid #ffffff35;border-radius:9px;padding:10px 5px;text-align:center}.store-stat strong{display:block;color:#a9e36b;font-size:18px}.store-stat small{font-size:11px;color:#d6dfd1}.store-actions{display:flex;gap:10px;margin-top:12px;position:relative}.store-actions a,.store-actions button{border:1px solid #ffffff6a;border-radius:8px;background:transparent;color:#fff;padding:10px 18px;font-weight:700}.store-actions button[aria-pressed=true]{color:#a9e36b;border-color:#a9e36b}.product-feature{font-size:11px;color:#6e9e29;font-weight:650;line-height:1.4}.product-meta{align-items:center}.store-vouchers{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 12px}.store-voucher{min-width:220px;scroll-snap-align:start;border:1px dashed #8cc63f;border-radius:10px;padding:12px;background:#f9fff4}.store-voucher b{display:block;font-size:13px}.store-voucher small{color:#666}
+
+/* Store compact marketplace cards + voucher rail */
+#panel-toko #voucherSection{padding:12px 14px;margin-bottom:12px}
+.store-vouchers{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.store-vouchers::-webkit-scrollbar{display:none}
+.store-voucher{flex:0 0 225px;min-width:225px;display:flex;gap:10px;align-items:center;background:#fff9f1;border:1px dashed #ecad65;padding:10px;border-radius:8px}
+.store-voucher .voucher-icon{font-size:23px;color:#e65c3e}
+.store-voucher b{font-size:12px;color:#c94e35}.store-voucher small{display:block;font-size:10px;line-height:1.4}
+.store-voucher a{color:#b14c29;font-size:11px;font-weight:700;text-decoration:underline}
+.product-card-body{gap:6px;padding:8px 9px 10px}
+.marketplace-product-name{font-weight:500;font-size:13px;min-height:35px}
+.marketplace-price-old{display:none}
+.product-feature{display:inline-block;max-width:100%;background:#fff6df;color:#c38b25;padding:3px 5px;border-radius:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-labels{display:flex;gap:4px;align-items:center;overflow:hidden;min-height:20px}
+.product-voucher-label{flex-shrink:0;color:#d95238;border:1px solid #edaa99;padding:2px 3px;font-size:9px;white-space:nowrap}
+.product-meta{display:flex;flex-wrap:nowrap;gap:3px;align-items:center;white-space:nowrap;font-size:clamp(8px,2.1vw,11px);overflow:hidden}
+.product-meta .product-rating{border:1px solid #e3ca5a;padding:2px 3px;color:#666;flex-shrink:0}
+.product-meta .meta-number{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.product-meta .meta-sep{color:#ddd}
 </style>
 </head>
 <body>
@@ -22,7 +41,7 @@
 <section class="hero"><div class="hero-kicker">IMAM SALES • OFFICIAL STOREFRONT</div><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p>Produk otomotif pilihan Imam Sales</p><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div></div><div class="store-actions"><a id="storeChat" href="/" title="Chat melalui website utama"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div><div class="hero-actions"><a href="#storeContent">Jelajahi Produk</a><a href="/" aria-label="Website utama">Website Utama</a></div></section>
 <nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
 <main class="content" id="storeContent">
-<section class="panel active" id="panel-toko"><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
+<section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
 <section class="panel" id="panel-produk"><div class="section"><div class="section-head"><h2>Produk Imam Sales</h2><span id="productCount" class="notice"></span></div><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
 <section class="panel" id="panel-kategori"><div class="section"><div class="section-head"><h2>Kategori Produk</h2></div><div class="category-list" id="categoryList"></div></div></section>
 </main><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
@@ -36,6 +55,8 @@ const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
 const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 let products=[],sort='populer',query='',tab='toko';
 $('year').textContent=new Date().getFullYear();
+loadStoreVouchers();
+setInterval(()=>{render()},300000);
 const num=x=>Number(x)||0;
 const price=p=>num(p.harga?.promo??p.harga?.normal);
 const normal=p=>num(p.harga?.normal);
@@ -59,12 +80,33 @@ function fmt(n){return Number.isFinite(Number(n))&&Number(n)>=0?Number(n).toLoca
 function feature(p){
  const obj=p.specifications||p.spesifikasi||p.fitur||p.features;
  let parts=[];
- if(Array.isArray(obj))parts=obj.filter(x=>typeof x==='string');
- else if(obj&&typeof obj==='object')parts=Object.entries(obj).filter(([k])=>!k.startsWith('_')).map(([k,v])=>`${k}: ${Array.isArray(v)?v.join(', '):String(v??'')}`);
- // Hanya ambil fakta eksplisit, bukan klaim buatan.
- const chosen=parts.find(x=>x&&x.length>3&&x.length<90&&!/^(nama|sku|kode|harga|warna|varian|brand|model|_)/i.test(x));
- return chosen?chosen.replace(/<[^>]+>/g,'').slice(0,70):'';
+ if(Array.isArray(obj))parts=obj.filter(x=>typeof x==='string'&&x.trim());
+ else if(obj&&typeof obj==='object')parts=Object.entries(obj).filter(([k,v])=>!k.startsWith('_')&&v!=null&&String(v).trim()).map(([k,v])=>`${k}: ${Array.isArray(v)?v.join(', '):String(v)}`);
+ parts=parts.map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(x=>x.length>=3&&x.length<=75&&!/^(nama|sku|kode|harga|brand|model|_)/i.test(x));
+ if(!parts.length)return '';
+ const bucket=Math.floor(Date.now()/300000);
+ let hash=0;for(const c of String(p.id))hash=(hash*31+c.charCodeAt(0))>>>0;
+ return parts[(bucket+hash)%parts.length];
 }
+let activeVouchers=[];
+function validVoucher(v){
+ if(!v||!v.id||!v.name)return false;
+ if(v.expired&&new Date(v.expired+'T23:59:59').getTime()<Date.now())return false;
+ return true;
+}
+async function loadStoreVouchers(){
+ try{
+  const response=await fetch('/store/vouchers.json',{cache:'no-store'});
+  if(!response.ok)throw Error('Daftar voucher tidak tersedia');
+  const data=await response.json();
+  activeVouchers=Array.isArray(data)?data.filter(validVoucher):[];
+  const section=$('voucherSection'),rail=$('storeVouchers');
+  section.classList.toggle('hidden',!activeVouchers.length);
+  rail.innerHTML=activeVouchers.map(v=>`<article class="store-voucher"><i class="fa-solid fa-ticket voucher-icon"></i><div><b>${esc(v.name)}</b><small>${esc(v.description||'')} · Min. ${money(v.min||0)}</small><small>Berlaku sampai ${esc(v.expired||'sesuai ketentuan')}</small><small>Gunakan saat checkout jika memenuhi syarat</small></div></article>`).join('');
+  render();
+ }catch(e){console.warn('Voucher Store:',e);$('voucherSection').classList.add('hidden')}
+}
+
 function card(p){
  const h=price(p),n=normal(p),disc=n>h&&h>0?Math.round((1-h/n)*100):0;
  const st=stats.get(String(p.id))||{};
@@ -74,14 +116,15 @@ function card(p){
  const sales=st.terjual??p.terjual;
  const views=st.views??p.views??p.viewCount;
  const benefit=feature(p);
+ const hasVoucher=activeVouchers.some(v=>v.type&&v.type.startsWith("product_"));
  return `<article class="product-card marketplace-card" data-product-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Lihat ${esc(p.nama)}">
  ${disc?`<span class="marketplace-discount-badge">-${disc}%</span>`:''}
  <div class="marketplace-image-wrap"><img src="${esc(productImageUrl(p.gambar||''))}" alt="${esc(p.nama)}" loading="lazy"></div>
- <div class="product-card-body"><small class="product-brand">${esc(p.brand||'')}</small>
+ <div class="product-card-body">
  <h3 class="marketplace-product-name">${esc(p.nama)}</h3>
  <div class="marketplace-price">${money(h)}${disc?`<span class="marketplace-price-old">${money(n)}</span>`:''}</div>
- ${benefit?`<div class="product-feature"><i class="fa-solid fa-bolt"></i> ${esc(benefit)}</div>`:''}
- <div class="product-meta"><span class="product-rating">⭐ ${rating}</span><span>${sales==null?'—':fmt(sales)} terjual</span><span><i class="fa-regular fa-eye"></i> ${views==null?'—':fmt(views)} dilihat</span></div>
+ <div class="product-labels">${hasVoucher?'<span class="product-voucher-label"><i class="fa-solid fa-ticket"></i> Voucher</span>':''}${benefit?`<span class="product-feature">${esc(benefit)}</span>`:''}</div>
+ <div class="product-meta"><span class="product-rating">⭐ ${rating}</span><span class="meta-sep">|</span><span class="meta-number">${sales==null?'—':fmt(sales)} terjual</span><span class="meta-sep">|</span><span class="meta-number"><i class="fa-regular fa-eye"></i> ${views==null?'—':fmt(views)}</span></div>
  </div></article>`;
 }
 function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
