@@ -102,26 +102,104 @@ img{-webkit-user-drag:none;user-drag:none}
 #storeContent .marketplace-image-wrap{-webkit-touch-callout:none}
 </style>
 <style>
-/* Scroll vertikal V4: satu header visual, posisi disimpan oleh tiap panel.
-   Mengganti selector scroll/header lama; mesin swipe horizontal tetap asli. */
+/* CLEAN HEADER ENGINE: satu sumber aturan; tanpa selector V4/finish bertumpuk. */
 html{scroll-behavior:auto}
 body{overflow-x:hidden}
-.hero{--store-hero-offset:0px;transform:translate3d(0,calc(-1 * var(--store-hero-offset)),0);margin-bottom:calc(-1 * var(--store-hero-offset))}
-.tabs{top:var(--store-top-height,60px)}
-.store-compact-tabs{display:none;flex:1;min-width:0;align-items:stretch;justify-content:space-around}
+:root{--store-header-progress:0;--store-top-height:60px}
+.top{background:rgba(255,255,255,var(--store-header-progress));box-shadow:0 2px 10px rgba(0,0,0,calc(.05 * var(--store-header-progress)));transition:none}
+.top-inner{position:relative;min-height:60px}
+.hero{
+ --store-hero-offset:0px;
+ transform:translate3d(0,calc(-1 * var(--store-hero-offset)),0);
+ margin-bottom:calc(-1 * var(--store-hero-offset));
+ margin-top:calc(-1 * var(--store-top-height));
+ padding-top:calc(17px + var(--store-top-height));
+ will-change:transform;
+}
+@media(min-width:750px){.hero{padding-top:calc(23px + var(--store-top-height))}}
+.tabs{top:var(--store-top-height)}
+/* Compact navigation overlays search rather than changing toolbar dimensions. */
+.store-compact-tabs{
+ display:flex;position:absolute;left:46px;right:98px;top:0;bottom:0;
+ align-items:stretch;justify-content:space-around;min-width:0;
+ opacity:0;visibility:hidden;pointer-events:none;
+}
 .store-compact-tab{border:0;border-bottom:2px solid transparent;background:transparent;color:#555;font-weight:650;padding:10px 5px;min-width:0}
 .store-compact-tab.active{color:#6e9e29;border-bottom-color:var(--green)}
-.store-compact-search{display:none;border:0;background:transparent;color:#d32343;font-size:20px;padding:6px}
-body.store-header-condensed .top-inner>.search,
-body.store-header-condensed #clearSearch,
-body.store-header-condensed .top-inner>a[aria-label="Beranda"]{display:none}
-body.store-header-condensed .store-compact-tabs{display:flex}
-body.store-header-condensed .store-compact-search{display:block}
+.store-compact-search{
+ display:block;position:absolute;right:49px;top:50%;transform:translateY(-50%);
+ border:0;background:transparent;color:#d32343;font-size:20px;padding:6px;
+ opacity:0;visibility:hidden;pointer-events:none;
+}
+.top-inner>.search{min-width:0;transition:opacity .1s linear}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search{
+ background:transparent;border:0;box-shadow:none;color:#fff;
+}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search input{color:#fff}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search input::placeholder{color:rgba(255,255,255,.85)}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search i{color:#fff!important}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.back,
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.top-btn{color:#fff}
+body.store-header-condensed:not(.store-search-mode) .top-inner>.search,
+body.store-header-condensed:not(.store-search-mode) #clearSearch,
+body.store-header-condensed:not(.store-search-mode) .top-inner>a[aria-label="Beranda"]{
+ opacity:0;visibility:hidden;pointer-events:none;
+}
+body.store-header-condensed:not(.store-search-mode) .store-compact-tabs,
+body.store-header-condensed:not(.store-search-mode) .store-compact-search{
+ opacity:1;visibility:visible;pointer-events:auto;
+}
 body.store-header-condensed .tabs{visibility:hidden;pointer-events:none}
-body.store-search-mode .top-inner>.search{display:flex!important}
+body.store-search-mode .top-inner>.search{opacity:1!important;visibility:visible!important;pointer-events:auto!important;background:#f4f5f4!important}
 body.store-search-mode .store-compact-tabs,
-body.store-search-mode .store-compact-search{display:none!important}
-body.store-search-mode #clearSearch{display:block!important}
+body.store-search-mode .store-compact-search{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+#panel-produk>.section{display:flex;flex-direction:column;min-height:0;padding-top:8px;margin-top:0}
+#panel-produk .section-head{position:relative;z-index:1;min-height:34px;padding-top:4px}
+
+</style>
+<style>
+/* FILTER DOCK CLEAN: satu baris filter asli, tetap utuh di bawah toolbar. */
+.store-filter-dock{
+ position:sticky;
+ top:var(--store-top-height,60px);
+ z-index:41;
+ width:100%;
+ min-width:0;
+ background:#fff;
+ border-bottom:1px solid #f0f0f0;
+ overflow:visible;
+ isolation:isolate;
+}
+.store-filter-dock[hidden]{display:none!important}
+.store-filter-dock .sortbar{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ width:100%;
+ height:72px;
+ min-height:72px;
+ padding:12px 12px 14px;
+ margin:0;
+ overflow-x:auto;
+ overflow-y:hidden;
+ scrollbar-width:none;
+ overscroll-behavior-x:contain;
+ -webkit-overflow-scrolling:touch;
+ scroll-snap-type:x proximity;
+}
+.store-filter-dock .sortbar::-webkit-scrollbar{display:none}
+.store-filter-dock .sort{
+ position:relative;
+ flex:0 0 auto;
+ min-height:44px;
+ padding:10px 14px;
+ line-height:22px;
+ white-space:nowrap;
+ scroll-snap-align:start;
+}
+#panel-produk>.section{padding-top:8px;margin-top:0}
+#storeContent>.panel{scroll-padding-top:0}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
@@ -130,10 +208,11 @@ body.store-search-mode #clearSearch{display:block!important}
 <div class="shell">
 <section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
 <nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
+<div class="store-filter-dock" id="storeFilterDock" hidden><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div></div>
 <main class="content" id="storeContent">
 <section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
-<section class="panel" id="panel-produk"><div class="section"><div class="section-head"><h2>Produk Imam Sales</h2><span id="productCount" class="notice"></span></div><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
-<section class="panel" id="panel-kategori"><div class="section"><div class="section-head"><h2>Kategori Produk</h2></div><div class="category-list" id="categoryList"></div></div></section>
+<section class="panel" id="panel-produk"><div class="section"><span id="productCount" class="notice" hidden></span><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
+<section class="panel" id="panel-kategori"><div class="section"><div class="category-list" id="categoryList"></div></div></section>
 </main><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -162,6 +241,7 @@ $('year').textContent=new Date().getFullYear();
   raf=0;
   headerOffset=Math.max(0,Math.min(headerMax(),headerOffset));
   hero.style.setProperty('--store-hero-offset',headerOffset+'px');
+  document.documentElement.style.setProperty('--store-header-progress',String(headerMax()?headerOffset/headerMax():0));
   document.body.classList.toggle('store-header-condensed',headerOffset>=headerMax()-1);
   document.body.classList.toggle('store-search-mode',searchMode);
   document.documentElement.style.setProperty('--store-top-height',top.offsetHeight+'px');
@@ -340,7 +420,7 @@ function render(){
  const filtered=products.filter(p=>[p.nama,p.brand,p.kategori,p.deskripsi].some(v=>String(v||'').toLowerCase().includes(query)));
  const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
  paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
- paint('allGrid',rank(filtered,sort));$('productCount').textContent=filtered.length+' produk';$('storeProductCount').textContent=products.length;$('empty').classList.toggle('hidden',filtered.length!==0);
+ $('allGrid').innerHTML=filtered.length?rank(filtered,sort).map(card).join(''):'';$('productCount').textContent=filtered.length+' produk';$('storeProductCount').textContent=products.length;$('empty').classList.toggle('hidden',filtered.length!==0);
  refreshStoreSold();
  const cats=new Map();products.forEach(p=>{const k=String(p.kategori||'Lainnya').trim();cats.set(k,(cats.get(k)||0)+1)});
  $('categoryList').innerHTML=[...cats].sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<button class="category" data-category="${esc(k)}"><span class="cat-icon"><i class="fa-solid fa-box"></i></span><span class="cat-name">${esc(k)}</span><span class="count">${n}</span><i class="fa-solid fa-chevron-right" style="color:#aaa"></i></button>`).join('');
@@ -353,6 +433,7 @@ function changeTab(t){
  previous.classList.remove('active');
  next.classList.add('active');
  tab=t;
+ $('storeFilterDock').hidden=t!=='produk';
  document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
  if(window.storeSyncVerticalHeader)window.storeSyncVerticalHeader();
 }
@@ -405,6 +486,7 @@ document.addEventListener('click',e=>{
     g.from.classList.remove('active');
     g.to.classList.add('active');
     tab=order[g.next];
+    $('storeFilterDock').hidden=tab!=='produk';
     document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
     if(window.storeSyncVerticalHeader)window.storeSyncVerticalHeader();
    }
@@ -573,7 +655,7 @@ $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search')
   setInterval(renderPresence,15000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPresence()});
 
- }catch(e){console.error(e);$('homeGrid').innerHTML='<p class="empty">Produk belum dapat dimuat. Silakan coba lagi.</p>';$('allGrid').innerHTML='<p class="empty">Produk belum dapat dimuat.</p>';$('storeStatus').textContent='Status aktivitas belum tersedia'}
+ }catch(e){console.error(e);$('homeGrid').innerHTML='<p class="empty">Produk belum dapat dimuat. Silakan coba lagi.</p>';$('allGrid').innerHTML='';$('empty').textContent='Produk belum dapat dimuat. Periksa koneksi katalog.';$('empty').classList.remove('hidden');$('storeStatus').textContent='Status aktivitas belum tersedia'}
 })();
 </script>
 </body></html>
