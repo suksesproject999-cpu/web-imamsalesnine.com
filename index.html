@@ -16659,10 +16659,7 @@ body.dark-mode .nine-share-btn{background:#24301d;color:#a9d86c;border-color:#45
   }
 }
 
-body.v15-card-zone #stickyCheckout{
-  opacity:0!important;pointer-events:none!important;transform:translate3d(0,125%,0)!important;
-  transition:transform .22s cubic-bezier(.2,.8,.2,1),opacity .16s ease!important;
-}
+/* Sticky checkout tetap aktif saat grid produk terlihat; zona kartu tidak menyembunyikan CTA. */
 
 
 
@@ -18545,6 +18542,96 @@ html.nine-store-detail-pending #nineStoreDetailCurtain{display:flex!important}
 .nine-store-curtain-line{height:15px;width:85%;background:#eef0eb;border-radius:7px}
 .nine-store-curtain-line.short{width:52%}
 @keyframes nineStoreShimmer{to{background-position-x:-200%}}
+</style>
+<style id="nf-final-purchase-style">
+
+/* NEXAI FINAL: satu struktur sheet, tidak mengubah gesture swipe-close */
+#purchaseSheet .purchase-panel{
+  height:min(610px,66dvh);max-height:66dvh;
+  padding:0;overflow:hidden;display:flex;flex-direction:column;
+  background:#fff;border-radius:22px 22px 0 0;
+}
+#purchaseSheet .purchase-handle{flex:none;margin:10px auto 0;}
+#purchaseContent{flex:1;min-height:0;}
+#purchaseSheet .nf-sheet-layout{height:100%;display:flex;flex-direction:column;min-height:0;}
+#purchaseSheet .purchase-top{
+  flex:none;min-height:136px;align-items:center;gap:10px;
+  padding:9px 48px 10px 16px;border-bottom:1px solid #ececec;
+}
+#purchaseSheet .nf-sheet-photo{position:relative;flex:none;width:104px;height:104px;}
+#purchaseSheet .purchase-image{width:104px;height:104px;object-fit:cover;border-radius:9px;}
+#purchaseSheet .nf-expand{
+  position:absolute;top:5px;right:5px;width:28px;height:28px;
+  background:rgba(0,0,0,.7);color:#fff;border:0;border-radius:50%;
+  display:grid;place-items:center;cursor:pointer;font-size:15px;
+}
+#purchaseSheet .purchase-info{gap:8px;justify-content:center;}
+#purchaseSheet .purchase-price{display:flex;align-items:baseline;flex-wrap:wrap;gap:5px;}
+#purchaseSheet .purchase-price strong{font-size:clamp(21px,5.4vw,30px);color:#c90024;line-height:1.2;}
+#purchaseSheet .purchase-price del{font-size:13px;color:#aaa;font-weight:400;}
+#purchaseSheet .v36-purchase-promo{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:0;}
+#purchaseSheet .v36-purchase-discount{font-size:12px;padding:4px 6px;}
+#purchaseSheet .v36-purchase-save{font-size:12px;padding:4px 6px;}
+#purchaseSheet .purchase-stock{font-size:14px;color:#888;}
+#purchaseSheet .purchase-close{
+  top:7px;right:10px;left:auto;width:32px;height:32px;
+  background:transparent;box-shadow:none;font-size:22px;color:#888;
+}
+#purchaseSheet .nf-sheet-scroll{
+  flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;
+  padding:12px 16px 10px;-webkit-overflow-scrolling:touch;
+}
+#purchaseSheet .nf-sheet-variant-title{font-size:15px;font-weight:600;color:#222;}
+#purchaseSheet .purchase-variants{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px;align-content:flex-start;}
+#purchaseSheet .purchase-variant{
+  border-radius:7px;padding:8px 10px;font-size:13px;font-weight:500;
+  min-height:38px;max-width:100%;overflow-wrap:anywhere;background:#f5f5f5;
+  border:1px solid transparent;color:#333;
+}
+#purchaseSheet .purchase-variant.active{border-color:#c90024;background:#fff;color:#c90024;}
+#purchaseSheet .nf-sheet-bottom{flex:none;background:#fff;border-top:1px solid #ececec;}
+#purchaseSheet .nf-sheet-qty-row{
+  min-height:58px;padding:8px 16px;display:flex;align-items:center;
+  justify-content:space-between;gap:12px;font-size:16px;
+}
+#purchaseSheet .purchase-qty{margin:0;gap:0;justify-content:flex-end;}
+#purchaseSheet .purchase-qty button{
+  width:35px;height:35px;border:1px solid #ddd;border-radius:0;
+  box-shadow:none;background:#fff;font-size:22px;color:#666;
+}
+#purchaseSheet .purchase-qty button:first-child{border-radius:8px 0 0 8px;}
+#purchaseSheet .purchase-qty button:last-child{border-radius:0 8px 8px 0;}
+#purchaseSheet #purchaseQtyInput{
+  width:50px;height:35px;border:1px solid #ddd;border-left:0;border-right:0;
+  border-radius:0;font-size:15px;font-weight:500;color:#c90024;
+}
+#purchaseSheet .purchase-footer{padding:10px 12px max(12px,env(safe-area-inset-bottom));border-top:1px solid #eee;}
+#purchaseSheet .purchase-submit,#purchaseSheet .purchase-submit.buy{
+  height:46px;background:#8cc63f;color:#fff;border-radius:9px;font-size:16px;
+}
+@media(max-width:380px){
+  #purchaseSheet .nf-sheet-photo,#purchaseSheet .purchase-image{width:96px;height:96px;}
+  #purchaseSheet .purchase-top{min-height:130px;}
+  #purchaseSheet .purchase-variant{font-size:13px;padding:9px 10px;}
+}
+#nfSheetGallery{
+  display:none;position:fixed;inset:0;background:#000;color:#fff;
+  z-index:10000000;flex-direction:column;align-items:center;
+  touch-action:pan-y;
+}
+#nfSheetGallery.nf-open{display:flex;}
+#nfSheetGallery .nf-gallery-head{
+  flex:none;width:100%;height:80px;display:flex;align-items:center;
+  justify-content:center;position:relative;font-size:20px;
+}
+#nfSheetGallery .nf-gallery-close{
+  position:absolute;right:15px;top:15px;width:48px;height:48px;
+  border:0;background:transparent;color:#bbb;font-size:32px;cursor:pointer;
+}
+#nfSheetGallery .nf-gallery-stage{flex:1;min-height:0;width:100%;display:flex;align-items:center;justify-content:center;}
+#nfSheetGallery .nf-gallery-stage img{max-width:100%;max-height:100%;object-fit:contain;}
+#nfSheetGallery .nf-gallery-caption{flex:none;min-height:80px;padding:12px 18px;text-align:center;font-size:17px;}
+
 </style>
 </head>
 <body><div id="nineStoreDetailCurtain" role="status" aria-live="polite"><div class="nine-store-curtain-box"><div class="nine-store-curtain-head"><span class="nine-store-curtain-icon">▣</span><span>IMAMSALESNINE.COM · Detail Produk</span></div><div class="nine-store-curtain-photo"></div><div class="nine-store-curtain-line"></div><div class="nine-store-curtain-line short"></div><small id="nineStoreCurtainMessage" style="color:#77816f;font-weight:400">Menyiapkan detail produk…</small><a href="/store/" style="font-size:12px;color:#699b33">Kembali ke Store</a></div></div>
@@ -23075,15 +23162,7 @@ let html = `
           <span><i class="fa-solid fa-truck-fast"></i><small>Seluruh Indonesia</small></span>
         </div>
         <div class="nine-detail-divider"></div>
-        <div class="product-options">
-          <div class="option-group">
-            <label>Pilih Varian</label>
-            <div id="variantContainer" class="variant-buttons sticky-trigger">
-              ${(product.varian?.length?product.varian:["Default"]).map((v,i)=>{const name=String(typeof v==="string"?v:(v?.nama||v?.name||v?.label||v?.warna||v?.value||"")).trim()||`Varian ${i+1}`;return `<button type="button" class="variant-btn ${selectedVariant===name?"active":""}" onclick='selectVariant(this,${JSON.stringify(name).replace(/'/g,"&#39;")})'>${name}</button>`}).join("")}
-            </div>
-            <input type="hidden" id="varian" value="${selectedVariant}">
-          </div>
-        </div>
+        <input type="hidden" id="varian" value="${selectedVariant}">
         <section class="nine-review-section">
           <div class="nine-review-heading"><strong><span data-detail-rating="${product.id}">—</span> <span id="nineReviewCount"></span></strong><button type="button" onclick="nineOpenReviews()">Lihat Semua <i class="fa-solid fa-chevron-right"></i></button></div>
           <details class="nine-review-composer"><summary>Tulis Ulasan Produk <i class="fa-solid fa-chevron-down"></i></summary><div class="nine-review-form"><div class="nine-review-stars" id="nineReviewStars">${[1,2,3,4,5].map(n=>`<button type="button" onclick="nineSetReviewStars(${n})" aria-label="${n} bintang">★</button>`).join("")}</div><textarea id="v17ReviewText" placeholder="Bagikan pengalaman menggunakan produk ini..." rows="3"></textarea><button type="button" onclick="nineSubmitDetailReview(this)">Kirim Ulasan</button></div></details><div id="nineReviewPreview" class="nine-review-preview"></div>
@@ -30410,11 +30489,12 @@ function initStickyCheckout(){
             document.body.classList.remove("sticky-active");
             return;
         }
-        const trigger=document.getElementById("variantContainer");
-        const headerHeight=document.querySelector(".nine-detail-topbar")?.getBoundingClientRect().height||0;
-        const passed=!!trigger && trigger.getBoundingClientRect().bottom < Math.max(72,headerHeight+8);
-        stickyActionMode=!passed;
-        updateStickyMode();
+        // Pemilih varian sudah berada di purchase sheet, bukan di detail.
+        // Selalu tampilkan Chat + Keranjang + Beli Sekarang seperti desain awal.
+        if(stickyActionMode || !sticky.querySelector('.sticky-actions .sticky-icon-btn')){
+            stickyActionMode=false;
+            updateStickyMode();
+        }
         sticky.classList.add("show");
         document.body.classList.add("sticky-active");
     };
@@ -30697,216 +30777,55 @@ document
 
 
 function renderPurchaseSheet(){
-
-if(!currentProduct) return;
-
-const panel=
-
-document.getElementById(
-"purchaseContent"
-);
-
-const promo=
-currentProduct.harga?.promo||0;
-
-const normal=
-currentProduct.harga?.normal||promo;
-
-const stok=
-currentProduct.stok?.jumlah??0;
-
-panel.innerHTML=
-`
-
-<div class="purchase-top">
-
-<img
-src="${currentProduct.gambar}"
-class="purchase-image">
-
-<div class="purchase-info">
-
-<div class="purchase-price">
-
-<strong>
-
-${formatRupiah(promo)}
-
-</strong>
-
-${
-normal>promo
-?
-
-`<del>
-
-${formatRupiah(normal)}
-
-</del>`
-
-:
-
-""
-
-}
-
-</div>
-
-<div class="purchase-stock">
-
-Stok :
-
-${stok}
-
-</div>
-
-</div>
-
-<button
-class="purchase-close"
-onclick="closePurchaseSheet()"
-aria-label="Tutup">
-
-<i class="fa-solid fa-xmark"></i>
-
-</button>
-
-</div>
-
-<div class="purchase-divider"></div>
-
-<div class="purchase-title">
-
-Pilih Varian
-
-</div>
-
-<div class="purchase-variants">
-
-${
-(Array.isArray(currentProduct.varian) && currentProduct.varian.length
-    ? currentProduct.varian
-    : ["Default"]).map((v,index)=>`
-
-<button
-
-class="purchase-variant
-${selectedVariant===v ? "active" : ""}"
-
-onclick="selectPurchaseVariant(${index})">
-
-${v}
-
-</button>
-
-`).join("")
-}
-
-</div>
-
-<div class="purchase-divider"></div>
-
-<div class="purchase-title">
-
-Jumlah
-
-</div>
-
-<div class="purchase-qty">
-
-<button
-onclick="changePurchaseQty(-1)">
-
-−
-
-</button>
-
-<input
-
-id="purchaseQtyInput"
-
-type="number"
-
-min="1"
-
-value="${selectedQty}"
-
-onblur="changePurchaseQtyInput(this)">
-
-<button
-onclick="changePurchaseQty(1)">
-
-+
-
-</button>
-
-</div>
-
-<div class="purchase-divider"></div>
-
-<div class="purchase-total">
-
-<span>
-
-Total
-
-</span>
-
-<strong>
-
-${formatRupiah(
-promo * selectedQty
-)}
-
-</strong>
-
-</div>
-
-<div class="purchase-footer">
-
-${
-purchaseMode==="cart"
-
-?
-
-`
-
-<button
-
-class="purchase-submit"
-
-onclick="confirmAddToCart()">
-
-<i class="fa-solid fa-cart-shopping"></i>
-
-Masukkan Keranjang
-
-</button>
-
-`
-
-:
-
-`
-
-<button
-
-class="purchase-submit buy"
-
-onclick="confirmBuyNow()">
-
-<i class="fa-solid fa-bolt"></i>
-
-Beli Sekarang
-
-</button>
-
-`
-
-}
-
-</div>
-`;
+  if(!currentProduct) return;
+  const panel=document.getElementById("purchaseContent");
+  if(!panel) return;
+  const p=currentProduct;
+  const promo=Number(p.harga?.promo||p.harga?.normal||0);
+  const normal=Number(p.harga?.normal||promo);
+  const stok=p.stok?.jumlah??p.stok?.qty??0;
+  const discount=normal>promo && promo>0 ? Math.round((1-promo/normal)*100) : 0;
+  const variants=(Array.isArray(p.varian)&&p.varian.length?p.varian:["Default"]);
+  const safe=t=>String(t??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+  panel.innerHTML=`
+    <div class="nf-sheet-layout">
+      <div class="purchase-top">
+        <div class="nf-sheet-photo">
+          <img src="${safe(p.gambar)}" class="purchase-image" alt="${safe(p.nama||"Foto produk")}">
+          <button type="button" class="nf-expand" onclick="nfOpenSheetGallery()" aria-label="Lihat semua foto produk"><i class="fa-solid fa-expand"></i></button>
+        </div>
+        <div class="purchase-info">
+          <div class="purchase-price"><strong>${formatRupiah(promo)}</strong>${normal>promo?`<del>${formatRupiah(normal)}</del>`:""}</div>
+          ${discount?`<div class="v36-purchase-promo"><span class="v36-purchase-discount">-${discount}%</span><span class="v36-purchase-save">Hemat ${formatRupiah(normal-promo)}</span></div>`:""}
+          <div class="purchase-stock">Stok: ${safe(stok)}</div>
+        </div>
+        <button type="button" class="purchase-close" onclick="closePurchaseSheet()" aria-label="Tutup"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="nf-sheet-scroll">
+        <div class="nf-sheet-variant-title">Pilih Varian</div>
+        <div class="purchase-variants">
+          ${variants.map((v,index)=>{
+            const name=String(typeof v==="string"?v:(v?.nama||v?.name||v?.label||v?.warna||v?.value||"")).trim()||`Varian ${index+1}`;
+            return `<button type="button" class="purchase-variant ${String(selectedVariant)===name?"active":""}" onclick="selectPurchaseVariant(${index})">${safe(name)}</button>`;
+          }).join("")}
+        </div>
+      </div>
+      <div class="nf-sheet-bottom">
+        <div class="nf-sheet-qty-row">
+          <span>Jumlah</span>
+          <div class="purchase-qty">
+            <button type="button" onclick="changePurchaseQty(-1)" aria-label="Kurangi jumlah">−</button>
+            <input id="purchaseQtyInput" type="number" min="1" value="${Math.max(1,Number(selectedQty)||1)}" onblur="changePurchaseQtyInput(this)" aria-label="Jumlah produk">
+            <button type="button" onclick="changePurchaseQty(1)" aria-label="Tambah jumlah">+</button>
+          </div>
+        </div>
+        <div class="purchase-footer">
+          ${purchaseMode==="cart"
+            ? `<button type="button" class="purchase-submit" onclick="confirmAddToCart()"><i class="fa-solid fa-cart-shopping"></i> Masukkan Keranjang</button>`
+            : `<button type="button" class="purchase-submit buy" onclick="confirmBuyNow()"><i class="fa-solid fa-bolt"></i> Beli Sekarang</button>`}
+        </div>
+      </div>
+    </div>`;
 }
 
 function selectPurchaseVariant(index){
@@ -30922,7 +30841,7 @@ function selectPurchaseVariant(index){
 
     if(value == null) return;
 
-    selectedVariant = String(value);
+    selectedVariant = String(typeof value==="string"?value:(value?.nama||value?.name||value?.label||value?.warna||value?.value||"Default"));
 
     // Sinkronkan ke detail produk jika detail sedang dirender.
     // Saat buy-now dibuka langsung dari card, elemen ini memang belum ada.
@@ -39208,6 +39127,59 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
 @media(max-width:380px){.nine-detail-shell .nine-unified-product-card .nine-store-voucher{font-size:8px;padding:2px}}
 </style>
 
+
+
+<div id="nfSheetGallery" role="dialog" aria-modal="true" aria-label="Galeri foto produk">
+  <div class="nf-gallery-head"><span id="nfGalleryCount">1/1</span>
+    <button type="button" class="nf-gallery-close" onclick="nfCloseSheetGallery()" aria-label="Kembali ke pilihan produk">×</button>
+  </div>
+  <div class="nf-gallery-stage"><img id="nfGalleryImage" alt="Foto produk"></div>
+  <div class="nf-gallery-caption" id="nfGalleryCaption"></div>
+</div>
+<script id="nf-final-purchase-gallery">
+(function(){
+  let photos=[],index=0,startX=0,startY=0;
+  const modal=()=>document.getElementById('nfSheetGallery');
+  function product(){
+    try{return currentProduct||null}catch(e){return null}
+  }
+  function draw(){
+    if(!photos.length)return;
+    document.getElementById('nfGalleryImage').src=photos[index].src;
+    document.getElementById('nfGalleryCount').textContent=(index+1)+'/'+photos.length;
+    document.getElementById('nfGalleryCaption').textContent=photos[index].label||'';
+  }
+  window.nfOpenSheetGallery=function(){
+    const p=product();if(!p)return;
+    const gallery=[p.gambar,...(Array.isArray(p.gallery)?p.gallery:[])];
+    const names=(Array.isArray(p.varian)?p.varian:[]).map(v=>typeof v==='string'?v:(v?.nama||v?.name||v?.label||''));
+    const seen=new Set();
+    photos=gallery.map((g,i)=>({
+      src:typeof g==='string'?g:(g?.url||g?.src||g?.gambar||''),
+      label:i===0?(p.nama||'Foto utama'):(names[i-1]||p.nama||'Foto produk')
+    })).filter(o=>{if(!o.src||seen.has(o.src))return false;seen.add(o.src);return true;});
+    if(!photos.length)return;
+    const sheetPhoto=document.querySelector('#purchaseContent .purchase-image')?.src;
+    index=Math.max(0,photos.findIndex(o=>{try{return new URL(o.src,location.href).href===sheetPhoto}catch(e){return false}}));
+    draw();modal().classList.add('nf-open');
+  };
+  window.nfCloseSheetGallery=function(){modal().classList.remove('nf-open');};
+  const el=modal();
+  el.addEventListener('touchstart',e=>{if(!e.touches.length)return;startX=e.touches[0].clientX;startY=e.touches[0].clientY;},{passive:true});
+  el.addEventListener('touchend',e=>{
+    if(!e.changedTouches.length||photos.length<2)return;
+    const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;
+    if(Math.abs(dx)>50&&Math.abs(dx)>Math.abs(dy)*1.3){index=(index+(dx<0?1:-1)+photos.length)%photos.length;draw();}
+  },{passive:true});
+  document.addEventListener('keydown',e=>{
+    if(!el.classList.contains('nf-open'))return;
+    if(e.key==='Escape')window.nfCloseSheetGallery();
+    if(photos.length>1&&(e.key==='ArrowRight'||e.key==='ArrowLeft')){
+      index=(index+(e.key==='ArrowRight'?1:-1)+photos.length)%photos.length;draw();
+    }
+  });
+})();
+</script>
 
 </body>
 </html>
