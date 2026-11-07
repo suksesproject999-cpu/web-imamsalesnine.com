@@ -33,6 +33,15 @@
 .product-meta .product-rating{border:1px solid #e3ca5a;padding:2px 3px;color:#666;flex-shrink:0}
 .product-meta .meta-number{overflow:hidden;text-overflow:ellipsis;min-width:0}
 .product-meta .meta-sep{color:#ddd}
+
+/* V3: hanya header statistik, gestur tab, dan proteksi seleksi */
+.store-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;width:100%;align-items:start}
+.store-stat{min-width:0!important;display:flex!important;flex-direction:column;align-items:center!important;justify-content:center!important;text-align:center!important;padding:0 2px!important}
+.store-stat strong{display:block;max-width:100%;white-space:nowrap;font-size:clamp(13px,3.5vw,18px)!important;font-variant-numeric:tabular-nums}
+.store-stat small{font-size:clamp(9px,2.5vw,12px)!important;white-space:nowrap}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default}
+img{-webkit-user-drag:none;user-drag:none}
 </style>
 
 <style>
@@ -85,7 +94,7 @@
 <body>
 <header class="top"><div class="shell top-inner"><a class="back" href="/" aria-label="Kembali ke beranda"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input id="search" placeholder="Cari di Store Imam Sales" autocomplete="off"></label><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a class="top-btn" href="/" aria-label="Beranda"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
-<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
+<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
 <nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
 <main class="content" id="storeContent">
 <section class="panel active" id="panel-toko"><div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Kategori</h2><button class="more" data-go="kategori">Lihat Semua ›</button></div><div class="chips" id="categoryChips"></div></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
@@ -124,6 +133,24 @@ const active=p=>p&&p.active!==false&&p.deleted!==true;
 const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.varian:[]});
 function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
 const stats=new Map();
+function formatStoreCompact(value){
+ const n=Number(value);
+ if(!Number.isFinite(n)||n<0)return '—';
+ if(n<1000)return Math.floor(n).toLocaleString('id-ID');
+ const units=n>=1e9?['M',1e9]:n>=1e6?['JT',1e6]:['RB',1000];
+ const scaled=n/units[1];
+ const rounded=scaled>=10?Math.floor(scaled):Math.floor(scaled*10)/10;
+ return rounded.toLocaleString('id-ID',{maximumFractionDigits:1})+units[0]+(scaled>rounded?'+':'');
+}
+function refreshStoreSold(){
+ const total=products.reduce((sum,p)=>{
+  const st=stats.get(String(p.id))||{};
+  const value=Number(st.terjual??p.terjual);
+  return sum+(Number.isFinite(value)&&value>0?value:0);
+ },0);
+ $('storeSoldTotal').textContent=formatStoreCompact(total);
+}
+
 function fmt(n){const x=Number(n);if(!Number.isFinite(x)||x<0)return '—';return x>=1000000?(x/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'jt':x>=10000?(x/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'rb':x.toLocaleString('id-ID')}
 function featureCandidates(p){
  const src=p.specifications??p.spesifikasi??p.fitur??p.features, result=[];
@@ -204,6 +231,7 @@ function render(){
  const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
  paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
  paint('allGrid',rank(filtered,sort));$('productCount').textContent=filtered.length+' produk';$('storeProductCount').textContent=products.length;$('empty').classList.toggle('hidden',filtered.length!==0);
+ refreshStoreSold();
  const cats=new Map();products.forEach(p=>{const k=String(p.kategori||'Lainnya').trim();cats.set(k,(cats.get(k)||0)+1)});
  $('categoryList').innerHTML=[...cats].sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<button class="category" data-category="${esc(k)}"><span class="cat-icon"><i class="fa-solid fa-box"></i></span><span class="cat-name">${esc(k)}</span><span class="count">${n}</span><i class="fa-solid fa-chevron-right" style="color:#aaa"></i></button>`).join('');
  $('categoryChips').innerHTML=[...cats].slice(0,12).map(([k,n])=>`<button class="chip" data-category="${esc(k)}">${esc(k)} (${n})</button>`).join('');
@@ -216,6 +244,26 @@ document.addEventListener('click',e=>{
  const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
  const cat=e.target.closest('[data-category]');if(cat){query=cat.dataset.category.toLowerCase();$('search').value=cat.dataset.category;render();changeTab('produk')}
 });
+// Swipe antartab hanya pada konten, bukan carousel horizontal, input, atau kontrol.
+(function(){
+ const root=$('storeContent');
+ const order=['toko','produk','kategori'];
+ let start=null;
+ root.addEventListener('touchstart',e=>{
+  if(e.touches.length!==1||e.target.closest('input,textarea,button,a,.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]')){start=null;return}
+  const t=e.touches[0];start={x:t.clientX,y:t.clientY,time:Date.now()};
+ },{passive:true});
+ root.addEventListener('touchend',e=>{
+  if(!start||e.changedTouches.length!==1)return;
+  const t=e.changedTouches[0],dx=t.clientX-start.x,dy=t.clientY-start.y;
+  const elapsed=Date.now()-start.time;start=null;
+  if(Math.abs(dx)<75||Math.abs(dx)<Math.abs(dy)*1.6||elapsed>1000)return;
+  const index=order.indexOf(tab),next=index+(dx<0?1:-1);
+  if(next>=0&&next<order.length)changeTab(order[next]);
+ },{passive:true});
+ root.addEventListener('touchcancel',()=>{start=null},{passive:true});
+})();
+document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
 document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
 $('search').addEventListener('input',e=>{query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
 $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search').focus()};
@@ -297,10 +345,37 @@ $('clearSearch').onclick=()=>{query='';$('search').value='';render();$('search')
    const docs=new Map();snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
    products=merge(seed,docs);render();
   },error=>console.warn('Firestore tidak tersedia, menggunakan katalog dasar:',error));
-  // Status online memakai endpoint yang sama dengan widget toko di detail produk.
-  fetch('/.netlify/functions/admin-presence',{cache:'no-store'}).then(r=>r.ok?r.json():null).then(d=>{
-   $('storeStatus').textContent=d?.success?(d.online?'● Admin sedang online':d.lastActiveAt?'Admin terakhir aktif '+new Date(d.lastActiveAt).toLocaleString('id-ID'):'Status aktivitas belum tersedia'):'Status aktivitas belum tersedia';
-  }).catch(()=>$('storeStatus').textContent='Status aktivitas belum tersedia');
+  // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
+  const presenceUrl='/.netlify/functions/admin-presence';
+  const activeWindowMs=90000;
+  let lastPresenceMs=0;
+  function renderPresence(){
+    const el=$('storeStatus');
+    if(!lastPresenceMs){el.textContent='Status aktivitas belum tersedia';return}
+    const age=Math.max(0,Date.now()-lastPresenceMs);
+    if(age<activeWindowMs){el.textContent='● Online';return}
+    const minutes=Math.floor(age/60000);
+    el.textContent=minutes<60?'Aktif '+Math.max(1,minutes)+' menit lalu':
+      minutes<1440?'Aktif '+Math.floor(minutes/60)+' jam lalu':
+      'Aktif '+Math.floor(minutes/1440)+' hari lalu';
+  }
+  async function refreshPresence(){
+    try{
+      const response=await fetch(presenceUrl,{cache:'no-store'});
+      if(!response.ok)throw Error('HTTP '+response.status);
+      const data=await response.json();
+      if(data.success!==true)throw Error('Respons status tidak valid');
+      const value=data.lastActiveAt;
+      lastPresenceMs=value?(typeof value==='number'?value:Date.parse(value)):0;
+      if(!Number.isFinite(lastPresenceMs))lastPresenceMs=0;
+    }catch(error){console.warn('Status aktivitas Store:',error);lastPresenceMs=0}
+    renderPresence();
+  }
+  refreshPresence();
+  setInterval(refreshPresence,30000);
+  setInterval(renderPresence,15000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPresence()});
+
  }catch(e){console.error(e);$('homeGrid').innerHTML='<p class="empty">Produk belum dapat dimuat. Silakan coba lagi.</p>';$('allGrid').innerHTML='<p class="empty">Produk belum dapat dimuat.</p>';$('storeStatus').textContent='Status aktivitas belum tersedia'}
 })();
 </script>
