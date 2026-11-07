@@ -73,6 +73,13 @@
 .store-swal-toast{font-size:13px!important;border-radius:12px!important;box-shadow:0 8px 30px #0002!important}
 .store-toast-fallback{position:fixed;top:76px;right:12px;left:12px;max-width:360px;margin-left:auto;z-index:99999;padding:12px 16px;border-radius:12px;background:#202a20;color:white;box-shadow:0 10px 32px #0003;font-size:13px}
 </style>
+<style>
+/* Statistik card: tingkatkan keterbacaan tanpa mengubah susunan elemen */
+.product-meta{font-size:clamp(10px,2.45vw,13px);gap:3px;line-height:1.3}
+.product-meta .product-rating{font-size:inherit;line-height:1.2;padding:2px 3px}
+.product-meta .meta-number{font-size:inherit;min-width:0}
+@media(max-width:360px){.product-meta{font-size:9px;gap:2px}}
+</style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body>
@@ -118,16 +125,31 @@ const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.var
 function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
 const stats=new Map();
 function fmt(n){const x=Number(n);if(!Number.isFinite(x)||x<0)return '—';return x>=1000000?(x/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'jt':x>=10000?(x/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'rb':x.toLocaleString('id-ID')}
+function featureCandidates(p){
+ const src=p.specifications??p.spesifikasi??p.fitur??p.features, result=[];
+ const add=(k,v)=>{
+  if(Array.isArray(v))v=v.filter(x=>typeof x==='string'||typeof x==='number').join(', ');
+  if(typeof v!=='string'&&typeof v!=='number')return;
+  const value=String(v).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  const label=(k?String(k).replace(/[_-]/g,' ')+': ':'')+value;
+  if(value&&label.length>=3&&label.length<=85&&!/^(nama|sku|kode|harga|brand|model|id|_)/i.test(label))result.push(label);
+ };
+ if(Array.isArray(src))src.forEach(x=>{
+  if(typeof x==='string'||typeof x==='number')add('',x);
+  else if(x&&typeof x==='object'){
+   const k=x.label??x.nama??x.name??x.key, v=x.value??x.nilai??x.isi??x.text;
+   if(k!=null&&v!=null)add(k,v);
+   else Object.entries(x).forEach(([key,value])=>add(key,value));
+  }
+ });
+ else if(src&&typeof src==='object')Object.entries(src).forEach(([k,v])=>add(k,v));
+ else if(typeof src==='string')src.split(/[;\n]/).forEach(v=>add('',v));
+ return [...new Set(result)];
+}
 function feature(p){
- const obj=p.specifications||p.spesifikasi||p.fitur||p.features;
- let parts=[];
- if(Array.isArray(obj))parts=obj.filter(x=>typeof x==='string'&&x.trim());
- else if(obj&&typeof obj==='object')parts=Object.entries(obj).filter(([k,v])=>!k.startsWith('_')&&v!=null&&String(v).trim()).map(([k,v])=>`${k}: ${Array.isArray(v)?v.join(', '):String(v)}`);
- parts=parts.map(x=>x.replace(/<[^>]*>/g,'').trim()).filter(x=>x.length>=3&&x.length<=75&&!/^(nama|sku|kode|harga|brand|model|_)/i.test(x));
- if(!parts.length)return '';
- const bucket=Math.floor(Date.now()/300000);
+ const parts=featureCandidates(p);if(!parts.length)return '';
  let hash=0;for(const c of String(p.id))hash=(hash*31+c.charCodeAt(0))>>>0;
- return parts[(bucket+hash)%parts.length];
+ return parts[(Math.floor(Date.now()/300000)+hash)%parts.length];
 }
 const STORE_VOUCHER_SNAPSHOT=[{"id":"BELANJA50","name":"Voucher Belanja","description":"Potongan Belanja Rp5.000","type":"product_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-tags","badge":"HOT","limit":"1 Voucher / Akun"},{"id":"DISKON10","name":"Diskon Produk 10%","description":"Diskon produk 10%","type":"product_percent","discount":10,"min":100000,"maxDiscount":500,"expired":"2026-12-31","icon":"fa-percent","badge":"PROMO","limit":"1 Voucher / Akun"},{"id":"ONGKIR5","name":"Diskon Ongkir","description":"Potongan Ongkir Rp5.000","type":"shipping_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-truck","badge":"HEMAT","limit":"1 Voucher / Akun"}];
 let activeVouchers=[];
