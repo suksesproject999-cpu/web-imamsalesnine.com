@@ -500,6 +500,13 @@ let flashRenderSignature="";
 function renderFlashSale(force=false){
  const items=activeFlashProducts();
  const section=$('flashSaleSection'),rail=$('flashSaleRail'),full=$('flashSaleFull');
+ // Deep link dari website utama: buka daftar Flash Sale setelah data CMS tersedia.
+ if(location.hash==='#flash-sale' && items.length && !full.classList.contains('open')){
+  full.classList.add('open');
+  full.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+ }
+
  section.classList.toggle('hidden',!items.length);
  const signature=JSON.stringify(items.map(p=>[p.id,p.nama,p.gambar,p.harga,p.flashSale,p.terjual]));
  if(force||signature!==flashRenderSignature){
@@ -518,6 +525,7 @@ function renderFlashSale(force=false){
  if(full.classList.contains('open')&&!items.length)closeFlashSale();
 }
 function closeFlashSale(){
+ if(location.hash==='#flash-sale')history.replaceState(null,'',location.pathname+location.search);
  $('flashSaleFull').classList.remove('open');
  $('flashSaleFull').setAttribute('aria-hidden','true');
  document.body.style.overflow='';
