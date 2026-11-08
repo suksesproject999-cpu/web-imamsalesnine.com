@@ -20499,101 +20499,40 @@ async function openPromoProduct(nama){
 }
 
 function openAllPromoProducts(){
-    if(!Array.isArray(allProducts) || !allProducts.length) return;
-
-    const products = allProducts
-        .filter(p => p?.promo?.active === true && p?.active !== false && p?.deleted !== true)
-        .sort((a,b) => Number(a?.promo?.order || 9999) - Number(b?.promo?.order || 9999));
-    const container = document.getElementById("product-grid-auto");
-    if(!container) return;
-
-    container.classList.remove("category-mode");
-
-    container.innerHTML = `
-        <div class="brand-page promo-direct-page">
-            <div class="product-toolbar">
-                <div>
-                    <span style="color:#8CC63F;font-weight:800;font-size:12px;letter-spacing:1px">PROMO PRODUK</span>
-                    <h2 style="margin:5px 0 0">Semua Produk Promo</h2>
-                </div>
-                <div class="toolbar-count">${products.length} Produk</div>
-            </div>
-            <div class="product-grid" id="promo-direct-products"></div>
-        </div>
-    `;
-
-    renderProductList(products, "promo-direct-products");
-
-    requestAnimationFrame(()=>{
-        const page = container.querySelector(".promo-direct-page");
-        const header = document.querySelector(".header");
-        if(!page) return;
-
-        const offset = header ? header.offsetHeight + 12 : 12;
-        const y = page.getBoundingClientRect().top + window.pageYOffset - offset;
-
-        window.scrollTo({top:y, behavior:"smooth"});
-    });
+ window.location.assign('/store/');
 }
 
 function renderPromoSlider(){
-  const track=document.getElementById("promoSliderTrack");
-  if(!track||!Array.isArray(allProducts)||!allProducts.length)return;
-
-  let items = allProducts
-    .filter(p => p?.promo?.active === true && p?.active !== false && p?.deleted !== true)
-    .sort((a,b) => Number(a?.promo?.order || 9999) - Number(b?.promo?.order || 9999));
-
-  const cards=items.map(p=>{
-    const promo=Number(window.nineEffectivePromo(p)??p.harga?.normal??0);
-    const normal=Number(p.harga?.normal||0);
-    const old=normal>promo&&promo>0?`<span class="promo-mini-old">Rp ${normal.toLocaleString("id-ID")}</span>`:"";
-    const price=promo?`Rp ${promo.toLocaleString("id-ID")}`:"Cek harga";
-    const safe=String(p.nama||"").replace(/\\/g,"\\\\").replace(/'/g,"\\'");
-    return `<article class="promo-mini-card" onclick="openPromoProduct('${safe}')">
-      <div class="promo-mini-image"><img src="${p.gambar||"images/no-image.png"}" alt="${p.nama||"Produk promo"}" loading="lazy" onerror="this.src='images/no-image.png'"></div>
-      <div class="promo-mini-info"><span class="promo-mini-badge">PROMO</span><h3 class="promo-mini-name">${p.nama||"Produk"}</h3><div class="promo-mini-price">${price}</div>${old}</div>
-    </article>`;
-  }).join("");
-
-  track.innerHTML=cards+cards;
-
-  if(track._promoTimer){
-    clearInterval(track._promoTimer);
-    track._promoTimer=null;
-  }
-
-  let index=0;
-
-  const getStep=()=>{
-    const card=track.querySelector(".promo-mini-card");
-    if(!card)return 0;
-    const style=getComputedStyle(track);
-    const gap=parseFloat(style.columnGap||style.gap)||0;
-    return Math.round(card.getBoundingClientRect().width + gap);
-  };
-
-  const move=()=>{
-    const step=getStep();
-    if(!step)return;
-
-    index++;
-    track.style.transition="transform 520ms cubic-bezier(.22,.61,.36,1)";
-    track.style.transform=`translate3d(${-index*step}px,0,0)`;
-
-    if(index>=items.length){
-      setTimeout(()=>{
-        track.style.transition="none";
-        index=0;
-        track.style.transform="translate3d(0,0,0)";
-        void track.offsetWidth;
-      },540);
-    }
-  };
-
-  if(items.length>1){
-    track._promoTimer=setInterval(move,3600);
-  }
+ const track=document.getElementById("promoSliderTrack");
+ if(!track||!Array.isArray(allProducts))return;
+ const items=allProducts.filter(p=>p&&p.active!==false&&p.deleted!==true&&(p.promo?.active===true||window.nineFlashActive(p)))
+ .sort((a,b)=>Number(a?.promo?.order??9999)-Number(b?.promo?.order??9999));
+ if(track._promoTimer){clearInterval(track._promoTimer);track._promoTimer=null;}
+ const escPromo=v=>String(v??"").replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const moneyPromo=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+ const cards=items.map(p=>{
+  const flash=window.nineFlashActive(p),price=Number(window.nineEffectivePromo(p)||0),normal=Number(p.harga?.normal||0);
+  const discount=normal>price&&price>0?Math.round((1-price/normal)*100):0;
+  return `<article class="nine-store-promo-card" role="link" tabindex="0" data-promo-product-id="${escPromo(p.id)}">
+   <div class="nine-store-promo-image"><img src="${escPromo(p.gambar||'images/no-image.png')}" alt="${escPromo(p.nama||'Produk')}" loading="lazy">
+   <span class="nine-store-promo-badge">${flash?'⚡ FLASH SALE':'PROMO'}</span>${discount?`<span class="nine-store-promo-discount">-${discount}%</span>`:''}</div>
+   <div class="nine-store-promo-body"><h3>${escPromo(p.nama||'Produk')}</h3><strong>${moneyPromo(price)}</strong>
+   ${discount?`<del>${moneyPromo(normal)}</del>`:''}
+   ${flash?`<div class="nine-store-promo-timer" data-nine-flash-end="${escPromo(p.flashSale.endAt)}"></div>`:''}
+   </div></article>`;
+ }).join('');
+ track.innerHTML=cards;
+ track.style.transform='none';
+ track.style.transition='none';
+ track.onclick=e=>{
+  const card=e.target.closest('[data-promo-product-id]');
+  if(!card)return;
+  const p=allProducts.find(x=>String(x.id)===card.dataset.promoProductId);
+  if(p)showProduct(p.nama);
+ };
+ track.onkeydown=e=>{
+  if(e.key==='Enter'||e.key===' '){const card=e.target.closest('[data-promo-product-id]');if(card){e.preventDefault();card.click();}}
+ };
 }
 
 // ==========================================
@@ -23163,6 +23102,7 @@ let html = `
         </div>
       </div>
       <div class="product-info">
+        ${window.nineFlashActive(product)?`<div class="nine-detail-flash-badge"><i class="fa-solid fa-bolt"></i> FLASH SALE <span data-nine-flash-end="${product.flashSale.endAt}"></span></div>`:''}
         <div class="nine-old-price">${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<del>Rp ${product.harga.normal.toLocaleString("id-ID")}</del><span class="nine-discount-percent">-${Math.round((1-window.nineEffectivePromo(product)/product.harga.normal)*100)}%</span>` : ""}</div>
         <div class="nine-price-row">
           <div class="price">Rp ${(window.nineEffectivePromo(product) || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-window.nineEffectivePromo(product)).toLocaleString("id-ID")}</span>` : ""}
@@ -39217,5 +39157,78 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
  document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
 })();
 </script>
+
+<style id="nine-flash-unified-main-css">
+#promoSliderTrack{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-width:none;transform:none!important;animation:none!important;-webkit-overflow-scrolling:touch}
+#promoSliderTrack::-webkit-scrollbar{display:none}
+#promoSliderTrack .nine-store-promo-card{flex:0 0 clamp(158px,44vw,210px);min-width:0;background:#fff;border:1px solid #e9e9e9;border-radius:9px;overflow:hidden;scroll-snap-align:start;color:#222;cursor:pointer}
+.nine-store-promo-image{position:relative;aspect-ratio:1/1;background:#fff}
+.nine-store-promo-image img{width:100%;height:100%;object-fit:contain;display:block}
+.nine-store-promo-badge{position:absolute;left:5px;top:6px;background:#eb4d2e;color:white;border-radius:4px;font-size:9px;font-weight:850;padding:5px 6px}
+.nine-store-promo-discount{position:absolute;right:0;top:0;background:#fff0eb;color:#e6543b;font-size:11px;font-weight:800;padding:5px}
+.nine-store-promo-body{padding:9px;display:flex;flex-direction:column;gap:5px}
+.nine-store-promo-body h3{font-size:12px;line-height:1.35;font-weight:600;min-height:33px;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;margin:0;color:#222}
+.nine-store-promo-body strong{color:#e45940;font-size:16px}
+.nine-store-promo-body del{color:#999;font-size:11px}
+.nine-store-promo-timer,.nine-card-flash-timer{font-size:10px;font-weight:750;color:#ba3926;background:#fff0eb;padding:5px 6px;border-radius:5px;font-variant-numeric:tabular-nums}
+.nine-detail-flash-badge{display:flex;align-items:center;gap:8px;flex-wrap:wrap;background:linear-gradient(90deg,#ed4b2c,#fa713b);color:#fff;border-radius:9px;padding:11px 13px;margin-bottom:12px;font-size:13px;font-weight:850}
+.nine-detail-flash-badge span{margin-left:auto;font-variant-numeric:tabular-nums}
+.marketplace-card .nine-card-flash-badge{position:absolute;left:5px;top:5px;z-index:4;background:#ed4b2c;color:#fff;border-radius:4px;padding:5px 6px;font-size:9px;font-weight:850}
+.marketplace-card .nine-card-flash-timer{margin:6px 0 0}
+</style>
+<script id="nine-flash-unified-main-js">
+(function(){
+ 'use strict';
+ const fmt=ms=>{let n=Math.max(0,Math.floor(ms/1000));return [Math.floor(n/3600),Math.floor(n%3600/60),n%60].map(x=>String(x).padStart(2,'0')).join(':')};
+ let priorActive='';
+ function sync(){
+  if(typeof allProducts==='undefined'||!Array.isArray(allProducts))return;
+  const now=Date.now(),byId=new Map(allProducts.map(p=>[String(p.id),p]));
+  document.querySelectorAll('[data-nine-flash-end]').forEach(el=>{
+   const ms=Date.parse(el.getAttribute('data-nine-flash-end'))-now;
+   const next=ms>0?'Berakhir '+fmt(ms):'Flash Sale berakhir';
+   if(el.textContent!==next)el.textContent=next;
+  });
+  document.querySelectorAll('.marketplace-card[data-product-id]').forEach(card=>{
+   const p=byId.get(String(card.dataset.productId));if(!p)return;
+   const active=window.nineFlashActive?.(p,now)===true;
+   let badge=card.querySelector('.nine-card-flash-badge'),timer=card.querySelector('.nine-card-flash-timer');
+   if(active){
+    if(!badge){badge=document.createElement('span');badge.className='nine-card-flash-badge';badge.textContent='⚡ FLASH SALE';card.prepend(badge);}
+    if(!timer){timer=document.createElement('div');timer.className='nine-card-flash-timer';const body=card.querySelector('.product-card-body')||card;body.append(timer);}
+    const next='Berakhir '+fmt(Date.parse(p.flashSale.endAt)-now);
+    if(timer.textContent!==next)timer.textContent=next;
+   }else{
+    if(badge)badge.remove();if(timer)timer.remove();
+   }
+  });
+  const activeIds=allProducts.filter(p=>window.nineFlashActive?.(p,now)).map(p=>String(p.id)).sort().join('|');
+  if(priorActive&&activeIds!==priorActive){
+   // Segarkan harga yang telah kembali ke harga CMS, tanpa mengubah data produk.
+   if(typeof window.renderPromoSlider==='function')window.renderPromoSlider();
+   if(typeof currentProduct==='object'&&currentProduct&&
+      !window.nineFlashActive(currentProduct)&&currentPage==='product'&&
+      document.querySelector('.nine-detail-flash-badge')&&typeof window.showProduct==='function'){
+      window.showProduct(currentProduct.nama,{skipView:true,preserveVariant:true});
+   }
+   document.querySelectorAll('.marketplace-card[data-product-id]').forEach(card=>{
+    const p=byId.get(String(card.dataset.productId));if(!p)return;
+    const price=card.querySelector('.marketplace-price');if(!price)return;
+    const effective=Number(window.nineEffectivePromo(p)),normal=Number(p.harga?.normal||0);
+    const old=normal>effective&&effective>0?`<span class="marketplace-price-old">Rp ${normal.toLocaleString('id-ID')}</span>`:'';
+    price.innerHTML='Rp '+effective.toLocaleString('id-ID')+old;
+    const disc=card.querySelector('.marketplace-discount-badge');
+    const pct=normal>effective&&effective>0?Math.round((1-effective/normal)*100):0;
+    if(disc){if(pct)disc.textContent='-'+pct+'%';else disc.remove();}
+   });
+  }
+  priorActive=activeIds;
+ }
+ setInterval(sync,1000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+ document.addEventListener('DOMContentLoaded',sync);
+})();
+</script>
+
 </body>
 </html>
