@@ -18633,6 +18633,21 @@ html.nine-store-detail-pending #nineStoreDetailCurtain{display:flex!important}
 #nfSheetGallery .nf-gallery-caption{flex:none;min-height:80px;padding:12px 18px;text-align:center;font-size:17px;}
 
 </style>
+<script id="nine-flash-price-engine">
+(function(){
+ 'use strict';
+ window.nineFlashActive=function(p,now=Date.now()){
+  const f=p?.flashSale, start=Date.parse(f?.startAt||''),end=Date.parse(f?.endAt||'');
+  const amount=Number(f?.price),normal=Number(p?.harga?.normal);
+  return f?.enabled===true&&Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&Number.isFinite(amount)&&amount>0&&amount<normal;
+ };
+ window.nineEffectivePromo=function(p){
+  if(window.nineFlashActive(p))return Number(p.flashSale.price);
+  const promo=Number(p?.harga?.promo);
+  return Number.isFinite(promo)&&promo>0?promo:Number(p?.harga?.normal)||0;
+ };
+})();
+</script>
 </head>
 <body><div id="nineStoreDetailCurtain" role="status" aria-live="polite"><div class="nine-store-curtain-box"><div class="nine-store-curtain-head"><span class="nine-store-curtain-icon">▣</span><span>IMAMSALESNINE.COM · Detail Produk</span></div><div class="nine-store-curtain-photo"></div><div class="nine-store-curtain-line"></div><div class="nine-store-curtain-line short"></div><small id="nineStoreCurtainMessage" style="color:#77816f;font-weight:400">Menyiapkan detail produk…</small><a href="/store/" style="font-size:12px;color:#699b33">Kembali ke Store</a></div></div>
 <div id="nineShareLoading" role="status" aria-live="polite" aria-label="Menyiapkan detail produk">
@@ -20530,7 +20545,7 @@ function renderPromoSlider(){
     .sort((a,b) => Number(a?.promo?.order || 9999) - Number(b?.promo?.order || 9999));
 
   const cards=items.map(p=>{
-    const promo=Number(p.harga?.promo??p.harga?.normal??0);
+    const promo=Number(window.nineEffectivePromo(p)??p.harga?.normal??0);
     const normal=Number(p.harga?.normal||0);
     const old=normal>promo&&promo>0?`<span class="promo-mini-old">Rp ${normal.toLocaleString("id-ID")}</span>`:"";
     const price=promo?`Rp ${promo.toLocaleString("id-ID")}`:"Cek harga";
@@ -22280,7 +22295,7 @@ async function renderMarketplaceCardWithStats(product){
 
                     ${
                         Number(
-                            product.harga?.promo ??
+                            window.nineEffectivePromo(product) ??
                             product.harga?.normal ??
                             0
                         ).toLocaleString(
@@ -22546,7 +22561,7 @@ function renderMarketplaceCard(product){
 
     const harga =
         Number(
-            product.harga?.promo ??
+            window.nineEffectivePromo(product) ??
             product.harga?.normal ??
             0
         );
@@ -22747,7 +22762,7 @@ function renderProductList(
 
         const harga =
             Number(
-                product.harga?.promo ??
+                window.nineEffectivePromo(product) ??
                 product.harga?.normal ??
                 0
             );
@@ -23148,11 +23163,11 @@ let html = `
         </div>
       </div>
       <div class="product-info">
-        <div class="nine-old-price">${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<del>Rp ${product.harga.normal.toLocaleString("id-ID")}</del><span class="nine-discount-percent">-${Math.round((1-product.harga.promo/product.harga.normal)*100)}%</span>` : ""}</div>
+        <div class="nine-old-price">${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<del>Rp ${product.harga.normal.toLocaleString("id-ID")}</del><span class="nine-discount-percent">-${Math.round((1-window.nineEffectivePromo(product)/product.harga.normal)*100)}%</span>` : ""}</div>
         <div class="nine-price-row">
-          <div class="price">Rp ${(product.harga?.promo || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-product.harga.promo).toLocaleString("id-ID")}</span>` : ""}
+          <div class="price">Rp ${(window.nineEffectivePromo(product) || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-window.nineEffectivePromo(product)).toLocaleString("id-ID")}</span>` : ""}
         </div><div class="nine-meta-actions">
-          ${product.harga?.promo && product.harga?.normal>product.harga?.promo ? `<button type="button" class="nine-voucher" onclick="nineOpenOriginalVoucher()"><i class="fa-solid fa-ticket"></i> Voucher</button>` : ""}
+          ${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<button type="button" class="nine-voucher" onclick="nineOpenOriginalVoucher()"><i class="fa-solid fa-ticket"></i> Voucher</button>` : ""}
           <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${Number(product.views||0).toLocaleString("id-ID")} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(sold)} terjual</span></div><button class="wishlist-btn" onclick="toggleWishlist(${product.id})" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
         <div class="product-title"><h2>${product.brand ? `<span class="nine-inline-brand">${product.brand}</span> ` : ""}${product.nama}</h2></div>
         <div class="product-highlights">
@@ -23358,7 +23373,7 @@ document.getElementById("stickyNormalPrice");
 if(stickyPrice && stickyNormal){
 
     const promo =
-    product.harga?.promo || 0;
+    window.nineEffectivePromo(product) || 0;
 
     const normal =
     product.harga?.normal || promo;
@@ -24008,7 +24023,7 @@ function addToCart(id) {
       kategori: product.kategori,
       varian: varian,
       qty: qty,
-      harga: product.harga?.promo ?? product.harga?.normal ?? 0
+      harga: window.nineEffectivePromo(product) ?? product.harga?.normal ?? 0
     });
 
   }
@@ -30706,10 +30721,10 @@ if(qty < 1){
 
     // NINE VFINAL: Beli Sekarang memakai sesi checkout sementara.
     // Keranjang asli tetap utuh di localStorage dan dikembalikan saat keluar.
-    window.__nineStartDirectCheckout?.([{id:product.id,nama:product.nama,gambar:product.gambar,brand:product.brand,kategori:product.kategori,varian:varian,qty:qty,harga:product.harga?.promo ?? product.harga?.normal ?? 0}]);
+    window.__nineStartDirectCheckout?.([{id:product.id,nama:product.nama,gambar:product.gambar,brand:product.brand,kategori:product.kategori,varian:varian,qty:qty,harga:window.nineEffectivePromo(product) ?? product.harga?.normal ?? 0}]);
     if(!window.__nineStartDirectCheckout){
       window.__nineOriginalCart=cart.map(x=>({...x}));
-      cart=[{id:product.id,nama:product.nama,gambar:product.gambar,brand:product.brand,kategori:product.kategori,varian:varian,qty:qty,harga:product.harga?.promo ?? product.harga?.normal ?? 0}];
+      cart=[{id:product.id,nama:product.nama,gambar:product.gambar,brand:product.brand,kategori:product.kategori,varian:varian,qty:qty,harga:window.nineEffectivePromo(product) ?? product.harga?.normal ?? 0}];
     }
 
 checkoutForm();
@@ -30781,7 +30796,7 @@ function renderPurchaseSheet(){
   const panel=document.getElementById("purchaseContent");
   if(!panel) return;
   const p=currentProduct;
-  const promo=Number(p.harga?.promo||p.harga?.normal||0);
+  const promo=Number(window.nineEffectivePromo(p)||p.harga?.normal||0);
   const normal=Number(p.harga?.normal||promo);
   const stok=p.stok?.jumlah??p.stok?.qty??0;
   const discount=normal>promo && promo>0 ? Math.round((1-promo/normal)*100) : 0;
@@ -38443,7 +38458,7 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape"){nineCloseSpecs();ni
 'use strict';
 const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 window.nineStoreRelatedCard=function(p){
-const price=Number(p.harga?.promo||p.harga?.normal||0),id=esc(p.id),name=esc(p.nama||'Produk');
+const price=Number(window.nineEffectivePromo(p)||p.harga?.normal||0),id=esc(p.id),name=esc(p.nama||'Produk');
 return '<article class="nine-compact-card nine-store-related-card" data-nine-product-id="'+id+'" role="button" tabindex="0" aria-label="Lihat '+name+'">'+
 '<img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+name+'"><div class="nine-compact-body">'+
 '<div class="nine-compact-title" title="'+name+'">'+name+'</div>'+
@@ -38545,7 +38560,7 @@ window.nineSyncHeaderCart=function(){const b=document.getElementById('nineHeader
 window.nineSetReviewStars=function(n){window.nineReviewRating=n;document.querySelectorAll('#nineReviewStars button').forEach((b,i)=>b.classList.toggle('selected',i<n))};
 window.nineSetReviewStars(5);
 window.nineCompactCard=function(p){
- const price=p.harga?.promo||p.harga?.normal||0;
+ const price=window.nineEffectivePromo(p)||p.harga?.normal||0;
  const id=esc(p.id),name=esc(p.nama||'Produk');
  return '<article class="nine-compact-card nine-unified-product-card" data-nine-product-id="'+id+'" role="button" tabindex="0" aria-label="Lihat '+name+'"><img loading="lazy" src="'+esc(p.gambar||'')+'" alt="'+name+'"><div class="nine-compact-body"><div class="nine-compact-title" title="'+name+'">'+name+'</div><div class="nine-store-price-row"><strong>Rp'+Number(price||0).toLocaleString('id-ID')+'</strong><span class="nine-store-voucher" aria-label="Voucher"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher</span></div><div class="nine-store-card-rating" data-rating-product="'+id+'">⭐ —</div><div class="nine-store-card-sold" data-sold-product="'+id+'">— terjual</div></div></article>';
 };
@@ -39181,5 +39196,26 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
 })();
 </script>
 
+<script id="nine-flash-boundary-sync">
+(function(){
+ let lastKey='';
+ function sync(){
+  const products=typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:[];
+  const key=products.filter(p=>p.flashSale?.enabled).map(p=>String(p.id)+':'+(window.nineFlashActive(p)?'1':'0')).join('|');
+  if(key===lastKey)return;
+  const wasInitialized=lastKey!=='';
+  lastKey=key;
+  if(!wasInitialized)return;
+  try{if(typeof renderPromoSlider==='function')renderPromoSlider();}catch(e){console.warn('Promo refresh:',e)}
+  try{
+   if(typeof currentPage!=='undefined'&&currentPage==='product'&&typeof currentProduct!=='undefined'&&currentProduct&&typeof showProduct==='function'){
+    showProduct(currentProduct.nama,{skipView:true,preserveVariant:true});
+   }
+  }catch(e){console.warn('Detail refresh:',e)}
+ }
+ setInterval(sync,1000);
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)sync()});
+})();
+</script>
 </body>
 </html>

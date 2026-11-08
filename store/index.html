@@ -375,7 +375,18 @@ $('year').textContent=new Date().getFullYear();
 loadStoreVouchers();
 setInterval(()=>{render()},300000);
 const num=x=>Number(x)||0;
-const price=p=>num(p.harga?.promo??p.harga?.normal);
+const regularPrice=p=>{
+ const normal=num(p.harga?.normal), promo=num(p.harga?.promo);
+ return promo>0?promo:normal;
+};
+const flashIsActive=(p,now=Date.now())=>{
+ const f=p?.flashSale;
+ if(!f||f.enabled!==true)return false;
+ const start=Date.parse(f.startAt||""),end=Date.parse(f.endAt||"");
+ const special=Number(f.price);
+ return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&Number.isFinite(special)&&special>0&&special<num(p.harga?.normal);
+};
+const price=p=>flashIsActive(p)?Number(p.flashSale.price):regularPrice(p);
 const normal=p=>num(p.harga?.normal);
 const sold=p=>num(p.terjual);
 // Samakan resolusi foto dengan index utama yang berada di root domain.
@@ -470,7 +481,7 @@ function activeFlashProducts(){
   const f=p.flashSale;
   if(!f||f.enabled!==true)return false;
   const start=Date.parse(f.startAt||""),end=Date.parse(f.endAt||"");
-  return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&normal(p)>price(p)&&price(p)>0;
+  return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&flashIsActive(p,now);
  }).sort((a,b)=>Date.parse(a.flashSale.endAt)-Date.parse(b.flashSale.endAt));
 }
 function flashDuration(ms){
@@ -517,7 +528,13 @@ document.addEventListener('click',e=>{
  if(e.target.closest('#flashSaleBack'))closeFlashSale();
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('flashSaleFull').classList.contains('open'))closeFlashSale()});
-setInterval(()=>renderFlashSale(),1000);
+let flashActiveKeys="";
+setInterval(()=>{
+ const keys=activeFlashProducts().map(p=>p.id).sort().join("|");
+ if(keys!==flashActiveKeys){flashActiveKeys=keys;render();return;}
+ renderFlashSale();
+},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
 
 function card(p){
  const h=price(p),n=normal(p),disc=n>h&&h>0?Math.round((1-h/n)*100):0;
