@@ -456,11 +456,28 @@ function card(p){
 }
 function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
 function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
+// Pencarian semantik ringan berbasis kategori Store realtime; ID hanya relasi internal.
+const searchNormalize=value=>String(value??'').toLocaleLowerCase('id-ID').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+function categorySearchTerms(c){
+ const raw=[c.name,c.description,c.deskripsi,c.keywords,c.aliases,c.searchKeywords,c.kataKunci];
+ return raw.flatMap(v=>Array.isArray(v)?v:[v]).filter(v=>typeof v==='string').flatMap(v=>v.split(/[,;\n]+/)).map(searchNormalize).filter(Boolean);
+}
+function searchMatches(p,needle){
+ if(!needle)return true;
+ const categories=(Array.isArray(p.storeCategories)?p.storeCategories:[])
+  .map(id=>storeCategories.find(c=>c.id===id&&c.active!==false)).filter(Boolean);
+ const fields=[p.nama,p.brand,p.kategori,p.deskripsi,p.sku,p.kode,p.fungsi,p.aplikasi,p.tags,...categories.flatMap(categorySearchTerms)];
+ const normalized=fields.map(searchNormalize).filter(Boolean);
+ if(normalized.some(v=>v.includes(needle)))return true;
+ // Semua kata boleh tersebar di nama, deskripsi, dan kategori, tetapi wajib semuanya cocok.
+ const words=needle.split(' ').filter(Boolean);
+ return words.length>1&&words.every(word=>normalized.some(v=>v.split(' ').some(token=>token.startsWith(word))));
+}
 function openStoreFilter(type,value){
  activeStoreCategory=type==='category'?value:'';
  activeBrand=type==='brand'?value:'';
  query='';
- $('search').value=value;
+ $('search').value=type==='category'?(storeCategories.find(c=>c.id===value)?.name||''):value;
  sort='populer';
  document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));
  render();
@@ -471,7 +488,7 @@ function render(){
  const filtered=products.filter(p=>{
   if(activeStoreCategory&&!(Array.isArray(p.storeCategories)&&p.storeCategories.includes(activeStoreCategory)))return false;
   if(activeBrand&&String(p.brand||'').toLowerCase()!==activeBrand.toLowerCase())return false;
-  return !query||[p.nama,p.brand,p.kategori,p.deskripsi].some(v=>String(v||'').toLowerCase().includes(query));
+  return searchMatches(p,searchNormalize(query));
  });
  const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
  paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
@@ -700,6 +717,9 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
 
   db.collection('store_categories').onSnapshot(snapshot=>{
    storeCategories=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.name).localeCompare(String(b.name)));
+   if(activeStoreCategory&&!storeCategories.some(c=>c.id===activeStoreCategory&&c.active!==false)){
+    activeStoreCategory='';$('search').value='';
+   }
    render();
   },error=>console.warn('Kategori Store belum dapat dibaca:',error));
   db.collection('cms_products').onSnapshot(snapshot=>{

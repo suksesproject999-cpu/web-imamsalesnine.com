@@ -4424,6 +4424,11 @@ body.nexai-seller-workspace #sellerCenterFrame{height:100%!important;min-height:
       id="site-menu-dropdown">
 
       <div class="site-menu-group-label">SELLER CENTER</div>
+      <button type="button" class="site-menu-item" id="nexaiSearchKeywordsOpen">
+        <i class="fa-solid fa-magnifying-glass"></i>
+        <span><b>Kata Kunci Search Store</b><small>Alias kategori realtime untuk pencarian pembeli.</small></span>
+      </button>
+
 
       <button type="button" class="site-menu-item" onclick="adminTool('seller')">
         <i class="fa-solid fa-boxes-stacked"></i>
@@ -13771,5 +13776,72 @@ launch?.addEventListener("click",()=>{
  if(workspace)workspace.hidden=true;
 },true);
 })();
-</script></body>
+</script>
+<style id="nexai-search-keywords-css">
+#nexaiKeywordsOverlay{display:none;position:fixed;inset:0;z-index:2147483000;background:#111827aa;padding:12px;align-items:center;justify-content:center}
+#nexaiKeywordsOverlay.open{display:flex}
+#nexaiKeywordsDialog{background:#fff;color:#1f2937;border-radius:16px;width:min(600px,100%);max-height:90dvh;overflow:auto;padding:20px;box-shadow:0 20px 60px #0004}
+#nexaiKeywordsDialog h2{font-size:19px;margin:0}
+#nexaiKeywordsDialog p{color:#64748b;font-size:13px;line-height:1.5}
+.nexai-kw-row{border:1px solid #e2e8f0;border-radius:12px;padding:12px;margin:12px 0}
+.nexai-kw-row label{display:block;font-size:13px;font-weight:750;margin-bottom:7px}
+.nexai-kw-row textarea{width:100%;min-height:80px;resize:vertical;padding:10px;border:1px solid #cbd5e1;border-radius:9px;font:inherit}
+.nexai-kw-row button,.nexai-kw-close{border:0;border-radius:9px;padding:10px 14px;background:#8cc63f;color:#17220d;font-weight:750;margin-top:8px}
+.nexai-kw-close{background:#f1f5f9;color:#1f2937;margin:0}
+.nexai-kw-top{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nexai-kw-status{font-size:12px;color:#64748b}
+</style>
+<div id="nexaiKeywordsOverlay" role="dialog" aria-modal="true" aria-labelledby="nexaiKeywordsTitle">
+ <div id="nexaiKeywordsDialog">
+  <div class="nexai-kw-top"><h2 id="nexaiKeywordsTitle">Kata Kunci Search Store</h2><button class="nexai-kw-close" id="nexaiKeywordsClose" type="button">Tutup ✕</button></div>
+  <p>Tambahkan sinonim pencarian per kategori Store. Pisahkan dengan koma, misalnya: lampu sorot, lampu tembak, spotlight. Nama kategori otomatis ikut dicari. ID Firestore tidak ditampilkan ke pembeli.</p>
+  <div class="nexai-kw-status" id="nexaiKeywordsStatus">Memuat kategori...</div>
+  <div id="nexaiKeywordsList"></div>
+ </div>
+</div>
+<script id="nexai-search-keywords-engine">
+(function(){
+ 'use strict';
+ const $=id=>document.getElementById(id),overlay=$('nexaiKeywordsOverlay');
+ const open=$('nexaiSearchKeywordsOpen'),list=$('nexaiKeywordsList'),status=$('nexaiKeywordsStatus');
+ if(!open||!overlay)return;
+ let collection=null,unsubscribe=null,items=[];
+ const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const words=v=>Array.isArray(v)?v.join(', '):String(v||'');
+ function draw(){
+  list.innerHTML=items.map(c=>`<div class="nexai-kw-row" data-id="${esc(c.id)}">
+   <label>${esc(c.name||'Kategori tanpa nama')} ${c.active===false?'(Nonaktif)':''}</label>
+   <textarea aria-label="Kata kunci untuk ${esc(c.name)}" placeholder="Contoh: lampu tembak, lampu sorot, spotlight">${esc(words(c.searchKeywords||c.aliases||c.keywords))}</textarea>
+   <button type="button" data-save="${esc(c.id)}">Simpan Kata Kunci</button></div>`).join('')||'<p>Belum ada kategori Store. Buat kategori di Seller Center terlebih dahulu.</p>';
+ }
+ function connect(){
+  if(collection)return;
+  try{
+   if(typeof db==='undefined'||!db||typeof db.collection!=='function'){status.textContent='Firestore Admin belum siap. Coba buka ulang menu.';return}
+   collection=db.collection('store_categories');
+   unsubscribe=collection.onSnapshot(s=>{
+    items=s.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0));
+    draw();status.textContent=items.length+' kategori tersinkron realtime.';
+   },e=>status.textContent='Gagal membaca kategori: '+e.message);
+  }catch(e){status.textContent='Firestore belum siap: '+e.message}
+ }
+ open.addEventListener('click',()=>{if(localStorage.getItem('role')!=='admin'){alert('Hanya Admin yang dapat mengubah kata kunci.');return}
+  document.getElementById('site-menu-dropdown')?.classList.remove('open');
+  overlay.classList.add('open');connect();
+ });
+ $('nexaiKeywordsClose').onclick=()=>overlay.classList.remove('open');
+ overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
+ list.addEventListener('click',async e=>{
+  const btn=e.target.closest('[data-save]');if(!btn||!collection)return;
+  const row=btn.closest('[data-id]'),id=btn.dataset.save;
+  const aliases=[...new Set(row.querySelector('textarea').value.split(/[,;\n]+/).map(x=>x.trim()).filter(Boolean))].slice(0,60);
+  btn.disabled=true;status.textContent='Menyimpan...';
+  try{await collection.doc(id).update({searchKeywords:aliases,updatedAt:firebase.firestore.FieldValue.serverTimestamp()});
+   status.textContent='Kata kunci berhasil disimpan realtime.'}
+  catch(err){status.textContent='Gagal menyimpan: '+err.message}
+  finally{btn.disabled=false}
+ });
+})();
+</script>
+</body>
 </html>
