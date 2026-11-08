@@ -12087,26 +12087,11 @@ html.imam-sales-loader-seen #pageLoader{
 .promo-kicker{display:block;margin-bottom:3px;color:#8CC63F;font-size:10px;font-weight:800;letter-spacing:1.5px}
 .promo-strip h2{margin:0;color:#fff;font-size:20px;line-height:1.2;text-align:left}.promo-strip h2::after{display:none}
 .promo-see-all{color:#aeb6b2;text-decoration:none;font-size:12px;white-space:nowrap}.promo-see-all-btn{background:none;border:0;padding:0;cursor:pointer;font:inherit}.promo-see-all:hover{color:#8CC63F}
-.promo-slider{width:100%;overflow:hidden;touch-action:pan-y}
-.promo-slider-track{display:flex;width:max-content;gap:12px;padding:3px 16px;will-change:transform;transform:translate3d(0,0,0)}
-.promo-mini-card{flex:0 0 245px;width:245px;height:90px;box-sizing:border-box;display:grid;grid-template-columns:80px minmax(0,1fr);align-items:center;gap:10px;padding:7px;border:1px solid rgba(255,255,255,.09);border-radius:15px;background:#171b1a;cursor:pointer;overflow:hidden;transition:border-color .25s,background .25s}
-.promo-mini-card:hover{border-color:rgba(140,198,63,.6);background:#1b201e}
-.promo-mini-image{width:80px;height:74px;border-radius:10px;overflow:hidden;background:#fff}.promo-mini-image img{display:block;width:100%;height:100%;object-fit:contain}
-.promo-mini-info{min-width:0;overflow:hidden}.promo-mini-badge{display:inline-block;margin-bottom:3px;padding:3px 7px;border-radius:999px;background:#8CC63F;color:#101510;font-size:8px;font-weight:900}
-.promo-mini-name{margin:0 0 4px;color:#fff;font-size:12px;font-weight:700;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.promo-mini-price{color:#8CC63F;font-size:12px;font-weight:800;white-space:nowrap}.promo-mini-old{display:block;margin-top:1px;color:#777f7b;font-size:9px;text-decoration:line-through;white-space:nowrap}
-@media(max-width:768px){
-.promo-strip{padding:15px 0 17px}
-.promo-strip-head{padding:0 14px;margin-bottom:10px}
-.promo-strip h2{font-size:17px}
-.promo-slider-track{gap:10px;padding:3px 16px}
-.promo-mini-card{flex:0 0 calc(100vw - 32px);width:calc(100vw - 32px);max-width:300px;height:82px;grid-template-columns:68px minmax(0,1fr);gap:9px;padding:7px;border-radius:12px}
-.promo-mini-image{width:68px;height:68px;border-radius:8px}
-.promo-mini-name,.promo-mini-price{font-size:11px}
-.promo-mini-old{font-size:8px}
-.promo-mini-badge{font-size:7px;padding:2px 6px}
-}
-@media(prefers-reduced-motion:reduce){.promo-slider-track{transition:none!important}}
+.promo-slider{width:100%;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;-webkit-overflow-scrolling:touch;touch-action:auto;scrollbar-width:none}
+.promo-slider::-webkit-scrollbar{display:none}
+.promo-slider-track{display:flex;width:max-content;gap:10px;padding:3px 16px 12px;transform:none;animation:none;transition:none}
+.promo-slider-track > .nine-store-promo-card{scroll-snap-align:start}
+@media(prefers-reduced-motion:reduce){.promo-slider-track{transition:none}}
 
 
 
@@ -18901,7 +18886,7 @@ Garansi Resmi • Harga Kompetitif • Siap Kirim Seluruh Indonesia
 <section class="promo-strip" id="promoProduk">
   <div class="promo-strip-head">
     <div><span class="promo-kicker">PROMO PILIHAN</span><h2>Produk Lagi Promo</h2></div>
-    <button type="button" class="promo-see-all promo-see-all-btn" onclick="openAllPromoProducts()">Lihat semua <i class="fa-solid fa-arrow-right"></i></button>
+    <button type="button" class="promo-see-all promo-see-all-btn" onclick="window.location.assign('/store/#flash-sale')">Lihat semua <i class="fa-solid fa-arrow-right"></i></button>
   </div>
   <div class="promo-slider"><div class="promo-slider-track" id="promoSliderTrack"></div></div>
 </section>
@@ -20498,10 +20483,6 @@ async function openPromoProduct(nama){
     });
 }
 
-function openAllPromoProducts(){
- window.location.assign('/store/#flash-sale');
-}
-
 function renderPromoSlider(){
  const track=document.getElementById("promoSliderTrack");
  if(!track||!Array.isArray(allProducts))return;
@@ -20522,9 +20503,12 @@ function renderPromoSlider(){
    </div></article>`;
  }).join('');
  track.innerHTML=cards;
- track.style.transform='none';
- track.style.transition='none';
+ // Native horizontal scroll; jangan buka produk saat drag.
+ track.onpointerdown=e=>{track._pointerStart={x:e.clientX,y:e.clientY};track._pointerDragged=false;};
+ track.onpointermove=e=>{if(track._pointerStart&&Math.abs(e.clientX-track._pointerStart.x)>8)track._pointerDragged=true;};
+ track.onpointerup=()=>{track._pointerStart=null;};
  track.onclick=e=>{
+  if(track._pointerDragged){track._pointerDragged=false;return;}
   const card=e.target.closest('[data-promo-product-id]');
   if(!card)return;
   const p=allProducts.find(x=>String(x.id)===card.dataset.promoProductId);
@@ -32956,31 +32940,6 @@ if(typeof window.showProduct==='function'){
     };
 }
 
-/* ----- Promo cards use the exact same shared-product transition as marketplace cards. ----- */
-function wirePromoCards(){
-    document.querySelectorAll('#promoSliderTrack .promo-mini-card').forEach(card=>{
-        if(card.dataset.v5Wired==='1') return;
-        card.dataset.v5Wired='1';
-        card.removeAttribute('onclick');
-        card.addEventListener('click',e=>{
-            if(e.defaultPrevented) return;
-            const name=card.querySelector('.promo-mini-name')?.textContent?.trim();
-            if(!name) return;
-            window.openProductWithTransition?.(card,name);
-        });
-    });
-}
-
-if(typeof window.renderPromoSlider==='function'){
-    const baseRenderPromoSlider=window.renderPromoSlider;
-    window.renderPromoSlider=function(){
-        const out=baseRenderPromoSlider.apply(this,arguments);
-        requestAnimationFrame(wirePromoCards);
-        return out;
-    };
-}
-requestAnimationFrame(wirePromoCards);
-
 /* Old inline openPromoProduct remains compatible with external calls. */
 window.openPromoProduct=function(cardOrName,maybeName){
     const card=(cardOrName && cardOrName.nodeType===1)?cardOrName:null;
@@ -32989,42 +32948,7 @@ window.openPromoProduct=function(cardOrName,maybeName){
     return window.openProductWithTransition?.(card,name) || window.showProduct?.(name);
 };
 
-/* ----- Promo “Lihat semua”: smooth route, never a Shopping Mall jump. ----- */
-window.openAllPromoProducts=function(){
-    if(!Array.isArray(allProducts)||!allProducts.length) return;
-    const products=allProducts
-        .filter(p=>p?.promo?.active===true && p?.active!==false && p?.deleted!==true)
-        .sort((a,b)=>Number(a?.promo?.order||9999)-Number(b?.promo?.order||9999));
-    const root=window.setProductRootMode('promo-list');
-    if(!root) return;
 
-    root.classList.add('route-preenter');
-    root.innerHTML=`
-        <div class="brand-page promo-direct-page">
-            <div class="product-toolbar">
-                <div>
-                    <span style="color:#8CC63F;font-weight:800;font-size:12px;letter-spacing:1px">PROMO PRODUK</span>
-                    <h2 style="margin:5px 0 0">Semua Produk Promo</h2>
-                </div>
-                <div class="toolbar-count">${products.length} Produk</div>
-            </div>
-            <div class="product-grid" id="promo-direct-products"></div>
-        </div>`;
-    renderProductList(products,'promo-direct-products');
-
-    requestAnimationFrame(()=>requestAnimationFrame(()=>{
-        const page=root.querySelector('.promo-direct-page');
-        const header=document.querySelector('.header');
-        if(page){
-            const offset=(header?.getBoundingClientRect().height||0)+12;
-            const y=Math.max(0,page.getBoundingClientRect().top+window.scrollY-offset);
-            window.scrollTo({top:y,behavior:'auto'});
-        }
-        root.classList.remove('route-preenter');
-        root.classList.add('route-reveal');
-        setTimeout(()=>root.classList.remove('route-reveal'),560);
-    }));
-};
 
 /* ----- Unified AI drag: same physics as Comment sheet (translate down + threshold/velocity). ----- */
 function installUnifiedAISwipe(){
@@ -34617,35 +34541,7 @@ window.openProductWithTransition=async function(card,nama){
     });
 };
 
-/* "Lihat semua" Promo: pure cross-fade, no translate/scale throw. */
-window.openAllPromoProducts=async function(){
-    if(!Array.isArray(window.allProducts||allProducts)||!(window.allProducts||allProducts).length) return;
-    const source=(window.allProducts||allProducts);
-    const products=source
-        .filter(p=>p?.promo?.active===true&&p?.active!==false&&p?.deleted!==true)
-        .sort((a,b)=>Number(a?.promo?.order||9999)-Number(b?.promo?.order||9999));
 
-    return softRoute(async()=>{
-        const root=typeof window.setProductRootMode==='function'
-            ? window.setProductRootMode('promo-list')
-            : getRoot();
-        if(!root) return;
-        root.classList.remove('route-preenter','route-reveal');
-        root.innerHTML=`
-            <div class="brand-page promo-direct-page">
-                <div class="product-toolbar">
-                    <div>
-                        <span style="color:#8CC63F;font-weight:800;font-size:12px;letter-spacing:1px">PROMO PRODUK</span>
-                        <h2 style="margin:5px 0 0">Semua Produk Promo</h2>
-                    </div>
-                    <div class="toolbar-count">${products.length} Produk</div>
-                </div>
-                <div class="product-grid" id="promo-direct-products"></div>
-            </div>`;
-        window.renderProductList?.(products,'promo-direct-products');
-        safeScrollTo(root.querySelector('.promo-direct-page'));
-    });
-};
 
 /* Professional detail badge. Use real view data if available; never invent a count. */
 function compactID(n){
@@ -34796,43 +34692,7 @@ window.openProductWithTransition=async function(card,nama){
     });
 };
 
-/* Promo "Lihat semua" -> promo listing: same transition language, no overlay and no visible jump. */
-window.openAllPromoProducts=async function(){
-    const button=document.querySelector('.promo-see-all-btn');
-    await tapFeedback(button);
 
-    const source=Array.isArray(window.allProducts)&&window.allProducts.length
-        ? window.allProducts
-        : (typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:[]);
-    if(!source.length) return;
-
-    const products=source
-        .filter(p=>p?.promo?.active===true&&p?.active!==false&&p?.deleted!==true)
-        .sort((a,b)=>Number(a?.promo?.order||9999)-Number(b?.promo?.order||9999));
-
-    return runCommerceTransition(async()=>{
-        const target=typeof window.setProductRootMode==='function'
-            ? window.setProductRootMode('promo-list')
-            : root();
-        if(!target) return;
-
-        target.classList.remove('route-preenter','route-reveal','v6-soft-enter');
-        target.innerHTML=`
-            <div class="brand-page promo-direct-page">
-                <div class="product-toolbar">
-                    <div>
-                        <span style="color:#8CC63F;font-weight:800;font-size:12px;letter-spacing:1px">PROMO PRODUK</span>
-                        <h2 style="margin:5px 0 0">Semua Produk Promo</h2>
-                    </div>
-                    <div class="toolbar-count">${products.length} Produk</div>
-                </div>
-                <div class="product-grid" id="promo-direct-products"></div>
-            </div>`;
-
-        window.renderProductList?.(products,'promo-direct-products');
-        positionAt(target.querySelector('.promo-direct-page'));
-    });
-};
 
 })();
 </script>
@@ -34870,18 +34730,7 @@ window.openProductWithTransition=async function(card,nama){
   window.scrollTo({top:y,behavior:"instant"});
  }
 };
-window.openAllPromoProducts=async function(){
-    const source=Array.isArray(window.allProducts)&&window.allProducts.length?window.allProducts:(typeof allProducts!=='undefined'&&Array.isArray(allProducts)?allProducts:[]);
-    if(!source.length)return;
-    const products=source.filter(p=>p?.promo?.active===true&&p?.active!==false&&p?.deleted!==true).sort((a,b)=>Number(a?.promo?.order||9999)-Number(b?.promo?.order||9999));
-    const target=typeof window.setProductRootMode==='function'?window.setProductRootMode('promo-list'):root();
-    if(!target)return;
-    target.classList.remove('route-preenter','route-reveal','v6-soft-enter','v7-fallback-enter');
-    target.innerHTML=`<div class="brand-page promo-direct-page"><div class="product-toolbar"><div><span style="color:#8CC63F;font-weight:800;font-size:12px;letter-spacing:1px">PROMO PRODUK</span><h2 style="margin:5px 0 0">Semua Produk Promo</h2></div><div class="toolbar-count">${products.length} Produk</div></div><div class="product-grid" id="promo-direct-products"></div></div>`;
-    window.renderProductList?.(products,'promo-direct-products');
-    placeAt(target.querySelector('.promo-direct-page'));
-    revealRoute();
-};
+
 })();
 </script>
 
@@ -39159,8 +39008,6 @@ body.nine-transaction-open #product-grid-auto.page-checkout .checkout-form {
 </script>
 
 <style id="nine-flash-unified-main-css">
-#promoSliderTrack{display:flex;gap:10px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;scrollbar-width:none;transform:none!important;animation:none!important;-webkit-overflow-scrolling:touch}
-#promoSliderTrack::-webkit-scrollbar{display:none}
 #promoSliderTrack .nine-store-promo-card{flex:0 0 clamp(158px,44vw,210px);min-width:0;background:#fff;border:1px solid #e9e9e9;border-radius:9px;overflow:hidden;scroll-snap-align:start;color:#222;cursor:pointer}
 .nine-store-promo-image{position:relative;aspect-ratio:1/1;background:#fff}
 .nine-store-promo-image img{width:100%;height:100%;object-fit:contain;display:block}
