@@ -1,0 +1,914 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Store | Imam Sales</title>
+<meta name="description" content="Jelajahi produk pilihan Imam Sales, harga promo, kategori, dan produk terbaru.">
+<link rel="canonical" href="https://imamsalesnine.com/store">
+<link rel="preconnect" href="https://www.gstatic.com">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<style>
+:root{--green:#8cc63f;--dark:#101411;--red:#e6543b;--muted:#858585;--line:#e9e9e9}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f5f5f5;color:#202020;font:15px system-ui,-apple-system,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
+.shell{max-width:1120px;margin:auto}.top{background:#fff;position:sticky;top:0;z-index:50;box-shadow:0 2px 10px #0000000d}.top-inner{display:flex;align-items:center;gap:14px;padding:12px 16px}.back{color:#d32343;font-size:22px}.search{display:flex;align-items:center;gap:10px;border-radius:30px;background:#f4f5f4;padding:10px 15px;flex:1;min-width:0}.search input{border:0;background:transparent;outline:0;min-width:0;width:100%;font-size:14px}.top-btn{border:0;background:transparent;color:#d32343;font-size:21px}.hero{background:linear-gradient(125deg,#0c100d,#253c1d 55%,#101711);color:#fff;min-height:190px;padding:26px 18px 24px;position:relative;overflow:hidden}.hero:before{content:"IMAM SALES";position:absolute;right:-15px;top:0;font-size:clamp(54px,11vw,145px);font-weight:900;color:#ffffff0c;white-space:nowrap}.hero-kicker{color:#a9e36b;letter-spacing:2px;font-size:11px;font-weight:800}.identity{position:relative;display:flex;gap:14px;align-items:center;margin-top:20px}.avatar{width:66px;height:66px;border-radius:16px;background:#fff;color:#77b83a;display:grid;place-items:center;font-size:29px;flex-shrink:0}.identity h1{font-size:clamp(18px,3.5vw,28px);margin:0 0 5px}.identity p{margin:0;color:#d5decf;font-size:12px}.hero-actions{margin-top:15px;display:flex;gap:10px;flex-wrap:wrap;position:relative}.hero-actions a{padding:10px 16px;border-radius:8px;border:1px solid #ffffff75;font-weight:650;font-size:13px}.hero-actions a:first-child{background:var(--green);border-color:var(--green);color:#15200e}.tabs{background:#fff;display:grid;grid-template-columns:repeat(3,1fr);position:sticky;top:62px;z-index:40;border-bottom:1px solid var(--line)}.tab{padding:16px 8px;border:0;background:transparent;font-weight:650;color:#555;border-bottom:3px solid transparent}.tab.active{color:#6e9e29;border-bottom-color:var(--green)}.content{padding:14px 12px 45px}.panel{display:block}/* Satu viewport swipe: setiap tab menyimpan scroll sendiri, tanpa tinggi semu. */
+#storeContent{position:relative;overflow:hidden;height:320px;min-height:0;touch-action:pan-y;overscroll-behavior-x:contain}
+#storeContent>.panel{display:block;position:absolute;inset:0;overflow-x:hidden;overflow-y:auto;overscroll-behavior-y:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;padding-bottom:24px;scroll-padding-bottom:24px;visibility:hidden;pointer-events:none;transform:translate3d(100%,0,0);backface-visibility:hidden}
+#storeContent>.panel.active{visibility:visible;pointer-events:auto;transform:translate3d(0,0,0)}
+#storeContent>.panel.swipe-peer{visibility:visible;pointer-events:none}
+#storeContent.swiping>.panel{will-change:transform}
+.banner{background:linear-gradient(115deg,#121512,#353b38);color:white;border-radius:14px;padding:26px 22px;min-height:140px;display:flex;flex-direction:column;justify-content:center;position:relative;overflow:hidden;margin:0 8px 14px}.banner:after{content:"NINE";position:absolute;right:12px;bottom:-28px;font-size:100px;letter-spacing:-8px;font-weight:900;color:#ffffff10}.banner small{color:#9edb56;letter-spacing:1.5px;font-weight:800}.banner h2{font-size:clamp(22px,5vw,37px);line-height:1.05;margin:8px 0}.banner p{margin:0;color:#d0d0d0;font-size:12px}.section{background:#fff;border-radius:15px;padding:16px;margin-bottom:14px}.section-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:14px}.section h2{font-size:17px;margin:0}.more{color:#699c26;font-size:13px;font-weight:700;border:0;background:transparent}.chips{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 12px}.chip{flex-shrink:0;background:#f6f8f3;border:1px solid #e3edda;color:#526b3a;border-radius:99px;padding:9px 13px;font-size:12px;font-weight:700}.chip.active{background:#e7f4d9;border-color:#9bca6e}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.product-card{border:1px solid #e9e9e9;border-radius:12px;background:#fff;overflow:hidden;min-width:0;cursor:pointer;position:relative;display:flex;flex-direction:column}.marketplace-image-wrap{width:100%;aspect-ratio:1/1;overflow:hidden;background:#fff}.marketplace-image-wrap img{display:block;width:100%;height:100%;object-fit:contain}.marketplace-discount-badge{position:absolute;right:0;top:0;background:#fff0eb;color:#e65c3e;padding:5px 8px;font-size:12px;font-weight:800;z-index:1}.product-card-body{padding:10px 11px 13px;display:flex;flex-direction:column;gap:8px;flex:1}.product-brand{color:#83ae4e;font-size:10px;font-weight:800;text-transform:uppercase}.marketplace-product-name{font-size:13px;line-height:1.35;font-weight:600;margin:0;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;min-height:35px}.marketplace-price{color:#e45940;font-weight:800;font-size:16px}.marketplace-price-old{font-size:11px;color:#aaa;text-decoration:line-through;font-weight:400;display:block;margin-top:3px}.product-meta{display:flex;flex-wrap:wrap;gap:8px;color:#777;font-size:11px}.product-rating{color:#e2a329}.product-voucher-info{color:#7c9e52;font-size:11px;font-weight:650}.sortbar{display:flex;gap:6px;overflow-x:auto;margin-bottom:14px;scrollbar-width:none}.sort{white-space:nowrap;background:#fff;border:1px solid #e7e7e7;border-radius:9px;padding:10px 13px;color:#666}.sort.active{color:#6a9c25;border-color:#a3ce78;background:#f7fbf1}.category-list{display:grid;gap:1px;background:#ececec;border-radius:12px;overflow:hidden}.category{display:flex;align-items:center;gap:12px;background:white;padding:15px 13px;border:0;text-align:left}.category .cat-icon{width:42px;height:42px;background:#f1f6e9;color:#8cc63f;border-radius:9px;display:grid;place-items:center}.category .cat-name{flex:1}.category .count{color:#aaa;font-size:12px}.empty{padding:35px 16px;text-align:center;color:#888}.notice{font-size:12px;color:#888;margin:0 0 14px}.footer{text-align:center;color:#888;padding:26px;font-size:12px}.loading{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.skeleton{height:280px;border-radius:12px;background:linear-gradient(90deg,#eee,#fafafa,#eee);background-size:200% 100%;animation:shine 1.3s infinite}@keyframes shine{to{background-position-x:-200%}}.hidden{display:none!important}
+@media(min-width:750px){.content{padding:22px}.grid,.loading{grid-template-columns:repeat(4,minmax(0,1fr))}.hero{padding:38px}.product-card-body{padding:13px}.marketplace-product-name{font-size:14px}.banner{min-height:190px}}
+
+.store-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:17px 0 0;position:relative}.store-stat{border:1px solid #ffffff35;border-radius:9px;padding:10px 5px;text-align:center}.store-stat strong{display:block;color:#a9e36b;font-size:18px}.store-stat small{font-size:11px;color:#d6dfd1}.store-actions{display:flex;gap:10px;margin-top:12px;position:relative}.store-actions a,.store-actions button{border:1px solid #ffffff6a;border-radius:8px;background:transparent;color:#fff;padding:10px 18px;font-weight:700}.store-actions button[aria-pressed=true]{color:#a9e36b;border-color:#a9e36b}.product-feature{font-size:11px;color:#6e9e29;font-weight:650;line-height:1.4}.product-meta{align-items:center}.store-vouchers{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;padding:2px 0 12px}.store-voucher{min-width:220px;scroll-snap-align:start;border:1px dashed #8cc63f;border-radius:10px;padding:12px;background:#f9fff4}.store-voucher b{display:block;font-size:13px}.store-voucher small{color:#666}
+
+/* Store compact marketplace cards + voucher rail */
+#panel-toko #voucherSection{padding:12px 14px;margin-bottom:12px}
+.store-vouchers{display:flex;gap:10px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.store-vouchers::-webkit-scrollbar{display:none}
+.store-voucher{flex:0 0 225px;min-width:225px;display:flex;gap:10px;align-items:center;background:#fff9f1;border:1px dashed #ecad65;padding:10px;border-radius:8px}
+.store-voucher .voucher-icon{font-size:23px;color:#e65c3e}
+.store-voucher b{font-size:12px;color:#c94e35}.store-voucher small{display:block;font-size:10px;line-height:1.4}
+.store-voucher a{color:#b14c29;font-size:11px;font-weight:700;text-decoration:underline}
+.product-card-body{gap:6px;padding:8px 9px 10px}
+.marketplace-product-name{font-weight:500;font-size:13px;min-height:35px}
+.marketplace-price-old{display:none}.product-card:has(.nine-flash-label) .marketplace-price-old{display:block;color:#929292;text-decoration:line-through;font-size:11px}
+.product-feature{display:inline-block;max-width:100%;background:#fff6df;color:#c38b25;padding:3px 5px;border-radius:2px;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.product-labels{display:flex;gap:4px;align-items:center;overflow:hidden;min-height:20px}
+.product-voucher-label{flex-shrink:0;color:#d95238;border:1px solid #edaa99;padding:2px 3px;font-size:9px;white-space:nowrap}
+.product-meta{display:flex;flex-wrap:nowrap;gap:3px;align-items:center;white-space:nowrap;font-size:clamp(8px,2.1vw,11px);overflow:hidden}
+.product-meta .product-rating{border:1px solid #e3ca5a;padding:2px 3px;color:#666;flex-shrink:0}
+.product-meta .meta-number{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.product-meta .meta-sep{color:#ddd}
+
+/* V3: hanya header statistik, gestur tab, dan proteksi seleksi */
+.store-stats{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:0!important;width:100%;align-items:start}
+.store-stat{min-width:0!important;display:flex!important;flex-direction:column;align-items:center!important;justify-content:center!important;text-align:center!important;padding:0 2px!important}
+.store-stat strong{display:block;max-width:100%;white-space:nowrap;font-size:clamp(13px,3.5vw,18px)!important;font-variant-numeric:tabular-nums}
+.store-stat small{font-size:clamp(9px,2.5vw,12px)!important;white-space:nowrap}
+body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default}
+img{-webkit-user-drag:none;user-drag:none}
+</style>
+
+<style>
+/* STORE V2 — layout padat, tanpa menambah komponen card tandingan */
+.hero{min-height:0;padding:17px 15px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:7px}
+.hero:before{font-size:clamp(45px,10vw,95px);right:0}
+.identity{grid-column:1;grid-row:1/3;margin:0;gap:9px;min-width:0;align-items:center}
+.avatar{width:49px;height:49px;border-radius:50%;font-size:23px}
+.identity h1{font-size:clamp(14px,3.8vw,19px);line-height:1.2;overflow-wrap:anywhere;margin-bottom:4px}
+.identity p{font-size:10px;line-height:1.3;margin:0}
+.store-actions{grid-column:2;grid-row:1/3;margin:0;display:flex;flex-direction:column;gap:6px;align-self:center}
+.store-actions a,.store-actions button{font-size:11px;padding:7px 9px;border-radius:5px;text-align:center;white-space:nowrap}
+.store-actions button[aria-pressed=true]{background:#8cc63f;color:#182411}
+.store-stats{grid-column:1/-1;grid-row:3;display:flex;gap:12px;align-items:center;margin:5px 0 0;min-width:0}
+.store-stat{border:0;padding:0;text-align:left;display:flex;gap:4px;align-items:baseline}
+.store-stat strong{font-size:12px;color:#e4f6c9}
+.store-stat small{font-size:10px;color:#d7dfd3}
+.tabs{top:60px}.tab{padding:12px 6px}
+.content{padding:8px 5px 35px}.section{padding:8px 5px;border-radius:7px;margin-bottom:8px}
+.section-head{margin:6px 6px 10px}.grid{gap:5px}
+.product-card{border-radius:5px}.product-card-body{padding:6px 7px 9px;gap:5px}
+.marketplace-product-name{font-size:12px;line-height:1.25;min-height:30px}
+.marketplace-price{font-size:15px}.product-labels{gap:3px}
+.product-feature{font-size:10px}.product-meta{font-size:clamp(8px,1.95vw,10px);gap:3px}
+.marketplace-discount-badge{padding:4px 6px}
+#voucherSection{border-radius:0;padding:8px 0;background:transparent}
+#voucherSection .section-head{margin:0 12px 7px}
+.store-vouchers{padding:2px 12px 9px;gap:9px;overscroll-behavior-x:contain;scrollbar-width:none}
+.store-vouchers::-webkit-scrollbar{display:none}
+.store-voucher{min-width:245px;max-width:260px;min-height:102px;display:flex;align-items:center;gap:9px;background:white;border:1px solid #e4e4e4;border-left:4px solid #8cc63f;border-radius:4px;box-shadow:0 2px 4px #0000000a;padding:10px}
+.store-voucher .voucher-icon{font-size:21px;color:#74ad3b}
+.store-voucher b{font-size:13px;color:#292929}
+.store-voucher small{font-size:10px}
+@media(max-width:360px){.store-stats{gap:8px}.store-stat strong{font-size:11px}.store-stat small{font-size:9px}.avatar{width:43px;height:43px}}
+@media(min-width:750px){.hero{padding:23px}.store-actions{flex-direction:row}.content{padding:16px}.section{padding:12px}}
+</style>
+<style>
+.store-swal-toast{font-size:13px!important;border-radius:12px!important;box-shadow:0 8px 30px #0002!important}
+.store-toast-fallback{position:fixed;top:76px;right:12px;left:12px;max-width:360px;margin-left:auto;z-index:99999;padding:12px 16px;border-radius:12px;background:#202a20;color:white;box-shadow:0 10px 32px #0003;font-size:13px}
+</style>
+<style>
+/* Statistik card: tingkatkan keterbacaan tanpa mengubah susunan elemen */
+.product-meta{font-size:clamp(10px,2.45vw,13px);gap:3px;line-height:1.3}
+.product-meta .product-rating{font-size:inherit;line-height:1.2;padding:2px 3px}
+.product-meta .meta-number{font-size:inherit;min-width:0}
+@media(max-width:360px){.product-meta{font-size:9px;gap:2px}}
+</style>
+<style>
+/* Swipe dan proteksi gambar: satu aturan khusus, tanpa mengubah layout kartu. */
+#storeContent{touch-action:pan-y}
+#storeContent .product-card img{-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;pointer-events:none}
+#storeContent .marketplace-image-wrap{-webkit-touch-callout:none}
+</style>
+<style>
+/* CLEAN HEADER ENGINE: satu sumber aturan; tanpa selector V4/finish bertumpuk. */
+html{scroll-behavior:auto}
+body{overflow-x:hidden}
+:root{--store-header-progress:0;--store-top-height:60px}
+.top{background:rgba(255,255,255,var(--store-header-progress));box-shadow:0 2px 10px rgba(0,0,0,calc(.05 * var(--store-header-progress)));transition:none}
+.top-inner{position:relative;min-height:60px}
+.hero{
+ --store-hero-offset:0px;
+ transform:translate3d(0,calc(-1 * var(--store-hero-offset)),0);
+ margin-bottom:calc(-1 * var(--store-hero-offset));
+ margin-top:calc(-1 * var(--store-top-height));
+ padding-top:calc(17px + var(--store-top-height));
+ will-change:transform;
+}
+@media(min-width:750px){.hero{padding-top:calc(23px + var(--store-top-height))}}
+.tabs{top:var(--store-top-height)}
+/* Compact navigation overlays search rather than changing toolbar dimensions. */
+.store-compact-tabs{
+ display:flex;position:absolute;left:46px;right:98px;top:0;bottom:0;
+ align-items:stretch;justify-content:space-around;min-width:0;
+ opacity:0;visibility:hidden;pointer-events:none;
+}
+.store-compact-tab{border:0;border-bottom:2px solid transparent;background:transparent;color:#555;font-weight:650;padding:10px 5px;min-width:0}
+.store-compact-tab.active{color:#6e9e29;border-bottom-color:var(--green)}
+.store-compact-search{
+ display:block;position:absolute;right:49px;top:50%;transform:translateY(-50%);
+ border:0;background:transparent;color:#d32343;font-size:20px;padding:6px;
+ opacity:0;visibility:hidden;pointer-events:none;
+}
+.top-inner>.search{min-width:0;transition:opacity .1s linear}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search{
+ background:transparent;border:0;box-shadow:none;color:#fff;
+}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search input{color:#fff}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search input::placeholder{color:rgba(255,255,255,.85)}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search i{color:#fff!important}
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.back,
+body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.top-btn{color:#fff}
+body.store-header-condensed:not(.store-search-mode) .top-inner>.search,
+body.store-header-condensed:not(.store-search-mode) #clearSearch,
+body.store-header-condensed:not(.store-search-mode) .top-inner>a[aria-label="Beranda"]{
+ opacity:0;visibility:hidden;pointer-events:none;
+}
+body.store-header-condensed:not(.store-search-mode) .store-compact-tabs,
+body.store-header-condensed:not(.store-search-mode) .store-compact-search{
+ opacity:1;visibility:visible;pointer-events:auto;
+}
+body.store-header-condensed .tabs{visibility:hidden;pointer-events:none}
+body.store-search-mode .top-inner>.search{opacity:1!important;visibility:visible!important;pointer-events:auto!important;background:#f4f5f4!important}
+body.store-search-mode .store-compact-tabs,
+body.store-search-mode .store-compact-search{opacity:0!important;visibility:hidden!important;pointer-events:none!important}
+body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!important;pointer-events:auto!important}
+#panel-produk>.section{display:flex;flex-direction:column;min-height:0;padding-top:8px;margin-top:0}
+#panel-produk .section-head{position:relative;z-index:1;min-height:34px;padding-top:4px}
+
+</style>
+<style>
+/* FILTER DOCK CLEAN: satu baris filter asli, tetap utuh di bawah toolbar. */
+.store-filter-dock{
+ position:sticky;
+ top:var(--store-top-height,60px);
+ z-index:41;
+ width:100%;
+ min-width:0;
+ background:#fff;
+ border-bottom:1px solid #f0f0f0;
+ overflow:visible;
+ isolation:isolate;
+}
+.store-filter-dock[hidden]{display:none!important}
+.store-filter-dock .sortbar{
+ display:flex;
+ align-items:center;
+ gap:8px;
+ width:100%;
+ height:72px;
+ min-height:72px;
+ padding:12px 12px 14px;
+ margin:0;
+ overflow-x:auto;
+ overflow-y:hidden;
+ scrollbar-width:none;
+ overscroll-behavior-x:contain;
+ -webkit-overflow-scrolling:touch;
+ scroll-snap-type:x proximity;
+}
+.store-filter-dock .sortbar::-webkit-scrollbar{display:none}
+.store-filter-dock .sort{
+ position:relative;
+ flex:0 0 auto;
+ min-height:44px;
+ padding:10px 14px;
+ line-height:22px;
+ white-space:nowrap;
+ scroll-snap-align:start;
+}
+#panel-produk>.section{padding-top:8px;margin-top:0}
+#storeContent>.panel{scroll-padding-top:0}
+</style>
+<style>
+/* Etalase kategori Store, terpisah dari kategori website utama. */
+.store-category-rail{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:3px 3px 12px;touch-action:auto}
+.store-category-rail::-webkit-scrollbar{display:none}
+.store-category-rail>.product-card{flex:0 0 clamp(145px,42%,200px);scroll-snap-align:start}
+.store-category-more{flex:0 0 145px;scroll-snap-align:end;border:1px dashed #9bc979;background:#f5faef;color:#608c2e;border-radius:8px;font-weight:750;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:9px}
+.store-category-more i{font-size:23px}
+.store-category-empty{padding:10px;color:#888;font-size:12px}
+</style>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<style id="warehouse-store-style">
+.wh-origin{position:relative;margin:0 5px 12px;z-index:3}
+.wh-origin-btn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 15px;background:linear-gradient(125deg,#fff,#f9fbf7);border:1px solid #e2e8dc;border-radius:14px;box-shadow:0 3px 12px #12240c0b;color:#242924}
+.wh-origin-btn .wh-pin{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#eff7e6;color:#689d30;font-size:16px}
+.wh-origin-label{display:block;font-size:11px;color:#798076;font-weight:600;margin-bottom:3px}
+.wh-origin-value{display:block;font-size:14px;font-weight:800;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wh-origin-chevron{margin-left:auto;color:#72994c;transition:transform .2s}
+.wh-origin.open .wh-origin-chevron{transform:rotate(180deg)}
+.wh-origin-dropdown{display:none;position:relative;background:#fff;border:1px solid #e1e8da;border-radius:14px;margin-top:7px;padding:12px;box-shadow:0 12px 25px #14231018}
+.wh-origin.open .wh-origin-dropdown{display:block}
+.wh-origin-search{width:100%;padding:12px 13px;border:1px solid #dce6d5;border-radius:10px;outline:none;background:#fafcf8;font-size:13px}
+.wh-origin-search:focus{border-color:#8cc63f;box-shadow:0 0 0 3px #8cc63f1c}
+.wh-origin-list{max-height:min(260px,38dvh);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;touch-action:pan-y;margin-top:8px}
+.wh-origin-option{width:100%;border:0;background:white;padding:11px 9px;display:flex;align-items:center;gap:10px;text-align:left;border-bottom:1px solid #f0f2ed;border-radius:8px;color:#2b3228}
+.wh-origin-option:active,.wh-origin-option.selected{background:#f2f9eb}
+.wh-origin-option span{flex:1;min-width:0}.wh-origin-option strong{display:block;font-size:13px}.wh-origin-option small{display:block;color:#7d8776;font-size:11px;margin-top:3px}
+.wh-origin-option .fa-check-circle{color:#75aa35}
+.wh-origin-empty{padding:18px;text-align:center;color:#899184;font-size:12px}
+</style>
+<style id="nexai-flash-sale-style">
+.flash-sale-section{border:1px solid #f0e1db;background:#fff}
+.flash-sale-section .flash-head{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin:4px 5px 12px}
+.flash-sale-section .flash-title{display:flex;align-items:center;gap:7px;font-size:17px;font-weight:900;color:#d83f28}
+.flash-sale-section .flash-title i{color:#f25a2b}
+.flash-clock-wrap{display:flex;align-items:center;gap:7px;flex-wrap:wrap;color:#777;font-size:11px}
+.flash-clock{display:inline-flex;align-items:center;gap:3px;font-variant-numeric:tabular-nums}
+.flash-clock b{background:#252525;color:#fff;border-radius:4px;padding:4px 5px;min-width:25px;text-align:center}
+.flash-sale-rail{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;scroll-snap-type:x proximity;scrollbar-width:none;-webkit-overflow-scrolling:touch;touch-action:auto;padding:2px 3px 12px}
+.flash-sale-rail::-webkit-scrollbar{display:none}
+.flash-sale-rail>.product-card{flex:0 0 clamp(145px,42%,200px);scroll-snap-align:start}
+.flash-card-timer{font-size:10px;font-weight:800;color:#b93220;background:#fff0eb;padding:5px 7px;border-top:1px solid #f7ded7;font-variant-numeric:tabular-nums;text-align:center}
+.flash-sale-more{color:#d8432d;background:none;border:0;font-size:12px;font-weight:800;white-space:nowrap}
+.flash-sale-full{position:fixed;inset:0;z-index:200;background:#f5f5f5;display:none;flex-direction:column}
+.flash-sale-full.open{display:flex}
+.flash-sale-full-header{display:flex;align-items:center;gap:14px;padding:14px;background:#fff;border-bottom:1px solid #e7e7e7}
+.flash-sale-full-header button{border:0;background:transparent;font-size:20px;color:#d8432d;padding:5px}
+.flash-sale-full-header strong{font-size:18px}
+.flash-sale-full-content{overflow-y:auto;flex:1;overscroll-behavior:contain;padding:12px;max-width:1120px;width:100%;margin:auto}
+.flash-sale-full .flash-sale-full-content .grid{gap:9px}
+@media(min-width:750px){.flash-sale-rail>.product-card{flex-basis:205px}}
+</style>
+<style id="nine-unified-flash-card-css">
+.nine-flash-label{position:absolute;left:4px;top:5px;z-index:2;display:inline-flex;align-items:center;gap:3px;background:#ee4b2b;color:#fff;font-size:9px;font-weight:850;padding:4px 6px;border-radius:4px;box-shadow:0 2px 6px #0002}
+.product-card .flash-card-timer{margin-top:auto;background:#fff0e9;color:#bf3a22;font-size:10px;letter-spacing:.05px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+</style>
+</head>
+<body>
+<header class="top"><div class="shell top-inner"><a class="back" href="/" aria-label="Kembali ke beranda"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input id="search" placeholder="Cari di Store Imam Sales" autocomplete="off"></label><div class="store-compact-tabs" aria-label="Navigasi Store saat scroll"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button class="store-compact-search" id="compactSearch" type="button" aria-label="Cari produk"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a class="top-btn" href="/" aria-label="Beranda"><i class="fa-solid fa-house"></i></a></div></header>
+<div class="shell">
+<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
+<nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
+<div class="store-filter-dock" id="storeFilterDock" hidden><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div></div>
+<main class="content" id="storeContent">
+<section class="panel active" id="panel-toko">
+<div class="wh-origin" id="whOrigin">
+ <button type="button" id="whOriginToggle" class="wh-origin-btn" aria-expanded="false" aria-controls="whOriginDropdown"><span class="wh-pin"><i class="fa-solid fa-location-dot"></i></span><span style="flex:1;min-width:0"><span class="wh-origin-label">Dikirim dari</span><span class="wh-origin-value" id="whOriginValue">DKI Jakarta</span></span><i class="fa-solid fa-chevron-down wh-origin-chevron"></i></button>
+ <div class="wh-origin-dropdown" id="whOriginDropdown"><input type="search" id="whOriginSearch" class="wh-origin-search" placeholder="Cari kota atau gudang..." autocomplete="off" aria-label="Cari gudang"><div class="wh-origin-list" id="whOriginList" role="listbox" aria-label="Pilihan gudang pengiriman"></div></div>
+</div>
+<div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section flash-sale-section hidden" id="flashSaleSection">
+ <div class="flash-head"><div class="flash-title"><i class="fa-solid fa-bolt"></i> FLASH SALE</div><button type="button" class="flash-sale-more" id="flashSaleMore">Lihat Semua »</button></div>
+ <div class="flash-clock-wrap">Berakhir dalam <span class="flash-clock" id="flashSaleClock">—</span></div>
+ <div class="flash-sale-rail" id="flashSaleRail" data-horizontal-scroll></div>
+</div>
+<div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Brand</h2><button class="more" data-go="kategori">Kategori Store ›</button></div><div class="chips" id="categoryChips" data-horizontal-scroll></div></div><div id="storeCategoryShelves"></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
+<section class="panel" id="panel-produk"><div class="section"><span id="productCount" class="notice" hidden></span><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
+<section class="panel" id="panel-kategori"><div class="section"><div class="category-list" id="categoryList"></div></div></section>
+</main><div class="flash-sale-full" id="flashSaleFull" aria-label="Daftar Flash Sale" aria-hidden="true">
+ <div class="flash-sale-full-header"><button type="button" id="flashSaleBack" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><strong>FLASH SALE</strong></div>
+ <div class="flash-sale-full-content"><div class="flash-clock-wrap" style="margin:5px 0 14px">Berakhir dalam <span class="flash-clock" id="flashSaleFullClock">—</span></div><div class="grid" id="flashSaleFullGrid"></div></div>
+</div><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
+<script>
+'use strict';
+const config={apiKey:"AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec",authDomain:"apin-web.firebaseapp.com",projectId:"apin-web",storageBucket:"apin-web.firebasestorage.app",messagingSenderId:"733140414417",appId:"1:733140414417:web:b6967fd053ac462b2ffaf0"};
+const $=id=>document.getElementById(id);
+const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
+const esc=x=>String(x??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let products=[],sort='populer',query='',tab='toko';
+let storeCategories=[],activeStoreCategory='',activeBrand='';
+$('year').textContent=new Date().getFullYear();
+// HEADER GLOBAL: satu status untuk Toko, Produk, Kategori.
+// scrollTop masing-masing panel dan mesin swipe horizontal tetap native/asli.
+(function(){
+ const root=$('storeContent'),hero=document.querySelector('.hero'),top=document.querySelector('.top');
+ const panels={toko:$('panel-toko'),produk:$('panel-produk'),kategori:$('panel-kategori')};
+ let headerOffset=0,raf=0,gesture=null,searchMode=false;
+ const headerMax=()=>hero.offsetHeight;
+ function fit(){
+  const vp=window.visualViewport;
+  const bottom=vp?vp.offsetTop+vp.height:window.innerHeight;
+  root.style.height=Math.max(160,Math.floor(bottom-root.getBoundingClientRect().top-8))+'px';
+ }
+ function paint(){
+  raf=0;
+  headerOffset=Math.max(0,Math.min(headerMax(),headerOffset));
+  hero.style.setProperty('--store-hero-offset',headerOffset+'px');
+  document.documentElement.style.setProperty('--store-header-progress',String(headerMax()?headerOffset/headerMax():0));
+  document.body.classList.toggle('store-header-condensed',headerOffset>=headerMax()-1);
+  document.body.classList.toggle('store-search-mode',searchMode);
+  document.documentElement.style.setProperty('--store-top-height',top.offsetHeight+'px');
+  fit();
+ }
+ function schedule(){if(!raf)raf=requestAnimationFrame(paint)}
+ function shift(delta){
+  const old=headerOffset;
+  headerOffset=Math.max(0,Math.min(headerMax(),old+delta));
+  if(Math.abs(headerOffset-old)>.01)schedule();
+  return headerOffset-old;
+ }
+ // Tangkap hanya gestur VERTIKAL untuk transisi header.
+ // Gestur horizontal diteruskan tanpa perubahan ke swipe engine yang sudah ada.
+ const excluded='input,textarea,select,[contenteditable="true"],.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]';
+ root.addEventListener('touchstart',e=>{
+  if(e.touches.length!==1||e.target.closest(excluded)){gesture=null;return}
+  const t=e.touches[0];
+  gesture={x:t.clientX,y:t.clientY,axis:null,headerGesture:false};
+ },{passive:true,capture:true});
+ root.addEventListener('touchmove',e=>{
+  const g=gesture;if(!g||e.touches.length!==1)return;
+  const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+  if(!g.axis){
+   if(Math.hypot(dx,dy)<8)return;
+   g.axis=Math.abs(dy)>Math.abs(dx)*1.12?'y':'x';
+  }
+  if(g.axis!=='y')return;
+  const panel=panels[tab],delta=-dy;
+  // Header hanya bereaksi ketika panel aktif benar-benar di posisi awal.
+  // Saat daftar masih bergulir, gerakan ke atas/bawah sepenuhnya native.
+  const atTop=panel.scrollTop<=2;
+  const canClose=delta>0&&headerOffset<headerMax()-1&&atTop;
+  const canOpen=delta<0&&headerOffset>0&&atTop;
+  if(g.headerGesture||canClose||canOpen){
+   if(e.cancelable)e.preventDefault();
+   shift(delta);
+   g.headerGesture=true;
+  }
+  // Perbarui titik sentuh meski konten yang bergulir, agar tak terjadi loncatan.
+  g.x=t.clientX;g.y=t.clientY;
+ },{passive:false,capture:true});
+ root.addEventListener('touchend',()=>{gesture=null},{passive:true,capture:true});
+ root.addEventListener('touchcancel',()=>{gesture=null},{passive:true,capture:true});
+ root.addEventListener('wheel',e=>{
+  const delta=e.deltaY;
+  const panel=panels[tab];
+  const atTop=panel.scrollTop<=2;
+  if(atTop&&((delta>0&&headerOffset<headerMax()-1)||(delta<0&&headerOffset>0))){
+   if(e.cancelable)e.preventDefault();
+   shift(delta);
+  }
+ },{passive:false});
+ // Pergantian tab TIDAK menyentuh headerOffset maupun scrollTop.
+ window.storeSyncVerticalHeader=()=>{gesture=null;schedule()};
+ window.addEventListener('resize',schedule,{passive:true});
+ window.addEventListener('orientationchange',schedule,{passive:true});
+ if(window.visualViewport)window.visualViewport.addEventListener('resize',schedule,{passive:true});
+ $('compactSearch').addEventListener('click',()=>{searchMode=true;schedule();$('search').focus()});
+ $('search').addEventListener('blur',()=>{
+  if(!searchMode)return;
+  setTimeout(()=>{if(document.activeElement!==$('search')){searchMode=false;schedule()}},100);
+ });
+ schedule();
+})();
+loadStoreVouchers();
+setInterval(()=>{render()},300000);
+const num=x=>Number(x)||0;
+const regularPrice=p=>{
+ const normal=num(p.harga?.normal), promo=num(p.harga?.promo);
+ return promo>0?promo:normal;
+};
+const flashIsActive=(p,now=Date.now())=>{
+ const f=p?.flashSale;
+ if(!f||f.enabled!==true)return false;
+ const start=Date.parse(f.startAt||""),end=Date.parse(f.endAt||"");
+ const special=Number(f.price);
+ return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&Number.isFinite(special)&&special>0&&special<num(p.harga?.normal);
+};
+const price=p=>flashIsActive(p)?Number(p.flashSale.price):regularPrice(p);
+const normal=p=>num(p.harga?.normal);
+const sold=p=>num(p.terjual);
+// Samakan resolusi foto dengan index utama yang berada di root domain.
+function productImageUrl(value){
+ const raw=String(value||'').trim();
+ if(!raw)return '/images/no-image.png';
+ if(/^(https?:)?\/\//i.test(raw))return raw.startsWith('//')?'https:'+raw:raw;
+ if(/^data:image\/(?:png|jpeg|jpg|webp|gif|avif);base64,/i.test(raw))return raw;
+ if(/^(?:javascript|data|blob|file):/i.test(raw))return '/images/no-image.png';
+ try{return new URL(raw,location.origin+'/').href}
+ catch{return '/images/no-image.png'}
+}
+
+const active=p=>p&&p.active!==false&&p.deleted!==true;
+const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.varian:[]});
+function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
+const stats=new Map();
+function formatStoreCompact(value){
+ const n=Number(value);
+ if(!Number.isFinite(n)||n<0)return '—';
+ if(n<1000)return Math.floor(n).toLocaleString('id-ID');
+ const units=n>=1e9?['M',1e9]:n>=1e6?['JT',1e6]:['RB',1000];
+ const scaled=n/units[1];
+ const rounded=scaled>=10?Math.floor(scaled):Math.floor(scaled*10)/10;
+ return rounded.toLocaleString('id-ID',{maximumFractionDigits:1})+units[0]+(scaled>rounded?'+':'');
+}
+function refreshStoreSold(){
+ const total=products.reduce((sum,p)=>{
+  const st=stats.get(String(p.id))||{};
+  const value=Number(st.terjual??p.terjual);
+  return sum+(Number.isFinite(value)&&value>0?value:0);
+ },0);
+ $('storeSoldTotal').textContent=formatStoreCompact(total);
+}
+
+function fmt(n){const x=Number(n);if(!Number.isFinite(x)||x<0)return '—';return x>=1000000?(x/1000000).toLocaleString('id-ID',{maximumFractionDigits:1})+'jt':x>=10000?(x/1000).toLocaleString('id-ID',{maximumFractionDigits:1})+'rb':x.toLocaleString('id-ID')}
+function featureCandidates(p){
+ const src=p.specifications??p.spesifikasi??p.fitur??p.features, result=[];
+ const add=(k,v)=>{
+  if(Array.isArray(v))v=v.filter(x=>typeof x==='string'||typeof x==='number').join(', ');
+  if(typeof v!=='string'&&typeof v!=='number')return;
+  const value=String(v).replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+  const label=(k?String(k).replace(/[_-]/g,' ')+': ':'')+value;
+  if(value&&label.length>=3&&label.length<=85&&!/^(nama|sku|kode|harga|brand|model|id|_)/i.test(label))result.push(label);
+ };
+ if(Array.isArray(src))src.forEach(x=>{
+  if(typeof x==='string'||typeof x==='number')add('',x);
+  else if(x&&typeof x==='object'){
+   const k=x.label??x.nama??x.name??x.key, v=x.value??x.nilai??x.isi??x.text;
+   if(k!=null&&v!=null)add(k,v);
+   else Object.entries(x).forEach(([key,value])=>add(key,value));
+  }
+ });
+ else if(src&&typeof src==='object')Object.entries(src).forEach(([k,v])=>add(k,v));
+ else if(typeof src==='string')src.split(/[;\n]/).forEach(v=>add('',v));
+ return [...new Set(result)];
+}
+function feature(p){
+ const parts=featureCandidates(p);if(!parts.length)return '';
+ let hash=0;for(const c of String(p.id))hash=(hash*31+c.charCodeAt(0))>>>0;
+ return parts[(Math.floor(Date.now()/300000)+hash)%parts.length];
+}
+const STORE_VOUCHER_SNAPSHOT=[{"id":"BELANJA50","name":"Voucher Belanja","description":"Potongan Belanja Rp5.000","type":"product_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-tags","badge":"HOT","limit":"1 Voucher / Akun"},{"id":"DISKON10","name":"Diskon Produk 10%","description":"Diskon produk 10%","type":"product_percent","discount":10,"min":100000,"maxDiscount":500,"expired":"2026-12-31","icon":"fa-percent","badge":"PROMO","limit":"1 Voucher / Akun"},{"id":"ONGKIR5","name":"Diskon Ongkir","description":"Potongan Ongkir Rp5.000","type":"shipping_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-truck","badge":"HEMAT","limit":"1 Voucher / Akun"}];
+let activeVouchers=[];
+function validVoucher(v){
+ if(!v||!v.id||!v.name)return false;
+ if(v.expired&&new Date(v.expired+'T23:59:59').getTime()<Date.now())return false;
+ return true;
+}
+async function loadStoreVouchers(){
+ try{
+  let data;
+  try {
+    const response=await fetch('/store/vouchers.json',{cache:'no-store'});
+    if(!response.ok)throw Error('HTTP '+response.status);
+    data=await response.json();
+  } catch(e) {
+    console.warn('Voucher JSON tidak tersedia, memakai salinan voucher dari paket:',e);
+    data=STORE_VOUCHER_SNAPSHOT;
+  }
+  activeVouchers=Array.isArray(data)?data.filter(validVoucher):[];
+  const section=$('voucherSection'),rail=$('storeVouchers');
+  section.classList.toggle('hidden',!activeVouchers.length);
+  rail.innerHTML=activeVouchers.map(v=>`<article class="store-voucher"><i class="fa-solid fa-ticket voucher-icon"></i><div><b>${esc(v.name)}</b><small>${esc(v.description||'')} · Min. ${money(v.min||0)}</small><small>Berlaku sampai ${esc(v.expired||'sesuai ketentuan')}</small><small>Gunakan saat checkout jika memenuhi syarat</small></div></article>`).join('');
+  render();
+ }catch(e){console.warn('Voucher Store:',e);$('voucherSection').classList.add('hidden')}
+}
+
+function activeFlashProducts(){
+ const now=Date.now();
+ return products.filter(p=>{
+  const f=p.flashSale;
+  if(!f||f.enabled!==true)return false;
+  const start=Date.parse(f.startAt||""),end=Date.parse(f.endAt||"");
+  return Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&flashIsActive(p,now);
+ }).sort((a,b)=>Date.parse(a.flashSale.endAt)-Date.parse(b.flashSale.endAt));
+}
+function flashDuration(ms){
+ const secs=Math.max(0,Math.floor(ms/1000));
+ const h=Math.floor(secs/3600),m=Math.floor(secs%3600/60),s=secs%60;
+ return [h,m,s].map(n=>String(n).padStart(2,"0")).join(":");
+}
+function flashClockHTML(ms){
+ return flashDuration(ms).split(":").map((n,i)=>`${i?'<span>:</span>':''}<b>${n}</b>`).join("");
+}
+let flashRenderSignature="";
+function renderFlashSale(force=false){
+ const items=activeFlashProducts();
+ const section=$('flashSaleSection'),rail=$('flashSaleRail'),full=$('flashSaleFull');
+ // Deep link dari website utama: buka daftar Flash Sale setelah data CMS tersedia.
+ if(location.hash==='#flash-sale' && items.length && !full.classList.contains('open')){
+  full.classList.add('open');
+  full.setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+ }
+
+ section.classList.toggle('hidden',!items.length);
+ const signature=JSON.stringify(items.map(p=>[p.id,p.nama,p.gambar,p.harga,p.flashSale,p.terjual]));
+ if(force||signature!==flashRenderSignature){
+  flashRenderSignature=signature;
+  rail.innerHTML=items.slice(0,10).map(p=>card(p)).join('');
+  $('flashSaleFullGrid').innerHTML=items.map(p=>card(p)).join('');
+ }
+ const soonest=items.length?Math.min(...items.map(p=>Date.parse(p.flashSale.endAt))):0;
+ const html=items.length?flashClockHTML(soonest-Date.now()):'—';
+ $('flashSaleClock').innerHTML=html;
+ $('flashSaleFullClock').innerHTML=html;
+ document.querySelectorAll('[data-flash-end]').forEach(el=>{
+  const left=Date.parse(el.dataset.flashEnd)-Date.now();
+  el.textContent=left>0?'Berakhir '+flashDuration(left):'Flash Sale berakhir';
+ });
+ if(full.classList.contains('open')&&!items.length)closeFlashSale();
+}
+function closeFlashSale(){
+ if(location.hash==='#flash-sale')history.replaceState(null,'',location.pathname+location.search);
+ $('flashSaleFull').classList.remove('open');
+ $('flashSaleFull').setAttribute('aria-hidden','true');
+ document.body.style.overflow='';
+}
+document.addEventListener('click',e=>{
+ if(e.target.closest('#flashSaleMore')){
+  renderFlashSale(true);
+  $('flashSaleFull').classList.add('open');
+  $('flashSaleFull').setAttribute('aria-hidden','false');
+  document.body.style.overflow='hidden';
+ }
+ if(e.target.closest('#flashSaleBack'))closeFlashSale();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&$('flashSaleFull').classList.contains('open'))closeFlashSale()});
+let flashActiveKeys="";
+setInterval(()=>{
+ const keys=activeFlashProducts().map(p=>p.id).sort().join("|");
+ if(keys!==flashActiveKeys){flashActiveKeys=keys;render();return;}
+ renderFlashSale();
+},1000);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)render()});
+
+function card(p){
+ const h=price(p),n=normal(p),disc=n>h&&h>0?Math.round((1-h/n)*100):0;
+ const st=stats.get(String(p.id))||{};
+ const count=Number(st.ratingCount??p.ratingCount??0);
+ const total=Number(st.ratingTotal??p.ratingTotal??0);
+ const rating=count>0&&Number.isFinite(total)?(total/count).toFixed(1):'—';
+ const sales=st.terjual??p.terjual;
+ const views=st.views??p.views??p.viewCount;
+ const benefit=feature(p);
+ const hasVoucher=activeVouchers.some(v=>v.type&&v.type.startsWith("product_"));
+ const isFlash=flashIsActive(p);
+ return `<article class="product-card marketplace-card" data-product-id="${esc(p.id)}" tabindex="0" role="link" aria-label="Lihat ${esc(p.nama)}">
+ ${disc?`<span class="marketplace-discount-badge">-${disc}%</span>`:''}
+ ${isFlash?`<span class="nine-flash-label"><i class="fa-solid fa-bolt"></i> FLASH SALE</span>`:'' }
+ <div class="marketplace-image-wrap"><img src="${esc(productImageUrl(p.gambar||''))}" alt="${esc(p.nama)}" loading="lazy"></div>
+ <div class="product-card-body">
+ <h3 class="marketplace-product-name">${esc(p.nama)}</h3>
+ <div class="marketplace-price">${money(h)}${disc?`<span class="marketplace-price-old">${money(n)}</span>`:''}</div>
+ <div class="product-labels">${hasVoucher?'<span class="product-voucher-label"><i class="fa-solid fa-ticket"></i> Voucher</span>':''}${benefit?`<span class="product-feature">${esc(benefit)}</span>`:''}</div>
+ <div class="product-meta"><span class="product-rating">⭐ ${rating}</span><span class="meta-sep">|</span><span class="meta-number">${sales==null?'—':fmt(sales)} terjual</span><span class="meta-sep">|</span><span class="meta-number"><i class="fa-regular fa-eye"></i> ${views==null?'—':fmt(views)}</span></div>
+ </div>${isFlash?`<div class="flash-card-timer" data-flash-end="${esc(p.flashSale.endAt)}"></div>`:''}</article>`;
+}
+function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
+function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
+// Pencarian semantik ringan berbasis kategori Store realtime; ID hanya relasi internal.
+const searchNormalize=value=>String(value??'').toLocaleLowerCase('id-ID').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
+function categorySearchTerms(c){
+ const raw=[c.name,c.description,c.deskripsi,c.keywords,c.aliases,c.searchKeywords,c.kataKunci];
+ return raw.flatMap(v=>Array.isArray(v)?v:[v]).filter(v=>typeof v==='string').flatMap(v=>v.split(/[,;\n]+/)).map(searchNormalize).filter(Boolean);
+}
+function searchMatches(p,needle){
+ if(!needle)return true;
+ const categories=(Array.isArray(p.storeCategories)?p.storeCategories:[])
+  .map(id=>storeCategories.find(c=>c.id===id&&c.active!==false)).filter(Boolean);
+ const fields=[p.nama,p.brand,p.kategori,p.deskripsi,p.sku,p.kode,p.fungsi,p.aplikasi,p.tags,...categories.flatMap(categorySearchTerms)];
+ const normalized=fields.map(searchNormalize).filter(Boolean);
+ if(normalized.some(v=>v.includes(needle)))return true;
+ // Semua kata boleh tersebar di nama, deskripsi, dan kategori, tetapi wajib semuanya cocok.
+ const words=needle.split(' ').filter(Boolean);
+ return words.length>1&&words.every(word=>normalized.some(v=>v.split(' ').some(token=>token.startsWith(word))));
+}
+function openStoreFilter(type,value){
+ activeStoreCategory=type==='category'?value:'';
+ activeBrand=type==='brand'?value:'';
+ query='';
+ $('search').value=type==='category'?(storeCategories.find(c=>c.id===value)?.name||''):value;
+ sort='populer';
+ document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));
+ render();
+ changeTab('produk');
+ $('panel-produk').scrollTop=0;
+}
+function render(){
+ const filtered=products.filter(p=>{
+  if(activeStoreCategory&&!(Array.isArray(p.storeCategories)&&p.storeCategories.includes(activeStoreCategory)))return false;
+  if(activeBrand&&String(p.brand||'').toLowerCase()!==activeBrand.toLowerCase())return false;
+  return searchMatches(p,searchNormalize(query));
+ });
+ const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
+ renderFlashSale();
+ paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
+ $('allGrid').innerHTML=filtered.length?rank(filtered,sort).map(card).join(''):'';
+ $('productCount').textContent=filtered.length+' produk';
+ $('storeProductCount').textContent=products.length;
+ $('empty').classList.toggle('hidden',filtered.length!==0);
+ refreshStoreSold();
+ const enabled=storeCategories.filter(c=>c.active!==false);
+ $('categoryList').innerHTML=enabled.map(c=>{
+  const count=products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id)).length;
+  return `<button class="category" data-store-category="${esc(c.id)}"><span class="cat-icon"><i class="fa-solid fa-tags"></i></span><span class="cat-name">${esc(c.name)}</span><span class="count">${count}</span><i class="fa-solid fa-chevron-right" style="color:#aaa"></i></button>`;
+ }).join('')||'<p class="empty">Kategori Store belum tersedia.</p>';
+ const brands=new Map();
+ products.forEach(p=>{const v=String(p.brand||'').trim();if(v)brands.set(v,(brands.get(v)||0)+1)});
+ $('categoryChips').innerHTML=[...brands].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([k,n])=>`<button class="chip" data-store-brand="${esc(k)}">${esc(k)} (${n})</button>`).join('');
+ const shelves=$('storeCategoryShelves');
+ // Jangan rebuild rail saat scroll/sentuh berlangsung: render dipanggil oleh statistik dan timer.
+ const signature=JSON.stringify(enabled.map(c=>[c.id,c.name,products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id)).map(p=>[p.id,p.nama,p.gambar,p.harga,p.terjual,p.active])]));
+ if(shelves.dataset.signature!==signature){
+  shelves.dataset.signature=signature;
+  shelves.innerHTML=enabled.map(c=>{
+   const items=products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id));
+   if(!items.length)return '';
+   return `<div class="section"><div class="section-head"><h2>${esc(c.name)}</h2><button class="more" data-store-category="${esc(c.id)}">Lihat Semua ›</button></div><div class="store-category-rail" data-horizontal-scroll>${items.map(card).join('')}<button class="store-category-more" data-store-category="${esc(c.id)}"><i class="fa-solid fa-arrow-right"></i><span>Lihat Semua</span></button></div></div>`;
+  }).join('');
+ }
+}
+
+function changeTab(t){
+ if(!['toko','produk','kategori'].includes(t)||t===tab)return;
+ const previous=$('panel-'+tab),next=$('panel-'+t);
+ // Setiap panel mempertahankan scrollTop sendiri secara native.
+ previous.classList.remove('active');
+ next.classList.add('active');
+ tab=t;
+ $('storeFilterDock').hidden=t!=='produk';
+ document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===t));
+ if(window.storeSyncVerticalHeader)window.storeSyncVerticalHeader();
+}
+document.addEventListener('click',e=>{
+ const cardEl=e.target.closest('[data-product-id]');if(cardEl){sessionStorage.setItem('nine_store_navigation',String(cardEl.dataset.productId));location.href='/?product='+encodeURIComponent(cardEl.dataset.productId)+'&from=store';return}
+ const t=e.target.closest('[data-tab]');if(t){changeTab(t.dataset.tab);return}
+ const go=e.target.closest('[data-go]');if(go){if(go.dataset.sort){sort=go.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));render()}changeTab(go.dataset.go);return}
+ const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
+ const storeCat=e.target.closest('[data-store-category]');
+ if(storeCat){openStoreFilter('category',storeCat.dataset.storeCategory);return}
+ const brand=e.target.closest('[data-store-brand]');
+ if(brand){openStoreFilter('brand',brand.dataset.storeBrand);return}
+});
+// SATU swipe engine: panel punya scroll mandiri, tanpa window.scrollTo atau tinggi sementara.
+(function(){
+ const root=$('storeContent'),order=['toko','produk','kategori'];
+ const excluded='input,textarea,select,[contenteditable="true"],.store-vouchers,.chips,.sortbar,[data-horizontal-scroll]';
+ const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;
+ let gesture=null,settling=false,ignoreClickUntil=0;
+ const panel=t=>$('panel-'+t);
+ const translate=(p,x)=>{p.style.transform=`translate3d(${x}px,0,0)`};
+ function clear(g){
+  if(g?.from){g.from.style.transition='';g.from.style.transform='';g.from.style.willChange=''}
+  if(g?.to){g.to.classList.remove('swipe-peer');g.to.style.transition='';g.to.style.transform='';g.to.style.willChange=''}
+  root.classList.remove('swiping');
+  settling=false;
+ }
+ function begin(g){
+  g.from=panel(order[g.index]);g.to=panel(order[g.next]);
+  g.width=root.clientWidth;
+  if(!g.width||!g.from||!g.to)return false;
+  root.classList.add('swiping');
+  g.to.classList.add('swipe-peer');
+  g.from.style.willChange='transform';g.to.style.willChange='transform';
+  translate(g.to,(g.next>g.index?1:-1)*g.width);
+  return true;
+ }
+ function drag(g,dx){
+  const x=Math.max(-g.width,Math.min(g.width,dx)),dir=g.next>g.index?1:-1;
+  translate(g.from,x);translate(g.to,x+dir*g.width);
+ }
+ function finish(commit){
+  const g=gesture;gesture=null;
+  if(!g?.from)return;
+  settling=true;
+  const dir=g.next>g.index?1:-1,duration=reduced?0:commit?230:160;
+  const end=commit?-dir*g.width:0;
+  const offset=commit?0:dir*g.width;
+  const ease='cubic-bezier(.2,.75,.25,1)';
+  const complete=()=>{
+   if(commit){
+    // Tujuan sudah berada di x=0 sebelum indikator berubah.
+    g.from.classList.remove('active');
+    g.to.classList.add('active');
+    tab=order[g.next];
+    $('storeFilterDock').hidden=tab!=='produk';
+    document.querySelectorAll('[data-tab]').forEach(x=>x.classList.toggle('active',x.dataset.tab===tab));
+    if(window.storeSyncVerticalHeader)window.storeSyncVerticalHeader();
+   }
+   clear(g);
+  };
+  if(!duration){translate(g.from,end);translate(g.to,offset);complete();return}
+  g.from.style.transition=`transform ${duration}ms ${ease}`;
+  g.to.style.transition=`transform ${duration}ms ${ease}`;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{
+   translate(g.from,end);translate(g.to,offset);
+  }));
+  setTimeout(complete,duration+35);
+ }
+ root.addEventListener('touchstart',e=>{
+  if(settling||e.touches.length!==1||e.target.closest(excluded)){gesture=null;return}
+  const t=e.touches[0],now=performance.now();
+  gesture={x:t.clientX,y:t.clientY,lastX:t.clientX,lastTime:now,start:now,
+   axis:null,index:order.indexOf(tab),next:-1,dx:0,velocity:0};
+ },{passive:true});
+ root.addEventListener('touchmove',e=>{
+  const g=gesture;if(!g||e.touches.length!==1)return;
+  const t=e.touches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+  if(!g.axis){
+   if(Math.hypot(dx,dy)<7)return;
+   if(Math.abs(dx)<=Math.abs(dy)*1.12){gesture=null;return}
+   g.axis='x';g.next=g.index+(dx<0?1:-1);
+   if(g.next<0||g.next>=order.length||!begin(g)){gesture=null;return}
+  }
+  if(e.cancelable)e.preventDefault();
+  const now=performance.now(),dt=now-g.lastTime;
+  if(dt>0&&dt<120)g.velocity=(t.clientX-g.lastX)/dt;
+  g.lastX=t.clientX;g.lastTime=now;g.dx=dx;
+  drag(g,dx);
+ },{passive:false});
+ root.addEventListener('touchend',e=>{
+  const g=gesture;if(!g)return;
+  if(g.axis!=='x'){gesture=null;return}
+  const t=e.changedTouches[0],dx=t.clientX-g.x,dy=t.clientY-g.y;
+  const toward=g.next>g.index?-1:1;
+  const distance=dx*toward,elapsed=Math.max(1,performance.now()-g.start);
+  const speed=Math.max(g.velocity*toward,distance/elapsed);
+  const commit=Math.abs(dx)>Math.abs(dy)*1.12&&(distance>g.width*.22||(distance>12&&speed>.22));
+  ignoreClickUntil=performance.now()+450;finish(commit);
+ },{passive:true});
+ root.addEventListener('touchcancel',()=>{if(gesture?.from)finish(false);else gesture=null},{passive:true});
+ root.addEventListener('click',e=>{
+  if(performance.now()<ignoreClickUntil){e.preventDefault();e.stopImmediatePropagation()}
+ },true);
+})();
+// Cegah menu tekan-lama Chrome pada foto produk Store.
+document.addEventListener('contextmenu',e=>{
+ if(e.target.closest('.marketplace-image-wrap img,.product-card img')){
+  e.preventDefault();
+ }
+},true);
+document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
+document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
+$('search').addEventListener('input',e=>{activeStoreCategory='';activeBrand='';query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
+$('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('search').value='';render();$('search').focus()};
+(async()=>{
+ try{
+  const r=await fetch('/produk.json',{cache:'no-store'});if(!r.ok)throw Error('produk.json gagal dimuat');
+  const seed=(await r.json()).map(normalize);products=seed.filter(active);render();
+  if(!window.firebase)return;
+  if(!firebase.apps.length)firebase.initializeApp(config);
+  // Samakan Firebase App Check reCAPTCHA Enterprise dengan website utama.
+  try {
+    if(firebase.appCheck && firebase.appCheck.ReCaptchaEnterpriseProvider){
+      firebase.appCheck().activate(new firebase.appCheck.ReCaptchaEnterpriseProvider('6LdyvOktAAAAAPcWRB-_bmuw3Z6wVSzgX1kAG11M'),true);
+    }
+  } catch(e){console.warn('App Check Store belum aktif:',e)}
+  const db=firebase.firestore();
+  // Statistik sama dengan website utama: statistik_produk.
+  db.collection('statistik_produk').onSnapshot(snap=>{
+   stats.clear();let ratingTotal=0,ratingCount=0;
+   snap.forEach(doc=>{const x=doc.data()||{};stats.set(String(doc.id),x);
+    const c=Number(x.ratingCount),t=Number(x.ratingTotal);
+    if(Number.isFinite(c)&&Number.isFinite(t)&&c>0&&t>=c&&t<=5*c){ratingCount+=c;ratingTotal+=t}
+   });
+   $('storeRating').textContent=ratingCount?(ratingTotal/ratingCount).toFixed(1):'—';
+   render();
+  },e=>console.warn('Statistik produk belum dapat dimuat:',e));
+  // Ikuti menggunakan penghitung like landing dan identitas pengunjung yang sama dengan website utama.
+  const visitorId=localStorage.getItem('visitor_id')||(()=>{const id=Date.now().toString(36)+Math.random().toString(36).slice(2,10);localStorage.setItem('visitor_id',id);return id})();
+  const likeRef=db.collection('interaksi_web').doc('landing');
+  const userLikeRef=db.collection('user_like').doc(visitorId);
+  likeRef.onSnapshot(doc=>{const x=doc.data()||{};$('storeFollowers').textContent=Number.isFinite(Number(x.like))?Number(x.like).toLocaleString('id-ID'):'—'},()=>{});
+  userLikeRef.onSnapshot(doc=>{
+    const liked=doc.exists&&doc.data().liked===true;
+    const btn=$('storeFollow');btn.setAttribute('aria-pressed',String(liked));
+    btn.innerHTML=liked?'<i class="fa-solid fa-heart"></i> Mengikuti':'<i class="fa-regular fa-heart"></i> Ikuti';
+   },e=>console.warn('Status Ikuti:',e));
+  // Ikuti: samakan pola update counter + set user dengan halaman utama.
+  // Hindari runTransaction yang dapat ditolak oleh rules meski update() diperbolehkan.
+  let followBusy=false;
+  const followToast=(message,icon='success')=>{
+    if(window.Swal && typeof Swal.fire==='function'){
+      Swal.fire({toast:true,position:'top-end',icon,title:message,
+        showConfirmButton:false,timer:2600,timerProgressBar:true,
+        customClass:{popup:'store-swal-toast'}});
+    }else{
+      const el=document.createElement('div');el.className='store-toast-fallback';
+      el.setAttribute('role','status');el.textContent=message;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),2800);
+    }
+  };
+  $('storeFollow').onclick=async()=>{
+    if(followBusy)return;
+    followBusy=true;
+    const button=$('storeFollow');button.disabled=true;
+    try{
+      const userSnap=await userLikeRef.get();
+      const alreadyLiked=userSnap.exists&&userSnap.data().liked===true;
+      if(alreadyLiked){
+        const counterSnap=await likeRef.get();
+        const total=Number(counterSnap.data()?.like)||0;
+        if(total>0){
+          await likeRef.update({like:firebase.firestore.FieldValue.increment(-1)});
+        }
+        await userLikeRef.set({liked:false});
+        followToast('Berhenti mengikuti toko');
+      }else{
+        await likeRef.update({like:firebase.firestore.FieldValue.increment(1)});
+        await userLikeRef.set({liked:true});
+        followToast('Berhasil mengikuti toko');
+      }
+      // Snapshot tetap menjadi sumber kebenaran untuk status dan jumlah.
+    }catch(e){
+      console.error('Store follow write failed',e?.code,e?.message,e);
+      followToast('Perubahan belum tersimpan. Coba lagi.','error');
+    }finally{followBusy=false;button.disabled=false}
+  };
+
+  db.collection('store_categories').onSnapshot(snapshot=>{
+   storeCategories=snapshot.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.name).localeCompare(String(b.name)));
+   if(activeStoreCategory&&!storeCategories.some(c=>c.id===activeStoreCategory&&c.active!==false)){
+    activeStoreCategory='';$('search').value='';
+   }
+   render();
+  },error=>console.warn('Kategori Store belum dapat dibaca:',error));
+  db.collection('cms_products').onSnapshot(snapshot=>{
+   const docs=new Map();snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
+   products=merge(seed,docs);render();
+  },error=>console.warn('Firestore tidak tersedia, menggunakan katalog dasar:',error));
+  // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
+  const presenceUrl='/.netlify/functions/admin-presence';
+  const activeWindowMs=90000;
+  let lastPresenceMs=0;
+  function renderPresence(){
+    const el=$('storeStatus');
+    if(!lastPresenceMs){el.textContent='Status aktivitas belum tersedia';return}
+    const age=Math.max(0,Date.now()-lastPresenceMs);
+    if(age<activeWindowMs){el.textContent='● Online';return}
+    const minutes=Math.floor(age/60000);
+    el.textContent=minutes<60?'Aktif '+Math.max(1,minutes)+' menit lalu':
+      minutes<1440?'Aktif '+Math.floor(minutes/60)+' jam lalu':
+      'Aktif '+Math.floor(minutes/1440)+' hari lalu';
+  }
+  async function refreshPresence(){
+    try{
+      const response=await fetch(presenceUrl,{cache:'no-store'});
+      if(!response.ok)throw Error('HTTP '+response.status);
+      const data=await response.json();
+      if(data.success!==true)throw Error('Respons status tidak valid');
+      const value=data.lastActiveAt;
+      lastPresenceMs=value?(typeof value==='number'?value:Date.parse(value)):0;
+      if(!Number.isFinite(lastPresenceMs))lastPresenceMs=0;
+    }catch(error){console.warn('Status aktivitas Store:',error);lastPresenceMs=0}
+    renderPresence();
+  }
+  refreshPresence();
+  setInterval(refreshPresence,30000);
+  setInterval(renderPresence,15000);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPresence()});
+
+ }catch(e){console.error(e);$('homeGrid').innerHTML='<p class="empty">Produk belum dapat dimuat. Silakan coba lagi.</p>';$('allGrid').innerHTML='';$('empty').textContent='Produk belum dapat dimuat. Periksa koneksi katalog.';$('empty').classList.remove('hidden');$('storeStatus').textContent='Status aktivitas belum tersedia'}
+})();
+</script>
+
+<script id="warehouse-store-engine">
+(function(){
+ 'use strict';
+ const root=document.getElementById('whOrigin'),toggle=document.getElementById('whOriginToggle'),search=document.getElementById('whOriginSearch'),list=document.getElementById('whOriginList'),label=document.getElementById('whOriginValue');
+ if(!root)return;
+ const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','&quot;':'&quot;',"'":'&#39;'}[c]));
+ const key='nine_store_warehouse_id';
+ let warehouses=[],selectedId=null,initialized=false;
+ try{selectedId=localStorage.getItem(key)}catch(e){}
+ function close(){root.classList.remove('open');toggle.setAttribute('aria-expanded','false')}
+ function render(){
+  const active=warehouses.filter(w=>w.active!==false);
+  const chosen=active.find(w=>w.id===selectedId);
+  const fallback=active.find(w=>w.isDefault)||active.find(w=>/dki jakarta/i.test((w.province||'')+' '+(w.city||'')))||active[0];
+  const selected=chosen||fallback;
+  if(selected){selectedId=selected.id;label.textContent=selected.city||selected.province||selected.name;try{localStorage.setItem(key,selected.id)}catch(e){}}
+  else{selectedId=null;label.textContent=initialized?'Lokasi belum tersedia':'DKI Jakarta'}
+  const q=search.value.trim().toLocaleLowerCase('id');
+  const shown=active.filter(w=>[w.city,w.province,w.name].some(v=>String(v||'').toLocaleLowerCase('id').includes(q)));
+  list.innerHTML=shown.length?shown.map(w=>`<button type="button" class="wh-origin-option ${w.id===selectedId?'selected':''}" role="option" aria-selected="${w.id===selectedId}" data-wh-id="${esc(w.id)}"><i class="fa-solid fa-warehouse" style="color:#84b54f"></i><span><strong>${esc(w.city||w.province||w.name)}</strong><small>${esc(w.province||'')}${w.name?' · '+esc(w.name):''}</small></span>${w.id===selectedId?'<i class="fa-solid fa-check-circle"></i>':''}</button>`).join(''):'<div class="wh-origin-empty">Tidak ada gudang yang cocok.</div>';
+ }
+ toggle.addEventListener('click',()=>{const open=!root.classList.contains('open');root.classList.toggle('open',open);toggle.setAttribute('aria-expanded',String(open));if(open){render();search.focus({preventScroll:true})}});
+ search.addEventListener('input',render);
+ list.addEventListener('click',e=>{const b=e.target.closest('[data-wh-id]');if(!b)return;selectedId=b.dataset.whId;try{localStorage.setItem(key,selectedId)}catch(e){}render();close();root.dispatchEvent(new CustomEvent('warehousechange',{detail:{warehouseId:selectedId},bubbles:true}))});
+ document.addEventListener('pointerdown',e=>{if(!root.contains(e.target))close()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+ function subscribe(){
+  if(typeof firebase==='undefined'||!firebase.apps||!firebase.apps.length){setTimeout(subscribe,300);return}
+  firebase.firestore().collection('store_warehouses').onSnapshot(snap=>{warehouses=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.city||'').localeCompare(String(b.city||'')));initialized=true;render()},err=>{initialized=true;label.textContent='Lokasi belum tersedia';list.innerHTML='<div class="wh-origin-empty">Lokasi belum bisa dimuat.</div>';console.warn('Gudang Store:',err)});
+ }
+ subscribe();
+})();
+</script>
+</body></html>

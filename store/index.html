@@ -1,12 +1,13 @@
-<!doctype html>
+<!DOCTYPE html>
+
 <html lang="id">
 <head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Store | Imam Sales</title>
-<meta name="description" content="Jelajahi produk pilihan Imam Sales, harga promo, kategori, dan produk terbaru.">
-<link rel="canonical" href="https://imamsalesnine.com/store">
-<link rel="preconnect" href="https://www.gstatic.com">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+<meta content="Jelajahi produk pilihan Imam Sales, harga promo, kategori, dan produk terbaru." name="description"/>
+<link href="https://imamsalesnine.com/store" rel="canonical"/>
+<link href="https://www.gstatic.com" rel="preconnect"/>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" rel="stylesheet"/>
 <style>
 :root{--green:#8cc63f;--dark:#101411;--red:#e6543b;--muted:#858585;--line:#e9e9e9}
 *{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f5f5f5;color:#202020;font:15px system-ui,-apple-system,Arial,sans-serif}button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}
@@ -49,7 +50,6 @@ body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
 input,textarea,[contenteditable="true"]{-webkit-user-select:text!important;user-select:text!important;-webkit-touch-callout:default}
 img{-webkit-user-drag:none;user-drag:none}
 </style>
-
 <style>
 /* STORE V2 — layout padat, tanpa menambah komponen card tandingan */
 .hero{min-height:0;padding:17px 15px 13px;display:grid;grid-template-columns:minmax(0,1fr) auto;column-gap:10px;row-gap:7px}
@@ -211,7 +211,6 @@ body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!impor
 .store-category-empty{padding:10px;color:#888;font-size:12px}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
 <style id="warehouse-store-style">
 .wh-origin{position:relative;margin:0 5px 12px;z-index:3}
 .wh-origin-btn{width:100%;display:flex;align-items:center;gap:12px;text-align:left;padding:13px 15px;background:linear-gradient(125deg,#fff,#f9fbf7);border:1px solid #e2e8dc;border-radius:14px;box-shadow:0 3px 12px #12240c0b;color:#242924}
@@ -259,28 +258,28 @@ body.store-search-mode #clearSearch{opacity:1!important;visibility:visible!impor
 </style>
 </head>
 <body>
-<header class="top"><div class="shell top-inner"><a class="back" href="/" aria-label="Kembali ke beranda"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input id="search" placeholder="Cari di Store Imam Sales" autocomplete="off"></label><div class="store-compact-tabs" aria-label="Navigasi Store saat scroll"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button class="store-compact-search" id="compactSearch" type="button" aria-label="Cari produk"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a class="top-btn" href="/" aria-label="Beranda"><i class="fa-solid fa-house"></i></a></div></header>
+<header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
-<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a id="storeChat" href="https://wa.me/6282210109369" target="_blank" rel="noopener noreferrer" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button id="storeFollow" type="button" aria-pressed="false"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
-<nav class="tabs" aria-label="Navigasi Store"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
-<div class="store-filter-dock" id="storeFilterDock" hidden><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div></div>
+<section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>IMAMSALESNINE.COM</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a href="https://wa.me/6282210109369" id="storeChat" rel="noopener noreferrer" target="_blank" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button aria-pressed="false" id="storeFollow" type="button"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
+<nav aria-label="Navigasi Store" class="tabs"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button></nav>
+<div class="store-filter-dock" hidden="" id="storeFilterDock"><div class="sortbar" id="sortBar"><button class="sort active" data-sort="populer">Populer</button><button class="sort" data-sort="terbaru">Terbaru</button><button class="sort" data-sort="terlaris">Terlaris</button><button class="sort" data-sort="promo">Promo</button><button class="sort" data-sort="murah">Harga ↑</button><button class="sort" data-sort="mahal">Harga ↓</button></div></div>
 <main class="content" id="storeContent">
 <section class="panel active" id="panel-toko">
 <div class="wh-origin" id="whOrigin">
- <button type="button" id="whOriginToggle" class="wh-origin-btn" aria-expanded="false" aria-controls="whOriginDropdown"><span class="wh-pin"><i class="fa-solid fa-location-dot"></i></span><span style="flex:1;min-width:0"><span class="wh-origin-label">Dikirim dari</span><span class="wh-origin-value" id="whOriginValue">DKI Jakarta</span></span><i class="fa-solid fa-chevron-down wh-origin-chevron"></i></button>
- <div class="wh-origin-dropdown" id="whOriginDropdown"><input type="search" id="whOriginSearch" class="wh-origin-search" placeholder="Cari kota atau gudang..." autocomplete="off" aria-label="Cari gudang"><div class="wh-origin-list" id="whOriginList" role="listbox" aria-label="Pilihan gudang pengiriman"></div></div>
+<button aria-controls="whOriginDropdown" aria-expanded="false" class="wh-origin-btn" id="whOriginToggle" type="button"><span class="wh-pin"><i class="fa-solid fa-location-dot"></i></span><span style="flex:1;min-width:0"><span class="wh-origin-label">Dikirim dari</span><span class="wh-origin-value" id="whOriginValue">DKI Jakarta</span></span><i class="fa-solid fa-chevron-down wh-origin-chevron"></i></button>
+<div class="wh-origin-dropdown" id="whOriginDropdown"><input aria-label="Cari gudang" autocomplete="off" class="wh-origin-search" id="whOriginSearch" placeholder="Cari kota atau gudang..." type="search"/><div aria-label="Pilihan gudang pengiriman" class="wh-origin-list" id="whOriginList" role="listbox"></div></div>
 </div>
 <div class="section hidden" id="voucherSection"><div class="section-head"><h2><i class="fa-solid fa-ticket"></i> Voucher Toko</h2></div><div class="store-vouchers" id="storeVouchers"></div></div><div class="banner"><small>IMAM SALES SELECTION</small><h2>Pilihan Produk Otomotif</h2><p>Temukan kebutuhan kendaraan dari katalog aktif kami.</p></div><div class="section flash-sale-section hidden" id="flashSaleSection">
- <div class="flash-head"><div class="flash-title"><i class="fa-solid fa-bolt"></i> FLASH SALE</div><button type="button" class="flash-sale-more" id="flashSaleMore">Lihat Semua »</button></div>
- <div class="flash-clock-wrap">Berakhir dalam <span class="flash-clock" id="flashSaleClock">—</span></div>
- <div class="flash-sale-rail" id="flashSaleRail" data-horizontal-scroll></div>
+<div class="flash-head"><div class="flash-title"><i class="fa-solid fa-bolt"></i> FLASH SALE</div><button class="flash-sale-more" id="flashSaleMore" type="button">Lihat Semua »</button></div>
+<div class="flash-clock-wrap">Berakhir dalam <span class="flash-clock" id="flashSaleClock">—</span></div>
+<div class="flash-sale-rail" data-horizontal-scroll="" id="flashSaleRail"></div>
 </div>
-<div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Brand</h2><button class="more" data-go="kategori">Kategori Store ›</button></div><div class="chips" id="categoryChips" data-horizontal-scroll></div></div><div id="storeCategoryShelves"></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
-<section class="panel" id="panel-produk"><div class="section"><span id="productCount" class="notice" hidden></span><div class="grid" id="allGrid"></div><p id="empty" class="empty hidden">Produk tidak ditemukan.</p></div></section>
+<div class="section"><div class="section-head"><h2><i class="fa-solid fa-fire" style="color:#e75b3e"></i> Penawaran Terbaik</h2><button class="more" data-go="produk" data-sort="promo">Lihat Semua ›</button></div><div class="grid" id="promoGrid"></div></div><div class="section"><div class="section-head"><h2>Penjualan Tertinggi</h2><button class="more" data-go="produk" data-sort="terlaris">Lihat Semua ›</button></div><div class="grid" id="topGrid"></div></div><div class="section"><div class="section-head"><h2>Jelajahi Brand</h2><button class="more" data-go="kategori">Kategori Store ›</button></div><div class="chips" data-horizontal-scroll="" id="categoryChips"></div></div><div id="storeCategoryShelves"></div><div class="section"><div class="section-head"><h2>Semua Produk</h2><button class="more" data-go="produk">Lihat Semua ›</button></div><div class="grid" id="homeGrid"></div></div></section>
+<section class="panel" id="panel-produk"><div class="section"><span class="notice" hidden="" id="productCount"></span><div class="grid" id="allGrid"></div><p class="empty hidden" id="empty">Produk tidak ditemukan.</p></div></section>
 <section class="panel" id="panel-kategori"><div class="section"><div class="category-list" id="categoryList"></div></div></section>
-</main><div class="flash-sale-full" id="flashSaleFull" aria-label="Daftar Flash Sale" aria-hidden="true">
- <div class="flash-sale-full-header"><button type="button" id="flashSaleBack" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button><strong>FLASH SALE</strong></div>
- <div class="flash-sale-full-content"><div class="flash-clock-wrap" style="margin:5px 0 14px">Berakhir dalam <span class="flash-clock" id="flashSaleFullClock">—</span></div><div class="grid" id="flashSaleFullGrid"></div></div>
+</main><div aria-hidden="true" aria-label="Daftar Flash Sale" class="flash-sale-full" id="flashSaleFull">
+<div class="flash-sale-full-header"><button aria-label="Kembali" id="flashSaleBack" type="button"><i class="fa-solid fa-arrow-left"></i></button><strong>FLASH SALE</strong></div>
+<div class="flash-sale-full-content"><div class="flash-clock-wrap" style="margin:5px 0 14px">Berakhir dalam <span class="flash-clock" id="flashSaleFullClock">—</span></div><div class="grid" id="flashSaleFullGrid"></div></div>
 </div><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
@@ -647,7 +646,7 @@ function changeTab(t){
  if(window.storeSyncVerticalHeader)window.storeSyncVerticalHeader();
 }
 document.addEventListener('click',e=>{
- const cardEl=e.target.closest('[data-product-id]');if(cardEl){sessionStorage.setItem('nine_store_navigation',String(cardEl.dataset.productId));location.href='/?product='+encodeURIComponent(cardEl.dataset.productId)+'&from=store';return}
+ const cardEl=e.target.closest('[data-product-id]');if(cardEl){e.preventDefault();window.nineStoreNative?.openProduct(cardEl.dataset.productId);return}
  const t=e.target.closest('[data-tab]');if(t){changeTab(t.dataset.tab);return}
  const go=e.target.closest('[data-go]');if(go){if(go.dataset.sort){sort=go.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x.dataset.sort===sort));render()}changeTab(go.dataset.go);return}
  const so=e.target.closest('[data-sort]');if(so){sort=so.dataset.sort;document.querySelectorAll('.sort').forEach(x=>x.classList.toggle('active',x===so));render();return}
@@ -761,7 +760,7 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
 (async()=>{
  try{
   const r=await fetch('/produk.json',{cache:'no-store'});if(!r.ok)throw Error('produk.json gagal dimuat');
-  const seed=(await r.json()).map(normalize);products=seed.filter(active);render();
+  const seed=(await r.json()).map(normalize);products=seed.filter(active);render();window.dispatchEvent(new Event("nine:catalog-updated"));
   if(!window.firebase)return;
   if(!firebase.apps.length)firebase.initializeApp(config);
   // Samakan Firebase App Check reCAPTCHA Enterprise dengan website utama.
@@ -841,7 +840,7 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   },error=>console.warn('Kategori Store belum dapat dibaca:',error));
   db.collection('cms_products').onSnapshot(snapshot=>{
    const docs=new Map();snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
-   products=merge(seed,docs);render();
+   products=merge(seed,docs);render();window.dispatchEvent(new Event("nine:catalog-updated"));
   },error=>console.warn('Firestore tidak tersedia, menggunakan katalog dasar:',error));
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
   const presenceUrl='/.netlify/functions/admin-presence';
@@ -877,7 +876,6 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
  }catch(e){console.error(e);$('homeGrid').innerHTML='<p class="empty">Produk belum dapat dimuat. Silakan coba lagi.</p>';$('allGrid').innerHTML='';$('empty').textContent='Produk belum dapat dimuat. Periksa koneksi katalog.';$('empty').classList.remove('hidden');$('storeStatus').textContent='Status aktivitas belum tersedia'}
 })();
 </script>
-
 <script id="warehouse-store-engine">
 (function(){
  'use strict';
@@ -909,6 +907,274 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   firebase.firestore().collection('store_warehouses').onSnapshot(snap=>{warehouses=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.city||'').localeCompare(String(b.city||'')));initialized=true;render()},err=>{initialized=true;label.textContent='Lokasi belum tersedia';list.innerHTML='<div class="wh-origin-empty">Lokasi belum bisa dimuat.</div>';console.warn('Gudang Store:',err)});
  }
  subscribe();
+})();
+</script>
+<style id="nine-native-commerce-style">
+#nineNativeCartButton{position:fixed;right:18px;bottom:22px;z-index:10030;border:0;border-radius:28px;padding:13px 18px;background:#111827;color:#fff;box-shadow:0 8px 28px #0004;font:700 14px system-ui;cursor:pointer}
+#nineNativeOverlay{position:fixed;inset:0;z-index:10040;background:#0009;display:none;align-items:center;justify-content:center;padding:16px}
+#nineNativeOverlay[aria-hidden="false"]{display:flex}
+#nineNativePanel{position:relative;background:#fff;color:#17202c;border-radius:18px;width:min(620px,100%);max-height:90vh;overflow:auto;padding:24px;font:14px/1.5 system-ui}
+#nineNativePanel h2{font-size:21px;margin:0 32px 12px 0}
+#nineNativePanel img{width:100%;max-height:260px;object-fit:contain;background:#f5f5f5;border-radius:12px}
+#nineNativePanel button{cursor:pointer;border-radius:9px;border:1px solid #d2d6df;padding:10px 14px;background:#fff}
+#nineNativePanel .ninePrimary{background:#111827;color:#fff;border-color:#111827}
+#nineNativeClose{position:absolute;top:12px;right:12px}
+.nineNativeLine{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid #e5e7eb}
+.nineNativeActions{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px}
+.nineQuote{border:1px solid #e5e7eb;border-radius:12px;padding:15px;margin-top:16px;background:#f9fafb}
+.nineQuote h3{margin:0 0 10px;font-size:17px}
+.nineQuoteRow{display:flex;justify-content:space-between;gap:12px;padding:6px 0}
+.nineQuoteNote{font-size:12px;color:#525e6b}
+.nineQuote label{display:block;margin:12px 0 5px;font-weight:600}
+.nineQuote input{box-sizing:border-box;width:100%;padding:10px;border:1px solid #bac2cc;border-radius:8px}
+.nineQuoteInput{display:flex;gap:8px}
+.nineQuoteInput input{min-width:0;flex:1}
+#nineNativePanel button:disabled{opacity:.5;cursor:not-allowed}
+</style>
+<button aria-label="Buka keranjang" id="nineNativeCartButton" type="button">Keranjang <span id="nineNativeCartCount">0</span></button>
+<div aria-hidden="true" id="nineNativeOverlay">
+<div aria-labelledby="nineNativeHeading" aria-modal="true" id="nineNativePanel" role="dialog" tabindex="-1">
+<button aria-label="Tutup" id="nineNativeClose" type="button">✕</button>
+<div id="nineNativeContent"></div>
+</div>
+</div>
+<script id="nine-native-commerce">
+(function(){
+'use strict';
+const key='nine_store_native_cart_v1';
+const overlay=document.getElementById('nineNativeOverlay');
+const content=document.getElementById('nineNativeContent');
+const badge=document.getElementById('nineNativeCartCount');
+const panel=document.getElementById('nineNativePanel');
+let lastFocus=null;
+let previousOverflow=null;
+let cart=Object.create(null);
+let voucherDraft='';
+let deliveryDestination='';
+content.addEventListener('input',e=>{
+ if(e.target?.id==='nineVoucherDraft')voucherDraft=e.target.value.slice(0,40);
+ if(e.target?.id==='nineDeliveryDestination')deliveryDestination=e.target.value.slice(0,120);
+});
+content.addEventListener('click',e=>{
+ if(e.target?.id!=='nineVoucherReview')return;
+ const msg=document.getElementById('nineVoucherMessage');
+ if(!msg)return;
+ const code=voucherDraft.trim();
+ msg.textContent=!code?'Masukkan kode voucher terlebih dahulu.':
+ /^[A-Za-z0-9_-]{3,40}$/.test(code)?
+ 'Kode tercatat untuk pemeriksaan. Validitas dan diskon belum diverifikasi; tidak ada potongan yang diterapkan.':
+ 'Format kode tidak valid. Gunakan 3–40 karakter huruf, angka, _ atau -.';
+});
+document.getElementById('whOrigin')?.addEventListener('warehousechange',()=>{
+ if(overlay.getAttribute('aria-hidden')==='false'&&content.querySelector('[data-native-cart-view]'))cartView(true);
+});
+
+const validCartId=id=>typeof id==='string'&&id.length>0&&id.length<=160&&id!=='__proto__'&&id!=='constructor'&&id!=='prototype';
+try{const stored=JSON.parse(localStorage.getItem(key)||'{}');if(stored&&typeof stored==='object'&&!Array.isArray(stored)){for(const [id,qty] of Object.entries(stored)){if(validCartId(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999)cart[id]=qty;}}}catch(e){console.warn('Keranjang lokal tidak terbaca',e);}
+const safe=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;'}[c]));
+const getProducts=()=>{try{return typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch(e){return []}};
+const find=id=>validCartId(String(id))?getProducts().find(p=>p&&String(p.id)===String(id)):undefined;
+const rupiah=n=>new Intl.NumberFormat('id-ID',{style:'currency',currency:'IDR',maximumFractionDigits:0}).format(n);
+const numericPrice=p=>{
+ if(!p)return NaN;
+ try{
+  const value=typeof price==='function'?Number(price(p)):Number(p.harga?.promo||p.harga?.normal);
+  return Number.isSafeInteger(value)&&value>0?value:NaN;
+ }catch(e){return NaN}
+};
+const validQty=n=>Number.isSafeInteger(n)&&n>=1&&n<=999;
+const safeMoney=n=>Number.isSafeInteger(n)&&n>=0&&Number.isSafeInteger(n)&&n<=Number.MAX_SAFE_INTEGER;
+const warehouseName=()=>document.getElementById('whOriginValue')?.textContent?.trim()||'Belum dipilih';
+function quotation(rows){
+ let subtotal=0,complete=rows.length>0,stockValid=true;
+ for(const {p,qty} of rows){
+  const unit=numericPrice(p),st=stockInfo(p);
+  if(!Number.isSafeInteger(unit)||unit<=0||!safeMoney(unit*qty)){complete=false;continue}
+  subtotal+=unit*qty;
+  if(!safeMoney(subtotal))complete=false;
+  if(st.state!=='known'||qty>st.count)stockValid=false;
+ }
+ return {subtotal:complete?subtotal:null,complete,stockValid};
+}
+const stockInfo=p=>{
+ if(!p)return {state:'missing',count:0,label:'Produk tidak ditemukan'};
+ // Hanya field stok numerik eksplisit yang dianggap otoritatif; tanpa field berarti belum terverifikasi.
+ const raw=p.stok??p.stock??p.stockQty??p.jumlahStok;
+ if(raw===undefined||raw===null||raw==='')return {state:'unknown',count:null,label:'Stok belum terverifikasi'};
+ const n=typeof raw==='number'?raw:(typeof raw==='string'&&/^\\d+$/.test(raw.trim())?Number(raw):NaN);
+ if(!Number.isSafeInteger(n)||n<0)return {state:'unknown',count:null,label:'Stok belum terverifikasi'};
+ return {state:n===0?'empty':'known',count:n,label:n===0?'Stok habis':`Stok terdata: ${n}`};
+};
+const canPurchase=p=>!!p&&validCartId(String(p.id))&&Number.isSafeInteger(numericPrice(p))&&stockInfo(p).state==='known'&&stockInfo(p).count>0;
+window.nineStoreNative=Object.freeze({openProduct:id=>detail(String(id)),openCart:()=>cartView()});
+
+const img=p=>{
+ let value='';try{value=typeof productImageUrl==='function'?productImageUrl(p.gambar||''):p.gambar||''}catch(e){value=p.gambar||''}
+ value=String(value||'').trim();
+ return /^(https?:\/\/|\/\/|\/(?!\/)|data:image\/(?:png|jpe?g|webp|gif);base64,)/i.test(value)?value:'/images/no-image.png';
+};
+const save=()=>{
+ try{localStorage.setItem(key,JSON.stringify(cart))}
+ catch(e){console.warn('Penyimpanan keranjang gagal',e)}
+ update();
+};
+window.addEventListener('nine:catalog-updated',()=>{update();if(overlay.getAttribute('aria-hidden')==='false'&&content.querySelector('[data-native-cart-view]'))cartView(true)});
+window.addEventListener('storage',e=>{
+ if(e.key!==key)return;
+ try{
+  const next=JSON.parse(e.newValue||'{}');const clean=Object.create(null);
+  if(next&&typeof next==='object'&&!Array.isArray(next)){
+   for(const [id,qty] of Object.entries(next)){
+    if(validCartId(id)&&Number.isSafeInteger(qty)&&qty>0&&qty<=999)clean[id]=qty;
+   }
+  }
+  cart=clean;update();
+  if(overlay.getAttribute('aria-hidden')==='false'&&content.querySelector('[data-native-cart-view]'))cartView(true);
+ }catch(err){console.warn('Sinkronisasi keranjang gagal',err)}
+});
+const update=()=>{
+ const count=Object.values(cart).reduce((n,q)=>n+(validQty(q)?q:0),0);
+ badge.textContent=String(count);
+ badge.setAttribute('aria-label',count+' barang di keranjang');
+};
+function open(html,keepFocus=false){
+ if(!keepFocus||overlay.getAttribute('aria-hidden')==='true')lastFocus=document.activeElement;
+ content.innerHTML=html;overlay.setAttribute('aria-hidden','false');
+ if(previousOverflow===null)previousOverflow=document.body.style.overflow;
+ document.body.style.overflow='hidden';panel.focus();
+}
+function close(){overlay.setAttribute('aria-hidden','true');document.body.style.overflow=previousOverflow===null?'':previousOverflow;previousOverflow=null;content.replaceChildren();if(lastFocus&&lastFocus.isConnected)lastFocus.focus()}
+function detail(id){
+ const p=find(id);if(!p){open('<h2 id="nineNativeHeading">Produk belum tersedia</h2><p>Data produk belum berhasil dimuat. Coba lagi sebentar.</p>');return}
+ const cost=numericPrice(p);
+ open(`<h2 id="nineNativeHeading">${safe(p.nama||'Produk')}</h2><img src="${safe(img(p))}" alt="${safe(p.nama||'Produk')}" loading="lazy"><p><strong>${Number.isFinite(cost)&&cost>0?rupiah(cost):'Harga belum tersedia'}</strong></p><p><strong>${safe(stockInfo(p).label)}</strong></p><p>${safe(p.deskripsi||p.description||'Silakan cek informasi produk sebelum membeli.')}</p><div class="nineNativeActions"><button class="ninePrimary" type="button" data-native-add="${safe(p.id)}" ${canPurchase(p)?'':'disabled aria-disabled="true"'}>Tambah ke keranjang</button><button type="button" data-native-cart>Buka keranjang</button></div>`);
+}
+function checkoutReadiness(rows,quote){
+ const blockers=[];
+ if(!rows.length)blockers.push('keranjang kosong');
+ if(!quote.complete)blockers.push('harga atau subtotal belum valid');
+ if(!quote.stockValid)blockers.push('stok belum terverifikasi');
+ if(!deliveryDestination.trim())blockers.push('tujuan pengiriman belum diisi');
+ blockers.push('tarif ongkir resmi belum dihitung');
+ blockers.push('voucher belum divalidasi di server');
+ blockers.push('transaksi atomik Firebase belum terintegrasi');
+ return {ready:false,blockers,message:'Checkout ditahan: '+blockers.join('; ')+'.'};
+}
+function exportDraft(){
+ const rows=Object.entries(cart).filter(([,qty])=>validQty(qty)).map(([id,qty])=>({id,qty,p:find(id)}));
+ const quote=quotation(rows);
+ if(!rows.length||!quote.complete){cartView(true);return}
+ const snapshot={
+  documentType:'RINGKASAN_BELANJA_BUKAN_PESANAN',
+  createdAt:new Date().toISOString(),
+  status:'DRAFT_ONLY_NOT_SUBMITTED',
+  originWarehouse:warehouseName(),
+  destination:deliveryDestination.trim(),
+  voucherCode:voucherDraft.trim(),
+  voucherStatus:'BELUM_DIVERIFIKASI',
+  shippingStatus:'BELUM_DIHITUNG',
+  grandTotal:null,
+  items:rows.map(({id,qty,p})=>({id,name:String(p?.nama||''),quantity:qty,unitPrice:numericPrice(p),lineSubtotal:numericPrice(p)*qty,stockStatus:stockInfo(p).state})),
+  productSubtotal:quote.subtotal,
+  blockers:checkoutReadiness(rows,quote).blockers
+ };
+ const blob=new Blob([JSON.stringify(snapshot,null,2)],{type:'application/json'});
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download='ringkasan-belanja-belum-dipesan.json';
+ document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function cartView(keepFocus=false){
+ const rows=Object.entries(cart).filter(([,qty])=>validQty(qty)).map(([id,qty])=>({id,qty,p:find(id)}));
+ const quote=quotation(rows);
+ const html=rows.map(({id,qty,p})=>{
+  const unit=p?numericPrice(p):NaN;const availability=stockInfo(p);
+  return `<div class="nineNativeLine"><div><strong>${safe(p?.nama||'Produk tidak ditemukan')}</strong><div>${p&&Number.isFinite(unit)&&unit>0?rupiah(unit):'Harga belum tersedia'} · ${safe(availability.label)}${availability.state==='known'&&qty>availability.count?' · Jumlah keranjang melebihi stok':''}</div></div><div><button data-native-minus="${safe(id)}" aria-label="Kurangi">−</button> ${qty} <button data-native-plus="${safe(id)}" aria-label="Tambah">+</button> <button data-native-remove="${safe(id)}" aria-label="Hapus">Hapus</button></div></div>`;
+ }).join('');
+ const subtotal=quote.complete?rupiah(quote.subtotal):'Belum dapat dihitung';
+ const message=rows.length===0?'Tambahkan produk untuk menghitung subtotal.':(!quote.complete?'Ada harga produk yang belum valid.':(!quote.stockValid?'Stok belum terverifikasi untuk seluruh barang.':'Subtotal produk sudah dapat dihitung.'));
+ open(`<div data-native-cart-view><h2 id="nineNativeHeading">Keranjang Store</h2>${html||'<p>Keranjang masih kosong.</p>'}
+ <section class="nineQuote" aria-label="Ringkasan biaya sementara">
+ <h3>Ringkasan biaya sementara</h3>
+ <div class="nineQuoteRow"><span>Subtotal produk</span><strong>${subtotal}</strong></div>
+ <div class="nineQuoteRow"><span>Diskon voucher</span><strong>Belum diverifikasi</strong></div>
+ <div class="nineQuoteRow"><span>Ongkir</span><strong>Belum dihitung</strong></div>
+ <div class="nineQuoteRow"><span>Total akhir</span><strong>Belum tersedia</strong></div>
+ <p class="nineQuoteNote">${safe(message)} Tidak ada voucher atau ongkir yang diasumsikan bernilai Rp0.</p>
+ <label for="nineVoucherDraft">Kode voucher (untuk pengecekan nanti)</label>
+ <div class="nineQuoteInput"><input id="nineVoucherDraft" type="text" maxlength="40" autocomplete="off" placeholder="Masukkan kode voucher" value="${safe(voucherDraft)}"><button type="button" id="nineVoucherReview">Periksa</button></div>
+ <p id="nineVoucherMessage" role="status">Voucher belum diverifikasi. Diskon tidak diterapkan.</p>
+ <label for="nineDeliveryDestination">Tujuan pengiriman (informasi awal)</label>
+ <input id="nineDeliveryDestination" type="text" maxlength="120" autocomplete="address-level2" placeholder="Kota / kecamatan tujuan" value="${safe(deliveryDestination)}">
+ <p class="nineQuoteNote">Gudang asal: ${safe(warehouseName())}. Tarif pengiriman harus dihitung oleh layanan resmi sebelum pembayaran.</p>
+ <div class="nineCheckoutPreflight" role="status" aria-live="polite">
+ <h3>Pemeriksaan kesiapan checkout</h3>
+ <p>${safe(checkoutReadiness(rows,quote).message)}</p>
+ <p class="nineQuoteNote">Belum ada pesanan dibuat atau dikirim. Stok, diskon, ongkir, dan harga wajib diverifikasi kembali di server saat transaksi.</p>
+ </div>
+ <button type="button" id="nineDraftOrder" ${rows.length&&quote.complete?'':'disabled aria-disabled="true"'}>Unduh ringkasan belanja (bukan pesanan)</button>
+ <button type="button" disabled aria-disabled="true" title="Checkout belum tersedia">Checkout belum tersedia</button>
+ </section>
+ <div class="nineNativeActions"><button type="button" id="nineNativeContinue">Lanjut belanja</button></div></div>`,keepFocus);
+}
+function add(id){
+ const p=find(id);if(!p){open('<h2 id="nineNativeHeading">Produk tidak ditemukan</h2><p>Produk tidak ada dalam katalog saat ini.</p>');return}
+ const unit=numericPrice(p);
+ if(!Number.isSafeInteger(unit)||unit<=0||!validCartId(String(id))){
+  open('<h2 id="nineNativeHeading">Harga belum tersedia</h2><p>Produk belum bisa dimasukkan ke keranjang sebelum harga valid.</p>');return;
+ }
+ if(stockInfo(p).state!=='known'||(cart[id]||0)>=stockInfo(p).count){cartView();return}
+ if((cart[id]||0)>=999){cartView();return}
+ cart[id]=(cart[id]||0)+1;save();cartView();
+}
+document.addEventListener('click',e=>{
+ if(!(e.target instanceof Element))return;
+ // Kartu produk ditangani langsung oleh mesin katalog Store.
+ // Jangan mencegatnya dua kali karena dapat menimbulkan konflik navigasi.
+ const el=e.target.closest('[data-native-add],[data-native-cart],[data-native-plus],[data-native-minus],[data-native-remove],#nineNativeContinue,#nineDraftOrder,#nineVoucherReview');
+ if(!el)return;
+ if(el.id==='nineDraftOrder'){exportDraft();return;}
+ if(el.id==='nineVoucherReview'){const status=document.getElementById('nineVoucherMessage');if(status)status.textContent='Kode voucher belum dapat diverifikasi tanpa layanan resmi. Diskon tidak diterapkan.';return;}
+ if(el.hasAttribute('data-native-add'))add(el.dataset.nativeAdd);
+ else if(el.hasAttribute('data-native-cart'))cartView();
+ else if(el.hasAttribute('data-native-plus')){
+  const id=el.dataset.nativePlus;
+  if(canPurchase(find(id))&&validQty(cart[id])&&cart[id]<999&&cart[id]<stockInfo(find(id)).count){cart[id]++;save()}
+  cartView();
+ }
+ else if(el.hasAttribute('data-native-minus')){
+  const id=el.dataset.nativeMinus;
+  if(validQty(cart[id])){cart[id]--;if(!cart[id])delete cart[id];save()}
+  cartView();
+ }
+ else if(el.hasAttribute('data-native-remove')){delete cart[el.dataset.nativeRemove];save();cartView()}
+ else close();
+},true);
+document.addEventListener('input',e=>{if(e.target?.id==='nineVoucherDraft')voucherDraft=e.target.value.slice(0,40);if(e.target?.id==='nineDeliveryDestination')deliveryDestination=e.target.value.slice(0,120)},true);
+document.addEventListener('keydown',e=>{
+ if(e.key==='Tab'&&overlay.getAttribute('aria-hidden')==='false'){
+  const els=Array.from(overlay.querySelectorAll('button:not([disabled]),a[href],input:not([disabled]),[tabindex]:not([tabindex="-1"])')).filter(x=>x.getClientRects().length);
+  if(els.length){const first=els[0],last=els[els.length-1];
+   if(e.shiftKey&&(document.activeElement===first||document.activeElement===panel)){e.preventDefault();last.focus()}
+   else if(!e.shiftKey&&(document.activeElement===last||document.activeElement===panel)){e.preventDefault();first.focus()}
+  }
+ }
+
+ if(e.key==='Escape'&&overlay.getAttribute('aria-hidden')==='false'){e.preventDefault();close();return}
+
+},true);
+overlay.addEventListener('click',e=>{if(e.target===overlay)close()});
+document.getElementById('nineNativeClose').addEventListener('click',close);
+document.getElementById('nineNativeCartButton').addEventListener('click',cartView);
+update();
+// Katalog Firebase dapat berubah setelah halaman dibuka. Segarkan keranjang yang sedang tampil.
+const grids=['homeGrid','allGrid'].map(id=>document.getElementById(id)).filter(Boolean);
+let refreshPending=false;
+const observer=new MutationObserver(()=>{
+ if(refreshPending||overlay.getAttribute('aria-hidden')!=='false'||!content.querySelector('[data-native-cart-view]'))return;
+ refreshPending=true;
+ queueMicrotask(()=>{refreshPending=false;if(overlay.getAttribute('aria-hidden')==='false'&&content.querySelector('[data-native-cart-view]'))cartView(true)});
+});
+grids.forEach(grid=>observer.observe(grid,{childList:true}));
 })();
 </script>
 </body></html>
