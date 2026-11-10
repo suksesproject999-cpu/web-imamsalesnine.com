@@ -598,10 +598,22 @@ body:has(#s5Cart.open)
 /* Product view count is displayed once, in the original detail statistics row. */
 #imamstoreLiveOriginalDetail .nine-review-toast:has(.fa-eye),
 #imamstoreLiveOriginalDetail .nine-review-toast:has(.fa-eye-regular){
- display:none!important
+ visibility:visible
 }
 #imamstoreLiveOriginalDetail [data-detail-views]{white-space:nowrap}
 #s5Cart.open #nexaiScopedToast{position:fixed!important;z-index:2147483600!important}
+</style>
+<style id="nexai-v84-functional-fixes">
+#nexaiV57Preview[hidden]{display:none!important}
+#nexaiV57Preview:not([hidden]){z-index:2147483646!important}
+#imamstoreOriginalPurchase.open{z-index:2147483000}
+#s5CartItems .ref-v42-select,#s5CartItems input[type=checkbox],
+#product-grid-auto .cart-page input[type=checkbox]{
+ position:relative;pointer-events:auto!important;touch-action:manipulation;
+ z-index:200!important;opacity:1!important
+}
+#s5Cart.open .nf-cart-footer{z-index:2147482500}
+#s5Cart.open .nf-cart-footer .nf-edit-actions{transition:opacity .18s ease}
 </style>
 </head>
 <body>
@@ -2175,6 +2187,7 @@ function mountCartFooter(){
   const f=document.createElement('div');f.className='nf-cart-footer';
   f.innerHTML=cartEditMode?'&lt;div class="nf-bottom-row nf-edit-row"&gt;&lt;label class="nf-all"&gt;&lt;input type="checkbox" id="nfAll"&gt;Semua&lt;/label&gt;&lt;button type="button" class="nf-favorite-selected"&gt;Favoritkan&lt;/button&gt;&lt;button type="button" class="nf-delete-selected"&gt;Hapus&lt;/button&gt;&lt;/div&gt;':'&lt;button type="button" class="nf-voucher-row"&gt;&lt;span&gt;&lt;i class="fa-solid fa-ticket"&gt;&lt;/i&gt;Voucher&lt;/span&gt;&lt;small&gt;Gunakan / masukkan kode ›&lt;/small&gt;&lt;/button&gt;&lt;div class="nf-bottom-row"&gt;&lt;label class="nf-all"&gt;&lt;input type="checkbox" id="nfAll"&gt;Semua&lt;/label&gt;&lt;button class="nf-totals" type="button" id="nfCartTotals"&gt;&lt;/button&gt;&lt;button class="nf-primary" type="button" id="nfCartGo"&gt;Checkout&lt;/button&gt;&lt;/div&gt;';
   document.body.appendChild(f);
+  f.dataset.mode=cartEditMode?'edit':'checkout';
   f.querySelector('.nf-voucher-row')?.addEventListener('click',voucher);
   f.querySelector('#nfAll').onchange=e=&gt;{selected=e.target.checked?new Set(cartNow().map((item,n)=&gt;key(item,n))):new Set();updateCartChecks()};
   f.querySelector('#nfCartTotals')?.addEventListener('click',()=&gt;details(chosen()));
@@ -3862,7 +3875,7 @@ function openPurchase(mode){
  panel.querySelector('#imamstorePurchaseTitle').textContent=p.nama||'Produk';
  const sheetImage=panel.querySelector('#imamstorePurchaseImage');
  const activeImage=host.querySelector('#mainProductImage');
- sheetImage.src=imageOf(activeImage?.currentSrc||activeImage?.src||p.gambar||p.gallery?.[0]);
+ sheetImage.src=imageOf(p.gambar||p.gallery?.[0]||p.galeri?.[0]);
  sheetImage.alt=p.nama||'Foto produk';
  sheetImage.onerror=()=>{sheetImage.onerror=null;sheetImage.src='/images/no-image.png'};
  const updateVariantImage=()=>{
@@ -3871,7 +3884,7 @@ function openPurchase(mode){
    sheetImage.src=imageOf(photos[0]);
    sheetImage.dataset.variantGallery='1';
   }else{
-   sheetImage.src=imageOf(activeImage?.currentSrc||activeImage?.src||p.gambar||p.gallery?.[0]);
+   sheetImage.src=imageOf(p.gambar||p.gallery?.[0]||p.galeri?.[0]);
    delete sheetImage.dataset.variantGallery;
   }
  };
@@ -4270,13 +4283,26 @@ function openVariant(index){const items=read(),line=items[index];if(!line)return
  content.querySelector('.ref-v42-confirm').onclick=()=>{const next=choices[selected],name=variantLabel(next);const stock=Number(next?.stok??next?.stock);if(next&&typeof next==='object'&&Number.isFinite(stock)&&stock<qty){if(window.Swal?.fire)window.Swal.fire({icon:'warning',text:'Stok varian tidak mencukupi untuk jumlah yang dipilih.',width:'min(90vw,360px)',confirmButtonColor:'#8cc63f'});return}
  const updated=read();if(!updated[index])return;updated[index].varian=name;updated[index].qty=qty;if('jumlah' in updated[index])updated[index].jumlah=qty;const price=Number(next?.harga?.promo??next?.harga?.normal??next?.harga??next?.price);if(Number.isFinite(price)&&price>0)updated[index].harga=price;
  updated[index].key=String(updated[index].id)+'::'+name;
- if(write(updated)){window.imamstoreReferenceV38?.closeModal?.();document.querySelector('#s5CartBack')?.dispatchEvent(new Event('noop'));refreshCartVariantButtons();window.imamstoreReferenceV38?.refresh?.()}
+ if(write(updated)){
+ window.imamstoreReferenceV38?.closeModal?.();
+ window.imamstoreReferenceV38?.refresh?.();
+ if($('s5Cart')?.classList.contains('open'))window.imamstoreV43?.sync?.();
+ window.__nineSyncVisibleTotals?.();
+ document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'variant-edit',id:updated[index].id}}));
+}
  };
  ref.hidden=false;document.body.style.overflow='hidden';
 }
 function refreshCartVariantButtons(){const cart=$('s5Cart'),items=$('s5CartItems');if(!cart||!items)return;
  const rows=[...items.querySelectorAll('.imam-cart-product')],lines=read();rows.forEach((row,i)=>{if(!lines[i])return;
- if(!row.querySelector('.ref-v42-select')){const check=document.createElement('input');check.type='checkbox';check.className='ref-v42-select';check.checked=window.imamstoreV43?.isSelected?.(lines[i].key)!==false;check.setAttribute('aria-label','Pilih '+(lines[i].nama||'produk'));row.prepend(check)}
+ if(!row.querySelector('.ref-v42-select')){const check=document.createElement('input');check.type='checkbox';check.className='ref-v42-select';check.checked=window.imamstoreV43?.isSelected?.(lines[i].key)!==false;check.setAttribute('aria-label','Pilih '+(lines[i].nama||'produk'));row.prepend(check);
+ check.addEventListener('change',()=>{
+  const key=String(lines[i].key||String(lines[i].id)+'::'+String(lines[i].varian||''));
+  window.imamstoreV43?.setSelected?.(key,check.checked);
+  window.imamstoreV43?.sync?.();
+  window.__nineSyncVisibleTotals?.();
+ });
+ }
  const info=row.querySelector('.imam-cart-product-info');if(info&&!info.querySelector('.ref-v42-change')){const b=document.createElement('button');b.type='button';b.className='ref-v42-change';b.textContent='Varian: '+(lines[i].varian||'Standar')+'  ▾';b.onclick=()=>openVariant(i);info.querySelector('h3')?.after(b)}else{const b=info?.querySelector('.ref-v42-change');if(b)b.textContent='Varian: '+(lines[i].varian||'Standar')+'  ▾'}
  });
  const checkout=$('s5DraftItems');if(checkout){[...checkout.querySelectorAll('.s5-item,.summary-item')].forEach((row,i)=>{if(!lines[i]||row.querySelector('.ref-v42-change'))return;const b=document.createElement('button');b.className='ref-v42-change';b.type='button';b.textContent='Ubah Varian';b.onclick=()=>openVariant(i);row.append(b)})}
@@ -5632,4 +5658,103 @@ document.addEventListener('focusin',event=>{
  },true);
 })();
 </script>
-</body></html>
+<script id="nexai-v84-interaction-guard">
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const cart=$('s5Cart'),draft=$('s5Draft'),detail=$('imamstoreLiveOriginalDetail');
+if(!cart)return;
+let wasOpen=cart.classList.contains('open');
+const resetEdit=()=>{
+ const edit=cart.querySelector('.nf-cart-edit');
+ if(edit&&edit.textContent.trim()==='Selesai')edit.click();
+};
+const observer=new MutationObserver(()=>{
+ const opened=cart.classList.contains('open');
+ if(wasOpen&&!opened)resetEdit();
+ wasOpen=opened;
+});
+observer.observe(cart,{attributes:true,attributeFilter:['class']});
+document.addEventListener('click',event=>{
+ const input=event.target.closest('#s5CartItems input[type="checkbox"],#product-grid-auto .cart-page input[type="checkbox"]');
+ if(input){event.stopPropagation();return}
+ // Photos in the cart navigate to the product; only the purchase/edit sheet uses preview.
+ const photo=event.target.closest('#s5CartItems .imam-cart-product img');
+ if(photo){
+  const card=photo.closest('.imam-cart-product');
+  const name=card?.querySelector('h3')?.textContent?.trim();
+  if(!name)return;
+  event.preventDefault();event.stopImmediatePropagation();
+  if(typeof window.showProduct==='function')window.showProduct(name);
+  else card.querySelector('h3')?.click();
+ }
+},true);
+const notify=(message,type='success')=>{
+ const target=cart.classList.contains('open')?cart:
+  draft?.classList.contains('open')?draft:
+  detail?.classList.contains('open')?detail:null;
+ if(!target)return;
+ let el=target.querySelector(':scope > .nexai-v84-toast');
+ if(!el){
+  el=document.createElement('div');el.className='nexai-v84-toast';
+  Object.assign(el.style,{position:'fixed',left:'50%',bottom:'max(95px,env(safe-area-inset-bottom))',transform:'translateX(-50%)',background:'#252525',color:'#fff',padding:'12px 18px',borderRadius:'12px',font:'600 13px system-ui',zIndex:'2147483600',pointerEvents:'none',maxWidth:'90vw',textAlign:'center'});
+  target.appendChild(el);
+ }
+ el.textContent=message;
+ el.hidden=false;
+ clearTimeout(el._hideTimer);
+ el._hideTimer=setTimeout(()=>{el.hidden=true},2400);
+};
+window.imamstoreV84Toast=notify;
+})();
+</script>
+<script id="nexai-v85-integrated-cleanup">
+(()=>{'use strict';
+const cart=document.getElementById('s5Cart');
+const detail=document.getElementById('imamstoreLiveOriginalDetail');
+let cleaning=false;
+function clean(){
+ if(cleaning)return;
+ cleaning=true;
+ try{
+  // Remove duplicate variant badges, keeping the first meaningful badge in each card.
+  document.querySelectorAll('#s5CartItems .imam-cart-product,#product-grid-auto .cart-item').forEach(card=>{
+   const seen=new Set();
+   card.querySelectorAll('.ref-v42-change,.n4-variant,.v39-variant-trigger,[data-variant-badge]').forEach(el=>{
+    const text=el.textContent.trim().replace(/\s+/g,' ').toLowerCase();
+    if(!text||!text.includes('varian'))return;
+    if(seen.has(text))el.remove();else seen.add(text);
+   });
+  });
+  // Remove redundant sticky cart action buttons, retaining exactly one cart action.
+  if(detail?.classList.contains('open')){
+   const actions=detail.querySelector('#stickyCheckout .sticky-actions');
+   if(actions){
+    const buttons=[...actions.querySelectorAll('button')];
+    const carts=buttons.filter(b=>/keranjang|shopping-cart|fa-cart/i.test((b.textContent||'')+' '+b.className+' '+b.innerHTML));
+    carts.slice(1).forEach(b=>b.remove());
+   }
+  }
+ }finally{cleaning=false}
+}
+let scheduled=false;
+const observer=new MutationObserver(()=>{
+ if(scheduled)return;scheduled=true;
+ requestAnimationFrame(()=>{scheduled=false;clean()});
+});
+observer.observe(document.body,{subtree:true,childList:true});
+clean();
+// Native card quantity changes and edit confirmations refresh both visible totals.
+document.addEventListener('change',e=>{
+ if(e.target.matches('#s5CartItems input[type=checkbox],#product-grid-auto .cart-page input[type=checkbox]')){
+  queueMicrotask(()=>window.__nineSyncVisibleTotals?.());
+ }
+},true);
+// Never allow the edit footer to remain visible outside the cart.
+const cartObserver=new MutationObserver(()=>{
+ if(!cart?.classList.contains('open')){
+  document.querySelectorAll('.nf-cart-footer').forEach(el=>el.remove());
+ }
+});
+if(cart)cartObserver.observe(cart,{attributes:true,attributeFilter:['class']});
+})();
+</script></body></html>
