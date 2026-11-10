@@ -4565,7 +4565,7 @@ function openVariant(index){
  const label=v=>variantLabel(v);
  const optionsFor=p=>{
   const fromPurchase=typeof window.imamstorePurchaseVariantOptions==='function'?window.imamstorePurchaseVariantOptions(p):[];
-  return [...new Set([...(Array.isArray(fromPurchase)?fromPurchase:[]),...variants(p).map(label)].map(x=>typeof x==='string'?x:label(x)).filter(Boolean))];
+  return [...new Set([...(Array.isArray(fromPurchase)?fromPurchase:[]),...variants(p).map(label),String(original.varian||'')].map(x=>typeof x==='string'?x:label(x)).filter(Boolean))];
  };
  const resolve=()=>productFor(snapshot)||(window.imamstoreActiveProduct&&String(window.imamstoreActiveProduct.id)===String(snapshot.id)?window.imamstoreActiveProduct:null);
  const entryFor=(p,name)=>variants(p).find(v=>label(v)===name);
@@ -4619,7 +4619,7 @@ function openVariant(index){
   output.textContent=String(qty);wrap.replaceChildren();
   price.textContent='Rp'+priceOf(p,chosen).toLocaleString('id-ID');
   if(!choices.length){
-   status.textContent='Memuat pilihan varian dari katalog produk…';confirm.disabled=true;return false;
+   status.textContent='Pilihan varian belum tersedia untuk produk ini.';confirm.disabled=true;return false;
   }
   status.textContent='';confirm.disabled=false;
   if(!chosen||!choices.includes(chosen))chosen=choices[0];
@@ -4644,7 +4644,7 @@ function openVariant(index){
  content.querySelector('[data-qty=plus]').onclick=()=>adjust(1);
  confirm.onclick=()=>{
   const p=resolve(),choices=optionsFor(p);
-  if(!p||!choices.includes(chosen)){status.textContent='Varian belum siap. Tunggu katalog dimuat.';return}
+  if(!choices.includes(chosen)){status.textContent='Pilih varian yang tersedia.';return}
   if(qty>stockOf(p,chosen)){status.textContent='Jumlah melebihi stok varian.';return}
   const items=read(),line=currentLine(items);if(!line)return;
   line.varian=chosen;line.qty=qty;line.harga=priceOf(p,chosen);line.key=String(line.id)+'|'+chosen;
@@ -6138,4 +6138,131 @@ const init=()=>{
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
-</body></html>
+
+<style id="nexai-cart-v3-fix">
+#s5Cart .ref-cart-checkout-row .v100-edit-actions{display:none!important}
+#s5Cart.v100-editing .ref-cart-checkout-row .v100-edit-actions{display:flex!important;gap:10px!important;flex:1;justify-content:flex-end}
+#s5Cart.v100-editing .ref-voucher-trigger,#s5Cart.v100-editing .ref-cart-sum,#s5Cart.v100-editing #s5Checkout{display:none!important}
+#s5Cart.v100-editing .ref-cart-checkout-row{display:flex!important}
+#s5Cart .v100-edit-actions button{border:1px solid #e94c31!important;border-radius:9px!important;padding:11px 16px!important;background:white!important;color:#e94c31!important;font-size:15px!important}
+#s5Cart .v100-edit-actions .v100-delete{background:#e94c31!important;color:white!important}
+#s5CartItems .nexai-shop-heading .nexai-shop-edit{pointer-events:auto!important}
+#s5CartItems .imam-cart-product{position:relative!important}
+#s5CartItems .imam-cart-product .nexai-swipe-actions{display:none!important}
+#s5CartItems .imam-cart-product.nexai-row-editing{transform:translateX(-116px);transition:transform .18s ease;overflow:visible!important}
+#s5CartItems .imam-cart-product .nexai-v3-row-actions{position:absolute;left:100%;top:0;bottom:0;display:flex;width:116px;align-items:stretch}
+#s5CartItems .nexai-v3-row-actions button{flex:1;border:0;color:#fff;font-size:12px;padding:0 3px}
+#s5CartItems .nexai-v3-row-actions .nexai-v3-similar{background:#fa9315}
+#s5CartItems .nexai-v3-row-actions .nexai-v3-remove{background:#ed4b2d}
+#s5CartItems .ref-v42-select{pointer-events:auto!important;position:relative!important;z-index:12!important;accent-color:#e94c31!important}
+#s5Cart .nexai-v3-confirm{position:fixed;inset:0;z-index:2147483600;background:#0009;display:flex;align-items:center;justify-content:center;padding:20px}
+#s5Cart .nexai-v3-dialog{background:#fff;border-radius:15px;padding:25px 20px;width:min(100%,420px);text-align:center;box-shadow:0 10px 30px #0002}
+#s5Cart .nexai-v3-dialog h2{font-size:23px;margin:0 0 12px}
+#s5Cart .nexai-v3-dialog p{font-size:15px;color:#666}
+#s5Cart .nexai-v3-dialog button{padding:12px 24px;border:0;border-radius:7px;margin:10px 5px 0;background:#e94c31;color:white}
+#s5Cart .nexai-v3-dialog button:last-child{background:#eee;color:#333}
+</style>
+<script id="nexai-cart-v3-fix-js">
+(()=>{'use strict';
+const init=()=>{
+ const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems');
+ if(!cart||!list||cart.dataset.nexaiV3)return;
+ cart.dataset.nexaiV3='1';
+ const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
+ const sel=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')}catch{return {}}};
+ const selected=()=>read().filter(x=>sel()[String(x.key)]!==false);
+ const refresh=()=>{window.imamstoreV43?.sync?.();window.imamstoreV54?.refresh?.();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('nine:cartchange'))};
+ const save=lines=>{localStorage.setItem(KEY,JSON.stringify(lines));refresh()};
+ const confirmInCart=(message,detail)=>new Promise(resolve=>{
+   const overlay=document.createElement('div');overlay.className='nexai-v3-confirm';
+   overlay.innerHTML='<div class="nexai-v3-dialog" role="alertdialog" aria-modal="true"><h2></h2><p></p><button type="button" data-yes>Hapus</button><button type="button" data-no>Batal</button></div>';
+   overlay.querySelector('h2').textContent=message;overlay.querySelector('p').textContent=detail;
+   const close=v=>{overlay.remove();resolve(v)};
+   overlay.querySelector('[data-yes]').onclick=()=>close(true);
+   overlay.querySelector('[data-no]').onclick=()=>close(false);
+   overlay.addEventListener('click',e=>{if(e.target===overlay)close(false)});
+   cart.append(overlay);
+ });
+ const remove=async keys=>{
+   if(!keys.length)return;
+   if(!await confirmInCart('Hapus produk terpilih?',keys.length+' produk akan dihapus dari keranjang.'))return;
+   const set=new Set(keys.map(String));save(read().filter(x=>!set.has(String(x.key))));
+ };
+ // Keep all cart actions inside cart; do not trigger product-page click handlers.
+ list.addEventListener('click',e=>{
+   const button=e.target.closest('.nexai-shop-edit,.nexai-v3-remove,.nexai-v3-similar');
+   if(!button)return;
+   e.preventDefault();e.stopPropagation();
+   if(button.matches('.nexai-shop-edit')){
+     const editing=!cart.classList.contains('v100-editing');
+     window.imamstoreV54?.edit?.(editing);
+     button.textContent=editing?'Selesai':'Ubah';
+     list.querySelectorAll('.nexai-row-editing').forEach(x=>x.classList.remove('nexai-row-editing'));
+   }else{
+     const row=button.closest('.imam-cart-product');
+     const key=row?.dataset.cartKey;
+     if(button.matches('.nexai-v3-remove')&&key)remove([key]);
+     if(button.matches('.nexai-v3-similar')){row?.classList.remove('nexai-row-editing');window.imamstoreCartToast?.('Lihat produk serupa melalui katalog');}
+   }
+ },true);
+ // Bind checkbox by stable cart key, not array index.
+ list.addEventListener('change',e=>{
+   const check=e.target.closest('.ref-v42-select');
+   if(!check)return;
+   e.stopPropagation();
+   const row=check.closest('.imam-cart-product');
+   const key=check.dataset.cartKey||row?.dataset.cartKey;
+   if(!key)return;
+   const state=sel();state[String(key)]=check.checked;
+   localStorage.setItem(SEL,JSON.stringify(state));queueMicrotask(refresh);
+ },true);
+ const edit=document.getElementById('refCartEdit');
+ edit?.addEventListener('click',()=>{queueMicrotask(()=>{const mode=cart.classList.contains('v100-editing');list.querySelectorAll('.nexai-shop-edit').forEach(x=>x.textContent=mode?'Selesai':'Ubah')})});
+ function decorate(){
+  const lines=read(),rows=[...list.querySelectorAll('.imam-cart-product')];
+  rows.forEach((row,i)=>{
+    const key=row.dataset.cartKey||lines[i]?.key;
+    if(!key)return;
+    row.dataset.cartKey=String(key);
+    const check=row.querySelector('.ref-v42-select');
+    if(check){check.dataset.cartKey=String(key);check.checked=sel()[String(key)]!==false;}
+    if(!row.querySelector('.nexai-v3-row-actions')){
+      const actions=document.createElement('div');actions.className='nexai-v3-row-actions';
+      actions.innerHTML='<button type="button" class="nexai-v3-similar">Serupa</button><button type="button" class="nexai-v3-remove">Hapus</button>';
+      row.append(actions);
+      let startX=0,startY=0;
+      row.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY},{passive:true});
+      row.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.3)row.classList.toggle('nexai-row-editing',dx<0)},{passive:true});
+    }
+  });
+ }
+ const obs=new MutationObserver(()=>{if(cart.classList.contains('open'))decorate()});
+ obs.observe(list,{childList:true});
+ // Override old edit actions to keep confirmation on cart page.
+ const actionRow=cart.querySelector('.v100-edit-actions');
+ if(actionRow){
+  const oldDelete=actionRow.querySelector('.v100-delete');
+  if(oldDelete){
+   const replacement=oldDelete.cloneNode(true);oldDelete.replaceWith(replacement);
+   replacement.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();remove(selected().map(x=>x.key))});
+  }
+ }
+ decorate();
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+<style id="nexai-variant-v4">
+.ref-v42-variant-title{font-size:23px!important;font-weight:750!important;margin:8px 0 20px!important}
+.ref-v42-product{display:flex!important;align-items:center!important;gap:15px!important;padding:0 0 20px!important;border-bottom:1px solid #eee!important}
+.ref-v42-product img{width:105px!important;height:105px!important;object-fit:contain!important;border-radius:12px!important}
+.ref-v42-product b{font-size:25px!important;color:#d40034!important}
+.ref-v42-product p{font-size:15px!important;line-height:1.4!important}
+.ref-v42-options{display:flex!important;flex-wrap:wrap!important;gap:9px!important;min-height:0!important;margin:12px 0 18px!important}
+.ref-v42-option{border:1px solid #e3e6df!important;background:#fff!important;color:#333!important;border-radius:9px!important;padding:11px 14px!important;font-size:14px!important}
+.ref-v42-option[aria-pressed=true]{background:#edf6df!important;border-color:#8cc63f!important;color:#638d2e!important}
+.ref-v102-status:empty{display:none!important}
+.ref-v42-confirm{width:100%!important;min-height:55px!important;border-radius:11px!important;background:#8cc63f!important;color:white!important;font-weight:750!important;font-size:17px!important}
+.ref-v42-confirm:disabled{opacity:.5!important}
+</style></body></html>
