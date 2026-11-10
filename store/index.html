@@ -6066,29 +6066,76 @@ document.addEventListener('change',e=>{
 @media(min-width:750px){#s5Cart .ref-cart-body{max-width:760px!important;margin:auto}#s5Cart .ref-cart-footer{padding-left:max(0px,calc((100vw - 760px)/2))!important;padding-right:max(0px,calc((100vw - 760px)/2))!important}}
 </style>
 
-<script id="nexai-cart-reference-controller">
+
+
+<style id="nexai-cart-repair-v2">
+/* Single edit controller is v54; use its existing wishlist/delete logic. */
+#s5Cart .v100-edit-actions{display:none!important}
+#s5Cart.v100-editing .v100-edit-actions{display:flex!important;gap:10px;align-items:center;justify-content:flex-end;flex:1;min-width:0}
+#s5Cart.v100-editing .ref-cart-sum,#s5Cart.v100-editing #s5Checkout{display:none!important}
+#s5Cart .v100-edit-actions button{font:500 15px system-ui!important;border:1px solid #e84d31!important;border-radius:10px!important;padding:12px 18px!important;background:#fff!important;color:#e84d31!important;min-height:46px!important;white-space:nowrap}
+#s5Cart .v100-edit-actions .v100-delete{background:#e84d31!important;color:#fff!important}
+#s5Cart .v100-edit-actions button:disabled{opacity:.45}
+#s5Cart .nexai-shop-heading{display:flex;align-items:center;gap:8px}
+#s5Cart .nexai-shop-heading .nexai-shop-edit{position:relative;z-index:10;cursor:pointer;min-width:48px;min-height:40px;touch-action:manipulation}
+#s5Cart .nexai-shop-heading .nexai-shop-edit:disabled{opacity:.5}
+#s5Cart .ref-cart-checkout-row{display:flex!important;align-items:center!important;gap:10px!important}
+#s5Cart .ref-cart-checkout-row>label{margin-right:auto;flex-shrink:0}
+#s5Cart .ref-cart-sum{margin-left:auto}
+#s5Cart .ref-cart-footer{padding-bottom:max(8px,env(safe-area-inset-bottom))!important}
+#s5Cart .ref-cart-body{padding-bottom:220px!important}
+#s5CartItems .imam-cart-product .ref-v42-change{cursor:pointer!important;pointer-events:auto!important;position:relative;z-index:5}
+#s5CartItems .imam-cart-product .imam-cart-product-info{position:relative;z-index:3}
+#s5CartItems .imam-cart-product .nexai-swipe-actions{z-index:1}
+@media(max-width:390px){#s5Cart .v100-edit-actions button{padding:10px 12px!important;font-size:13px!important}}
+/* Variant sheet matches purchase sheet dimensions, header, spacing and choice chips */
+.ref-modal:not(.ref-fullpage){align-items:flex-end!important;background:#0009!important}
+.ref-modal:not(.ref-fullpage) .ref-modal-panel{width:min(100%,520px)!important;max-width:520px!important;max-height:92dvh!important;border-radius:25px 25px 0 0!important;background:#fff!important;padding:20px 17px max(24px,env(safe-area-inset-bottom))!important}
+.ref-modal:not(.ref-fullpage) .ref-modal-panel h2.ref-v42-variant-title{font-size:22px!important;font-weight:750!important;margin:12px 0 22px!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-product{display:flex!important;align-items:center!important;gap:14px!important;min-height:110px!important;padding:0 0 20px!important;border-bottom:1px solid #eee!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-product img{width:100px!important;height:105px!important;object-fit:contain!important;border-radius:12px!important;border:1px solid #eee!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-product b{font-size:24px!important;color:#d40034!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-product p{font-size:15px!important;line-height:1.5!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-options{display:flex!important;flex-wrap:wrap!important;gap:9px!important;padding:12px 0 20px!important;max-height:34dvh!important;overflow-y:auto!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-option{border:1px solid #ddd!important;background:#fff!important;color:#222!important;border-radius:9px!important;padding:10px 13px!important;font-size:15px!important;font-weight:600!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-option[aria-pressed=true]{background:#edf6df!important;border-color:#91c642!important;color:#628e2f!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-confirm{width:100%!important;background:#8cc63f!important;color:#fff!important;min-height:56px!important;border:0!important;border-radius:10px!important;font-size:17px!important;font-weight:750!important}
+.ref-modal:not(.ref-fullpage) .ref-v42-confirm:disabled{opacity:.5!important}
+</style>
+<script id="nexai-cart-repair-v2-js">
 (()=>{'use strict';
-const ready=()=>{
- const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems'),edit=document.getElementById('refCartEdit');
- if(!cart||!list||!edit||cart.dataset.nexaiReference)return;
- cart.dataset.nexaiReference='1';
- const actions=document.createElement('div');actions.className='nexai-edit-actions';
- const fav=document.createElement('button');fav.type='button';fav.textContent='Favoritkan';
- const del=document.createElement('button');del.type='button';del.textContent='Hapus';
- actions.append(fav,del);
- const checkout=document.getElementById('s5Checkout');checkout?.parentElement?.append(actions);
- let editing=false;
- function setEdit(value){editing=value;cart.classList.toggle('nexai-editing',value);edit.textContent=value?'Selesai':'Ubah';}
- edit.addEventListener('click',()=>{setTimeout(()=>setEdit(editing),0)},true);
- function selected(){return [...list.querySelectorAll('.imam-cart-product')].filter(el=>el.querySelector('.ref-v42-select')?.checked)}
- fav.addEventListener('click',()=>{const n=selected().length;window.imamstoreCartToast?.(n?'Fitur favorit perlu integrasi akun.':'Pilih produk terlebih dahulu.');});
- del.addEventListener('click',()=>{const items=selected();if(!items.length){window.imamstoreCartToast?.('Pilih produk yang ingin dihapus.');return;}const fire=window.Swal?.fire;if(!fire){window.imamstoreCartToast?.('Konfirmasi penghapusan belum tersedia.');return;}fire({title:'Hapus '+items.length+' produk?',icon:'warning',showCancelButton:true,confirmButtonText:'Hapus',cancelButtonText:'Batal',confirmButtonColor:'#e94c31'}).then(async r=>{if(!r.isConfirmed)return;for(const item of items){const btn=item.querySelector('.nexai-delete');if(btn)btn.click();}setEdit(false);});});
- function decorate(){if(!list.querySelector('.imam-cart-product'))return;
- if(!list.querySelector('.nexai-shop-heading')){const heading=document.createElement('div');heading.className='nexai-shop-heading';heading.innerHTML='<span class="nexai-shop-mark">STORE</span><strong>ImamStore — Nine Autoseries</strong><span aria-hidden="true">›</span><button type="button" class="nexai-shop-edit">Ubah</button>';heading.querySelector('button').addEventListener('click',()=>edit.click());list.prepend(heading);}
+const init=()=>{
+ const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems'),header=document.getElementById('refCartEdit');
+ if(!cart||!list||!header||cart.dataset.nexaiRepairV2)return;
+ cart.dataset.nexaiRepairV2='1';
+ function decorate(){
+  const hasItems=!!list.querySelector('.imam-cart-product');
+  let heading=list.querySelector('.nexai-shop-heading');
+  if(!hasItems){heading?.remove();return}
+  if(!heading){
+   heading=document.createElement('div');heading.className='nexai-shop-heading';
+   heading.innerHTML='<span class="nexai-shop-mark">STORE</span><strong>ImamStore — Nine Autoseries</strong><span aria-hidden="true">›</span><button type="button" class="nexai-shop-edit">Ubah</button>';
+   list.prepend(heading);
+  }
+  const btn=heading.querySelector('.nexai-shop-edit');
+  if(btn)btn.textContent=cart.classList.contains('v100-editing')?'Selesai':'Ubah';
  }
- let busy=false;new MutationObserver(()=>{if(busy)return;busy=true;queueMicrotask(()=>{decorate();busy=false})}).observe(list,{childList:true});decorate();
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',ready);else ready();
+ list.addEventListener('click',e=>{
+  const btn=e.target.closest('.nexai-shop-edit');
+  if(!btn)return;
+  e.preventDefault();e.stopPropagation();
+  if(window.imamstoreV54?.edit)window.imamstoreV54.edit(!cart.classList.contains('v100-editing'));
+  else header.click();
+  decorate();
+ });
+ header.addEventListener('click',()=>requestAnimationFrame(decorate));
+ const observer=new MutationObserver(()=>{if(list.querySelector('.imam-cart-product')&&!list.querySelector('.nexai-shop-heading'))decorate()});
+ observer.observe(list,{childList:true});
+ const classObserver=new MutationObserver(decorate);
+ classObserver.observe(cart,{attributes:true,attributeFilter:['class']});
+ decorate();
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
 })();
 </script>
 </body></html>
