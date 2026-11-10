@@ -6218,4 +6218,16 @@ new MutationObserver(schedule).observe(detail,{childList:true,subtree:true});
 detail.addEventListener('scroll',schedule,{passive:true});
 schedule();
 })();
-</script></body></html>
+</script><style id="nexai-v16-toast-flash-clearance">
+/* Toast ulasan/dilihat tetap pada posisi aslinya saat promo tidak aktif. */
+#imamstoreLiveOriginalDetail .gallery-main:has(> .nine-detail-flash-badge:not([hidden])) > .nine-review-toast-stack {
+ bottom:calc(10px + var(--nine-flash-banner-clearance, 74px))!important;
+}
+/* Animasi posisi halus tanpa mengganti pengendali toast atau countdown. */
+#imamstoreLiveOriginalDetail .gallery-main > .nine-review-toast-stack {
+ transition:bottom .22s ease!important;
+}
+@media (prefers-reduced-motion:reduce){
+ #imamstoreLiveOriginalDetail .gallery-main > .nine-review-toast-stack{transition:none!important}
+}
+</style></body></html>
