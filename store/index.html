@@ -750,20 +750,7 @@ padding-bottom:env(safe-area-inset-bottom)!important;font-family:inherit!importa
 .nf-cart-footer-clean[data-mode="edit"] .nf-delete-selected{border-color:#f05235!important;color:#f05235!important}
 .nf-cart-footer-clean button:disabled{opacity:.45!important}
 </style>
-<style id="imamstore-v100-stage5-clean">
-#s5Cart .v80-card-edit,#s5Cart .v80-card-actions{display:none!important}
-#s5Cart .imam-cart-product{transform:none!important}
-#s5Cart .ref-cart-footer .v100-edit-actions{display:none}
-#s5Cart.v100-editing .ref-cart-footer .ref-voucher-trigger,
-#s5Cart.v100-editing .ref-cart-footer .ref-cart-sum,
-#s5Cart.v100-editing .ref-cart-footer #s5Checkout{display:none!important}
-#s5Cart.v100-editing .ref-cart-footer .v100-edit-actions{display:flex!important;gap:10px;margin-left:auto;align-items:center}
-#s5Cart .v100-edit-actions button{font:inherit;background:#fff;border:1px solid #bcbcbc;border-radius:12px;padding:11px 16px;color:#292929}
-#s5Cart .v100-edit-actions .v100-delete{border-color:#ef4e2d;color:#ef4e2d}
-#s5Cart .v100-edit-actions button:disabled{opacity:.4}
-#s5Cart.v100-editing .ref-cart-checkout-row{display:flex!important;align-items:center;justify-content:space-between;gap:8px}
-#s5Cart.v100-editing .ref-cart-footer{padding-top:8px!important}
-</style></head>
+</head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
@@ -2764,6 +2751,10 @@ const V=window.V38=window.V38||{};
  if(!data.length){const empty=document.createElement('div');empty.className='imam-cart-empty';empty.textContent='Keranjang masih kosong. Pilih produk untuk mulai belanja.';target.append(empty)}
  data.forEach(x=>{
   const item=document.createElement('article');item.className='imam-cart-product';item.dataset.cartKey=String(x.key);
+  item.classList.add('nexai-cart-swipe');
+  let touchOrigin=null;
+  item.addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,.ref-v42-change'))return;touchOrigin={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+  item.addEventListener('touchend',e=>{if(!touchOrigin||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touchOrigin.x,dy=e.changedTouches[0].clientY-touchOrigin.y;touchOrigin=null;if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.35)item.classList.toggle('nexai-swipe-open',dx<0)},{passive:true});
   const select=document.createElement('input');select.type='checkbox';select.className='ref-v42-select';select.dataset.cartKey=String(x.key);select.setAttribute('aria-label','Pilih '+x.nama);
   select.checked=window.imamstoreV43?.isSelected?.(x.key)!==false;select.addEventListener('click',e=>e.stopPropagation());select.addEventListener('change',()=>{const key='imamstore_cart_selection_v43';let state={};try{state=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}state[String(x.key)]=select.checked;localStorage.setItem(key,JSON.stringify(state));window.imamstoreV43?.sync?.()});item.append(select);
   const img=document.createElement('img');img.src=safeUrl(x.gambar);img.alt='Foto '+x.nama;img.loading='lazy';
@@ -2777,7 +2768,13 @@ const V=window.V38=window.V38||{};
   const minus=document.createElement('button');minus.type='button';minus.textContent='−';minus.setAttribute('aria-label','Kurangi jumlah '+x.nama);minus.onclick=()=>update(x.key,-1);
   const amount=document.createElement('span');amount.textContent=String(x.qty);amount.setAttribute('aria-label','Jumlah '+x.qty);
   const plus=document.createElement('button');plus.type='button';plus.textContent='+';plus.setAttribute('aria-label','Tambah jumlah '+x.nama);plus.onclick=()=>update(x.key,1);
-  qty.append(minus,amount,plus);controls.append(remove,qty);info.append(controls);item.append(img,info);target.append(item);
+  qty.append(minus,amount,plus);controls.append(remove,qty);info.append(controls);item.append(img,info);
+  const swipeActions=document.createElement('div');swipeActions.className='nexai-swipe-actions';
+  const similar=document.createElement('button');similar.type='button';similar.textContent='Serupa';similar.className='nexai-similar';
+  similar.onclick=e=>{e.stopPropagation();item.classList.remove('nexai-swipe-open');cartPanel.classList.remove('open');document.body.classList.remove('stage4-detail-open');document.dispatchEvent(new CustomEvent('imamstore:cart-similar',{detail:{id:x.id,nama:x.nama}}));};
+  const swipeDelete=document.createElement('button');swipeDelete.type='button';swipeDelete.textContent='Hapus';swipeDelete.className='nexai-delete';
+  swipeDelete.onclick=e=>{e.stopPropagation();remove.click()};
+  swipeActions.append(similar,swipeDelete);item.append(swipeActions);target.append(item);
  });
  const sum=data.reduce((n,x)=>n+Number(x.harga)*x.qty,0);const count=data.reduce((n,x)=>n+x.qty,0);
  const summary=el('s5CartTotal');summary.replaceChildren();
@@ -2801,6 +2798,19 @@ const V=window.V38=window.V38||{};
  checked.push({...line,harga:current})}
  if(warnings.length){alert('Ringkasan pesanan ditahan karena data katalog berubah atau belum siap:\n\n'+warnings.join('\n')+'\n\nPeriksa ulang produk sebelum melanjutkan.');return}
  if(!checked.length)return;draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
+ document.addEventListener('imamstore:cart-line-updated',()=>{
+  if(!cartPanel.classList.contains('open'))return;
+  const data=read();
+  [...el('s5CartItems').querySelectorAll('.imam-cart-product')].forEach((card,i)=>{
+   const line=data.find(x=>String(x.key)===card.dataset.cartKey)||data[i];if(!line)return;
+   const count=card.querySelector('.imam-cart-qty span');if(count)count.textContent=String(line.qty);
+   const price=card.querySelector('.imam-cart-price');if(price)price.textContent=fmt(line.harga);
+   const variant=card.querySelector('.ref-v42-change');if(variant)variant.textContent='Varian: '+(line.varian||'Standar')+'  ▾';
+  });
+  const count=data.reduce((n,x)=>n+(Number(x.qty)||0),0),sum=data.reduce((n,x)=>n+(Number(x.harga)||0)*(Number(x.qty)||0),0);
+  const summary=el('s5CartTotal');if(summary){const a=summary.querySelector('.imam-cart-summary-line span'),b=summary.querySelector('.imam-cart-summary-line strong');if(a)a.textContent='Subtotal ('+count+' barang)';if(b)b.textContent=fmt(sum)}
+  window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
+ });
  el('s5CartBack').onclick=()=>{
   cartPanel.classList.remove('open');
   document.body.classList.remove('stage4-detail-open');
@@ -4566,12 +4576,12 @@ function openVariant(index){
   const items=read(),line=currentLine(items);if(!line)return;
   line.qty=qty;if('jumlah'in line)line.jumlah=qty;
   line.varian=chosen;line.harga=priceOf(resolve(),chosen);
-  if(write(items)){dirty=true;paintCard()}
+  if(write(items)){dirty=true;paintCard();document.dispatchEvent(new Event('imamstore:cart-line-updated'))}
  }
  function rollback(){
   if(committed||!dirty)return;
   const items=read(),line=currentLine(items);
-  if(line){Object.keys(line).forEach(k=>delete line[k]);Object.assign(line,snapshot);write(items);paintCard()}
+  if(line){Object.keys(line).forEach(k=>delete line[k]);Object.assign(line,snapshot);write(items);paintCard();document.dispatchEvent(new Event('imamstore:cart-line-updated'))}
  }
  const closeObserver=new MutationObserver(()=>{
   if(closed)return;
@@ -4617,10 +4627,11 @@ function openVariant(index){
   if(!p||!choices.includes(chosen)){status.textContent='Varian belum siap. Tunggu katalog dimuat.';return}
   if(qty>stockOf(p,chosen)){status.textContent='Jumlah melebihi stok varian.';return}
   const items=read(),line=currentLine(items);if(!line)return;
-  line.varian=chosen;line.qty=qty;line.harga=priceOf(p,chosen);line.key=String(line.id)+'::'+chosen;
+  line.varian=chosen;line.qty=qty;line.harga=priceOf(p,chosen);line.key=String(line.id)+'|'+chosen;
   if('jumlah'in line)line.jumlah=qty;
   if(!write(items)){status.textContent='Gagal menyimpan perubahan.';return}
-  committed=true;closed=true;closeObserver.disconnect();clearTimeout(refreshTimer);
+  try{const k='imamstore_cart_selection_v43',map=JSON.parse(localStorage.getItem(k)||'{}')||{};if(Object.prototype.hasOwnProperty.call(map,oldKey)){map[String(line.key)]=map[oldKey];delete map[oldKey];localStorage.setItem(k,JSON.stringify(map))}}catch{}
+  committed=true;closed=true;document.dispatchEvent(new Event('imamstore:cart-line-updated'));closeObserver.disconnect();clearTimeout(refreshTimer);
   document.removeEventListener('keydown',onEscape,true);
   window.imamstoreReferenceV38?.closeModal?.();
   window.renderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
@@ -4877,8 +4888,7 @@ function paint(){
  const disabled=!selected().length;
  actions.querySelectorAll('button').forEach(x=>x.disabled=disabled);
  // Hilangkan seluruh tombol geser/aksi lama dari card; Ubah varian tetap tersedia.
- cart.querySelectorAll('.v80-card-edit,.v80-card-actions').forEach(x=>x.remove());
- cart.querySelectorAll('.v80-actions-open').forEach(x=>x.classList.remove('v80-actions-open'));
+ // Kontrol aksi card tidak lagi dihapus pada setiap render sticky.
 }
 edit.addEventListener('click',()=>{editing=!editing;paint()});
 $('s5CartBack')?.addEventListener('click',()=>{editing=false;paint()},true);
@@ -5234,39 +5244,24 @@ function hideToast(){
  if(toast)toast.style.opacity='0';
  shownHost=null;
 }
-const toastQueue=[];
-let toastBusy=false;
-function show(message,type='info'){
+function show(message,type='info',expectedHost=null){
  const host=active();
- if(!host)return;
- toastQueue.push({host,message:String(message),type});
- if(toastBusy)return;
- const next=()=>{
-  const entry=toastQueue.shift();
-  if(!entry){toastBusy=false;return}
-  if(!entry.host.classList.contains('open')){next();return}
-  toastBusy=true;
-  if(!toast){
-   toast=document.createElement('div');
-   toast.id='nexaiScopedToast';
-   toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');
-   Object.assign(toast.style,{position:'fixed',top:'max(76px,env(safe-area-inset-top))',left:'50%',transform:'translateX(-50%)',maxWidth:'min(90vw,390px)',padding:'12px 17px',borderRadius:'12px',color:'#fff',font:'600 13px/1.5 system-ui,sans-serif',boxShadow:'0 8px 25px #0003',zIndex:'2147483600',textAlign:'center',pointerEvents:'none'});
-  }
-  entry.host.appendChild(toast);
-  toast.textContent=entry.message;
-  toast.style.background=entry.type==='error'?'#b42318':entry.type==='delete'?'#F05235':entry.type==='success'?'#8DC63F':'#333';
-  toast.style.opacity='1';
-  clearTimeout(timer);
-  timer=setTimeout(()=>{toast.style.opacity='0';setTimeout(next,220)},2100);
- };
- next();
+ if(!host||(expectedHost&&host!==expectedHost))return;
+ clearTimeout(timer);
+ if(!toast){
+  toast=document.createElement('div');toast.id='nexaiScopedToast';
+  toast.setAttribute('role','status');toast.setAttribute('aria-live','polite');
+  Object.assign(toast.style,{position:'fixed',top:'max(76px,env(safe-area-inset-top))',left:'50%',transform:'translateX(-50%)',maxWidth:'min(90vw,390px)',padding:'12px 17px',borderRadius:'12px',color:'#fff',font:'600 13px/1.5 system-ui,sans-serif',boxShadow:'0 8px 25px #0003',zIndex:'2147483600',textAlign:'center',pointerEvents:'none'});
+ }
+ shownHost=host;host.appendChild(toast);
+ toast.textContent=String(message);
+ toast.style.background=type==='error'?'#b42318':type==='delete'?'#F05235':type==='success'?'#8DC63F':'#333';
+ toast.style.opacity='1';
+ timer=setTimeout(hideToast,2100);
 }
 window.imamstoreToast=show;
 window.imamstoreCartToast=(message)=>{
- if(!cart.classList.contains('open')&&!document.querySelector('#product-grid-auto .cart-page'))return;
- // Hanya jalur keranjang yang memanggil notifikasi penghapusan.
- if(cart.classList.contains('open'))show(String(message),'delete');
- else window.imamstoreCartPageToast?.(String(message));
+ if(cart.classList.contains('open'))show(String(message),'delete',cart);
 };
 const old=$('imamstoreActiveToast');
 if(old)old.remove();
@@ -5323,28 +5318,7 @@ if(order){
 /* Toast should not remain visible after leaving its originating view. */
 body .store-swal-toast{z-index:2147483000}
 </style>
-<script id="imamstore-toast-page-scope-fix-script">
-(function(){
-'use strict';
-let lastView='';
-const view=()=>{
- const visible=id=>{const e=document.getElementById(id);if(!e)return false;const st=getComputedStyle(e);return st.display!=='none'&&st.visibility!=='hidden'&&(e.classList.contains('open')||e.offsetParent!==null)};
- if(visible('s5CheckoutPage')||visible('imamCheckoutPage'))return 'checkout';
- if(visible('s5CartPage')||visible('imamCartPage'))return 'cart';
- const detail=document.getElementById('imamstoreLiveOriginalDetail');
- if(detail&&detail.classList.contains('open'))return 'product';
- return location.hash+'|'+location.search;
-};
-const clear=()=>{
- document.querySelectorAll('.swal2-container:has(.swal2-toast),.store-toast-fallback').forEach(el=>el.remove());
-};
-const sync=()=>{const next=view();if(lastView&&next!==lastView)clear();lastView=next;};
-lastView=view();
-window.addEventListener('popstate',sync);
-window.addEventListener('hashchange',sync);
-document.addEventListener('click',()=>setTimeout(sync,80),true);
-})();
-</script>
+
 
 <style id="nexai-store-polish-v44">
 /* Store-only polish: original-inspired responsive voucher cards and shared variant sheet. */
@@ -5832,7 +5806,7 @@ document.addEventListener('keydown',e=>{
 <script id="nexai-v58-shared-preview">
 (function(){
 'use strict';
-const selector='#checkout-summary .v38-checkout-thumb, #s5CartItems .imam-cart-product img, #product-grid-auto .cart-page .cart-item img';
+const selector='#checkout-summary .v38-checkout-thumb';
 function urlOf(img){return img.currentSrc||img.getAttribute('src')||''}
 function openFor(img){
  const card=img.closest('.summary-item,.imam-cart-product,.cart-item');
@@ -5999,19 +5973,7 @@ document.addEventListener('change',e=>{
 #nexaiCartPageToast{position:fixed;top:calc(env(safe-area-inset-top) + 92px);left:50%;transform:translateX(-50%);z-index:2147483600;max-width:90vw;padding:12px 18px;border-radius:12px;background:#f05235;color:white;font:600 14px system-ui;box-shadow:0 8px 24px #0003;pointer-events:none;text-align:center}
 </style>
 
-<script id="nexai-v105-cart-toast">
-(()=>{'use strict';let timer;
-window.imamstoreCartPageToast=message=>{
- const page=document.querySelector('#product-grid-auto .cart-page');
- if(!page||!page.isConnected)return;
- let el=document.getElementById('nexaiCartPageToast');
- if(!el){el=document.createElement('div');el.id='nexaiCartPageToast';el.setAttribute('role','status');document.body.append(el)}
- el.textContent=String(message);el.hidden=false;clearTimeout(timer);
- timer=setTimeout(()=>{el.hidden=true},2500);
-};
-new MutationObserver(()=>{const el=document.getElementById('nexaiCartPageToast');if(el&&!document.querySelector('#product-grid-auto .cart-page'))el.hidden=true}).observe(document.getElementById('product-grid-auto')||document.body,{childList:true,subtree:true});
-})();
-</script>
+
 <style id="nexai-v105-cart-controls">
 #product-grid-auto .cart-page .n4-card .n4-viewport{overflow:hidden!important;touch-action:pan-y!important}
 #product-grid-auto .cart-page .n4-card .n4-track{display:flex!important;transform:translateX(0);transition:transform .22s ease!important;width:100%!important}
@@ -6019,4 +5981,16 @@ new MutationObserver(()=>{const el=document.getElementById('nexaiCartPageToast')
 #product-grid-auto .cart-page .n4-card .n4-main{flex:0 0 100%!important;min-width:0!important}
 #product-grid-auto .cart-page .n4-card .n4-swipe-actions{flex:0 0 196px!important}
 #product-grid-auto .cart-page .nf-item-select,.nf-cart-footer-clean #nfAll{appearance:auto!important;-webkit-appearance:checkbox!important;pointer-events:auto!important;accent-color:#8dc63f!important;opacity:1!important}
-</style></body></html>
+</style><style id="nexai-v107-stage5-cart-core">
+#s5CartItems .imam-cart-product.nexai-cart-swipe{touch-action:pan-y;overflow:hidden}
+#s5CartItems .nexai-cart-swipe>img,#s5CartItems .nexai-cart-swipe>.imam-cart-product-info{transition:transform .22s ease;position:relative;z-index:2;background:#fff}
+#s5CartItems .nexai-cart-swipe.nexai-swipe-open>img,#s5CartItems .nexai-cart-swipe.nexai-swipe-open>.imam-cart-product-info{transform:translateX(-126px)}
+#s5CartItems .nexai-cart-swipe>.ref-v42-select{z-index:4;pointer-events:auto;appearance:auto;-webkit-appearance:checkbox;accent-color:#8dc63f}
+#s5CartItems .nexai-swipe-actions{position:absolute;right:0;top:0;bottom:0;display:flex;width:126px;z-index:1;opacity:0;pointer-events:none;transition:opacity .2s ease}
+#s5CartItems .nexai-swipe-open .nexai-swipe-actions{opacity:1;pointer-events:auto}
+#s5CartItems .nexai-swipe-actions button{flex:1;min-width:0;border:0;color:#fff;font-size:13px;font-weight:700;touch-action:manipulation}
+#s5CartItems .nexai-similar{background:#f69216}
+#s5CartItems .nexai-delete{background:#f05235}
+#s5CartItems .nexai-cart-swipe .imam-cart-remove{display:none!important}
+</style>
+</body></html>
