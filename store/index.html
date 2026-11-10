@@ -589,10 +589,7 @@ body:has(#s5Cart.open)
  visibility:visible!important;opacity:1!important;
  min-width:22px!important;min-height:22px!important
 }
-/* Flash Sale badge already exists in the product renderer: don't suppress it. */
-#imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) .nine-flash-label{
- display:inline-flex!important;visibility:visible!important;opacity:1!important
-}
+
 </style>
 <style id="nexai-v82-source-alignment">
 /* Product view count is displayed once, in the original detail statistics row. */
@@ -615,32 +612,56 @@ body:has(#s5Cart.open)
 #s5Cart.open .nf-cart-footer{z-index:2147482500}
 #s5Cart.open .nf-cart-footer .nf-edit-actions{transition:opacity .18s ease}
 </style>
-<style id="imamstore-v90-canonical-controls">
-/* Single canonical purchase footer; previous v46/v89 implementations removed. */
-#imamstoreLiveOriginalDetail.open #stickyCheckout {
-position:fixed!important;left:14px!important;right:14px!important;bottom:14px!important;
-width:auto!important;max-width:none!important;min-height:0!important;max-height:none!important;
-padding:20px!important;padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
-background:#fff!important;border:0!important;border-radius:34px!important;
-box-shadow:0 14px 38px rgba(0,0,0,.17)!important;z-index:2147482000!important;
-display:block!important;visibility:visible!important;opacity:1!important;transform:none!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions {
-display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;gap:14px!important;width:100%!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button{
-display:flex!important;align-items:center!important;justify-content:center!important;
-min-width:0!important;height:84px!important;min-height:84px!important;
-border-radius:23px!important;opacity:1!important;visibility:visible!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button:last-child{
-font-weight:800!important;font-size:20px!important}
-#s5Cart.nf-editing .nf-cart-footer .nf-cart-voucher,
-#s5Cart.nf-editing .nf-cart-footer .nf-cart-total,
-#s5Cart.nf-editing .nf-cart-footer .nf-cart-checkout{display:none!important}
-#s5Cart.nf-editing .nf-cart-footer{background:#fff!important}
-@media(max-width:440px){
-#imamstoreLiveOriginalDetail.open #stickyCheckout{padding:12px!important;border-radius:25px!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{grid-template-columns:60px 60px minmax(0,1fr)!important;gap:10px!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button{height:64px!important;min-height:64px!important;border-radius:20px!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button:last-child{font-size:16px!important}
+<style id="imamstore-v91-controls">
+#imamstoreLiveOriginalDetail.open #stickyCheckout{position:fixed!important;left:14px!important;right:14px!important;bottom:14px!important;width:auto!important;max-width:none!important;display:block!important;padding:20px!important;background:#fff!important;border-radius:34px!important;box-shadow:0 12px 36px #0002!important;z-index:2147482000!important;transform:none!important;visibility:visible!important;opacity:1!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;gap:14px!important;width:100%!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button{min-width:0!important;min-height:84px!important;height:84px!important;display:flex!important;align-items:center!important;justify-content:center!important;border-radius:23px!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button:last-child{font-weight:800!important;font-size:20px!important}
+#product-grid-auto .cart-page.nf-editing .nf-cart-footer .nf-voucher-row,
+#product-grid-auto .cart-page.nf-editing .nf-cart-footer #nfCartTotals,
+#product-grid-auto .cart-page.nf-editing .nf-cart-footer #nfCartGo{display:none!important}
+#product-grid-auto .cart-page.nf-editing .nf-cart-footer{background:#fff!important}
+@media(max-width:440px){#imamstoreLiveOriginalDetail.open #stickyCheckout{padding:12px!important;border-radius:25px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{grid-template-columns:60px 60px minmax(0,1fr)!important;gap:10px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button{height:64px!important;min-height:64px!important;border-radius:20px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button:last-child{font-size:16px!important}}
+</style>
+<style id="imamstore-v92-sheet-sticky-canonical">
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{
+ display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;gap:14px!important;width:100%!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn,
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn{
+ width:100%!important;height:70px!important;background:white!important;color:#555!important;
+ border:1px solid #e4e4e4!important;border-radius:22px!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn i:before{content:"\\f086"!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout [data-nex-buy]{
+ height:70px!important;min-width:0!important;border-radius:20px!important;
+ background:#8dc63f!important;color:white!important;font-weight:800!important}
+.ref-modal:not([hidden]){z-index:2147483300!important}
+.ref-modal .ref-v42-options{display:flex!important;flex-wrap:wrap!important;gap:12px!important}
+.ref-modal .ref-v42-option{min-height:54px!important;padding:12px 20px!important;border-radius:15px!important}
+#s5Cart.open .nf-cart-footer .nf-edit-actions{display:flex;align-items:center;gap:10px}
+#s5Cart.open .nf-cart-footer .nf-edit-actions button{min-height:48px;border-radius:14px}
+</style><style id="nexai-v93-flash-label-fix">
+/* One banner with two explicit areas: title on the left, timer on the right. */
+#imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]){
+ display:grid!important;grid-template-columns:minmax(0,1fr) auto!important;
+ align-items:center!important;column-gap:10px!important;
+}
+#imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) > .nine-flash-label{
+ display:inline-flex!important;position:static!important;inset:auto!important;
+ min-width:0!important;width:max-content!important;max-width:100%!important;
+ visibility:visible!important;opacity:1!important;
+ align-items:center!important;gap:6px!important;
+ color:#fff!important;background:transparent!important;
+ padding:0!important;margin:0!important;box-shadow:none!important;
+ font-size:14px!important;line-height:1.3!important;font-weight:800!important;
+ white-space:nowrap!important;overflow:visible!important;
+}
+#imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) > .nine-flash-timer{
+ display:block!important;position:static!important;min-width:0!important;
+ color:#fff!important;text-align:right!important;white-space:nowrap!important;
+}
+@media(max-width:360px){
+ #imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) > .nine-flash-label{font-size:12px!important}
+ #imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) > .nine-flash-timer{font-size:11px!important}
 }
 </style>
 </head>
@@ -3592,7 +3613,7 @@ let html = `
         </div>
       </div>
       <div class="product-info">
-        ${`<div class="nine-detail-flash-badge" ${window.nineFlashActive(product)?'':'hidden'}><strong class="nine-flash-label" style="display:inline-flex;align-items:center;gap:6px;visibility:visible"><i class="fa-solid fa-bolt" aria-hidden="true"></i> FLASH SALE</strong><span class="nine-flash-timer" data-nine-flash-end="${product.flashSale?.endAt||''}">Berakhir --:--:--</span></div>`}
+        ${`<div class="nine-detail-flash-badge" ${window.nineFlashActive(product)?'':'hidden'}><strong class="nine-flash-label" aria-label="Flash Sale"><i class="fa-solid fa-bolt" aria-hidden="true"></i><span>FLASH SALE</span></strong><span class="nine-flash-timer" data-nine-flash-end="${product.flashSale?.endAt||''}">Berakhir --:--:--</span></div>`}
         <div class="nine-old-price">${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<del>Rp ${product.harga.normal.toLocaleString("id-ID")}</del><span class="nine-discount-percent">-${Math.round((1-window.nineEffectivePromo(product)/product.harga.normal)*100)}%</span>` : ""}</div>
         <div class="nine-price-row">
           <div class="price">Rp ${(window.nineEffectivePromo(product) || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-window.nineEffectivePromo(product)).toLocaleString("id-ID")}</span>` : ""}
@@ -3761,7 +3782,7 @@ stroke-linejoin="round">
     class="sticky-icon-btn"
     onclick="openStickyWhatsApp()">
 
-       <i class="fa-solid fa-comment-dots"></i>
+       <i class="fa-solid fa-comments" aria-hidden="true"></i>
        
 
     </button>
@@ -3892,6 +3913,7 @@ window.goCart=()=>{close();document.dispatchEvent(new Event('imamstore:open-cart
 let purchaseMode='cart';
 function activeProduct(){return window.imamstoreActiveProduct||null}
 function variantOptions(p){return Array.isArray(p?.varian)?p.varian.map(v=>typeof v==='string'?v:String(v?.nama||v?.name||v?.label||'')).filter(Boolean):[]}
+window.imamstorePurchaseVariantOptions=variantOptions;
 function purchaseVariantPhotos(product,selectedName){
  const entries=Array.isArray(product?.varian)?product.varian:[];
  const selected=entries.find(v=>v&&typeof v==='object'&&
@@ -4329,15 +4351,41 @@ function finish(e){const a=active;if(!a)return;active=null;cancelAnimationFrame(
 }
 document.addEventListener('touchend',finish,{capture:true,passive:true});document.addEventListener('touchcancel',finish,{capture:true,passive:true});
 function read(){try{const x=JSON.parse(localStorage.getItem(cartKey)||'[]');return Array.isArray(x)?x:[]}catch{return []}}
-function write(items){try{localStorage.setItem(cartKey,JSON.stringify(items));window.dispatchEvent(new Event('storage'));return true}catch{return false}}
-function productFor(line){const list=window.imamstoreV29?.products?.()||[];return list.find(p=>String(p.id)===String(line.id))||null}
+function write(items){
+ try{
+  localStorage.setItem(cartKey,JSON.stringify(items));
+  const live=window.cart;
+  if(Array.isArray(live)){live.splice(0,live.length,...items)}
+  window.dispatchEvent(new Event('storage'));
+  window.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{items,source:'variant-sheet'}}));
+  return true;
+ }catch(err){console.error('Gagal menyimpan keranjang',err);return false}
+}
+function productFor(line){
+ const sources=[
+  window.imamstoreV29?.products?.(),window.allProducts,
+  window.products,window.imamstoreProducts,
+  (typeof allProducts!=='undefined'?allProducts:null)
+ ];
+ for(const list of sources){
+  if(!Array.isArray(list))continue;
+  const found=list.find(p=>String(p.id||p.id_produk||p.productId)===String(line.id)
+   ||String(p.nama||p.name||'').trim().toLowerCase()===String(line.nama||'').trim().toLowerCase());
+  if(found)return found;
+ }
+ return null;
+}
 function variants(p){const a=p?.varian||p?.variants||[];return Array.isArray(a)?a:[]}
 function variantLabel(v){return typeof v==='string'?v:String(v?.nama||v?.name||v?.label||v?.warna||'Standar')}
 function safeText(t){return String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function openVariant(index){const items=read(),line=items[index];if(!line)return;
  const active=window.imamstoreActiveProduct||window.currentProduct;
  const p=productFor(line)||(active&&String(active.id)===String(line.id)?active:null);
- const v=variants(p),choices=v.length?v:[line.varian||'Standar'];let selected=choices.findIndex(x=>variantLabel(x)===line.varian);if(selected<0)selected=0;
+ const sourceVariants=variants(p);
+ const purchaseOptions=(typeof window.imamstorePurchaseVariantOptions==='function'
+  ?window.imamstorePurchaseVariantOptions(p):[]);
+ const choices=sourceVariants.length?sourceVariants:
+  purchaseOptions.length?purchaseOptions:[line.varian||'Standar'];let selected=choices.findIndex(x=>variantLabel(x)===line.varian);if(selected<0)selected=0;
  const ref=document.querySelector('.ref-modal'),content=$('refModalContent');if(!ref||!content)return;
  content.innerHTML='<h2 class="ref-v42-variant-title">Ubah Varian</h2><div class="ref-v42-product"><img alt="Foto produk"><div><b></b><p></p></div></div><h3 style="margin-top:22px">Pilih Varian</h3><div class="ref-v42-options"></div><div class="nine-clean-qty"><button type="button" data-qty="minus" aria-label="Kurangi jumlah">−</button><output aria-live="polite"></output><button type="button" data-qty="plus" aria-label="Tambah jumlah">+</button></div><button class="ref-v42-confirm">Konfirmasi</button>';
  const img=content.querySelector('img');const source=line.gambar||p?.gambar||p?.gallery?.[0]||p?.galeri?.[0];
@@ -4369,6 +4417,14 @@ function openVariant(index){const items=read(),line=items[index];if(!line)return
   window.imamstoreV43?.sync?.();
  }
  window.__nineSyncVisibleTotals?.();
+ const row=document.querySelectorAll('#s5CartItems .imam-cart-product')[index];
+ if(row){
+  const qtyNode=row.querySelector('input[type=number],.cart-qty-value,.quantity-value,.qty-value,.qty-display,.cart-quantity output');
+  if(qtyNode){if('value'in qtyNode)qtyNode.value=String(qty);else qtyNode.textContent=String(qty)}
+  const variantNode=row.querySelector('.ref-v42-change');
+  if(variantNode)variantNode.textContent='Varian: '+name+' ▾';
+ }
+ requestAnimationFrame(()=>{window.imamstoreV43?.sync?.();window.__nineSyncVisibleTotals?.()});
  document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'variant-edit',id:updated[index].id}}));
 }
  };
