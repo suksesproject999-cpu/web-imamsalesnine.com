@@ -2788,6 +2788,7 @@ const V=window.V38=window.V38||{};
  const note=document.createElement('p');note.className='imam-cart-summary-note';note.textContent='Ongkir, voucher, dan pembayaran belum dihitung. Tidak ada transaksi yang dikirim.';summary.append(note);
  el('s5Checkout').disabled=!data.length;
  }
+ window.__nexaiCoreRenderCart=renderCart;
  function openCart(){document.getElementById('imamstoreLiveOriginalDetail')?.classList.remove('open');document.body.classList.remove('imamstore-original-open');draft.classList.remove('open');document.getElementById('imamstoreOriginalPurchase')?.classList.remove('open');const purchase=document.getElementById('imamstoreOriginalPurchase');if(purchase)purchase.hidden=true;cartPanel.classList.add('open');document.body.classList.add('stage4-detail-open');renderCart();window.imamstoreV43?.sync?.()}
  function openDraft(lines){draftOrigin=Array.isArray(lines)?'detail':'cart';const data=Array.isArray(lines)?lines:read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);if(!data.length)return;
  // Never treat a locally saved price as authoritative. Recheck product, variant and price.
@@ -2802,7 +2803,7 @@ const V=window.V38=window.V38||{};
  if(current!==Number(line.harga)){warnings.push(line.nama+': harga berubah dari '+fmt(line.harga)+' menjadi '+fmt(current)+'.');continue}
  checked.push({...line,harga:current})}
  if(warnings.length){alert('Ringkasan pesanan ditahan karena data katalog berubah atau belum siap:\n\n'+warnings.join('\n')+'\n\nPeriksa ulang produk sebelum melanjutkan.');return}
- if(!checked.length)return;draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
+ if(!checked.length)return;window.__nexaiCheckoutLines=checked.map(x=>({...x}));draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
  document.addEventListener('imamstore:cart-line-updated',()=>{
   if(!cartPanel.classList.contains('open'))return;
   const data=read();
@@ -4342,9 +4343,7 @@ function refreshCart(){
  window.imamstoreUnifiedCards?.refresh?.();
 }
 function refreshCheckout(){
- const chosen=[...$('s5DraftItems').querySelectorAll('.s5-item')];
- const fromCart=read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);
- const rows=chosen.length?fromCart:fromCart;
+ const rows=Array.isArray(window.__nexaiCheckoutLines)?window.__nexaiCheckoutLines:read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);
  const count=rows.reduce((a,x)=>a+(Number(x.qty)||0),0);
  const sum=rows.reduce((a,x)=>a+(Number(x.qty)||0)*(Number(x.harga)||0),0);
  const voucher=window.imamstoreV43?.totals?.().voucher||null;
@@ -4541,7 +4540,7 @@ function productFor(line){
   const byName=String(p.nama||p.name||'').trim().toLowerCase()===String(line.nama||'').trim().toLowerCase();
   if(byId||byName)matches.push({p,byId});
  }}
- matches.sort((a,b)=>variants(b.p).length-variants(a.p).length||Number(b.byId)-Number(a.byId));
+ matches.sort((a,b)=>Number(b.byId)-Number(a.byId)||variants(b.p).length-variants(a.p).length);
  return matches[0]?.p||null;
 }
 function variantLabel(v){return typeof v==='string'?v:String(v?.nama||v?.name||v?.label||v?.warna||'Standar')}
@@ -4551,7 +4550,8 @@ function openVariant(index){
  const sheet=$('imamstoreOriginalPurchase'),selector=$('imamstorePurchaseVariant'),
  qtyInput=$('imamstorePurchaseQty'),action=$('imamstorePurchaseAction'),message=$('imamstorePurchaseMessage');
  if(!sheet||!selector||!qtyInput||!action)return;
- const p=productFor(original),oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
+ const canonical=window.imamstoreV29?.products?.()||[];
+ const p=canonical.find(v=>String(v.id)===String(original.id))||productFor(original),oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
  const oldTitle=sheet.querySelector('#imamstorePurchaseTitle')?.textContent||'';
  const oldImage=$('imamstorePurchaseImage')?.src||'';
  const oldText=action.textContent,oldSelectChange=selector.onchange,oldBackdrop=sheet.onclick;
@@ -6065,113 +6065,96 @@ document.addEventListener('change',e=>{
 
 
 
-<style id="nexai-v7-cart-lime">
-#s5Cart{--cart-lime:#8cc63f;--cart-dark:#689d2b}
-#s5Cart .ref-cart-header button,#s5Cart .ref-cart-header i,#s5Cart .ref-cart-header svg{color:var(--cart-lime)!important}
-#s5Cart .ref-cart-checkout-row input,#s5CartItems input[type=checkbox]{accent-color:var(--cart-lime)!important}
-#s5Cart #s5Checkout,#s5Cart .v100-delete,#s5Cart .nexai-edit-actions button:last-child{background:var(--cart-lime)!important;color:#fff!important;border-color:var(--cart-lime)!important}
-#s5Cart .ref-cart-sum b,#s5Cart .imam-cart-price,#s5Cart .nexai-shop-heading .nexai-shop-edit,#s5Cart #refCartEdit{color:var(--cart-dark)!important}
-#s5Cart .nexai-shop-mark{background:var(--cart-lime)!important}
-#s5Cart .v100-edit-actions button{border-color:var(--cart-lime)!important;color:var(--cart-dark)!important}
-#s5Cart .v100-edit-actions .v100-delete{color:#fff!important}
+<style id="nexai-v8-clean-cart-style">
+#s5Cart{--n8:#8cc63f;--n8deep:#699d30}
+#s5Cart .ref-v42-select,#s5Cart input[type="checkbox"]{accent-color:var(--n8)!important}
+#s5Cart .ref-cart-header svg,#s5Cart .ref-cart-header i,#s5Cart #refCartEdit,#s5Cart .ref-voucher-trigger svg,#s5Cart .ref-voucher-trigger i{color:var(--n8deep)!important}
+#s5Cart .ref-cart-sum,#s5Cart #s5CartTotal,#s5Cart .imam-cart-price{color:#e75136!important}
+#s5Cart #s5Checkout,#s5Cart .v100-delete{background:var(--n8)!important;border-color:var(--n8)!important;color:#fff!important}
+#s5Cart .v100-edit-actions .v100-favorite{border-color:var(--n8)!important;color:var(--n8deep)!important}
 #s5CartItems .imam-cart-product{position:relative!important;overflow:hidden!important}
-#s5CartItems .imam-cart-product .nexai-v7-edit{position:absolute;right:12px;top:8px;z-index:10;border:0;background:#fff;color:#777;padding:8px 10px;font-size:14px;cursor:pointer}
-#s5CartItems .imam-cart-product .nexai-v7-actions{position:absolute;right:0;top:0;bottom:0;width:34%;display:flex;z-index:4;transform:translateX(101%);transition:transform .23s ease}
-#s5CartItems .nexai-v7-actions button{width:50%;min-width:0;border:0;background:#8cc63f;color:#fff;font-weight:700;font-size:13px;padding:2px}
-#s5CartItems .nexai-v7-actions .nexai-v7-delete{background:#699d30}
-#s5CartItems .imam-cart-product.nexai-v7-open .nexai-v7-actions{transform:translateX(0)}
-#s5CartItems .imam-cart-product>img,#s5CartItems .imam-cart-product>.imam-cart-product-info,#s5CartItems .imam-cart-product>.ref-v42-select{transition:transform .23s ease!important;position:relative}
-#s5CartItems .imam-cart-product.nexai-v7-open>img,#s5CartItems .imam-cart-product.nexai-v7-open>.imam-cart-product-info,#s5CartItems .imam-cart-product.nexai-v7-open>.ref-v42-select{transform:translateX(-34%)!important}
-#s5CartItems .imam-cart-product.nexai-v7-open .nexai-v7-edit{right:35%;color:var(--cart-dark)}
 #s5CartItems .imam-cart-product .nexai-swipe-actions{display:none!important}
-#s5Cart .nexai-v7-confirm{position:fixed;inset:0;z-index:2147483500;background:#0009;display:flex;align-items:center;justify-content:center;padding:20px}
-#s5Cart .nexai-v7-dialog{width:min(100%,420px);border-radius:14px;background:#fff;padding:24px 18px;text-align:center;box-shadow:0 20px 50px #0003}
-#s5Cart .nexai-v7-warn{border:3px solid #8cc63f;color:#8cc63f;width:72px;height:72px;border-radius:50%;font-size:52px;margin:0 auto 15px}
-#s5Cart .nexai-v7-dialog h2{font-size:22px;margin:12px 0}
-#s5Cart .nexai-v7-dialog p{color:#666;line-height:1.5}
-#s5Cart .nexai-v7-dialog button{border:0;border-radius:8px;padding:12px 22px;margin:7px;background:#8cc63f;color:#fff;font-weight:700}
-#s5Cart .nexai-v7-dialog button[data-no]{background:#737b80}
-</style><script id="nexai-v7-cart-fixes">
+#s5CartItems .imam-cart-product .n8-edit{position:absolute;right:8px;top:8px;border:0;background:#fff;color:#777;padding:7px 10px;z-index:9;font-size:14px}
+#s5CartItems .imam-cart-product .n8-actions{position:absolute;top:0;bottom:0;right:0;width:34%;display:flex;transform:translateX(101%);transition:transform .22s ease;z-index:3}
+#s5CartItems .n8-actions button{width:50%;border:0;background:#8cc63f;color:white;font-weight:700;font-size:13px}
+#s5CartItems .n8-actions .n8-remove{background:#699d30}
+#s5CartItems .imam-cart-product.n8-open .n8-actions{transform:translateX(0)}
+#s5CartItems .imam-cart-product>img,#s5CartItems .imam-cart-product>.imam-cart-product-info,#s5CartItems .imam-cart-product>.ref-v42-select{transition:transform .22s ease!important}
+#s5CartItems .imam-cart-product.n8-open>img,#s5CartItems .imam-cart-product.n8-open>.imam-cart-product-info,#s5CartItems .imam-cart-product.n8-open>.ref-v42-select{transform:translateX(-34%)!important}
+#s5CartItems .imam-cart-product.n8-open .n8-edit{right:35%;color:#699d30}
+#s5Cart .n8-overlay{position:fixed;inset:0;background:#0009;z-index:2147483600;display:grid;place-items:center;padding:18px}
+#s5Cart .n8-dialog{width:min(100%,410px);padding:24px 20px;background:white;border-radius:15px;text-align:center}
+#s5Cart .n8-dialog h2{font-size:22px}
+#s5Cart .n8-dialog p{color:#666}
+#s5Cart .n8-dialog button{background:#8cc63f;color:white;border:0;border-radius:8px;padding:12px 25px;margin:8px 5px}
+#s5Cart .n8-dialog button[data-no]{background:#777}
+#s5Cart .n8-edit{touch-action:manipulation}
+</style><script id="nexai-v8-clean-cart-engine">
 (()=>{
 'use strict';
-const boot=()=>{
+function start(){
 const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems');
 if(!cart||!list)return;
 const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
-const read=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch{return []}};
-const chosen=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}catch{return {}}};
-const selected=()=>read().filter(x=>chosen()[String(x.key)]!==false);
-const refresh=()=>{
- window.renderCart?.();
+const read=()=>{try{const v=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(v)?v:[]}catch{return []}};
+const selection=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}catch{return {}}};
+const selected=()=>read().filter(x=>selection()[String(x.key)]!==false);
+const render=()=>{
+ // Render from persisted canonical cart, never from stale cached DOM.
+ if(typeof window.__nexaiCoreRenderCart==='function')window.__nexaiCoreRenderCart();
+ else window.renderCart?.();
  window.imamstoreV43?.sync?.();
  window.imamstoreReferenceV38?.refresh?.();
  window.imamstoreRefreshCartBadge?.();
- document.dispatchEvent(new Event('nine:cartchange'));
+ document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'cart-v8'}}));
 };
-const confirmDelete=(count)=>new Promise(resolve=>{
- const shade=document.createElement('div');shade.className='nexai-v7-confirm';
- shade.innerHTML='<div class="nexai-v7-dialog" role="alertdialog" aria-modal="true"><div class="nexai-v7-warn">!</div><h2>Hapus produk terpilih?</h2><p></p><div><button type="button" data-ok>Hapus</button><button type="button" data-no>Batal</button></div></div>';
- shade.querySelector('p').textContent=count+' produk akan dihapus dari keranjang.';
- const done=value=>{shade.remove();resolve(value)};
- shade.querySelector('[data-ok]').onclick=()=>done(true);
- shade.querySelector('[data-no]').onclick=()=>done(false);
- cart.append(shade);
-});
-const erase=async(keys)=>{
- keys=[...new Set(keys.map(String))];if(!keys.length)return;
- if(!await confirmDelete(keys.length))return;
- const set=new Set(keys);
- const after=read().filter(x=>!set.has(String(x.key)));
- try{localStorage.setItem(KEY,JSON.stringify(after))}catch(e){console.error(e);return}
- const selection=chosen();keys.forEach(k=>delete selection[k]);
- localStorage.setItem(SEL,JSON.stringify(selection));
- refresh();
-};
+function ask(n){return new Promise(resolve=>{
+const shade=document.createElement('div');shade.className='n8-overlay';
+shade.innerHTML='<div class="n8-dialog" role="alertdialog" aria-modal="true"><h2>Hapus produk terpilih?</h2><p></p><button type="button" data-yes>Hapus</button><button type="button" data-no>Batal</button></div>';
+shade.querySelector('p').textContent=n+' produk akan dihapus dari keranjang.';
+const finish=x=>{shade.remove();resolve(x)};
+shade.querySelector('[data-yes]').onclick=()=>finish(true);
+shade.querySelector('[data-no]').onclick=()=>finish(false);
+cart.append(shade);
+})}
+async function erase(keys){
+keys=[...new Set(keys.map(String))];if(!keys.length)return;
+if(!await ask(keys.length))return;
+const ids=new Set(keys),next=read().filter(x=>!ids.has(String(x.key)));
+try{localStorage.setItem(KEY,JSON.stringify(next))}catch(e){console.error('Gagal menyimpan penghapusan',e);return}
+const m=selection();keys.forEach(k=>delete m[k]);localStorage.setItem(SEL,JSON.stringify(m));
+render();
+}
 function decorate(){
- const data=read();
- for(const row of list.querySelectorAll('.imam-cart-product')){
-  const key=row.dataset.cartKey||'';
-  const line=data.find(x=>String(x.key)===key);if(!line)continue;
-  row.classList.remove('nexai-swipe-open');
-  row.querySelectorAll('.nexai-v6-actions,.nexai-v6-edit,.nexai-v7-actions,.nexai-v7-edit').forEach(n=>n.remove());
-  const edit=document.createElement('button');edit.type='button';edit.className='nexai-v7-edit';edit.textContent='Ubah';edit.setAttribute('aria-label','Ubah '+line.nama);
-  const actions=document.createElement('div');actions.className='nexai-v7-actions';
-  actions.innerHTML='<button type="button" class="nexai-v7-similar">Serupa</button><button type="button" class="nexai-v7-delete">Hapus</button>';
-  row.append(edit,actions);
-  const check=row.querySelector('.ref-v42-select');if(check){check.checked=chosen()[key]!==false;check.dataset.cartKey=key}
- }
+for(const row of list.querySelectorAll('.imam-cart-product')){
+ if(row.querySelector('.n8-edit'))continue;
+ const edit=document.createElement('button');edit.type='button';edit.className='n8-edit';edit.textContent='Ubah';
+ const actions=document.createElement('div');actions.className='n8-actions';
+ actions.innerHTML='<button type="button" class="n8-similar">Serupa</button><button type="button" class="n8-remove">Hapus</button>';
+ row.append(edit,actions);
 }
-let rendering=false;
-new MutationObserver(()=>{if(rendering)return;rendering=true;queueMicrotask(()=>{decorate();rendering=false})}).observe(list,{childList:true});
+}
+let busy=false;
+new MutationObserver(()=>{if(busy)return;busy=true;queueMicrotask(()=>{decorate();busy=false})}).observe(list,{childList:true});
 list.addEventListener('click',e=>{
- const b=e.target.closest('.nexai-v7-edit,.nexai-v7-delete,.nexai-v7-similar');if(!b)return;
- e.preventDefault();e.stopImmediatePropagation();
- const row=b.closest('.imam-cart-product');if(!row)return;
- if(b.classList.contains('nexai-v7-edit')){
-  const was=row.classList.contains('nexai-v7-open');
-  list.querySelectorAll('.nexai-v7-open').forEach(r=>{r.classList.remove('nexai-v7-open');r.querySelector('.nexai-v7-edit').textContent='Ubah'});
-  if(!was){row.classList.add('nexai-v7-open');b.textContent='Selesai'}
- }else if(b.classList.contains('nexai-v7-delete'))erase([row.dataset.cartKey]);
- else{
-  row.classList.remove('nexai-v7-open');
-  const line=read().find(x=>String(x.key)===row.dataset.cartKey);
-  if(line){cart.classList.remove('open');document.dispatchEvent(new CustomEvent('imamstore:cart-similar',{detail:{id:line.id,nama:line.nama}}))}
- }
-},true);
-list.addEventListener('change',e=>{
- if(!e.target.matches('.ref-v42-select'))return;
- const key=e.target.closest('.imam-cart-product')?.dataset.cartKey;
- if(!key)return;
- const m=chosen();m[key]=e.target.checked;localStorage.setItem(SEL,JSON.stringify(m));
- queueMicrotask(()=>{window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()});
-});
-const sticky=cart.querySelector('.v100-delete');
-if(sticky){
- // Capture before the legacy handler to avoid the global modal.
- sticky.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();erase(selected().map(x=>x.key))},true);
+const b=e.target.closest('.n8-edit,.n8-remove,.n8-similar');if(!b)return;
+e.preventDefault();e.stopImmediatePropagation();
+const row=b.closest('.imam-cart-product');if(!row)return;
+if(b.matches('.n8-edit')){
+ const open=!row.classList.contains('n8-open');
+ list.querySelectorAll('.n8-open').forEach(x=>{x.classList.remove('n8-open');x.querySelector('.n8-edit').textContent='Ubah'});
+ if(open){row.classList.add('n8-open');b.textContent='Selesai'}
+}else if(b.matches('.n8-remove'))erase([row.dataset.cartKey]);
+else{
+ row.classList.remove('n8-open');row.querySelector('.n8-edit').textContent='Ubah';
+ const line=read().find(x=>String(x.key)===row.dataset.cartKey);
+ if(line){cart.classList.remove('open');document.dispatchEvent(new CustomEvent('imamstore:cart-similar',{detail:{id:line.id,nama:line.nama}}))}
 }
+},true);
+const sticky=cart.querySelector('.v100-delete');
+if(sticky)sticky.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();erase(selected().map(x=>x.key))},true);
 decorate();
-};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
+}
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
 </script></body></html>
