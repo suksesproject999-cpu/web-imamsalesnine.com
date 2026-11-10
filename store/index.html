@@ -3806,7 +3806,7 @@ let html = `
     </div>
     <div class="product-bottom">
       
-      <section><h2>Terakhir Dilihat</h2><div id="recentProducts" class="product-grid"></div></section><section class="nine-all-products" id="nineAllProductsSection"><h2>Mungkin Kamu Juga Suka</h2><div id="nineAllProductsGrid"></div><nav id="nineAllPagination" aria-label="Halaman produk"></nav><button type="button" id="nineAllBackTop" onclick="document.getElementById('nineAllProductsSection')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Kembali ke Semua Produk"><i class="fa-solid fa-arrow-up"></i></button></section>
+      <section><h2>Terakhir Dilihat</h2><div id="recentProducts" class="product-grid"></div></section><section class="nine-all-products" id="nineAllProductsSection"><h2>Mungkin Kamu Juga Suka</h2><div id="nineAllProductsGrid"></div><nav id="nineAllPagination" aria-label="Halaman produk"></nav><button type="button" id="nineAllBackTop" hidden onclick="document.getElementById('nineAllProductsSection')?.scrollIntoView({behavior:'smooth',block:'start'})" aria-label="Kembali ke Semua Produk"><i class="fa-solid fa-arrow-up"></i></button></section>
     </div>
   </div>
   <div class="nine-spec-overlay" id="nineSpecOverlay" onclick="if(event.target===this)nineCloseSpecs()">
@@ -4252,9 +4252,6 @@ const host=document.getElementById('imamstoreLiveOriginalDetail');if(!host)retur
 const get=(id)=>host.querySelector('#'+id);
 function ensure(){
  if(!host.classList.contains('open'))return;
- const up=host.querySelector('.imamstore-v35-up')||document.createElement('button');
- if(!up.isConnected){up.type='button';up.className='imamstore-v35-up';up.setAttribute('aria-label','Kembali ke atas detail produk');up.textContent='↑';host.append(up);up.addEventListener('click',()=>host.scrollTo({top:0,behavior:'smooth'}))}
- up.hidden=host.scrollTop<450;
  const sticky=get('stickyCheckout');if(sticky){sticky.style.removeProperty('display');sticky.hidden=false;sticky.setAttribute('aria-label','Tombol pembelian produk')}
  const spec=get('nineSpecOverlay');if(spec){spec.setAttribute('role','presentation');spec.querySelector('.nine-spec-sheet')?.setAttribute('role','dialog')}
 }
@@ -4723,7 +4720,9 @@ let scrollNode=null;
 function update(){const up=detail.querySelector('#nineAllBackTop');if(!up)return;
  const inner=detail.querySelector('.nine-detail-shell');
  const distance=Math.max(detail.scrollTop||0,inner?.scrollTop||0);
- up.classList.toggle('v46-visible',detail.classList.contains('open')&&distance>520);
+ const show=detail.classList.contains('open')&&distance>520;
+ up.hidden=!show;
+ up.style.display=show?'flex':'none';
 }
 function bind(){const inner=detail.querySelector('.nine-detail-shell');if(inner!==scrollNode){scrollNode?.removeEventListener('scroll',update);scrollNode=inner;scrollNode?.addEventListener('scroll',update,{passive:true})}update()}
 detail.addEventListener('scroll',update,{passive:true});
@@ -6181,34 +6180,42 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 }
 #imamstoreLiveOriginalDetail .imamstore-v35-up{transition:opacity .2s ease,transform .2s ease!important}
 #imamstoreLiveOriginalDetail .imamstore-v35-up[hidden]{display:none!important;visibility:hidden!important;pointer-events:none!important}
-</style><style id="nexai-v12-targeted-layout">
-/* Detail-only: badge over bottom-left of hero image. Recommendation badges untouched. */
+</style><style id="imamstore-v13-component-ownership">
+/* ONE original banner: moved intact, never cloned. */
 #imamstoreLiveOriginalDetail .gallery-main{position:relative}
-#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-hero-flash{position:absolute!important;left:12px!important;bottom:12px!important;top:auto!important;right:auto!important;z-index:35!important;display:inline-flex!important;align-items:center!important;gap:5px!important;background:#ee4b2b!important;color:#fff!important;border-radius:7px!important;padding:7px 11px!important;box-shadow:0 2px 8px #0003!important;font-size:12px!important;font-weight:800!important;pointer-events:none!important}
-#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-hero-flash[hidden]{display:none!important}
-#imamstoreLiveOriginalDetail .nine-detail-flash-badge>.nine-flash-label{display:none!important}
-#imamstoreLiveOriginalDetail #stickyCheckout{left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;width:auto!important;max-width:calc(100vw - 24px)!important;border-radius:22px!important;padding:10px!important;box-shadow:0 5px 25px #0002!important;border:1px solid #e6e9e2!important;box-sizing:border-box!important}
-#imamstoreLiveOriginalDetail .nine-detail-shell{padding-bottom:155px!important}
-#imamstoreLiveOriginalDetail .imamstore-v35-up[hidden]{display:none!important;pointer-events:none!important}
-#imamstoreLiveOriginalDetail .imamstore-v35-up{right:20px!important;bottom:calc(112px + env(safe-area-inset-bottom))!important}
-</style><script id="nexai-v12-detail-flash-only">
-(()=>{
-const host=document.getElementById('imamstoreLiveOriginalDetail');if(!host)return;
-let scheduled=false;
-function sync(){
- scheduled=false;
- const gallery=host.querySelector('.product-detail .gallery-main');
- const banner=host.querySelector('.product-info .nine-detail-flash-badge');
- if(!gallery||!banner)return;
- let badge=gallery.querySelector(':scope > .nine-detail-hero-flash');
- if(!badge){badge=document.createElement('span');badge.className='nine-detail-hero-flash';badge.innerHTML='<i class="fa-solid fa-bolt" aria-hidden="true"></i> FLASH SALE';gallery.append(badge)}
- badge.hidden=banner.hidden||!host.classList.contains('open');
- const up=host.querySelector('.imamstore-v35-up');
- if(up)up.hidden=!host.classList.contains('open')||host.scrollTop<450;
+#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-flash-badge{
+ position:absolute!important;inset:auto 0 0 0!important;width:100%!important;
+ margin:0!important;border-radius:0!important;z-index:22!important;
+ box-sizing:border-box!important;display:flex!important;align-items:center!important;
+ justify-content:space-between!important;gap:8px!important;
 }
-function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(sync)}}
-new MutationObserver(schedule).observe(host,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']});
-host.addEventListener('scroll',schedule,{passive:true});
+#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-flash-badge[hidden]{display:none!important}
+#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-flash-badge>.nine-flash-label{display:inline-flex!important}
+#imamstoreLiveOriginalDetail #nineAllBackTop[hidden]{display:none!important}
+#imamstoreLiveOriginalDetail #stickyCheckout{
+ position:fixed!important;left:12px!important;right:12px!important;
+ bottom:calc(12px + env(safe-area-inset-bottom))!important;
+ width:auto!important;max-width:none!important;
+ border-radius:22px!important;padding:10px!important;
+ box-shadow:0 5px 25px #0002!important;
+ box-sizing:border-box!important;
+}
+#imamstoreLiveOriginalDetail .nine-detail-shell{padding-bottom:155px!important}
+</style><script id="imamstore-v13-original-flash-relocation">
+(()=>{'use strict';
+const detail=document.getElementById('imamstoreLiveOriginalDetail');if(!detail)return;
+let queued=false;
+function relocate(){
+ queued=false;
+ if(!detail.classList.contains('open'))return;
+ const gallery=detail.querySelector('.product-detail .gallery-main');
+ const banner=detail.querySelector('.nine-detail-flash-badge');
+ if(!gallery||!banner)return;
+ if(banner.parentElement!==gallery)gallery.appendChild(banner);
+}
+function schedule(){if(!queued){queued=true;requestAnimationFrame(relocate)}}
+new MutationObserver(schedule).observe(detail,{childList:true,subtree:true});
+detail.addEventListener('scroll',schedule,{passive:true});
 schedule();
 })();
 </script></body></html>
