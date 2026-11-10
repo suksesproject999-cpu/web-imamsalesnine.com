@@ -615,48 +615,35 @@ body:has(#s5Cart.open)
 #s5Cart.open .nf-cart-footer{z-index:2147482500}
 #s5Cart.open .nf-cart-footer .nf-edit-actions{transition:opacity .18s ease}
 </style>
-<style id="nexai-v89-single-sticky">
-#imamstoreLiveOriginalDetail.open #stickyCheckout{
- display:block!important;position:fixed!important;left:0!important;right:0!important;bottom:0!important;
- width:100%!important;max-width:none!important;min-height:0!important;max-height:none!important;
- padding:10px 14px calc(10px + env(safe-area-inset-bottom))!important;
- border:0!important;border-top:1px solid #e5e5e5!important;border-radius:0!important;
- background:#fff!important;box-shadow:0 -4px 18px #0000000d!important;
- z-index:2147482000!important;transform:none!important;opacity:1!important;visibility:visible!important
+<style id="imamstore-v90-canonical-controls">
+/* Single canonical purchase footer; previous v46/v89 implementations removed. */
+#imamstoreLiveOriginalDetail.open #stickyCheckout {
+position:fixed!important;left:14px!important;right:14px!important;bottom:14px!important;
+width:auto!important;max-width:none!important;min-height:0!important;max-height:none!important;
+padding:20px!important;padding-bottom:calc(20px + env(safe-area-inset-bottom))!important;
+background:#fff!important;border:0!important;border-radius:34px!important;
+box-shadow:0 14px 38px rgba(0,0,0,.17)!important;z-index:2147482000!important;
+display:block!important;visibility:visible!important;opacity:1!important;transform:none!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions {
+display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;gap:14px!important;width:100%!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button{
+display:flex!important;align-items:center!important;justify-content:center!important;
+min-width:0!important;height:84px!important;min-height:84px!important;
+border-radius:23px!important;opacity:1!important;visibility:visible!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button:last-child{
+font-weight:800!important;font-size:20px!important}
+#s5Cart.nf-editing .nf-cart-footer .nf-cart-voucher,
+#s5Cart.nf-editing .nf-cart-footer .nf-cart-total,
+#s5Cart.nf-editing .nf-cart-footer .nf-cart-checkout{display:none!important}
+#s5Cart.nf-editing .nf-cart-footer{background:#fff!important}
+@media(max-width:440px){
+#imamstoreLiveOriginalDetail.open #stickyCheckout{padding:12px!important;border-radius:25px!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{grid-template-columns:60px 60px minmax(0,1fr)!important;gap:10px!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button{height:64px!important;min-height:64px!important;border-radius:20px!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions button:last-child{font-size:16px!important}
 }
-#imamstoreLiveOriginalDetail.open #stickyCheckout>.sticky-close,
-#imamstoreLiveOriginalDetail.open #stickyCheckout>.sticky-content{display:none!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout>.sticky-actions{
- display:grid!important;grid-template-columns:62px 62px minmax(0,1fr)!important;
- gap:12px!important;align-items:stretch!important;width:100%!important
-}
-#imamstoreLiveOriginalDetail.open #stickyCheckout>.sticky-actions>button{
- display:flex!important;align-items:center!important;justify-content:center!important;
- width:100%!important;height:56px!important;min-height:56px!important;
- border-radius:16px!important;margin:0!important;padding:0!important;
- visibility:visible!important;opacity:1!important;overflow:hidden!important
-}
-#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn,
-#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn{
- border:1px solid #e3e3e3!important;background:#fff!important;color:#555!important;font-size:23px!important
-}
-#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyBuyBtn{
- background:#8dc63f!important;border:0!important;color:#fff!important;
- font-weight:800!important;font-size:15px!important;white-space:nowrap!important
-}
-#s5Cart.open .nf-cart-footer:has(.nf-edit-row) .nf-voucher-row,
-#s5Cart.open .nf-cart-footer:has(.nf-edit-row) #nfCartGo,
-#s5Cart.open .nf-cart-footer:has(.nf-edit-row) #nfCartTotals{display:none!important}
-#s5Cart.open .nf-cart-footer .nf-edit-row{
- display:grid!important;grid-template-columns:minmax(0,1fr) auto auto!important;
- gap:12px!important;align-items:center!important;width:100%!important
-}
-#s5Cart.open .nf-cart-footer .nf-edit-row button{
- background:#fff!important;color:#333!important;border:1px solid #bdbdbd!important;
- border-radius:12px!important;padding:12px 16px!important;font-weight:600!important
-}
-#s5Cart.open .nf-cart-footer .nf-edit-row .nf-delete-selected{color:#e45436!important;border-color:#e45436!important}
-</style></head>
+</style>
+</head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
@@ -4478,49 +4465,7 @@ for(const id of ['refCartVoucher','refCheckoutVoucher']){const el=$(id);if(el)el
 const cart=$('s5CartItems');if(cart){new MutationObserver(()=>queueMicrotask(sync)).observe(cart,{childList:true});}
 window.addEventListener('storage',sync);document.addEventListener('imamstore:open-product',()=>queueMicrotask(sync));document.addEventListener('imamstore:cart-changed',sync);document.addEventListener('click',e=>{if(e.target.closest('#s5Cart,.ref-modal'))queueMicrotask(sync)},true);
 window.imamstoreV43=Object.freeze({isSelected,selected,openVoucher,sync,getVoucher:()=>totals().voucher,getVouchers:()=>({product:totals().productVoucher,shipping:totals().shippingVoucher}),totals,transactionsActive:true});sync();
-})();</script><style id="imamstore-v46-sticky-reference">
-/* v46: floating purchase bar follows provided mobile reference */
-#imamstoreLiveOriginalDetail #stickyCheckout{
- left:14px;right:14px;bottom:14px;width:calc(100% - 28px);max-width:none;
- min-height:126px;max-height:none;padding:20px;
- border:0;border-radius:34px;background:#fff;
- box-shadow:0 14px 38px rgba(0,0,0,.17);
- padding-bottom:calc(20px + env(safe-area-inset-bottom));
-}
-#imamstoreLiveOriginalDetail #stickyCheckout .sticky-actions{
- display:grid;grid-template-columns:84px 84px minmax(0,1fr);
- gap:14px;width:100%;align-items:stretch;
-}
-#imamstoreLiveOriginalDetail #stickyCheckout .sticky-actions button{
- height:84px;min-height:84px;border-radius:23px;
- font-size:28px;padding:0;box-shadow:none;
-}
-#imamstoreLiveOriginalDetail #stickyCheckout .sticky-icon-btn{
- background:#fff;color:#555;border:1px solid #e2e2e2;
-}
-#imamstoreLiveOriginalDetail #stickyCheckout #stickyBuyBtn{
- background:#8cc63f;color:#fff;border:0;
- font-size:23px;font-weight:800;white-space:nowrap;
-}
-#imamstoreLiveOriginalDetail #nineAllBackTop{
- position:fixed;right:42px;bottom:calc(150px + env(safe-area-inset-bottom));
- width:70px;height:70px;border-radius:50%;
- background:#8cc63f;color:#fff;border:0;
- box-shadow:0 8px 20px #0002;font-size:29px;
- opacity:0;visibility:hidden;pointer-events:none;
- transform:translateY(16px);transition:opacity .24s ease,transform .24s ease,visibility .24s;
-}
-#imamstoreLiveOriginalDetail #nineAllBackTop.v46-visible{
- opacity:1;visibility:visible;pointer-events:auto;transform:translateY(0);
-}
-@media(max-width:500px){
- #imamstoreLiveOriginalDetail #stickyCheckout{padding:12px;min-height:0;border-radius:28px;padding-bottom:calc(12px + env(safe-area-inset-bottom))}
- #imamstoreLiveOriginalDetail #stickyCheckout .sticky-actions{grid-template-columns:56px 56px minmax(0,1fr);gap:9px}
- #imamstoreLiveOriginalDetail #stickyCheckout .sticky-actions button{height:60px;min-height:60px;border-radius:16px;font-size:23px}
- #imamstoreLiveOriginalDetail #stickyCheckout #stickyBuyBtn{font-size:clamp(14px,4vw,19px)}
- #imamstoreLiveOriginalDetail #nineAllBackTop{right:22px;bottom:calc(115px + env(safe-area-inset-bottom));width:54px;height:54px;font-size:24px}
-}
-</style><script id="imamstore-v46-scroll-threshold">(()=>{'use strict';
+})();</script><script id="imamstore-v46-scroll-threshold">(()=>{'use strict';
 const detail=document.getElementById('imamstoreLiveOriginalDetail');if(!detail)return;
 let scrollNode=null;
 function update(){const up=detail.querySelector('#nineAllBackTop');if(!up)return;
