@@ -4254,7 +4254,7 @@ function ensure(){
  if(!host.classList.contains('open'))return;
  const up=host.querySelector('.imamstore-v35-up')||document.createElement('button');
  if(!up.isConnected){up.type='button';up.className='imamstore-v35-up';up.setAttribute('aria-label','Kembali ke atas detail produk');up.textContent='↑';host.append(up);up.addEventListener('click',()=>host.scrollTo({top:0,behavior:'smooth'}))}
- up.hidden=host.scrollTop<220;
+ up.hidden=host.scrollTop<450;
  const sticky=get('stickyCheckout');if(sticky){sticky.style.removeProperty('display');sticky.hidden=false;sticky.setAttribute('aria-label','Tombol pembelian produk')}
  const spec=get('nineSpecOverlay');if(spec){spec.setAttribute('role','presentation');spec.querySelector('.nine-spec-sheet')?.setAttribute('role','dialog')}
 }
@@ -6169,26 +6169,7 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #s5Cart .n8-actions .n8-similar{background:#699d30!important}
 #s5Cart .ref-voucher-trigger,#s5Cart .ref-voucher-trigger svg,#s5Cart .ref-voucher-trigger i{color:#699d30!important}
 #s5Cart .imam-cart-price,#s5Cart .ref-cart-sum b,#s5Cart .ref-cart-sum strong{color:#e75136!important}
-</style><style id="nexai-v10-premium-layout">
-/* Flash label overlaps bottom of the main product photo, without covering the title. */
-.product-card.marketplace-card{position:relative}
-.product-card.marketplace-card .marketplace-image-wrap{position:relative}
-.product-card.marketplace-card>.nine-flash-label{position:absolute!important;top:auto!important;left:8px!important;bottom:auto!important;z-index:4;transform:none!important}
-.product-card.marketplace-card:has(.marketplace-image-wrap)>.nine-flash-label{top:calc(var(--n10-image-height, 0px) + 2px)!important}
-.product-card.marketplace-card .flash-card-timer{position:static!important;display:inline-flex!important;width:auto!important;max-width:100%;margin:6px 0 5px!important;padding:5px 9px!important;border-radius:7px!important;background:#f4f9e9!important;color:#699d30!important;font-size:12px!important;font-weight:700!important;text-align:left!important}
-.product-card.marketplace-card .product-card-body{position:relative}
-.product-card.marketplace-card .marketplace-image-wrap{overflow:hidden}
-#imamstoreLiveOriginalDetail #stickyCheckout{left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;border-radius:22px!important;padding:10px!important;box-shadow:0 6px 28px #0002!important;border:1px solid #e6e9e2!important;width:auto!important}
-#imamstoreLiveOriginalDetail .nine-detail-shell{padding-bottom:130px!important}
-#s5Cart .ref-v42-select:checked,#s5CartItems .ref-v42-select:checked,#s5Cart input[type=checkbox]:checked{background:#8cc63f!important;border-color:#8cc63f!important}
-#s5Cart .v100-delete,#s5Cart .ref-cart-checkout-row .v100-delete{background:#8cc63f!important;color:white!important;border-color:#8cc63f!important}
-</style><script id="nexai-v10-flash-position">
-(()=>{function align(){document.querySelectorAll('.product-card.marketplace-card>.nine-flash-label').forEach(label=>{const card=label.parentElement,img=card.querySelector('.marketplace-image-wrap');if(!img)return;label.style.setProperty('top',(img.offsetTop+img.offsetHeight-22)+'px','important')})}
-let queued=false;const schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;align()})};
-new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
-window.addEventListener('resize',schedule);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
-})();
-</script><style id="nexai-v11-price-and-scroll">
+</style><style id="nexai-v11-price-and-scroll">
 /* Total keranjang dan checkout: oranye konsisten, tanpa mengubah warna tombol. */
 #s5Cart #s5CartTotal,#s5Cart .ref-cart-sum,#s5Cart .ref-cart-sum b,
 #s5Cart .ref-cart-sum strong,#s5Cart .ref-cart-total,
@@ -6200,30 +6181,34 @@ window.addEventListener('resize',schedule);if(document.readyState==='loading')do
 }
 #imamstoreLiveOriginalDetail .imamstore-v35-up{transition:opacity .2s ease,transform .2s ease!important}
 #imamstoreLiveOriginalDetail .imamstore-v35-up[hidden]{display:none!important;visibility:hidden!important;pointer-events:none!important}
-</style><script id="nexai-v11-scroll-top-controller">
+</style><style id="nexai-v12-targeted-layout">
+/* Detail-only: badge over bottom-left of hero image. Recommendation badges untouched. */
+#imamstoreLiveOriginalDetail .gallery-main{position:relative}
+#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-hero-flash{position:absolute!important;left:12px!important;bottom:12px!important;top:auto!important;right:auto!important;z-index:35!important;display:inline-flex!important;align-items:center!important;gap:5px!important;background:#ee4b2b!important;color:#fff!important;border-radius:7px!important;padding:7px 11px!important;box-shadow:0 2px 8px #0003!important;font-size:12px!important;font-weight:800!important;pointer-events:none!important}
+#imamstoreLiveOriginalDetail .gallery-main>.nine-detail-hero-flash[hidden]{display:none!important}
+#imamstoreLiveOriginalDetail .nine-detail-flash-badge>.nine-flash-label{display:none!important}
+#imamstoreLiveOriginalDetail #stickyCheckout{left:12px!important;right:12px!important;bottom:calc(12px + env(safe-area-inset-bottom))!important;width:auto!important;max-width:calc(100vw - 24px)!important;border-radius:22px!important;padding:10px!important;box-shadow:0 5px 25px #0002!important;border:1px solid #e6e9e2!important;box-sizing:border-box!important}
+#imamstoreLiveOriginalDetail .nine-detail-shell{padding-bottom:155px!important}
+#imamstoreLiveOriginalDetail .imamstore-v35-up[hidden]{display:none!important;pointer-events:none!important}
+#imamstoreLiveOriginalDetail .imamstore-v35-up{right:20px!important;bottom:calc(112px + env(safe-area-inset-bottom))!important}
+</style><script id="nexai-v12-detail-flash-only">
 (()=>{
- const init=()=>{
-  const host=document.getElementById('imamstoreLiveOriginalDetail');
-  if(!host)return;
-  let raf=0;
-  const sync=()=>{
-   raf=0;
-   const btn=host.querySelector('.imamstore-v35-up');
-   if(!btn)return;
-   const visible=host.classList.contains('open')&&host.scrollTop>=450;
-   btn.hidden=!visible;
-   btn.style.setProperty('display',visible?'grid':'none','important');
-   btn.style.pointerEvents=visible?'auto':'none';
-   btn.setAttribute('aria-hidden',visible?'false':'true');
-  };
-  const schedule=()=>{if(!raf)raf=requestAnimationFrame(sync)};
-  host.addEventListener('scroll',schedule,{passive:true});
-  const mo=new MutationObserver(schedule);
-  mo.observe(host,{attributes:true,attributeFilter:['class'],childList:true,subtree:false});
-  document.addEventListener('click',schedule,true);
-  window.addEventListener('resize',schedule,{passive:true});
-  sync();
- };
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+const host=document.getElementById('imamstoreLiveOriginalDetail');if(!host)return;
+let scheduled=false;
+function sync(){
+ scheduled=false;
+ const gallery=host.querySelector('.product-detail .gallery-main');
+ const banner=host.querySelector('.product-info .nine-detail-flash-badge');
+ if(!gallery||!banner)return;
+ let badge=gallery.querySelector(':scope > .nine-detail-hero-flash');
+ if(!badge){badge=document.createElement('span');badge.className='nine-detail-hero-flash';badge.innerHTML='<i class="fa-solid fa-bolt" aria-hidden="true"></i> FLASH SALE';gallery.append(badge)}
+ badge.hidden=banner.hidden||!host.classList.contains('open');
+ const up=host.querySelector('.imamstore-v35-up');
+ if(up)up.hidden=!host.classList.contains('open')||host.scrollTop<450;
+}
+function schedule(){if(!scheduled){scheduled=true;requestAnimationFrame(sync)}}
+new MutationObserver(schedule).observe(host,{subtree:true,childList:true,attributes:true,attributeFilter:['hidden','class']});
+host.addEventListener('scroll',schedule,{passive:true});
+schedule();
 })();
 </script></body></html>
