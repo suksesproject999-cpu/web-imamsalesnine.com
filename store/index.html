@@ -4555,116 +4555,80 @@ function productFor(line){
 function variantLabel(v){return typeof v==='string'?v:String(v?.nama||v?.name||v?.label||v?.warna||'Standar')}
 function safeText(t){return String(t??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
 function openVariant(index){
- const original=read()[index];if(!original)return;
- const ref=document.querySelector('.ref-modal'),content=$('refModalContent');
- if(!ref||!content)return;
- const oldKey=String(original.key),oldIndex=index;
- const snapshot=structuredClone(original);
- let qty=Math.max(1,Number(original.qty)||1),chosen=String(original.varian||'');
- let committed=false,closed=false,dirty=false,refreshTimer=0;
- const label=v=>variantLabel(v);
- const optionsFor=p=>{
-  const fromPurchase=typeof window.imamstorePurchaseVariantOptions==='function'?window.imamstorePurchaseVariantOptions(p):[];
-  return [...new Set([...(Array.isArray(fromPurchase)?fromPurchase:[]),...variants(p).map(label),String(original.varian||'')].map(x=>typeof x==='string'?x:label(x)).filter(Boolean))];
+ const items=read(),original=items[index];if(!original)return;
+ const sheet=$('imamstoreOriginalPurchase'),selector=$('imamstorePurchaseVariant'),
+ qtyInput=$('imamstorePurchaseQty'),action=$('imamstorePurchaseAction'),message=$('imamstorePurchaseMessage');
+ if(!sheet||!selector||!qtyInput||!action)return;
+ const p=productFor(original),oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
+ const oldTitle=sheet.querySelector('#imamstorePurchaseTitle')?.textContent||'';
+ const oldImage=$('imamstorePurchaseImage')?.src||'';
+ const oldText=action.textContent;
+ const choices=[...new Set([...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
+ let chosen=String(original.varian||choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
+ const priceOf=name=>{
+  const v=variants(p).find(v=>variantLabel(v)===name);
+  const raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
+  const n=Number(raw);return Number.isFinite(n)&&n>0?n:Number(original.harga)||0;
  };
- const resolve=()=>productFor(snapshot)||(window.imamstoreActiveProduct&&String(window.imamstoreActiveProduct.id)===String(snapshot.id)?window.imamstoreActiveProduct:null);
- const entryFor=(p,name)=>variants(p).find(v=>label(v)===name);
- const priceOf=(p,name)=>{
-  const v=entryFor(p,name),raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
-  const n=Number(raw);return Number.isFinite(n)&&n>0?n:Number(snapshot.harga)||0;
+ const stockOf=name=>{
+  const v=variants(p).find(v=>variantLabel(v)===name),raw=v&&typeof v==='object'?(v.stok??v.stock):null;
+  return raw==null||!Number.isFinite(Number(raw))?999:Math.max(0,Number(raw));
  };
- const stockOf=(p,name)=>{
-  const v=entryFor(p,name),raw=v&&typeof v==='object'?(v.stok??v.stock):null,n=Number(raw);
-  return raw==null||typeof raw==='object'||!Number.isFinite(n)?Infinity:Math.max(0,n);
- };
- const currentLine=items=>items.find(x=>String(x.key)===oldKey)||items[oldIndex];
- function paintCard(){
-  const line=currentLine(read());if(!line)return;
-  const row=[...document.querySelectorAll('#s5CartItems .imam-cart-product')].find(x=>x.dataset.cartKey===oldKey)||document.querySelectorAll('#s5CartItems .imam-cart-product')[oldIndex];
-  if(row){
-   row.dataset.cartKey=oldKey;
-   const count=row.querySelector('.imam-cart-qty span, .imam-cart-qty output');
-   if(count)count.textContent=String(line.qty);
-   const price=row.querySelector('.imam-cart-price');if(price)price.textContent='Rp'+Number(line.harga||0).toLocaleString('id-ID');
-   const variant=row.querySelector('.ref-v42-change');if(variant)variant.textContent='Varian: '+(line.varian||'Standar')+'  ▾';
-  }
+ function restore(){
+  if(done)return;done=true;
+  action.onclick=oldAction;$('imamstorePurchaseClose').onclick=oldClose;
+  sheet.classList.remove('open');sheet.hidden=true;
+  action.textContent=oldText;
+  if(sheet.querySelector('#imamstorePurchaseTitle'))sheet.querySelector('#imamstorePurchaseTitle').textContent=oldTitle;
+  if($('imamstorePurchaseImage'))$('imamstorePurchaseImage').src=oldImage;
+  selector.onchange=null;
   window.imamstoreV43?.sync?.();
-  window.__nineSyncVisibleTotals?.();
+ }
+ const oldBackdrop=sheet.onclick;
+ sheet.onclick=e=>{if(e.target===sheet){sheet.onclick=oldBackdrop;restore()}};
+ $('imamstorePurchaseClose').onclick=()=>{sheet.onclick=oldBackdrop;restore()};
+ selector.replaceChildren();
+ choices.forEach(v=>selector.add(new Option(v,v)));
+ selector.value=chosen;
+ qtyInput.value=String(qty);
+ sheet.querySelector('#imamstorePurchaseTitle').textContent=original.nama||'Produk';
+ const photo=$('imamstorePurchaseImage');if(photo)photo.src=original.gambar||'/images/no-image.png';
+ action.textContent='Konfirmasi';
+ message.hidden=false;
+ function update(){
+  chosen=selector.value;qty=Math.max(1,Math.min(999,Math.floor(Number(qtyInput.value)||1)));
+  qtyInput.value=String(qty);
+  const stock=stockOf(chosen),valid=choices.length>0&&qty<=stock;
+  action.disabled=!valid;
+  message.textContent=!choices.length?'Pilihan varian belum tersedia.':qty>stock?'Jumlah melebihi stok varian.':'';
+  const price=$('refPurchasePrice');if(price)price.textContent='Rp'+priceOf(chosen).toLocaleString('id-ID');
+  const match=variants(p).find(v=>variantLabel(v)===chosen);
+  const pic=match&&typeof match==='object'?(match.gambar||match.image||match.foto||match.thumbnail):null;
+  if(pic&&photo)photo.src=typeof pic==='string'?pic:(pic.url||pic.src||photo.src);
+  const grid=sheet.querySelector('.ref-v45-variant-grid');
+  if(grid){grid.replaceChildren();choices.forEach(name=>{const b=document.createElement('button');b.type='button';b.textContent=name;b.setAttribute('aria-pressed',String(name===chosen));b.onclick=()=>{selector.value=name;update()};grid.append(b)})}
+ }
+ selector.onchange=update;
+ qtyInput.addEventListener('input',update,{signal:(()=>{const c=new AbortController();sheet._nexaiQtyAbort?.abort();sheet._nexaiQtyAbort=c;return c.signal})()});
+ action.onclick=()=>{
+  update();if(action.disabled)return;
+  const current=read(),pos=current.findIndex(x=>String(x.key)===oldKey);
+  if(pos<0){message.textContent='Produk tidak ditemukan dalam keranjang.';return}
+  const line=current[pos],newKey=String(line.id)+'|'+chosen;
+  const collision=current.findIndex((x,i)=>i!==pos&&String(x.key)===newKey);
+  if(collision>=0){current[collision].qty=(Number(current[collision].qty)||0)+qty;current.splice(pos,1)}
+  else {line.varian=chosen;line.qty=qty;line.harga=priceOf(chosen);line.key=newKey;if('jumlah'in line)line.jumlah=qty}
+  try{
+   localStorage.setItem(cartKey,JSON.stringify(current));
+   const key='imamstore_cart_selection_v43',m=JSON.parse(localStorage.getItem(key)||'{}');
+   if(Object.prototype.hasOwnProperty.call(m,oldKey)){m[newKey]=m[oldKey];delete m[oldKey];localStorage.setItem(key,JSON.stringify(m))}
+  }catch(e){message.textContent='Gagal menyimpan perubahan.';return}
+  sheet.onclick=oldBackdrop;restore();
+  window.renderCart?.();window.imamstoreV43?.sync?.();
   window.imamstoreRefreshCartBadge?.();
- }
- function updateLine(){
-  const items=read(),line=currentLine(items);if(!line)return;
-  line.qty=qty;if('jumlah'in line)line.jumlah=qty;
-  line.varian=chosen;line.harga=priceOf(resolve(),chosen);
-  if(write(items)){dirty=true;paintCard();document.dispatchEvent(new Event('imamstore:cart-line-updated'))}
- }
- function rollback(){
-  if(committed||!dirty)return;
-  const items=read(),line=currentLine(items);
-  if(line){Object.keys(line).forEach(k=>delete line[k]);Object.assign(line,snapshot);write(items);paintCard();document.dispatchEvent(new Event('imamstore:cart-line-updated'))}
- }
- const closeObserver=new MutationObserver(()=>{
-  if(closed)return;
-  if(ref.hidden||!ref.isConnected){closed=true;closeObserver.disconnect();clearTimeout(refreshTimer);rollback();document.removeEventListener('keydown',onEscape,true)}
- });
- function onEscape(e){if(e.key==='Escape')setTimeout(()=>{if(!committed)rollback()},0)}
- content.innerHTML='<h2 class="ref-v42-variant-title">Ubah Varian</h2><div class="ref-v42-product"><img alt="Foto produk"><div><b></b><p></p></div></div><h3 style="margin-top:22px">Pilih Varian</h3><div class="ref-v42-options"></div><p class="ref-v102-status" role="status"></p><div class="nine-clean-qty"><button type="button" data-qty="minus">−</button><output aria-live="polite"></output><button type="button" data-qty="plus">+</button></div><button type="button" class="ref-v42-confirm">Konfirmasi</button>';
- const img=content.querySelector('img'),price=content.querySelector('.ref-v42-product b'),status=content.querySelector('.ref-v102-status'),wrap=content.querySelector('.ref-v42-options'),output=content.querySelector('output'),confirm=content.querySelector('.ref-v42-confirm');
- img.src=snapshot.gambar||'/images/no-image.png';img.alt=snapshot.nama||'Foto produk';
- img.onerror=()=>{img.onerror=null;img.src='/images/no-image.png'};
- img.onclick=()=>window.imamstorePhotoPreview?.openImages?.([img.currentSrc||img.src],img.currentSrc||img.src);
- content.querySelector('.ref-v42-product p').textContent=snapshot.nama||'';
- function render(){
-  const p=resolve(),choices=optionsFor(p);
-  output.textContent=String(qty);wrap.replaceChildren();
-  price.textContent='Rp'+priceOf(p,chosen).toLocaleString('id-ID');
-  if(!choices.length){
-   status.textContent='Pilihan varian belum tersedia untuk produk ini.';confirm.disabled=true;return false;
-  }
-  status.textContent='';confirm.disabled=false;
-  if(!chosen||!choices.includes(chosen))chosen=choices[0];
-  choices.forEach(name=>{
-   const b=document.createElement('button');b.type='button';b.className='ref-v42-option';b.textContent=name;
-   b.setAttribute('aria-pressed',String(name===chosen));
-   b.onclick=()=>{
-    chosen=name;
-    const entry=entryFor(p,name),picture=entry&&typeof entry==='object'?(entry.gambar||entry.image||entry.foto||entry.thumbnail):null;
-    const url=typeof picture==='string'?picture:picture?.url||picture?.src;
-    if(url)img.src=url;
-    updateLine();render();
-   };wrap.append(b);
-  });
-  return true;
- }
- function adjust(delta){
-  const limit=stockOf(resolve(),chosen),next=Math.min(999,limit,Math.max(1,qty+delta));
-  if(next===qty)return;qty=next;updateLine();render();
- }
- content.querySelector('[data-qty=minus]').onclick=()=>adjust(-1);
- content.querySelector('[data-qty=plus]').onclick=()=>adjust(1);
- confirm.onclick=()=>{
-  const p=resolve(),choices=optionsFor(p);
-  if(!choices.includes(chosen)){status.textContent='Pilih varian yang tersedia.';return}
-  if(qty>stockOf(p,chosen)){status.textContent='Jumlah melebihi stok varian.';return}
-  const items=read(),line=currentLine(items);if(!line)return;
-  line.varian=chosen;line.qty=qty;line.harga=priceOf(p,chosen);line.key=String(line.id)+'|'+chosen;
-  if('jumlah'in line)line.jumlah=qty;
-  if(!write(items)){status.textContent='Gagal menyimpan perubahan.';return}
-  try{const k='imamstore_cart_selection_v43',map=JSON.parse(localStorage.getItem(k)||'{}')||{};if(Object.prototype.hasOwnProperty.call(map,oldKey)){map[String(line.key)]=map[oldKey];delete map[oldKey];localStorage.setItem(k,JSON.stringify(map))}}catch{}
-  committed=true;closed=true;document.dispatchEvent(new Event('imamstore:cart-line-updated'));closeObserver.disconnect();clearTimeout(refreshTimer);
-  document.removeEventListener('keydown',onEscape,true);
-  window.imamstoreReferenceV38?.closeModal?.();
-  window.renderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
+  document.dispatchEvent(new Event('imamstore:cart-line-updated'));
  };
- ref.hidden=false;document.body.style.overflow='hidden';
- closeObserver.observe(ref,{attributes:true,attributeFilter:['hidden','class','style']});
- document.addEventListener('keydown',onEscape,true);
- let attempts=0;
- const hydrate=()=>{
-  if(closed||ref.hidden||content.querySelector('.ref-v42-options')!==wrap)return;
-  if(!render()&&++attempts<80)refreshTimer=setTimeout(hydrate,250);
- };
- hydrate();
+ sheet.hidden=false;sheet.classList.add('open');update();
 }
 function refreshCartVariantButtons(){const cart=$('s5Cart'),items=$('s5CartItems');if(!cart||!items)return;
  const rows=[...items.querySelectorAll('.imam-cart-product')],lines=read();rows.forEach((row,i)=>{if(!lines[i])return;
@@ -6102,157 +6066,10 @@ document.addEventListener('change',e=>{
 .ref-modal:not(.ref-fullpage) .ref-v42-confirm{width:100%!important;background:#8cc63f!important;color:#fff!important;min-height:56px!important;border:0!important;border-radius:10px!important;font-size:17px!important;font-weight:750!important}
 .ref-modal:not(.ref-fullpage) .ref-v42-confirm:disabled{opacity:.5!important}
 </style>
-<script id="nexai-cart-repair-v2-js">
-(()=>{'use strict';
-const init=()=>{
- const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems'),header=document.getElementById('refCartEdit');
- if(!cart||!list||!header||cart.dataset.nexaiRepairV2)return;
- cart.dataset.nexaiRepairV2='1';
- function decorate(){
-  const hasItems=!!list.querySelector('.imam-cart-product');
-  let heading=list.querySelector('.nexai-shop-heading');
-  if(!hasItems){heading?.remove();return}
-  if(!heading){
-   heading=document.createElement('div');heading.className='nexai-shop-heading';
-   heading.innerHTML='<span class="nexai-shop-mark">STORE</span><strong>ImamStore — Nine Autoseries</strong><span aria-hidden="true">›</span><button type="button" class="nexai-shop-edit">Ubah</button>';
-   list.prepend(heading);
-  }
-  const btn=heading.querySelector('.nexai-shop-edit');
-  if(btn)btn.textContent=cart.classList.contains('v100-editing')?'Selesai':'Ubah';
- }
- list.addEventListener('click',e=>{
-  const btn=e.target.closest('.nexai-shop-edit');
-  if(!btn)return;
-  e.preventDefault();e.stopPropagation();
-  if(window.imamstoreV54?.edit)window.imamstoreV54.edit(!cart.classList.contains('v100-editing'));
-  else header.click();
-  decorate();
- });
- header.addEventListener('click',()=>requestAnimationFrame(decorate));
- const observer=new MutationObserver(()=>{if(list.querySelector('.imam-cart-product')&&!list.querySelector('.nexai-shop-heading'))decorate()});
- observer.observe(list,{childList:true});
- const classObserver=new MutationObserver(decorate);
- classObserver.observe(cart,{attributes:true,attributeFilter:['class']});
- decorate();
-};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
 
-<style id="nexai-cart-v3-fix">
-#s5Cart .ref-cart-checkout-row .v100-edit-actions{display:none!important}
-#s5Cart.v100-editing .ref-cart-checkout-row .v100-edit-actions{display:flex!important;gap:10px!important;flex:1;justify-content:flex-end}
-#s5Cart.v100-editing .ref-voucher-trigger,#s5Cart.v100-editing .ref-cart-sum,#s5Cart.v100-editing #s5Checkout{display:none!important}
-#s5Cart.v100-editing .ref-cart-checkout-row{display:flex!important}
-#s5Cart .v100-edit-actions button{border:1px solid #e94c31!important;border-radius:9px!important;padding:11px 16px!important;background:white!important;color:#e94c31!important;font-size:15px!important}
-#s5Cart .v100-edit-actions .v100-delete{background:#e94c31!important;color:white!important}
-#s5CartItems .nexai-shop-heading .nexai-shop-edit{pointer-events:auto!important}
-#s5CartItems .imam-cart-product{position:relative!important}
-#s5CartItems .imam-cart-product .nexai-swipe-actions{display:none!important}
-#s5CartItems .imam-cart-product.nexai-row-editing{transform:translateX(-116px);transition:transform .18s ease;overflow:visible!important}
-#s5CartItems .imam-cart-product .nexai-v3-row-actions{position:absolute;left:100%;top:0;bottom:0;display:flex;width:116px;align-items:stretch}
-#s5CartItems .nexai-v3-row-actions button{flex:1;border:0;color:#fff;font-size:12px;padding:0 3px}
-#s5CartItems .nexai-v3-row-actions .nexai-v3-similar{background:#fa9315}
-#s5CartItems .nexai-v3-row-actions .nexai-v3-remove{background:#ed4b2d}
-#s5CartItems .ref-v42-select{pointer-events:auto!important;position:relative!important;z-index:12!important;accent-color:#e94c31!important}
-#s5Cart .nexai-v3-confirm{position:fixed;inset:0;z-index:2147483600;background:#0009;display:flex;align-items:center;justify-content:center;padding:20px}
-#s5Cart .nexai-v3-dialog{background:#fff;border-radius:15px;padding:25px 20px;width:min(100%,420px);text-align:center;box-shadow:0 10px 30px #0002}
-#s5Cart .nexai-v3-dialog h2{font-size:23px;margin:0 0 12px}
-#s5Cart .nexai-v3-dialog p{font-size:15px;color:#666}
-#s5Cart .nexai-v3-dialog button{padding:12px 24px;border:0;border-radius:7px;margin:10px 5px 0;background:#e94c31;color:white}
-#s5Cart .nexai-v3-dialog button:last-child{background:#eee;color:#333}
-</style>
-<script id="nexai-cart-v3-fix-js">
-(()=>{'use strict';
-const init=()=>{
- const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems');
- if(!cart||!list||cart.dataset.nexaiV3)return;
- cart.dataset.nexaiV3='1';
- const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
- const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
- const sel=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')}catch{return {}}};
- const selected=()=>read().filter(x=>sel()[String(x.key)]!==false);
- const refresh=()=>{window.imamstoreV43?.sync?.();window.imamstoreV54?.refresh?.();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('nine:cartchange'))};
- const save=lines=>{localStorage.setItem(KEY,JSON.stringify(lines));refresh()};
- const confirmInCart=(message,detail)=>new Promise(resolve=>{
-   const overlay=document.createElement('div');overlay.className='nexai-v3-confirm';
-   overlay.innerHTML='<div class="nexai-v3-dialog" role="alertdialog" aria-modal="true"><h2></h2><p></p><button type="button" data-yes>Hapus</button><button type="button" data-no>Batal</button></div>';
-   overlay.querySelector('h2').textContent=message;overlay.querySelector('p').textContent=detail;
-   const close=v=>{overlay.remove();resolve(v)};
-   overlay.querySelector('[data-yes]').onclick=()=>close(true);
-   overlay.querySelector('[data-no]').onclick=()=>close(false);
-   overlay.addEventListener('click',e=>{if(e.target===overlay)close(false)});
-   cart.append(overlay);
- });
- const remove=async keys=>{
-   if(!keys.length)return;
-   if(!await confirmInCart('Hapus produk terpilih?',keys.length+' produk akan dihapus dari keranjang.'))return;
-   const set=new Set(keys.map(String));save(read().filter(x=>!set.has(String(x.key))));
- };
- // Keep all cart actions inside cart; do not trigger product-page click handlers.
- list.addEventListener('click',e=>{
-   const button=e.target.closest('.nexai-shop-edit,.nexai-v3-remove,.nexai-v3-similar');
-   if(!button)return;
-   e.preventDefault();e.stopPropagation();
-   if(button.matches('.nexai-shop-edit')){
-     const editing=!cart.classList.contains('v100-editing');
-     window.imamstoreV54?.edit?.(editing);
-     button.textContent=editing?'Selesai':'Ubah';
-     list.querySelectorAll('.nexai-row-editing').forEach(x=>x.classList.remove('nexai-row-editing'));
-   }else{
-     const row=button.closest('.imam-cart-product');
-     const key=row?.dataset.cartKey;
-     if(button.matches('.nexai-v3-remove')&&key)remove([key]);
-     if(button.matches('.nexai-v3-similar')){row?.classList.remove('nexai-row-editing');window.imamstoreCartToast?.('Lihat produk serupa melalui katalog');}
-   }
- },true);
- // Bind checkbox by stable cart key, not array index.
- list.addEventListener('change',e=>{
-   const check=e.target.closest('.ref-v42-select');
-   if(!check)return;
-   e.stopPropagation();
-   const row=check.closest('.imam-cart-product');
-   const key=check.dataset.cartKey||row?.dataset.cartKey;
-   if(!key)return;
-   const state=sel();state[String(key)]=check.checked;
-   localStorage.setItem(SEL,JSON.stringify(state));queueMicrotask(refresh);
- },true);
- const edit=document.getElementById('refCartEdit');
- edit?.addEventListener('click',()=>{queueMicrotask(()=>{const mode=cart.classList.contains('v100-editing');list.querySelectorAll('.nexai-shop-edit').forEach(x=>x.textContent=mode?'Selesai':'Ubah')})});
- function decorate(){
-  const lines=read(),rows=[...list.querySelectorAll('.imam-cart-product')];
-  rows.forEach((row,i)=>{
-    const key=row.dataset.cartKey||lines[i]?.key;
-    if(!key)return;
-    row.dataset.cartKey=String(key);
-    const check=row.querySelector('.ref-v42-select');
-    if(check){check.dataset.cartKey=String(key);check.checked=sel()[String(key)]!==false;}
-    if(!row.querySelector('.nexai-v3-row-actions')){
-      const actions=document.createElement('div');actions.className='nexai-v3-row-actions';
-      actions.innerHTML='<button type="button" class="nexai-v3-similar">Serupa</button><button type="button" class="nexai-v3-remove">Hapus</button>';
-      row.append(actions);
-      let startX=0,startY=0;
-      row.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY},{passive:true});
-      row.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;if(Math.abs(dx)>55&&Math.abs(dx)>Math.abs(dy)*1.3)row.classList.toggle('nexai-row-editing',dx<0)},{passive:true});
-    }
-  });
- }
- const obs=new MutationObserver(()=>{if(cart.classList.contains('open'))decorate()});
- obs.observe(list,{childList:true});
- // Override old edit actions to keep confirmation on cart page.
- const actionRow=cart.querySelector('.v100-edit-actions');
- if(actionRow){
-  const oldDelete=actionRow.querySelector('.v100-delete');
-  if(oldDelete){
-   const replacement=oldDelete.cloneNode(true);oldDelete.replaceWith(replacement);
-   replacement.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();remove(selected().map(x=>x.key))});
-  }
- }
- decorate();
-};
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
-})();
-</script>
+
+
+
 <style id="nexai-variant-v4">
 .ref-v42-variant-title{font-size:23px!important;font-weight:750!important;margin:8px 0 20px!important}
 .ref-v42-product{display:flex!important;align-items:center!important;gap:15px!important;padding:0 0 20px!important;border-bottom:1px solid #eee!important}
@@ -6265,4 +6082,91 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 .ref-v102-status:empty{display:none!important}
 .ref-v42-confirm{width:100%!important;min-height:55px!important;border-radius:11px!important;background:#8cc63f!important;color:white!important;font-weight:750!important;font-size:17px!important}
 .ref-v42-confirm:disabled{opacity:.5!important}
-</style></body></html>
+</style>
+<style id="nexai-v5-unified-cart-style">
+#s5Cart .v100-edit-actions{display:none!important}
+#s5Cart.v100-editing .v100-edit-actions{display:flex!important;align-items:center;gap:10px;justify-content:flex-end;flex:1}
+#s5Cart.v100-editing .ref-voucher-trigger,#s5Cart.v100-editing .ref-cart-sum,#s5Cart.v100-editing #s5Checkout{display:none!important}
+#s5Cart.v100-editing .ref-cart-checkout-row{display:flex!important;align-items:center;gap:10px}
+#s5Cart .v100-edit-actions button{min-height:46px;border:1px solid #e94b30;background:#fff;color:#e94b30;border-radius:9px;padding:9px 16px;font-size:15px}
+#s5Cart .v100-edit-actions .v100-delete{background:#e94b30;color:white}
+#s5CartItems .imam-cart-product{overflow:hidden!important;isolation:isolate}
+#s5CartItems .nexai-v5-row-actions{position:absolute;right:0;top:0;bottom:0;width:42%;max-width:190px;display:flex;z-index:1;transform:translateX(101%);transition:transform .2s}
+#s5CartItems .nexai-v5-row-actions button{flex:1;border:0;color:white;font-size:14px}
+#s5CartItems .nexai-v5-similar{background:#f99412}
+#s5CartItems .nexai-v5-delete{background:#ec4b2d}
+#s5CartItems .imam-cart-product.nexai-v5-revealed .nexai-v5-row-actions{transform:translateX(0)}
+#s5CartItems .imam-cart-product.nexai-v5-revealed>:not(.nexai-v5-row-actions){transform:translateX(-38%);transition:transform .2s}
+#s5CartItems .ref-v42-select{accent-color:#e94b30!important;pointer-events:auto!important;z-index:10!important;position:relative}
+#s5Cart .nexai-shop-edit{cursor:pointer;pointer-events:auto!important;z-index:12;position:relative}
+#imamstoreOriginalPurchase.open{z-index:2147483200!important}
+</style>
+<script id="nexai-v5-unified-cart-engine">
+(()=>{'use strict';
+const init=()=>{
+ const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems'),header=document.getElementById('refCartEdit');
+ if(!cart||!list||!header)return;
+ const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
+ const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
+ const selection=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')}catch{return {}}};
+ const sync=()=>{window.imamstoreV43?.sync?.();window.imamstoreV54?.refresh?.()};
+ let applying=false;
+ function decorate(){
+  if(applying)return;applying=true;
+  try{
+   const lines=read(),rows=[...list.querySelectorAll('.imam-cart-product')];
+   rows.forEach((row,i)=>{
+    const key=String(row.dataset.cartKey||lines[i]?.key||'');
+    if(!key)return;
+    row.dataset.cartKey=key;
+    const check=row.querySelector('.ref-v42-select');
+    if(check){check.dataset.cartKey=key;check.checked=selection()[key]!==false}
+    if(!row.querySelector('.nexai-v5-row-actions')){
+     const actions=document.createElement('div');actions.className='nexai-v5-row-actions';
+     actions.innerHTML='<button type="button" class="nexai-v5-similar">Serupa</button><button type="button" class="nexai-v5-delete">Hapus</button>';
+     row.append(actions);
+     let startX=0,startY=0;
+     row.addEventListener('touchstart',e=>{startX=e.touches[0].clientX;startY=e.touches[0].clientY},{passive:true});
+     row.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX,dy=e.changedTouches[0].clientY-startY;if(Math.abs(dx)>48&&Math.abs(dx)>Math.abs(dy)*1.4){row.classList.toggle('nexai-v5-revealed',dx<0)}},{passive:true});
+    }
+   });
+   list.querySelectorAll('.nexai-shop-edit').forEach(b=>{{const label=cart.classList.contains('v100-editing')?'Selesai':'Ubah';if(b.textContent!==label)b.textContent=label}});
+  }finally{applying=false}
+ }
+ async function remove(keys){
+  if(!keys.length)return;
+  const response=window.Swal?.fire?await window.Swal.fire({target:cart,title:'Hapus produk terpilih?',text:keys.length+' produk akan dihapus dari keranjang.',icon:'warning',showCancelButton:true,confirmButtonText:'Hapus',cancelButtonText:'Batal',confirmButtonColor:'#e94b30'}):{isConfirmed:window.confirm('Hapus '+keys.length+' produk?')};
+  if(!response?.isConfirmed)return;
+  const set=new Set(keys.map(String));
+  localStorage.setItem(KEY,JSON.stringify(read().filter(x=>!set.has(String(x.key)))));
+  window.renderCart?.();sync();window.imamstoreRefreshCartBadge?.();
+ }
+ list.addEventListener('click',e=>{
+  const button=e.target.closest('.nexai-shop-edit,.nexai-v5-delete,.nexai-v5-similar');
+  if(!button)return;
+  e.preventDefault();e.stopImmediatePropagation();
+  if(button.matches('.nexai-shop-edit')){
+   const next=!cart.classList.contains('v100-editing');
+   window.imamstoreV54?.edit?.(next);
+   list.querySelectorAll('.nexai-v5-revealed').forEach(row=>row.classList.remove('nexai-v5-revealed'));
+   decorate();
+  }else{
+   const row=button.closest('.imam-cart-product'),key=row?.dataset.cartKey;
+   if(button.matches('.nexai-v5-delete')&&key)remove([key]);
+   else if(button.matches('.nexai-v5-similar'))row?.classList.remove('nexai-v5-revealed');
+  }
+ },true);
+ // v43 owns checkbox change, no competing capture listener.
+ header.addEventListener('click',()=>queueMicrotask(decorate));
+ list.addEventListener('change',e=>{if(e.target.matches('.ref-v42-select'))queueMicrotask(sync)});
+ const all=document.getElementById('refCartSelectAll');
+ all?.addEventListener('change',()=>queueMicrotask(sync));
+ const observer=new MutationObserver(()=>{if(cart.classList.contains('open'))queueMicrotask(decorate)});
+ observer.observe(list,{childList:true});
+ document.addEventListener('imamstore:open-cart',()=>queueMicrotask(decorate));
+ decorate();sync();
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script>
+</body></html>
