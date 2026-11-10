@@ -1988,6 +1988,7 @@ requestAnimationFrame(()=&gt;{if((window.currentPage||'')==='cart')enhanceCart()
 })();
 </template>
 <template id="stage4-source-nine-final-cart-checkout-js">
+
 (function(){
 'use strict';
 const money=n=&gt;'Rp'+Math.max(0,Math.round(Number(n)||0)).toLocaleString('id-ID');
@@ -2051,7 +2052,7 @@ if(typeof oldRenderCategories==='function')window.renderCategories=function(){
 const oldRenderCart=window.renderCart;
 if(typeof oldRenderCart==='function')window.renderCart=function(){
  // Single cart-entry boundary: never persist editing state across page visits.
- const entering=!(document.querySelector('#product-grid-auto .cart-page')) || window.__imamstoreCartLeft===true || (window.currentPage!=='cart' && window.currentPage!==undefined);
+ const entering=!(document.querySelector('#product-grid-auto .cart-page')) || window.__imamstoreCartLeft===true || (window.currentPage!=='cart' &amp;&amp; window.currentPage!==undefined);
  window.__imamstoreCartLeft=false;
  if(entering){cartEditMode=false;selectedReady=false;selected.clear()}
  restore();
@@ -2078,7 +2079,7 @@ if(typeof oldCheckout==='function')window.checkoutForm=function(){
    if(!items.length){try{Swal.fire({icon:'info',text:'Centang produk yang ingin di-checkout.'})}catch(_){}return}
    if(!begin(items,'cart'))return;
  }
- if(window.__nineCheckoutSession&&!cartNow().length){
+ if(window.__nineCheckoutSession&amp;&amp;!cartNow().length){
   window.imamstoreToast?.('Tidak ada produk untuk checkout','error');
   restore();
   return;
@@ -2307,12 +2308,13 @@ function enhanceCart(){
    const viewport=document.createElement('div');viewport.className='n4-viewport';
    const track=document.createElement('div');track.className='n4-track';
    const main=document.createElement('div');main.className='n4-main';
-   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.className='nf-item-select';checkbox.checked=selected.has(id);checkbox.setAttribute('aria-label','Pilih produk');
+   const checkbox=document.createElement('input');checkbox.type='checkbox';checkbox.className='nf-item-select';checkbox.checked=selected.has(id);checkbox.setAttribute('aria-label','Pilih produk');checkbox.style.cssText='position:relative;z-index:4;pointer-events:auto;';
    checkbox.onchange=()=&gt;{
      checkbox.checked?selected.add(id):selected.delete(id);
      updateCartChecks();
    };
    checkbox.onclick=e=&gt;{e.stopPropagation();};
+   checkbox.addEventListener('click',e=&gt;{if(e.detail===0)return;},false);
    checkbox.addEventListener('pointerdown',e=&gt;e.stopPropagation());
    main.append(checkbox,photo,info);
    // V103: aksi geser milik card; tombol Ubah tidak memicu geser.
@@ -2322,23 +2324,23 @@ function enhanceCart(){
    actions.append(similar,remove);
    track.append(main,actions);viewport.appendChild(track);card.replaceChildren(top,viewport);
    let swipeStart=null,swipeOpen=false;
-   const setSwipe=open=>{swipeOpen=!!open;card.classList.toggle('n4-swiped',swipeOpen);};
-   viewport.addEventListener('touchstart',e=>{if(e.touches.length!==1)return;swipeStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
-   viewport.addEventListener('touchend',e=>{
+   const setSwipe=open=&gt;{swipeOpen=!!open;card.classList.toggle('n4-swiped',swipeOpen);card.querySelector('.n4-edit')?.setAttribute('aria-expanded',String(swipeOpen));};
+   viewport.addEventListener('touchstart',e=&gt;{if(e.touches.length!==1)return;swipeStart={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+   viewport.addEventListener('touchend',e=&gt;{
     if(!swipeStart||!e.changedTouches.length)return;
     const dx=e.changedTouches[0].clientX-swipeStart.x,dy=e.changedTouches[0].clientY-swipeStart.y;swipeStart=null;
-    if(Math.abs(dx)>42&amp;&amp;Math.abs(dx)>Math.abs(dy)*1.4)setSwipe(dx&lt;0);
+    if(Math.abs(dx)&gt;42&amp;&amp;Math.abs(dx)&gt;Math.abs(dy)*1.4)setSwipe(dx&lt;0);
    },{passive:true});
-   similar.onclick=e=>{e.stopPropagation();setSwipe(false);renderCartRecommendations(root);root.querySelector('.nf-more-products')?.scrollIntoView({behavior:'smooth',block:'start'})};
-   remove.onclick=e=>{
+   similar.onclick=e=&gt;{e.stopPropagation();setSwipe(false);renderCartRecommendations(root);root.querySelector('.nf-more-products')?.scrollIntoView({behavior:'smooth',block:'start'})};
+   remove.onclick=e=&gt;{
     e.stopPropagation();setSwipe(false);
-    const execute=()=>{
-     const idx=cartNow().findIndex((x,i)=>key(x,i)===id);
+    const execute=()=&gt;{
+     const idx=cartNow().findIndex((x,i)=&gt;key(x,i)===id);
      if(idx&lt;0)return;
      cartNow().splice(idx,1);selected.delete(id);selectedReady=false;
-     saveCart();renderCart();window.imamstoreCartToast?.('Produk berhasil dihapus dari keranjang');
+     saveCart();renderCart();window.imamstoreCartPageToast?.('Produk berhasil dihapus dari keranjang');
     };
-    if(window.Swal?.fire)window.Swal.fire({title:'Hapus produk ini?',text:String(item.nama||''),icon:'warning',showCancelButton:true,confirmButtonText:'Hapus',cancelButtonText:'Batal',confirmButtonColor:'#F05235'}).then(r=>{if(r.isConfirmed)execute()});
+    if(window.Swal?.fire)window.Swal.fire({title:'Hapus produk ini?',text:String(item.nama||''),icon:'warning',showCancelButton:true,confirmButtonText:'Hapus',cancelButtonText:'Batal',confirmButtonColor:'#F05235'}).then(r=&gt;{if(r.isConfirmed)execute()});
     else if(window.confirm('Hapus produk ini?'))execute();
    };
    const goProduct=()=&gt;{if(typeof window.showProduct==='function')window.showProduct(item.nama)};
@@ -2425,7 +2427,7 @@ if(typeof legacyQty==='function'){
   window.changeCartQty=function(index,delta){
     const out=legacyQty.apply(this,arguments);
     syncVisibleTotals();
-    requestAnimationFrame(()=>{syncVisibleTotals();window.imamstoreRefreshCartBadge?.()});
+    requestAnimationFrame(()=&gt;{syncVisibleTotals();window.imamstoreRefreshCartBadge?.()});
     return out;
   };
   try{changeCartQty=window.changeCartQty}catch(_){ }
@@ -2496,6 +2498,7 @@ const grid=document.getElementById('product-grid-auto');
 if(grid?.querySelector('.cart-page'))enhanceCart();
 if(grid?.querySelector('.checkout-form'))enhanceCheckout();
 })();
+
 </template>
 <template id="stage4-source-nf-final-purchase-gallery">
 (function(){
@@ -4525,107 +4528,102 @@ function openVariant(index){
  const original=read()[index];if(!original)return;
  const ref=document.querySelector('.ref-modal'),content=$('refModalContent');
  if(!ref||!content)return;
- let current=read().find(x=>x.key===original.key)||original;
- let qty=Math.max(1,Math.min(999,Number(current.qty)||1)),chosen=String(current.varian||'');
- let committed=false,changed=false,closed=false;
- const key=String(original.key);
+ const oldKey=String(original.key),oldIndex=index;
+ const snapshot=structuredClone(original);
+ let qty=Math.max(1,Number(original.qty)||1),chosen=String(original.varian||'');
+ let committed=false,closed=false,dirty=false,refreshTimer=0;
+ const label=v=>variantLabel(v);
  const optionsFor=p=>{
-  const purchase=typeof window.imamstorePurchaseVariantOptions==='function'?window.imamstorePurchaseVariantOptions(p):[];
-  const full=variants(p).map(variantLabel);
-  return [...new Set([...purchase,...full].filter(Boolean))];
+  const fromPurchase=typeof window.imamstorePurchaseVariantOptions==='function'?window.imamstorePurchaseVariantOptions(p):[];
+  return [...new Set([...(Array.isArray(fromPurchase)?fromPurchase:[]),...variants(p).map(label)].map(x=>typeof x==='string'?x:label(x)).filter(Boolean))];
  };
- const resolve=()=>productFor(original)||(window.imamstoreActiveProduct&&String(window.imamstoreActiveProduct.id)===String(original.id)?window.imamstoreActiveProduct:null);
+ const resolve=()=>productFor(snapshot)||(window.imamstoreActiveProduct&&String(window.imamstoreActiveProduct.id)===String(snapshot.id)?window.imamstoreActiveProduct:null);
+ const entryFor=(p,name)=>variants(p).find(v=>label(v)===name);
  const priceOf=(p,name)=>{
-  const v=variants(p).find(x=>variantLabel(x)===name);
-  const raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
-  const n=Number(raw);return Number.isFinite(n)&&n>0?n:Number(original.harga)||0;
+  const v=entryFor(p,name),raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
+  const n=Number(raw);return Number.isFinite(n)&&n>0?n:Number(snapshot.harga)||0;
  };
  const stockOf=(p,name)=>{
-  const v=variants(p).find(x=>variantLabel(x)===name);
-  const raw=v&&typeof v==='object'?(v.stok??v.stock):null;
-  const n=raw==null||typeof raw==='object'?NaN:Number(raw);
-  return Number.isFinite(n)&&n>=0?n:Infinity;
+  const v=entryFor(p,name),raw=v&&typeof v==='object'?(v.stok??v.stock):null,n=Number(raw);
+  return raw==null||typeof raw==='object'||!Number.isFinite(n)?Infinity:Math.max(0,n);
  };
- function syncCard(){
-  const line=read().find(x=>String(x.key)===key);
-  const row=[...document.querySelectorAll('#s5CartItems .imam-cart-product')].find(x=>x.dataset.cartKey===key);
-  if(row&&line){
-   const amount=row.querySelector('.imam-cart-qty span');if(amount)amount.textContent=String(line.qty);
-   const unit=row.querySelector('.imam-cart-price');if(unit)unit.textContent='Rp'+Number(line.harga||0).toLocaleString('id-ID');
+ const currentLine=items=>items.find(x=>String(x.key)===oldKey)||items[oldIndex];
+ function paintCard(){
+  const line=currentLine(read());if(!line)return;
+  const row=[...document.querySelectorAll('#s5CartItems .imam-cart-product')].find(x=>x.dataset.cartKey===oldKey)||document.querySelectorAll('#s5CartItems .imam-cart-product')[oldIndex];
+  if(row){
+   row.dataset.cartKey=oldKey;
+   const count=row.querySelector('.imam-cart-qty span, .imam-cart-qty output');
+   if(count)count.textContent=String(line.qty);
+   const price=row.querySelector('.imam-cart-price');if(price)price.textContent='Rp'+Number(line.harga||0).toLocaleString('id-ID');
+   const variant=row.querySelector('.ref-v42-change');if(variant)variant.textContent='Varian: '+(line.varian||'Standar')+'  ▾';
   }
   window.imamstoreV43?.sync?.();
   window.__nineSyncVisibleTotals?.();
   window.imamstoreRefreshCartBadge?.();
-  document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'variant-live-qty',id:original.id}}));
  }
- function applyQty(){
-  const items=read(),line=items.find(x=>String(x.key)===key);if(!line)return;
-  line.qty=qty;
-  if('jumlah'in line)line.jumlah=qty;
-  if(write(items)){changed=true;syncCard()}
+ function updateLine(){
+  const items=read(),line=currentLine(items);if(!line)return;
+  line.qty=qty;if('jumlah'in line)line.jumlah=qty;
+  line.varian=chosen;line.harga=priceOf(resolve(),chosen);
+  if(write(items)){dirty=true;paintCard()}
  }
  function rollback(){
-  if(committed||!changed)return;
-  const items=read(),line=items.find(x=>String(x.key)===key);
-  if(line){line.qty=original.qty;if('jumlah'in line)line.jumlah=original.jumlah??original.qty;write(items);window.renderCart?.();syncCard()}
+  if(committed||!dirty)return;
+  const items=read(),line=currentLine(items);
+  if(line){Object.keys(line).forEach(k=>delete line[k]);Object.assign(line,snapshot);write(items);paintCard()}
  }
  const closeObserver=new MutationObserver(()=>{
   if(closed)return;
-  if(ref.hidden||!ref.isConnected){closed=true;closeObserver.disconnect();rollback();document.removeEventListener('keydown',onEscape,true)}
+  if(ref.hidden||!ref.isConnected){closed=true;closeObserver.disconnect();clearTimeout(refreshTimer);rollback();document.removeEventListener('keydown',onEscape,true)}
  });
- function onEscape(e){if(e.key==='Escape'){setTimeout(()=>{if(!committed)rollback()},0)}}
+ function onEscape(e){if(e.key==='Escape')setTimeout(()=>{if(!committed)rollback()},0)}
  content.innerHTML='<h2 class="ref-v42-variant-title">Ubah Varian</h2><div class="ref-v42-product"><img alt="Foto produk"><div><b></b><p></p></div></div><h3 style="margin-top:22px">Pilih Varian</h3><div class="ref-v42-options"></div><p class="ref-v102-status" role="status"></p><div class="nine-clean-qty"><button type="button" data-qty="minus">−</button><output aria-live="polite"></output><button type="button" data-qty="plus">+</button></div><button type="button" class="ref-v42-confirm">Konfirmasi</button>';
- const img=content.querySelector('img'),price=content.querySelector('.ref-v42-product b'),status=content.querySelector('.ref-v102-status'),wrap=content.querySelector('.ref-v42-options'),output=content.querySelector('output');
- img.src=original.gambar||'/images/no-image.png';img.alt=original.nama||'Foto produk';
+ const img=content.querySelector('img'),price=content.querySelector('.ref-v42-product b'),status=content.querySelector('.ref-v102-status'),wrap=content.querySelector('.ref-v42-options'),output=content.querySelector('output'),confirm=content.querySelector('.ref-v42-confirm');
+ img.src=snapshot.gambar||'/images/no-image.png';img.alt=snapshot.nama||'Foto produk';
  img.onerror=()=>{img.onerror=null;img.src='/images/no-image.png'};
  img.onclick=()=>window.imamstorePhotoPreview?.openImages?.([img.currentSrc||img.src],img.currentSrc||img.src);
- content.querySelector('.ref-v42-product p').textContent=original.nama||'';
+ content.querySelector('.ref-v42-product p').textContent=snapshot.nama||'';
  function render(){
   const p=resolve(),choices=optionsFor(p);
-  price.textContent='Rp'+priceOf(p,chosen).toLocaleString('id-ID');
   output.textContent=String(qty);wrap.replaceChildren();
+  price.textContent='Rp'+priceOf(p,chosen).toLocaleString('id-ID');
   if(!choices.length){
-   status.textContent='Memuat pilihan varian dari katalog produk…';
-   content.querySelector('.ref-v42-confirm').disabled=true;
-   return false;
+   status.textContent='Memuat pilihan varian dari katalog produk…';confirm.disabled=true;return false;
   }
-  status.textContent='';content.querySelector('.ref-v42-confirm').disabled=false;
-  if(!choices.includes(chosen))chosen=choices[0];
+  status.textContent='';confirm.disabled=false;
+  if(!chosen||!choices.includes(chosen))chosen=choices[0];
   choices.forEach(name=>{
    const b=document.createElement('button');b.type='button';b.className='ref-v42-option';b.textContent=name;
    b.setAttribute('aria-pressed',String(name===chosen));
    b.onclick=()=>{
     chosen=name;
-    const entry=variants(p).find(x=>variantLabel(x)===name);
-    const picture=entry&&typeof entry==='object'?(entry.gambar||entry.image||entry.foto||entry.thumbnail):null;
+    const entry=entryFor(p,name),picture=entry&&typeof entry==='object'?(entry.gambar||entry.image||entry.foto||entry.thumbnail):null;
     const url=typeof picture==='string'?picture:picture?.url||picture?.src;
     if(url)img.src=url;
-    render();
-   };
-   wrap.append(b);
+    updateLine();render();
+   };wrap.append(b);
   });
   return true;
  }
  function adjust(delta){
-  const limit=stockOf(resolve(),chosen);
-  const next=Math.min(999,limit,Math.max(1,qty+delta));
-  if(next===qty)return;
-  qty=next;output.textContent=String(qty);applyQty();
+  const limit=stockOf(resolve(),chosen),next=Math.min(999,limit,Math.max(1,qty+delta));
+  if(next===qty)return;qty=next;updateLine();render();
  }
  content.querySelector('[data-qty=minus]').onclick=()=>adjust(-1);
  content.querySelector('[data-qty=plus]').onclick=()=>adjust(1);
- content.querySelector('.ref-v42-confirm').onclick=()=>{
+ confirm.onclick=()=>{
   const p=resolve(),choices=optionsFor(p);
-  if(!p||!choices.includes(chosen)){status.textContent='Pilihan varian belum siap. Tunggu katalog selesai dimuat.';return}
+  if(!p||!choices.includes(chosen)){status.textContent='Varian belum siap. Tunggu katalog dimuat.';return}
   if(qty>stockOf(p,chosen)){status.textContent='Jumlah melebihi stok varian.';return}
-  const items=read(),line=items.find(x=>String(x.key)===key);if(!line)return;
-  const newKey=String(line.id)+'::'+chosen;
-  const collision=items.find(x=>x!==line&&String(x.key)===newKey);
-  if(collision){collision.qty=Math.min(999,Number(collision.qty||0)+qty);items.splice(items.indexOf(line),1)}
-  else{line.varian=chosen;line.qty=qty;line.key=newKey;line.harga=priceOf(p,chosen);if('jumlah'in line)line.jumlah=qty}
-  if(!write(items)){status.textContent='Gagal menyimpan perubahan keranjang.';return}
-  committed=true;closed=true;closeObserver.disconnect();document.removeEventListener('keydown',onEscape,true);
-  window.imamstoreReferenceV38?.closeModal?.();window.renderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
+  const items=read(),line=currentLine(items);if(!line)return;
+  line.varian=chosen;line.qty=qty;line.harga=priceOf(p,chosen);line.key=String(line.id)+'::'+chosen;
+  if('jumlah'in line)line.jumlah=qty;
+  if(!write(items)){status.textContent='Gagal menyimpan perubahan.';return}
+  committed=true;closed=true;closeObserver.disconnect();clearTimeout(refreshTimer);
+  document.removeEventListener('keydown',onEscape,true);
+  window.imamstoreReferenceV38?.closeModal?.();
+  window.renderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
  };
  ref.hidden=false;document.body.style.overflow='hidden';
  closeObserver.observe(ref,{attributes:true,attributeFilter:['hidden','class','style']});
@@ -4633,8 +4631,7 @@ function openVariant(index){
  let attempts=0;
  const hydrate=()=>{
   if(closed||ref.hidden||content.querySelector('.ref-v42-options')!==wrap)return;
-  const available=render();
-  if(!available&&++attempts<50)setTimeout(hydrate,200);
+  if(!render()&&++attempts<80)refreshTimer=setTimeout(hydrate,250);
  };
  hydrate();
 }
@@ -5578,17 +5575,7 @@ body.nexai-v48-cart-active > .nf-cart-footer .nf-all {
   z-index:12;
 }
 </style>
-<script id="nexai-v49-selection-event-isolation">
-(function(){
-  'use strict';
-  /* Cegah klik checkbox ikut memicu navigasi/card, tanpa membatalkan perubahan checkbox. */
-  document.addEventListener('click',function(event){
-    var checkbox=event.target.closest &&
-      event.target.closest('#product-grid-auto .cart-page .nf-item-select, .nf-cart-footer #nfAll');
-    if(checkbox) event.stopPropagation();
-  },false);
-})();
-</script>
+
 
 <style id="nexai-v50-shared-cart-checkout-cards">
 /* Proporsi thumbnail dan isi konsisten untuk ringkasan keranjang/checkout. */
@@ -5999,16 +5986,7 @@ document.addEventListener('change',e=>{
  }
 });
 })();
-</script><style id="nexai-v101-clean-cart">
-/* V101: no horizontal swipe drawer in product cards */
-#product-grid-auto .cart-page .n4-viewport,
-#product-grid-auto .cart-page .n4-track,
-#product-grid-auto .cart-page .n4-main{transform:none!important;translate:none!important;touch-action:pan-y!important}
-#product-grid-auto .cart-page .n4-actions{display:none!important}
-#product-grid-auto .cart-page .n4-card .n4-main{width:100%!important;min-width:0!important}
-#product-grid-auto .cart-page .nf-item-select,
-#product-grid-auto .cart-page #nfAll{pointer-events:auto!important;cursor:pointer;accent-color:#8cc63f}
-</style>
+</script>
 <style id="nexai-v103-cart-swipe-style">
 #product-grid-auto .n4-card .n4-viewport{overflow:hidden}
 #product-grid-auto .n4-card .n4-track{display:flex;width:100%;transition:transform .2s ease;will-change:transform}
@@ -6020,17 +5998,25 @@ document.addEventListener('change',e=>{
 #product-grid-auto .n4-card.n4-swiped .n4-track{transform:translateX(-196px)}
 #nexaiCartPageToast{position:fixed;top:calc(env(safe-area-inset-top) + 92px);left:50%;transform:translateX(-50%);z-index:2147483600;max-width:90vw;padding:12px 18px;border-radius:12px;background:#f05235;color:white;font:600 14px system-ui;box-shadow:0 8px 24px #0003;pointer-events:none;text-align:center}
 </style>
-<script id="nexai-v103-cart-page-toast">
+
+<script id="nexai-v105-cart-toast">
 (()=>{'use strict';let timer;
-window.imamstoreCartPageToast=function(message){
- const root=document.querySelector('#product-grid-auto .cart-page');
- if(!root||!root.isConnected||root.offsetParent===null)return;
+window.imamstoreCartPageToast=message=>{
+ const page=document.querySelector('#product-grid-auto .cart-page');
+ if(!page||!page.isConnected)return;
  let el=document.getElementById('nexaiCartPageToast');
- if(!el){el=document.createElement('div');el.id='nexaiCartPageToast';el.setAttribute('role','status');document.body.appendChild(el)}
- el.textContent=String(message);el.hidden=false;
- clearTimeout(timer);timer=setTimeout(()=>{el.hidden=true},2300);
+ if(!el){el=document.createElement('div');el.id='nexaiCartPageToast';el.setAttribute('role','status');document.body.append(el)}
+ el.textContent=String(message);el.hidden=false;clearTimeout(timer);
+ timer=setTimeout(()=>{el.hidden=true},2500);
 };
 new MutationObserver(()=>{const el=document.getElementById('nexaiCartPageToast');if(el&&!document.querySelector('#product-grid-auto .cart-page'))el.hidden=true}).observe(document.getElementById('product-grid-auto')||document.body,{childList:true,subtree:true});
 })();
 </script>
-</body></html>
+<style id="nexai-v105-cart-controls">
+#product-grid-auto .cart-page .n4-card .n4-viewport{overflow:hidden!important;touch-action:pan-y!important}
+#product-grid-auto .cart-page .n4-card .n4-track{display:flex!important;transform:translateX(0);transition:transform .22s ease!important;width:100%!important}
+#product-grid-auto .cart-page .n4-card.n4-swiped .n4-track{transform:translateX(-196px)!important}
+#product-grid-auto .cart-page .n4-card .n4-main{flex:0 0 100%!important;min-width:0!important}
+#product-grid-auto .cart-page .n4-card .n4-swipe-actions{flex:0 0 196px!important}
+#product-grid-auto .cart-page .nf-item-select,.nf-cart-footer-clean #nfAll{appearance:auto!important;-webkit-appearance:checkbox!important;pointer-events:auto!important;accent-color:#8dc63f!important;opacity:1!important}
+</style></body></html>
