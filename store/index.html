@@ -4551,12 +4551,15 @@ function openVariant(index){
  qtyInput=$('imamstorePurchaseQty'),action=$('imamstorePurchaseAction'),message=$('imamstorePurchaseMessage');
  if(!sheet||!selector||!qtyInput||!action)return;
  const canonical=window.imamstoreV29?.products?.()||[];
- const p=canonical.find(v=>String(v.id)===String(original.id))||productFor(original),oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
+ const detailProduct=window.imamstoreActiveProduct;
+ const resolved=productFor(original);
+ const p=detailProduct&&String(detailProduct.id)===String(original.id)&&variants(detailProduct).length>variants(resolved).length?detailProduct:resolved,oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
  const oldTitle=sheet.querySelector('#imamstorePurchaseTitle')?.textContent||'';
  const oldImage=$('imamstorePurchaseImage')?.src||'';
  const oldText=action.textContent,oldSelectChange=selector.onchange,oldBackdrop=sheet.onclick;
  const catalogOptions=p?window.imamstorePurchaseVariantOptions?.(p)||[]:[];
- const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
+ const alternate=window.imamstoreV29?.products?.()?.find(x=>String(x.id)===String(original.id));
+ const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),...variants(alternate).map(variantLabel),String(original.varian||'')].filter(Boolean))];
  let chosen=String(original.varian||choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
  const priceOf=name=>{
   const v=variants(p).find(v=>variantLabel(v)===name);
@@ -6157,4 +6160,12 @@ decorate();
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start);else start();
 })();
-</script></body></html>
+</script><style id="nexai-v9-lime-final">
+#s5Cart .ref-v42-select,#s5CartItems .ref-v42-select,#s5Cart input[type="checkbox"]{appearance:none!important;-webkit-appearance:none!important;width:20px!important;height:20px!important;min-width:20px!important;border:1.5px solid #b7b7b7!important;border-radius:3px!important;background:#fff!important;position:relative!important}
+#s5Cart .ref-v42-select:checked,#s5CartItems .ref-v42-select:checked,#s5Cart input[type="checkbox"]:checked{background:#8cc63f!important;border-color:#8cc63f!important}
+#s5Cart .ref-v42-select:checked::after,#s5CartItems .ref-v42-select:checked::after,#s5Cart input[type="checkbox"]:checked::after{content:""!important;position:absolute!important;left:5px!important;top:1px!important;width:6px!important;height:11px!important;border:solid #fff!important;border-width:0 3px 3px 0!important;transform:rotate(45deg)!important}
+#s5Cart .v100-delete,#s5Cart .ref-cart-footer .v100-delete,#s5Cart .ref-cart-checkout-row .v100-delete,#s5Cart .n8-actions .n8-remove{background:#8cc63f!important;color:white!important;border-color:#8cc63f!important}
+#s5Cart .n8-actions .n8-similar{background:#699d30!important}
+#s5Cart .ref-voucher-trigger,#s5Cart .ref-voucher-trigger svg,#s5Cart .ref-voucher-trigger i{color:#699d30!important}
+#s5Cart .imam-cart-price,#s5Cart .ref-cart-sum b,#s5Cart .ref-cart-sum strong{color:#e75136!important}
+</style></body></html>
