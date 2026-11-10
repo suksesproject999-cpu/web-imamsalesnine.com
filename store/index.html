@@ -2248,6 +2248,15 @@ function enhanceCart(){
  if(root.classList.contains('n4-ready') &amp;&amp; root.querySelector('.nf-header') &amp;&amp; document.querySelector('.nf-cart-footer') &amp;&amp;
     [...root.querySelectorAll('#cart-list .cart-item')].every((c,n)=&gt;c.classList.contains('n4-card') &amp;&amp; c.dataset.n4Id===key(cartNow()[n],n))){
     root.querySelector('.nf-cart-edit').textContent=cartEditMode?'Selesai':'Ubah';
+    root.querySelectorAll('#cart-list .cart-item').forEach((card,n)=>{
+     const item=cartNow()[n];if(!item)return;
+     const check=card.querySelector('.nf-item-select');if(check)check.checked=selected.has(key(item,n));
+     const qty=card.querySelector('.cart-qty span,.cart-qty output,.cart-qty input,.qty-value');
+     if(qty){if('value' in qty)qty.value=String(item.qty||1);else qty.textContent=String(item.qty||1)}
+     const total=card.querySelector('.cart-total');if(total)total.textContent=money((Number(item.harga)||0)*(Number(item.qty)||1));
+     const variant=card.querySelector('.v39-variant-trigger,.ref-v42-variant');
+     if(variant&&item.varian!=null)variant.textContent=String(item.varian);
+    });
     paintCartFooter();return;
  }
  cartEnhancing=true;
@@ -2740,11 +2749,10 @@ const V=window.V38=window.V38||{};
  function total(data){return fmt(data.reduce((a,x)=>a+(Number(x.harga)||0)*Math.max(1,Number(x.qty)||1),0))}
  function cartDeleteToast(count){
  const message=count===1?'Produk dihapus dari keranjang':count+' produk dihapus dari keranjang';
- if(typeof window.imamstoreCartToast==='function')window.imamstoreCartToast(message);
- else window.imamstoreToast?.(message,'success');
+ if(cartPanel.classList.contains('open'))window.imamstoreCartToast?.(message);
 }
  function renderCart(){
- const data=read(),target=el('s5CartItems');target.replaceChildren();queueMicrotask(()=>window.imamstoreV54?.refresh?.());
+ const data=read(),target=el('s5CartItems');target.replaceChildren();
  const head=document.createElement('div');head.className='imam-cart-heading';
  const title=document.createElement('strong');title.textContent='Produk dalam keranjang ('+data.length+')';head.append(title);
  if(data.length){const clear=document.createElement('button');clear.type='button';clear.textContent='Hapus semua';clear.addEventListener('click',()=>{if(window.Swal?.fire){window.Swal.fire({title:'Hapus semua produk?',icon:'warning',showCancelButton:true,confirmButtonText:'Hapus',cancelButtonText:'Batal',confirmButtonColor:'#8cc63f',width:'min(90vw,410px)'}).then(r=>{if(r.isConfirmed&&save([])){renderCart();cartDeleteToast(data.length)}})}else{console.warn('Konfirmasi tidak tersedia; keranjang tidak dihapus.')}});head.append(clear)}target.append(head);
@@ -2752,9 +2760,21 @@ const V=window.V38=window.V38||{};
  data.forEach(x=>{
   const item=document.createElement('article');item.className='imam-cart-product';item.dataset.cartKey=String(x.key);
   item.classList.add('nexai-cart-swipe');
-  let touchOrigin=null;
-  item.addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button,input,.ref-v42-change'))return;touchOrigin={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
-  item.addEventListener('touchend',e=>{if(!touchOrigin||!e.changedTouches.length)return;const dx=e.changedTouches[0].clientX-touchOrigin.x,dy=e.changedTouches[0].clientY-touchOrigin.y;touchOrigin=null;if(Math.abs(dx)>42&&Math.abs(dx)>Math.abs(dy)*1.35)item.classList.toggle('nexai-swipe-open',dx<0)},{passive:true});
+  // Satu pemilik gesture per card. Scroll vertikal dan kontrol tidak ditangkap.
+  let swipeOrigin=null;
+  item.addEventListener('pointerdown',e=>{
+   if(e.target.closest('button,input,a,.ref-v42-change')||!e.isPrimary)return;
+   swipeOrigin={id:e.pointerId,x:e.clientX,y:e.clientY};
+  },{passive:true});
+  item.addEventListener('pointerup',e=>{
+   if(!swipeOrigin||swipeOrigin.id!==e.pointerId)return;
+   const dx=e.clientX-swipeOrigin.x,dy=e.clientY-swipeOrigin.y;swipeOrigin=null;
+   if(Math.abs(dx)>45&&Math.abs(dx)>Math.abs(dy)*1.35){
+    target.querySelectorAll('.nexai-swipe-open').forEach(card=>{if(card!==item)card.classList.remove('nexai-swipe-open')});
+    item.classList.toggle('nexai-swipe-open',dx<0);
+   }
+  },{passive:true});
+  item.addEventListener('pointercancel',()=>{swipeOrigin=null},{passive:true});
   const select=document.createElement('input');select.type='checkbox';select.className='ref-v42-select';select.dataset.cartKey=String(x.key);select.setAttribute('aria-label','Pilih '+x.nama);
   select.checked=window.imamstoreV43?.isSelected?.(x.key)!==false;select.addEventListener('click',e=>e.stopPropagation());select.addEventListener('change',()=>{const key='imamstore_cart_selection_v43';let state={};try{state=JSON.parse(localStorage.getItem(key)||'{}')||{}}catch{}state[String(x.key)]=select.checked;localStorage.setItem(key,JSON.stringify(state));window.imamstoreV43?.sync?.()});item.append(select);
   const img=document.createElement('img');img.src=safeUrl(x.gambar);img.alt='Foto '+x.nama;img.loading='lazy';
@@ -5982,7 +6002,7 @@ document.addEventListener('change',e=>{
 #product-grid-auto .cart-page .n4-card .n4-swipe-actions{flex:0 0 196px!important}
 #product-grid-auto .cart-page .nf-item-select,.nf-cart-footer-clean #nfAll{appearance:auto!important;-webkit-appearance:checkbox!important;pointer-events:auto!important;accent-color:#8dc63f!important;opacity:1!important}
 </style><style id="nexai-v107-stage5-cart-core">
-#s5CartItems .imam-cart-product.nexai-cart-swipe{touch-action:pan-y;overflow:hidden}
+#s5CartItems .imam-cart-product.nexai-cart-swipe{touch-action:pan-y;overflow:hidden;position:relative;isolation:isolate}
 #s5CartItems .nexai-cart-swipe>img,#s5CartItems .nexai-cart-swipe>.imam-cart-product-info{transition:transform .22s ease;position:relative;z-index:2;background:#fff}
 #s5CartItems .nexai-cart-swipe.nexai-swipe-open>img,#s5CartItems .nexai-cart-swipe.nexai-swipe-open>.imam-cart-product-info{transform:translateX(-126px)}
 #s5CartItems .nexai-cart-swipe>.ref-v42-select{z-index:4;pointer-events:auto;appearance:auto;-webkit-appearance:checkbox;accent-color:#8dc63f}
