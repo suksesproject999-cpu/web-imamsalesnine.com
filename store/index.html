@@ -2789,7 +2789,7 @@ const V=window.V38=window.V38||{};
  el('s5Checkout').disabled=!data.length;
  }
  function openCart(){document.getElementById('imamstoreLiveOriginalDetail')?.classList.remove('open');document.body.classList.remove('imamstore-original-open');draft.classList.remove('open');document.getElementById('imamstoreOriginalPurchase')?.classList.remove('open');const purchase=document.getElementById('imamstoreOriginalPurchase');if(purchase)purchase.hidden=true;cartPanel.classList.add('open');document.body.classList.add('stage4-detail-open');renderCart();window.imamstoreV43?.sync?.()}
- function openDraft(lines){draftOrigin=Array.isArray(lines)?'detail':'cart';const data=Array.isArray(lines)?lines:read();if(!data.length)return;
+ function openDraft(lines){draftOrigin=Array.isArray(lines)?'detail':'cart';const data=Array.isArray(lines)?lines:read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);if(!data.length)return;
  // Never treat a locally saved price as authoritative. Recheck product, variant and price.
  const warnings=[];const checked=[];
  for(const line of data){const p=liveProduct(line.id);if(!p){warnings.push(line.nama+': data produk belum tersedia; tunggu katalog dimuat.');continue}
@@ -4342,7 +4342,14 @@ function refreshCart(){
  window.imamstoreUnifiedCards?.refresh?.();
 }
 function refreshCheckout(){
- const {count,sum,discount,total,voucher}=orderTotals();
+ const chosen=[...$('s5DraftItems').querySelectorAll('.s5-item')];
+ const fromCart=read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);
+ const rows=chosen.length?fromCart:fromCart;
+ const count=rows.reduce((a,x)=>a+(Number(x.qty)||0),0);
+ const sum=rows.reduce((a,x)=>a+(Number(x.qty)||0)*(Number(x.harga)||0),0);
+ const voucher=window.imamstoreV43?.totals?.().voucher||null;
+ const discount=Math.min(sum,window.imamstoreV43?.totals?.().discount||0);
+ const total=Math.max(0,sum-discount);
  $('refCheckoutCount').textContent=count;
  $('refCheckoutSubtotal').textContent=money(sum);
  $('refCheckoutDiscount').textContent=discount?'- '+money(discount):money(0);
@@ -6056,117 +6063,115 @@ document.addEventListener('change',e=>{
 
 
 
-<style id="nexai-v6-cart-single-controller-css">
-#s5CartItems .nexai-swipe-actions{display:none!important}
-#s5CartItems .imam-cart-product{overflow:hidden!important;isolation:isolate}
-#s5CartItems .imam-cart-product>.nexai-v6-content{display:contents}
-#s5CartItems .nexai-v6-actions{position:absolute;right:0;top:0;bottom:0;width:38%;display:flex;transform:translateX(101%);transition:transform .22s ease;z-index:2}
-#s5CartItems .nexai-v6-actions button{width:50%;border:0;color:#fff;font-size:clamp(12px,3vw,16px);font-weight:650;padding:4px}
-#s5CartItems .nexai-v6-similar{background:#fb9412}
-#s5CartItems .nexai-v6-delete{background:#ed4d30}
-#s5CartItems .imam-cart-product.nexai-v6-open .nexai-v6-actions{transform:translateX(0)}
-#s5CartItems .imam-cart-product.nexai-v6-open>:not(.nexai-v6-actions):not(.nexai-v6-edit){transform:translateX(-38%);transition:transform .22s ease}
-#s5CartItems .imam-cart-product>.nexai-v6-edit{position:absolute;top:10px;right:16px;z-index:4;background:#fff;border:0;color:#777;padding:8px 9px;font-size:14px}
-#s5CartItems .imam-cart-product.nexai-v6-open>.nexai-v6-edit{right:39%;color:#e94c31}
-#s5CartItems .imam-cart-product>.ref-v42-select{z-index:5!important;position:relative;pointer-events:auto!important}
-#s5CartItems .imam-cart-product>.imam-cart-remove{display:none!important}
-#s5CartItems .imam-cart-product .imam-cart-controls>.imam-cart-remove{display:none!important}
-#s5Cart .v100-edit-actions{display:none!important}
-#s5Cart.v100-editing .v100-edit-actions{display:flex!important}
-#s5Cart.v100-editing .ref-cart-sum,#s5Cart.v100-editing #s5Checkout,#s5Cart.v100-editing .ref-voucher-trigger{display:none!important}
-#s5Cart .ref-cart-footer{z-index:2147482501}
-#s5Cart .nexai-v6-confirm{position:fixed;inset:0;z-index:2147483500;background:#0009;display:flex;align-items:center;justify-content:center;padding:20px}
-#s5Cart .nexai-v6-dialog{background:#fff;border-radius:13px;padding:24px 18px;text-align:center;width:min(100%,420px)}
-#s5Cart .nexai-v6-dialog h2{font-size:23px;margin:8px 0}
-#s5Cart .nexai-v6-dialog p{color:#666;line-height:1.5}
-#s5Cart .nexai-v6-dialog button{border:0;border-radius:7px;padding:12px 22px;margin:8px 5px;background:#ed4d30;color:#fff}
-#s5Cart .nexai-v6-dialog button[data-cancel]{background:#777}
-</style>
-<script id="nexai-v6-cart-single-controller">
+
+
+<style id="nexai-v7-cart-lime">
+#s5Cart{--cart-lime:#8cc63f;--cart-dark:#689d2b}
+#s5Cart .ref-cart-header button,#s5Cart .ref-cart-header i,#s5Cart .ref-cart-header svg{color:var(--cart-lime)!important}
+#s5Cart .ref-cart-checkout-row input,#s5CartItems input[type=checkbox]{accent-color:var(--cart-lime)!important}
+#s5Cart #s5Checkout,#s5Cart .v100-delete,#s5Cart .nexai-edit-actions button:last-child{background:var(--cart-lime)!important;color:#fff!important;border-color:var(--cart-lime)!important}
+#s5Cart .ref-cart-sum b,#s5Cart .imam-cart-price,#s5Cart .nexai-shop-heading .nexai-shop-edit,#s5Cart #refCartEdit{color:var(--cart-dark)!important}
+#s5Cart .nexai-shop-mark{background:var(--cart-lime)!important}
+#s5Cart .v100-edit-actions button{border-color:var(--cart-lime)!important;color:var(--cart-dark)!important}
+#s5Cart .v100-edit-actions .v100-delete{color:#fff!important}
+#s5CartItems .imam-cart-product{position:relative!important;overflow:hidden!important}
+#s5CartItems .imam-cart-product .nexai-v7-edit{position:absolute;right:12px;top:8px;z-index:10;border:0;background:#fff;color:#777;padding:8px 10px;font-size:14px;cursor:pointer}
+#s5CartItems .imam-cart-product .nexai-v7-actions{position:absolute;right:0;top:0;bottom:0;width:34%;display:flex;z-index:4;transform:translateX(101%);transition:transform .23s ease}
+#s5CartItems .nexai-v7-actions button{width:50%;min-width:0;border:0;background:#8cc63f;color:#fff;font-weight:700;font-size:13px;padding:2px}
+#s5CartItems .nexai-v7-actions .nexai-v7-delete{background:#699d30}
+#s5CartItems .imam-cart-product.nexai-v7-open .nexai-v7-actions{transform:translateX(0)}
+#s5CartItems .imam-cart-product>img,#s5CartItems .imam-cart-product>.imam-cart-product-info,#s5CartItems .imam-cart-product>.ref-v42-select{transition:transform .23s ease!important;position:relative}
+#s5CartItems .imam-cart-product.nexai-v7-open>img,#s5CartItems .imam-cart-product.nexai-v7-open>.imam-cart-product-info,#s5CartItems .imam-cart-product.nexai-v7-open>.ref-v42-select{transform:translateX(-34%)!important}
+#s5CartItems .imam-cart-product.nexai-v7-open .nexai-v7-edit{right:35%;color:var(--cart-dark)}
+#s5CartItems .imam-cart-product .nexai-swipe-actions{display:none!important}
+#s5Cart .nexai-v7-confirm{position:fixed;inset:0;z-index:2147483500;background:#0009;display:flex;align-items:center;justify-content:center;padding:20px}
+#s5Cart .nexai-v7-dialog{width:min(100%,420px);border-radius:14px;background:#fff;padding:24px 18px;text-align:center;box-shadow:0 20px 50px #0003}
+#s5Cart .nexai-v7-warn{border:3px solid #8cc63f;color:#8cc63f;width:72px;height:72px;border-radius:50%;font-size:52px;margin:0 auto 15px}
+#s5Cart .nexai-v7-dialog h2{font-size:22px;margin:12px 0}
+#s5Cart .nexai-v7-dialog p{color:#666;line-height:1.5}
+#s5Cart .nexai-v7-dialog button{border:0;border-radius:8px;padding:12px 22px;margin:7px;background:#8cc63f;color:#fff;font-weight:700}
+#s5Cart .nexai-v7-dialog button[data-no]{background:#737b80}
+</style><script id="nexai-v7-cart-fixes">
 (()=>{
 'use strict';
-const init=()=>{
- const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems');
- if(!cart||!list)return;
- const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
- const read=()=>{try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return []}};
- const selections=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')}catch{return {}}};
- const selected=()=>read().filter(x=>selections()[String(x.key)]!==false);
- const sync=()=>{window.imamstoreV43?.sync?.();window.imamstoreV54?.refresh?.()};
- const confirmDelete=(n,title)=>new Promise(resolve=>{
-   const shade=document.createElement('div');shade.className='nexai-v6-confirm';
-   shade.innerHTML='<div class="nexai-v6-dialog" role="alertdialog" aria-modal="true"><h2></h2><p></p><button data-confirm type="button">Hapus</button><button data-cancel type="button">Batal</button></div>';
-   shade.querySelector('h2').textContent=title||'Hapus produk terpilih?';
-   shade.querySelector('p').textContent=n+' produk akan dihapus dari keranjang.';
-   const done=v=>{shade.remove();resolve(v)};
-   shade.querySelector('[data-confirm]').onclick=()=>done(true);
-   shade.querySelector('[data-cancel]').onclick=()=>done(false);
-   cart.append(shade);
- });
- const remove=async keys=>{
-  if(!keys.length)return;
-  if(!await confirmDelete(keys.length))return;
-  const ids=new Set(keys.map(String));
-  localStorage.setItem(KEY,JSON.stringify(read().filter(x=>!ids.has(String(x.key)))));
-  window.renderCart?.();sync();window.imamstoreRefreshCartBadge?.();
-  document.dispatchEvent(new Event('nine:cartchange'));
- };
- // Reuse the original purchase bottom sheet, and the canonical product variant list.
- function decorate(){
-  const lines=read();
-  for(const row of list.querySelectorAll('.imam-cart-product')){
-   const key=String(row.dataset.cartKey||'');
-   const x=lines.find(v=>String(v.key)===key);
-   if(!x)continue;
-   const checkbox=row.querySelector('.ref-v42-select');
-   if(checkbox){checkbox.dataset.cartKey=key;checkbox.checked=selections()[key]!==false}
-   if(!row.querySelector('.nexai-v6-edit')){
-    const edit=document.createElement('button');edit.type='button';edit.className='nexai-v6-edit';edit.textContent='Ubah';
-    edit.setAttribute('aria-label','Ubah '+x.nama);row.append(edit);
-   }
-   if(!row.querySelector('.nexai-v6-actions')){
-    const actions=document.createElement('div');actions.className='nexai-v6-actions';
-    actions.innerHTML='<button type="button" class="nexai-v6-similar">Serupa</button><button type="button" class="nexai-v6-delete">Hapus</button>';
-    row.append(actions);
-   }
-  }
- }
- list.addEventListener('click',e=>{
-  const button=e.target.closest('.nexai-v6-edit,.nexai-v6-delete,.nexai-v6-similar');
-  if(!button)return;
-  e.preventDefault();e.stopImmediatePropagation();
-  const row=button.closest('.imam-cart-product');if(!row)return;
-  if(button.matches('.nexai-v6-edit')){
-   const next=!row.classList.contains('nexai-v6-open');
-   list.querySelectorAll('.nexai-v6-open').forEach(r=>{r.classList.remove('nexai-v6-open');r.querySelector('.nexai-v6-edit').textContent='Ubah'});
-   row.classList.toggle('nexai-v6-open',next);button.textContent=next?'Selesai':'Ubah';
-  }else if(button.matches('.nexai-v6-delete'))remove([row.dataset.cartKey]);
-  else{
-   row.classList.remove('nexai-v6-open');row.querySelector('.nexai-v6-edit').textContent='Ubah';
-   const line=read().find(x=>String(x.key)===String(row.dataset.cartKey));
-   if(line){cart.classList.remove('open');document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:String(line.id)}}))}
-  }
- },true);
- // Native change is authoritative. Do not reset checked state on click/mousedown.
- list.addEventListener('change',e=>{
-  if(!e.target.matches('.ref-v42-select'))return;
-  const key=e.target.dataset.cartKey||e.target.closest('.imam-cart-product')?.dataset.cartKey;
-  if(!key)return;
-  const map=selections();map[String(key)]=e.target.checked;
-  localStorage.setItem(SEL,JSON.stringify(map));
-  queueMicrotask(sync);
- });
- // Replace sticky delete handler with cart-owned dialog; no global SweetAlert portal.
- const old=cart.querySelector('.v100-delete');
- if(old){const fresh=old.cloneNode(true);old.replaceWith(fresh);
-  fresh.onclick=e=>{e.preventDefault();e.stopImmediatePropagation();remove(selected().map(x=>x.key))};
- }
- const obs=new MutationObserver(()=>{if(cart.classList.contains('open'))queueMicrotask(decorate)});
- obs.observe(list,{childList:true});
- document.addEventListener('imamstore:open-cart',()=>queueMicrotask(decorate));
- decorate();sync();
+const boot=()=>{
+const cart=document.getElementById('s5Cart'),list=document.getElementById('s5CartItems');
+if(!cart||!list)return;
+const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
+const read=()=>{try{const a=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(a)?a:[]}catch{return []}};
+const chosen=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}catch{return {}}};
+const selected=()=>read().filter(x=>chosen()[String(x.key)]!==false);
+const refresh=()=>{
+ window.renderCart?.();
+ window.imamstoreV43?.sync?.();
+ window.imamstoreReferenceV38?.refresh?.();
+ window.imamstoreRefreshCartBadge?.();
+ document.dispatchEvent(new Event('nine:cartchange'));
 };
-if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+const confirmDelete=(count)=>new Promise(resolve=>{
+ const shade=document.createElement('div');shade.className='nexai-v7-confirm';
+ shade.innerHTML='<div class="nexai-v7-dialog" role="alertdialog" aria-modal="true"><div class="nexai-v7-warn">!</div><h2>Hapus produk terpilih?</h2><p></p><div><button type="button" data-ok>Hapus</button><button type="button" data-no>Batal</button></div></div>';
+ shade.querySelector('p').textContent=count+' produk akan dihapus dari keranjang.';
+ const done=value=>{shade.remove();resolve(value)};
+ shade.querySelector('[data-ok]').onclick=()=>done(true);
+ shade.querySelector('[data-no]').onclick=()=>done(false);
+ cart.append(shade);
+});
+const erase=async(keys)=>{
+ keys=[...new Set(keys.map(String))];if(!keys.length)return;
+ if(!await confirmDelete(keys.length))return;
+ const set=new Set(keys);
+ const after=read().filter(x=>!set.has(String(x.key)));
+ try{localStorage.setItem(KEY,JSON.stringify(after))}catch(e){console.error(e);return}
+ const selection=chosen();keys.forEach(k=>delete selection[k]);
+ localStorage.setItem(SEL,JSON.stringify(selection));
+ refresh();
+};
+function decorate(){
+ const data=read();
+ for(const row of list.querySelectorAll('.imam-cart-product')){
+  const key=row.dataset.cartKey||'';
+  const line=data.find(x=>String(x.key)===key);if(!line)continue;
+  row.classList.remove('nexai-swipe-open');
+  row.querySelectorAll('.nexai-v6-actions,.nexai-v6-edit,.nexai-v7-actions,.nexai-v7-edit').forEach(n=>n.remove());
+  const edit=document.createElement('button');edit.type='button';edit.className='nexai-v7-edit';edit.textContent='Ubah';edit.setAttribute('aria-label','Ubah '+line.nama);
+  const actions=document.createElement('div');actions.className='nexai-v7-actions';
+  actions.innerHTML='<button type="button" class="nexai-v7-similar">Serupa</button><button type="button" class="nexai-v7-delete">Hapus</button>';
+  row.append(edit,actions);
+  const check=row.querySelector('.ref-v42-select');if(check){check.checked=chosen()[key]!==false;check.dataset.cartKey=key}
+ }
+}
+let rendering=false;
+new MutationObserver(()=>{if(rendering)return;rendering=true;queueMicrotask(()=>{decorate();rendering=false})}).observe(list,{childList:true});
+list.addEventListener('click',e=>{
+ const b=e.target.closest('.nexai-v7-edit,.nexai-v7-delete,.nexai-v7-similar');if(!b)return;
+ e.preventDefault();e.stopImmediatePropagation();
+ const row=b.closest('.imam-cart-product');if(!row)return;
+ if(b.classList.contains('nexai-v7-edit')){
+  const was=row.classList.contains('nexai-v7-open');
+  list.querySelectorAll('.nexai-v7-open').forEach(r=>{r.classList.remove('nexai-v7-open');r.querySelector('.nexai-v7-edit').textContent='Ubah'});
+  if(!was){row.classList.add('nexai-v7-open');b.textContent='Selesai'}
+ }else if(b.classList.contains('nexai-v7-delete'))erase([row.dataset.cartKey]);
+ else{
+  row.classList.remove('nexai-v7-open');
+  const line=read().find(x=>String(x.key)===row.dataset.cartKey);
+  if(line){cart.classList.remove('open');document.dispatchEvent(new CustomEvent('imamstore:cart-similar',{detail:{id:line.id,nama:line.nama}}))}
+ }
+},true);
+list.addEventListener('change',e=>{
+ if(!e.target.matches('.ref-v42-select'))return;
+ const key=e.target.closest('.imam-cart-product')?.dataset.cartKey;
+ if(!key)return;
+ const m=chosen();m[key]=e.target.checked;localStorage.setItem(SEL,JSON.stringify(m));
+ queueMicrotask(()=>{window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()});
+});
+const sticky=cart.querySelector('.v100-delete');
+if(sticky){
+ // Capture before the legacy handler to avoid the global modal.
+ sticky.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();erase(selected().map(x=>x.key))},true);
+}
+decorate();
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',boot);else boot();
 })();
-</script>
-</body></html>
+</script></body></html>
