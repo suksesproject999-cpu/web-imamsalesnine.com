@@ -624,16 +624,50 @@ body:has(#s5Cart.open)
 @media(max-width:440px){#imamstoreLiveOriginalDetail.open #stickyCheckout{padding:12px!important;border-radius:25px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{grid-template-columns:60px 60px minmax(0,1fr)!important;gap:10px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button{height:64px!important;min-height:64px!important;border-radius:20px!important}#imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions>button:last-child{font-size:16px!important}}
 </style>
 <style id="imamstore-v92-sheet-sticky-canonical">
+#imamstoreLiveOriginalDetail.open #stickyCheckout{
+ box-sizing:border-box!important;position:fixed!important;left:14px!important;
+ right:14px!important;bottom:0!important;width:auto!important;max-height:none!important;
+ min-height:0!important;padding:18px 20px calc(18px + env(safe-area-inset-bottom))!important;
+ border:0!important;border-radius:32px 32px 0 0!important;
+ background:#fff!important;box-shadow:0 -7px 28px rgba(0,0,0,.08)!important;
+ z-index:2147482000!important
+}
 #imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{
- display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;gap:14px!important;width:100%!important}
+ display:grid!important;grid-template-columns:84px 84px minmax(0,1fr)!important;
+ gap:14px!important;width:100%!important;align-items:stretch!important
+}
 #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn,
 #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn{
- width:100%!important;height:70px!important;background:white!important;color:#555!important;
- border:1px solid #e4e4e4!important;border-radius:22px!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn i:before{content:"\\f086"!important}
-#imamstoreLiveOriginalDetail.open #stickyCheckout [data-nex-buy]{
- height:70px!important;min-width:0!important;border-radius:20px!important;
- background:#8dc63f!important;color:white!important;font-weight:800!important}
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100%!important;height:84px!important;min-height:84px!important;
+ padding:0!important;background:#fff!important;color:#555!important;
+ border:1px solid #e4e4e4!important;border-radius:27px!important;
+ font-size:0!important;line-height:1!important
+}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn svg{
+ width:35px!important;height:35px!important;display:block!important;flex:none!important
+}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn i{display:none!important}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn i{
+ display:block!important;font-size:35px!important;font-family:"Font Awesome 6 Free"!important;
+ font-weight:900!important
+}
+#imamstoreLiveOriginalDetail.open #stickyCheckout #stickyBuyBtn{
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ height:84px!important;min-height:84px!important;min-width:0!important;
+ border-radius:27px!important;background:#8dc63f!important;color:#fff!important;
+ font-size:clamp(14px,3.6vw,26px)!important;font-weight:800!important;
+ white-space:nowrap!important
+}
+@media(max-width:480px){
+ #imamstoreLiveOriginalDetail.open #stickyCheckout{left:12px!important;right:12px!important;padding:13px 12px calc(13px + env(safe-area-inset-bottom))!important;border-radius:25px 25px 0 0!important}
+ #imamstoreLiveOriginalDetail.open #stickyCheckout .sticky-actions{grid-template-columns:56px 56px minmax(0,1fr)!important;gap:9px!important}
+ #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn,
+ #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn,
+ #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyBuyBtn{height:60px!important;min-height:60px!important;border-radius:18px!important}
+ #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyChatBtn svg{width:29px!important;height:29px!important}
+ #imamstoreLiveOriginalDetail.open #stickyCheckout #stickyCartBtn i{font-size:29px!important}
+}
 .ref-modal:not([hidden]){z-index:2147483300!important}
 .ref-modal .ref-v42-options{display:flex!important;flex-wrap:wrap!important;gap:12px!important}
 .ref-modal .ref-v42-option{min-height:54px!important;padding:12px 20px!important;border-radius:15px!important}
@@ -3782,7 +3816,7 @@ stroke-linejoin="round">
     class="sticky-icon-btn"
     onclick="openStickyWhatsApp()">
 
-       <i class="fa-solid fa-comments" aria-hidden="true"></i>
+       <svg aria-hidden="true" viewBox="0 0 24 24" width="35" height="35" fill="#555"><path d="M9.5 3C4.8 3 1 6.2 1 10.2c0 2.1 1.1 4 2.9 5.4L3 19l4.1-2.2c.8.2 1.6.3 2.4.3 4.7 0 8.5-3.2 8.5-7.1S14.2 3 9.5 3Z"/><path d="M19 9.4c2.4 1.2 4 3.4 4 5.8 0 1.7-.8 3.2-2.1 4.3l.7 2.5-3-1.6c-.6.2-1.3.2-2 .2-2.3 0-4.3-1-5.6-2.5 5-.5 8.8-4.1 8.8-8.7H19Z"/></svg>
        
 
     </button>
@@ -4033,6 +4067,8 @@ window.imamstoreOriginalDetailStatus=()=>({active:host.classList.contains('open'
  if(mode==='cart'){
   // Tetap di detail produk; beri umpan balik sebelum pengguna memilih membuka keranjang.
   window.imamstoreToast?.('Produk berhasil masuk ke keranjang','success');
+  // Update the header badge immediately from the same saved cart data.
+  window.imamstoreRefreshCartBadge?.();
   document.dispatchEvent(new Event('nine:cartchange'));
   const detail=document.getElementById('imamstoreLiveOriginalDetail');
   const cartIcon=detail?.querySelector('#stickyCartBtn')||
@@ -4543,7 +4579,7 @@ function run(){
  for(const id of ['refCartVoucher','refCheckoutVoucher'])setIcon(document.getElementById(id),'ticket');
  const address=document.querySelector('#refAddressOpen strong');setIcon(address,'location-dot');
  for(const h of document.querySelectorAll('#s5Draft .ref-checkout-card h2')){const t=h.textContent.toLowerCase();setIcon(h,t.includes('pengiriman')?'truck-fast':t.includes('catatan')?'note-sticky':t.includes('syarat')?'file-contract':'clipboard-list')}
- const detail=document.getElementById('imamstoreLiveOriginalDetail');if(detail){for(const b of detail.querySelectorAll('#stickyCheckout .sticky-icon-btn')){const t=(b.getAttribute('aria-label')||b.textContent||'').toLowerCase();const name=/chat|pesan|whatsapp/.test(t)?'comments':'cart-shopping';setIcon(b,name,true);b.setAttribute('aria-label',name==='cart-shopping'?'Keranjang':'Pesan')}
+ const detail=document.getElementById('imamstoreLiveOriginalDetail');if(detail){for(const b of detail.querySelectorAll('#stickyCheckout .sticky-icon-btn'))b.setAttribute('aria-label',b.id==='stickyChatBtn'?'Pesan':'Keranjang')
  const up=detail.querySelector('#nineAllBackTop');if(up)setIcon(up,'arrow-up',true);
  for(const b of detail.querySelectorAll('[aria-label*="Bagikan"],[aria-label*="Share"]'))setIcon(b,'share-nodes');}
 }
@@ -5753,4 +5789,36 @@ document.addEventListener('focusin',event=>{
 })();
 </script>
 
+<script id="nexai-v94-header-cart-badge">
+(()=>{
+ 'use strict';
+ const countItems=()=>{
+  let rows=[];
+  try{
+   const raw=localStorage.getItem('imamstore_cart_stage5');
+   const parsed=raw?JSON.parse(raw):[];
+   if(Array.isArray(parsed))rows=parsed;
+  }catch(_){}
+  return rows.reduce((sum,item)=>sum+Math.max(0,Math.floor(Number(item.qty??item.jumlah??item.quantity??0)||0)),0);
+ };
+ const refresh=()=>{
+  const count=countItems();
+  for(const id of ['nineHeaderCartCount','s4CartCount']){
+   const el=document.getElementById(id);
+   if(!el)continue;
+   el.textContent=String(count);
+   el.hidden=count===0;
+  }
+  const countLabel=document.getElementById('refCartCount');
+  if(countLabel)countLabel.textContent='('+count+')';
+  return count;
+ };
+ window.imamstoreRefreshCartBadge=refresh;
+ document.addEventListener('nine:cartchange',refresh);
+ window.addEventListener('storage',event=>{if(!event.key||event.key==='imamstore_cart_stage5')refresh()});
+ document.addEventListener('imamstore:open-product',refresh);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',refresh,{once:true});
+ else refresh();
+})();
+</script>
 </body></html>
