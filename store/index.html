@@ -4587,4 +4587,31 @@ if(order){
 }
 })();
 </script>
+
+<style id="imamstore-toast-page-scope-fix">
+/* Toast should not remain visible after leaving its originating view. */
+body .store-swal-toast{z-index:2147483000}
+</style>
+<script id="imamstore-toast-page-scope-fix-script">
+(function(){
+'use strict';
+let lastView='';
+const view=()=>{
+ const visible=id=>{const e=document.getElementById(id);if(!e)return false;const st=getComputedStyle(e);return st.display!=='none'&&st.visibility!=='hidden'&&(e.classList.contains('open')||e.offsetParent!==null)};
+ if(visible('s5CheckoutPage')||visible('imamCheckoutPage'))return 'checkout';
+ if(visible('s5CartPage')||visible('imamCartPage'))return 'cart';
+ const detail=document.getElementById('imamstoreLiveOriginalDetail');
+ if(detail&&detail.classList.contains('open'))return 'product';
+ return location.hash+'|'+location.search;
+};
+const clear=()=>{
+ document.querySelectorAll('.swal2-container:has(.swal2-toast),.store-toast-fallback').forEach(el=>el.remove());
+};
+const sync=()=>{const next=view();if(lastView&&next!==lastView)clear();lastView=next;};
+lastView=view();
+window.addEventListener('popstate',sync);
+window.addEventListener('hashchange',sync);
+document.addEventListener('click',()=>setTimeout(sync,80),true);
+})();
+</script>
 </body></html>
