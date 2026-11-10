@@ -1058,11 +1058,11 @@ function card(p){
  ${isFlash?`<span class="nine-flash-label"><i class="fa-solid fa-bolt"></i> FLASH SALE</span>`:'' }
  <div class="marketplace-image-wrap"><img src="${esc(productImageUrl(p.gambar||''))}" alt="${esc(p.nama)}" loading="lazy"></div>
  <div class="product-card-body">
- <h3 class="marketplace-product-name">${esc(p.nama)}</h3>
+ ${isFlash?`<div class="flash-card-timer" data-flash-end="${esc(p.flashSale.endAt)}"></div>`:''}<h3 class="marketplace-product-name">${esc(p.nama)}</h3>
  <div class="marketplace-price">${money(h)}${disc?`<span class="marketplace-price-old">${money(n)}</span>`:''}</div>
  <div class="product-labels">${hasVoucher?'<span class="product-voucher-label"><i class="fa-solid fa-ticket"></i> Voucher</span>':''}${benefit?`<span class="product-feature">${esc(benefit)}</span>`:''}</div>
  <div class="product-meta"><span class="product-rating">⭐ ${rating}</span><span class="meta-sep">|</span><span class="meta-number">${sales==null?'—':fmt(sales)} terjual</span><span class="meta-sep">|</span><span class="meta-number"><i class="fa-regular fa-eye"></i> ${views==null?'—':fmt(views)}</span></div>
- </div>${isFlash?`<div class="flash-card-timer" data-flash-end="${esc(p.flashSale.endAt)}"></div>`:''}</article>`;
+ </div></article>`;
 }
 function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
 function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
@@ -2832,6 +2832,7 @@ const V=window.V38=window.V38||{};
 
  // Product detail original -> existing local cart and checkout simulation.
  window.imamstoreCartBridge=Object.freeze({
+  getProduct(id){return liveProduct(id)||null},
   addProduct(id,variant,qty){
    const p=liveProduct(id);if(!p)return {ok:false,message:'Produk tidak ditemukan'};
    const variants=Array.isArray(p.varian)?p.varian:[];
@@ -4552,14 +4553,14 @@ function openVariant(index){
  if(!sheet||!selector||!qtyInput||!action)return;
  const canonical=window.imamstoreV29?.products?.()||[];
  const detailProduct=window.imamstoreActiveProduct;
- const resolved=productFor(original);
+ const resolved=window.imamstoreCartBridge?.getProduct?.(original.id)||productFor(original);
  const p=detailProduct&&String(detailProduct.id)===String(original.id)&&variants(detailProduct).length>variants(resolved).length?detailProduct:resolved,oldKey=String(original.key),oldAction=action.onclick,oldClose=$('imamstorePurchaseClose').onclick;
  const oldTitle=sheet.querySelector('#imamstorePurchaseTitle')?.textContent||'';
  const oldImage=$('imamstorePurchaseImage')?.src||'';
  const oldText=action.textContent,oldSelectChange=selector.onchange,oldBackdrop=sheet.onclick;
  const catalogOptions=p?window.imamstorePurchaseVariantOptions?.(p)||[]:[];
  const alternate=window.imamstoreV29?.products?.()?.find(x=>String(x.id)===String(original.id));
- const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),...variants(alternate).map(variantLabel),String(original.varian||'')].filter(Boolean))];
+ const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
  let chosen=String(original.varian||choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
  const priceOf=name=>{
   const v=variants(p).find(v=>variantLabel(v)===name);
@@ -6168,4 +6169,61 @@ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',
 #s5Cart .n8-actions .n8-similar{background:#699d30!important}
 #s5Cart .ref-voucher-trigger,#s5Cart .ref-voucher-trigger svg,#s5Cart .ref-voucher-trigger i{color:#699d30!important}
 #s5Cart .imam-cart-price,#s5Cart .ref-cart-sum b,#s5Cart .ref-cart-sum strong{color:#e75136!important}
-</style></body></html>
+</style><style id="nexai-v10-premium-layout">
+/* Flash label overlaps bottom of the main product photo, without covering the title. */
+.product-card.marketplace-card{position:relative}
+.product-card.marketplace-card .marketplace-image-wrap{position:relative}
+.product-card.marketplace-card>.nine-flash-label{position:absolute!important;top:auto!important;left:8px!important;bottom:auto!important;z-index:4;transform:none!important}
+.product-card.marketplace-card:has(.marketplace-image-wrap)>.nine-flash-label{top:calc(var(--n10-image-height, 0px) + 2px)!important}
+.product-card.marketplace-card .flash-card-timer{position:static!important;display:inline-flex!important;width:auto!important;max-width:100%;margin:6px 0 5px!important;padding:5px 9px!important;border-radius:7px!important;background:#f4f9e9!important;color:#699d30!important;font-size:12px!important;font-weight:700!important;text-align:left!important}
+.product-card.marketplace-card .product-card-body{position:relative}
+.product-card.marketplace-card .marketplace-image-wrap{overflow:hidden}
+#imamstoreLiveOriginalDetail #stickyCheckout{left:10px!important;right:10px!important;bottom:calc(10px + env(safe-area-inset-bottom))!important;border-radius:22px!important;padding:10px!important;box-shadow:0 6px 28px #0002!important;border:1px solid #e6e9e2!important;width:auto!important}
+#imamstoreLiveOriginalDetail .nine-detail-shell{padding-bottom:130px!important}
+#s5Cart .ref-v42-select:checked,#s5CartItems .ref-v42-select:checked,#s5Cart input[type=checkbox]:checked{background:#8cc63f!important;border-color:#8cc63f!important}
+#s5Cart .v100-delete,#s5Cart .ref-cart-checkout-row .v100-delete{background:#8cc63f!important;color:white!important;border-color:#8cc63f!important}
+</style><script id="nexai-v10-flash-position">
+(()=>{function align(){document.querySelectorAll('.product-card.marketplace-card>.nine-flash-label').forEach(label=>{const card=label.parentElement,img=card.querySelector('.marketplace-image-wrap');if(!img)return;label.style.setProperty('top',(img.offsetTop+img.offsetHeight-22)+'px','important')})}
+let queued=false;const schedule=()=>{if(queued)return;queued=true;requestAnimationFrame(()=>{queued=false;align()})};
+new MutationObserver(schedule).observe(document.body,{childList:true,subtree:true});
+window.addEventListener('resize',schedule);if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',schedule);else schedule();
+})();
+</script><style id="nexai-v11-price-and-scroll">
+/* Total keranjang dan checkout: oranye konsisten, tanpa mengubah warna tombol. */
+#s5Cart #s5CartTotal,#s5Cart .ref-cart-sum,#s5Cart .ref-cart-sum b,
+#s5Cart .ref-cart-sum strong,#s5Cart .ref-cart-total,
+#s5Draft #s5DraftTotal,#s5Draft #refCheckoutFooterTotal,
+#s5Draft .ref-checkout-footer #refCheckoutFooterTotal,
+#s5Draft .ref-checkout-footer #refOrderBreakdown>span:last-child,
+#s5Draft .ref-checkout-total,#s5Draft .ref-order-total{
+ color:#e75136!important;
+}
+#imamstoreLiveOriginalDetail .imamstore-v35-up{transition:opacity .2s ease,transform .2s ease!important}
+#imamstoreLiveOriginalDetail .imamstore-v35-up[hidden]{display:none!important;visibility:hidden!important;pointer-events:none!important}
+</style><script id="nexai-v11-scroll-top-controller">
+(()=>{
+ const init=()=>{
+  const host=document.getElementById('imamstoreLiveOriginalDetail');
+  if(!host)return;
+  let raf=0;
+  const sync=()=>{
+   raf=0;
+   const btn=host.querySelector('.imamstore-v35-up');
+   if(!btn)return;
+   const visible=host.classList.contains('open')&&host.scrollTop>=450;
+   btn.hidden=!visible;
+   btn.style.setProperty('display',visible?'grid':'none','important');
+   btn.style.pointerEvents=visible?'auto':'none';
+   btn.setAttribute('aria-hidden',visible?'false':'true');
+  };
+  const schedule=()=>{if(!raf)raf=requestAnimationFrame(sync)};
+  host.addEventListener('scroll',schedule,{passive:true});
+  const mo=new MutationObserver(schedule);
+  mo.observe(host,{attributes:true,attributeFilter:['class'],childList:true,subtree:false});
+  document.addEventListener('click',schedule,true);
+  window.addEventListener('resize',schedule,{passive:true});
+  sync();
+ };
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',init);else init();
+})();
+</script></body></html>
