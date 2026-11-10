@@ -698,6 +698,41 @@ body:has(#s5Cart.open)
  #imamstoreLiveOriginalDetail .nine-detail-flash-badge:not([hidden]) > .nine-flash-timer{font-size:11px!important}
 }
 </style>
+<style id="nexai-v96-unified-cart-ui">
+/* Header quantity: readable orange text above the original icon. */
+#nineHeaderCartCount:not([hidden]),#s4CartCount:not([hidden]){
+ color:#F05235!important;background:transparent!important;
+ font-weight:800!important;font-size:15px!important;
+ border:0!important;box-shadow:none!important;
+}
+/* Native checkboxes remain clickable in the original cart cards. */
+#product-grid-auto .cart-page .nf-item-select,
+#product-grid-auto .cart-page #nfAll{
+ appearance:auto!important;-webkit-appearance:checkbox!important;
+ accent-color:#8DC63F!important;pointer-events:auto!important;
+ opacity:1!important;visibility:visible!important;cursor:pointer!important;
+ position:relative!important;z-index:10!important;
+}
+#product-grid-auto .cart-page .n4-main{pointer-events:auto!important}
+#product-grid-auto .cart-page .n4-main .cart-image,
+#product-grid-auto .cart-page .n4-main .cart-info{min-width:0}
+#product-grid-auto .cart-page .nf-cart-edit{white-space:nowrap!important}
+.nf-cart-footer .nf-bottom-row{display:flex!important;align-items:center!important;gap:12px!important}
+.nf-cart-footer[data-mode="edit"] .nf-bottom-row .nf-all{margin-right:auto!important}
+.nf-cart-footer[data-mode="edit"] .nf-favorite-selected,
+.nf-cart-footer[data-mode="edit"] .nf-delete-selected{
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;
+ min-height:44px!important;border-radius:12px!important;
+ padding:9px 15px!important;font-size:15px!important;font-weight:500!important;
+ background:#fff!important;border:1px solid #bbb!important;color:#222!important;
+}
+.nf-cart-footer[data-mode="edit"] .nf-delete-selected{border-color:#F05235!important;color:#F05235!important}
+.nf-cart-footer[data-mode="edit"] .nf-voucher-row,
+.nf-cart-footer[data-mode="edit"] #nfCartTotals,
+.nf-cart-footer[data-mode="edit"] #nfCartGo{display:none!important}
+.nf-cart-footer[data-mode="checkout"] .nf-favorite-selected,
+.nf-cart-footer[data-mode="checkout"] .nf-delete-selected{display:none!important}
+</style>
 </head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
@@ -1886,6 +1921,8 @@ document.getElementById('v38VariantConfirm')?.addEventListener('click',()=&gt;{
  try{saveCart()}catch(_){localStorage.setItem('cart',JSON.stringify(items))}
  close('v38VariantModal');
  if((window.currentPage||currentPage)==='cart'){
+   // Rebuild the active card from the saved cart immediately, not on the next visit.
+   queueMicrotask(()=>{window.renderCart?.();window.__nineSyncVisibleTotals?.();window.imamstoreRefreshCartBadge?.()});
    // Keep existing card nodes for a smooth confirmation when no rows merge.
    if(items.length!==before){
      const y=window.scrollY;
@@ -1984,7 +2021,8 @@ if(typeof oldRenderCategories==='function')window.renderCategories=function(){
 const oldRenderCart=window.renderCart;
 if(typeof oldRenderCart==='function')window.renderCart=function(){
  // Single cart-entry boundary: never persist editing state across page visits.
- const entering=!(document.querySelector('#product-grid-auto .cart-page'));
+ const entering=!(document.querySelector('#product-grid-auto .cart-page')) || window.__imamstoreCartLeft===true;
+ window.__imamstoreCartLeft=false;
  if(entering){cartEditMode=false;selectedReady=false;selected.clear()}
  restore();
  // Build the enhanced cart in the same JavaScript turn as the legacy renderer.
@@ -2199,7 +2237,7 @@ function enhanceCart(){
   root.querySelectorAll('.v39-cart-voucher-hero,.v38-voucher-entry,.v17-voucher-panel').forEach(el=&gt;el.remove());
   document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(x=&gt;x.remove());
   root.querySelectorAll('.nf-header').forEach(x=&gt;x.remove());
-  const head=header('Keranjang Saya ('+cartNow().length+')',()=&gt;{cartEditMode=false;selectedReady=false;closeCartActionPanels(root);restore();document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(el=&gt;el.remove());renderCategories()});
+  const head=header('Keranjang Saya ('+cartNow().length+')',()=&gt;{cartEditMode=false;window.__imamstoreCartLeft=true;selectedReady=false;closeCartActionPanels(root);restore();document.querySelectorAll('.nf-cart-footer,.nf-checkout-footer').forEach(el=&gt;el.remove());renderCategories()});
   head.insertAdjacentHTML('beforeend','&lt;button type="button" class="nf-cart-edit"&gt;'+(cartEditMode?'Selesai':'Ubah')+'&lt;/button&gt;&lt;button type="button" class="nf-cart-chat" aria-label="WhatsApp"&gt;&lt;i class="fa-regular fa-comments"&gt;&lt;/i&gt;&lt;/button&gt;');
   head.querySelector('.nf-cart-edit').onclick=()=&gt;{
    cartEditMode=!cartEditMode;closeCartActionPanels(root);
@@ -5098,7 +5136,7 @@ function show(message,type='info'){
   }
   entry.host.appendChild(toast);
   toast.textContent=entry.message;
-  toast.style.background=entry.type==='error'?'#b42318':entry.type==='success'?'#287d38':'#333';
+  toast.style.background=entry.type==='error'?'#b42318':entry.type==='delete'?'#F05235':entry.type==='success'?'#8DC63F':'#333';
   toast.style.opacity='1';
   clearTimeout(timer);
   timer=setTimeout(()=>{toast.style.opacity='0';setTimeout(next,220)},2100);
@@ -5109,7 +5147,7 @@ window.imamstoreToast=show;
 window.imamstoreCartToast=(message)=>{
  if(!cart.classList.contains('open'))return;
  // The cart container is the only toast owner; never append to detail/checkout.
- show(String(message),'success');
+ show(String(message),'delete');
 };
 const old=$('imamstoreActiveToast');
 if(old)old.remove();
@@ -5821,4 +5859,29 @@ document.addEventListener('focusin',event=>{
  else refresh();
 })();
 </script>
-</body></html>
+<script id="nexai-v96-cart-state-coordinator">
+(()=>{
+'use strict';
+const root=()=>document.querySelector('#product-grid-auto .cart-page');
+let was=!!root();
+const watch=new MutationObserver(()=>{
+ const now=!!root();
+ if(was&&!now){
+  window.__imamstoreCartLeft=true;
+  document.querySelectorAll('.nf-cart-footer').forEach(el=>el.remove());
+ }
+ was=now;
+});
+watch.observe(document.getElementById('product-grid-auto')||document.body,{childList:true,subtree:true});
+const refresh=()=>{
+ window.imamstoreRefreshCartBadge?.();
+ window.__nineSyncVisibleTotals?.();
+};
+document.addEventListener('nine:cartchange',refresh);
+document.addEventListener('change',e=>{
+ if(e.target.matches('#product-grid-auto .cart-page .nf-item-select,#nfAll')){
+  requestAnimationFrame(refresh);
+ }
+});
+})();
+</script></body></html>
