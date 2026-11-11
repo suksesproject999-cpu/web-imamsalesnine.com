@@ -13884,7 +13884,7 @@ const launch=document.getElementById("nineOrderLaunch"),panel=document.getElemen
 const $=id=>document.getElementById(id);
 const msg=t=>{$("nineOrderMsg").textContent=t;};
 let authorized=false, busy=false;
-function validAdmin(user){return !!user && !user.isAnonymous && ADMIN_FIREBASE_UID!=="U7XnPGpjjUNAYnwuoMh68I8guT33" && user.uid===ADMIN_FIREBASE_UID;}
+function validAdmin(user){return !!user && !user.isAnonymous && user.uid===ADMIN_FIREBASE_UID;}
 function ensureNetlifyAdmin(){
  const token=localStorage.getItem("token");
  if(!token)return Promise.reject(new Error("Silakan login Admin V5 melalui Netlify terlebih dahulu."));
@@ -13895,7 +13895,7 @@ async function check(){
  authorized=false;$("nineOrderRefresh").disabled=true;
  const user=firebase.auth().currentUser;
  $("nineOrderIdentity").textContent=user?("Firebase: "+(user.email||"(tanpa email)")+" | UID: "+user.uid):"Firebase: belum login";
- if(!validAdmin(user)){msg("Akses belum aktif. Login dengan akun Firebase admin dan isi UID admin pada kode revisi.");return;}
+ if(!validAdmin(user)){msg("Akses belum aktif. Pastikan sesi Firebase memakai UID admin yang terdaftar.");return;}
  try{await ensureNetlifyAdmin();authorized=true;$("nineOrderRefresh").disabled=false;msg("Dua pemeriksaan login berhasil. Firestore Rules tetap menentukan izin akses.");}
  catch(e){msg(e.message);}
 }
