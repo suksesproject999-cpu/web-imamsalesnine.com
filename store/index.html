@@ -4200,6 +4200,7 @@ function openPurchase(mode){
  panel.querySelector('#imamstorePurchaseMessage').textContent='';panel.querySelector('#imamstorePurchaseMessage').hidden=true;
  panel.hidden=false;panel.classList.add('open');
  panel.querySelector('#imamstorePurchaseAction').focus();
+ queueMicrotask(()=>document.getElementById('imamstorePurchaseQty')?.dispatchEvent(new Event('input',{bubbles:true})));
 }
 function closePurchase(){const p=document.getElementById('imamstoreOriginalPurchase');if(p){p.classList.remove('open');p.hidden=true}}
 window.openCartSheet=()=>openPurchase('cart');
@@ -4459,22 +4460,34 @@ $('refTermsOpen').onclick=()=>showModal('<h2>Syarat &amp; Ketentuan</h2>'+docume
 $('refTermsBody').onchange=e=>{$('refTermsFooter').checked=e.target.checked};$('refTermsFooter').onchange=e=>{$('refTermsBody').checked=e.target.checked};
 
 function updatePurchase(){
- if($('imamstoreOriginalPurchase')?.dataset.nineEditing==='true')return;
- const p=window.imamstoreActiveProduct||window.imamstoreV29?.currentProduct?.();if(!p)return;
- const input=$('imamstorePurchaseQty');if(!input)return;
- const qty=Math.max(1,Math.floor(Number(input.value)||1));
- const name=$('imamstorePurchaseVariant')?.value;
- const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name)||window.imamstoreUnifiedPrice?.quote?.(p);
- if(!q)return;
- const set=(id,value)=>{const el=$(id);if(el&&el.textContent!==value)el.textContent=value};
- const valid=q.verified!==false&&q.price>0;
- set('refPurchasePrice',valid?money(q.price):'Harga belum tersedia');
- set('refPurchaseNormal',valid&&q.saving?money(q.normal):'');
+ const panel=document.getElementById('imamstoreOriginalPurchase');
+ if(!panel||panel.hidden||!panel.classList.contains('open')||panel.dataset.nineEditing==='true')return;
+ const product=window.imamstoreActiveProduct;
+ const selector=document.getElementById('imamstorePurchaseVariant');
+ const input=document.getElementById('imamstorePurchaseQty');
+ if(!product||!selector||!input)return;
+ const qty=Math.max(1,Math.min(999,Math.floor(Number(input.value)||1)));
+ const variant=selector.value;
+ const options=window.imamstorePurchaseVariantOptions?.(product)||[];
+ const normalized=x=>String(x??'').trim().replace(/\\s+/g,' ').toLocaleLowerCase('id-ID');
+ const validVariant=!options.length||options.some(x=>normalized(x)===normalized(variant));
+ const q=window.imamstoreUnifiedPrice?.quote?.(product);
+ const price=Number(q?.price);
+ const valid=validVariant&&Number.isFinite(price)&&price>0;
+ const money=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+ const set=(id,value)=>{const el=document.getElementById(id);if(el&&el.textContent!==value)el.textContent=value};
+ set('refPurchasePrice',valid?money(price):'Harga belum tersedia');
+ set('refPurchaseNormal',valid&&q.normal>price?money(q.normal):'');
  set('refPurchaseBadge',valid&&q.percent?'-'+q.percent+'%':'');
  set('refPurchaseSaving',valid&&q.saving?'Hemat '+money(q.saving):'');
- set('ninePurchaseBudgetValue',valid?money(q.price*qty):'—');
+ set('ninePurchaseBudgetValue',valid?money(price*qty):'—');
  set('ninePurchaseBudgetLabel','Total belanja · '+qty+' pcs');
- set('refPurchaseStock','Stok: '+((p.stok?.jumlah===null||p.stok?.jumlah===undefined||p.stok?.jumlah==='')?'Perlu konfirmasi':p.stok.jumlah));
+ set('refPurchaseStock','Stok: '+((product.stok?.jumlah===null||product.stok?.jumlah===undefined||product.stok?.jumlah==='')?'Perlu konfirmasi':product.stok.jumlah));
+ const action=document.getElementById('imamstorePurchaseAction');
+ if(action)action.disabled=!valid;
+ const message=document.getElementById('imamstorePurchaseMessage');
+ if(message&&!valid){message.hidden=false;message.textContent=validVariant?'Harga produk belum tersedia.':'Pilihan varian tidak sesuai produk.'}
+ else if(message){message.hidden=true;message.textContent=''}
 }
 
 const purchaseQty=$('imamstorePurchaseQty');
@@ -5131,8 +5144,8 @@ const flash=root.querySelector('.nine-detail-flash-badge');if(flash){flash.hidde
 const banner=root.querySelector('.nine-detail-flash-badge [data-nine-flash-end]');if(banner){const end=q.endAt||Date.parse(p.flashSale?.endAt||banner.dataset.nineFlashEnd||'');const running=q.flash&&Number.isFinite(end)&&end>Date.now();if(flash)flash.hidden=!running;if(running){const sec=Math.max(0,Math.ceil((end-Date.now())/1000));const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),ss=sec%60;setText(banner,`Berakhir ${[h,m,ss].map(x=>String(x).padStart(2,'0')).join(':')}`);banner.dataset.nineFlashEnd=p.flashSale?.endAt||banner.dataset.nineFlashEnd;}else{setText(banner,'Berakhir --:--:--');}}
 const stickyPrice=root.querySelector('#stickyPrice');setText(stickyPrice,fmt(q.price));setText(root.querySelector('#stickyNormalPrice'),q.percent?fmt(q.normal):'');
 const qty=num(root.querySelector('#stickyQty')?.textContent)||1;setText(root.querySelector('#stickyTotal'),fmt(q.price*qty));
-const purchase=document.getElementById('imamstoreOriginalPurchase');if(purchase?.classList.contains('open')){const actionPrice=purchase.querySelector('#imamstorePurchasePrice');setText(actionPrice,fmt(q.price))}
-const purchase2=document.getElementById('refPurchasePrice');if(purchase2&&purchase?.dataset.nineEditing!=='true'){setText(purchase2,fmt(q.price));setText(document.getElementById('refPurchaseNormal'),q.percent?fmt(q.normal):'');setText(document.getElementById('refPurchaseBadge'),q.percent?'-'+q.percent+'%':'');/* saving is owned by updatePurchase() and follows quantity */}
+const purchase=document.getElementById('imamstoreOriginalPurchase');if(purchase?.classList.contains('open')&&purchase.dataset.nineEditing!=='true'&&String(window.imamstoreActiveProduct?.id)===String(p.id)){const actionPrice=purchase.querySelector('#imamstorePurchasePrice');setText(actionPrice,fmt(q.price))}
+const purchase2=document.getElementById('refPurchasePrice');if(purchase2&&purchase?.dataset.nineEditing!=='true'&&!purchase?.classList.contains('open')){setText(purchase2,fmt(q.price));setText(document.getElementById('refPurchaseNormal'),q.percent?fmt(q.normal):'');setText(document.getElementById('refPurchaseBadge'),q.percent?'-'+q.percent+'%':'');/* saving is owned by updatePurchase() and follows quantity */}
 const voucher=info.querySelector('.nine-voucher');if(voucher)voucher.style.display='';
 }
 let lastState='';function tick(){const data=catalog(),now=Date.now();const state=data.map(p=>{const f=p.flashSale;return f?.enabled?String(p.id)+':'+Number(active(p,now))+':'+quote(p,now).price:''}).filter(Boolean).join('|');const changed=state!==lastState;if(changed){lastState=state;updateCart();document.dispatchEvent(new CustomEvent('imamstore:flash-price-change'));window.imamstoreReferenceV38?.refresh?.()}updateDetail()}
