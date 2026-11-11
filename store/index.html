@@ -793,7 +793,7 @@ body > .swal2-container:not(.swal2-toast-shown) {
 #imamstoreOriginalPurchase .nine-qty-heading span{font-size:17px;font-weight:750}
 #imamstoreOriginalPurchase #ninePurchaseBudgetValue{font-size:20px;font-weight:800;color:#4d7f22;white-space:nowrap;font-variant-numeric:tabular-nums}
 @media(max-width:360px){#imamstoreOriginalPurchase #ninePurchaseBudgetValue{font-size:18px}}
-</style></head>
+</style><style id="nine-5k3-notice-style">#nineVoucherReconcileNotice{margin:8px 16px;color:#9b451e;font-size:13px;line-height:1.45}#nineVoucherReconcileNotice[hidden]{display:none!important}</style></head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
@@ -2823,7 +2823,11 @@ const V=window.V38=window.V38||{};
  if(current!==Number(line.harga)){warnings.push(line.nama+': harga berubah dari '+fmt(line.harga)+' menjadi '+fmt(current)+'.');continue}
  checked.push({...line,harga:current})}
  if(warnings.length){alert('Ringkasan pesanan ditahan karena data katalog berubah atau belum siap:\n\n'+warnings.join('\n')+'\n\nPeriksa ulang produk sebelum melanjutkan.');return}
- if(!checked.length)return;window.imamstoreV43?.beginCheckout?.(draftOrigin);window.__nexaiCheckoutLines=checked.map(x=>({...x}));window.__nexaiCheckoutMode=draftOrigin;draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
+ if(!checked.length)return;window.__nexaiCheckoutLines=checked.map(x=>({...x}));window.__nexaiCheckoutMode=draftOrigin;draftItems=window.__nexaiCheckoutLines;window.imamstoreV43?.beginCheckout?.(draftOrigin);cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');
+ let notice=document.getElementById('nineVoucherReconcileNotice');
+ if(!notice){notice=document.createElement('div');notice.id='nineVoucherReconcileNotice';notice.setAttribute('role','status');notice.hidden=true;el('s5DraftItems')?.before(notice)}
+ notice.hidden=true;notice.textContent='';
+ const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked));window.imamstoreV43?.publishQuote?.();document.dispatchEvent(new Event('imamstore:quote-refresh'))}
  document.addEventListener('imamstore:cart-line-updated',()=>{
   if(!cartPanel.classList.contains('open'))return;
   const data=read();
@@ -2917,7 +2921,13 @@ const V=window.V38=window.V38||{};
      if(!lines[i]||card.querySelector('.nine-checkout-edit-btn'))return;
      const btn=document.createElement('button');btn.type='button';btn.className='nine-checkout-edit-btn';
      btn.textContent='Ubah Varian / Jumlah';
-     btn.addEventListener('click',()=>nineDraftEdit(i));
+     const stableId=String(lines[i].key||lines[i].id+'|'+lines[i].varian);
+     btn.addEventListener('click',()=>{
+      const current=window.__nexaiCheckoutLines||[];
+      const currentIndex=current.findIndex(x=>String(x.key||x.id+'|'+x.varian)===stableId);
+      if(currentIndex<0){window.Swal?.fire?.({icon:'info',text:'Produk telah berubah. Periksa kembali pesanan.'});return}
+      nineDraftEdit(currentIndex);
+     });
      (card.querySelector('main')||card).append(btn);
    });
  }
@@ -4414,7 +4424,7 @@ function refreshCheckout(){
  $('refAddressSummary').textContent=selectedAddress?selectedAddress.full:'Tambahkan alamat pengiriman sebelum membuat pesanan.';
 }
 document.addEventListener('imamstore:quote-refresh',()=>{if($('s5Draft')?.classList.contains('open'))refreshCheckout();else refreshCart()});
-window.addEventListener('imamstore:checkout-variant-updated',()=>{refreshCheckout();window.imamstoreV43?.publishQuote?.()});
+window.addEventListener('imamstore:checkout-variant-updated',()=>{refreshCheckout()});
 const cartObserver=new MutationObserver(()=>{if($('s5Cart').classList.contains('open'))refreshCart()});cartObserver.observe($('s5CartItems'),{childList:true});
 const draftObserver=new MutationObserver(()=>{if($('s5Draft').classList.contains('open'))refreshCheckout()});draftObserver.observe($('s5DraftItems'),{childList:true});
 /* Cart edit controlled by unified cart controller v54. */
@@ -4627,11 +4637,16 @@ function openVariant(index, source='cart'){
  const priceOf=name=>{
   const v=variants(p).find(v=>variantLabel(v)===name);
   const raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
-  const n=Number(raw);return Number.isFinite(n)&&n>0?n:Number(original.harga)||0;
+  const n=raw==null?NaN:Number(raw);
+  if(Number.isFinite(n)&&n>0)return n;
+  // Harga item lama hanya sah untuk varian yang SAMA, bukan varian baru.
+  return name===String(original.varian||'')&&Number(original.harga)>0?Number(original.harga):NaN;
  };
  const stockOf=name=>{
-  const v=variants(p).find(v=>variantLabel(v)===name),raw=v&&typeof v==='object'?(v.stok??v.stock):null;
-  return raw==null||!Number.isFinite(Number(raw))?999:Math.max(0,Number(raw));
+  const v=variants(p).find(v=>variantLabel(v)===name);
+  const raw=v&&typeof v==='object'?(v.stok??v.stock):null;
+  const n=raw==null?NaN:Number(raw);
+  return Number.isFinite(n)&&n>=0?n:null;
  };
  function restore(){
   if(done)return;done=true;
@@ -4659,16 +4674,17 @@ function openVariant(index, source='cart'){
  function update(){
   chosen=selector.value;qty=Math.max(1,Math.min(999,Math.floor(Number(qtyInput.value)||1)));
   qtyInput.value=String(qty);
-  const stock=stockOf(chosen),valid=choices.length>0&&qty<=stock;
+  const stock=stockOf(chosen),unit=priceOf(chosen);
+  const valid=choices.length>0&&Number.isFinite(unit)&&unit>0&&(stock===null||qty<=stock);
   action.disabled=!valid;
-  message.textContent=!choices.length?'Pilihan varian belum tersedia.':qty>stock?'Jumlah melebihi stok varian.':'';
-  const unit=priceOf(chosen);
-  const price=$('refPurchasePrice');if(price)price.textContent='Rp'+unit.toLocaleString('id-ID');
+  message.textContent=!choices.length?'Pilihan varian belum tersedia.':!Number.isFinite(unit)||unit<=0?'Harga varian belum terverifikasi. Pilih varian lain.':stock!==null&&qty>stock?'Jumlah melebihi stok varian.':stock===null?'Stok belum terverifikasi; konfirmasi ketersediaan sebelum pembayaran.':'';
+
+  const price=$('refPurchasePrice');if(price)price.textContent=Number.isFinite(unit)?'Rp'+unit.toLocaleString('id-ID'):'Harga belum tersedia';
   const match=variants(p).find(v=>variantLabel(v)===chosen);
   const normalRaw=match&&typeof match==='object'?(match.harga?.normal??match.harga_normal??match.originalPrice):null;
   const productNormal=p?.harga?.normal;
   const normal=Number(normalRaw??(match?null:productNormal));
-  const saving=Number.isFinite(normal)&&normal>unit?Math.max(0,normal-unit):0;
+  const saving=Number.isFinite(unit)&&Number.isFinite(normal)&&normal>unit?Math.max(0,normal-unit):0;
   const pct=saving?Math.round(saving/normal*100):0;
   const badge=$('refPurchaseBadge'),oldSaving=$('refPurchaseSaving'),normalLabel=$('refPurchaseNormal');
   if(badge)badge.textContent=saving?'-'+pct+'%':'';
@@ -4677,7 +4693,7 @@ function openVariant(index, source='cart'){
   const saveLabel=$('refPurchaseSaving');
   if(saveLabel)saveLabel.textContent=saving?'Hemat Rp'+saving.toLocaleString('id-ID'):'';
   const budgetValue=$('ninePurchaseBudgetValue');
-  if(budgetValue)budgetValue.textContent='Rp'+(unit*qty).toLocaleString('id-ID');
+  if(budgetValue)budgetValue.textContent=Number.isFinite(unit)?'Rp'+(unit*qty).toLocaleString('id-ID'):'—';
   const pic=match&&typeof match==='object'?(match.gambar||match.image||match.foto||match.thumbnail):null;
   if(pic&&photo)photo.src=typeof pic==='string'?pic:(pic.url||pic.src||photo.src);
   const grid=sheet.querySelector('.ref-v45-variant-grid');
@@ -4695,14 +4711,14 @@ function openVariant(index, source='cart'){
  qtyInput.addEventListener('input',update,{signal:(()=>{const c=new AbortController();sheet._nexaiQtyAbort?.abort();sheet._nexaiQtyAbort=c;return c.signal})()});
  action.onclick=()=>{
   update();if(action.disabled)return;
-  const current=isCheckout?window.__nexaiCheckoutLines:read(),pos=isCheckout?index:current.findIndex(x=>String(x.key)===oldKey);
+  const current=isCheckout?window.__nexaiCheckoutLines:read(),pos=isCheckout?current?.findIndex(x=>x===original):current.findIndex(x=>String(x.key)===oldKey);
   if(!Array.isArray(current)||pos<0||current[pos]!==original&&isCheckout){message.textContent='Data produk telah berubah. Buka kembali editor.';return}
   if(isCheckout){
    const updated=current.map(x=>({...x}));
    updated[pos]={...updated[pos],varian:chosen,qty,harga:priceOf(chosen),key:String(original.id)+'|'+chosen};if('jumlah' in updated[pos])updated[pos].jumlah=qty;
-   window.__nexaiCheckoutLines=updated;
-   window.__nineSyncCheckoutSessionItems?.(updated);
-   window.dispatchEvent(new CustomEvent('imamstore:checkout-variant-updated',{detail:{items:updated}}));
+   if(!window.imamstoreV43?.commitCheckoutItems?.(updated)){
+    message.textContent='Sesi checkout berubah. Buka kembali editor.';return;
+   }
    sheet.onclick=oldBackdrop;restore();
    return;
   }
@@ -4815,14 +4831,18 @@ const calculateQuote=(lines,voucherSelection)=>{
  voucher:pv||sv,productVoucher:pv,shippingVoucher:sv,
  shippingPending:true});
 };
-const scopedQuote=(lines,scope)=>{
- const state=voucherState[scope];
- const raw=calculateQuote(lines,state);
- // Voucher tidak memenuhi minimum/kedaluwarsa dibatalkan, bukan disimpan diam-diam.
- let changed=false;
- if(state.product&&!raw.productVoucher){state.product=null;changed=true}
- if(state.shipping&&!raw.shippingVoucher){state.shipping=null;changed=true}
- return changed?calculateQuote(lines,state):raw;
+const scopedQuote=(lines,scope)=>calculateQuote(lines,voucherState[scope]);
+const reconcileVoucher=(scope,lines)=>{
+ const state=voucherState[scope],quote=calculateQuote(lines,state);
+ const removed=[];
+ for(const slot of ['product','shipping']){
+  if(state[slot]&&!quote[slot+'Voucher']){removed.push(state[slot].name||state[slot].id);state[slot]=null}
+ }
+ if(removed.length&&scope==='checkout'){
+  const note=document.getElementById('nineVoucherReconcileNotice');
+  if(note){note.textContent='Voucher tidak berlaku setelah perubahan pesanan: '+removed.join(', ');note.hidden=false}
+ }
+ return removed;
 };
 const cartTotals=()=>scopedQuote(selected(),'cart');
 const checkoutTotals=()=>scopedQuote(checkoutLines()||[],'checkout');
@@ -4868,8 +4888,21 @@ window.imamstoreV43=Object.freeze({
   const quote=cartTotals();
   voucherState.checkout={product:quote.productVoucher,shipping:quote.shippingVoucher};
  }
- publishQuote();
+ reconcileVoucher('checkout',window.__nexaiCheckoutLines||[]);
+ return calculateQuote(window.__nexaiCheckoutLines||[],voucherState.checkout);
 },
+ commitCheckoutItems:(lines)=>{
+  if(!checkoutActive()||!Array.isArray(lines)||!lines.length)return false;
+  // Jangan commit sebagian bila ada harga/qty tidak sah.
+  if(lines.some(x=>!Number.isSafeInteger(Number(x.qty))||Number(x.qty)<1||Number(x.qty)>999||
+    !Number.isSafeInteger(Number(x.harga))||Number(x.harga)<=0||
+    !String(x.id||'').trim()||!String(x.varian||'').trim()))return false;
+  const snapshot=lines.map(x=>({...x,qty:Number(x.qty),harga:Number(x.harga)}));
+  window.__nexaiCheckoutLines=snapshot;
+  reconcileVoucher('checkout',snapshot);
+  window.dispatchEvent(new CustomEvent('imamstore:checkout-variant-updated',{detail:{items:snapshot}}));
+  return true;
+ },
  endCheckout:()=>{resetCheckoutVouchers();publishQuote()},
  publishQuote,transactionsActive:true
 });sync();
