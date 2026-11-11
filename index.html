@@ -8342,6 +8342,39 @@ body.nexai-track-open{overflow:hidden}
  #topMenu.v29-drawer,#menuOverlay.v29-overlay{transition:none!important}
 }
 </style>
+<style id="nexai-tahap5h-final">
+.v5h-account{max-width:100%;min-width:0}
+.v5h-heading{margin-bottom:14px}
+.v5h-profile{display:flex;align-items:center;gap:14px;padding:17px!important;border:1px solid #e5eedb;border-radius:18px;background:linear-gradient(135deg,#f7fbf1,#fff);margin:16px 0 22px}
+.v5h-profile-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:3px}
+.v5h-profile-copy strong,.v5h-profile-copy small{overflow-wrap:anywhere}
+.v5h-profile-copy small{font-size:12px;color:#68766a}
+.v5h-shield{color:#80b93b;font-size:20px}
+.v5h-section{display:flex;flex-direction:column;gap:12px}
+.v5h-section-heading{display:flex;flex-direction:column;gap:4px;margin-bottom:2px}
+.v5h-section-heading strong{font-size:16px;color:#243125}
+.v5h-section-heading small{font-size:12px;color:#6d796c}
+.v5h-primary{display:flex;align-items:center;gap:13px;width:100%;padding:16px;border-radius:17px;background:#8cc63f;color:#17260d;text-decoration:none;box-shadow:0 8px 20px rgba(140,198,63,.2);transition:transform .2s,background .2s}
+.v5h-primary:hover{background:#a1d65b;transform:translateY(-2px)}
+.v5h-icon{width:45px;height:45px;flex:0 0 45px;display:grid;place-items:center;border-radius:13px;background:rgba(255,255,255,.5);font-size:21px}
+.v5h-link-copy{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+.v5h-link-copy strong{font-size:16px}
+.v5h-link-copy small{font-size:12px;line-height:1.4}
+.v5h-mini-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.v5h-mini{min-width:0;min-height:117px;border:1px solid #e3e9de;border-radius:16px;background:#fff;color:#243125;text-decoration:none;display:flex;flex-direction:column;align-items:flex-start;justify-content:center;gap:7px;padding:15px;cursor:pointer;font-family:inherit;text-align:left}
+.v5h-mini:hover{border-color:#8cc63f;background:#f7fbf2}
+.v5h-mini>i{color:#79ae36;font-size:21px}
+.v5h-mini strong{font-size:13px;line-height:1.3}
+.v5h-mini small{font-size:11px;color:#718072}
+.v5h-note{display:flex;gap:9px;align-items:flex-start;color:#657264;font-size:12px;line-height:1.6;margin:18px 0!important}
+.v5h-note i{color:#83b93d;margin-top:3px}
+.v5h-logout{margin-top:4px;width:100%}
+@media(max-width:420px){.v5h-mini{padding:12px;min-height:106px}.v5h-primary{padding:13px}.v5h-profile{padding:13px!important}}
+body.dark-mode .v5h-profile{background:#222d20;border-color:#43553c}
+body.dark-mode .v5h-section-heading strong,body.dark-mode .v5h-mini{color:#edf3e9}
+body.dark-mode .v5h-mini{background:#20291f;border-color:#43553c}
+body.dark-mode .v5h-note,body.dark-mode .v5h-profile-copy small{color:#b2bea9}
+</style>
 </head>
 <body>
 <a class="skip-link" href="#about">Lewati ke konten utama</a>
@@ -15385,7 +15418,23 @@ function renderLogin(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<sp
     }
 });$('#v29Google')?.addEventListener('click',async()=>{await googleSignIn()});$('#v29ToReg')?.addEventListener('click',()=>renderRegister(body))}
 function renderRegister(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-user-plus"></i>${T('Buat akun','Create account')}</span><h2 class="v29-title">${T('Daftar akun baru','Create your account')}</h2><p class="v29-sub">${T('Buat akun untuk menulis ulasan dan menggunakan fitur pelanggan.','Create an account to post reviews and use customer features.')}</p><div class="v29-field"><label>Email</label><input id="v29RegEmail" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><input id="v29RegPass" class="v29-input" type="password" autocomplete="new-password" minlength="6" placeholder="${T('Minimal 6 karakter','At least 6 characters')}"></div><button type="button" id="v29Register" class="v29-primary">${T('Daftar Akun','Create Account')}</button><div class="v29-switch">${T('Sudah punya akun?','Already have an account?')} <button type="button" id="v29ToLogin">${T('Masuk','Sign In')}</button></div></div>`;wireAuthTop();$('#v29ToLogin')?.addEventListener('click',()=>renderLogin(body));$('#v29Register')?.addEventListener('click',async()=>{const email=$('#v29RegEmail')?.value.trim(),p=$('#v29RegPass')?.value||'';if(!email||p.length<6)return alertBox('info',T('Data belum valid','Invalid information'),T('Gunakan email valid dan password minimal 6 karakter.','Use a valid email and a password of at least 6 characters.'));try{await auth()?.createUserWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Pendaftaran gagal','Registration failed'),human(e))}})}
-function renderProfile(body,u){const n=u.displayName||u.email?.split('@')[0]||'User';body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Akun Anda terhubung dengan pengalaman marketplace Imam Sales Nine.','Your account is connected to the Imam Sales Nine marketplace.')}</p><div class="v29-profile"><div class="v29-avatar">${esc(n.charAt(0).toUpperCase())}</div><div><strong>${esc(n)}</strong><small>${esc(u.email||'')}</small></div></div><button type="button" id="v29Logout" class="v29-secondary"><i class="fa-solid fa-right-from-bracket"></i>${T('Keluar','Sign Out')}</button></div>`;wireAuthTop();$('#v29Logout')?.addEventListener('click',async()=>{try{await auth()?.signOut();renderAccount()}catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}})}
+function renderProfile(body,u){
+const n=u.displayName||u.email?.split('@')[0]||'User';
+const first=esc(n.charAt(0).toUpperCase());
+body.innerHTML=`<div class="v29-auth v5h-account">${topAuth()}
+<div class="v5h-heading"><span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Semua kebutuhan belanja dan pesanan dalam satu tempat.','Your shopping and orders in one place.')}</p></div>
+<div class="v29-profile v5h-profile"><div class="v29-avatar">${first}</div><div class="v5h-profile-copy"><strong>${esc(n)}</strong><small>${esc(u.email||'')}</small></div><i class="fa-solid fa-shield-halved v5h-shield" aria-hidden="true"></i></div>
+<section class="v5h-section" aria-label="${T('Layanan pesanan','Order services')}">
+<div class="v5h-section-heading"><strong>${T('Pesanan & Pengiriman','Orders & Delivery')}</strong><small>${T('Akses cepat aktivitas belanja','Quick shopping access')}</small></div>
+<a class="v5h-primary" href="/store/?orders=1"><span class="v5h-icon"><i class="fa-solid fa-box-open" aria-hidden="true"></i></span><span class="v5h-link-copy"><strong>${T('Pesanan Saya','My Orders')}</strong><small>${T('Riwayat, status dan detail pesanan','History, status and order details')}</small></span><i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>
+<div class="v5h-mini-grid"><a href="/store/" class="v5h-mini"><i class="fa-solid fa-store" aria-hidden="true"></i><strong>${T('Belanja Lagi','Shop Again')}</strong><small>ImamStore</small></a><button type="button" class="v5h-mini" id="v5hTrack"><i class="fa-solid fa-truck-fast" aria-hidden="true"></i><strong>${T('Lacak Pengiriman','Track Delivery')}</strong><small>${T('Cek resi paket','Check tracking')}</small></button></div>
+</section>
+<p class="v5h-note"><i class="fa-solid fa-lock" aria-hidden="true"></i>${T('Gunakan akun yang sama seperti saat checkout untuk melihat pesanan Anda.','Use the same account as checkout to view your orders.')}</p>
+<button type="button" id="v29Logout" class="v29-secondary v5h-logout"><i class="fa-solid fa-right-from-bracket"></i>${T('Keluar','Sign Out')}</button></div>`;
+wireAuthTop();
+$('#v5hTrack')?.addEventListener('click',()=>{closeAccount();setTimeout(()=>window.nexaiOpenTracking?.(),0)});
+$('#v29Logout')?.addEventListener('click',async()=>{try{await auth()?.signOut();renderAccount()}catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}});
+}
 function renderAccount(){const body=$('#v17AccountBody');if(!body)return;const u=auth()?.currentUser;u?renderProfile(body,u):renderLogin(body);registerRoot(body)}
 function openAccount(){closeMenu();const m=$('#v17AccountModal');if(!m)return;m.classList.remove('v24-account-modal','v25-account-modal','v26-account');m.classList.add('v29-account');if(m.classList.contains('show')&&m.classList.contains('v29-ready'))return;renderAccount();m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';m.classList.add('show','v29-ready')}
 function syncThemeFromStorage(){const saved=localStorage.getItem('theme');document.body.classList.toggle('dark-mode',saved==='dark')}
