@@ -4772,7 +4772,7 @@ window.addEventListener('load',check,{once:true});
 })();</script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script><script id="imamstore-v51-original-firebase-checkout">(()=>{'use strict';
 /* Migrasi alur asli v21: commit statistik_produk + orders, update ranking best effort, konfirmasi WA. */
 const $=id=>document.getElementById(id),button=$('refPlaceOrder'),note=$('refCheckoutWarning');if(!button)return;
-const KEY='imamstore_cart_stage5',ADMIN='6282210109369';let busy=false;
+const KEY='imamstore_cart_stage5',ADMIN='6282210109369';let busy=false,committed=false;
 const money=n=>'Rp '+Math.round(Number(n)||0).toLocaleString('id-ID');
 const read=(key,def)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??def}catch{return def}};
 const popup=(icon,title,text)=>window.Swal?.fire?window.Swal.fire({icon,title,text,confirmButtonColor:'#8cc63f',width:'min(90vw,410px)'}):Promise.resolve((note.textContent=title+' — '+text));
@@ -4785,7 +4785,7 @@ const selected=()=>{
  const cart=read(KEY,[]);
  return (Array.isArray(cart)?cart:[]).filter(x=>x&&Number(x.qty)>0&&window.imamstoreV43?.isSelected?.(x.key)!==false);
 };
-const ready=()=>!busy&&selected().length>0;
+const ready=()=>!busy&&!committed&&selected().length>0;
 function refresh(){button.disabled=!ready();button.setAttribute('aria-disabled',String(button.disabled))}
 function address(){const a=read('imamstore_ref_addresses_v38',[]),summary=$('refAddressSummary')?.textContent?.trim()||'';return (Array.isArray(a)?a:[]).find(x=>x.full===summary)||(Array.isArray(a)?a:[]).find(x=>summary.includes(x.full))||null}
 function db(){try{return (typeof window.db!=='undefined'&&window.db)||firebase.firestore()}catch{return null}}
@@ -4794,7 +4794,7 @@ function price(x){return Number(x.harga??x.price??x.unitPrice??0)||0}
 function orderId(){try{return crypto.randomUUID()}catch{return 'ORD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8)}}
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
+async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
 const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
 const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.totals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
@@ -4812,6 +4812,7 @@ const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,p
 /* Tahap 5C.2: pesanan saja. Statistik penjualan dan ranking tidak boleh dinaikkan
    dari checkout browser yang belum diverifikasi admin. */
 await store.collection('orders').doc(d.orderId).set(order);
+committed=true; /* Firestore mengonfirmasi commit: jangan izinkan submit ulang dari checkout yang sama. */
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
 button.textContent='Pesanan tercatat';
@@ -4822,9 +4823,35 @@ if(result.isConfirmed){const url='https://wa.me/'+ADMIN+'?text='+encodeURICompon
    Only now reconcile the purchased cart lines. */
 /* Remove only purchased lines from local cart, preserving unselected lines. */
 try{const cart=read(KEY,[]),counts=new Map();if(!directBuy)lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
+/* Setelah dialog sukses selesai, tutup checkout dan hapus hanya state transaksi sementara. */
 window.__nexaiCheckoutLines=null;window.__nexaiCheckoutMode=null;
-if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';
-}catch(err){console.error('Checkout original Firebase',err);window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent='Buat Pesanan';refresh()}}
+const draft=$('s5Draft');
+if(draft){
+ draft.classList.remove('open');
+ const rows=$('s5DraftItems');if(rows)rows.replaceChildren();
+}
+document.body.classList.remove('stage4-detail-open');
+for(const id of ['refCheckoutCount','refCheckoutSubtotal','refCheckoutDiscount','s5DraftTotal','refCheckoutFooterTotal']){
+ const el=$(id);if(el)el.textContent=id==='refCheckoutCount'?'0':money(0);
+}
+for(const id of ['refTermsBody','refTermsFooter']){const el=$(id);if(el)el.checked=false}
+if($('refOrderNote'))$('refOrderNote').value='';
+if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat. Buka Pesanan Saya untuk melihat status.';
+try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catch(e){console.warn('Refresh setelah checkout',e)}
+
+}catch(err){console.error('Checkout original Firebase',err);if(committed){console.warn('Pesanan telah tersimpan; kegagalan hanya terjadi pada langkah pasca-checkout.',err);return;}window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
+/* Reset guard hanya setelah checkout benar-benar ditutup dan sesi baru dibuka. */
+const checkoutPanel=$('s5Draft');let lastOpen=!!checkoutPanel?.classList.contains('open');
+if(checkoutPanel)new MutationObserver(()=>{
+ const now=checkoutPanel.classList.contains('open');
+ if(now&&!lastOpen){committed=false;button.textContent='Buat Pesanan';refresh()}
+ lastOpen=now;
+}).observe(checkoutPanel,{attributes:true,attributeFilter:['class']});
+/* Penangkap awal mencegah handler lain mengirim ulang ketika transaksi sudah commit. */
+checkoutPanel?.addEventListener('click',e=>{
+ if(!committed||!e.target.closest('#refPlaceOrder'))return;
+ e.preventDefault();e.stopImmediatePropagation();
+},true);
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan dicatat ke Firebase dan dikonfirmasi melalui WhatsApp.';refresh();
 window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51'});
 })();</script><div aria-live="polite" id="toast" role="status"></div><script id="imamstore-v52-toast-bridge">(()=>{'use strict';
