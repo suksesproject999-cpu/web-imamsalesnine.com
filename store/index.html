@@ -4969,18 +4969,48 @@ function orderId(){try{return crypto.randomUUID()}catch{return 'ORD-'+Date.now()
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
 async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
-const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
+// Sinkronisasi final: snapshot checkout wajib cocok dengan katalog aktif.
+ const catalog=window.imamstoreV29?.products?.();
+ if(!Array.isArray(catalog)||!catalog.length){await popup('warning','Katalog belum siap','Muat ulang data produk sebelum mengirim pesanan.');return}
+ const items=[];const problems=[];
+ for(const x of lines){
+  const p=catalog.find(p=>String(p.id)===String(x.id));
+  const qty=Number(x.qty),variant=String(x.varian||'');
+  if(!p||p.active===false||p.aktif===false||p.deleted===true||p.status==='nonaktif'){problems.push(name(x)+': produk tidak tersedia');continue}
+  if(!Number.isSafeInteger(qty)||qty<1||qty>99){problems.push(name(x)+': jumlah tidak valid');continue}
+  const variants=Array.isArray(p.varian)?p.varian:[];
+  const match=variants.find(v=>String(typeof v==='string'?v:(v?.nama??v?.name??v?.label??''))===variant);
+  if(variants.length&&!match){problems.push(name(x)+': varian berubah');continue}
+  const rawStock=(match&&typeof match==='object'?(match.stok??match.stock):null)??p.stok??p.stock;
+  const stock=rawStock==null||typeof rawStock==='object'?NaN:Number(rawStock);
+  if(Number.isFinite(stock)&&stock>=0&&qty>stock){problems.push(name(x)+': stok tidak cukup');continue}
+  const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,variant);
+  const current=Number(q?.price);
+  if(!q?.verified||!Number.isFinite(current)||current<=0||Math.abs(current-price(x))>0.001){
+   problems.push(name(x)+': harga berubah, periksa kembali keranjang');continue
+  }
+  items.push({productId:String(p.id),nama:String(p.nama||p.name||p.title||name(x)),varian:variant,qty,harga:current});
+ }
+ if(problems.length){await popup('warning','Data checkout berubah',problems.join('; ').slice(0,900));return}
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
 const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.checkoutTotals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
 const directBuy=window.__nexaiCheckoutMode==='detail'&&$('s5Draft')?.classList.contains('open');
-const appliedProductDiscount=Math.max(0,Math.min(subtotal,Number(productDiscount)||0));
+const quotedSubtotal=Number(pricing?.subtotal);
+ if(!pricing||!Number.isFinite(quotedSubtotal)||Math.abs(quotedSubtotal-subtotal)>0.01){
+  await popup('warning','Ringkasan belum sinkron','Subtotal checkout berubah. Kembali ke keranjang dan ulangi checkout.');return
+ }
+ const rawDiscount=Number(productDiscount);
+ if(!Number.isFinite(rawDiscount)||rawDiscount<0||rawDiscount>subtotal){
+  await popup('warning','Voucher tidak valid','Periksa kembali voucher dan total pembayaran.');return
+ }
+ const appliedProductDiscount=rawDiscount;
 // Ongkir belum diketahui: voucher ongkir dicatat sebagai potensi, bukan mengurangi total barang.
 const appliedShippingDiscount=0;
 const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
 const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
 const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
-if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
-if(!/^0?8\d{8,13}$/.test(d.wa.replace(/\D/g,''))){await popup('warning','Nomor WhatsApp tidak valid','Gunakan nomor Indonesia yang benar.');return}
+if(!d.ekspedisi){await popup('warning','Pengiriman belum dipilih','Pilih metode pengiriman sebelum melanjutkan.');return}if(!d.provinsi||!d.kota||!/^\d{5}$/.test(d.kodepos)){await popup('warning','Alamat tidak lengkap','Lengkapi provinsi, kota, dan kode pos 5 digit.');return}if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
+if(!/^(?:62|0)?8\d{8,12}$/.test(d.wa.replace(/\D/g,''))){await popup('warning','Nomor WhatsApp tidak valid','Gunakan nomor Indonesia yang benar.');return}
 busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Mencatat permintaan pesanan di Firebase…';
 try{const FV=firebase.firestore.FieldValue,grouped=new Map();items.forEach(x=>grouped.set(x.productId,(grouped.get(x.productId)||0)+x.qty));
 const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,provinsi:d.provinsi,kota:d.kota,kodepos:d.kodepos,alamat:d.alamat},ekspedisi:d.ekspedisi,catatan:d.catatan,items,totals:summary,vouchers:{product:summary.productVoucherName,shipping:summary.shippingVoucherName},status:'checkout_created',channel:'whatsapp',createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()};
