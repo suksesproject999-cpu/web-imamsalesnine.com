@@ -772,6 +772,13 @@ body > .swal2-container:not(.swal2-toast-shown) {
 .nine-checkout-edit-actions button{border-radius:12px;padding:13px 8px;font-weight:700;border:1px solid #b7c8a5;background:#fff;color:#263021}
 .nine-checkout-edit-actions button:last-child{background:#8dc63f;border-color:#8dc63f}
 .nine-checkout-edit-actions button:disabled{opacity:.5}
+</style><style id="nine-editor-pricing-style">
+#imamstoreOriginalPurchase .nine-editor-saving-row{display:inline-flex;align-items:center;margin:4px 0 0 8px;font-size:13px;font-weight:700;color:#68982f;vertical-align:middle}
+#imamstoreOriginalPurchase #refPurchaseBadge{display:inline-flex;align-items:center}
+#imamstoreOriginalPurchase .nine-editor-budget{margin:12px 0 8px;padding:12px 14px;border-radius:12px;background:#f0f8e8;color:#243020}
+#imamstoreOriginalPurchase .nine-editor-budget-line{display:flex;justify-content:space-between;gap:10px;align-items:center;font-size:15px}
+#imamstoreOriginalPurchase .nine-editor-budget-line strong{font-size:19px;color:#4d7f22}
+#imamstoreOriginalPurchase .nine-editor-budget-saved{font-size:13px;color:#638d30;margin-top:5px}
 </style></head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
@@ -4386,8 +4393,9 @@ function refreshCheckout(){
  const count=rows.reduce((a,x)=>a+(Number(x.qty)||0),0);
  const sum=rows.reduce((a,x)=>a+(Number(x.qty)||0)*(Number(x.harga)||0),0);
  const directBuy=window.__nexaiCheckoutMode==='detail';
- const voucher=directBuy?null:(window.imamstoreV43?.totals?.().voucher||null);
- const discount=directBuy?0:Math.min(sum,window.imamstoreV43?.totals?.().discount||0);
+ const quote=window.imamstoreV43?.checkoutTotals?.();
+ const voucher=quote?.productVoucher||null;
+ const discount=Math.min(sum,Math.max(0,Number(quote?.productDiscount)||0));
  const total=Math.max(0,sum-discount);
  $('refCheckoutCount').textContent=count;
  $('refCheckoutSubtotal').textContent=money(sum);
@@ -4411,7 +4419,8 @@ function addressForm(){showModal('<h2>Alamat Baru</h2><form id="refAddressForm">
 function addressList(){const all=getAddresses();showModal('<h2>Alamat Saya</h2><div id="refAddressList"></div><button class="ref-green" id="refAddressAdd">+ Tambah Alamat</button>',root=>{const list=root.querySelector('#refAddressList');all.forEach(a=>{const b=document.createElement('button');b.style.cssText='width:100%;background:#f6f9f2;border:1px solid #e0e8d7;padding:13px;border-radius:12px;text-align:left;margin-bottom:10px';b.textContent=a.name+' · '+a.phone+'\n'+a.full;b.onclick=()=>{selectedAddress=a;closeModal();refreshCheckout()};list.append(b)});root.querySelector('#refAddressAdd').onclick=addressForm});modal.classList.add('ref-fullpage')}
 $('refAddressOpen').onclick=addressList;
 function breakdown(){
- const cartOpen=document.getElementById('s5Cart')?.classList.contains('open');const t=cartOpen?window.imamstoreV43?.totals?.():null;const {count,sum,discount,total,voucher}=t?{count:t.count,sum:t.subtotal,discount:t.discount,total:t.total,voucher:t.productVoucher||t.voucher}:orderTotals();
+ const cartOpen=document.getElementById('s5Cart')?.classList.contains('open');const t=cartOpen?window.imamstoreV43?.totals?.():null;const quote=cartOpen?t:window.imamstoreV43?.checkoutTotals?.();
+ const {count,sum,discount,total,voucher}=quote?{count:quote.count,sum:quote.subtotal,discount:quote.productDiscount,total:quote.total,voucher:quote.productVoucher}:orderTotals();
  showModal('<h2>Rincian Pesanan</h2><div id="refBreakdownLines"></div><p style="color:#777;font-size:13px">Total sementara belum termasuk ongkos kirim. Ongkir dikonfirmasi admin.</p>',root=>{
   for(const [a,b] of [['Subtotal '+count+' produk',money(sum)],['Voucher produk',voucher?.name||'Tidak dipilih'],['Diskon voucher',discount?'- '+money(discount):money(0)],['Ongkos kirim','Dihitung Admin'],['Total sementara',money(total)]]){
    const line=document.createElement('div');line.style.cssText='display:flex;justify-content:space-between;gap:8px;padding:15px 0;border-bottom:1px solid #eee';
@@ -4424,6 +4433,7 @@ $('refTermsOpen').onclick=()=>showModal('<h2>Syarat &amp; Ketentuan</h2>'+docume
 $('refTermsBody').onchange=e=>{$('refTermsFooter').checked=e.target.checked};$('refTermsFooter').onchange=e=>{$('refTermsBody').checked=e.target.checked};
 
 function updatePurchase(){
+ if($('imamstoreOriginalPurchase')?.dataset.nineEditing==='true')return;
  const p=window.imamstoreActiveProduct||window.imamstoreV29?.currentProduct?.();if(!p)return;
  const input=$('imamstorePurchaseQty'),saving=$('refPurchaseSaving');
  if(!input||!saving)return;
@@ -4599,6 +4609,13 @@ function openVariant(index, source='cart'){
  const oldTitle=sheet.querySelector('#imamstorePurchaseTitle')?.textContent||'';
  const oldImage=$('imamstorePurchaseImage')?.src||'';
  const oldText=action.textContent,oldSelectChange=selector.onchange,oldBackdrop=sheet.onclick;
+ const priceArea=$('refPurchaseBadge')?.parentElement;
+ let savingRow=sheet.querySelector('#nineEditorSavingsRow');
+ if(!savingRow&&priceArea){savingRow=document.createElement('div');savingRow.id='nineEditorSavingsRow';savingRow.className='nine-editor-saving-row';priceArea.append(savingRow)}
+ const qtyArea=qtyInput.closest('.imamstore-qty-row')||qtyInput.parentElement;
+ let budget=sheet.querySelector('#nineEditorBudget');
+ if(!budget&&qtyArea){budget=document.createElement('div');budget.id='nineEditorBudget';budget.className='nine-editor-budget';qtyArea.after(budget)}
+ sheet.dataset.nineEditing='true';
  const catalogOptions=p?window.imamstorePurchaseVariantOptions?.(p)||[]:[];
  const alternate=window.imamstoreV29?.products?.()?.find(x=>String(x.id)===String(original.id));
  const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
@@ -4620,6 +4637,8 @@ function openVariant(index, source='cart'){
   if(sheet.querySelector('#imamstorePurchaseTitle'))sheet.querySelector('#imamstorePurchaseTitle').textContent=oldTitle;
   if($('imamstorePurchaseImage'))$('imamstorePurchaseImage').src=oldImage;
   selector.onchange=oldSelectChange;sheet.onclick=oldBackdrop;
+  delete sheet.dataset.nineEditing;
+  sheet._nineEditorUpdate=null;
   window.imamstoreV43?.sync?.();
  }
  sheet.onclick=e=>{if(e.target===sheet){sheet.onclick=oldBackdrop;restore()}};
@@ -4638,14 +4657,41 @@ function openVariant(index, source='cart'){
   const stock=stockOf(chosen),valid=choices.length>0&&qty<=stock;
   action.disabled=!valid;
   message.textContent=!choices.length?'Pilihan varian belum tersedia.':qty>stock?'Jumlah melebihi stok varian.':'';
-  const price=$('refPurchasePrice');if(price)price.textContent='Rp'+priceOf(chosen).toLocaleString('id-ID');
+  const unit=priceOf(chosen);
+  const price=$('refPurchasePrice');if(price)price.textContent='Rp'+unit.toLocaleString('id-ID');
   const match=variants(p).find(v=>variantLabel(v)===chosen);
+  const normalRaw=match&&typeof match==='object'?(match.harga?.normal??match.harga_normal??match.originalPrice):null;
+  const productNormal=p?.harga?.normal;
+  const normal=Number(normalRaw??(match?null:productNormal));
+  const saving=Number.isFinite(normal)&&normal>unit?Math.max(0,normal-unit):0;
+  const pct=saving?Math.round(saving/normal*100):0;
+  const badge=$('refPurchaseBadge'),oldSaving=$('refPurchaseSaving'),normalLabel=$('refPurchaseNormal');
+  if(badge)badge.textContent=saving?'-'+pct+'%':'';
+  if(oldSaving)oldSaving.textContent='';
+  if(normalLabel)normalLabel.textContent=saving?'Rp'+normal.toLocaleString('id-ID'):'';
+  if(savingRow)savingRow.textContent=saving?'Hemat Rp'+saving.toLocaleString('id-ID')+' / pcs':'';
+  if(budget){
+   budget.replaceChildren();
+   const line=document.createElement('div');line.className='nine-editor-budget-line';
+   const label=document.createElement('span');label.textContent='Total '+qty+' pcs';
+   const amount=document.createElement('strong');amount.textContent='Rp'+(unit*qty).toLocaleString('id-ID');
+   line.append(label,amount);budget.append(line);
+   if(saving){const detail=document.createElement('div');detail.className='nine-editor-budget-saved';detail.textContent='Total hemat Rp'+(saving*qty).toLocaleString('id-ID');budget.append(detail)}
+  }
   const pic=match&&typeof match==='object'?(match.gambar||match.image||match.foto||match.thumbnail):null;
   if(pic&&photo)photo.src=typeof pic==='string'?pic:(pic.url||pic.src||photo.src);
   const grid=sheet.querySelector('.ref-v45-variant-grid');
   if(grid){grid.replaceChildren();choices.forEach(name=>{const b=document.createElement('button');b.type='button';b.textContent=name;b.setAttribute('aria-pressed',String(name===chosen));b.onclick=()=>{selector.value=name;update()};grid.append(b)})}
  }
  selector.onchange=update;
+ // Tombol +/- bawaan mengubah input secara programatik; perbarui budget setelah handler bawaan.
+ const qtyButtons=sheet.querySelectorAll('#imamstoreQtyMinus,#imamstoreQtyPlus');
+ sheet._nineEditorUpdate=update;
+ if(!sheet._nineQtyDelegated){sheet._nineQtyDelegated=true;sheet.addEventListener('click',e=>{
+  if(!e.target.closest('#imamstoreQtyMinus,#imamstoreQtyPlus'))return;
+  queueMicrotask(()=>sheet._nineEditorUpdate?.());
+  setTimeout(()=>sheet._nineEditorUpdate?.(),0);
+ })}
  qtyInput.addEventListener('input',update,{signal:(()=>{const c=new AbortController();sheet._nexaiQtyAbort?.abort();sheet._nexaiQtyAbort=c;return c.signal})()});
  action.onclick=()=>{
   update();if(action.disabled)return;
@@ -4745,11 +4791,12 @@ const slotOf=v=>v?.type==='shipping_fixed'?'shipping':'product';
 let chosen={product:null,shipping:null};
 const eligible=(v,sum)=>!!v&&sum>=Number(v.min||0)&&(!v.expired||Date.now()<=new Date(v.expired+'T23:59:59').getTime());
 const voucherValue=(v,sum)=>{if(!eligible(v,sum))return 0;let d=v.type==='product_percent'?Math.floor(sum*Number(v.discount||0)/100):Number(v.discount||0);if(v.maxDiscount!=null)d=Math.min(d,Number(v.maxDiscount));return Math.max(0,Math.min(sum,Math.floor(d)))};
-const totals=()=>{const lines=selected(),count=lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0),0),subtotal=lines.reduce((n,x)=>n+Math.max(0,Number(x.harga)||0)*Math.max(0,Number(x.qty)||0),0),productVoucher=eligible(chosen.product,subtotal)?chosen.product:null,shippingVoucher=eligible(chosen.shipping,subtotal)?chosen.shipping:null,productDiscount=voucherValue(productVoucher,subtotal),shippingDiscount=voucherValue(shippingVoucher,subtotal);return {count,subtotal,discount:productDiscount,productDiscount,shippingDiscount,total:Math.max(0,subtotal-productDiscount),voucher:productVoucher||shippingVoucher,productVoucher,shippingVoucher};};
+const checkoutLines=()=>{const draft=$('s5Draft');return draft?.classList.contains('open')&&Array.isArray(window.__nexaiCheckoutLines)?window.__nexaiCheckoutLines:null};
+const totals=(linesOverride)=>{const lines=Array.isArray(linesOverride)?linesOverride:selected(),count=lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0),0),subtotal=lines.reduce((n,x)=>n+Math.max(0,Number(x.harga)||0)*Math.max(0,Number(x.qty)||0),0),productVoucher=eligible(chosen.product,subtotal)?chosen.product:null,shippingVoucher=eligible(chosen.shipping,subtotal)?chosen.shipping:null,productDiscount=voucherValue(productVoucher,subtotal),shippingDiscount=voucherValue(shippingVoucher,subtotal);return {count,subtotal,discount:productDiscount,productDiscount,shippingDiscount,total:Math.max(0,subtotal-productDiscount),voucher:productVoucher||shippingVoucher,productVoucher,shippingVoucher};};
 function modal(html,init){const m=document.querySelector('.ref-modal'),body=$('refModalContent');if(!m||!body)return;body.innerHTML=html;m.hidden=false;document.body.style.overflow='hidden';init?.(body)}
 function close(){window.imamstoreReferenceV38?.closeModal?.()}
 function terms(v){modal('<h2>Syarat &amp; Ketentuan Voucher</h2><div class="ref-v43-voucher"><span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small></div></div><h3>Aturan Penggunaan</h3><p>Maksimal satu voucher produk dan satu voucher ongkir per pesanan. Minimum belanja dihitung dari produk yang dicentang.</p><h3>Masa Berlaku</h3><p id="v43Expiry"></p><h3>Batas Diskon</h3><p id="v43Cap"></p><h3>Ketentuan Voucher</h3><p id="v43Limit"></p><button class="ref-green" id="v43TermsOk">Kembali ke voucher</button>',root=>{root.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';root.querySelector('b').textContent=v.name;root.querySelector('small').textContent=v.description+' · Min. '+money(v.min);root.querySelector('#v43Expiry').textContent=v.expired?'Berlaku hingga '+new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID'):'Tidak ada tanggal kedaluwarsa yang tercantum';root.querySelector('#v43Cap').textContent=v.maxDiscount==null?'Tidak tercantum batas maksimal diskon':('Maksimal potongan '+money(v.maxDiscount));root.querySelector('#v43Limit').textContent=v.limit||'Tidak ada batas penggunaan yang tercantum';root.querySelector('#v43TermsOk').onclick=openVoucher})}
-function openVoucher(){const sum=selected().reduce((a,x)=>a+Number(x.harga||0)*Number(x.qty||0),0);modal('<h2>Voucher &amp; Promo</h2><p>Gunakan maksimal satu voucher produk dan satu voucher ongkir.</p><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher"><button id="v43VoucherApply">Pakai</button></div><div id="v43VoucherList"></div><button class="ref-green" id="v43VoucherDone">Selesai</button>',root=>{root.querySelector('#v43VoucherApply').onclick=()=>alertUI('Kode voucher belum dapat diverifikasi.');root.querySelector('#v43VoucherDone').onclick=close;const list=root.querySelector('#v43VoucherList');vouchers.forEach(v=>{const slot=slotOf(v),active=chosen[slot]?.id===v.id,ok=eligible(v,sum),row=document.createElement('div');row.className='ref-v43-voucher';row.innerHTML='<span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small></div><div class="ref-v43-voucher-actions"><button class="ref-v43-choose"></button><button class="ref-v43-terms">S&amp;K</button></div>';row.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';row.querySelector('b').textContent=v.name+' · '+(v.type==='product_percent'?v.discount+'%':money(v.discount));row.querySelector('small').textContent=v.description+' · Min. '+money(v.min)+' · Hingga '+v.expired;const btn=row.querySelector('.ref-v43-choose');btn.textContent=!ok?'Belum memenuhi syarat':active?'Batalkan':'Gunakan';btn.disabled=!ok;btn.onclick=()=>{chosen[slot]=active?null:v;sync();window.imamstoreReferenceV38?.refresh?.();openVoucher()};row.querySelector('.ref-v43-terms').onclick=()=>terms(v);list.append(row)})})}
+function openVoucher(){const lines=checkoutLines()||selected();const sum=lines.reduce((a,x)=>a+Number(x.harga||0)*Number(x.qty||0),0);modal('<h2>Voucher &amp; Promo</h2><p>Gunakan maksimal satu voucher produk dan satu voucher ongkir.</p><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher"><button id="v43VoucherApply">Pakai</button></div><div id="v43VoucherList"></div><button class="ref-green" id="v43VoucherDone">Selesai</button>',root=>{root.querySelector('#v43VoucherApply').onclick=()=>alertUI('Kode voucher belum dapat diverifikasi.');root.querySelector('#v43VoucherDone').onclick=close;const list=root.querySelector('#v43VoucherList');vouchers.forEach(v=>{const slot=slotOf(v),active=chosen[slot]?.id===v.id,ok=eligible(v,sum),row=document.createElement('div');row.className='ref-v43-voucher';row.innerHTML='<span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small></div><div class="ref-v43-voucher-actions"><button class="ref-v43-choose"></button><button class="ref-v43-terms">S&amp;K</button></div>';row.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';row.querySelector('b').textContent=v.name+' · '+(v.type==='product_percent'?v.discount+'%':money(v.discount));row.querySelector('small').textContent=v.description+' · Min. '+money(v.min)+' · Hingga '+v.expired;const btn=row.querySelector('.ref-v43-choose');btn.textContent=!ok?'Belum memenuhi syarat':active?'Batalkan':'Gunakan';btn.disabled=!ok;btn.onclick=()=>{chosen[slot]=active?null:v;sync();window.imamstoreReferenceV38?.refresh?.();openVoucher()};row.querySelector('.ref-v43-terms').onclick=()=>terms(v);list.append(row)})})}
 function openProduct(line){const id=String(line.id);const cart=$('s5Cart');cart?.classList.remove('open');document.body.classList.remove('stage4-detail-open');document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));}
 function sync(){const lines=read(),sel=selected(),all=lines.length>0&&sel.length===lines.length,count=sel.reduce((n,x)=>n+(Number(x.qty)||0),0),pricing=totals();
  const wrap=$('s5CartItems');if(wrap){const rows=[...wrap.querySelectorAll('.imam-cart-product')];rows.forEach((row,i)=>{const c=row.querySelector('.ref-v42-select');const rowKey=c?.dataset.cartKey||row.dataset.cartKey;const x=(rowKey?lines.find(item=>String(item.key)===String(rowKey)):null)||lines[i];if(!x)return;if(c){c.checked=isSelected(x.key);c.dataset.cartKey=String(x.key);
@@ -4770,7 +4817,7 @@ for(const id of ['refCartVoucher','refCheckoutVoucher']){const el=$(id);if(el)el
 // Browser alert is not monkey-patched globally.
 const cart=$('s5CartItems');if(cart){new MutationObserver(()=>queueMicrotask(sync)).observe(cart,{childList:true});}
 window.addEventListener('storage',sync);document.addEventListener('imamstore:open-product',()=>queueMicrotask(sync));document.addEventListener('imamstore:cart-changed',sync);
-window.imamstoreV43=Object.freeze({isSelected,selected,openVoucher,sync,getVoucher:()=>totals().voucher,getVouchers:()=>({product:totals().productVoucher,shipping:totals().shippingVoucher}),totals,transactionsActive:true});sync();
+window.imamstoreV43=Object.freeze({isSelected,selected,openVoucher,sync,getVoucher:()=>totals(checkoutLines()||undefined).voucher,getVouchers:()=>({product:totals(checkoutLines()||undefined).productVoucher,shipping:totals(checkoutLines()||undefined).shippingVoucher}),totals,checkoutTotals:()=>totals(checkoutLines()||undefined),transactionsActive:true});sync();
 })();</script><script id="imamstore-v46-scroll-threshold">(()=>{'use strict';
 const detail=document.getElementById('imamstoreLiveOriginalDetail');if(!detail)return;
 let scrollNode=null;
@@ -4836,11 +4883,12 @@ async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='func
 async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
 const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
-const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.totals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
+const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.checkoutTotals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
 const directBuy=window.__nexaiCheckoutMode==='detail'&&$('s5Draft')?.classList.contains('open');
-const appliedProductDiscount=directBuy?0:Math.max(0,Math.min(subtotal,Number(productDiscount)||0));
-const appliedShippingDiscount=directBuy?0:Math.max(0,Number(shippingDiscount)||0);
-const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:directBuy?null:(vouchers.product?.name||null),shippingVoucherName:directBuy?null:(vouchers.shipping?.name||null)};
+const appliedProductDiscount=Math.max(0,Math.min(subtotal,Number(productDiscount)||0));
+// Ongkir belum diketahui: voucher ongkir dicatat sebagai potensi, bukan mengurangi total barang.
+const appliedShippingDiscount=0;
+const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
 const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
 const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
 if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
