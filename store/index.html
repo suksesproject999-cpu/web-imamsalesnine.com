@@ -750,6 +750,14 @@ padding-bottom:env(safe-area-inset-bottom)!important;font-family:inherit!importa
 .nf-cart-footer-clean[data-mode="edit"] .nf-delete-selected{border-color:#f05235!important;color:#f05235!important}
 .nf-cart-footer-clean button:disabled{opacity:.45!important}
 </style>
+
+<!-- Tahap 5E.2: SweetAlert confirmation must overlay the full-screen checkout (#s5Draft).
+     The checkout uses z-index:2147483000, higher than SweetAlert2's default 1060. -->
+<style id="nexai-checkout-swal-layer-v52">
+body > .swal2-container:not(.swal2-toast-shown) {
+  z-index: 2147483644 !important;
+}
+</style>
 </head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
