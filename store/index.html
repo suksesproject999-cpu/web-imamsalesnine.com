@@ -2812,7 +2812,7 @@ const V=window.V38=window.V38||{};
  if(current!==Number(line.harga)){warnings.push(line.nama+': harga berubah dari '+fmt(line.harga)+' menjadi '+fmt(current)+'.');continue}
  checked.push({...line,harga:current})}
  if(warnings.length){alert('Ringkasan pesanan ditahan karena data katalog berubah atau belum siap:\n\n'+warnings.join('\n')+'\n\nPeriksa ulang produk sebelum melanjutkan.');return}
- if(!checked.length)return;window.__nexaiCheckoutLines=checked.map(x=>({...x}));draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
+ if(!checked.length)return;window.__nexaiCheckoutLines=checked.map(x=>({...x}));window.__nexaiCheckoutMode=draftOrigin;draftItems=checked;cartPanel.classList.remove('open');draft.classList.add('open');document.body.classList.add('stage4-detail-open');const target=el('s5DraftItems');target.replaceChildren();checked.forEach(x=>target.append(row(x,false)));text('s5DraftTotal','SIMULASI — bukan pesanan. Subtotal (belum termasuk ongkir): '+total(checked))}
  document.addEventListener('imamstore:cart-line-updated',()=>{
   if(!cartPanel.classList.contains('open'))return;
   const data=read();
@@ -2831,7 +2831,7 @@ const V=window.V38=window.V38||{};
   document.body.classList.remove('stage4-detail-open');
  };
  el('s5DraftBack').onclick=()=>{
-  draftItems=null;draft.classList.remove('open');
+  draftItems=null;window.__nexaiCheckoutLines=null;window.__nexaiCheckoutMode=null;draft.classList.remove('open');
   if(draftOrigin==='detail'){
    document.getElementById('imamstoreLiveOriginalDetail')?.classList.add('open');
    document.body.classList.add('imamstore-original-open');
@@ -4361,8 +4361,9 @@ function refreshCheckout(){
  const rows=Array.isArray(window.__nexaiCheckoutLines)?window.__nexaiCheckoutLines:read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);
  const count=rows.reduce((a,x)=>a+(Number(x.qty)||0),0);
  const sum=rows.reduce((a,x)=>a+(Number(x.qty)||0)*(Number(x.harga)||0),0);
- const voucher=window.imamstoreV43?.totals?.().voucher||null;
- const discount=Math.min(sum,window.imamstoreV43?.totals?.().discount||0);
+ const directBuy=window.__nexaiCheckoutMode==='detail';
+ const voucher=directBuy?null:(window.imamstoreV43?.totals?.().voucher||null);
+ const discount=directBuy?0:Math.min(sum,window.imamstoreV43?.totals?.().discount||0);
  const total=Math.max(0,sum-discount);
  $('refCheckoutCount').textContent=count;
  $('refCheckoutSubtotal').textContent=money(sum);
@@ -4775,7 +4776,15 @@ const KEY='imamstore_cart_stage5',ADMIN='6282210109369';let busy=false;
 const money=n=>'Rp '+Math.round(Number(n)||0).toLocaleString('id-ID');
 const read=(key,def)=>{try{return JSON.parse(localStorage.getItem(key)||'null')??def}catch{return def}};
 const popup=(icon,title,text)=>window.Swal?.fire?window.Swal.fire({icon,title,text,confirmButtonColor:'#8cc63f',width:'min(90vw,410px)'}):Promise.resolve((note.textContent=title+' — '+text));
-const selected=()=>{const cart=read(KEY,[]);return (Array.isArray(cart)?cart:[]).filter(x=>x&&Number(x.qty)>0&&window.imamstoreV43?.isSelected?.(x.key)!==false)};
+const selected=()=>{
+ const draft=$('s5Draft');
+ if(draft?.classList.contains('open')){
+  const lines=window.__nexaiCheckoutLines;
+  return Array.isArray(lines)?lines.filter(x=>x&&Number(x.qty)>0):[];
+ }
+ const cart=read(KEY,[]);
+ return (Array.isArray(cart)?cart:[]).filter(x=>x&&Number(x.qty)>0&&window.imamstoreV43?.isSelected?.(x.key)!==false);
+};
 const ready=()=>!busy&&selected().length>0;
 function refresh(){button.disabled=!ready();button.setAttribute('aria-disabled',String(button.disabled))}
 function address(){const a=read('imamstore_ref_addresses_v38',[]),summary=$('refAddressSummary')?.textContent?.trim()||'';return (Array.isArray(a)?a:[]).find(x=>x.full===summary)||(Array.isArray(a)?a:[]).find(x=>summary.includes(x.full))||null}
@@ -4789,7 +4798,10 @@ async function submit(){if(busy)return;if(typeof window.nexaiRequireCustomerLogi
 const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
 const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.totals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
-const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount,shippingDiscount,totalBayar:subtotal-productDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
+const directBuy=window.__nexaiCheckoutMode==='detail'&&$('s5Draft')?.classList.contains('open');
+const appliedProductDiscount=directBuy?0:Math.max(0,Math.min(subtotal,Number(productDiscount)||0));
+const appliedShippingDiscount=directBuy?0:Math.max(0,Number(shippingDiscount)||0);
+const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:directBuy?null:(vouchers.product?.name||null),shippingVoucherName:directBuy?null:(vouchers.shipping?.name||null)};
 const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
 const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
 if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
@@ -4809,7 +4821,8 @@ if(result.isConfirmed){const url='https://wa.me/'+ADMIN+'?text='+encodeURICompon
 /* Checkout state stays mounted until the success dialog is dismissed.
    Only now reconcile the purchased cart lines. */
 /* Remove only purchased lines from local cart, preserving unselected lines. */
-try{const cart=read(KEY,[]),counts=new Map();lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
+try{const cart=read(KEY,[]),counts=new Map();if(!directBuy)lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
+window.__nexaiCheckoutLines=null;window.__nexaiCheckoutMode=null;
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';
 }catch(err){console.error('Checkout original Firebase',err);window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent='Buat Pesanan';refresh()}}
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan dicatat ke Firebase dan dikonfirmasi melalui WhatsApp.';refresh();
