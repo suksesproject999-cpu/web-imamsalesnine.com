@@ -6309,8 +6309,8 @@ schedule();
   <div id="nexaiOrdersList"></div>
   <p style="font-size:12px;color:#6a7167;line-height:1.6">Nomor pesanan berbeda dari resi/AWB. Status pengiriman hanya ditampilkan jika sudah dicatat oleh penjual. Pesanan tanpa akun memerlukan verifikasi penjual; tidak dapat dibuka menggunakan nomor pesanan saja.</p>
  </section>
-</div><script id="nexai-order-history-v2-js">
-(function(){
+</div><script id="nexai-order-history-v3-js">
+document.addEventListener('DOMContentLoaded',function(){
 'use strict';
 const dialog=document.getElementById('nexaiOrdersDialog'),message=document.getElementById('nexaiOrdersMessage'),list=document.getElementById('nexaiOrdersList');
 const invoice=document.getElementById('nexaiInvoiceDialog'),invoiceBody=document.getElementById('nexaiInvoiceBody');
@@ -6402,8 +6402,8 @@ invoice.addEventListener('click',e=>{if(e.target===invoice)closeInvoice()});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!invoice.hidden)closeInvoice();else if(!dialog.hidden)close()}});
 const actions=document.querySelector('.hero-actions')||document.querySelector('.store-actions');
 if(actions&&!document.getElementById('nexaiOrdersLauncher')){const b=el('button','nexai-orders-open','Pesanan Saya');b.id='nexaiOrdersLauncher';b.type='button';b.addEventListener('click',open);actions.append(b)}
-if(new URLSearchParams(location.search).get('orders')==='1'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',open,{once:true});else open()}
-})();
+if(new URLSearchParams(location.search).get('orders')==='1'){open()}
+});
 </script>
 
 <style id="nexai-customer-login-style">
