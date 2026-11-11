@@ -4935,6 +4935,7 @@ window.imamstoreV43=Object.freeze({
   }
   window.__nexaiCheckoutLines=snapshot;
   reconcileVoucher('checkout',snapshot);
+  document.dispatchEvent(new CustomEvent('imamstore:checkout-variant-updated',{detail:{items:snapshot}}));
   window.dispatchEvent(new CustomEvent('imamstore:checkout-variant-updated',{detail:{items:snapshot}}));
   return true;
  },
@@ -5109,8 +5110,8 @@ function quote(p,now=Date.now()){const normal=num(p?.harga?.normal)||num(p?.harg
 function variantQuote(p,name,now=Date.now()){
  const base=quote(p,now);
  const variants=Array.isArray(p?.varian)?p.varian:[];
- const selected=String(name??'');
- const match=variants.find(v=>String(typeof v==='string'?v:(v?.nama??v?.name??v?.label??''))===selected);
+ const selected=String(name??'').trim().toLocaleLowerCase('id');
+ const match=variants.find(v=>String(typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna??'')).trim().toLocaleLowerCase('id')===selected);
  // Varian hanya identitas pilihan. Harga selalu berasal dari harga produk aktif.
  // Jangan mengambil match.harga, match.price, atau harga tersimpan di keranjang.
  const variantFound=!!match;
@@ -5131,7 +5132,7 @@ const banner=root.querySelector('.nine-detail-flash-badge [data-nine-flash-end]'
 const stickyPrice=root.querySelector('#stickyPrice');setText(stickyPrice,fmt(q.price));setText(root.querySelector('#stickyNormalPrice'),q.percent?fmt(q.normal):'');
 const qty=num(root.querySelector('#stickyQty')?.textContent)||1;setText(root.querySelector('#stickyTotal'),fmt(q.price*qty));
 const purchase=document.getElementById('imamstoreOriginalPurchase');if(purchase?.classList.contains('open')){const actionPrice=purchase.querySelector('#imamstorePurchasePrice');setText(actionPrice,fmt(q.price))}
-const purchase2=document.getElementById('refPurchasePrice');if(purchase2){setText(purchase2,fmt(q.price));setText(document.getElementById('refPurchaseNormal'),q.percent?fmt(q.normal):'');setText(document.getElementById('refPurchaseBadge'),q.percent?'-'+q.percent+'%':'');/* saving is owned by updatePurchase() and follows quantity */}
+const purchase2=document.getElementById('refPurchasePrice');if(purchase2&&purchase?.dataset.nineEditing!=='true'){setText(purchase2,fmt(q.price));setText(document.getElementById('refPurchaseNormal'),q.percent?fmt(q.normal):'');setText(document.getElementById('refPurchaseBadge'),q.percent?'-'+q.percent+'%':'');/* saving is owned by updatePurchase() and follows quantity */}
 const voucher=info.querySelector('.nine-voucher');if(voucher)voucher.style.display='';
 }
 let lastState='';function tick(){const data=catalog(),now=Date.now();const state=data.map(p=>{const f=p.flashSale;return f?.enabled?String(p.id)+':'+Number(active(p,now))+':'+quote(p,now).price:''}).filter(Boolean).join('|');const changed=state!==lastState;if(changed){lastState=state;updateCart();document.dispatchEvent(new CustomEvent('imamstore:flash-price-change'));window.imamstoreReferenceV38?.refresh?.()}updateDetail()}
