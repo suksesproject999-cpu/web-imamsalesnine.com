@@ -4454,23 +4454,22 @@ $('refTermsBody').onchange=e=>{$('refTermsFooter').checked=e.target.checked};$('
 function updatePurchase(){
  if($('imamstoreOriginalPurchase')?.dataset.nineEditing==='true')return;
  const p=window.imamstoreActiveProduct||window.imamstoreV29?.currentProduct?.();if(!p)return;
- const input=$('imamstorePurchaseQty'),saving=$('refPurchaseSaving');
- if(!input||!saving)return;
+ const input=$('imamstorePurchaseQty');if(!input)return;
  const qty=Math.max(1,Math.floor(Number(input.value)||1));
- const q=window.imamstoreUnifiedPrice?.quote?.(p);
- const variantName=$('imamstorePurchaseVariant')?.value;
- const variant=Array.isArray(p.varian)?p.varian.find(v=>String(typeof v==='string'?v:(v.nama||v.name||v.label||''))===String(variantName)):null;
- const normal=Number(variant?.harga?.normal ?? q?.normal ?? p.harga?.normal)||0;
- const promo=Number(variant?.harga?.promo ?? variant?.harga?.jual ?? q?.price ?? p.harga?.promo ?? normal)||normal;
- const unitSaving=Math.max(0,normal-promo);
- const set=(id,value)=>{const el=$(id);if(el)el.textContent=value};
- set('refPurchasePrice',money(promo));
- set('refPurchaseNormal',unitSaving?money(normal):'');
- set('refPurchaseBadge',normal>0&&unitSaving?'-'+Math.round(unitSaving/normal*100)+'%':'');
- set('refPurchaseSaving',unitSaving?'Hemat '+money(unitSaving):'');
- set('ninePurchaseBudgetValue',money(promo*qty));
+ const name=$('imamstorePurchaseVariant')?.value;
+ const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name)||window.imamstoreUnifiedPrice?.quote?.(p);
+ if(!q)return;
+ const set=(id,value)=>{const el=$(id);if(el&&el.textContent!==value)el.textContent=value};
+ const valid=q.verified!==false&&q.price>0;
+ set('refPurchasePrice',valid?money(q.price):'Harga belum tersedia');
+ set('refPurchaseNormal',valid&&q.saving?money(q.normal):'');
+ set('refPurchaseBadge',valid&&q.percent?'-'+q.percent+'%':'');
+ set('refPurchaseSaving',valid&&q.saving?'Hemat '+money(q.saving):'');
+ set('ninePurchaseBudgetValue',valid?money(q.price*qty):'—');
+ set('ninePurchaseBudgetLabel','Total belanja · '+qty+' pcs');
  set('refPurchaseStock','Stok: '+((p.stok?.jumlah===null||p.stok?.jumlah===undefined||p.stok?.jumlah==='')?'Perlu konfirmasi':p.stok.jumlah));
 }
+
 const purchaseQty=$('imamstorePurchaseQty');
 if(purchaseQty){
  // Satu jalur hitung ulang untuk ketik manual, +/- dan perubahan nilai via kode.
@@ -4634,14 +4633,15 @@ function openVariant(index, source='cart'){
  const alternate=window.imamstoreV29?.products?.()?.find(x=>String(x.id)===String(original.id));
  const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
  let chosen=String(original.varian||choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
- const priceOf=name=>{
-  const v=variants(p).find(v=>variantLabel(v)===name);
-  const raw=v&&typeof v==='object'?(v.harga?.promo??v.harga?.normal??v.harga??v.price):null;
-  const n=raw==null?NaN:Number(raw);
-  if(Number.isFinite(n)&&n>0)return n;
-  // Harga item lama hanya sah untuk varian yang SAMA, bukan varian baru.
-  return name===String(original.varian||'')&&Number(original.harga)>0?Number(original.harga):NaN;
+ const variantPrice=name=>{
+  const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);
+  if(q?.verified&&q.price>0)return q;
+  // Harga lama hanya boleh digunakan untuk varian yang sama.
+  if(name===String(original.varian||'')&&Number(original.harga)>0)
+   return {price:Number(original.harga),normal:0,saving:0,percent:0,verified:true};
+  return {price:NaN,normal:0,saving:0,percent:0,verified:false};
  };
+ const priceOf=name=>variantPrice(name).price;
  const stockOf=name=>{
   const v=variants(p).find(v=>variantLabel(v)===name);
   const raw=v&&typeof v==='object'?(v.stok??v.stock):null;
@@ -4681,11 +4681,10 @@ function openVariant(index, source='cart'){
 
   const price=$('refPurchasePrice');if(price)price.textContent=Number.isFinite(unit)?'Rp'+unit.toLocaleString('id-ID'):'Harga belum tersedia';
   const match=variants(p).find(v=>variantLabel(v)===chosen);
-  const normalRaw=match&&typeof match==='object'?(match.harga?.normal??match.harga_normal??match.originalPrice):null;
-  const productNormal=p?.harga?.normal;
-  const normal=Number(normalRaw??(match?null:productNormal));
-  const saving=Number.isFinite(unit)&&Number.isFinite(normal)&&normal>unit?Math.max(0,normal-unit):0;
-  const pct=saving?Math.round(saving/normal*100):0;
+  const quoted=variantPrice(chosen);
+  const normal=Number(quoted.normal)||0;
+  const saving=Number(quoted.saving)||0;
+  const pct=Number(quoted.percent)||0;
   const badge=$('refPurchaseBadge'),oldSaving=$('refPurchaseSaving'),normalLabel=$('refPurchaseNormal');
   if(badge)badge.textContent=saving?'-'+pct+'%':'';
   if(oldSaving)oldSaving.textContent='';
@@ -4694,6 +4693,7 @@ function openVariant(index, source='cart'){
   if(saveLabel)saveLabel.textContent=saving?'Hemat Rp'+saving.toLocaleString('id-ID'):'';
   const budgetValue=$('ninePurchaseBudgetValue');
   if(budgetValue)budgetValue.textContent=Number.isFinite(unit)?'Rp'+(unit*qty).toLocaleString('id-ID'):'—';
+  const budgetLabel=$('ninePurchaseBudgetLabel');if(budgetLabel)budgetLabel.textContent='Total belanja · '+qty+' pcs';
   const pic=match&&typeof match==='object'?(match.gambar||match.image||match.foto||match.thumbnail):null;
   if(pic&&photo)photo.src=typeof pic==='string'?pic:(pic.url||pic.src||photo.src);
   const grid=sheet.querySelector('.ref-v45-variant-grid');
@@ -5041,10 +5041,26 @@ const KEY='imamstore_cart_stage5',fmt=n=>'Rp '+Math.round(Number(n)||0).toLocale
 const num=v=>{const n=Number(v);return Number.isFinite(n)&&n>0?n:0};
 function active(p,now=Date.now()){const f=p?.flashSale,start=Date.parse(f?.startAt||''),end=Date.parse(f?.endAt||''),price=num(f?.price),normal=num(p?.harga?.normal??p?.harga);return f?.enabled===true&&Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&price>0&&price<normal}
 function quote(p,now=Date.now()){const normal=num(p?.harga?.normal)||num(p?.harga),regular=num(p?.harga?.promo),flash=active(p,now);const price=flash?num(p.flashSale.price):(regular>0&&regular<normal?regular:normal);return {normal,price,flash,percent:normal>price?Math.round((normal-price)/normal*100):0,saving:Math.max(0,normal-price),endAt:flash?Date.parse(p.flashSale.endAt):null}}
-window.nineFlashActive=active;window.nineEffectivePromo=p=>quote(p).price;window.imamstoreUnifiedPrice=Object.freeze({quote,active,version:'v53'});
+function variantQuote(p,name,now=Date.now()){
+ const base=quote(p,now);
+ const variants=Array.isArray(p?.varian)?p.varian:[];
+ const match=variants.find(v=>String(typeof v==='string'?v:(v?.nama??v?.name??v?.label??''))===String(name??''));
+ if(!match)return {...base,verified:variants.length===0||!name,variantFound:false};
+ if(typeof match==='string')return {...base,verified:base.price>0,variantFound:true};
+ const value=v=>{const n=Number(v);return Number.isFinite(n)&&n>0?n:0};
+ const h=match.harga;
+ const normal=value(h&&typeof h==='object'?h.normal:(match.harga_normal??match.originalPrice??h));
+ const promo=value(h&&typeof h==='object'?(h.promo??h.jual):match.price);
+ const regular=promo>0?promo:normal;
+ // Flash sale di katalog adalah promo level produk; pertahankan prioritas aslinya.
+ const price=base.flash?base.price:regular;
+ const original=normal||(!base.flash&&price===base.price?base.normal:0);
+ return {normal:original,price,flash:base.flash,percent:original>price?Math.round((original-price)/original*100):0,saving:Math.max(0,original-price),endAt:base.endAt,verified:price>0,variantFound:true};
+}
+window.nineFlashActive=active;window.nineEffectivePromo=p=>quote(p).price;window.imamstoreUnifiedPrice=Object.freeze({quote,variantQuote,active,version:'refactor-1'});
 const catalog=()=>{try{return window.imamstoreV29?.products?.()||[]}catch{return []}};
 const find=id=>catalog().find(p=>String(p.id)===String(id));
-function updateCart(){let lines;try{lines=JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return false}if(!Array.isArray(lines)||!lines.length)return false;let changed=false;for(const line of lines){const p=find(line.id);if(!p)continue;const q=quote(p),variant=Array.isArray(p.varian)?p.varian.find(v=>typeof v==='object'&&String(v.nama||v.name||v.label)===String(line.varian)):null;const variantPrice=num(variant?.harga?.promo??variant?.harga?.normal??variant?.harga??variant?.price);const next=q.flash?q.price:(variantPrice>0?variantPrice:q.price);if(next>0&&num(line.harga)!==next){line.harga=next;changed=true}}if(changed){try{localStorage.setItem(KEY,JSON.stringify(lines))}catch{return false}document.dispatchEvent(new CustomEvent('imamstore:prices-updated'));window.dispatchEvent(new Event('storage'))}return changed}
+function updateCart(){let lines;try{lines=JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return false}if(!Array.isArray(lines)||!lines.length)return false;let changed=false;for(const line of lines){const p=find(line.id);if(!p)continue;const q=variantQuote(p,line.varian);const next=q.verified?q.price:0;if(next>0&&num(line.harga)!==next){line.harga=next;changed=true}}if(changed){try{localStorage.setItem(KEY,JSON.stringify(lines))}catch{return false}document.dispatchEvent(new CustomEvent('imamstore:prices-updated'));window.dispatchEvent(new Event('storage'))}return changed}
 function setText(el,text){if(el&&el.textContent!==text)el.textContent=text}
 function updateDetail(){const root=document.getElementById('imamstoreLiveOriginalDetail');if(!root?.classList.contains('open'))return;const current=window.imamstoreActiveProduct;const catalogProduct=current&&find(current.id);const p=catalogProduct?.flashSale?.endAt?catalogProduct:current;if(!p)return;const q=quote(p),info=root.querySelector('.product-info');if(!info)return;
 const price=info.querySelector('.nine-price-row .price');setText(price,fmt(q.price));const old=info.querySelector('.nine-old-price');if(old){const target=q.percent?`<del>${fmt(q.normal)}</del><span class="nine-discount-percent">-${q.percent}%</span>`:'';if(old.innerHTML!==target)old.innerHTML=target}
