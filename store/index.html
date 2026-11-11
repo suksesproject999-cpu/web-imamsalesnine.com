@@ -2829,7 +2829,15 @@ const V=window.V38=window.V38||{};
    document.body.classList.add('imamstore-original-open');
   }else openCart();
  };
- el('s5Checkout').onclick=openDraft;
+ el('s5Checkout').onclick=async function(){
+  if(typeof window.nexaiRequireCustomerLogin!=='function'){
+    alert('Login pelanggan belum siap. Muat ulang halaman dan coba lagi.');return;
+  }
+  try{
+    if(!await window.nexaiRequireCustomerLogin())return;
+    openDraft();
+  }catch(e){console.error('Checkout login guard',e);alert('Login gagal. Coba kembali.')}
+ };
 
  // Product detail original -> existing local cart and checkout simulation.
  window.imamstoreCartBridge=Object.freeze({
@@ -4769,7 +4777,7 @@ function price(x){return Number(x.harga??x.price??x.unitPrice??0)||0}
 function orderId(){try{return crypto.randomUUID()}catch{return 'ORD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8)}}
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy)return;if(!await window.nexaiRequireCustomerLogin?.()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
+async function submit(){if(busy)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
 const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
 const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.totals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
@@ -4785,12 +4793,16 @@ const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,p
    dari checkout browser yang belum diverifikasi admin. */
 await store.collection('orders').doc(d.orderId).set(order);
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
-/* Remove only purchased lines from local cart, preserving unselected lines. */
-try{const cart=read(KEY,[]),counts=new Map();lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
+button.textContent='Pesanan tercatat';
 const result=await (window.Swal?.fire?Swal.fire({icon:'success',title:'Pesanan berhasil dicatat',html:'<p>Nomor pesanan:</p><strong style="font-size:19px;word-break:break-all">'+String(d.orderId).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</strong><p style="font-size:13px;color:#666;margin-top:12px">Simpan nomor ini. Pesanan masih menunggu konfirmasi melalui WhatsApp; ini bukan nomor resi pengiriman.</p>',showCancelButton:true,showDenyButton:true,confirmButtonText:'Lanjut WhatsApp',denyButtonText:'Salin Nomor',cancelButtonText:'Tutup',confirmButtonColor:'#8cc63f',denyButtonColor:'#51664a'}):Promise.resolve({isConfirmed:true}));
 if(result.isDenied){try{await navigator.clipboard.writeText(String(d.orderId));window.imamstoreToast?.('Nomor pesanan disalin.','success')}catch(_){window.prompt('Salin nomor pesanan:',String(d.orderId))}}
 if(result.isConfirmed){const url='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,items,summary));const w=window.open(url,'_blank','noopener,noreferrer');if(!w)location.href=url}
+/* Checkout state stays mounted until the success dialog is dismissed.
+   Only now reconcile the purchased cart lines. */
+/* Remove only purchased lines from local cart, preserving unselected lines. */
+try{const cart=read(KEY,[]),counts=new Map();lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
+if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';
 }catch(err){console.error('Checkout original Firebase',err);window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent='Buat Pesanan';refresh()}}
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan dicatat ke Firebase dan dikonfirmasi melalui WhatsApp.';refresh();
 window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51'});
