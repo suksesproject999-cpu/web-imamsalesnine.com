@@ -4836,7 +4836,7 @@ for(const id of ['refCheckoutCount','refCheckoutSubtotal','refCheckoutDiscount',
 }
 for(const id of ['refTermsBody','refTermsFooter']){const el=$(id);if(el)el.checked=false}
 if($('refOrderNote'))$('refOrderNote').value='';
-if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat. Buka Pesanan Saya untuk melihat status.';
+if(note)note.textContent='';
 try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catch(e){console.warn('Refresh setelah checkout',e)}
 
 }catch(err){console.error('Checkout original Firebase',err);if(committed){console.warn('Pesanan telah tersimpan; kegagalan hanya terjadi pada langkah pasca-checkout.',err);return;}window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
@@ -4844,7 +4844,7 @@ try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catc
 const checkoutPanel=$('s5Draft');let lastOpen=!!checkoutPanel?.classList.contains('open');
 if(checkoutPanel)new MutationObserver(()=>{
  const now=checkoutPanel.classList.contains('open');
- if(now&&!lastOpen){committed=false;button.textContent='Buat Pesanan';refresh()}
+ if(now&&!lastOpen){committed=false;button.textContent='Buat Pesanan';if(note)note.textContent='';refresh()}
  lastOpen=now;
 }).observe(checkoutPanel,{attributes:true,attributeFilter:['class']});
 /* Penangkap awal mencegah handler lain mengirim ulang ketika transaksi sudah commit. */
@@ -6312,45 +6312,96 @@ schedule();
 </div><script id="nexai-order-history-v2-js">
 (function(){
 'use strict';
-const dialog=document.getElementById('nexaiOrdersDialog');
-const message=document.getElementById('nexaiOrdersMessage');
-const list=document.getElementById('nexaiOrdersList');
-if(!dialog||!message||!list)return;
-let previousFocus=null;
-function close(){dialog.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.()}
-function text(tag,value){const el=document.createElement(tag);el.textContent=String(value??'');return el}
-function row(data){
- const card=document.createElement('article');card.className='nexai-order-card';
- card.appendChild(text('strong',data.orderId||'Nomor tidak tersedia'));
- const status=String(data.status||'Belum diperbarui');
- card.appendChild(text('p','Status: '+(status==='checkout_created'?'Pesanan tercatat — menunggu konfirmasi':status)));
- card.appendChild(text('p','Dibuat: '+(data.createdAt?.toDate?.()?.toLocaleString('id-ID')||'Waktu belum tersedia')));
- if(data.awb||data.resi||data.trackingNumber)card.appendChild(text('p','Nomor resi: '+(data.awb||data.resi||data.trackingNumber)));
- const btn=text('button','Salin nomor pesanan');btn.type='button';btn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(data.orderId||''));btn.textContent='Tersalin'}catch{btn.textContent='Salin manual: '+String(data.orderId||'')}});card.appendChild(btn);
- return card;
+const dialog=document.getElementById('nexaiOrdersDialog'),message=document.getElementById('nexaiOrdersMessage'),list=document.getElementById('nexaiOrdersList');
+const invoice=document.getElementById('nexaiInvoiceDialog'),invoiceBody=document.getElementById('nexaiInvoiceBody');
+if(!dialog||!message||!list||!invoice||!invoiceBody)return;
+let previousFocus=null,detailFocus=null,loading=false,loadToken=0;
+const el=(tag,cls,content)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(content!==undefined)e.textContent=String(content??'');return e};
+const val=v=>v===null||v===undefined||String(v).trim()===''?'Belum tersedia':String(v);
+const rupiah=n=>Number.isFinite(Number(n))?'Rp'+Math.round(Number(n)).toLocaleString('id-ID'):'Belum tersedia';
+const date=v=>{try{const d=v?.toDate?.()||(v?.seconds?new Date(v.seconds*1000):v?new Date(v):null);return d&&!isNaN(d.getTime())?d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'Belum tersedia'}catch{return 'Belum tersedia'}};
+const statuses={checkout_created:'Menunggu konfirmasi',pending:'Menunggu konfirmasi',confirmed:'Dikonfirmasi',processing:'Diproses',packed:'Dikemas',shipped:'Dikirim',delivered:'Terkirim',completed:'Selesai',cancelled:'Dibatalkan',canceled:'Dibatalkan'};
+const status=v=>statuses[String(v||'').toLowerCase()]||val(v);
+const line=(parent,label,value)=>{const row=el('div','nexai-invoice-line');row.append(el('span','',label),el('strong','',val(value)));parent.append(row)};
+const section=(heading)=>{const node=el('section','nexai-invoice-section');node.append(el('h3','',heading));invoiceBody.append(node);return node};
+function closeInvoice(){invoice.hidden=true;invoiceBody.replaceChildren();detailFocus?.focus?.()}
+function close(){loadToken++;closeInvoice();dialog.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.()}
+function showInvoice(data){
+ detailFocus=document.activeElement;invoiceBody.replaceChildren();
+ const id=val(data.orderId),customer=data.customer||{},totals=data.totals||{},items=Array.isArray(data.items)?data.items:[];
+ const heading=section('Informasi pesanan');
+ line(heading,'Nomor pesanan',id);line(heading,'Dibuat',date(data.createdAt));line(heading,'Diperbarui',date(data.updatedAt));
+ line(heading,'Status pesanan',status(data.status));line(heading,'Metode pemesanan',data.channel==='whatsapp'?'Konfirmasi via WhatsApp':val(data.channel));
+ const productSection=section('Produk yang dipesan');
+ if(!items.length)productSection.append(el('p','nexai-invoice-footnote','Rincian produk belum tersedia.'));
+ items.forEach(x=>{
+  const card=el('div','nexai-invoice-product'),info=el('div','nexai-invoice-product-info');
+  info.append(el('strong','',val(x.nama||x.name||x.title)),el('small','','Varian: '+val(x.varian||x.variant)+' · Jumlah: '+val(x.qty)));
+  info.append(el('strong','',rupiah(Number(x.harga)*Number(x.qty))));
+  // Gambar hanya dari URL HTTPS yang sudah tersimpan dalam pesanan; tidak ditebak.
+  const src=String(x.image||x.gambar||'');
+  if(/^https:\/\/[^ ]+$/i.test(src)){const img=el('img');img.src=src;img.alt='Foto produk';img.loading='lazy';img.referrerPolicy='no-referrer';card.append(img)}
+  card.append(info);productSection.append(card);
+ });
+ const ship=section('Penerima & pengiriman');
+ line(ship,'Nama penerima',customer.nama||customer.name);line(ship,'WhatsApp',customer.wa||customer.phone);
+ line(ship,'Alamat',customer.alamat||customer.address);line(ship,'Kota',customer.kota||customer.city);
+ line(ship,'Provinsi',customer.provinsi||customer.province);line(ship,'Kode pos',customer.kodepos||customer.postal);
+ line(ship,'Ekspedisi',data.ekspedisi||data.shipping?.courier);
+ line(ship,'Nomor resi / AWB',data.awb||data.resi||data.trackingNumber||data.shipping?.awb);
+ const breakdown=section('Ringkasan pembayaran');
+ line(breakdown,'Jumlah item',totals.totalItem??items.reduce((a,x)=>a+(Number(x.qty)||0),0));
+ line(breakdown,'Subtotal produk',rupiah(totals.subtotal));
+ line(breakdown,'Diskon produk',rupiah(totals.productDiscount||0));
+ line(breakdown,'Voucher produk',totals.productVoucherName||data.vouchers?.product);
+ line(breakdown,'Potongan ongkir',rupiah(totals.shippingDiscount||0));
+ line(breakdown,'Voucher ongkir',totals.shippingVoucherName||data.vouchers?.shipping);
+ line(breakdown,'Ongkos kirim',Number.isFinite(Number(data.shippingCost))&&data.shippingCost!==undefined?rupiah(data.shippingCost):'Dikonfirmasi penjual');
+ const total=el('div','nexai-invoice-line nexai-invoice-total');total.append(el('span','','Total pesanan'),el('strong','',rupiah(totals.totalBayar)));breakdown.append(total);
+ if(data.catatan){const notes=section('Catatan pelanggan');notes.append(el('p','nexai-invoice-footnote',data.catatan))}
+ const foot=el('p','nexai-invoice-footnote','Ini rincian pesanan, bukan bukti pembayaran. Total dan ongkir akhir mengikuti konfirmasi penjual. Nomor pesanan bukan nomor resi.');
+ invoiceBody.append(foot);
+ const copy=el('button','nexai-invoice-primary','Salin nomor pesanan');copy.type='button';copy.addEventListener('click',()=>copyId(id,copy));invoiceBody.append(copy);
+ invoice.hidden=false;invoice.querySelector('.nexai-invoice-panel').scrollTop=0;document.getElementById('nexaiInvoiceClose')?.focus();
+}
+async function copyId(id,button){try{await navigator.clipboard.writeText(id);button.textContent='Nomor berhasil disalin'}catch{window.prompt('Salin nomor pesanan:',id)}}
+function renderOrder(data){
+ const card=el('article','nexai-order-card'),top=el('div','nexai-order-top'),left=el('div');
+ left.append(el('strong','',date(data.createdAt)),el('span','nexai-order-number','No. '+val(data.orderId)));
+ top.append(left,el('span','nexai-status',status(data.status)));card.append(top);
+ const items=Array.isArray(data.items)?data.items:[];
+ const names=items.map(x=>x.nama||x.name||x.title).filter(Boolean);
+ card.append(el('div','nexai-order-preview',names.length?names.slice(0,2).join(' · ')+(names.length>2?' +'+(names.length-2)+' produk lainnya':''):'Rincian produk belum tersedia'));
+ const total=el('div','nexai-order-money');total.append(el('span','','Total pesanan'),el('strong','',rupiah(data.totals?.totalBayar)));card.append(total);
+ const actions=el('div','nexai-order-actions');
+ const detail=el('button','nexai-detail-btn','Lihat Rincian');detail.type='button';detail.addEventListener('click',()=>showInvoice(data));
+ const copy=el('button','','Salin Nomor');copy.type='button';copy.addEventListener('click',()=>copyId(val(data.orderId),copy));
+ actions.append(detail,copy);card.append(actions);return card;
 }
 async function open(){
- previousFocus=document.activeElement;dialog.hidden=false;document.body.style.overflow='hidden';document.getElementById('nexaiOrdersClose')?.focus();list.replaceChildren();message.textContent='Memeriksa akun pelanggan…';
+ const token=++loadToken;previousFocus=document.activeElement;dialog.hidden=false;document.body.style.overflow='hidden';document.getElementById('nexaiOrdersClose')?.focus();list.replaceChildren();message.textContent='Memeriksa akun pelanggan…';
  try{
-  if(!window.firebase?.auth||!window.firebase?.firestore){message.textContent='Layanan akun belum siap. Silakan coba lagi nanti.';return}
-  const auth=firebase.auth();await auth.authStateReady?.();const user=auth.currentUser;
-  if(!user||user.isAnonymous){message.textContent='Masuk menggunakan Google atau email untuk melihat pesanan akun Anda.';const b=text('button','Masuk ke akun pelanggan');b.type='button';b.className='nexai-orders-open';b.addEventListener('click',async()=>{if(await window.nexaiRequireCustomerLogin?.())open()});list.appendChild(b);return}
-  message.textContent='Memuat pesanan akun Anda…';
-  const snapshot=await firebase.firestore().collection('orders').where('uid','==',user.uid).limit(40).get();
-  const docs=snapshot.docs.map(d=>d.data()).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
-  if(!docs.length){message.textContent='Belum ada pesanan yang terhubung ke akun ini. Pesanan yang dibuat sebagai tamu tidak otomatis muncul.';return}
-  message.textContent='Menampilkan '+docs.length+' pesanan terbaru yang terhubung ke akun ini.';
-  docs.forEach(data=>list.appendChild(row(data)));
- }catch(e){console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Akses pesanan belum diizinkan oleh aturan keamanan Firestore. Hubungi admin untuk mengaktifkan akses akun secara aman.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
+  if(!window.firebase?.auth||!window.firebase?.firestore){message.textContent='Layanan akun belum siap. Silakan coba lagi.';return}
+  const auth=firebase.auth();await auth.authStateReady?.();if(token!==loadToken)return;
+  const user=auth.currentUser;
+  if(!user||user.isAnonymous){message.textContent='Masuk menggunakan Google atau email untuk melihat pesanan akun Anda.';const b=el('button','nexai-orders-open','Masuk ke akun pelanggan');b.type='button';b.addEventListener('click',async()=>{if(await window.nexaiRequireCustomerLogin?.()){close();open()}});list.append(b);return}
+  message.textContent='Memuat riwayat pesanan…';
+  const snap=await firebase.firestore().collection('orders').where('uid','==',user.uid).limit(40).get();
+  if(token!==loadToken)return;
+  const docs=snap.docs.map(d=>({...d.data(),orderId:d.data().orderId||d.id})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,10);
+  if(!docs.length){message.textContent='Belum ada pesanan yang terhubung ke akun ini.';return}
+  message.textContent='Menampilkan '+docs.length+' pesanan terbaru dari akun ini.';
+  docs.forEach(d=>list.append(renderOrder(d)));
+ }catch(e){if(token!==loadToken)return;console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Akses pesanan ditolak Firestore Rules. Hubungi admin.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
 }
 window.nexaiOpenOrders=open;
 document.getElementById('nexaiOrdersClose')?.addEventListener('click',close);
+document.getElementById('nexaiInvoiceClose')?.addEventListener('click',closeInvoice);
 dialog.addEventListener('click',e=>{if(e.target===dialog)close()});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!dialog.hidden)close()});
+invoice.addEventListener('click',e=>{if(e.target===invoice)closeInvoice()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(!invoice.hidden)closeInvoice();else if(!dialog.hidden)close()}});
 const actions=document.querySelector('.hero-actions')||document.querySelector('.store-actions');
-if(actions&&!document.getElementById('nexaiOrdersLauncher')){
- const button=document.createElement('button');button.type='button';button.id='nexaiOrdersLauncher';button.className='nexai-orders-open';button.textContent='Pesanan Saya';button.addEventListener('click',open);actions.appendChild(button);
-}
+if(actions&&!document.getElementById('nexaiOrdersLauncher')){const b=el('button','nexai-orders-open','Pesanan Saya');b.id='nexaiOrdersLauncher';b.type='button';b.addEventListener('click',open);actions.append(b)}
 if(new URLSearchParams(location.search).get('orders')==='1'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',open,{once:true});else open()}
 })();
 </script>
@@ -6429,4 +6480,49 @@ root.addEventListener('click',e=>{if(e.target===root&&!busy)finish(false)});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden&&!busy){e.stopPropagation();finish(false)}});
 })();
 </script>
+
+<style id="nexai-stage5j-premium-css">
+#nexaiOrdersDialog{z-index:2147483500}
+.nexai-orders-panel{width:min(100%,640px);max-height:94dvh;padding:22px 18px 34px;overscroll-behavior:contain}
+.nexai-orders-head h2{font-size:25px;font-weight:800}
+.nexai-order-card{padding:17px;border-radius:18px;background:#fff;border:1px solid #e2e8dc;box-shadow:0 5px 18px #1d331008}
+.nexai-order-top,.nexai-order-actions,.nexai-order-money,.nexai-invoice-line{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.nexai-order-top{align-items:flex-start}
+.nexai-order-number{font-size:12px;color:#687366;overflow-wrap:anywhere;display:block;margin-top:5px}
+.nexai-status{display:inline-flex;align-items:center;border-radius:999px;padding:6px 10px;font-size:11px;font-weight:750;background:#f2f6eb;color:#537d2c;max-width:55%;text-align:center}
+.nexai-order-preview{margin:14px 0;font-size:14px;line-height:1.5;font-weight:650;color:#283025;overflow-wrap:anywhere}
+.nexai-order-money{border-top:1px solid #edf0e9;padding-top:13px;margin-top:12px}
+.nexai-order-money strong{color:#d95435;font-size:19px}
+.nexai-order-actions{margin-top:15px}
+.nexai-order-actions button{flex:1;min-height:43px}
+.nexai-order-actions .nexai-detail-btn{background:#8cc63f;color:#192710;border-color:#8cc63f}
+#nexaiInvoiceDialog[hidden]{display:none!important}
+#nexaiInvoiceDialog{position:fixed;inset:0;z-index:2147483501;background:#000b;display:flex;align-items:flex-end;justify-content:center}
+.nexai-invoice-panel{background:#fff;color:#243022;width:min(100%,640px);max-height:94dvh;overflow-y:auto;border-radius:24px 24px 0 0;padding:20px 18px 35px;overscroll-behavior:contain}
+.nexai-invoice-header{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nexai-invoice-header h2{font-size:23px;margin:0}
+.nexai-invoice-close{border:0;border-radius:50%;background:#f0f4eb;color:#507c2c;font-size:25px;width:42px;height:42px}
+.nexai-invoice-section{border:1px solid #e6ecdf;border-radius:15px;padding:15px;margin:15px 0;background:#fff}
+.nexai-invoice-section h3{font-size:15px;margin:0 0 13px}
+.nexai-invoice-line{align-items:flex-start;font-size:13px;line-height:1.5;margin:9px 0}
+.nexai-invoice-line span{color:#64705f;flex:0 0 38%}
+.nexai-invoice-line strong{font-weight:650;text-align:right;overflow-wrap:anywhere;min-width:0}
+.nexai-invoice-product{padding:12px 0;border-bottom:1px solid #edf1e9;display:flex;gap:12px;align-items:center}
+.nexai-invoice-product:last-child{border-bottom:0}
+.nexai-invoice-product img{width:68px;height:68px;object-fit:contain;border:1px solid #edf0e9;border-radius:9px}
+.nexai-invoice-product-info{flex:1;min-width:0;font-size:13px}
+.nexai-invoice-product-info strong{display:block;overflow-wrap:anywhere}
+.nexai-invoice-product-info small{display:block;color:#657062;margin:5px 0}
+.nexai-invoice-total{border-top:1px dashed #cbd8c2;padding-top:12px;margin-top:12px}
+.nexai-invoice-total strong{color:#d95435;font-size:19px}
+.nexai-invoice-footnote{color:#6c7769;font-size:12px;line-height:1.6}
+.nexai-invoice-primary{width:100%;background:#8cc63f;border:0;border-radius:12px;padding:14px;font-weight:800;color:#192710}
+@media(min-width:700px){#nexaiInvoiceDialog{align-items:center}.nexai-invoice-panel{border-radius:22px}}
+</style>
+<div id="nexaiInvoiceDialog" hidden role="dialog" aria-modal="true" aria-labelledby="nexaiInvoiceTitle">
+ <section class="nexai-invoice-panel" tabindex="-1">
+  <div class="nexai-invoice-header"><h2 id="nexaiInvoiceTitle">Rincian Pesanan</h2><button type="button" id="nexaiInvoiceClose" class="nexai-invoice-close" aria-label="Tutup rincian">×</button></div>
+  <div id="nexaiInvoiceBody"></div>
+ </section>
+</div>
 </body></html>
