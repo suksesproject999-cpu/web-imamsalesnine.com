@@ -777,6 +777,7 @@ padding-bottom:env(safe-area-inset-bottom)!important;font-family:inherit!importa
 </div><footer class="footer">© <span id="year"></span> Imam Sales · <a href="/">Kembali ke Website Utama</a></footer></div>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-check-compat.js"></script>
 <script>
 'use strict';
@@ -4768,26 +4769,27 @@ function price(x){return Number(x.harga??x.price??x.unitPrice??0)||0}
 function orderId(){try{return crypto.randomUUID()}catch{return 'ORD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8)}}
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy)return;const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
+async function submit(){if(busy)return;if(!await window.nexaiRequireCustomerLogin?.()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
 const items=lines.map(x=>({productId:String(x.id||''),nama:name(x),varian:String(x.varian||''),qty:Math.floor(Number(x.qty)||0),harga:price(x)}));
 if(!items.length||items.some(x=>!x.productId||x.qty<1||x.qty>99||x.harga<=0)){await popup('warning','Data keranjang belum valid','Periksa produk, varian, harga, dan jumlah.');return}
 const subtotal=items.reduce((n,x)=>n+x.harga*x.qty,0),pricing=window.imamstoreV43?.totals?.(),vouchers=window.imamstoreV43?.getVouchers?.()||{},productDiscount=pricing?.productDiscount||0,shippingDiscount=pricing?.shippingDiscount||0;
 const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount,shippingDiscount,totalBayar:subtotal-productDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
-let uid=null;try{uid=firebase.auth().currentUser?.uid||null}catch{}
+const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
 const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
 if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
 if(!/^0?8\d{8,13}$/.test(d.wa.replace(/\D/g,''))){await popup('warning','Nomor WhatsApp tidak valid','Gunakan nomor Indonesia yang benar.');return}
-busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Mencatat pesanan dan statistik di Firebase…';
+busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Mencatat permintaan pesanan di Firebase…';
 try{const FV=firebase.firestore.FieldValue,grouped=new Map();items.forEach(x=>grouped.set(x.productId,(grouped.get(x.productId)||0)+x.qty));
 const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,provinsi:d.provinsi,kota:d.kota,kodepos:d.kodepos,alamat:d.alamat},ekspedisi:d.ekspedisi,catatan:d.catatan,items,totals:summary,vouchers:{product:summary.productVoucherName,shipping:summary.shippingVoucherName},status:'checkout_created',channel:'whatsapp',createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()};
-/* Single atomic commit: unlike old v21 best-effort log, order + sold stats succeed or fail together. */
-const batch=store.batch();batch.set(store.collection('orders').doc(d.orderId),order);for(const [id,qty] of grouped)batch.set(store.collection('statistik_produk').doc(id),{terjual:FV.increment(qty),lastSoldAt:FV.serverTimestamp()},{merge:true});await batch.commit();
+/* Tahap 5C.2: pesanan saja. Statistik penjualan dan ranking tidak boleh dinaikkan
+   dari checkout browser yang belum diverifikasi admin. */
+await store.collection('orders').doc(d.orderId).set(order);
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
-void ranking([...grouped.keys()]);
 /* Remove only purchased lines from local cart, preserving unselected lines. */
 try{const cart=read(KEY,[]),counts=new Map();lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
-const result=await (window.Swal?.fire?Swal.fire({icon:'success',title:'Pesanan berhasil diproses',text:'Order ID: '+d.orderId,showCancelButton:true,confirmButtonText:'Buka WhatsApp',cancelButtonText:'Selesai',confirmButtonColor:'#8cc63f'}):Promise.resolve({isConfirmed:true}));
+const result=await (window.Swal?.fire?Swal.fire({icon:'success',title:'Pesanan berhasil dicatat',html:'<p>Nomor pesanan:</p><strong style="font-size:19px;word-break:break-all">'+String(d.orderId).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</strong><p style="font-size:13px;color:#666;margin-top:12px">Simpan nomor ini. Pesanan masih menunggu konfirmasi melalui WhatsApp; ini bukan nomor resi pengiriman.</p>',showCancelButton:true,showDenyButton:true,confirmButtonText:'Lanjut WhatsApp',denyButtonText:'Salin Nomor',cancelButtonText:'Tutup',confirmButtonColor:'#8cc63f',denyButtonColor:'#51664a'}):Promise.resolve({isConfirmed:true}));
+if(result.isDenied){try{await navigator.clipboard.writeText(String(d.orderId));window.imamstoreToast?.('Nomor pesanan disalin.','success')}catch(_){window.prompt('Salin nomor pesanan:',String(d.orderId))}}
 if(result.isConfirmed){const url='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,items,summary));const w=window.open(url,'_blank','noopener,noreferrer');if(!w)location.href=url}
 }catch(err){console.error('Checkout original Firebase',err);window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent='Buat Pesanan';refresh()}}
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan dicatat ke Firebase dan dikonfirmasi melalui WhatsApp.';refresh();
@@ -5002,7 +5004,7 @@ async function emit(type,ids){
  }));
 }
 document.addEventListener('nine:productactivity',e=>{const x=e.detail||{};void emit(x.type,x.ids)});
-document.addEventListener('nine:wishlistchange',e=>{if(e.detail?.added)void emit('favorite',[String(e.detail.id)])});
+document.addEventListener('nine:wishlistchange',e=>{if(e.detail?.liked===true)void emit('favorite',[String(e.detail.id)])});
 function watch(){
  const pid=activeId();
  if(pid===currentId&&off)return;
@@ -6230,4 +6232,141 @@ schedule();
 @media (prefers-reduced-motion:reduce){
  #imamstoreLiveOriginalDetail .gallery-main > .nine-review-toast-stack{transition:none!important}
 }
-</style></body></html>
+</style><style id="nexai-order-history-v2-css">
+#nexaiOrdersDialog[hidden]{display:none!important}
+#nexaiOrdersDialog{position:fixed;inset:0;z-index:2147483500;background:rgba(0,0,0,.65);display:flex;align-items:flex-end;justify-content:center}
+.nexai-orders-panel{width:min(100%,560px);max-height:90dvh;overflow:auto;background:#fff;border-radius:22px 22px 0 0;padding:20px 18px 32px;color:#232923;box-shadow:0 -12px 40px #0003}
+.nexai-orders-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}.nexai-orders-head h2{font-size:21px;margin:0}.nexai-orders-head button{border:0;background:#f1f5ed;border-radius:50%;width:40px;height:40px;font-size:25px;color:#507d23}
+#nexaiOrdersMessage{font-size:13px;line-height:1.65;color:#596457;margin:12px 0}
+.nexai-order-card{background:#f8fbf5;border:1px solid #dfead5;border-radius:14px;padding:14px;margin:10px 0}
+.nexai-order-card strong{font-size:14px;overflow-wrap:anywhere}.nexai-order-card p{margin:7px 0;font-size:12px;line-height:1.5}.nexai-order-card button{border:1px solid #8cc63f;background:#fff;border-radius:8px;padding:8px 11px;color:#4b7721;font-weight:700}
+.nexai-orders-open{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:9px;background:#8cc63f;color:#18240e;border:0;font-weight:750;font-size:13px}
+@media(min-width:700px){#nexaiOrdersDialog{align-items:center}.nexai-orders-panel{border-radius:20px}}
+</style><div id="nexaiOrdersDialog" role="dialog" aria-modal="true" aria-labelledby="nexaiOrdersTitle" hidden>
+ <section class="nexai-orders-panel">
+  <div class="nexai-orders-head"><h2 id="nexaiOrdersTitle">Pesanan Saya</h2><button type="button" id="nexaiOrdersClose" aria-label="Tutup">×</button></div>
+  <p id="nexaiOrdersMessage" role="status" aria-live="polite">Memuat…</p>
+  <div id="nexaiOrdersList"></div>
+  <p style="font-size:12px;color:#6a7167;line-height:1.6">Nomor pesanan berbeda dari resi/AWB. Status pengiriman hanya ditampilkan jika sudah dicatat oleh penjual. Pesanan tanpa akun memerlukan verifikasi penjual; tidak dapat dibuka menggunakan nomor pesanan saja.</p>
+ </section>
+</div><script id="nexai-order-history-v2-js">
+(function(){
+'use strict';
+const dialog=document.getElementById('nexaiOrdersDialog');
+const message=document.getElementById('nexaiOrdersMessage');
+const list=document.getElementById('nexaiOrdersList');
+if(!dialog||!message||!list)return;
+let previousFocus=null;
+function close(){dialog.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.()}
+function text(tag,value){const el=document.createElement(tag);el.textContent=String(value??'');return el}
+function row(data){
+ const card=document.createElement('article');card.className='nexai-order-card';
+ card.appendChild(text('strong',data.orderId||'Nomor tidak tersedia'));
+ const status=String(data.status||'Belum diperbarui');
+ card.appendChild(text('p','Status: '+(status==='checkout_created'?'Pesanan tercatat — menunggu konfirmasi':status)));
+ card.appendChild(text('p','Dibuat: '+(data.createdAt?.toDate?.()?.toLocaleString('id-ID')||'Waktu belum tersedia')));
+ if(data.awb||data.resi||data.trackingNumber)card.appendChild(text('p','Nomor resi: '+(data.awb||data.resi||data.trackingNumber)));
+ const btn=text('button','Salin nomor pesanan');btn.type='button';btn.addEventListener('click',async()=>{try{await navigator.clipboard.writeText(String(data.orderId||''));btn.textContent='Tersalin'}catch{btn.textContent='Salin manual: '+String(data.orderId||'')}});card.appendChild(btn);
+ return card;
+}
+async function open(){
+ previousFocus=document.activeElement;dialog.hidden=false;document.body.style.overflow='hidden';document.getElementById('nexaiOrdersClose')?.focus();list.replaceChildren();message.textContent='Memeriksa akun pelanggan…';
+ try{
+  if(!window.firebase?.auth||!window.firebase?.firestore){message.textContent='Layanan akun belum siap. Silakan coba lagi nanti.';return}
+  const auth=firebase.auth();await auth.authStateReady?.();const user=auth.currentUser;
+  if(!user||user.isAnonymous){message.textContent='Masuk menggunakan Google atau email untuk melihat pesanan akun Anda.';const b=text('button','Masuk ke akun pelanggan');b.type='button';b.className='nexai-orders-open';b.addEventListener('click',async()=>{if(await window.nexaiRequireCustomerLogin?.())open()});list.appendChild(b);return}
+  message.textContent='Memuat pesanan akun Anda…';
+  const snapshot=await firebase.firestore().collection('orders').where('uid','==',user.uid).limit(40).get();
+  const docs=snapshot.docs.map(d=>d.data()).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0));
+  if(!docs.length){message.textContent='Belum ada pesanan yang terhubung ke akun ini. Pesanan yang dibuat sebagai tamu tidak otomatis muncul.';return}
+  message.textContent='Menampilkan '+docs.length+' pesanan terbaru yang terhubung ke akun ini.';
+  docs.forEach(data=>list.appendChild(row(data)));
+ }catch(e){console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Akses pesanan belum diizinkan oleh aturan keamanan Firestore. Hubungi admin untuk mengaktifkan akses akun secara aman.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
+}
+window.nexaiOpenOrders=open;
+document.getElementById('nexaiOrdersClose')?.addEventListener('click',close);
+dialog.addEventListener('click',e=>{if(e.target===dialog)close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!dialog.hidden)close()});
+const actions=document.querySelector('.hero-actions')||document.querySelector('.store-actions');
+if(actions&&!document.getElementById('nexaiOrdersLauncher')){
+ const button=document.createElement('button');button.type='button';button.id='nexaiOrdersLauncher';button.className='nexai-orders-open';button.textContent='Pesanan Saya';button.addEventListener('click',open);actions.appendChild(button);
+}
+if(new URLSearchParams(location.search).get('orders')==='1'){if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',open,{once:true});else open()}
+})();
+</script>
+
+<style id="nexai-customer-login-style">
+#nexaiCustomerLogin[hidden]{display:none!important}
+#nexaiCustomerLogin{position:fixed;inset:0;z-index:2147483645;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.78)}
+#nexaiCustomerLogin .ncl-card{width:min(100%,410px);background:#121911;color:#fff;border:1px solid #557c2d;border-radius:18px;padding:23px;box-shadow:0 16px 55px #0009;font:14px/1.5 Arial,sans-serif}
+#nexaiCustomerLogin h2{margin:0 0 8px;font-size:22px;color:#b9ec6b}
+#nexaiCustomerLogin p{margin:0 0 14px;color:#d5dfce}
+#nexaiCustomerLogin label{display:block;margin:10px 0 4px}
+#nexaiCustomerLogin input{display:block;width:100%;box-sizing:border-box;padding:12px;border:1px solid #5b6855;border-radius:9px;background:#fff;color:#111;font-size:15px}
+#nexaiCustomerLogin button{cursor:pointer;padding:11px 13px;border-radius:9px;border:1px solid #8cc63f;background:#8cc63f;color:#14200d;font-weight:700}
+#nexaiCustomerLogin button:disabled{opacity:.55;cursor:wait}
+#nexaiCustomerLogin .ncl-actions{display:grid;gap:9px;margin-top:16px}
+#nexaiCustomerLogin .ncl-secondary{background:transparent;color:#c9f28b}
+#nexaiCustomerLogin .ncl-close{float:right;background:transparent;color:#fff;border-color:#65745a}
+#nexaiCustomerLogin #nclMessage{margin:12px 0 0;min-height:20px;color:#ffd48d;overflow-wrap:anywhere}
+</style>
+<div id="nexaiCustomerLogin" hidden role="dialog" aria-modal="true" aria-labelledby="nclTitle">
+<section class="ncl-card">
+<button type="button" class="ncl-close" id="nclClose" aria-label="Tutup">×</button>
+<h2 id="nclTitle">Masuk ImamStore</h2>
+<p>Gunakan akun Google atau email untuk checkout dan melihat riwayat pesanan.</p>
+<form id="nclForm" autocomplete="on">
+<label for="nclEmail">Email</label><input id="nclEmail" type="email" autocomplete="email" required>
+<label for="nclPassword">Password</label><input id="nclPassword" type="password" autocomplete="current-password" minlength="6" required>
+<div class="ncl-actions">
+<button type="button" id="nclGoogle">Masuk dengan Google</button>
+<button type="submit" id="nclEmailLogin">Masuk dengan email</button>
+<button type="button" class="ncl-secondary" id="nclRegister">Daftar akun email baru</button>
+<button type="button" class="ncl-secondary" id="nclCancel">Batal</button>
+</div>
+</form>
+<p id="nclMessage" role="status" aria-live="polite"></p>
+</section>
+</div>
+<script id="nexai-customer-login-js">
+(function(){
+'use strict';
+const root=document.getElementById('nexaiCustomerLogin');
+const msg=document.getElementById('nclMessage');
+const form=document.getElementById('nclForm');
+let pending=null,previousFocus=null,busy=false;
+const auth=()=>window.firebase?.auth?.();
+function eligible(){const user=auth()?.currentUser;return !!(user&&!user.isAnonymous)}
+function finish(ok){root.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.();const resolve=pending;pending=null;resolve?.(!!ok)}
+function errorMessage(e){const code=e?.code||'';const messages={
+'auth/popup-blocked':'Popup Google diblokir. Izinkan popup lalu coba lagi.',
+'auth/popup-closed-by-user':'Login Google dibatalkan.',
+'auth/operation-not-allowed':'Metode login belum diaktifkan pada Firebase Console.',
+'auth/unauthorized-domain':'Domain website belum diizinkan pada Firebase Authentication.',
+'auth/invalid-credential':'Email atau password tidak cocok.',
+'auth/wrong-password':'Email atau password tidak cocok.',
+'auth/user-not-found':'Akun email belum ditemukan.',
+'auth/email-already-in-use':'Email sudah terdaftar. Silakan masuk.',
+'auth/weak-password':'Gunakan password minimal 6 karakter.',
+'auth/network-request-failed':'Koneksi bermasalah. Silakan coba lagi.',
+'auth/account-exists-with-different-credential':'Email sudah terdaftar menggunakan metode login lain.'
+};return messages[code]||'Login belum berhasil. Periksa pengaturan Firebase dan coba lagi.'}
+function lock(v){busy=v;root.querySelectorAll('button,input').forEach(x=>{if(x.id!=='nclClose'&&x.id!=='nclCancel')x.disabled=v})}
+async function run(action){if(busy)return;lock(true);msg.textContent='Memproses login…';try{await action();if(!eligible())throw new Error('Akun pelanggan belum aktif');finish(true)}catch(e){console.warn('[ImamStore Customer Auth]',e?.code||e?.message);msg.textContent=errorMessage(e)}finally{lock(false)}}
+window.nexaiRequireCustomerLogin=async function(){
+if(!auth()){return false}
+try{await auth().authStateReady?.()}catch(_){}
+if(eligible())return true;
+if(pending)return new Promise(resolve=>{const old=pending;pending=(value)=>{old(value);resolve(value)}});
+previousFocus=document.activeElement;root.hidden=false;document.body.style.overflow='hidden';msg.textContent='';document.getElementById('nclGoogle').focus();
+return new Promise(resolve=>{pending=resolve});
+};
+document.getElementById('nclGoogle').addEventListener('click',()=>run(async()=>{const provider=new firebase.auth.GoogleAuthProvider();await auth().signInWithPopup(provider)}));
+form.addEventListener('submit',e=>{e.preventDefault();run(()=>auth().signInWithEmailAndPassword(document.getElementById('nclEmail').value.trim(),document.getElementById('nclPassword').value))});
+document.getElementById('nclRegister').addEventListener('click',()=>run(()=>auth().createUserWithEmailAndPassword(document.getElementById('nclEmail').value.trim(),document.getElementById('nclPassword').value)));
+['nclClose','nclCancel'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{if(!busy)finish(false)}));
+root.addEventListener('click',e=>{if(e.target===root&&!busy)finish(false)});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden&&!busy){e.stopPropagation();finish(false)}});
+})();
+</script>
+</body></html>

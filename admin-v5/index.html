@@ -4818,6 +4818,7 @@ body.nexai-seller-workspace #sellerCenterFrame{height:100%!important;min-height:
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
 
 
@@ -13843,5 +13844,104 @@ launch?.addEventListener("click",()=>{
  });
 })();
 </script>
+
+<style>
+#nineOrderLaunch{position:fixed;right:18px;bottom:20px;z-index:2147483000;background:#8cc63f;color:#102000;border:0;border-radius:14px;padding:13px 18px;font-weight:800;cursor:pointer;box-shadow:0 7px 28px #0008}
+#nineOrderPanel{display:none;position:fixed;inset:0;z-index:2147483001;background:#000c;padding:20px;overflow:auto}
+#nineOrderPanel.active{display:block}
+#nineOrderPanel .nine-shell{max-width:920px;margin:3vh auto;background:#101710;color:#eef4e9;border:1px solid #8cc63f55;border-radius:18px;padding:24px;font-family:Arial,sans-serif}
+#nineOrderPanel input,#nineOrderPanel select{background:#202b1b;border:1px solid #617b52;color:white;border-radius:8px;padding:11px;max-width:100%;width:100%;box-sizing:border-box}
+#nineOrderPanel button{border:0;border-radius:8px;padding:10px 14px;background:#8cc63f;color:#122000;font-weight:700;cursor:pointer}
+#nineOrderPanel button:disabled{opacity:.45;cursor:not-allowed}
+#nineOrderPanel .nine-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
+#nineOrderPanel .nine-row>*{flex:1;min-width:130px}
+#nineOrderPanel .nine-item{padding:14px;border:1px solid #536746;border-radius:12px;margin:12px 0;overflow-wrap:anywhere}
+#nineOrderPanel small{color:#b8c4ae}#nineOrderPanel .nine-msg{white-space:pre-wrap;color:#e8d8a4}
+</style>
+<button type="button" id="nineOrderLaunch">📦 Pesanan ImamStore (Uji)</button>
+<section id="nineOrderPanel" aria-label="Pesanan ImamStore" role="dialog" aria-modal="true">
+<div class="nine-shell">
+<div class="nine-row"><h2 style="margin:0;flex:4">Pesanan ImamStore — Mode Uji</h2><button type="button" id="nineOrderClose">Tutup</button></div>
+<p>Login Firebase khusus admin diperlukan. Login Netlify tetap berlaku secara terpisah. Data hanya akan tampil apabila Firestore Rules mengizinkan UID admin.</p>
+<div id="nineOrderAuth">
+<div class="nine-row"><input id="nineOrderEmail" type="email" placeholder="Email admin Firebase" autocomplete="username"><input id="nineOrderPass" type="password" placeholder="Password Firebase" autocomplete="current-password"></div>
+<div class="nine-row"><button type="button" id="nineOrderSignIn">Login Firebase Admin</button><button type="button" id="nineOrderSignOut">Keluar Firebase</button></div>
+</div>
+<p id="nineOrderIdentity"></p>
+<p id="nineOrderMsg" class="nine-msg" role="status"></p>
+<div class="nine-row"><button type="button" id="nineOrderRefresh" disabled>Muat pesanan (maks. 30)</button></div>
+<div id="nineOrderList"></div>
+<p><small>Mode uji: status dan resi hanya dapat disimpan bila Firestore Rules mengizinkan. Tidak ada bypass aturan database. Jangan gunakan di produksi sebelum rules diuji.</small></p>
+</div></section>
+<script>
+(function(){
+"use strict";
+// ISI UID akun Firebase admin setelah membuat akun di Firebase Authentication.
+// UID adalah identitas publik, BUKAN password atau secret.
+// Daftarkan UID yang sama pada Firestore Rules secara terpisah.
+const ADMIN_FIREBASE_UID = "U7XnPGpjjUNAYnwuoMh68I8guT33";
+const launch=document.getElementById("nineOrderLaunch"),panel=document.getElementById("nineOrderPanel");
+const $=id=>document.getElementById(id);
+const msg=t=>{$("nineOrderMsg").textContent=t;};
+let authorized=false, busy=false;
+function validAdmin(user){return !!user && !user.isAnonymous && ADMIN_FIREBASE_UID!=="U7XnPGpjjUNAYnwuoMh68I8guT33" && user.uid===ADMIN_FIREBASE_UID;}
+function ensureNetlifyAdmin(){
+ const token=localStorage.getItem("token");
+ if(!token)return Promise.reject(new Error("Silakan login Admin V5 melalui Netlify terlebih dahulu."));
+ return fetch("/.netlify/functions/verify-token",{headers:{Authorization:"Bearer "+token},cache:"no-store"})
+ .then(async r=>{const d=await r.json();if(!r.ok||!d.success||d.user?.role!=="admin")throw Error("Role Netlify bukan admin atau sesi berakhir.");return true;});
+}
+async function check(){
+ authorized=false;$("nineOrderRefresh").disabled=true;
+ const user=firebase.auth().currentUser;
+ $("nineOrderIdentity").textContent=user?("Firebase: "+(user.email||"(tanpa email)")+" | UID: "+user.uid):"Firebase: belum login";
+ if(!validAdmin(user)){msg("Akses belum aktif. Login dengan akun Firebase admin dan isi UID admin pada kode revisi.");return;}
+ try{await ensureNetlifyAdmin();authorized=true;$("nineOrderRefresh").disabled=false;msg("Dua pemeriksaan login berhasil. Firestore Rules tetap menentukan izin akses.");}
+ catch(e){msg(e.message);}
+}
+launch.addEventListener("click",()=>{panel.classList.add("active");check();});
+$("nineOrderClose").addEventListener("click",()=>panel.classList.remove("active"));
+$("nineOrderSignIn").addEventListener("click",async()=>{
+ try{await ensureNetlifyAdmin();await firebase.auth().signInWithEmailAndPassword($("nineOrderEmail").value.trim(),$("nineOrderPass").value);$("nineOrderPass").value="";await check();}
+ catch(e){$("nineOrderPass").value="";msg("Login gagal: "+e.message);}
+});
+$("nineOrderSignOut").addEventListener("click",async()=>{await firebase.auth().signOut();$("nineOrderList").replaceChildren();await check();});
+firebase.auth().onAuthStateChanged(()=>{if(panel.classList.contains("active"))check();});
+function el(tag,txt){const e=document.createElement(tag);if(txt!==undefined)e.textContent=String(txt);return e;}
+function row(doc){
+ const d=doc.data()||{},c=d.customer||{},item=el("article");item.className="nine-item";
+ item.append(el("h3",d.orderId||doc.id),el("p","Pelanggan: "+(c.nama||"-")+" | "+(c.email||"-")),el("p","Status: "+(d.status||"-")+" | Ekspedisi: "+(d.ekspedisi||"-")));
+ const products=Array.isArray(d.items)?d.items:[];
+ item.append(el("p","Produk: "+products.length+" item | Total (belum diverifikasi): "+JSON.stringify(d.totals||{}).slice(0,220)));
+ const line=el("div");line.className="nine-row";
+ const status=el("select");
+ ["checkout_created","confirmed","processing","shipped","completed","cancelled"].forEach(v=>{const opt=el("option",v);opt.value=v;status.append(opt);});
+ status.value=["checkout_created","confirmed","processing","shipped","completed","cancelled"].includes(d.status)?d.status:"checkout_created";
+ const awb=el("input");awb.placeholder="Nomor resi / AWB";awb.value=String(d.awb||d.resi||d.trackingNumber||"").slice(0,120);
+ const save=el("button","Simpan status & resi");
+ save.addEventListener("click",async()=>{
+  if(busy||!authorized||!validAdmin(firebase.auth().currentUser))return;
+  if(!confirm("Simpan perubahan untuk "+doc.id+"?"))return;
+  busy=true;save.disabled=true;
+  try{await ensureNetlifyAdmin();const payload={status:status.value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
+   if(awb.value.trim())payload.awb=awb.value.trim().slice(0,120);
+   await firebase.firestore().collection("orders").doc(doc.id).update(payload);
+   msg("Perubahan berhasil disimpan. Pastikan status pembayaran sudah diverifikasi manual.");
+  }catch(e){msg("Gagal menyimpan: "+e.message);}
+  finally{busy=false;save.disabled=false;}
+ });
+ line.append(status,awb,save);item.append(line);return item;
+}
+$("nineOrderRefresh").addEventListener("click",async()=>{
+ if(!authorized||!validAdmin(firebase.auth().currentUser))return;
+ const list=$("nineOrderList");list.replaceChildren();msg("Memuat pesanan...");
+ try{await ensureNetlifyAdmin();const snap=await firebase.firestore().collection("orders").limit(30).get();
+  const docs=snap.docs.sort((a,b)=>{const av=a.data().createdAt?.toMillis?.()||0,bv=b.data().createdAt?.toMillis?.()||0;return bv-av;});
+  docs.forEach(d=>list.append(row(d)));msg("Terbaca "+docs.length+" pesanan. Periksa izin Firestore dan hasil uji sebelum produksi.");
+ }catch(e){msg("Gagal membaca orders: "+e.message);}
+});
+})();
+</script>
+
 </body>
 </html>
