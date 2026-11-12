@@ -13845,45 +13845,200 @@ launch?.addEventListener("click",()=>{
 })();
 </script>
 
-<style>
+<style id="imamstore-r16-orders-ui">
 #nineOrderLaunch{position:fixed;right:18px;bottom:20px;z-index:2147483000;background:#8cc63f;color:#102000;border:0;border-radius:14px;padding:13px 18px;font-weight:800;cursor:pointer;box-shadow:0 7px 28px #0008}
-#nineOrderPanel{display:none;position:fixed;inset:0;z-index:2147483001;background:#000c;padding:20px;overflow:auto}
+#nineOrderPanel{display:none;position:fixed;inset:0;z-index:2147483001;background:#061008;padding:0;overflow:hidden}
 #nineOrderPanel.active{display:block}
-#nineOrderPanel .nine-shell{max-width:920px;margin:3vh auto;background:#101710;color:#eef4e9;border:1px solid #8cc63f55;border-radius:18px;padding:24px;font-family:Arial,sans-serif}
-#nineOrderPanel input,#nineOrderPanel select{background:#202b1b;border:1px solid #617b52;color:white;border-radius:8px;padding:11px;max-width:100%;width:100%;box-sizing:border-box}
-#nineOrderPanel button{border:0;border-radius:8px;padding:10px 14px;background:#8cc63f;color:#122000;font-weight:700;cursor:pointer}
-#nineOrderPanel button:disabled{opacity:.45;cursor:not-allowed}
-#nineOrderPanel .nine-row{display:flex;gap:10px;flex-wrap:wrap;margin:12px 0}
-#nineOrderPanel .nine-row>*{flex:1;min-width:130px}
-#nineOrderPanel .nine-item{padding:14px;border:1px solid #536746;border-radius:12px;margin:12px 0;overflow-wrap:anywhere}
-#nineOrderPanel small{color:#b8c4ae}#nineOrderPanel .nine-msg{white-space:pre-wrap;color:#e8d8a4}
+#nineOrderPanel .nine-shell{height:100dvh;display:flex;flex-direction:column;background:#f7faf5;color:#1f2b18;font-family:Arial,sans-serif}
+#nineOrderPanel .nine-topbar{position:sticky;top:0;z-index:3;background:linear-gradient(180deg,#11220f 0%,#152b12 100%);color:#f5faef;padding:18px 16px 14px;border-bottom:1px solid #22371d;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+#nineOrderPanel .nine-topline{display:flex;align-items:center;gap:10px;justify-content:space-between;flex-wrap:wrap}
+#nineOrderPanel .nine-title{display:flex;flex-direction:column;gap:4px}
+#nineOrderPanel .nine-title h2{margin:0;font-size:24px;line-height:1.15}
+#nineOrderPanel .nine-title p{margin:0;color:#cbdbc4;font-size:13px;line-height:1.5}
+#nineOrderPanel .nine-toolbar{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#nineOrderPanel .nine-toolbar button{border:0;border-radius:12px;padding:11px 14px;background:#8cc63f;color:#132109;font-weight:800;cursor:pointer}
+#nineOrderPanel .nine-toolbar .nine-secondary{background:#24371f;color:#f3f8ee;border:1px solid #395334}
+#nineOrderPanel .nine-meta{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:14px}
+#nineOrderPanel .nine-metric{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:12px 14px}
+#nineOrderPanel .nine-metric small{display:block;color:#c1d3b8;font-size:11px;margin-bottom:5px}
+#nineOrderPanel .nine-metric strong{font-size:18px;display:block}
+#nineOrderPanel .nine-body{flex:1;overflow:auto;padding:16px}
+#nineOrderPanel .nine-auth-card,#nineOrderPanel .nine-info-card,#nineOrderPanel .nine-order-card{background:#fff;border:1px solid #dfe8d8;border-radius:18px;box-shadow:0 8px 24px rgba(24,44,16,.06)}
+#nineOrderPanel .nine-auth-card{padding:16px;margin-bottom:14px}
+#nineOrderPanel .nine-auth-grid{display:grid;grid-template-columns:1.3fr 1fr auto auto;gap:10px;align-items:end}
+#nineOrderPanel .nine-field{display:flex;flex-direction:column;gap:7px}
+#nineOrderPanel .nine-field label{font-size:12px;font-weight:800;color:#4a5d40;text-transform:uppercase;letter-spacing:.04em}
+#nineOrderPanel .nine-field input,#nineOrderPanel .nine-field select,#nineOrderPanel .nine-field textarea{background:#fff;border:1px solid #cfdcc4;color:#1f2b18;border-radius:12px;padding:12px 13px;max-width:100%;width:100%;box-sizing:border-box;font:inherit}
+#nineOrderPanel .nine-auth-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+#nineOrderPanel .nine-auth-actions button,#nineOrderPanel .nine-action-btn{border:0;border-radius:12px;padding:12px 15px;background:#8cc63f;color:#132109;font-weight:800;cursor:pointer}
+#nineOrderPanel .nine-auth-actions .nine-secondary,#nineOrderPanel .nine-action-btn.nine-secondary{background:#f2f6ee;color:#2d4123;border:1px solid #d8e3cf}
+#nineOrderPanel .nine-auth-status{margin-top:12px;color:#596b4d;font-size:13px;line-height:1.6;white-space:pre-wrap}
+#nineOrderPanel .nine-info-card{padding:14px 16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap}
+#nineOrderPanel .nine-info-card p{margin:0;font-size:13px;color:#607357;line-height:1.6}
+#nineOrderPanel .nine-orders{display:grid;gap:16px}
+#nineOrderPanel .nine-empty{padding:24px;border:1px dashed #cad8c0;border-radius:16px;text-align:center;color:#64755a;background:#fff}
+#nineOrderPanel .nine-order-card{overflow:hidden}
+#nineOrderPanel .nine-order-header{padding:18px 18px 14px;border-bottom:1px solid #edf2e9;background:linear-gradient(180deg,#fbfdf9 0%,#f5f9f2 100%)}
+#nineOrderPanel .nine-order-headline{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;flex-wrap:wrap}
+#nineOrderPanel .nine-order-headline h3{margin:0;font-size:22px;line-height:1.25;color:#15210e;overflow-wrap:anywhere}
+#nineOrderPanel .nine-order-headline small{display:block;color:#71816a;font-size:12px;margin-top:6px}
+#nineOrderPanel .nine-status{display:inline-flex;align-items:center;justify-content:center;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;white-space:nowrap}
+#nineOrderPanel .nine-status.checkout_created{background:#eef5e6;color:#53752f}
+#nineOrderPanel .nine-status.confirmed{background:#e9f4ff;color:#245f95}
+#nineOrderPanel .nine-status.processing{background:#fff3db;color:#8c5d0d}
+#nineOrderPanel .nine-status.shipped,#nineOrderPanel .nine-status.packed{background:#efe9ff;color:#5c42a2}
+#nineOrderPanel .nine-status.completed,#nineOrderPanel .nine-status.delivered{background:#e6f6ea;color:#237646}
+#nineOrderPanel .nine-status.cancelled{background:#fdecec;color:#a33b3b}
+#nineOrderPanel .nine-order-body{padding:18px;display:grid;grid-template-columns:1.1fr .9fr;gap:16px}
+#nineOrderPanel .nine-section{border:1px solid #e5eee0;border-radius:15px;padding:15px;background:#fff}
+#nineOrderPanel .nine-section h4{margin:0 0 12px;font-size:14px;color:#476233;text-transform:uppercase;letter-spacing:.05em}
+#nineOrderPanel .nine-kv{display:grid;grid-template-columns:110px 1fr;gap:6px 12px;font-size:13px;line-height:1.55}
+#nineOrderPanel .nine-kv strong{color:#64755a;font-weight:700}
+#nineOrderPanel .nine-kv span{overflow-wrap:anywhere}
+#nineOrderPanel .nine-address{margin-top:10px;padding-top:10px;border-top:1px dashed #dde7d6;font-size:13px;line-height:1.55;color:#2d3b26;white-space:pre-wrap;overflow-wrap:anywhere}
+#nineOrderPanel .nine-products{display:grid;gap:12px}
+#nineOrderPanel .nine-product{display:grid;grid-template-columns:62px 1fr auto;gap:12px;align-items:start;padding:12px;border:1px solid #edf2e9;border-radius:14px;background:#fcfefb}
+#nineOrderPanel .nine-product img{width:62px;height:62px;object-fit:contain;border-radius:12px;border:1px solid #e3ebde;background:#fff}
+#nineOrderPanel .nine-product .placeholder{width:62px;height:62px;border-radius:12px;border:1px dashed #d5dfcf;background:#f8faf6;display:flex;align-items:center;justify-content:center;color:#90a08a;font-size:11px}
+#nineOrderPanel .nine-product h5{margin:0 0 4px;font-size:14px;color:#132109;overflow-wrap:anywhere}
+#nineOrderPanel .nine-product small{display:block;color:#677660;font-size:12px;line-height:1.5}
+#nineOrderPanel .nine-product strong{display:block;text-align:right;min-width:100px;font-size:15px;color:#d95435}
+#nineOrderPanel .nine-summary-line{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;font-size:13px;padding:8px 0;border-bottom:1px dashed #e7eee2}
+#nineOrderPanel .nine-summary-line:last-child{border-bottom:0}
+#nineOrderPanel .nine-summary-line span{color:#66765f}
+#nineOrderPanel .nine-summary-line strong{font-size:13px;text-align:right;overflow-wrap:anywhere}
+#nineOrderPanel .nine-summary-line.total strong{font-size:20px;color:#d95435}
+#nineOrderPanel .nine-order-footer{padding:18px;border-top:1px solid #edf2e9;background:#fbfdf9}
+#nineOrderPanel .nine-editor{display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end}
+#nineOrderPanel .nine-editor .nine-action-btn{padding:13px 18px;min-width:180px}
+#nineOrderPanel .nine-feedback{margin-top:10px;color:#596b4d;font-size:13px;line-height:1.6;min-height:20px}
+@media (max-width:860px){#nineOrderPanel .nine-meta{grid-template-columns:repeat(2,minmax(0,1fr))}#nineOrderPanel .nine-order-body{grid-template-columns:1fr}#nineOrderPanel .nine-editor{grid-template-columns:1fr}#nineOrderPanel .nine-auth-grid{grid-template-columns:1fr 1fr}#nineOrderPanel .nine-auth-grid .nine-wide{grid-column:1/-1}}
+@media (max-width:560px){#nineOrderLaunch{right:12px;bottom:12px;padding:12px 14px;border-radius:12px}#nineOrderPanel .nine-topbar{padding:16px 12px 12px}#nineOrderPanel .nine-body{padding:12px}#nineOrderPanel .nine-meta{grid-template-columns:1fr 1fr}#nineOrderPanel .nine-topline{align-items:flex-start}#nineOrderPanel .nine-toolbar{width:100%}#nineOrderPanel .nine-toolbar button{flex:1}#nineOrderPanel .nine-auth-grid{grid-template-columns:1fr}#nineOrderPanel .nine-product{grid-template-columns:52px 1fr}#nineOrderPanel .nine-product img,#nineOrderPanel .nine-product .placeholder{width:52px;height:52px}#nineOrderPanel .nine-product strong{grid-column:2;text-align:left;min-width:0;margin-top:6px}#nineOrderPanel .nine-kv{grid-template-columns:96px 1fr}}
 </style>
-<button type="button" id="nineOrderLaunch">📦 Pesanan ImamStore (Uji)</button>
+<button type="button" id="nineOrderLaunch">📦 Kelola Pesanan</button>
 <section id="nineOrderPanel" aria-label="Pesanan ImamStore" role="dialog" aria-modal="true">
 <div class="nine-shell">
-<div class="nine-row"><h2 style="margin:0;flex:4">Pesanan ImamStore — Mode Uji</h2><button type="button" id="nineOrderClose">Tutup</button></div>
-<p>Login Firebase khusus admin diperlukan. Login Netlify tetap berlaku secara terpisah. Data hanya akan tampil apabila Firestore Rules mengizinkan UID admin.</p>
-<div id="nineOrderAuth">
-<div class="nine-row"><input id="nineOrderEmail" type="email" placeholder="Email admin Firebase" autocomplete="username"><input id="nineOrderPass" type="password" placeholder="Password Firebase" autocomplete="current-password"></div>
-<div class="nine-row"><button type="button" id="nineOrderSignIn">Login Firebase Admin</button><button type="button" id="nineOrderSignOut">Keluar Firebase</button></div>
+ <div class="nine-topbar">
+  <div class="nine-topline">
+   <div class="nine-title">
+    <h2>Kelola Pesanan ImamStore</h2>
+    <p>Tampilan kerja dibuat seperti halaman faktur agar nyaman membaca rincian pembeli, produk, pembayaran, dan status pesanan.</p>
+   </div>
+   <div class="nine-toolbar">
+    <button type="button" class="nine-secondary" id="nineOrderClose">Tutup</button>
+    <button type="button" id="nineOrderRefresh" disabled>Muat Pesanan</button>
+   </div>
+  </div>
+  <div class="nine-meta">
+   <div class="nine-metric"><small>Status panel</small><strong id="nineMetricMode">Mode Admin</strong></div>
+   <div class="nine-metric"><small>Login Firebase</small><strong id="nineMetricAuth">Belum login</strong></div>
+   <div class="nine-metric"><small>Pesanan dimuat</small><strong id="nineMetricCount">0</strong></div>
+   <div class="nine-metric"><small>Hak akses</small><strong id="nineMetricAccess">Belum aktif</strong></div>
+  </div>
+ </div>
+ <div class="nine-body">
+  <div class="nine-auth-card" id="nineOrderAuth">
+   <div class="nine-auth-grid">
+    <div class="nine-field"><label for="nineOrderEmail">Email admin Firebase</label><input id="nineOrderEmail" type="email" placeholder="admin@imamstore.com" autocomplete="username"></div>
+    <div class="nine-field"><label for="nineOrderPass">Password Firebase</label><input id="nineOrderPass" type="password" placeholder="Password Firebase" autocomplete="current-password"></div>
+    <button type="button" class="nine-action-btn nine-wide" id="nineOrderSignIn">Login Firebase Admin</button>
+    <button type="button" class="nine-action-btn nine-secondary nine-wide" id="nineOrderSignOut">Keluar Firebase</button>
+   </div>
+   <div class="nine-auth-status" id="nineOrderIdentity">Firebase: belum login</div>
+  </div>
+  <div class="nine-info-card">
+   <p id="nineOrderMsg">Login Firebase admin dan sesi Netlify admin wajib aktif. Setelah itu tekan Muat Pesanan untuk membaca daftar order.</p>
+  </div>
+  <div id="nineOrderList" class="nine-orders"></div>
+  <div id="nineOrderEmpty" class="nine-empty" hidden>Belum ada pesanan untuk ditampilkan.</div>
+ </div>
 </div>
-<p id="nineOrderIdentity"></p>
-<p id="nineOrderMsg" class="nine-msg" role="status"></p>
-<div class="nine-row"><button type="button" id="nineOrderRefresh" disabled>Muat pesanan (maks. 30)</button></div>
-<div id="nineOrderList"></div>
-<p><small>Mode uji: status dan resi hanya dapat disimpan bila Firestore Rules mengizinkan. Tidak ada bypass aturan database. Jangan gunakan di produksi sebelum rules diuji.</small></p>
-</div></section>
-<script>
+</section>
+<script id="imamstore-r16-admin-orders-page">
 (function(){
 "use strict";
-// ISI UID akun Firebase admin setelah membuat akun di Firebase Authentication.
-// UID adalah identitas publik, BUKAN password atau secret.
-// Daftarkan UID yang sama pada Firestore Rules secara terpisah.
 const ADMIN_FIREBASE_UID = "U7XnPGpjjUNAYnwuoMh68I8guT33";
 const launch=document.getElementById("nineOrderLaunch"),panel=document.getElementById("nineOrderPanel");
 const $=id=>document.getElementById(id);
-const msg=t=>{$("nineOrderMsg").textContent=t;};
-let authorized=false, busy=false;
+const statMode=$("nineMetricMode"),statAuth=$("nineMetricAuth"),statCount=$("nineMetricCount"),statAccess=$("nineMetricAccess");
+const list=$("nineOrderList"),empty=$("nineOrderEmpty");
+let authorized=false,busy=false;
+const STATUS_OPTIONS=["checkout_created","confirmed","processing","packed","shipped","delivered","completed","cancelled"];
+const STATUS_LABEL={checkout_created:"Menunggu konfirmasi",confirmed:"Dikonfirmasi",processing:"Diproses",packed:"Dikemas",shipped:"Dikirim",delivered:"Terkirim",completed:"Selesai",cancelled:"Dibatalkan"};
+
+// Selaras dengan R14: perbarui status, statistik terjual, dan ledger dalam satu transaksi.
+const SOLD_STATUSES=new Set(['confirmed','processing','packed','shipped','delivered','completed']);
+function quantities(items){
+ if(!Array.isArray(items)||items.length<1||items.length>10)throw new Error('Rincian pesanan tidak valid.');
+ const result=new Map();
+ for(const it of items){
+  const id=String(it?.productId??'').trim(),qty=Number(it?.qty);
+  if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!Number.isSafeInteger(qty)||qty<1||qty>999)
+    throw new Error('ID produk atau jumlah pesanan tidak valid.');
+  result.set(id,(result.get(id)||0)+qty);
+ }
+ return result;
+}
+async function saveAdminOrder(orderId,newStatus,newResi){
+ if(!STATUS_OPTIONS.includes(newStatus))throw new Error('Status tidak valid.');
+ const store=firebase.firestore(), FV=firebase.firestore.FieldValue;
+ const orderRef=store.collection('orders').doc(orderId);
+ const ledgerRef=store.collection('order_sale_ledger').doc(orderId);
+ return store.runTransaction(async tx=>{
+  const [orderSnap,ledgerSnap]=await Promise.all([tx.get(orderRef),tx.get(ledgerRef)]);
+  if(!orderSnap.exists)throw new Error('Pesanan tidak ditemukan.');
+  const order=orderSnap.data()||{},units=quantities(order.items);
+  const counted=ledgerSnap.exists&&ledgerSnap.data()?.counted===true;
+  const nextCounted=SOLD_STATUSES.has(newStatus);
+  const delta=Number(nextCounted)-Number(counted);
+  const statRefs=[];
+  // Baca seluruh dokumen SEBELUM penulisan transaksi.
+  if(delta!==0){
+   for(const [id,qty] of units){
+    const ref=store.collection('statistik_produk').doc(id);
+    const snap=await tx.get(ref);
+    statRefs.push({ref,snap,id,qty});
+   }
+  }
+  const changes={status:newStatus,updatedAt:FV.serverTimestamp()};
+  const previousResi=String(order.resi??order.awb??order.trackingNumber??'');
+  if(newResi!==undefined&&newResi!==previousResi)changes.resi=newResi;
+  tx.update(orderRef,changes);
+  let affected=0;
+  for(const {ref,snap,id,qty} of statRefs){
+   // Jika statistik belum ada, angka 0 menjadi dasar; jangan menebak dari dokumen lain.
+   const current=Number(snap.exists?(snap.data()?.terjual??0):0);
+   if(!Number.isSafeInteger(current)||current<0)throw new Error('Statistik produk tidak valid: '+id);
+   const next=current+delta*qty;
+   if(next<0)throw new Error('Statistik produk tidak mencukupi untuk koreksi: '+id);
+   tx.set(ref,{terjual:next,updatedAt:FV.serverTimestamp()},{merge:true});
+   affected+=qty;
+  }
+  if(delta!==0){
+   tx.set(ledgerRef,{
+    orderId,counted:nextCounted,
+    productQuantities:Object.fromEntries(units),updatedAt:FV.serverTimestamp()
+   },{merge:true});
+  }
+  return {delta,affected};
+ });
+}
+window.imamstoreAdminInvoiceSales=Object.freeze({saveAdminOrder,quantities});
+
+function msg(t){$("nineOrderMsg").textContent=t;}
+function money(v){return 'Rp '+Math.round(Number(v)||0).toLocaleString('id-ID');}
+function safe(v){return String(v??'').trim();}
+function maybe(v,fallback='-'){const s=safe(v);return s||fallback;}
+function formatDate(ts){
+ try{
+  let d=null;
+  if(ts?.toDate)d=ts.toDate();
+  else if(ts?.seconds)d=new Date(ts.seconds*1000);
+  else if(typeof ts==='string'||typeof ts==='number')d=new Date(ts);
+  if(!d || Number.isNaN(d.getTime()))return '-';
+  return new Intl.DateTimeFormat('id-ID',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit',second:'2-digit'}).format(d);
+ }catch{return '-'}
+}
 function validAdmin(user){return !!user && !user.isAnonymous && user.uid===ADMIN_FIREBASE_UID;}
 function ensureNetlifyAdmin(){
  const token=localStorage.getItem("token");
@@ -13891,55 +14046,162 @@ function ensureNetlifyAdmin(){
  return fetch("/.netlify/functions/verify-token",{headers:{Authorization:"Bearer "+token},cache:"no-store"})
  .then(async r=>{const d=await r.json();if(!r.ok||!d.success||d.user?.role!=="admin")throw Error("Role Netlify bukan admin atau sesi berakhir.");return true;});
 }
+function setMetrics(user){
+ statAuth.textContent=user?(user.email||'Sudah login'):'Belum login';
+ statAccess.textContent=authorized?'Aktif':'Belum aktif';
+}
 async function check(){
  authorized=false;$("nineOrderRefresh").disabled=true;
  const user=firebase.auth().currentUser;
  $("nineOrderIdentity").textContent=user?("Firebase: "+(user.email||"(tanpa email)")+" | UID: "+user.uid):"Firebase: belum login";
- if(!validAdmin(user)){msg("Akses belum aktif. Pastikan sesi Firebase memakai UID admin yang terdaftar.");return;}
- try{await ensureNetlifyAdmin();authorized=true;$("nineOrderRefresh").disabled=false;msg("Dua pemeriksaan login berhasil. Firestore Rules tetap menentukan izin akses.");}
- catch(e){msg(e.message);}
+ if(!validAdmin(user)){
+  statMode.textContent='Mode Admin';setMetrics(user);
+  msg("Akses belum aktif. Pastikan sesi Firebase memakai UID admin yang terdaftar.");
+  return;
+ }
+ try{await ensureNetlifyAdmin();authorized=true;$("nineOrderRefresh").disabled=false;statMode.textContent='Siap Kerja';setMetrics(user);msg("Login Firebase admin dan sesi Netlify admin terverifikasi. Tekan Muat Pesanan untuk menampilkan halaman faktur pesanan.");}
+ catch(e){setMetrics(user);msg(e.message);}
 }
-launch.addEventListener("click",()=>{panel.classList.add("active");check();});
-$("nineOrderClose").addEventListener("click",()=>panel.classList.remove("active"));
+function openPanel(){panel.classList.add('active');document.body.style.overflow='hidden';check();}
+function closePanel(){panel.classList.remove('active');document.body.style.removeProperty('overflow');}
+launch.addEventListener('click',openPanel);
+$("nineOrderClose").addEventListener('click',closePanel);
+panel.addEventListener('click',e=>{if(e.target===panel)closePanel();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('active'))closePanel();});
 $("nineOrderSignIn").addEventListener("click",async()=>{
  try{await ensureNetlifyAdmin();await firebase.auth().signInWithEmailAndPassword($("nineOrderEmail").value.trim(),$("nineOrderPass").value);$("nineOrderPass").value="";await check();}
  catch(e){$("nineOrderPass").value="";msg("Login gagal: "+e.message);}
 });
-$("nineOrderSignOut").addEventListener("click",async()=>{await firebase.auth().signOut();$("nineOrderList").replaceChildren();await check();});
+$("nineOrderSignOut").addEventListener("click",async()=>{await firebase.auth().signOut();list.replaceChildren();empty.hidden=true;statCount.textContent='0';await check();});
 firebase.auth().onAuthStateChanged(()=>{if(panel.classList.contains("active"))check();});
-function el(tag,txt){const e=document.createElement(tag);if(txt!==undefined)e.textContent=String(txt);return e;}
-function row(doc){
- const d=doc.data()||{},c=d.customer||{},item=el("article");item.className="nine-item";
- item.append(el("h3",d.orderId||doc.id),el("p","Pelanggan: "+(c.nama||"-")+" | "+(c.email||"-")),el("p","Status: "+(d.status||"-")+" | Ekspedisi: "+(d.ekspedisi||"-")));
- const products=Array.isArray(d.items)?d.items:[];
- item.append(el("p","Produk: "+products.length+" item | Total (belum diverifikasi): "+JSON.stringify(d.totals||{}).slice(0,220)));
- const line=el("div");line.className="nine-row";
- const status=el("select");
- ["checkout_created","confirmed","processing","shipped","completed","cancelled"].forEach(v=>{const opt=el("option",v);opt.value=v;status.append(opt);});
- status.value=["checkout_created","confirmed","processing","shipped","completed","cancelled"].includes(d.status)?d.status:"checkout_created";
- const awb=el("input");awb.placeholder="Nomor resi / AWB";awb.value=String(d.awb||d.resi||d.trackingNumber||"").slice(0,120);
- const save=el("button","Simpan status & resi");
- save.addEventListener("click",async()=>{
-  if(busy||!authorized||!validAdmin(firebase.auth().currentUser))return;
-  if(!confirm("Simpan perubahan untuk "+doc.id+"?"))return;
-  busy=true;save.disabled=true;
-  try{await ensureNetlifyAdmin();const payload={status:status.value,updatedAt:firebase.firestore.FieldValue.serverTimestamp()};
-   if(awb.value.trim())payload.awb=awb.value.trim().slice(0,120);
-   await firebase.firestore().collection("orders").doc(doc.id).update(payload);
-   msg("Perubahan berhasil disimpan. Pastikan status pembayaran sudah diverifikasi manual.");
-  }catch(e){msg("Gagal menyimpan: "+e.message);}
-  finally{busy=false;save.disabled=false;}
- });
- line.append(status,awb,save);item.append(line);return item;
+function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=String(txt);return e;}
+function productImage(item){return item?.foto||item?.image||item?.thumbnail||item?.imageUrl||item?.gambar||item?.photo||'';}
+function getCustomer(order){return order.customer||order.pembeli||order.buyer||{};}
+function getBuyerAddress(order){
+ const c=getCustomer(order);
+ const lines=[];
+ const direct=safe(c.alamat||c.address||order.alamat||order.address || order.shippingAddress?.address);
+ if(direct)lines.push(direct);
+ const tail=[c.kecamatan||order.shippingAddress?.district,c.kota||c.city||order.shippingAddress?.city,c.provinsi||c.province||order.shippingAddress?.province,c.kodePos||c.postalCode||order.shippingAddress?.postalCode].map(safe).filter(Boolean);
+ if(tail.length)lines.push(tail.join(', '));
+ return lines.join('\n')||'-';
 }
-$("nineOrderRefresh").addEventListener("click",async()=>{
- if(!authorized||!validAdmin(firebase.auth().currentUser))return;
- const list=$("nineOrderList");list.replaceChildren();msg("Memuat pesanan...");
- try{await ensureNetlifyAdmin();const snap=await firebase.firestore().collection("orders").limit(30).get();
-  const docs=snap.docs.sort((a,b)=>{const av=a.data().createdAt?.toMillis?.()||0,bv=b.data().createdAt?.toMillis?.()||0;return bv-av;});
-  docs.forEach(d=>list.append(row(d)));msg("Terbaca "+docs.length+" pesanan. Periksa izin Firestore dan hasil uji sebelum produksi.");
- }catch(e){msg("Gagal membaca orders: "+e.message);}
-});
+function getExpedition(order){return maybe(order.ekspedisi||order.shipping?.expedition||order.shipping?.courier||order.courier||order.metodePengiriman,'-');}
+function getTotals(order){
+ const t=order.totals||{};
+ return {
+  totalJenisProduk:Number(t.totalJenisProduk ?? t.totalProductTypes ?? (Array.isArray(order.items)?order.items.length:0))||0,
+  totalItem:Number(t.totalItem ?? t.totalItems ?? (Array.isArray(order.items)?order.items.reduce((n,it)=>n+(Number(it.qty)||0),0):0))||0,
+  subtotal:Number(t.subtotal ?? t.subTotal ?? order.subtotal ?? 0)||0,
+  productVoucherName:maybe(t.productVoucherName ?? t.voucherProduk ?? order.voucherProduk,''),
+  productDiscount:Number(t.productDiscount ?? t.diskonProduk ?? order.productDiscount ?? 0)||0,
+  shippingVoucherName:maybe(t.shippingVoucherName ?? t.voucherOngkir ?? order.voucherOngkir,''),
+  shippingDiscount:Number(t.shippingDiscount ?? t.diskonOngkir ?? order.shippingDiscount ?? 0)||0,
+  totalBayar:Number(t.totalBayar ?? t.total ?? order.totalBayar ?? 0)||0
+ };
+}
+function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('strong','',label),el('span','',maybe(value)));return wrap;}
+ function renderProducts(items){
+  const wrap=el('div','nine-products');
+  (Array.isArray(items)?items:[]).forEach((item,idx)=>{
+   const row=el('div','nine-product');
+   const src=productImage(item);
+   if(src){const img=el('img');img.src=src;img.alt=safe(item.nama||item.name||('Produk '+(idx+1)));img.loading='lazy';row.append(img);}else{row.append(el('div','placeholder','Foto'));}
+   const info=el('div','');
+   info.append(el('h5','',safe(item.nama||item.name||('Produk '+(idx+1)))));
+   info.append(el('small','', 'Varian: '+maybe(item.varian||item.variant||item.variasi,'-')));
+   info.append(el('small','', 'Qty: '+(Number(item.qty)||0)));
+   info.append(el('small','', 'Harga satuan: '+money(item.harga ?? item.price ?? item.unitPrice ?? 0)));
+   row.append(info);
+   row.append(el('strong','', money(item.subtotal ?? ((Number(item.qty)||0)*(Number(item.harga ?? item.price ?? item.unitPrice)||0)) )));
+   wrap.append(row);
+  });
+  if(!wrap.children.length)wrap.append(el('div','nine-empty','Belum ada rincian produk.'));
+  return wrap;
+ }
+ function renderSummary(order){
+  const t=getTotals(order), box=el('div','nine-section');
+  box.append(el('h4','', 'Ringkasan Pembayaran'));
+  const lines=[
+   ['Total jenis produk',t.totalJenisProduk],
+   ['Total item',t.totalItem],
+   ['Subtotal produk',money(t.subtotal)],
+   ['Voucher produk',t.productVoucherName||'-'],
+   ['Diskon produk','- '+money(t.productDiscount)],
+   ['Voucher ongkir',t.shippingVoucherName||'-'],
+   ['Diskon ongkir','- '+money(t.shippingDiscount)],
+   ['Ongkos kirim',maybe(order.ongkirLabel||order.shipping?.costLabel||order.shippingCostLabel,'Dihitung Admin')],
+  ];
+  lines.forEach(([k,v])=>{const line=el('div','nine-summary-line');line.append(el('span','',k),el('strong','',String(v)));box.append(line);});
+  const total=el('div','nine-summary-line total');total.append(el('span','','Total belanja'),el('strong','',money(t.totalBayar)));box.append(total);
+  return box;
+ }
+ function row(doc){
+  const d=doc.data()||{},c=getCustomer(d),card=el('article','nine-order-card');
+  const header=el('div','nine-order-header');
+  const top=el('div','nine-order-headline');
+  const left=el('div','');
+  left.append(el('h3','',safe(d.orderId||doc.id)));
+  left.append(el('small','', 'Tanggal order: '+formatDate(d.createdAt)+' • Ekspedisi: '+getExpedition(d)));
+  const badge=el('span','nine-status '+safe(d.status||'checkout_created'),STATUS_LABEL[d.status]||STATUS_LABEL.checkout_created);
+  top.append(left,badge);header.append(top);card.append(header);
+  const body=el('div','nine-order-body');
+  const leftCol=el('div','');
+  const buyer=el('div','nine-section');buyer.append(el('h4','', 'Data Pembeli'));
+  const buyerGrid=el('div','nine-kv');
+  [['Nama',c.nama||c.name],['No. WA',c.noWa||c.whatsapp||c.phone||c.telepon],['Email',c.email||'-'],['Provinsi',c.provinsi||c.province],['Kota',c.kota||c.city],['Kode Pos',c.kodePos||c.postalCode]].forEach(([k,v])=>{buyerGrid.append(el('strong','',k),el('span','',maybe(v)));});
+  buyer.append(buyerGrid);
+  buyer.append(el('div','nine-address',getBuyerAddress(d)));
+  leftCol.append(buyer);
+  const products=el('div','nine-section');products.append(el('h4','', 'Detail Pesanan'));products.append(renderProducts(d.items));leftCol.append(products);
+  body.append(leftCol);
+  const rightCol=el('div','');
+  rightCol.append(renderSummary(d));
+  const note=el('div','nine-section');note.append(el('h4','', 'Catatan & Pengiriman'));
+  const noteGrid=el('div','nine-kv');
+  [['Status teknis',d.status||'checkout_created'],['Nomor resi',d.awb||d.resi||d.trackingNumber||'-'],['Ekspedisi',getExpedition(d)],['Catatan',d.catatan||d.notes||'-']].forEach(([k,v])=>{noteGrid.append(el('strong','',k),el('span','',maybe(v)));});
+  note.append(noteGrid);rightCol.append(note);
+  body.append(rightCol);card.append(body);
+  const footer=el('div','nine-order-footer');
+  const editor=el('div','nine-editor');
+  const statusField=el('div','nine-field');statusField.append(el('label','', 'Ubah status'));const status=el('select');
+  STATUS_OPTIONS.forEach(v=>{const opt=el('option','',STATUS_LABEL[v]||v);opt.value=v;status.append(opt);});
+  status.value=STATUS_OPTIONS.includes(d.status)?d.status:'checkout_created';statusField.append(status);
+  const awbField=el('div','nine-field');awbField.append(el('label','', 'Nomor resi / AWB'));const awb=el('input');awb.placeholder='Isi setelah pesanan dikirim';awb.maxLength=120;awb.value=safe(d.awb||d.resi||d.trackingNumber).slice(0,120);awbField.append(awb);
+  const save=el('button','nine-action-btn','Simpan Status');
+  const feedback=el('div','nine-feedback','');feedback.setAttribute('aria-live','polite');
+  save.addEventListener('click',async()=>{
+   if(busy||!authorized||!validAdmin(firebase.auth().currentUser))return;
+   if(!confirm('Simpan perubahan untuk order '+safe(d.orderId||doc.id)+'?'))return;
+   busy=true;save.disabled=true;
+   try{
+    await ensureNetlifyAdmin();
+    const resi=safe(awb.value).slice(0,120);
+    const outcome=await saveAdminOrder(doc.id,status.value,resi);
+    badge.className='nine-status '+status.value;
+    badge.textContent=STATUS_LABEL[status.value]||status.value;
+    const salesNote=outcome.delta>0?' Statistik terjual bertambah '+outcome.affected+' unit.':outcome.delta<0?' Statistik terjual dikoreksi '+outcome.affected+' unit.':' Statistik terjual tidak berubah.';
+    feedback.textContent='Status dan resi berhasil diperbarui.'+salesNote;
+    msg('Perubahan berhasil disimpan dan disinkronkan.');
+   }
+   catch(e){feedback.textContent='Gagal menyimpan perubahan. Periksa izin admin atau coba lagi.';msg('Gagal menyimpan: '+e.message);} finally{busy=false;save.disabled=false;}
+  });
+  editor.append(statusField,awbField,save);footer.append(editor,feedback);card.append(footer);
+  return card;
+ }
+ $("nineOrderRefresh").addEventListener("click",async()=>{
+  if(!authorized||!validAdmin(firebase.auth().currentUser))return;
+  list.replaceChildren();empty.hidden=true;msg('Memuat pesanan...');statCount.textContent='0';
+  try{
+   await ensureNetlifyAdmin();
+   const snap=await firebase.firestore().collection("orders").limit(30).get();
+   const docs=snap.docs.sort((a,b)=>{const av=a.data().createdAt?.toMillis?.()||0,bv=b.data().createdAt?.toMillis?.()||0;return bv-av;});
+   if(!docs.length){empty.hidden=false;msg('Belum ada pesanan untuk ditampilkan.');return;}
+   docs.forEach(d=>list.append(row(d)));
+   statCount.textContent=String(docs.length);
+   msg('Terbaca '+docs.length+' pesanan. Silakan kelola seperti halaman faktur.');
+  }catch(e){msg('Gagal membaca orders: '+e.message);} 
+ });
 })();
 </script>
 
