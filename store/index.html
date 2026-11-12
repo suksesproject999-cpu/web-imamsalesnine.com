@@ -5372,32 +5372,26 @@ if(mismatches.length){
  await popup('warning','Periksa kembali pesanan',friendly.slice(0,4).join(' ').slice(0,950));
  return;
 }
-/* Periksa sesi dan App Check sebelum menulis. Token tidak pernah dicatat ke console. */
-const token=await checkoutUser.getIdTokenResult(true);
-const provider=token?.signInProvider||token?.claims?.firebase?.sign_in_provider||'';
-if(provider==='anonymous'){
+/* R9: App Check SDK tidak boleh menjadi gerbang buatan ketika enforcement
+   dinonaktifkan. SDK akan mengirim token secara otomatis bila tersedia.
+   Izin sebenarnya tetap dievaluasi server melalui Auth + Firestore Rules. */
+let token, provider='unknown';
+try{
+ token=await checkoutUser.getIdTokenResult(); // tanpa force-refresh setiap order
+ provider=token?.signInProvider||token?.claims?.firebase?.sign_in_provider||'unknown';
+}catch(authError){
+ console.warn('[ImamStore R9 developer] Sesi login tidak siap',{code:String(authError?.code||'unknown')});
+ throw authError;
+}
+if(provider==='anonymous'||checkoutUser.isAnonymous){
  await popup('warning','Silakan masuk kembali','Untuk melanjutkan pesanan, masuk kembali menggunakan akun Google atau email.');
  return;
 }
-let securityStatus='not-available';
-if(imamstoreR8Security.appCheckReady&&typeof firebase.appCheck==='function'){
- try{
-  const attestation=await firebase.appCheck().getToken(false);
-  if(!attestation?.token)throw new Error('App verification token was empty');
-  securityStatus='verified-client-token';
-  imamstoreR8Security.appCheckToken='ready';
- }catch(checkError){
-  imamstoreR8Security.appCheckToken='failed';
-  console.warn('[ImamStore R8 developer] App verification check did not complete',{code:String(checkError?.code||'unknown'),message:String(checkError?.message||'').slice(0,180)});
-  const err=new Error('Security verification did not complete');
-  err.code='imamstore/security-verification-failed';
-  throw err;
- }
-}else{
- console.warn('[ImamStore R8 developer] App Check not initialized before checkout',imamstoreR8Security.bootstrapError);
- securityStatus='not-initialized';
-}
-lastAttemptMeta={stage:'orders-create',orderId:d.orderId,project:firebase?.app?.()?.options?.projectId||'unavailable',provider:provider||'unknown',appCheck:securityStatus,items:items.length,preflight:'passed'};
+/* Tidak ada await appCheck().getToken() dalam submit.
+   Token App Check tetap dikelola Firebase SDK jika provider terpasang. */
+const securityStatus=imamstoreR8Security.appCheckReady?'managed-by-sdk':'not-initialized';
+lastAttemptMeta={stage:'orders-create',orderId:d.orderId,project:firebase?.app?.()?.options?.projectId||'unavailable',provider:provider||'unknown',appCheck:securityStatus,items:items.length,preflight:'passed',timestamp:new Date().toISOString()};
+window.imamstoreCheckoutLastAttempt=Object.freeze({...lastAttemptMeta});
 
 /* Tahap 5C.2: pesanan saja. Statistik penjualan dan ranking tidak boleh dinaikkan
    dari checkout browser yang belum diverifikasi admin. */
@@ -5430,16 +5424,22 @@ if($('refOrderNote'))$('refOrderNote').value='';
 if(note)note.textContent='';
 try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catch(e){console.warn('Refresh setelah checkout',e)}
 
-}catch(err){console.error('[ImamStore R8 developer] Checkout request failed',err);if(committed){console.warn('[ImamStore R8 developer] Order committed; only post-checkout failed',err);return;}
+}catch(err){console.error('[ImamStore R9 developer] Checkout request failed',err);if(committed){console.warn('[ImamStore R9 developer] Order committed; only post-checkout failed',err);return;}
 const customerMessage=window.imamstoreCustomerCheckoutR7.serviceError(err);
 if(note)note.textContent=customerMessage.title+'. Pesanan belum dinyatakan berhasil.';
-console.warn('[ImamStore R8 developer diagnostics]',{...lastAttemptMeta,code:String(err?.code||'unknown'),authenticated:!!firebase?.auth?.()?.currentUser,isAnonymous:!!firebase?.auth?.()?.currentUser?.isAnonymous,securityBootstrap:window.imamstoreR8Security?.status?.()});
-await popup('error',customerMessage.title,customerMessage.text)}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
+const technicalCode=String(err?.code||'unknown');
+const failureStage=lastAttemptMeta?.stage||(technicalCode.startsWith('auth/')?'auth-session':'prewrite');
+const diagnostic=Object.freeze({stage:failureStage,code:technicalCode,project:firebase?.app?.()?.options?.projectId||'unavailable',provider:lastAttemptMeta?.provider||'unknown',preflight:lastAttemptMeta?.preflight||'not-completed',items:lastAttemptMeta?.items??0,authenticated:!!firebase?.auth?.()?.currentUser,isAnonymous:!!firebase?.auth?.()?.currentUser?.isAnonymous});
+window.imamstoreCheckoutLastError=diagnostic;
+console.warn('[ImamStore R9 developer] Checkout diagnostic (tanpa alamat/nomor telepon):',diagnostic);
+if(technicalCode==='permission-denied'&&diagnostic.preflight==='passed') console.warn('[ImamStore R9 developer] Lokal valid, permintaan ditolak server. Periksa Firestore Rules /orders/{orderId}, provider Auth, dan rules yang benar-benar terbit. App Check enforcement yang OFF tidak mematikan Security Rules.');
+const assistanceCode=technicalCode==='permission-denied'?'IS-C02':technicalCode==='failed-precondition'?'IS-C03':technicalCode.startsWith('auth/')?'IS-C04':technicalCode.includes('network')||technicalCode==='unavailable'?'IS-C05':'IS-C01';
+await popup('error',customerMessage.title,customerMessage.text+' Kode bantuan: '+assistanceCode+'.')}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
 /* Reset guard hanya setelah checkout benar-benar ditutup dan sesi baru dibuka. */
 const checkoutPanel=$('s5Draft');let lastOpen=!!checkoutPanel?.classList.contains('open');
 if(checkoutPanel)new MutationObserver(()=>{
  const now=checkoutPanel.classList.contains('open');
- if(now&&!lastOpen){committed=false;pendingOrderId=null;lastAttemptMeta=null;button.textContent='Buat Pesanan';if(note)note.textContent='';refresh()}
+ if(now&&!lastOpen){committed=false;pendingOrderId=null;lastAttemptMeta=null;window.imamstoreCheckoutLastError=null;window.imamstoreCheckoutLastAttempt=null;button.textContent='Buat Pesanan';if(note)note.textContent='';refresh()}
  lastOpen=now;
 }).observe(checkoutPanel,{attributes:true,attributeFilter:['class']});
 /* Penangkap awal mencegah handler lain mengirim ulang ketika transaksi sudah commit. */
@@ -5448,7 +5448,7 @@ checkoutPanel?.addEventListener('click',e=>{
  e.preventDefault();e.stopImmediatePropagation();
 },true);
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan akan dikonfirmasi setelah berhasil dikirim.';refresh();
-window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r8-security-handshake'});
+window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r9-nonblocking-appcheck'});
 })();
 </script><div aria-live="polite" id="toast" role="status"></div><script id="imamstore-v52-toast-bridge">(()=>{'use strict';
 let timer=null,toast=null;
