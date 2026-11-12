@@ -907,6 +907,21 @@ body > .swal2-container:not(.swal2-toast-shown) {
 .imam-r13-fallback{width:min(94vw,470px)}
 @media(max-width:380px){.imam-r13-success-content{padding:22px 17px 5px}.imam-r13-wa-popup .swal2-actions,.imam-r13-wa-actions{padding:7px 17px 20px}.imam-r13-steps{gap:6px}.imam-r13-steps>div{font-size:10px}.imam-r13-wa-confirm{font-size:14px}}
 </style>
+<style id="imamstore-r20-brand-logos">
+/* R20: Kartu brand logo. Hanya ruang Jelajahi Brand, tanpa mengubah kategori/filter. */
+#categoryChips.store-brand-logos{display:flex;gap:10px;align-items:stretch;overflow-x:auto;overflow-y:hidden;padding:3px 3px 12px;scrollbar-width:none;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+#categoryChips.store-brand-logos::-webkit-scrollbar{display:none}
+#categoryChips .store-brand-logo-card{flex:0 0 146px;min-width:146px;min-height:112px;max-width:146px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;padding:12px 8px 10px;border:1px solid #e1e9d8;border-radius:15px;background:#fff;box-shadow:0 2px 7px #1220090a;scroll-snap-align:start;text-align:center;cursor:pointer;transition:border-color .15s,background-color .15s,transform .15s}
+#categoryChips .store-brand-logo-card:active{transform:scale(.98);background:#f4faee}
+#categoryChips .store-brand-logo-card:focus-visible{outline:2px solid #8cc63f;outline-offset:2px}
+#categoryChips .store-brand-logo-wrap{width:100%;height:62px;display:flex;align-items:center;justify-content:center;min-width:0}
+#categoryChips .store-brand-logo{display:block;max-width:100%;width:120px;height:60px;object-fit:contain;object-position:center}
+#categoryChips .store-brand-logo[hidden],#categoryChips .store-brand-logo-fallback[hidden]{display:none}
+#categoryChips .store-brand-logo-fallback{font-size:12px;line-height:1.3;font-weight:850;color:#516d3b;overflow-wrap:anywhere}
+#categoryChips .store-brand-product-count{display:inline-flex;justify-content:center;align-items:center;color:#608d2e;background:#eff7e8;border-radius:99px;padding:5px 11px;min-width:72px;font-size:11px;font-weight:750;line-height:1.2;white-space:nowrap;font-variant-numeric:tabular-nums}
+@media(max-width:480px){#categoryChips .store-brand-logo-card{flex-basis:128px;min-width:128px;max-width:128px;min-height:105px;padding:10px 7px 9px}#categoryChips .store-brand-logo-wrap{height:56px}#categoryChips .store-brand-logo{height:55px;width:110px}}
+@media(prefers-reduced-motion:reduce){#categoryChips .store-brand-logo-card{transition:none}}
+</style>
 </head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
@@ -1280,6 +1295,54 @@ function openStoreFilter(type,value){
  changeTab('produk');
  $('panel-produk').scrollTop=0;
 }
+// Logo brand di root utama /assets/brands/.
+// Jika nama file berbeda dari nama brand, dapat dipetakan tanpa menyentuh filter:
+// window.IMAMSTORE_BRAND_LOGOS = {'NINE LUXIMOS': 'luximos-logo.webp'};
+const brandLogoResolved=new Map();
+function brandLogoCandidates(brand){
+ const name=String(brand||'').trim();
+ const slug=name.toLowerCase().normalize('NFKD').replace(/[\u0300-\u036f]/g,'')
+  .replace(/[^a-z0-9]+/g,'-').replace(/^-|-$/g,'');
+ const bare=slug.replace(/^nine-/,'');
+ const external=window.IMAMSTORE_BRAND_LOGOS||{};
+ const mapped=external[name]||external[name.toUpperCase()]||external[slug];
+ const filenames=[];
+ if(typeof mapped==='string'&&mapped.trim())filenames.push(mapped.trim());
+ // Nama lazim di folder brand. Tiap alternatif hanya dicoba bila file sebelumnya gagal.
+ for(const base of [...new Set([slug,slug.replace(/-/g,'_'),bare,name])]){
+  if(!base)continue;
+  for(const ext of ['png','webp','svg'])filenames.push(base+'.'+ext);
+ }
+ const seen=new Set();
+ return filenames.map(file=>{
+  const cleaned=file.replace(/^\/?assets\/brands\//i,'').replace(/^\/+/, '');
+  return '/assets/brands/'+cleaned.split('/').map(encodeURIComponent).join('/');
+ }).filter(url=>{if(seen.has(url))return false;seen.add(url);return true});
+}
+(function installBrandLogoFallback(){
+ const host=$('categoryChips');
+ if(!host||host.dataset.logoFallbackInstalled)return;
+ host.dataset.logoFallbackInstalled='true';
+ host.addEventListener('load',event=>{
+  const img=event.target;
+  if(!img?.matches?.('.store-brand-logo'))return;
+  brandLogoResolved.set(img.dataset.brandName,img.getAttribute('src'));
+  img.hidden=false;
+  const fallback=img.parentElement?.querySelector('.store-brand-logo-fallback');
+  if(fallback)fallback.hidden=true;
+ },true);
+ host.addEventListener('error',event=>{
+  const img=event.target;
+  if(!img?.matches?.('.store-brand-logo'))return;
+  const name=img.dataset.brandName,paths=brandLogoCandidates(name);
+  const next=Number(img.dataset.brandAttempt||0)+1;
+  if(next<paths.length){img.dataset.brandAttempt=String(next);img.src=paths[next];return;}
+  img.hidden=true;
+  const fallback=img.parentElement?.querySelector('.store-brand-logo-fallback');
+  if(fallback)fallback.hidden=false;
+  brandLogoResolved.set(name,'');
+ },true);
+})();
 function render(){
  const filtered=products.filter(p=>{
   if(activeStoreCategory&&!(Array.isArray(p.storeCategories)&&p.storeCategories.includes(activeStoreCategory)))return false;
@@ -1301,7 +1364,24 @@ function render(){
  }).join('')||'<p class="empty">Kategori Store belum tersedia.</p>';
  const brands=new Map();
  products.forEach(p=>{const v=String(p.brand||'').trim();if(v)brands.set(v,(brands.get(v)||0)+1)});
- $('categoryChips').innerHTML=[...brands].sort((a,b)=>b[1]-a[1]).slice(0,20).map(([k,n])=>`<button class="chip" data-store-brand="${esc(k)}">${esc(k)} (${n})</button>`).join('');
+ const brandRows=[...brands].sort((a,b)=>b[1]-a[1]).slice(0,20);
+ const brandHost=$('categoryChips');
+ const brandSignature=JSON.stringify(brandRows);
+ // Hindari membuat ulang gambar/scroll saat render dipicu timer atau statistik produk.
+ if(brandHost.dataset.brandSignature!==brandSignature){
+  brandHost.dataset.brandSignature=brandSignature;
+  brandHost.classList.add('store-brand-logos');
+  brandHost.innerHTML=brandRows.map(([k,n])=>{
+   const candidates=brandLogoCandidates(k);
+   const src=brandLogoResolved.get(k)||candidates[0];
+   const index=Math.max(0,candidates.indexOf(src));
+   const savedAsMissing=brandLogoResolved.get(k)==='';
+   return `<button type="button" class="chip store-brand-logo-card" data-store-brand="${esc(k)}" aria-label="Lihat ${esc(n)} produk ${esc(k)}" title="${esc(k)}">`
+    +`<span class="store-brand-logo-wrap"><img class="store-brand-logo" data-brand-name="${esc(k)}" data-brand-attempt="${index}" src="${esc(src)}" alt="Logo ${esc(k)}" loading="lazy" decoding="async" ${savedAsMissing?'hidden':''}>`
+    +`<span class="store-brand-logo-fallback" ${savedAsMissing?'':'hidden'}>${esc(k)}</span></span>`
+    +`<span class="store-brand-product-count">${n} Produk</span></button>`;
+  }).join('');
+ }
  const shelves=$('storeCategoryShelves');
  // Jangan rebuild rail saat scroll/sentuh berlangsung: render dipanggil oleh statistik dan timer.
  const signature=JSON.stringify(enabled.map(c=>[c.id,c.name,products.filter(p=>Array.isArray(p.storeCategories)&&p.storeCategories.includes(c.id)).map(p=>[p.id,p.nama,p.gambar,p.harga,p.terjual,p.active])]));
