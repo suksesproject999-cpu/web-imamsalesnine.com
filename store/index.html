@@ -873,7 +873,41 @@ body > .swal2-container:not(.swal2-toast-shown) {
  #imamstoreOriginalPurchase .ref-v45-variant-grid button{font-size:12px;}
  #imamstoreOriginalPurchase #ninePurchaseBudgetValue{font-size:16px;}
 }
-</style></head>
+</style><style id="imamstore-r13-checkout-wa-style">
+/* Dialog R13: tampilan pelanggan saja, tanpa mengubah style bottom sheet dan card. */
+.swal2-popup.imam-r13-wa-popup,.imam-r13-wa-popup.imam-r13-fallback{
+ box-sizing:border-box;border-radius:22px;overflow:hidden;background:#fff;
+ max-height:min(94dvh,830px);overflow-y:auto;overscroll-behavior:contain;
+ font-family:system-ui,-apple-system,Arial,sans-serif;color:#242b21;
+ box-shadow:0 18px 55px rgba(0,0,0,.22);text-align:left;
+}
+.imam-r13-wa-popup .swal2-html-container{margin:0;padding:0;overflow:visible;text-align:left}
+.imam-r13-wa-popup .swal2-title{display:none}
+.imam-r13-success-content{padding:26px 24px 6px}
+.imam-r13-check-mark{text-align:center;margin:0 0 7px}
+.imam-r13-eyebrow{text-align:center;color:#64982b;letter-spacing:1.25px;font-size:10px;font-weight:800}
+.imam-r13-success-content h2{font-size:clamp(20px,5.2vw,25px);line-height:1.22;font-weight:800;letter-spacing:-.5px;margin:8px 0 10px;text-align:center;color:#263322}
+.imam-r13-lead{text-align:center;color:#636b60;font-size:13px;line-height:1.6;margin:0 0 18px}
+.imam-r13-receipt{background:#f5f9f0;border:1px solid #e2edd5;border-radius:13px;padding:13px 15px;text-align:center;display:flex;flex-direction:column;gap:6px}
+.imam-r13-receipt span{font-size:11px;color:#687562;font-weight:650}
+.imam-r13-receipt strong{font-size:13px;word-break:break-all;line-height:1.45;color:#263a20;user-select:text;-webkit-user-select:text}
+.imam-r13-receipt small{font-size:10px;color:#87917f}
+.imam-r13-steps{display:grid;grid-template-columns:1fr 1.35fr;gap:12px;margin:17px 0 13px}
+.imam-r13-steps>div{display:flex;align-items:center;gap:7px;font-size:11px;line-height:1.35;font-weight:700;color:#596a52}
+.imam-r13-step-icon{display:grid;place-items:center;width:25px;height:25px;flex:0 0 25px;border-radius:50%;font-size:12px;font-weight:900}
+.imam-r13-step-icon.done{background:#e5f2d8;color:#558e22}
+.imam-r13-step-icon.next{background:#8cc63f;color:#fff}
+.imam-r13-footnote{font-size:11px;color:#6b7466;line-height:1.65;margin:0 0 12px}
+.imam-r13-wa-popup .swal2-actions,.imam-r13-wa-actions{margin:0!important;padding:7px 24px 25px;width:100%;box-sizing:border-box;display:flex!important}
+.imam-r13-wa-confirm{display:flex!important;align-items:center;justify-content:center;gap:10px;width:100%;min-height:53px;border:0;border-radius:13px;background:#8cc63f;color:#17250e;box-shadow:0 3px 10px #8cc63f36;font-weight:800;font-size:15px;cursor:pointer;padding:12px 10px;transition:filter .15s}
+.imam-r13-wa-confirm i{font-size:22px}
+.imam-r13-wa-confirm:hover{filter:brightness(.97)}
+.imam-r13-wa-confirm:focus-visible{outline:3px solid #4c7b18;outline-offset:3px}
+.imam-r13-fallback-shade{position:fixed;inset:0;background:#0009;z-index:2147483645;display:flex;align-items:center;justify-content:center;padding:12px;box-sizing:border-box}
+.imam-r13-fallback{width:min(94vw,470px)}
+@media(max-width:380px){.imam-r13-success-content{padding:22px 17px 5px}.imam-r13-wa-popup .swal2-actions,.imam-r13-wa-actions{padding:7px 17px 20px}.imam-r13-steps{gap:6px}.imam-r13-steps>div{font-size:10px}.imam-r13-wa-confirm{font-size:14px}}
+</style>
+</head>
 <body>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="/"><i class="fa-solid fa-house"></i></a></div></header>
 <div class="shell">
@@ -1037,7 +1071,7 @@ const flashIsActive=(p,now=Date.now())=>{
 };
 const price=p=>flashIsActive(p)?Number(p.flashSale.price):regularPrice(p);
 const normal=p=>num(p.harga?.normal);
-const sold=p=>num(p.terjual);
+const sold=p=>num(stats.get(String(p.id))?.terjual ?? p.terjual);
 // Samakan resolusi foto dengan index utama yang berada di root domain.
 function productImageUrl(value){
  const raw=String(value||'').trim();
@@ -1200,7 +1234,7 @@ function card(p){
  const count=Number(st.ratingCount??p.ratingCount??0);
  const total=Number(st.ratingTotal??p.ratingTotal??0);
  const rating=count>0&&Number.isFinite(total)?(total/count).toFixed(1):'—';
- const sales=st.terjual??p.terjual;
+ const sales=st.terjual??p.terjual??0;
  const views=st.views??p.views??p.viewCount;
  const benefit=feature(p);
  const hasVoucher=activeVouchers.some(v=>v.type&&v.type.startsWith("product_"));
@@ -5229,7 +5263,7 @@ window.imamstoreFirebaseStatus=check;
 window.addEventListener('load',check,{once:true});
 })();</script><script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-functions-compat.js"></script><script id="imamstore-v51-original-firebase-checkout">
 (()=>{'use strict';
-/* Migrasi alur asli v21: commit statistik_produk + orders, update ranking best effort, konfirmasi WA. */
+/* Checkout menyimpan orders sekali. Statistik terjual dihitung setelah admin memverifikasi pesanan (R14), bukan dari klaim pembeli. */
 const $=id=>document.getElementById(id),button=$('refPlaceOrder'),note=$('refCheckoutWarning');if(!button)return;
 const KEY='imamstore_cart_stage5',ADMIN='6282210109369';let busy=false,committed=false,pendingOrderId=null,lastAttemptMeta=null;
 const money=n=>'Rp '+Math.round(Number(n)||0).toLocaleString('id-ID');
@@ -5363,7 +5397,194 @@ window.imamstoreCheckoutSafeReport=()=>{
 };
 
 
-function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
+/* R13 — satu formatter untuk WhatsApp checkout dan riwayat pesanan.
+   Tanggal toko memakai WIB; total dan item berasal dari transaksi tersimpan. */
+function orderTimeWIB(value){
+ let date=value;
+ if(value&&typeof value.toDate==='function')date=value.toDate();
+ else if(value&&typeof value.seconds==='number')date=new Date(value.seconds*1000);
+ else if(value&&typeof value.toMillis==='function')date=new Date(value.toMillis());
+ else if(!(value instanceof Date))date=new Date(value||Date.now());
+ if(!(date instanceof Date)||!Number.isFinite(date.getTime()))date=new Date();
+ const parts=Object.fromEntries(new Intl.DateTimeFormat('en-GB',{
+  timeZone:'Asia/Jakarta',day:'2-digit',month:'2-digit',year:'numeric',
+  hour:'2-digit',minute:'2-digit',second:'2-digit',hourCycle:'h23'
+ }).formatToParts(date).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
+ return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}.${parts.minute}.${parts.second}`;
+}
+function message(d,items,s){
+ const safe=v=>v==null||String(v).trim()===''?'-':String(v).trim();
+ const qty=items.reduce((n,x)=>n+(Number(x.qty)||0),0);
+ const sum=items.reduce((n,x)=>n+(Number(x.harga)||0)*(Number(x.qty)||0),0);
+ const subtotal=Number.isFinite(Number(s.subtotal))?Number(s.subtotal):sum;
+ const pDiscount=Number(s.productDiscount)||0;
+ const sDiscount=Number(s.shippingDiscount)||0;
+ const paid=Number.isFinite(Number(s.totalBayar))?Number(s.totalBayar):subtotal-pDiscount;
+ const goods=items.map((x,i)=>[
+  `${i+1}. ${safe(x.nama)}`,
+  '',
+  `    Varian  : ${safe(x.varian)}`,
+  `    Qty     : ${Number(x.qty)||0}`,
+  `    Harga   : ${money(x.harga)}`,
+  `    Subtotal: ${money((Number(x.qty)||0)*(Number(x.harga)||0))}`
+ ].join('\n')).join('\n\n');
+ return [
+  'Halo Imamsalesnine.com 👋',
+  '',
+  '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+  '',
+  '◆ FORM PEMESANAN',
+  '',
+  `Tanggal Order : ${orderTimeWIB(d.createdAt)}`,
+  `Order ID      : ${safe(d.orderId)}`,
+  '',
+  '──────────────────────────',
+  '',
+  '◉ DATA PEMBELI',
+  '',
+  `Nama      : ${safe(d.nama)}`,
+  `No. WA    : ${safe(d.wa)}`,
+  `Email     : ${safe(d.email)}`,
+  '',
+  '⌖ ALAMAT PENGIRIMAN',
+  '',
+  `Provinsi  : ${safe(d.provinsi)}`,
+  `Kota      : ${safe(d.kota)}`,
+  `Kode Pos  : ${safe(d.kodepos)}`,
+  '',
+  'Alamat :',
+  safe(d.alamat),
+  '',
+  '⇢ PENGIRIMAN',
+  '',
+  `Ekspedisi : ${safe(d.ekspedisi)}`,
+  '',
+  '──────────────────────────',
+  '',
+  '▣ DETAIL PESANAN',
+  '',
+  goods,
+  '',
+  '──────────────────────────',
+  '',
+  '⌁ RINGKASAN PEMBAYARAN',
+  '',
+  `Total Jenis Produk : ${items.length}`,
+  `Total Item         : ${Number.isFinite(Number(s.totalItem))?Number(s.totalItem):qty}`,
+  '',
+  `Subtotal Produk    : ${money(subtotal)}`,
+  '',
+  `Voucher Produk     : ${safe(s.productVoucherName)}`,
+  `Diskon Produk      : - ${money(pDiscount)}`,
+  '',
+  `Voucher Ongkir     : ${safe(s.shippingVoucherName)}`,
+  `Diskon Ongkir      : - ${money(sDiscount)}`,
+  '',
+  `Total Belanja      : ${money(paid)}`,
+  '',
+  'Ongkos Kirim       : Dihitung Admin',
+  '',
+  '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+  '',
+  '📜 PERSETUJUAN',
+  '',
+  '✓ Saya telah membaca dan menyetujui seluruh syarat & ketentuan pemesanan.',
+  '',
+  '━━━━━━━━━━━━━━━━━━━━━━━━━━',
+  '',
+  '✎ CATATAN',
+  '',
+  safe(d.catatan),
+  '',
+  '──────────────────────────',
+  '',
+  '✓ Total Harga',
+  '✓ Ongkos Kirim',
+  '✓ Metode Pembayaran',
+  '',
+  'Terima kasih.'
+ ].join('\n');
+}
+window.imamstoreOrderWhatsAppURL=function(order){
+ const c=order?.customer||{}, lines=Array.isArray(order?.items)?order.items:[];
+ if(!order?.orderId||!lines.length)return '';
+ const d={orderId:String(order.orderId),createdAt:order.createdAt,nama:String(c.nama||''),
+  wa:String(c.wa||''),email:String(c.email||''),provinsi:String(c.provinsi||''),
+  kota:String(c.kota||''),kodepos:String(c.kodepos||''),alamat:String(c.alamat||''),
+  ekspedisi:String(order.ekspedisi||''),catatan:String(order.catatan||'')};
+ return 'https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,lines,order.totals||{}));
+};
+/* Untuk tes regresi format, tidak untuk dipakai sebagai klaim pesan sudah terkirim. */
+window.imamstoreWhatsAppFormatR13=message;
+/* Dialog WA wajib: tidak ditutup lewat luar, Escape, atau Back saat checkout masih terbuka.
+   Tombol hanya MEMBUKA chat; pengiriman pesan tetap perlu ditekan di WhatsApp. */
+function lockWaDialog(orderId){
+ let enabled=true;
+ try{history.pushState({imamstoreWAConfirmation:orderId},'',location.href)}catch(_){ }
+ const onBack=()=>{
+  if(!enabled)return;
+  try{history.pushState({imamstoreWAConfirmation:orderId},'',location.href)}catch(_){ }
+ };
+ window.addEventListener('popstate',onBack);
+ return ()=>{
+  enabled=false;window.removeEventListener('popstate',onBack);
+  try{if(history.state?.imamstoreWAConfirmation===orderId)
+   history.replaceState({...history.state,imamstoreWAConfirmation:null},'',location.href)}catch(_){ }
+ };
+}
+function openWhatsAppFromClick(url){
+ try{
+  const tab=window.open(url,'_blank');
+  if(tab){try{tab.opener=null}catch(_){ }return true}
+ }catch(_){ }
+ // Android/webview dapat memblokir pop-up. Navigasi langsung berasal dari klik.
+ window.location.assign(url);
+ return true;
+}
+async function confirmWhatsAppRequired(id,url){
+ const clean=str=>String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const html=`<div class="imam-r13-success-content">
+  <div class="imam-r13-check-mark" aria-hidden="true"><svg viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="32" fill="#eff8e5" stroke="#a4d56b" stroke-width="2"/><path d="m21 37 10 10 21-23" fill="none" stroke="#6cab2e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+  <div class="imam-r13-eyebrow">LANGKAH 1 SELESAI</div>
+  <h2 id="imamR13ModalTitle">Pesanan berhasil dicatat</h2>
+  <p class="imam-r13-lead">Pesanan Anda telah tersimpan. Lanjutkan ke WhatsApp agar admin menerima pesan konfirmasi.</p>
+  <div class="imam-r13-receipt"><span>Nomor pesanan</span><strong>${clean(id)}</strong><small>Nomor ini bukan nomor resi pengiriman.</small></div>
+  <div class="imam-r13-steps"><div><span class="imam-r13-step-icon done">✓</span><span>Tercatat di sistem</span></div><div><span class="imam-r13-step-icon next">2</span><span>Konfirmasi ke admin via WhatsApp</span></div></div>
+  <p class="imam-r13-footnote">Setelah WhatsApp terbuka, tekan <b>Kirim</b> untuk menyampaikan format pesanan. Status pesanan dapat dipantau melalui <b>Pesanan Saya</b>.</p>
+ </div>`;
+ const release=lockWaDialog(id);
+ try{
+  if(window.Swal?.fire){
+   const result=await Swal.fire({
+    html,icon:undefined,showConfirmButton:true,showDenyButton:false,showCancelButton:false,
+    showCloseButton:false,allowOutsideClick:false,allowEscapeKey:false,allowEnterKey:true,
+    returnFocus:false,focusConfirm:true,buttonsStyling:false,
+    confirmButtonText:'<i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Kirim Pesanan via WhatsApp',
+    customClass:{popup:'imam-r13-wa-popup',confirmButton:'imam-r13-wa-confirm',actions:'imam-r13-wa-actions'},
+    width:'min(94vw,470px)',padding:0,
+    preConfirm:()=>{openWhatsAppFromClick(url);return true}
+   });
+   if(!result?.isConfirmed)return await confirmWhatsAppFallback(html,url);
+   return true;
+  }
+  return await confirmWhatsAppFallback(html,url);
+ }finally{release()}
+}
+function confirmWhatsAppFallback(html,url){
+ return new Promise(resolve=>{
+  const shade=document.createElement('div');shade.className='imam-r13-fallback-shade';
+  shade.setAttribute('role','presentation');
+  shade.innerHTML='<section class="imam-r13-wa-popup imam-r13-fallback" role="dialog" aria-modal="true" aria-labelledby="imamR13ModalTitle">'+html
+   +'<div class="imam-r13-wa-actions"><button type="button" class="imam-r13-wa-confirm"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Kirim Pesanan via WhatsApp</button></div></section>';
+  const btn=shade.querySelector('button');const stop=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation()}};
+  document.addEventListener('keydown',stop,true);document.body.appendChild(shade);btn.focus();
+  btn.addEventListener('click',()=>{
+   openWhatsAppFromClick(url);
+   document.removeEventListener('keydown',stop,true);
+   shade.remove();resolve(true)
+  },{once:true});
+ });
+}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
 async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
 // Sinkronisasi final: snapshot checkout wajib cocok dengan katalog aktif.
@@ -5478,13 +5699,21 @@ committed=true; window.imamstoreCheckoutLastError=null; /* Firestore mengonfirma
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
 button.textContent='Pesanan tercatat';
-const result=await (window.Swal?.fire?Swal.fire({icon:'success',title:'Pesanan berhasil dicatat',html:'<p>Nomor pesanan:</p><strong style="font-size:19px;word-break:break-all">'+String(d.orderId).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</strong><p style="font-size:13px;color:#666;margin-top:12px">Simpan nomor ini. Pesanan masih menunggu konfirmasi melalui WhatsApp; ini bukan nomor resi pengiriman.</p>',showCancelButton:true,showDenyButton:true,confirmButtonText:'Lanjut WhatsApp',denyButtonText:'Salin Nomor',cancelButtonText:'Tutup',confirmButtonColor:'#8cc63f',denyButtonColor:'#51664a'}):Promise.resolve({isConfirmed:true}));
-if(result.isDenied){try{await navigator.clipboard.writeText(String(d.orderId));window.imamstoreToast?.('Nomor pesanan disalin.','success')}catch(_){window.prompt('Salin nomor pesanan:',String(d.orderId))}}
-if(result.isConfirmed){const url='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,items,summary));const w=window.open(url,'_blank','noopener,noreferrer');if(!w)location.href=url}
-/* Checkout state stays mounted until the success dialog is dismissed.
-   Only now reconcile the purchased cart lines. */
-/* Remove only purchased lines from local cart, preserving unselected lines. */
-try{const cart=read(KEY,[]),counts=new Map();if(!directBuy)lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);localStorage.setItem(KEY,JSON.stringify(remaining));window.dispatchEvent(new Event('storage'));window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.()}catch(e){console.warn('Cart update',e)}
+/* R13: proses aman = commit orders -> bersihkan item terpesan ->
+   tampilkan dialog WA wajib -> buka chat hanya dari klik, tidak submit ulang. */
+const waUrl='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message({...d,createdAt:new Date()},items,summary));
+/* Keranjang dikonsolidasikan segera setelah server mengonfirmasi commit.
+   Menutup tab saat dialog WA aktif tidak mengembalikan item yang sudah dipesan. */
+try{
+ const cart=read(KEY,[]),counts=new Map();
+ if(!directBuy)lines.forEach(x=>counts.set(String(x.key),(counts.get(String(x.key))||0)+Number(x.qty)));
+ const remaining=cart.map(x=>{const n=counts.get(String(x.key))||0;
+  return n?{...x,qty:Math.max(0,Number(x.qty)-n)}:x}).filter(x=>Number(x.qty)>0);
+ localStorage.setItem(KEY,JSON.stringify(remaining));
+ window.dispatchEvent(new Event('storage'));
+ window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.();
+}catch(e){console.warn('[ImamStore developer] Sinkronisasi keranjang pasca-order',e)}
+await confirmWhatsAppRequired(d.orderId,waUrl);
 /* Setelah dialog sukses selesai, tutup checkout dan hapus hanya state transaksi sementara. */
 window.__nexaiCheckoutLines=null;window.__nexaiCheckoutMode=null;window.imamstoreV43?.endCheckout?.();
 const draft=$('s5Draft');
@@ -5500,6 +5729,7 @@ for(const id of ['refTermsBody','refTermsFooter']){const el=$(id);if(el)el.check
 if($('refOrderNote'))$('refOrderNote').value='';
 if(note)note.textContent='';
 try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catch(e){console.warn('Refresh setelah checkout',e)}
+/* Pembukaan WhatsApp sudah dilakukan langsung dari klik tombol modal. */
 
 }catch(err){console.error('[ImamStore R9 developer] Checkout request failed',err);if(committed){console.warn('[ImamStore R9 developer] Order committed; only post-checkout failed',err);return;}
 const customerMessage=window.imamstoreCustomerCheckoutR7.serviceError(err);
@@ -5524,8 +5754,8 @@ checkoutPanel?.addEventListener('click',e=>{
  if(!committed||!e.target.closest('#refPlaceOrder'))return;
  e.preventDefault();e.stopImmediatePropagation();
 },true);
-button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan akan dikonfirmasi setelah berhasil dikirim.';refresh();
-window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r10-order-reconciliation'});
+button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan akan tercatat dan menunggu konfirmasi admin.';refresh();
+window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r13-required-wa-confirmation'});
 })();
 </script><script id="imamstore-r10-private-debug">
 (()=>{'use strict';
@@ -5997,9 +6227,13 @@ function gallery(){
 }
 function updateStats(pid,data){
  if(pid!==activeId)return;
- const sold=Number(data?.terjual??data?.sold??data?.totalTerjual);
+ // Statistik Firestore dapat belum mempunyai field terjual (produk baru).
+ // Pakai angka awal katalog atau 0, jangan menampilkan "data belum tersedia".
+ const product=getProduct();
+ const fallback=Number(product?.terjual??product?.sold??product?.totalTerjual??0);
+ const sold=Number(data?.terjual??data?.sold??data?.totalTerjual??(Number.isFinite(fallback)&&fallback>=0?fallback:0));
  const soldNode=host.querySelector('[data-detail-sold]');
- if(soldNode)soldNode.textContent=Number.isFinite(sold)&&sold>=0?sold.toLocaleString('id-ID')+' terjual':'Data terjual belum tersedia';
+ if(soldNode)soldNode.textContent=(Number.isFinite(sold)&&sold>=0?sold:0).toLocaleString('id-ID')+' terjual';
  const count=Number(data?.ratingCount)||0,total=Number(data?.ratingTotal)||0;
  const average=count>0?(total/count).toLocaleString('id-ID',{minimumFractionDigits:1,maximumFractionDigits:1}):'—';
  const badge=host.querySelector('[data-detail-rating-badge] small');if(badge)badge.textContent='★ '+average;
@@ -7123,7 +7357,7 @@ schedule();
 @media(min-width:700px){#nexaiOrdersDialog{align-items:center}.nexai-orders-panel{border-radius:20px}}
 </style><div aria-labelledby="nexaiOrdersTitle" aria-modal="true" hidden="" id="nexaiOrdersDialog" role="dialog">
 <section class="nexai-orders-panel">
-<div class="nexai-orders-head"><h2 id="nexaiOrdersTitle">Pesanan Saya</h2><button aria-label="Tutup" id="nexaiOrdersClose" type="button">×</button></div>
+<div class="nexai-orders-head"><h2 id="nexaiOrdersTitle">Pesanan Saya</h2><button id="nexaiOrdersRefresh" type="button" aria-label="Perbarui status pesanan" title="Perbarui status" style="font-size:18px">↻</button><button aria-label="Tutup" id="nexaiOrdersClose" type="button">×</button></div>
 <p aria-live="polite" id="nexaiOrdersMessage" role="status">Memuat…</p>
 <div id="nexaiOrdersList"></div>
 <p style="font-size:12px;color:#6a7167;line-height:1.6">Nomor pesanan berbeda dari resi/AWB. Status pengiriman hanya ditampilkan jika sudah dicatat oleh penjual. Pesanan tanpa akun memerlukan verifikasi penjual; tidak dapat dibuka menggunakan nomor pesanan saja.</p>
@@ -7195,6 +7429,9 @@ function renderOrder(data){
  const actions=el('div','nexai-order-actions');
  const detail=el('button','nexai-detail-btn','Lihat Rincian');detail.type='button';detail.addEventListener('click',()=>showInvoice(data));
  const copy=el('button','','Salin Nomor');copy.type='button';copy.addEventListener('click',()=>copyId(val(data.orderId),copy));
+ const waUrl=window.imamstoreOrderWhatsAppURL?.(data);
+ if(waUrl){const wa=el('a','nexai-detail-btn','Kirim via WhatsApp');wa.href=waUrl;wa.target='_blank';wa.rel='noopener noreferrer';
+  wa.style.cssText='display:inline-flex;align-items:center;text-decoration:none;border:1px solid #8cc63f;border-radius:8px;padding:8px 11px;color:#4b7721;font-size:13px;font-weight:700;background:#fff';actions.append(wa)}
  actions.append(detail,copy);card.append(actions);return card;
 }
 async function open(){
@@ -7214,6 +7451,7 @@ async function open(){
  }catch(e){if(token!==loadToken)return;console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Riwayat pesanan belum dapat ditampilkan. Silakan masuk kembali atau hubungi layanan pelanggan.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
 }
 window.nexaiOpenOrders=open;
+document.getElementById('nexaiOrdersRefresh')?.addEventListener('click',open);
 document.getElementById('nexaiOrdersClose')?.addEventListener('click',close);
 document.getElementById('nexaiInvoiceClose')?.addEventListener('click',closeInvoice);
 dialog.addEventListener('click',e=>{if(e.target===dialog)close()});
@@ -7357,5 +7595,175 @@ observer.observe(target,{childList:true,subtree:true});
 
 <script id="nexai-v7-purchase-single-state">
 /* Removed: duplicate purchase state and capture submit handler superseded by Commerce Sheet R2. */
+</script>
+
+<style id="imamstore-r12-admin-orders-style">
+#imamstoreAdminOrders[hidden]{display:none!important}
+#imamstoreAdminOrders{position:fixed;inset:0;z-index:2147483550;display:flex;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.7)}
+#imamstoreAdminOrders .r12-admin-panel{background:#fff;color:#273024;border-radius:18px 18px 0 0;width:min(100%,680px);max-height:91dvh;overflow:auto;padding:16px 16px 30px;overscroll-behavior:contain}
+#imamstoreAdminOrders header{display:flex;align-items:center;gap:8px;position:sticky;top:-16px;background:white;padding:14px 0;z-index:2;border-bottom:1px solid #e8eadf}
+#imamstoreAdminOrders header h2{font-size:20px;margin:0;flex:1}
+#imamstoreAdminOrders button{cursor:pointer}
+#imamstoreAdminOrders .r12-admin-close,#imamstoreAdminOrders .r12-admin-refresh{background:#f4f7f0;border:0;border-radius:8px;padding:8px 12px;color:#456d28;font-weight:750}
+#imamstoreAdminOrders .r12-admin-order{border:1px solid #dce5d4;border-radius:13px;padding:14px;margin:12px 0;background:#fcfefa}
+#imamstoreAdminOrders .r12-admin-order h3{font-size:14px;overflow-wrap:anywhere;margin:0 0 8px}
+#imamstoreAdminOrders .r12-admin-order p{margin:5px 0;font-size:13px;line-height:1.5}
+#imamstoreAdminOrders label{display:block;font-size:12px;font-weight:700;margin-top:12px}
+#imamstoreAdminOrders select,#imamstoreAdminOrders input{display:block;width:100%;border:1px solid #d4dfcc;padding:10px;border-radius:8px;margin-top:5px;background:white;color:#273024;font:inherit}
+#imamstoreAdminOrders .r12-admin-save{border:0;background:#8cc63f;color:#18230d;border-radius:9px;padding:11px 15px;font-weight:800;margin-top:12px}
+#imamstoreAdminOrders .r12-admin-save:disabled{opacity:.6}
+#imamstoreAdminOrders #r12AdminMessage{margin:10px 0;color:#596450;font-size:13px}
+@media(min-width:700px){#imamstoreAdminOrders{align-items:center}#imamstoreAdminOrders .r12-admin-panel{border-radius:18px}}
+</style>
+<div id="imamstoreAdminOrders" hidden role="dialog" aria-modal="true" aria-labelledby="r12AdminTitle">
+<section class="r12-admin-panel">
+<header><h2 id="r12AdminTitle">Kelola Pesanan</h2><button type="button" class="r12-admin-refresh" id="r12AdminRefresh">Muat Ulang</button><button type="button" class="r12-admin-close" id="r12AdminClose">Tutup</button></header>
+<p id="r12AdminMessage" role="status">Memuat data pesanan…</p><div id="r12AdminList"></div>
+<p style="font-size:12px;color:#66735c">Status hanya bisa diubah oleh admin terverifikasi. Periksa harga, stok, dan pembayaran sebelum memilih Dikonfirmasi. Statistik Terjual naik saat pesanan dikonfirmasi, turun jika dibatalkan; pesanan yang baru dicatat belum dihitung sebagai terjual.</p>
+</section></div>
+<script id="imamstore-r12-admin-orders-js">
+document.addEventListener('DOMContentLoaded',function(){
+'use strict';
+const box=document.getElementById('imamstoreAdminOrders');
+const list=document.getElementById('r12AdminList'),info=document.getElementById('r12AdminMessage');
+if(!box||!list||!info)return;
+const statuses=[['checkout_created','Menunggu konfirmasi'],['confirmed','Dikonfirmasi'],['processing','Diproses'],['packed','Dikemas'],['shipped','Dikirim'],['delivered','Terkirim'],['completed','Selesai'],['cancelled','Dibatalkan']];
+let adminAllowed=false,loadEpoch=0,button=null;
+// R14: statistik penjualan hanya dihitung setelah admin memverifikasi pesanan.
+// Satu transaksi atomik mencatat status + ledger + setiap produk; aman dari klik ganda.
+const soldStatuses=new Set(['confirmed','processing','packed','shipped','delivered','completed']);
+function orderQuantities(items){
+ if(!Array.isArray(items)||!items.length||items.length>10)throw Error('Rincian pesanan tidak valid untuk perhitungan penjualan.');
+ const units=new Map();
+ for(const item of items){
+  const id=String(item?.productId??'').trim(),qty=Number(item?.qty);
+  if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!Number.isSafeInteger(qty)||qty<1||qty>999)
+   throw Error('ID produk atau jumlah pada pesanan tidak valid.');
+  units.set(id,(units.get(id)||0)+qty);
+ }
+ return units;
+}
+function catalogSoldBaseline(id){
+ const rows=window.imamstoreV29?.products?.();
+ const product=Array.isArray(rows)?rows.find(x=>String(x.id)===id):null;
+ const sold=Number(product?.terjual);
+ return Number.isSafeInteger(sold)&&sold>=0?sold:0;
+}
+async function saveStatusWithSales(orderDocumentId,newStatus,resa){
+ if(!statuses.some(([s])=>s===newStatus))throw Error('Status pesanan tidak dikenal.');
+ const store=firebase.firestore(),FV=firebase.firestore.FieldValue;
+ const orderRef=store.collection('orders').doc(orderDocumentId);
+ const ledgerRef=store.collection('order_sale_ledger').doc(orderDocumentId);
+ return await store.runTransaction(async tx=>{
+  // SELURUH pembacaan transaksi harus dilakukan sebelum menulis.
+  const [orderSnap,ledgerSnap]=await Promise.all([tx.get(orderRef),tx.get(ledgerRef)]);
+  if(!orderSnap.exists)throw Error('Pesanan tidak ditemukan.');
+  const order=orderSnap.data()||{};
+  const units=orderQuantities(order.items);
+  const counted=ledgerSnap.exists&&ledgerSnap.data()?.counted===true;
+  const shouldCount=soldStatuses.has(newStatus);
+  const delta=(shouldCount?1:0)-(counted?1:0);
+  const stats=[];
+  if(delta!==0){
+   for(const [productId,qty] of units){
+    const ref=store.collection('statistik_produk').doc(productId);
+    stats.push({productId,qty,ref,snap:await tx.get(ref)});
+   }
+  }
+  // R11 hanya memperbolehkan field status, resi, dan updatedAt dari admin.
+  const changes={status:newStatus,updatedAt:FV.serverTimestamp()};
+  if(resa!==undefined && resa!==String(order.resi||order.awb||''))changes.resi=resa;
+  tx.update(orderRef,changes);
+  let changedUnits=0;
+  for(const {productId,qty,ref,snap} of stats){
+   const value=snap.exists?snap.data()?.terjual:undefined;
+   const current=value===undefined||value===null?catalogSoldBaseline(productId):Number(value);
+   if(!Number.isSafeInteger(current)||current<0)throw Error('Statistik awal produk tidak valid.');
+   const next=current+delta*qty;
+   if(next<0)throw Error('Statistik penjualan lebih kecil daripada jumlah yang perlu dikoreksi.');
+   tx.set(ref,{terjual:next,updatedAt:FV.serverTimestamp()},{merge:true});
+   changedUnits+=qty;
+  }
+  // Ledger privat per order mencegah pencatatan ulang, termasuk bila status berganti.
+  if(delta!==0){
+   tx.set(ledgerRef,{orderId:orderDocumentId,counted:shouldCount,
+    productQuantities:Object.fromEntries(units),updatedAt:FV.serverTimestamp()},{merge:true});
+  }
+  return {delta,changedUnits};
+ });
+}
+window.imamstoreR14SalesAdmin=Object.freeze({saveStatusWithSales,orderQuantities});
+
+const elt=(tag,cls,txt)=>{const n=document.createElement(tag);if(cls)n.className=cls;if(txt!==undefined)n.textContent=String(txt);return n};
+const money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
+async function verifyAdmin(force=false){
+ try{const a=window.firebase?.auth?.(),u=a?.currentUser;
+  if(!u||u.isAnonymous)return false;
+  const t=await u.getIdTokenResult(force);
+  return a.currentUser?.uid===u.uid && (t?.claims?.admin===true || u.uid==='U7XnPGpjjUNAYnwuoMh68I8guT33');
+ }catch{return false}
+}
+function close(){loadEpoch++;box.hidden=true;document.body.style.removeProperty('overflow')}
+async function load(){
+ const ticket=++loadEpoch;list.replaceChildren();info.textContent='Memuat pesanan terbaru…';
+ if(!(await verifyAdmin(true))){adminAllowed=false;close();button?.remove();button=null;return}
+ try{
+  // Batasi pembacaan: tidak ada onSnapshot dan hanya dijalankan ketika admin meminta.
+  const snap=await firebase.firestore().collection('orders').orderBy('createdAt','desc').limit(25).get();
+  if(ticket!==loadEpoch)return;
+  if(snap.empty){info.textContent='Belum ada pesanan.';return}
+  info.textContent='Menampilkan '+snap.docs.length+' pesanan terbaru. Gunakan Muat Ulang untuk melihat perubahan.';
+  snap.docs.forEach(doc=>{
+   const o=doc.data()||{},item=elt('article','r12-admin-order');
+   item.append(elt('h3','',String(o.orderId||doc.id)));
+   item.append(elt('p','','Penerima: '+String(o.customer?.nama||'-')));
+   const summary=Array.isArray(o.items)?o.items.map(x=>String(x.nama||'Produk')+' ×'+Number(x.qty||0)).slice(0,4).join(' • '):'-';
+   item.append(elt('p','',summary));
+   item.append(elt('p','','Total sementara: '+money(o.totals?.totalBayar)));
+   const statLabel=elt('label','','Status pesanan');
+   const sel=elt('select');
+   statuses.forEach(([value,label])=>{const opt=elt('option','',label);opt.value=value;sel.append(opt)});
+   sel.value=statuses.some(([v])=>v===o.status)?o.status:'checkout_created';statLabel.append(sel);item.append(statLabel);
+   const resiLabel=elt('label','','Nomor resi (opsional)');const resi=elt('input');
+   resi.maxLength=120;resi.placeholder='Isi setelah dikirim';resi.value=String(o.resi||o.awb||'').slice(0,120);resiLabel.append(resi);item.append(resiLabel);
+   const save=elt('button','r12-admin-save','Simpan Status');save.type='button';
+   const feedback=elt('p','r12-admin-feedback','');feedback.setAttribute('aria-live','polite');
+   save.addEventListener('click',async()=>{
+    if(save.disabled)return;
+    if(!(await verifyAdmin(true))){feedback.textContent='Sesi admin perlu diverifikasi ulang.';return}
+    if(!statuses.some(([v])=>v===sel.value)){feedback.textContent='Status tidak dikenali.';return}
+    save.disabled=true;feedback.textContent='Menyimpan perubahan…';
+    try{
+     const nextResi=resi.value.trim();
+     const result=await saveStatusWithSales(doc.id,sel.value,nextResi);
+     o.status=sel.value;o.resi=nextResi;
+     const explanation=result.delta>0?' Statistik terjual bertambah '+result.changedUnits+' unit.':
+       result.delta<0?' Statistik terjual dikoreksi -'+result.changedUnits+' unit.':
+       ' Statistik terjual tidak berubah.';
+     feedback.textContent='Status berhasil diperbarui. Pelanggan dapat melihatnya di Pesanan Saya.'+explanation;
+    }catch(e){console.warn('[ImamStore R12 admin] Perubahan status gagal',String(e?.code||'unknown'));feedback.textContent='Perubahan belum berhasil disimpan. Periksa akses admin dan coba lagi.'}
+    finally{save.disabled=false}
+   });
+   item.append(save,feedback);list.append(item);
+  });
+ }catch(e){if(ticket===loadEpoch){console.warn('[ImamStore R12 admin] Gagal memuat',String(e?.code||'unknown'));info.textContent='Pesanan belum bisa dimuat. Periksa izin akun admin atau coba lagi.'}}
+}
+async function open(){if(!adminAllowed||!(await verifyAdmin()))return;box.hidden=false;document.body.style.overflow='hidden';load()}
+document.getElementById('r12AdminClose')?.addEventListener('click',close);
+document.getElementById('r12AdminRefresh')?.addEventListener('click',load);
+box.addEventListener('click',e=>{if(e.target===box)close()});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!box.hidden)close()});
+const actions=document.querySelector('.hero-actions')||document.querySelector('.store-actions');
+const auth=window.firebase?.auth?.();
+if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
+ const id=u?.uid||'';const allowed=!!u&&await verifyAdmin(false);
+ if(auth.currentUser?.uid!==id)return;
+ adminAllowed=allowed;
+ if(!allowed){button?.remove();button=null;if(!box.hidden)close();return}
+ if(!actions||button)return;
+ button=elt('button','nexai-orders-open','Kelola Pesanan');button.id='r12AdminLauncher';button.type='button';
+ button.addEventListener('click',open);actions.append(button);
+});
+});
 </script>
 </body></html>
