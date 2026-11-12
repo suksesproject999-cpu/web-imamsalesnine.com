@@ -5429,7 +5429,19 @@ function auditOrderAgainstR4(o,authUser){
  fail(keys(v,['product','shipping']),'Struktur voucher tidak cocok R4');
  if(v&&t){
   fail(v.product===t.productVoucherName,'Nama voucher produk berbeda dari ringkasan');
-  fail(v.shipping===t.shippingVoucherName,'Nama voucher ongkir berbeda dari ringkasan');
+  // R19: snapshot voucher ongkir pada nilai existing vouchers.shipping.
+  // Firestore Rules R15 membatasi keys vouchers, bukan tipe nilai shipping.
+  const shippingName=(v.shipping && typeof v.shipping==='object')?v.shipping.name:v.shipping;
+  fail(shippingName===t.shippingVoucherName,'Nama voucher ongkir berbeda dari ringkasan');
+  if(v.shipping && typeof v.shipping==='object'){
+   fail(Object.keys(v.shipping).length===3 &&
+    ['name','code','potentialDiscount'].every(k=>Object.prototype.hasOwnProperty.call(v.shipping,k)),
+    'Struktur snapshot voucher ongkir tidak valid');
+   fail(typeof v.shipping.name==='string' && v.shipping.name.length<=180,'Nama voucher ongkir tidak valid');
+   fail(typeof v.shipping.code==='string' && v.shipping.code.length<=80,'Kode voucher ongkir tidak valid');
+   fail(Number.isSafeInteger(v.shipping.potentialDiscount) && v.shipping.potentialDiscount>=0 &&
+    v.shipping.potentialDiscount<=100000000,'Potensi potongan ongkir tidak valid');
+  }
  }
  return [...new Set(issues)];
 }
@@ -5497,13 +5509,21 @@ function orderTimeWIB(value){
  }).formatToParts(date).filter(x=>x.type!=='literal').map(x=>[x.type,x.value]));
  return `${parts.day}/${parts.month}/${parts.year}, ${parts.hour}.${parts.minute}.${parts.second}`;
 }
-function message(d,items,s){
+function message(d,items,s,storedVouchers){
  const safe=v=>v==null||String(v).trim()===''?'-':String(v).trim();
  const qty=items.reduce((n,x)=>n+(Number(x.qty)||0),0);
  const sum=items.reduce((n,x)=>n+(Number(x.harga)||0)*(Number(x.qty)||0),0);
  const subtotal=Number.isFinite(Number(s.subtotal))?Number(s.subtotal):sum;
  const pDiscount=Number(s.productDiscount)||0;
  const sDiscount=Number(s.shippingDiscount)||0;
+ const shippingMeta=storedVouchers?.shipping;
+ const shippingSelected=!!String(s.shippingVoucherName||'').trim();
+ const shippingPotential=shippingMeta && typeof shippingMeta==='object' &&
+   Number.isSafeInteger(Number(shippingMeta.potentialDiscount)) && Number(shippingMeta.potentialDiscount)>=0
+   ? Number(shippingMeta.potentialDiscount):null;
+ const shippingPotentialLine=!shippingSelected?null:shippingPotential===null?
+   'Potensi Ongkir      : Menunggu verifikasi admin':
+   'Potensi Diskon Ongkir: Hingga '+money(shippingPotential)+' (menunggu ongkir admin)';
  const paid=Number.isFinite(Number(s.totalBayar))?Number(s.totalBayar):subtotal-pDiscount;
  const goods=items.map((x,i)=>[
   `${i+1}. ${safe(x.nama)}`,
@@ -5563,7 +5583,8 @@ function message(d,items,s){
   `Diskon Produk      : - ${money(pDiscount)}`,
   '',
   `Voucher Ongkir     : ${safe(s.shippingVoucherName)}`,
-  `Diskon Ongkir      : - ${money(sDiscount)}`,
+  `Diskon Ongkir      : ${shippingSelected?'Belum dihitung ('+money(sDiscount)+')':'- '+money(sDiscount)}`,
+  ...(shippingPotentialLine?[shippingPotentialLine]:[]),
   '',
   `Total Belanja      : ${money(paid)}`,
   '',
@@ -5597,7 +5618,7 @@ window.imamstoreOrderWhatsAppURL=function(order){
   wa:String(c.wa||''),email:String(c.email||''),provinsi:String(c.provinsi||''),
   kota:String(c.kota||''),kodepos:String(c.kodepos||''),alamat:String(c.alamat||''),
   ekspedisi:String(order.ekspedisi||''),catatan:String(order.catatan||'')};
- return 'https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,lines,order.totals||{}));
+ return 'https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message(d,lines,order.totals||{},order.vouchers||{}));
 };
 /* Untuk tes regresi format, tidak untuk dipakai sebagai klaim pesan sudah terkirim. */
 window.imamstoreWhatsAppFormatR13=message;
@@ -5710,12 +5731,31 @@ const quotedSubtotal=Number(pricing?.subtotal);
 // Ongkir belum diketahui: voucher ongkir dicatat sebagai potensi, bukan mengurangi total barang.
 const appliedShippingDiscount=0;
 const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
+// R19: snapshot lengkap voucher terpilih di field vouchers.shipping yang sudah diizinkan R15.
+// Total pesanan tetap tidak dipotong ongkir, karena ongkir aktual ditetapkan admin.
+const shippingCandidate=pricing?.shippingVoucher && vouchers.shipping?.id===pricing.shippingVoucher?.id
+ ? pricing.shippingVoucher : null;
+const shippingPotential=Number(pricing?.shippingPotential);
+if(vouchers.shipping && (!shippingCandidate || !Number.isSafeInteger(shippingPotential) ||
+  shippingPotential<0 || shippingPotential>100000000)){
+ await popup('warning','Periksa voucher ongkir','Pilihan voucher berubah. Buka kembali Voucher & Promo sebelum membuat pesanan.');return;
+}
+const shippingSnapshot=shippingCandidate?{
+ name:String(shippingCandidate.name||''),
+ code:String(shippingCandidate.id||''),
+ potentialDiscount:shippingPotential
+}:null;
 const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
-const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
+// R19: alamat buku tidak memiliki field email; gunakan email akun login bila kosong.
+const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),
+ email:String(a.email||checkoutUser.email||''),
+ provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),
+ kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),
+ ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
 if(!d.ekspedisi){await popup('warning','Pengiriman belum dipilih','Pilih metode pengiriman sebelum melanjutkan.');return}const finalAddressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress({name:d.nama,phone:d.wa,province:d.provinsi,city:d.kota,postal:d.kodepos,full:d.alamat,email:d.email})||[];if(finalAddressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(finalAddressIssues);return}
 busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Memproses pesanan Anda…';
 try{const FV=firebase.firestore.FieldValue,grouped=new Map();items.forEach(x=>grouped.set(x.productId,(grouped.get(x.productId)||0)+x.qty));
-const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,provinsi:d.provinsi,kota:d.kota,kodepos:d.kodepos,alamat:d.alamat},ekspedisi:d.ekspedisi,catatan:d.catatan,items,totals:summary,vouchers:{product:summary.productVoucherName,shipping:summary.shippingVoucherName},status:'checkout_created',channel:'whatsapp',createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()};
+const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,provinsi:d.provinsi,kota:d.kota,kodepos:d.kodepos,alamat:d.alamat},ekspedisi:d.ekspedisi,catatan:d.catatan,items,totals:summary,vouchers:{product:summary.productVoucherName,shipping:shippingSnapshot},status:'checkout_created',channel:'whatsapp',createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()};
 /* R6: jangan kirim payload yang sudah pasti ditolak oleh skema Rules R4. */
 const mismatches=auditOrderAgainstR4(order,checkoutUser);
 if(mismatches.length){
@@ -5786,7 +5826,7 @@ if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmas
 button.textContent='Pesanan tercatat';
 /* R13: proses aman = commit orders -> bersihkan item terpesan ->
    tampilkan dialog WA wajib -> buka chat hanya dari klik, tidak submit ulang. */
-const waUrl='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message({...d,createdAt:new Date()},items,summary));
+const waUrl='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message({...d,createdAt:new Date()},items,summary,order.vouchers));
 /* Keranjang dikonsolidasikan segera setelah server mengonfirmasi commit.
    Menutup tab saat dialog WA aktif tidak mengembalikan item yang sudah dipesan. */
 try{

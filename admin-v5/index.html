@@ -14099,20 +14099,29 @@ function getBuyerAddress(order){
  const lines=[];
  const direct=safe(c.alamat||c.address||order.alamat||order.address || order.shippingAddress?.address);
  if(direct)lines.push(direct);
- const tail=[c.kecamatan||order.shippingAddress?.district,c.kota||c.city||order.shippingAddress?.city,c.provinsi||c.province||order.shippingAddress?.province,c.kodePos||c.postalCode||order.shippingAddress?.postalCode].map(safe).filter(Boolean);
+ const tail=[c.kecamatan||order.shippingAddress?.district,c.kota||c.city||order.shippingAddress?.city,c.provinsi||c.province||order.shippingAddress?.province,c.kodepos||c.kodePos||c.postal||c.postalCode||order.shippingAddress?.postalCode].map(safe).filter(Boolean);
  if(tail.length)lines.push(tail.join(', '));
  return lines.join('\n')||'-';
 }
 function getExpedition(order){return maybe(order.ekspedisi||order.shipping?.expedition||order.shipping?.courier||order.courier||order.metodePengiriman,'-');}
 function getTotals(order){
  const t=order.totals||{};
+ const shipping=order.vouchers?.shipping;
+ const shippingMeta=shipping&&typeof shipping==='object'?shipping:null;
+ const shippingName=t.shippingVoucherName||
+  (shippingMeta?.name??(typeof shipping==='string'?shipping:null));
+ const storedPotential=shippingMeta?.potentialDiscount;
+ const shippingPotential=Number.isSafeInteger(Number(storedPotential)) &&
+   storedPotential!==null && storedPotential!==undefined && Number(storedPotential)>=0
+  ?Number(storedPotential):null;
  return {
   totalJenisProduk:Number(t.totalJenisProduk ?? t.totalProductTypes ?? (Array.isArray(order.items)?order.items.length:0))||0,
   totalItem:Number(t.totalItem ?? t.totalItems ?? (Array.isArray(order.items)?order.items.reduce((n,it)=>n+(Number(it.qty)||0),0):0))||0,
   subtotal:Number(t.subtotal ?? t.subTotal ?? order.subtotal ?? 0)||0,
   productVoucherName:maybe(t.productVoucherName ?? t.voucherProduk ?? order.voucherProduk,''),
   productDiscount:Number(t.productDiscount ?? t.diskonProduk ?? order.productDiscount ?? 0)||0,
-  shippingVoucherName:maybe(t.shippingVoucherName ?? t.voucherOngkir ?? order.voucherOngkir,''),
+  shippingVoucherName:maybe(shippingName ?? t.voucherOngkir ?? order.voucherOngkir,''),
+  shippingPotential,
   shippingDiscount:Number(t.shippingDiscount ?? t.diskonOngkir ?? order.shippingDiscount ?? 0)||0,
   totalBayar:Number(t.totalBayar ?? t.total ?? order.totalBayar ?? 0)||0
  };
@@ -14146,7 +14155,12 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
    ['Voucher produk',t.productVoucherName||'-'],
    ['Diskon produk','- '+money(t.productDiscount)],
    ['Voucher ongkir',t.shippingVoucherName||'-'],
-   ['Diskon ongkir','- '+money(t.shippingDiscount)],
+   ['Diskon ongkir',t.shippingVoucherName!=='-'?'Belum dihitung ('+money(t.shippingDiscount)+')':'- '+money(t.shippingDiscount)],
+   ...(t.shippingVoucherName!=='-'?[[
+    'Potensi potongan ongkir',t.shippingPotential!==null?
+      'Hingga '+money(t.shippingPotential)+' (menunggu ongkir admin)':
+      'Menunggu verifikasi admin (data pesanan lama)'
+   ]]:[]),
    ['Ongkos kirim',maybe(order.ongkirLabel||order.shipping?.costLabel||order.shippingCostLabel,'Dihitung Admin')],
   ];
   lines.forEach(([k,v])=>{const line=el('div','nine-summary-line');line.append(el('span','',k),el('strong','',String(v)));box.append(line);});
@@ -14166,7 +14180,7 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
   const leftCol=el('div','');
   const buyer=el('div','nine-section');buyer.append(el('h4','', 'Data Pembeli'));
   const buyerGrid=el('div','nine-kv');
-  [['Nama',c.nama||c.name],['No. WA',c.noWa||c.whatsapp||c.phone||c.telepon],['Email',c.email||'-'],['Provinsi',c.provinsi||c.province],['Kota',c.kota||c.city],['Kode Pos',c.kodePos||c.postalCode]].forEach(([k,v])=>{buyerGrid.append(el('strong','',k),el('span','',maybe(v)));});
+  [['Nama',c.nama||c.name],['No. WA',c.wa||c.noWa||c.whatsapp||c.phone||c.telepon],['Email',c.email||'-'],['Provinsi',c.provinsi||c.province],['Kota',c.kota||c.city],['Kode Pos',c.kodepos||c.kodePos||c.postal||c.postalCode]].forEach(([k,v])=>{buyerGrid.append(el('strong','',k),el('span','',maybe(v)));});
   buyer.append(buyerGrid);
   buyer.append(el('div','nine-address',getBuyerAddress(d)));
   leftCol.append(buyer);
