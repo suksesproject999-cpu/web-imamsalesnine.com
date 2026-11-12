@@ -5315,6 +5315,53 @@ function auditOrderAgainstR4(o,authUser){
  return [...new Set(issues)];
 }
 window.imamstoreCheckoutR4Audit=Object.freeze({version:'R6',check:auditOrderAgainstR4});
+/* R10 — reconcile a possibly committed order after a lost acknowledgement.
+   A customer cannot re-create/update an existing order under R4. Do not claim
+   success unless the server returns an identical order owned by this session. */
+function stableJson(v){
+ if(Array.isArray(v))return '['+v.map(stableJson).join(',')+']';
+ if(v&&typeof v==='object')return '{'+Object.keys(v).sort().map(k=>JSON.stringify(k)+':'+stableJson(v[k])).join(',')+'}';
+ return JSON.stringify(v);
+}
+async function findIdenticalCommittedOrder(ref,requestOrder){
+ try{
+  const snapshot=await ref.get({source:'server'});
+  if(!snapshot?.exists)return false;
+  const previous=snapshot.data();
+  return previous?.uid===requestOrder.uid
+   && previous?.orderId===requestOrder.orderId
+   && previous?.channel===requestOrder.channel
+   && previous?.ekspedisi===requestOrder.ekspedisi
+   && previous?.catatan===requestOrder.catatan
+   && stableJson(previous?.customer)===stableJson(requestOrder.customer)
+   && stableJson(previous?.items)===stableJson(requestOrder.items)
+   && stableJson(previous?.totals)===stableJson(requestOrder.totals)
+   && stableJson(previous?.vouchers)===stableJson(requestOrder.vouchers)
+   && typeof previous?.status==='string';
+ }catch(e){
+  // R4 intentionally denies get() on a missing or non-owned order.
+  return false;
+ }
+}
+/* Safe developer report: never includes address, phone, email, UID or auth token. */
+window.imamstoreCheckoutSafeReport=()=>{
+ const err=window.imamstoreCheckoutLastError||{};
+ const attempt=window.imamstoreCheckoutLastAttempt||{};
+ return Object.freeze({
+  version:'R10',project:String(err.project||attempt.project||'unknown'),
+  stage:String(err.stage||attempt.stage||'unknown'),
+  errorCode:String(err.code||'unknown'),
+  provider:String(err.provider||attempt.provider||'unknown'),
+  preflight:String(err.preflight||attempt.preflight||'unknown'),
+  numberOfLines:Number(err.items??attempt.items??0),
+  isAuthenticated:typeof err.authenticated==='boolean'?err.authenticated:!!firebase?.auth?.()?.currentUser,
+  isAnonymous:typeof err.isAnonymous==='boolean'?err.isAnonymous:!!firebase?.auth?.()?.currentUser?.isAnonymous,
+  existingOrderVerified:!!attempt.existingOrderVerified,
+  tokenRefreshAttempted:!!attempt.tokenRefreshAttempted,
+  time:new Date().toISOString()
+ });
+};
+
 
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
@@ -5395,8 +5442,38 @@ window.imamstoreCheckoutLastAttempt=Object.freeze({...lastAttemptMeta});
 
 /* Tahap 5C.2: pesanan saja. Statistik penjualan dan ranking tidak boleh dinaikkan
    dari checkout browser yang belum diverifikasi admin. */
-await store.collection('orders').doc(d.orderId).set(order);
-committed=true; /* Firestore mengonfirmasi commit: jangan izinkan submit ulang dari checkout yang sama. */
+const orderRef=store.collection('orders').doc(d.orderId);
+try{
+ await orderRef.set(order);
+}catch(firstError){
+ /* A lost response may conceal a successful commit. Check only this customer's
+    exact document, compare full order contents and keep the same order number. */
+ const alreadySaved=await findIdenticalCommittedOrder(orderRef,order);
+ if(alreadySaved){
+  lastAttemptMeta.existingOrderVerified=true;
+  window.imamstoreCheckoutLastAttempt=Object.freeze({...lastAttemptMeta});
+ }else{
+  /* A stale identity token sometimes needs renewal. Retry only once after
+     a verifiably refreshed token; never change an order's ID on retry. */
+  let retried=false;
+  if(String(firstError?.code||'')==='permission-denied' && firebase?.auth?.()?.currentUser?.uid===uid){
+   try{
+    lastAttemptMeta.tokenRefreshAttempted=true;
+    const fresh=await checkoutUser.getIdTokenResult(true);
+    const freshProvider=fresh?.claims?.firebase?.sign_in_provider||fresh?.signInProvider||'unknown';
+    if(freshProvider!=='anonymous' && !checkoutUser.isAnonymous && fresh?.token && fresh.token!==token?.token){
+     await orderRef.set(order);retried=true;
+    }
+   }catch(retryError){
+    if(await findIdenticalCommittedOrder(orderRef,order))retried=true;
+    else console.warn('[ImamStore R10 developer] Token refreshed but order still rejected',String(retryError?.code||'unknown'));
+   }
+  }
+  window.imamstoreCheckoutLastAttempt=Object.freeze({...lastAttemptMeta});
+  if(!retried)throw firstError;
+ }
+}
+committed=true; window.imamstoreCheckoutLastError=null; /* Firestore mengonfirmasi commit: jangan izinkan submit ulang dari checkout yang sama. */
 /* R5: order activity denotes a RECORDED REQUEST, not payment/verified purchase. */
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
 if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
@@ -5448,7 +5525,24 @@ checkoutPanel?.addEventListener('click',e=>{
  e.preventDefault();e.stopImmediatePropagation();
 },true);
 button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan akan dikonfirmasi setelah berhasil dikirim.';refresh();
-window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r9-nonblocking-appcheck'});
+window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r10-order-reconciliation'});
+})();
+</script><script id="imamstore-r10-private-debug">
+(()=>{'use strict';
+if(new URLSearchParams(location.search).get('checkoutDebug')!=='1')return;
+const start=()=>{
+ const b=document.createElement('button');b.type='button';b.textContent='Salin Laporan Checkout';
+ b.setAttribute('aria-label','Salin laporan diagnostik checkout');
+ Object.assign(b.style,{position:'fixed',right:'9px',top:'max(10px,env(safe-area-inset-top))',zIndex:'2147483645',maxWidth:'185px',padding:'9px 12px',font:'700 11px Arial,sans-serif',borderRadius:'12px',background:'#202a20',color:'white',border:'1px solid #8cc63f'});
+ b.addEventListener('click',async()=>{
+  const text=JSON.stringify(window.imamstoreCheckoutSafeReport?.()||{version:'R10',status:'Belum ada checkout'},null,2);
+  try{await navigator.clipboard.writeText(text)}catch(_){window.prompt('Salin laporan berikut:',text);return}
+  if(window.Swal?.fire)await window.Swal.fire({icon:'success',title:'Laporan disalin',text:'Laporan teknis tanpa alamat, nomor HP, atau identitas pribadi sudah disalin.',confirmButtonColor:'#8cc63f'});
+  else window.alert('Laporan disalin.');
+ });
+ document.body.appendChild(b);
+};
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',start,{once:true});else start();
 })();
 </script><div aria-live="polite" id="toast" role="status"></div><script id="imamstore-v52-toast-bridge">(()=>{'use strict';
 let timer=null,toast=null;
