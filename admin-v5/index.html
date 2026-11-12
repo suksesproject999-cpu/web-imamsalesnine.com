@@ -13950,11 +13950,22 @@ launch?.addEventListener("click",()=>{
    <p id="nineOrderMsg">Login Firebase admin dan sesi Netlify admin wajib aktif. Setelah itu tekan Muat Pesanan untuk membaca daftar order.</p>
   </div>
   <div id="nineOrderList" class="nine-orders"></div>
+  <div class="nine-pagination" id="nineOrderPagination" hidden>
+   <button type="button" class="nine-action-btn nine-secondary" id="nineOrderMore">Muat 30 Pesanan Lebih Lama</button>
+   <p>Daftar diurutkan berdasarkan waktu pesanan terbaru. Halaman berikutnya diambil saat dibutuhkan untuk menghemat pembacaan.</p>
+  </div>
   <div id="nineOrderEmpty" class="nine-empty" hidden>Belum ada pesanan untuk ditampilkan.</div>
  </div>
 </div>
 </section>
-<script id="imamstore-r16-admin-orders-page">
+<style id="imamstore-r17-admin-paging-css">
+#nineOrderPagination[hidden]{display:none!important}
+#nineOrderPagination{display:flex;align-items:center;flex-direction:column;gap:10px;margin:20px 0 30px;padding:16px;border:1px dashed #d6e3cc;background:#fff;border-radius:16px}
+#nineOrderPagination #nineOrderMore{width:min(100%,330px);min-height:44px}
+#nineOrderPagination #nineOrderMore:disabled{opacity:.65;cursor:wait}
+#nineOrderPagination p{margin:0;max-width:600px;color:#667560;font-size:12px;line-height:1.55;text-align:center}
+</style>
+<script id="imamstore-r17-admin-orders-page">
 (function(){
 "use strict";
 const ADMIN_FIREBASE_UID = "U7XnPGpjjUNAYnwuoMh68I8guT33";
@@ -13962,7 +13973,9 @@ const launch=document.getElementById("nineOrderLaunch"),panel=document.getElemen
 const $=id=>document.getElementById(id);
 const statMode=$("nineMetricMode"),statAuth=$("nineMetricAuth"),statCount=$("nineMetricCount"),statAccess=$("nineMetricAccess");
 const list=$("nineOrderList"),empty=$("nineOrderEmpty");
+const more=$("nineOrderMore"),paging=$("nineOrderPagination");
 let authorized=false,busy=false;
+let oldestCursor=null,loadingOrders=false,queryEpoch=0,orderCount=0;
 const STATUS_OPTIONS=["checkout_created","confirmed","processing","packed","shipped","delivered","completed","cancelled"];
 const STATUS_LABEL={checkout_created:"Menunggu konfirmasi",confirmed:"Dikonfirmasi",processing:"Diproses",packed:"Dikemas",shipped:"Dikirim",delivered:"Terkirim",completed:"Selesai",cancelled:"Dibatalkan"};
 
@@ -14072,7 +14085,11 @@ $("nineOrderSignIn").addEventListener("click",async()=>{
  try{await ensureNetlifyAdmin();await firebase.auth().signInWithEmailAndPassword($("nineOrderEmail").value.trim(),$("nineOrderPass").value);$("nineOrderPass").value="";await check();}
  catch(e){$("nineOrderPass").value="";msg("Login gagal: "+e.message);}
 });
-$("nineOrderSignOut").addEventListener("click",async()=>{await firebase.auth().signOut();list.replaceChildren();empty.hidden=true;statCount.textContent='0';await check();});
+$("nineOrderSignOut").addEventListener("click",async()=>{
+  queryEpoch++;oldestCursor=null;orderCount=0;list.replaceChildren();
+  paging.hidden=true;empty.hidden=true;statCount.textContent='0';
+  await firebase.auth().signOut();await check();
+ });
 firebase.auth().onAuthStateChanged(()=>{if(panel.classList.contains("active"))check();});
 function el(tag,cls,txt){const e=document.createElement(tag);if(cls)e.className=cls;if(txt!==undefined)e.textContent=String(txt);return e;}
 function productImage(item){return item?.foto||item?.image||item?.thumbnail||item?.imageUrl||item?.gambar||item?.photo||'';}
@@ -14189,19 +14206,59 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
   editor.append(statusField,awbField,save);footer.append(editor,feedback);card.append(footer);
   return card;
  }
- $("nineOrderRefresh").addEventListener("click",async()=>{
-  if(!authorized||!validAdmin(firebase.auth().currentUser))return;
-  list.replaceChildren();empty.hidden=true;msg('Memuat pesanan...');statCount.textContent='0';
+ // R17: query TERBARU dilakukan di Firestore, bukan sort sesudah limit.
+ // Pagination berbasis cursor menjaga penggunaan reads proporsional.
+ async function loadOrders(older=false){
+  if(!authorized||!validAdmin(firebase.auth().currentUser)||loadingOrders)return;
+  if(older && !oldestCursor)return;
+  loadingOrders=true;
+  const ticket=++queryEpoch;
+  const refresh=$("nineOrderRefresh");
+  refresh.disabled=true;
+  more.disabled=true;
+  const oldLabel=more.textContent;
+  if(older){more.textContent='Memuat...';msg('Mengambil pesanan lebih lama...');}
+  else{msg('Memuat 30 pesanan terbaru dari server...');}
   try{
    await ensureNetlifyAdmin();
-   const snap=await firebase.firestore().collection("orders").limit(30).get();
-   const docs=snap.docs.sort((a,b)=>{const av=a.data().createdAt?.toMillis?.()||0,bv=b.data().createdAt?.toMillis?.()||0;return bv-av;});
-   if(!docs.length){empty.hidden=false;msg('Belum ada pesanan untuk ditampilkan.');return;}
-   docs.forEach(d=>list.append(row(d)));
-   statCount.textContent=String(docs.length);
-   msg('Terbaca '+docs.length+' pesanan. Silakan kelola seperti halaman faktur.');
-  }catch(e){msg('Gagal membaca orders: '+e.message);} 
- });
+   let query=firebase.firestore().collection('orders').orderBy('createdAt','desc').limit(30);
+   if(older)query=query.startAfter(oldestCursor);
+   // Menghindari cache lama saat admin menekan Muat Pesanan.
+   const snap=await query.get({source:'server'});
+   if(ticket!==queryEpoch || !authorized)return;
+   if(!older){
+    list.replaceChildren();
+    orderCount=0;
+    oldestCursor=null;
+   }
+   if(!snap.empty){
+    snap.docs.forEach(doc=>list.append(row(doc)));
+    orderCount+=snap.docs.length;
+    oldestCursor=snap.docs[snap.docs.length-1];
+   }
+   empty.hidden=orderCount!==0;
+   statCount.textContent=String(orderCount);
+   paging.hidden=snap.docs.length<30;
+   if(!older){
+    msg(orderCount?'Menampilkan '+orderCount+' pesanan terbaru lintas akun pelanggan. Klik Muat Pesanan untuk memeriksa pesanan baru.':'Belum ada pesanan dengan tanggal pembuatan.');
+   }else{
+    msg(snap.empty?'Tidak ada pesanan lebih lama.':'Menampilkan '+orderCount+' pesanan. Halaman tambahan sudah dimuat.');
+   }
+  }catch(e){
+   if(ticket===queryEpoch){
+    // Tidak hilangkan daftar faktur yang sudah ada ketika koneksi gagal.
+    msg('Gagal memuat pesanan: '+String(e?.message||'Tidak bisa terhubung.'));
+   }
+  }finally{
+   if(ticket===queryEpoch){
+    loadingOrders=false;
+    refresh.disabled=!authorized;
+    more.disabled=false;more.textContent=oldLabel;
+   }
+  }
+ }
+ $("nineOrderRefresh").addEventListener('click',()=>loadOrders(false));
+ more.addEventListener('click',()=>loadOrders(true));
 })();
 </script>
 
