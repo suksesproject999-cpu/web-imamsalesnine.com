@@ -4855,25 +4855,43 @@ function orderTotals(){
  if(t)return {count:t.count,sum:t.subtotal,discount:t.discount,total:t.total,voucher:t.voucher};
  const {count,sum}=currentSum();return {count,sum,discount:0,total:sum,voucher:null};
 }
+function voucherSummaryLabel(q){
+ const n=Number(!!q?.productVoucher)+Number(!!q?.shippingVoucher);
+ if(!n)return 'Pilih voucher ›';
+ return n===2?'2 voucher dipilih ›':q.shippingVoucher?'Voucher ongkir dipilih ›':'Voucher produk dipilih ›';
+}
 function refreshCart(){
- const {count,discount,total,voucher}=orderTotals();
- $('refVoucherSaved').textContent=voucher?'Hemat '+money(discount)+' ›':'Pilih voucher ›';
+ const q=window.imamstoreV43?.cartTotals?.();
+ const {count,discount,total}=q?{count:q.count,discount:q.productDiscount,total:q.total}:orderTotals();
+ $('refVoucherSaved').textContent=q?voucherSummaryLabel(q):(discount?'Hemat '+money(discount)+' ›':'Pilih voucher ›');
  $('refCartCount').textContent='('+count+')';
  $('s5CartTotal').textContent='Total '+money(total);
  $('s5Checkout').textContent='Checkout ('+count+')';
- $('refCartSavings').textContent=discount?'Hemat '+money(discount):'';
+ $('refCartSavings').textContent=[discount?'Hemat '+money(discount):'',q?.shippingVoucher?'Voucher ongkir dipilih':''].filter(Boolean).join(' · ');
  window.imamstoreUnifiedCards?.refresh?.();
 }
+function checkoutVoucherBreakdown(q){
+ const breakdown=document.querySelector('#s5Draft .ref-order-breakdown');if(!breakdown)return;
+ const shippingRow=[...breakdown.children].find(el=>el.textContent.includes('Ongkos Kirim'));
+ if(!shippingRow)return;
+ const ensure=(id,label)=>{let row=breakdown.querySelector('#'+id);if(!row){row=document.createElement('div');row.id=id;const l=document.createElement('span'),r=document.createElement('b');l.textContent=label;row.append(l,r);breakdown.insertBefore(row,shippingRow)}return row.querySelector('b')};
+ ensure('refCheckoutVoucherProductLabel','Voucher produk').textContent=q.productVoucher?.name||'Tidak dipilih';
+ ensure('refCheckoutVoucherShippingLabel','Voucher ongkir').textContent=q.shippingVoucher?.name||'Tidak dipilih';
+ ensure('refCheckoutShippingPotential','Potensi potongan ongkir').textContent=q.shippingVoucher?'Hingga '+money(q.shippingPotential||0):money(0);
+ let note=breakdown.querySelector('#refCheckoutShippingDisclaimer');
+ if(!note){note=document.createElement('p');note.id='refCheckoutShippingDisclaimer';note.className='v43-checkout-shipping-note';breakdown.insertBefore(note,breakdown.querySelector('.ref-total'))}
+ note.textContent=q.shippingVoucher?'Voucher ongkir dipilih. Potongan aktual dihitung setelah admin menetapkan biaya kirim, maksimal sebesar ongkir.':'Ongkos kirim dihitung admin dan belum termasuk total belanja.';
+}
 function refreshCheckout(){
- const quote=window.imamstoreV43?.checkoutTotals?.();
- if(!quote)return;
- const {count,subtotal:sum,productDiscount:discount,total,productVoucher:voucher}=quote;
+ const quote=window.imamstoreV43?.checkoutTotals?.();if(!quote)return;
+ const {count,subtotal:sum,productDiscount:discount,total}=quote;
  $('refCheckoutCount').textContent=count;
  $('refCheckoutSubtotal').textContent=money(sum);
  $('refCheckoutDiscount').textContent=discount?'- '+money(discount):money(0);
  $('s5DraftTotal').textContent=money(total);
  $('refCheckoutFooterTotal').textContent=money(total);
- $('refCheckoutVoucherValue').textContent=voucher?'Hemat '+money(discount):'Pilih ›';
+ $('refCheckoutVoucherValue').textContent=voucherSummaryLabel(quote);
+ checkoutVoucherBreakdown(quote);
  $('refAddressTitle').textContent=selectedAddress?selectedAddress.name:' + Tambahkan Alamat';
  $('refAddressSummary').textContent=selectedAddress?selectedAddress.full:'Tambahkan alamat pengiriman sebelum membuat pesanan.';
 }
@@ -4939,7 +4957,7 @@ function breakdown(){
  const cartOpen=document.getElementById('s5Cart')?.classList.contains('open');const quote=cartOpen?window.imamstoreV43?.cartTotals?.():window.imamstoreV43?.checkoutTotals?.();
  const {count,sum,discount,total,voucher}=quote?{count:quote.count,sum:quote.subtotal,discount:quote.productDiscount,total:quote.total,voucher:quote.productVoucher}:orderTotals();
  showModal('<h2>Rincian Pesanan</h2><div id="refBreakdownLines"></div><p style="color:#777;font-size:13px">Total sementara belum termasuk ongkos kirim. Ongkir dikonfirmasi admin.</p>',root=>{
-  for(const [a,b] of [['Subtotal '+count+' produk',money(sum)],['Voucher produk',voucher?.name||'Tidak dipilih'],['Diskon voucher',discount?'- '+money(discount):money(0)],['Ongkos kirim','Dihitung Admin'],['Total sementara',money(total)]]){
+  for(const [a,b] of [['Subtotal '+count+' produk',money(sum)],['Voucher produk',quote?.productVoucher?.name||voucher?.name||'Tidak dipilih'],['Diskon produk',discount?'- '+money(discount):money(0)],['Voucher ongkir',quote?.shippingVoucher?.name||'Tidak dipilih'],['Potensi potongan ongkir',quote?.shippingVoucher?'Hingga '+money(quote.shippingPotential||0)+' (menunggu admin)':money(0)],['Ongkos kirim','Dihitung Admin'],['Total sementara (belum ongkir)',money(total)]]){
    const line=document.createElement('div');line.style.cssText='display:flex;justify-content:space-between;gap:8px;padding:15px 0;border-bottom:1px solid #eee';
    const left=document.createElement('span'),right=document.createElement('b');left.textContent=a;right.textContent=b;line.append(left,right);root.querySelector('#refBreakdownLines').append(line);
   }
@@ -5113,8 +5131,9 @@ const calculateQuote=(lines,voucherSelection)=>{
  const productDiscount=Math.min(subtotal,voucherValue(pv,subtotal));
  // Ongkir belum diketahui: voucher ongkir bukan pengurang subtotal produk.
  const shippingDiscount=0;
+ const shippingPotential=sv?voucherValue(sv,subtotal):0;
  return Object.freeze({count,subtotal,discount:productDiscount,productDiscount,
- shippingDiscount,total:Math.max(0,subtotal-productDiscount),totalBayar:Math.max(0,subtotal-productDiscount),
+ shippingDiscount,shippingPotential,total:Math.max(0,subtotal-productDiscount),totalBayar:Math.max(0,subtotal-productDiscount),
  voucher:pv||sv,productVoucher:pv,shippingVoucher:sv,
  shippingPending:true});
 };
@@ -5138,15 +5157,81 @@ const totals=(linesOverride)=>Array.isArray(linesOverride)?
 function publishQuote(){
  const quote=checkoutActive()?checkoutTotals():cartTotals();
  window.__nineLatestQuote=quote;
+ const n=Number(!!quote.productVoucher)+Number(!!quote.shippingVoucher);
+ const label=n===2?'2 voucher dipilih ›':quote.shippingVoucher?'Voucher ongkir dipilih ›':quote.productVoucher?'Voucher produk dipilih ›':'Pilih voucher ›';
+ const trigger=checkoutActive()?$('refCheckoutVoucherValue'):$('refVoucherSaved');
+ if(trigger)trigger.textContent=label;
  window.dispatchEvent(new CustomEvent('imamstore:quote-updated',{detail:{scope:currentScope(),quote}}));
  return quote;
 }
 function modal(html,init){const m=document.querySelector('.ref-modal'),body=$('refModalContent');if(!m||!body)return;body.innerHTML=html;m.hidden=false;document.body.style.overflow='hidden';init?.(body)}
 function close(){window.imamstoreReferenceV38?.closeModal?.()}
-function terms(v){modal('<h2>Syarat &amp; Ketentuan Voucher</h2><div class="ref-v43-voucher"><span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small></div></div><h3>Aturan Penggunaan</h3><p>Maksimal satu voucher produk dan satu voucher ongkir per pesanan. Minimum belanja dihitung dari produk yang dicentang.</p><h3>Masa Berlaku</h3><p id="v43Expiry"></p><h3>Batas Diskon</h3><p id="v43Cap"></p><h3>Ketentuan Voucher</h3><p id="v43Limit"></p><button class="ref-green" id="v43TermsOk">Kembali ke voucher</button>',root=>{root.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';root.querySelector('b').textContent=v.name;root.querySelector('small').textContent=v.description+' · Min. '+money(v.min);root.querySelector('#v43Expiry').textContent=v.expired?'Berlaku hingga '+new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID'):'Tidak ada tanggal kedaluwarsa yang tercantum';root.querySelector('#v43Cap').textContent=v.maxDiscount==null?'Tidak tercantum batas maksimal diskon':('Maksimal potongan '+money(v.maxDiscount));root.querySelector('#v43Limit').textContent=v.limit||'Tidak ada batas penggunaan yang tercantum';root.querySelector('#v43TermsOk').onclick=openVoucher})}
-function openVoucher(){const lines=checkoutActive()?checkoutLines():selected();const chosen=activeVouchers();const sum=lines.reduce((a,x)=>a+Number(x.harga||0)*Number(x.qty||0),0);modal('<h2>Voucher &amp; Promo</h2><p>Gunakan maksimal satu voucher produk dan satu voucher ongkir.</p><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher"><button id="v43VoucherApply">Pakai</button></div><div id="v43VoucherList"></div><button class="ref-green" id="v43VoucherDone">Selesai</button>',root=>{root.querySelector('#v43VoucherApply').onclick=()=>alertUI('Kode voucher belum dapat diverifikasi.');root.querySelector('#v43VoucherDone').onclick=close;const list=root.querySelector('#v43VoucherList');vouchers.forEach(v=>{const slot=slotOf(v),active=chosen[slot]?.id===v.id,ok=eligible(v,sum),row=document.createElement('div');row.className='ref-v43-voucher';row.innerHTML='<span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small></div><div class="ref-v43-voucher-actions"><button class="ref-v43-choose"></button><button class="ref-v43-terms">S&amp;K</button></div>';row.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';row.querySelector('b').textContent=v.name+' · '+(v.type==='product_percent'?v.discount+'%':money(v.discount));row.querySelector('small').textContent=v.description+' · Min. '+money(v.min)+' · Hingga '+v.expired;const btn=row.querySelector('.ref-v43-choose');btn.textContent=!ok?'Belum memenuhi syarat':active?'Batalkan':'Gunakan';btn.disabled=!ok;btn.onclick=()=>{chosen[slot]=active?null:v;sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher()};row.querySelector('.ref-v43-terms').onclick=()=>terms(v);list.append(row)})})}
+function terms(v){
+ const amount=v.type==='product_percent'?v.discount+'%':money(v.discount);
+ const shipping=slotOf(v)==='shipping';
+ const validUntil=v.expired?new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'numeric',month:'long',year:'numeric'}):'Tidak dibatasi';
+ modal('<div class="v43-compact-sheet v43-terms-sheet">'+
+ '<header class="v43-compact-head"><h2>Syarat & Ketentuan Voucher</h2><p>Rincian penggunaan voucher</p></header>'+
+ '<div class="v43-compact-scroll"><div class="v43-terms-identity"><span class="v43-terms-icon"><i class="fa-solid '+v.icon+'" aria-hidden="true"></i></span><div><b id="v43TermsTitle"></b><small id="v43TermsDesc"></small></div></div>'+
+ '<div class="v43-terms-grid"><div><small>Minimal belanja</small><strong id="v43TermsMinimum"></strong></div><div><small>Berlaku sampai</small><strong id="v43TermsExpiry"></strong></div><div><small>Potongan</small><strong id="v43TermsValue"></strong></div><div><small>Batas potongan</small><strong id="v43TermsMaximum"></strong></div></div>'+
+ '<section class="v43-terms-notes"><h3>Ketentuan penggunaan</h3><p id="v43TermsLimit"></p><p>Maksimal satu voucher produk dan satu voucher ongkir dalam satu pesanan. Minimal belanja dihitung dari produk yang dipilih.</p><p id="v43TermsShipping"></p></section></div>'+
+ '<footer class="v43-compact-foot"><button class="ref-green" id="v43TermsOk" type="button">Kembali ke Voucher</button></footer></div>',root=>{
+  root.querySelector('#v43TermsTitle').textContent=v.name;
+  root.querySelector('#v43TermsDesc').textContent=v.description;
+  root.querySelector('#v43TermsMinimum').textContent=money(v.min);
+  root.querySelector('#v43TermsExpiry').textContent=validUntil;
+  root.querySelector('#v43TermsValue').textContent=amount;
+  root.querySelector('#v43TermsMaximum').textContent=v.maxDiscount==null?'Tidak dicantumkan':money(v.maxDiscount);
+  root.querySelector('#v43TermsLimit').textContent=v.limit||'Batas penggunaan tidak dicantumkan.';
+  root.querySelector('#v43TermsShipping').textContent=shipping?'Voucher ongkir baru dihitung setelah admin menetapkan ongkos kirim. Potongan maksimal sebesar ongkir sebenarnya.':'Voucher produk mengurangi total produk yang memenuhi syarat.';
+  root.querySelector('#v43TermsOk').onclick=openVoucher;
+ });
+}
+function openVoucher(){
+ const lines=checkoutActive()?checkoutLines():selected(),chosen=activeVouchers();
+ const sum=lines.reduce((a,x)=>a+Number(x.harga||0)*Number(x.qty||0),0);
+ modal('<div class="v43-compact-sheet v43-voucher-sheet">'+
+ '<header class="v43-compact-head"><h2>Voucher & Promo</h2><p>Pilih satu voucher produk dan satu voucher ongkir.</p></header>'+
+ '<div class="v43-compact-scroll"><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher" autocomplete="off" aria-label="Kode voucher"><button type="button" id="v43VoucherApply">Pakai</button></div>'+
+ '<div id="v43VoucherList"></div><p class="v43-compact-hint">Voucher ongkir yang dipilih menunggu perhitungan biaya kirim oleh admin. Total produk belum dikurangi ongkir.</p></div>'+
+ '<footer class="v43-compact-foot"><span id="v43SelectionCount" role="status"></span><button class="ref-green" type="button" id="v43VoucherDone">Selesai</button></footer></div>',root=>{
+  const selectedCount=Object.values(chosen).filter(Boolean).length;
+  root.querySelector('#v43SelectionCount').textContent=selectedCount?selectedCount+' voucher dipilih':'Belum ada voucher dipilih';
+  root.querySelector('#v43VoucherDone').onclick=close;
+  const code=root.querySelector('#v43VoucherCode');
+  const applyCode=()=>{
+   const input=code.value.trim().toUpperCase(),v=vouchers.find(x=>x.id.toUpperCase()===input);
+   if(!input){alertUI('Masukkan kode voucher terlebih dahulu.');return}
+   if(!v){alertUI('Kode voucher tidak dikenal. Silakan pilih voucher yang tersedia.');return}
+   if(!eligible(v,sum)){alertUI('Voucher belum memenuhi minimal belanja '+money(v.min)+' atau masa berlakunya telah habis.');return}
+   chosen[slotOf(v)]=v;
+   sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher();
+  };
+  root.querySelector('#v43VoucherApply').onclick=applyCode;
+  code.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCode()}});
+  const list=root.querySelector('#v43VoucherList');
+  vouchers.forEach(v=>{
+   const slot=slotOf(v),active=chosen[slot]?.id===v.id,ok=eligible(v,sum);
+   const row=document.createElement('div');row.className='ref-v43-voucher v43-voucher-item'+(active?' is-selected':'')+(!ok?' is-disabled':'');
+   row.innerHTML='<span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small><span class="v43-voucher-state" aria-live="polite"></span></div><div class="ref-v43-voucher-actions"><button type="button" class="ref-v43-choose"></button><button type="button" class="ref-v43-terms">S&K</button></div>';
+   row.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';
+   const title=row.querySelector('b'); title.textContent=v.name+' · '+(v.type==='product_percent'?v.discount+'%':money(v.discount));
+   const expiry=v.expired?new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tidak dibatasi';
+   row.querySelector('small').textContent='Min. '+money(v.min)+' · Sampai '+expiry;
+   const stateLabel=row.querySelector('.v43-voucher-state');
+   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Voucher produk aktif'):(!ok?(sum<Number(v.min||0)?'Belanja kurang '+money(Number(v.min||0)-sum):'Tidak berlaku'):'Tersedia untuk dipilih');
+   const btn=row.querySelector('.ref-v43-choose');
+   btn.textContent=active?'Batalkan':ok?'Gunakan':'Belum sesuai';btn.disabled=!ok&&!active;
+   btn.setAttribute('aria-pressed',String(active));
+   btn.setAttribute('aria-label',(active?'Batalkan':'Gunakan')+' '+v.name);
+   btn.onclick=()=>{chosen[slot]=active?null:v;sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher()};
+   row.querySelector('.ref-v43-terms').onclick=()=>terms(v);
+   list.append(row);
+  });
+ });
+}
 function openProduct(line){const id=String(line.id);const cart=$('s5Cart');cart?.classList.remove('open');document.body.classList.remove('stage4-detail-open');document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));}
-function sync(){const lines=read(),sel=selected(),all=lines.length>0&&sel.length===lines.length,count=sel.reduce((n,x)=>n+(Number(x.qty)||0),0),pricing=cartTotals();
+function sync(){const lines=read(),sel=selected(),all=lines.length>0&&sel.length===lines.length,count=sel.reduce((n,x)=>n+(Number(x.qty)||0),0);reconcileVoucher('cart',sel);const pricing=cartTotals();
  const wrap=$('s5CartItems');if(wrap){const rows=[...wrap.querySelectorAll('.imam-cart-product')];rows.forEach((row,i)=>{const c=row.querySelector('.ref-v42-select');const rowKey=c?.dataset.cartKey||row.dataset.cartKey;const x=(rowKey?lines.find(item=>String(item.key)===String(rowKey)):null)||lines[i];if(!x)return;if(c){c.checked=isSelected(x.key);c.dataset.cartKey=String(x.key);
  c.onchange=event=>{
   event.stopPropagation();
@@ -5156,7 +5241,7 @@ function sync(){const lines=read(),sel=selected(),all=lines.length>0&&sel.length
  };
  c.onclick=event=>event.stopPropagation();}row.classList.toggle('ref-v43-unchecked',!isSelected(x.key));const image=row.querySelector(':scope > img'),name=row.querySelector('h3');for(const target of [image,name])if(target){target.tabIndex=0;target.setAttribute('role','link');target.onclick=()=>openProduct(x);target.onkeydown=e=>{if(e.key==='Enter')openProduct(x)}}})}
  const allBox=$('refCartSelectAll');if(allBox){allBox.checked=all;allBox.indeterminate=sel.length>0&&!all;allBox.onchange=()=>{const m=selection();lines.forEach(x=>m[String(x.key)]=allBox.checked);writeSelection(m)}};
- const total=$('s5CartTotal');if(total)total.textContent='Total '+money(pricing.total);const totalQty=lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0),0);const badge=$('refCartCount');if(badge)badge.textContent='('+totalQty+')';for(const id of ['nineHeaderCartCount','s4CartCount']){const detailBadge=$(id);if(detailBadge){detailBadge.textContent=String(totalQty);detailBadge.hidden=totalQty===0;}}const savings=$('refCartSavings');if(savings)savings.textContent=pricing.discount?'Hemat '+money(pricing.discount):'';const btn=$('s5Checkout');if(btn){btn.textContent='Checkout ('+count+')';btn.disabled=count===0}publishQuote(); }
+ const total=$('s5CartTotal');if(total)total.textContent='Total '+money(pricing.total);const totalQty=lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0),0);const badge=$('refCartCount');if(badge)badge.textContent='('+totalQty+')';for(const id of ['nineHeaderCartCount','s4CartCount']){const detailBadge=$(id);if(detailBadge){detailBadge.textContent=String(totalQty);detailBadge.hidden=totalQty===0;}}const savings=$('refCartSavings');if(savings)savings.textContent=[pricing.discount?'Hemat '+money(pricing.discount):'',pricing.shippingVoucher?'Voucher ongkir dipilih':''].filter(Boolean).join(' · ');const btn=$('s5Checkout');if(btn){btn.textContent='Checkout ('+count+')';btn.disabled=count===0}publishQuote(); }
 // Selection events are handled exclusively by the checkbox onchange in sync().
 // Cart, checkout and detail route to this voucher sheet; original voucher policy is not yet restored.
 window.nineOpenOriginalVoucher=openVoucher;window.imamstoreOpenVoucherSheet=openVoucher;
@@ -7766,4 +7851,55 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 });
 });
 </script>
+
+<style id="imamstore-r18-voucher-compact-css">
+/* Hanya voucher dan S&K voucher: tinggi identik, daftar dapat digulir tanpa mendorong tombol. */
+.ref-modal:not([hidden]) .ref-modal-panel:has(.v43-compact-sheet){
+ width:min(100%,600px)!important;height:min(72dvh,760px)!important;max-height:min(72dvh,760px)!important;
+ overflow:hidden!important;display:flex;flex-direction:column;position:relative;
+ padding:12px 14px max(12px,env(safe-area-inset-bottom))!important;transform:translate3d(0,0,0);
+}
+.ref-modal .ref-modal-panel:has(.v43-compact-sheet) .ref-drag-handle{margin:0 auto 7px!important;flex-shrink:0}
+.ref-modal .ref-modal-panel:has(.v43-compact-sheet)>.ref-modal-close{position:absolute;right:14px;top:20px;z-index:3;margin:0;width:35px;height:35px;font-size:23px}
+#refModalContent:has(.v43-compact-sheet){display:flex;min-height:0;flex:1 1 auto;overflow:hidden}
+#refModalContent .v43-compact-sheet{display:flex;flex-direction:column;min-height:0;width:100%;height:100%;font-family:inherit;color:#222}
+#refModalContent .v43-compact-head{flex:none;padding:8px 45px 12px 4px;border-bottom:1px solid #edf1e8}
+#refModalContent .v43-compact-head h2{font-size:clamp(19px,4.6vw,23px);line-height:1.2;margin:3px 0 5px;font-weight:800}
+#refModalContent .v43-compact-head p{margin:0;color:#6d7867;font-size:12px;line-height:1.4}
+#refModalContent .v43-compact-scroll{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:7px 3px 14px}
+#refModalContent .v43-compact-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;flex:none;border-top:1px solid #e7eddf;padding:11px 3px 4px;background:#fff}
+#refModalContent .v43-compact-foot span{font-size:12px;color:#628b32;font-weight:750;min-width:0}
+#refModalContent .v43-compact-foot .ref-green{width:auto;min-width:145px;margin:0;min-height:44px;font-size:15px;border-radius:11px}
+#refModalContent .ref-v43-voucher-input{display:flex;gap:7px;margin:7px 0 11px}
+#refModalContent .ref-v43-voucher-input input{padding:10px 12px;min-height:43px;font-size:13px}
+#refModalContent .ref-v43-voucher-input button{font-size:13px;min-width:73px}
+#refModalContent .v43-voucher-item{display:grid;grid-template-columns:35px minmax(0,1fr) 86px!important;align-items:center;gap:10px!important;padding:11px 10px!important;margin:8px 0!important;border-radius:13px!important;border:1px solid #dde7d4!important;box-shadow:none;background:#fff!important;min-height:110px}
+#refModalContent .v43-voucher-item.is-selected{background:#f3fae9!important;border-color:#8cc63f!important;box-shadow:inset 3px 0 0 #8cc63f}
+#refModalContent .v43-voucher-item.is-disabled{background:#fafafa!important;opacity:.8}
+#refModalContent .v43-voucher-item .ref-v43-voucher-icon{font-size:21px}
+#refModalContent .v43-voucher-item .ref-v43-voucher-main{min-width:0;overflow-wrap:anywhere}
+#refModalContent .v43-voucher-item .ref-v43-voucher-main b{font-size:13px;line-height:1.35;word-break:normal}
+#refModalContent .v43-voucher-item .ref-v43-voucher-main small{font-size:11px;line-height:1.4;margin-top:3px}
+#refModalContent .v43-voucher-state{display:block;color:#689934;font-size:11px;line-height:1.4;font-weight:700;margin-top:4px}
+#refModalContent .v43-voucher-item.is-disabled .v43-voucher-state{color:#9a6d27}
+#refModalContent .v43-voucher-item .ref-v43-voucher-actions{max-width:none;width:86px;gap:6px}
+#refModalContent .v43-voucher-item .ref-v43-voucher-actions button{width:100%;min-height:34px!important;line-height:1.2;font-size:11px!important;padding:7px 4px!important;border-radius:9px;white-space:normal}
+#refModalContent .v43-voucher-item.is-selected .ref-v43-choose{background:#fff!important;border:1px solid #7ba83d!important;color:#4c7724!important}
+#refModalContent .v43-voucher-item .ref-v43-terms{background:#f2f5ef!important;color:#5e6b59!important}
+#refModalContent .v43-compact-hint{font-size:11px;line-height:1.5;color:#67765f;margin:11px 5px 2px}
+#refModalContent .v43-terms-identity{display:flex;gap:12px;align-items:center;padding:15px 5px}
+#refModalContent .v43-terms-icon{width:48px;height:48px;display:grid;place-items:center;flex:none;border-radius:13px;background:#eaf4de;color:#6b9f31;font-size:22px}
+#refModalContent .v43-terms-identity b{font-size:17px;display:block}
+#refModalContent .v43-terms-identity small{font-size:12px;color:#707b68;line-height:1.5}
+#refModalContent .v43-terms-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+#refModalContent .v43-terms-grid>div{background:#f6f9f3;border:1px solid #e3eddc;border-radius:11px;padding:11px;min-width:0}
+#refModalContent .v43-terms-grid small{display:block;color:#75806c;font-size:11px}
+#refModalContent .v43-terms-grid strong{display:block;margin-top:5px;font-size:13px;color:#263923;overflow-wrap:anywhere}
+#refModalContent .v43-terms-notes{padding:12px 4px;font-size:12px;line-height:1.55;color:#566450}
+#refModalContent .v43-terms-notes h3{font-size:14px;margin:0 0 8px}
+#refModalContent .v43-terms-notes p{margin:0 0 7px}
+#s5Draft .v43-checkout-shipping-note{font-size:11px;line-height:1.55;color:#668047;background:#f4faed;border-radius:9px;padding:9px 11px;margin:7px 0 10px}
+#s5Cart #refVoucherSaved,#s5Draft #refCheckoutVoucherValue{max-width:62%;white-space:normal;font-size:clamp(11px,2.8vw,13px);text-align:right;color:#648f30}
+@media(min-width:700px){.ref-modal:not([hidden]) .ref-modal-panel:has(.v43-compact-sheet){border-radius:22px 22px 0 0}}
+</style>
 </body></html>
