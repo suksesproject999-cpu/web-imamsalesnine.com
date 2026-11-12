@@ -6768,4 +6768,90 @@ const observer=new MutationObserver(removeWrongEditors);
 observer.observe(target,{childList:true,subtree:true});
 })();
 </script>
+
+<script id="nexai-v7-purchase-single-state">
+(()=>{'use strict';
+const $=id=>document.getElementById(id);
+const panel=$('imamstoreOriginalPurchase'),selector=$('imamstorePurchaseVariant'),qty=$('imamstorePurchaseQty'),action=$('imamstorePurchaseAction');
+if(!panel||!selector||!qty||!action)return;
+const norm=v=>String(v??'').trim().replace(/\s+/g,' ').toLocaleLowerCase('id-ID');
+const money=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
+const product=()=>{
+ const id=window.imamstoreActiveProduct?.id;
+ const list=window.imamstoreV29?.products?.()||[];
+ return list.find(p=>String(p.id)===String(id))||window.imamstoreActiveProduct||null;
+};
+const names=p=>(Array.isArray(p?.varian)?p.varian:[]).map(v=>typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna??'')).map(v=>String(v).trim()).filter(Boolean);
+const state={id:null,mode:'cart',busy:false};
+function resolve(){
+ const p=product();
+ if(!p)return {ok:false,message:'Produk tidak ditemukan'};
+ const variants=names(p);
+ const current=variants.find(v=>norm(v)===norm(selector.value));
+ if(variants.length&&!current)return {ok:false,message:'Pilih varian yang tersedia'};
+ const count=Number(qty.value);
+ if(!Number.isInteger(count)||count<1||count>999)return {ok:false,message:'Jumlah harus 1 sampai 999'};
+ const quote=window.imamstoreUnifiedPrice?.quote?.(p);
+ const unit=Number(quote?.price);
+ if(!Number.isFinite(unit)||unit<=0)return {ok:false,message:'Harga produk belum tersedia'};
+ if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif'};
+ return {ok:true,p,variant:current||'Default',count,unit,quote};
+}
+function render(){
+ if(panel.hidden||!panel.classList.contains('open')||panel.dataset.nineEditing==='true')return;
+ const r=resolve(),p=r.p||product();
+ if(!p)return;
+ if(state.id!==String(p.id)){state.id=String(p.id)}
+ const set=(id,value)=>{const el=$(id);if(el&&el.textContent!==value)el.textContent=value};
+ set('refPurchasePrice',r.ok?money(r.unit):'Harga belum tersedia');
+ set('refPurchaseNormal',r.ok&&r.quote.normal>r.unit?money(r.quote.normal):'');
+ set('refPurchaseBadge',r.ok&&r.quote.percent?'-'+r.quote.percent+'%':'');
+ set('refPurchaseSaving',r.ok&&r.quote.saving?'Hemat '+money(r.quote.saving):'');
+ set('ninePurchaseBudgetValue',r.ok?money(r.unit*r.count):'—');
+ set('ninePurchaseBudgetLabel','Total belanja · '+(r.ok?r.count:Math.max(1,Number(qty.value)||1))+' pcs');
+ const message=$('imamstorePurchaseMessage');
+ if(message){message.textContent=r.ok?'':r.message;message.hidden=r.ok}
+ action.disabled=!r.ok||state.busy;
+ // Sync visual buttons from the actual select; no mutation of the selected value.
+ panel.querySelectorAll('.ref-v45-variant-grid button').forEach(b=>b.setAttribute('aria-pressed',String(norm(b.textContent)===norm(selector.value))));
+}
+function refresh(){queueMicrotask(render)}
+// Legacy handlers may set stale totals; run after they finish, using current product identity.
+selector.addEventListener('change',refresh);
+qty.addEventListener('input',refresh);qty.addEventListener('change',refresh);
+panel.addEventListener('click',e=>{
+ if(e.target.closest('#imamstoreQtyMinus,#imamstoreQtyPlus,.ref-v45-variant-grid button'))setTimeout(render,0);
+},false);
+new MutationObserver(()=>{if(panel.classList.contains('open')&&!panel.hidden){state.id=String(product()?.id??'');setTimeout(render,0)}}).observe(panel,{attributes:true,attributeFilter:['class','hidden']});
+// Override the legacy action, which could read a different product and price than the sheet.
+action.addEventListener('click',e=>{
+ e.preventDefault();e.stopImmediatePropagation();
+ if(panel.dataset.nineEditing==='true')return;
+ if(state.busy)return;
+ const r=resolve();render();
+ if(!r.ok)return;
+ const bridge=window.imamstoreCartBridge;
+ if(!bridge){const msg=$('imamstorePurchaseMessage');if(msg){msg.hidden=false;msg.textContent='Keranjang belum siap. Muat ulang halaman.'}return}
+ state.busy=true;action.disabled=true;
+ try{
+  const mode=action.textContent.includes('Ringkasan')?'buy':'cart';
+  const result=mode==='buy'?bridge.previewBuy(r.p.id,r.variant,r.count):bridge.addProduct(r.p.id,r.variant,r.count);
+  if(!result?.ok){const msg=$('imamstorePurchaseMessage');if(msg){msg.hidden=false;msg.textContent=result?.message||'Gagal memproses produk'}return}
+  window.closePurchaseSheet?.();
+  if(mode==='cart'){
+   document.dispatchEvent(new Event('nine:cartchange'));
+   window.imamstoreRefreshCartBadge?.();
+   window.imamstoreToast?.('Produk berhasil masuk ke keranjang','success');
+  }else{
+   $('imamstoreLiveOriginalDetail')?.classList.remove('open');
+   document.body.classList.remove('imamstore-original-open');
+  }
+ }catch(err){
+  const msg=$('imamstorePurchaseMessage');if(msg){msg.hidden=false;msg.textContent='Terjadi kendala. Silakan coba lagi.'}
+  console.error('Purchase action failed',err);
+ }finally{state.busy=false;render()}
+},true);
+document.addEventListener('imamstore:flash-price-change',refresh);
+})();
+</script>
 </body></html>
