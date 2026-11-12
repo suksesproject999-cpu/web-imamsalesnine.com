@@ -1100,7 +1100,34 @@ function productImageUrl(value){
 
 const active=p=>p&&p.active!==false&&p.deleted!==true;
 const normalize=p=>({...p,harga:p.harga||{},varian:Array.isArray(p.varian)?p.varian:[]});
-function merge(seed,docs){const map=new Map(seed.map(p=>[String(p.id),normalize(p)]));docs.forEach((v,id)=>{const key=String(v.id??id);map.set(key,normalize({...map.get(key),...v,id:key}));});return [...map.values()].filter(active)}
+// Katalog dari CMS adalah sumber live; produk baru CMS harus terlihat di depan,
+// sementara urutan seluruh produk dasar yang sudah ada tetap dipertahankan.
+function cmsProductTime(p){
+ const date=p?.createdAt??p?.updatedAt??null;
+ if(date&&typeof date.toMillis==='function')return date.toMillis();
+ if(date&&typeof date.seconds==='number')return date.seconds*1000;
+ if(typeof date==='string'||typeof date==='number'){
+  const ms=typeof date==='number'?date:Date.parse(date);
+  if(Number.isFinite(ms)&&ms>0)return ms;
+ }
+ const match=String(p?.id??'').match(/^(?:NEW|COPY|P)-(\d{13})(?:-|$)/i);
+ return match?Number(match[1]):0;
+}
+function merge(seed,docs){
+ const map=new Map(seed.map(p=>[String(p.id),normalize(p)])),newCms=[];
+ docs.forEach((value,id)=>{
+  if(!value||typeof value!=='object')return;
+  const key=String(value.id??id).trim();
+  if(!key)return;
+  const normalized=normalize({...map.get(key),...value,id:key});
+  if(map.has(key))map.set(key,normalized);
+  else newCms.push(normalized);
+ });
+ newCms.sort((a,b)=>cmsProductTime(b)-cmsProductTime(a));
+ return [...newCms,...map.values()].filter(active);
+}
+const catalogHealth={seed:0,cms:0,cmsNew:0,visible:0,seedError:'',cmsError:'',updatedAt:''};
+window.imamstoreCatalogHealth=()=>({...catalogHealth});
 const stats=new Map();
 function formatStoreCompact(value){
  const n=Number(value);
@@ -1265,7 +1292,24 @@ function card(p){
  <div class="product-meta"><span class="product-rating">⭐ ${rating}</span><span class="meta-sep">|</span><span class="meta-number">${sales==null?'—':fmt(sales)} terjual</span><span class="meta-sep">|</span><span class="meta-number"><i class="fa-regular fa-eye"></i> ${views==null?'—':fmt(views)}</span></div>
  </div></article>`;
 }
-function rank(list,mode){let a=[...list];if(mode==='terbaru')a.reverse();if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));if(mode==='murah')a.sort((x,y)=>price(x)-price(y));if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));return a}
+function rank(list,mode){
+ let a=[...list];
+ if(mode==='terbaru'){
+  // Produk CMS terbaru lebih dulu; untuk produk dasar tanpa tanggal,
+  // pertahankan perilaku 'terbaru' lama (urutan kebalikan katalog dasar).
+  const index=new Map(products.map((p,i)=>[String(p.id),i]));
+  a.sort((x,y)=>{
+   const tx=cmsProductTime(x),ty=cmsProductTime(y);
+   if(tx!==ty)return ty-tx;
+   return (index.get(String(y.id))??0)-(index.get(String(x.id))??0);
+  });
+ }
+ if(mode==='terlaris')a.sort((x,y)=>sold(y)-sold(x));
+ if(mode==='promo')a.sort((x,y)=>((normal(y)-price(y))/Math.max(1,normal(y)))-((normal(x)-price(x))/Math.max(1,normal(x))));
+ if(mode==='murah')a.sort((x,y)=>price(x)-price(y));
+ if(mode==='mahal')a.sort((x,y)=>price(y)-price(x));
+ return a;
+}
 function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
 // Pencarian semantik ringan berbasis kategori Store realtime; ID hanya relasi internal.
 const searchNormalize=value=>String(value??'').toLocaleLowerCase('id-ID').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
@@ -1519,10 +1563,24 @@ document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-
 $('search').addEventListener('input',e=>{activeStoreCategory='';activeBrand='';query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
 $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('search').value='';render();$('search').focus()};
 (async()=>{
+ const seed=[];
  try{
-  const r=await fetch('/produk.json',{cache:'no-store'});if(!r.ok)throw Error('produk.json gagal dimuat');
-  const seed=(await r.json()).map(normalize);products=seed.filter(active);if(!products.length)console.warn("Katalog produk kosong");render();
-  if(!window.firebase)return;
+  // Jangan biarkan kegagalan katalog JSON menghentikan CMS Firestore.
+  try{
+   const r=await fetch('/produk.json',{cache:'no-store'});
+   if(!r.ok)throw Error('HTTP '+r.status);
+   const data=await r.json();
+   if(!Array.isArray(data))throw Error('Format katalog bukan array');
+   seed.push(...data.filter(Boolean).map(normalize));
+  }catch(error){
+   catalogHealth.seedError=String(error?.message||error).slice(0,120);
+   console.warn('[ImamStore katalog] Katalog dasar gagal dimuat, CMS tetap dicoba:',error);
+  }
+  catalogHealth.seed=seed.length;
+  products=seed.filter(active);
+  catalogHealth.visible=products.length;
+  render();
+  if(!window.firebase){catalogHealth.cmsError='Firebase SDK belum siap';return;}
   if(!imamstoreBootstrapFirebaseR8())console.warn('[ImamStore R8 developer] Bootstrap was not completed');
   const db=firebase.firestore();
   // Statistik sama dengan website utama: statistik_produk.
@@ -1594,9 +1652,21 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
    render();
   },error=>console.warn('Kategori Store belum dapat dibaca:',error));
   db.collection('cms_products').onSnapshot(snapshot=>{
-   const docs=new Map();snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
-   products=merge(seed,docs);render();
-  },error=>console.warn('Firestore tidak tersedia, menggunakan katalog dasar:',error));
+   const docs=new Map();
+   snapshot.forEach(doc=>docs.set(doc.id,doc.data()));
+   const seedIds=new Set(seed.map(p=>String(p.id)));
+   catalogHealth.cms=docs.size;
+   catalogHealth.cmsNew=[...docs].filter(([id,v])=>v&&active(v)&&!seedIds.has(String(v.id??id))).length;
+   catalogHealth.cmsError='';
+   catalogHealth.updatedAt=new Date().toISOString();
+   products=merge(seed,docs);
+   catalogHealth.visible=products.length;
+   render();
+   console.info('[ImamStore katalog] Sinkron CMS:',catalogHealth.cms,'dokumen,',catalogHealth.cmsNew,'produk baru,',products.length,'produk tampil.');
+  },error=>{
+   catalogHealth.cmsError=String(error?.code||error?.message||error).slice(0,120);
+   console.warn('[ImamStore katalog] CMS belum bisa dibaca; katalog dasar tetap ditampilkan:',error);
+  });
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
   const presenceUrl='/.netlify/functions/admin-presence';
   const activeWindowMs=90000;
@@ -1628,7 +1698,12 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   setInterval(renderPresence,15000);
   document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPresence()});
 
- }catch(e){console.error('Katalog asli tidak tersedia:',e);products=[];render()}
+ }catch(e){
+  console.error('Katalog gagal menyelesaikan inisialisasi:',e);
+  // Jangan kosongkan katalog yang sudah berhasil diperoleh dari JSON / CMS.
+  catalogHealth.cmsError=String(e?.code||e?.message||e).slice(0,120);
+  if(!products.length)render();
+ }
 })();
 </script>
 <script id="warehouse-store-engine">
