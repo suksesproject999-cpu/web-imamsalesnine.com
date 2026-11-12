@@ -4702,6 +4702,73 @@ $('imamstoreSaveDraft')?.addEventListener('click',()=>{
  if(!data.imamstoreCheckoutName||!/^0[0-9+ -]{7,17}$/.test(data.imamstoreCheckoutPhone)||data.imamstoreCheckoutAddress.length<12){msg.textContent='Isi nama, nomor HP Indonesia, dan alamat lengkap minimal 12 karakter.';return}
  try{localStorage.setItem(key,JSON.stringify(data));msg.textContent='Data checkout tersimpan di perangkat ini. Belum ada pesanan atau pembayaran yang dikirim.'}catch(e){msg.textContent='Gagal menyimpan. Periksa izin penyimpanan browser.'}
 });
+})();</script><script id="imamstore-r7-customer-checkout-feedback">(()=>{'use strict';
+/* Pesan untuk pelanggan selalu netral; detail teknis hanya ditulis ke console. */
+const trim=v=>String(v??'').trim();
+function validateSavedAddress(a){
+ const issues=[];
+ if(!a)return ['Pilih atau tambahkan alamat pengiriman terlebih dahulu.'];
+ const name=trim(a.name||a.nama),phone=trim(a.phone||a.wa),province=trim(a.province||a.provinsi),city=trim(a.city||a.kota),postal=trim(a.postal||a.kodepos),full=trim(a.full||a.alamat),email=trim(a.email);
+ const digits=phone.replace(/\D/g,'');
+ if(!name)issues.push('Isi nama lengkap penerima.');else if(name.length>160)issues.push('Nama penerima terlalu panjang (maksimal 160 karakter).');
+ if(!/^(?:62|0)?8\d{8,12}$/.test(digits)||phone.length<8||phone.length>30)issues.push('Periksa nomor WhatsApp penerima. Gunakan nomor aktif yang diawali 08 atau 628.');
+ if(!province)issues.push('Isi provinsi tujuan.');else if(province.length>150)issues.push('Nama provinsi terlalu panjang.');
+ if(!city)issues.push('Isi kota atau kabupaten tujuan.');else if(city.length>150)issues.push('Nama kota atau kabupaten terlalu panjang.');
+ if(!/^\d{5}$/.test(postal))issues.push('Kode pos wajib 5 angka, tanpa huruf atau spasi.');
+ if(!full)issues.push('Isi alamat lengkap, termasuk jalan dan nomor rumah.');else if(full.length>1600)issues.push('Alamat terlalu panjang. Singkatkan hingga maksimal 1.600 karakter.');
+ if(email.length>160)issues.push('Alamat email terlalu panjang.');
+ return issues;
+}
+function validateDraftAddress(d){
+ const data={...d,full:[d.street,d.district,d.city,d.province,d.postal].map(trim).filter(Boolean).join(', ')};
+ const issues=validateSavedAddress(data);
+ if(!trim(d.district))issues.push('Isi kecamatan tujuan.');
+ if(!trim(d.street))issues.push('Isi jalan dan nomor rumah secara lengkap.');
+ return [...new Set(issues)];
+}
+function describeOrderIssues(issues){
+ const messages=[];
+ for(const raw of issues){const m=String(raw||'');let friendly='';
+  if(/nama penerima/i.test(m))friendly='Periksa nama lengkap penerima pada alamat pengiriman.';
+  else if(/nomor whatsapp/i.test(m))friendly='Periksa nomor WhatsApp pada alamat pengiriman.';
+  else if(/email/i.test(m))friendly='Periksa email pada alamat pengiriman.';
+  else if(/provinsi/i.test(m))friendly='Periksa provinsi pada alamat pengiriman.';
+  else if(/kota/i.test(m))friendly='Periksa kota/kabupaten pada alamat pengiriman.';
+  else if(/kode pos/i.test(m))friendly='Isi kode pos dengan 5 angka.';
+  else if(/alamat lengkap|struktur alamat/i.test(m))friendly='Periksa kembali informasi alamat pengiriman.';
+  else if(/ekspedisi/i.test(m))friendly='Pilih layanan pengiriman yang tersedia.';
+  else if(/nama produk|nama varian|ID produk|struktur item|jumlah jenis produk|Produk baris/i.test(m))friendly='Ada detail produk yang perlu diperbarui. Kembali ke keranjang dan periksa produk, varian, serta jumlahnya.';
+  else if(/voucher|diskon/i.test(m))friendly='Periksa voucher atau promo yang dipilih, lalu hitung ulang pesanan.';
+  else if(/subtotal|total bayar|total jumlah item|struktur total/i.test(m))friendly='Rincian harga berubah. Periksa kembali total belanja sebelum melanjutkan.';
+  else if(/login|sesi|UID/i.test(m))friendly='Sesi akun perlu diperbarui. Silakan masuk kembali.';
+  else if(/catatan/i.test(m))friendly='Catatan pesanan terlalu panjang. Singkatkan catatan lalu coba lagi.';
+  else friendly='Informasi pesanan belum lengkap atau sudah berubah. Periksa kembali dan coba lagi.';
+  if(!messages.includes(friendly))messages.push(friendly);
+ }
+ return messages;
+}
+function serviceError(err){
+ const code=String(err?.code||'').toLowerCase();
+ if(/network|offline|deadline-exceeded/.test(code))return {title:'Koneksi terputus',text:'Pesanan belum terkirim. Periksa koneksi internet, lalu coba lagi. Produk di keranjang tetap tersimpan.'};
+ if(/unauthenticated|auth\/|invalid-credential/.test(code))return {title:'Silakan masuk kembali',text:'Sesi akun Anda perlu diperbarui sebelum membuat pesanan. Masuk kembali, lalu coba lagi. Keranjang tetap tersimpan.'};
+ if(/resource-exhausted/.test(code))return {title:'Terlalu banyak permintaan',text:'Mohon tunggu sebentar sebelum mencoba membuat pesanan kembali. Keranjang tetap tersimpan.'};
+ if(/permission-denied|failed-precondition/.test(code))return {title:'Pesanan belum dapat diproses',text:'Data pesanan belum dapat diterima saat ini. Bila nama, nomor penerima, dan alamat sudah benar, coba lagi beberapa saat atau hubungi layanan pelanggan. Produk di keranjang tetap aman.'};
+ return {title:'Pesanan belum berhasil dikirim',text:'Kami belum dapat menyelesaikan permintaan pesanan Anda. Silakan coba lagi beberapa saat. Produk di keranjang tetap tersimpan.'};
+}
+async function promptAddress(issues){
+ const list=[...new Set(issues||[])].slice(0,6);
+ const text=list.join('\n');
+ const alert=window.Swal?.fire;
+ if(alert){
+  const html='<div style="text-align:left;line-height:1.7;font-size:14px">'+list.map(m=>'<div style="margin-bottom:7px">• '+m.replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))+'</div>').join('')+'</div>';
+  const res=await window.Swal.fire({icon:'warning',title:'Periksa alamat pengiriman',html,showCancelButton:true,confirmButtonText:'Perbaiki Alamat',cancelButtonText:'Nanti',confirmButtonColor:'#8cc63f',width:'min(92vw,430px)'});
+  if(res.isConfirmed){if(typeof window.imamstoreOpenAddressEditorR7==='function')window.imamstoreOpenAddressEditorR7();else document.getElementById('refAddressOpen')?.click()}
+ }else{
+  window.alert('Periksa alamat pengiriman:\n'+text);
+  document.getElementById('refAddressOpen')?.click();
+ }
+}
+window.imamstoreCustomerCheckoutR7=Object.freeze({validateSavedAddress,validateDraftAddress,describeOrderIssues,serviceError,promptAddress});
 })();</script><script id="imamstore-reference-v39-js">
 (()=>{'use strict';
 const $=id=>document.getElementById(id),money=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
@@ -4765,8 +4832,52 @@ $('refCartChat').onclick=()=>{const message='Halo Imam Sales Nine, saya ingin be
 // Voucher buttons are owned by the v43 voucher controller only.
 function getAddresses(){try{return JSON.parse(localStorage.getItem(ADDR)||'[]')}catch{return []}}
 function saveAddresses(a){try{localStorage.setItem(ADDR,JSON.stringify(a))}catch{}}
-function addressForm(){showModal('<h2>Alamat Baru</h2><form id="refAddressForm"><label>Nama lengkap<input name="name" required maxlength="100"></label><label>Nomor telepon<input name="phone" type="tel" required pattern="[0-9+ ]{9,17}"></label><label>Provinsi<input name="province" required></label><label>Kota / Kabupaten<input name="city" required></label><label>Kecamatan<input name="district" required></label><label>Kode Pos<input name="postal" inputmode="numeric" required pattern="[0-9]{5}"></label><label>Jalan / Nomor Rumah<textarea name="street" required></textarea></label><label>Detail / Patokan (opsional)<textarea name="landmark"></textarea></label><label>Label Alamat<select name="label"><option>Rumah</option><option>Kantor</option><option>Lainnya</option></select></label><label><input type="checkbox" name="primary" style="width:auto"> Jadikan alamat utama</label><button class="ref-green" type="submit">Simpan Alamat</button></form>',root=>{root.querySelector('form').onsubmit=e=>{e.preventDefault();const d=Object.fromEntries(new FormData(e.target));const a={...d,full:[d.street,d.district,d.city,d.province,d.postal].filter(Boolean).join(', ')};const all=getAddresses();all.push(a);saveAddresses(all);selectedAddress=a;closeModal();refreshCheckout()}});modal.classList.add('ref-fullpage')}
-function addressList(){const all=getAddresses();showModal('<h2>Alamat Saya</h2><div id="refAddressList"></div><button class="ref-green" id="refAddressAdd">+ Tambah Alamat</button>',root=>{const list=root.querySelector('#refAddressList');all.forEach(a=>{const b=document.createElement('button');b.style.cssText='width:100%;background:#f6f9f2;border:1px solid #e0e8d7;padding:13px;border-radius:12px;text-align:left;margin-bottom:10px';b.textContent=a.name+' · '+a.phone+'\n'+a.full;b.onclick=()=>{selectedAddress=a;closeModal();refreshCheckout()};list.append(b)});root.querySelector('#refAddressAdd').onclick=addressForm});modal.classList.add('ref-fullpage')}
+function addressForm(editIndex=-1){
+ const old=editIndex>=0?getAddresses()[editIndex]||{}:{};
+ showModal('<h2>'+(editIndex>=0?'Ubah Alamat':'Alamat Baru')+'</h2><form id="refAddressForm"><label>Nama lengkap<input name="name" required maxlength="160" autocomplete="name"></label><label>Nomor WhatsApp<input name="phone" type="tel" required inputmode="tel" maxlength="30" placeholder="08xxxxxxxxxx" autocomplete="tel"></label><label>Provinsi<input name="province" required maxlength="150"></label><label>Kota / Kabupaten<input name="city" required maxlength="150"></label><label>Kecamatan<input name="district" required maxlength="150"></label><label>Kode Pos<input name="postal" inputmode="numeric" required minlength="5" maxlength="5" pattern="[0-9]{5}"></label><label>Jalan / Nomor Rumah<textarea name="street" required maxlength="1400"></textarea></label><label>Detail / Patokan (opsional)<textarea name="landmark" maxlength="200"></textarea></label><label>Label Alamat<select name="label"><option>Rumah</option><option>Kantor</option><option>Lainnya</option></select></label><label><input type="checkbox" name="primary" style="width:auto"> Jadikan alamat utama</label><div id="refAddressFormError" role="alert" aria-live="polite" style="font-size:13px;color:#ae293d;line-height:1.5" hidden></div><button class="ref-green" type="submit">Simpan Alamat</button></form>',root=>{
+  const form=root.querySelector('#refAddressForm');
+  Object.entries(old).forEach(([key,val])=>{if(form.elements.namedItem(key)&&key!=='primary')form.elements.namedItem(key).value=val??''});
+  if(editIndex>=0)form.elements.namedItem('primary').checked=!!(selectedAddress&&(selectedAddress.full===old.full));
+  form.onsubmit=e=>{
+   e.preventDefault();
+   const d=Object.fromEntries(new FormData(form));
+   const issues=window.imamstoreCustomerCheckoutR7?.validateDraftAddress(d)||[];
+   if(issues.length){
+    const box=root.querySelector('#refAddressFormError');
+    if(box){box.hidden=false;box.textContent=issues.join(' ')}
+    const fieldOrder=['name','phone','province','city','district','postal','street'];
+    const target=fieldOrder.map(k=>form.elements.namedItem(k)).find(el=>el&&(!String(el.value||'').trim()||!el.checkValidity()));
+    (target||box)?.focus?.();
+    return;
+   }
+   const a={...d,full:[d.street,d.district,d.city,d.province,d.postal].map(v=>String(v||'').trim()).filter(Boolean).join(', ')};
+   const all=getAddresses();
+   if(editIndex>=0&&editIndex<all.length)all[editIndex]=a;else all.push(a);
+   saveAddresses(all);selectedAddress=a;closeModal();refreshCheckout();
+   const warn=$('refCheckoutWarning');if(warn)warn.textContent='Alamat pengiriman tersimpan. Periksa rincian pesanan sebelum melanjutkan.';
+   window.imamstoreToast?.('Alamat berhasil disimpan.','success');
+  };
+ });
+ modal.classList.add('ref-fullpage');
+}
+function addressList(){const all=getAddresses();showModal('<h2>Alamat Saya</h2><div id="refAddressList"></div><button class="ref-green" id="refAddressAdd">+ Tambah Alamat</button>',root=>{
+ const list=root.querySelector('#refAddressList');
+ all.forEach((a,index)=>{
+  const wrap=document.createElement('div');wrap.style.cssText='display:flex;align-items:stretch;gap:7px;margin-bottom:10px';
+  const b=document.createElement('button');b.type='button';b.style.cssText='flex:1;min-width:0;background:#f6f9f2;border:1px solid #e0e8d7;padding:13px;border-radius:12px;text-align:left;white-space:pre-wrap;overflow-wrap:anywhere';
+  b.textContent=(a.name||a.nama||'Penerima')+' · '+(a.phone||a.wa||'')+'\n'+(a.full||'');
+  b.onclick=()=>{selectedAddress=a;closeModal();refreshCheckout()};
+  const edit=document.createElement('button');edit.type='button';edit.textContent='Ubah';edit.style.cssText='color:#65942d;background:#fff;border:1px solid #d7e8c8;border-radius:10px;padding:0 12px;font-weight:700';edit.setAttribute('aria-label','Ubah alamat penerima');edit.onclick=()=>addressForm(index);
+  wrap.append(b,edit);list.append(wrap);
+ });
+ root.querySelector('#refAddressAdd').onclick=()=>addressForm(-1);
+});modal.classList.add('ref-fullpage')}
+window.imamstoreOpenAddressEditorR7=()=>{
+ const all=getAddresses();
+ const summary=$('refAddressSummary')?.textContent?.trim()||'';
+ const index=all.findIndex(a=>a&&a.full&&(a.full===summary||summary.includes(a.full)));
+ addressForm(index);
+};
 $('refAddressOpen').onclick=addressList;
 function breakdown(){
  const cartOpen=document.getElementById('s5Cart')?.classList.contains('open');const quote=cartOpen?window.imamstoreV43?.cartTotals?.():window.imamstoreV43?.checkoutTotals?.();
@@ -5118,9 +5229,74 @@ function db(){try{return (typeof window.db!=='undefined'&&window.db)||firebase.f
 function name(x){return String(x.nama||x.name||x.title||'Produk')}
 function price(x){return Number(x.harga??x.price??x.unitPrice??0)||0}
 function orderId(){try{return crypto.randomUUID()}catch{return 'ORD-'+Date.now().toString(36).toUpperCase()+'-'+Math.random().toString(36).slice(2,8)}}
+/* R6 — sesuaikan validasi permintaan pesanan dengan Firestore Rules R4.
+   Ini pemeriksaan lokal untuk mendeteksi mismatch; bukan pengganti Rules/validasi backend. */
+function auditOrderAgainstR4(o,authUser){
+ const issues=[];
+ const fail=(pass,detail)=>{if(!pass)issues.push(detail)};
+ const str=(v,min,max)=>typeof v==='string'&&v.length>=min&&v.length<=max;
+ const keys=(o,required)=>o&&typeof o==='object'&&!Array.isArray(o)
+  &&Object.keys(o).length===required.length&&required.every(k=>Object.prototype.hasOwnProperty.call(o,k));
+ const isNum=n=>typeof n==='number'&&Number.isFinite(n);
+ const safeInt=n=>Number.isSafeInteger(n);
+ const idValid=x=>str(x,1,120)&&/^[A-Za-z0-9_-]{1,120}$/.test(x);
+ const rootKeys=['orderId','uid','customer','ekspedisi','catatan','items','totals','vouchers','status','channel','createdAt','updatedAt'];
+ fail(keys(o,rootKeys),'Struktur field pesanan tidak sama dengan R4');
+ fail(!!authUser&&!authUser.isAnonymous,'Akun bukan login pelanggan permanen (Google/email)');
+ fail(o?.uid===authUser?.uid,'UID pesanan berbeda dari sesi login');
+ fail(str(o?.orderId,1,100),'Nomor pesanan tidak valid');
+ fail(o?.status==='checkout_created','Status awal bukan checkout_created');
+ fail(o?.channel==='whatsapp','Channel harus whatsapp');
+ fail(str(o?.ekspedisi,1,100),'Metode ekspedisi tidak valid (maksimal 100 karakter)');
+ fail(str(o?.catatan,0,500),'Catatan melebihi 500 karakter');
+ const c=o?.customer,cKeys=['nama','wa','email','provinsi','kota','kodepos','alamat'];
+ fail(keys(c,cKeys),'Struktur alamat tidak cocok dengan R4');
+ if(c){
+  fail(str(c.nama,1,160),'Nama penerima harus 1–160 karakter');
+  fail(str(c.wa,8,30),'Nomor WhatsApp harus 8–30 karakter');
+  fail(str(c.email,0,160),'Email maksimal 160 karakter');
+  fail(str(c.provinsi,1,150),'Nama provinsi harus 1–150 karakter');
+  fail(str(c.kota,1,150),'Nama kota harus 1–150 karakter');
+  fail(typeof c.kodepos==='string'&&/^[0-9]{5}$/.test(c.kodepos),'Kode pos harus 5 digit');
+  fail(str(c.alamat,1,1600),'Alamat lengkap harus 1–1600 karakter');
+ }
+ const lines=o?.items;
+ fail(Array.isArray(lines)&&lines.length>=1&&lines.length<=30,'Jumlah jenis produk harus 1–30 baris');
+ if(Array.isArray(lines))for(const [i,x] of lines.entries()){
+  const p=`Produk baris ${i+1}: `;
+  fail(keys(x,['productId','nama','varian','qty','harga']),p+'struktur item tidak sesuai');
+  fail(idValid(x?.productId),p+'ID produk hanya boleh huruf, angka, _ atau - (maksimal 120)');
+  fail(str(x?.nama,1,200),p+'nama produk harus 1–200 karakter');
+  fail(str(x?.varian,0,150),p+'nama varian maksimal 150 karakter');
+  fail(safeInt(x?.qty)&&x.qty>=1&&x.qty<=999,p+'jumlah harus bilangan bulat 1–999');
+  fail(isNum(x?.harga)&&x.harga>0&&x.harga<=1000000000,p+'harga tidak valid');
+ }
+ const t=o?.totals;
+ fail(keys(t,['totalItem','subtotal','productDiscount','shippingDiscount','totalBayar','productVoucherName','shippingVoucherName']),'Struktur total pesanan tidak sesuai R4');
+ if(t&&Array.isArray(lines)){
+  const qty=lines.reduce((v,x)=>v+(isNum(x?.qty)?x.qty:0),0);
+  const sub=lines.reduce((v,x)=>v+(isNum(x?.qty)&&isNum(x?.harga)?x.qty*x.harga:0),0);
+  fail(safeInt(t.totalItem)&&t.totalItem===qty,'Total jumlah item tidak sesuai rincian');
+  fail(isNum(t.subtotal)&&t.subtotal>0&&t.subtotal===sub,'Subtotal tidak sama dengan penjumlahan harga × jumlah');
+  fail(isNum(t.productDiscount)&&t.productDiscount>=0&&t.productDiscount<=sub,'Diskon produk tidak valid');
+  fail(t.shippingDiscount===0,'Diskon ongkir harus 0 sebelum admin menghitung ongkir');
+  fail(isNum(t.totalBayar)&&t.totalBayar===t.subtotal-t.productDiscount,'Total bayar tidak sesuai subtotal dikurangi diskon');
+  fail(t.productVoucherName==null||str(t.productVoucherName,1,180),'Nama voucher produk lebih dari 180 karakter');
+  fail(t.shippingVoucherName==null||str(t.shippingVoucherName,1,180),'Nama voucher ongkir lebih dari 180 karakter');
+ }
+ const v=o?.vouchers;
+ fail(keys(v,['product','shipping']),'Struktur voucher tidak cocok R4');
+ if(v&&t){
+  fail(v.product===t.productVoucherName,'Nama voucher produk berbeda dari ringkasan');
+  fail(v.shipping===t.shippingVoucherName,'Nama voucher ongkir berbeda dari ringkasan');
+ }
+ return [...new Set(issues)];
+}
+window.imamstoreCheckoutR4Audit=Object.freeze({version:'R6',check:auditOrderAgainstR4});
+
 function message(d,items,s){const rows=items.map((x,i)=>`${i+1}. ${x.nama}\nVarian: ${x.varian||'-'}\nQty: ${x.qty}\nHarga: ${money(x.harga)}\nSubtotal: ${money(x.qty*x.harga)}`).join('\n\n');return `Halo Imamsalesnine.com 👋\n\nFORM PEMESANAN\nTanggal Order: ${new Date().toLocaleString('id-ID')}\nOrder ID: ${d.orderId}\nNama: ${d.nama}\nNo. WA: ${d.wa}\nAlamat: ${d.alamat}\nEkspedisi: ${d.ekspedisi}\n\nDETAIL PESANAN\n${rows}\n\nSubtotal: ${money(s.subtotal)}\nVoucher Produk: ${s.productVoucherName||'-'}\nDiskon Produk: ${money(s.productDiscount)}\nVoucher Ongkir: ${s.shippingVoucherName||'-'}\nPotongan Ongkir: ${money(s.shippingDiscount)}\nTotal Belanja: ${money(s.totalBayar)}\nOngkos kirim: Dihitung Admin\nCatatan: ${d.catatan||'-'}\n\nSaya menyetujui syarat dan ketentuan pemesanan.\nMohon konfirmasi harga akhir, stok, dan ongkos kirim.`}
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();if(!a){await popup('warning','Alamat belum lengkap','Tambahkan dan pilih alamat pengiriman lengkap terlebih dahulu.');return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Firebase belum siap','Firestore belum terhubung.');return}
+async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
 // Sinkronisasi final: snapshot checkout wajib cocok dengan katalog aktif.
  const catalog=window.imamstoreV29?.products?.();
  if(!Array.isArray(catalog)||!catalog.length){await popup('warning','Katalog belum siap','Muat ulang data produk sebelum mengirim pesanan.');return}
@@ -5161,11 +5337,27 @@ const appliedShippingDiscount=0;
 const summary={totalItem:items.reduce((n,x)=>n+x.qty,0),subtotal,productDiscount:appliedProductDiscount,shippingDiscount:appliedShippingDiscount,totalBayar:subtotal-appliedProductDiscount,productVoucherName:vouchers.product?.name||null,shippingVoucherName:vouchers.shipping?.name||null};
 const checkoutUser=firebase.auth().currentUser;if(!checkoutUser||checkoutUser.isAnonymous){await popup('warning','Sesi login diperlukan','Silakan masuk kembali dengan Google atau email.');return}const uid=checkoutUser.uid;
 const d={orderId:orderId(),nama:String(a.name||a.nama||''),wa:String(a.phone||a.wa||''),email:String(a.email||''),provinsi:String(a.province||a.provinsi||''),kota:String(a.city||a.kota||''),kodepos:String(a.postal||a.kodepos||''),alamat:String(a.full||''),ekspedisi:String($('refShipping')?.value||''),catatan:String($('refOrderNote')?.value||'').slice(0,500)};
-if(!d.ekspedisi){await popup('warning','Pengiriman belum dipilih','Pilih metode pengiriman sebelum melanjutkan.');return}if(!d.provinsi||!d.kota||!/^\d{5}$/.test(d.kodepos)){await popup('warning','Alamat tidak lengkap','Lengkapi provinsi, kota, dan kode pos 5 digit.');return}if(!d.nama||!d.wa||!d.alamat){await popup('warning','Alamat tidak lengkap','Nama, WhatsApp, dan alamat wajib diisi.');return}
-if(!/^(?:62|0)?8\d{8,12}$/.test(d.wa.replace(/\D/g,''))){await popup('warning','Nomor WhatsApp tidak valid','Gunakan nomor Indonesia yang benar.');return}
-busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Mencatat permintaan pesanan di Firebase…';
+if(!d.ekspedisi){await popup('warning','Pengiriman belum dipilih','Pilih metode pengiriman sebelum melanjutkan.');return}const finalAddressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress({name:d.nama,phone:d.wa,province:d.provinsi,city:d.kota,postal:d.kodepos,full:d.alamat,email:d.email})||[];if(finalAddressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(finalAddressIssues);return}
+busy=true;refresh();button.textContent='Memproses…';if(note)note.textContent='Memproses pesanan Anda…';
 try{const FV=firebase.firestore.FieldValue,grouped=new Map();items.forEach(x=>grouped.set(x.productId,(grouped.get(x.productId)||0)+x.qty));
 const order={orderId:d.orderId,uid,customer:{nama:d.nama,wa:d.wa,email:d.email,provinsi:d.provinsi,kota:d.kota,kodepos:d.kodepos,alamat:d.alamat},ekspedisi:d.ekspedisi,catatan:d.catatan,items,totals:summary,vouchers:{product:summary.productVoucherName,shipping:summary.shippingVoucherName},status:'checkout_created',channel:'whatsapp',createdAt:FV.serverTimestamp(),updatedAt:FV.serverTimestamp()};
+/* R6: jangan kirim payload yang sudah pasti ditolak oleh skema Rules R4. */
+const mismatches=auditOrderAgainstR4(order,checkoutUser);
+if(mismatches.length){
+ console.warn('[ImamStore R6] Validasi lokal tidak cocok dengan Rules R4:',mismatches);
+ const friendly=window.imamstoreCustomerCheckoutR7.describeOrderIssues(mismatches);
+ if(mismatches.some(x=>/nama penerima|nomor WhatsApp|email|provinsi|kota|kode pos|alamat lengkap|Struktur alamat/i.test(x))){await window.imamstoreCustomerCheckoutR7.promptAddress(friendly);return;}
+ await popup('warning','Periksa kembali pesanan',friendly.slice(0,4).join(' ').slice(0,950));
+ return;
+}
+/* Refresh token login untuk menghindari sesi Auth usang saat menulis Firestore. */
+const token=await checkoutUser.getIdTokenResult(true);
+const provider=token?.signInProvider||token?.claims?.firebase?.sign_in_provider||'';
+if(provider==='anonymous'){
+ await popup('warning','Silakan masuk kembali','Untuk melanjutkan pesanan, masuk kembali menggunakan akun Google atau email.');
+ return;
+}
+
 /* Tahap 5C.2: pesanan saja. Statistik penjualan dan ranking tidak boleh dinaikkan
    dari checkout browser yang belum diverifikasi admin. */
 await store.collection('orders').doc(d.orderId).set(order);
@@ -5197,7 +5389,11 @@ if($('refOrderNote'))$('refOrderNote').value='';
 if(note)note.textContent='';
 try{window.imamstoreReferenceV38?.refresh?.();window.imamstoreV43?.sync?.()}catch(e){console.warn('Refresh setelah checkout',e)}
 
-}catch(err){console.error('Checkout original Firebase',err);if(committed){console.warn('Pesanan telah tersimpan; kegagalan hanya terjadi pada langkah pasca-checkout.',err);return;}window.imamstoreToast?.('Pesanan gagal dicatat. Silakan coba lagi.','error');await popup('error','Pesanan belum diproses',err?.code==='permission-denied'?'Firestore Rules menolak pencatatan pesanan atau statistik. Keranjang tetap aman.':'Pesanan gagal dicatat di Firebase. Keranjang tetap aman. Periksa koneksi dan coba lagi.')}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
+}catch(err){console.error('[ImamStore R7] Checkout request failed',err);if(committed){console.warn('Pesanan telah tersimpan; kegagalan hanya terjadi pada langkah pasca-checkout.',err);return;}
+const customerMessage=window.imamstoreCustomerCheckoutR7.serviceError(err);
+if(note)note.textContent=customerMessage.title+'. Silakan cek kembali lalu coba lagi.';
+console.warn('[ImamStore R7 Checkout diagnostic]',{code:String(err?.code||'unknown'),project:firebase?.app?.()?.options?.projectId||'unknown',authenticated:!!firebase?.auth?.()?.currentUser,isAnonymous:!!firebase?.auth?.()?.currentUser?.isAnonymous});
+await popup('error',customerMessage.title,customerMessage.text)}finally{busy=false;button.textContent=committed?'Pesanan tercatat':'Buat Pesanan';refresh()}}
 /* Reset guard hanya setelah checkout benar-benar ditutup dan sesi baru dibuka. */
 const checkoutPanel=$('s5Draft');let lastOpen=!!checkoutPanel?.classList.contains('open');
 if(checkoutPanel)new MutationObserver(()=>{
@@ -5210,8 +5406,8 @@ checkoutPanel?.addEventListener('click',e=>{
  if(!committed||!e.target.closest('#refPlaceOrder'))return;
  e.preventDefault();e.stopImmediatePropagation();
 },true);
-button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan dicatat ke Firebase dan dikonfirmasi melalui WhatsApp.';refresh();
-window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51'});
+button.onclick=submit;for(const id of ['refTermsBody','refTermsFooter'])$(id)?.addEventListener('change',refresh);for(const id of ['s5CartItems','s5DraftItems']){const el=$(id);if(el)new MutationObserver(refresh).observe(el,{childList:true,subtree:true})}window.addEventListener('storage',refresh);setInterval(refresh,1800);if(note)note.textContent='Pesanan akan dikonfirmasi setelah berhasil dikirim.';refresh();
+window.imamstoreOriginalCheckout=Object.freeze({ready,submit,version:'v51-r7-customer-feedback'});
 })();
 </script><div aria-live="polite" id="toast" role="status"></div><script id="imamstore-v52-toast-bridge">(()=>{'use strict';
 let timer=null,toast=null;
@@ -5741,7 +5937,7 @@ function reviews(pid){
  },err=>{
   if(token!==reviewToken)return;
   console.warn('Gagal memuat ulasan',err);
-  const message='Ulasan belum berhasil dimuat. Periksa izin baca Firestore.';
+  const message='Ulasan belum dapat ditampilkan. Silakan coba lagi nanti.';
   preview.textContent=message;
   if(full)full.textContent=message;
   if(count)count.textContent='(— ulasan)';
@@ -5869,27 +6065,16 @@ new MutationObserver(()=>{
  const host=active();
  if(host!==shownHost||toast.parentElement!==shownHost)hideToast();
 }).observe(document.body,{subtree:true,attributes:true,attributeFilter:['class']});
-function validAddress(){
+function selectedAddressData(){
  let data=[];try{data=JSON.parse(localStorage.getItem('imamstore_ref_addresses_v38')||'[]')}catch{}
  const summary=$('refAddressSummary')?.textContent?.trim()||'';
- const a=Array.isArray(data)?data.find(x=>x.full===summary)||data.find(x=>summary.includes(x.full)&&x.full):null;
- if(!a)return false;
- const phone=String(a.phone||a.wa||'').replace(/\D/g,'');
- const postal=String(a.postal||a.kodepos||'').trim();
- return !!(
-  String(a.name||a.nama||'').trim()&&
-  /^(?:62|0)?8\d{8,12}$/.test(phone)&&
-  String(a.full||'').trim()&&
-  String(a.province||a.provinsi||'').trim()&&
-  String(a.city||a.kota||'').trim()&&
-  /^\d{5}$/.test(postal)
- );
+ return Array.isArray(data)?data.find(x=>x?.full&&x.full===summary)||data.find(x=>x?.full&&summary.includes(x.full))||null:null;
 }
 function check(){
- if(!validAddress())return 'Lengkapi alamat terpilih, nama, nomor WhatsApp valid, kota, provinsi, dan kode pos 5 digit.';
+ const issues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(selectedAddressData())||[];if(issues.length)return {type:'address',issues};
  const session=window.__nineCheckoutSession;
- if(session&&Array.isArray(session.items)&&!session.items.length)return 'Pilih minimal satu produk sebelum membuat pesanan.';
- if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked)return 'Centang persetujuan Syarat & Ketentuan untuk melanjutkan checkout.';
+ if(session&&Array.isArray(session.items)&&!session.items.length)return {type:'other',message:'Pilih minimal satu produk sebelum membuat pesanan.'};
+ if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked)return {type:'other',message:'Centang persetujuan Syarat & Ketentuan untuk melanjutkan checkout.'};
  return '';
 }
 if(order){
@@ -5903,9 +6088,11 @@ if(order){
   if(error){
    e.preventDefault();
    e.stopImmediatePropagation();
+   const message=error.type==='address'?error.issues[0]:error.message;
    const warning=$('refCheckoutWarning');
-   if(warning){warning.textContent=error;warning.hidden=false}
-   show(error,'error');
+   if(warning){warning.textContent=message;warning.hidden=false}
+   if(error.type==='address'){window.imamstoreCustomerCheckoutR7?.promptAddress(error.issues)}
+   else show(message,'error');
   }
  },true);
  sync();
@@ -6889,7 +7076,7 @@ async function open(){
   if(!docs.length){message.textContent='Belum ada pesanan yang terhubung ke akun ini.';return}
   message.textContent='Menampilkan '+docs.length+' pesanan terbaru dari akun ini.';
   docs.forEach(d=>list.append(renderOrder(d)));
- }catch(e){if(token!==loadToken)return;console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Akses pesanan ditolak Firestore Rules. Hubungi admin.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
+ }catch(e){if(token!==loadToken)return;console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Riwayat pesanan belum dapat ditampilkan. Silakan masuk kembali atau hubungi layanan pelanggan.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
 }
 window.nexaiOpenOrders=open;
 document.getElementById('nexaiOrdersClose')?.addEventListener('click',close);
@@ -6948,8 +7135,8 @@ function finish(ok){root.hidden=true;document.body.style.removeProperty('overflo
 function errorMessage(e){const code=e?.code||'';const messages={
 'auth/popup-blocked':'Popup Google diblokir. Izinkan popup lalu coba lagi.',
 'auth/popup-closed-by-user':'Login Google dibatalkan.',
-'auth/operation-not-allowed':'Metode login belum diaktifkan pada Firebase Console.',
-'auth/unauthorized-domain':'Domain website belum diizinkan pada Firebase Authentication.',
+'auth/operation-not-allowed':'Metode masuk ini belum tersedia. Silakan pilih cara masuk lainnya atau hubungi layanan pelanggan.',
+'auth/unauthorized-domain':'Login belum tersedia saat ini. Silakan coba lagi atau hubungi layanan pelanggan.',
 'auth/invalid-credential':'Email atau password tidak cocok.',
 'auth/wrong-password':'Email atau password tidak cocok.',
 'auth/user-not-found':'Akun email belum ditemukan.',
@@ -6957,7 +7144,7 @@ function errorMessage(e){const code=e?.code||'';const messages={
 'auth/weak-password':'Gunakan password minimal 6 karakter.',
 'auth/network-request-failed':'Koneksi bermasalah. Silakan coba lagi.',
 'auth/account-exists-with-different-credential':'Email sudah terdaftar menggunakan metode login lain.'
-};return messages[code]||'Login belum berhasil. Periksa pengaturan Firebase dan coba lagi.'}
+};return messages[code]||'Login belum berhasil. Periksa akun dan koneksi Anda, lalu coba lagi.'}
 function lock(v){busy=v;root.querySelectorAll('button,input').forEach(x=>{if(x.id!=='nclClose'&&x.id!=='nclCancel')x.disabled=v})}
 async function run(action){if(busy)return;lock(true);msg.textContent='Memproses login…';try{await action();if(!eligible())throw new Error('Akun pelanggan belum aktif');finish(true)}catch(e){console.warn('[ImamStore Customer Auth]',e?.code||e?.message);msg.textContent=errorMessage(e)}finally{lock(false)}}
 window.nexaiRequireCustomerLogin=async function(){
