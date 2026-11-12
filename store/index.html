@@ -2759,7 +2759,7 @@ const V=window.V38=window.V38||{};
  const fmt=n=>'Rp '+Math.round(Math.max(0,Number(n)||0)).toLocaleString('id-ID');
  const getPrice=p=>typeof price==='function'?price(p):Number(p.harga?.promo||p.harga?.normal||0);
  const variantName=v=>v==null?'':typeof v==='string'?v:String(v.nama||v.name||v.label||'');
- const variantPrice=(p,v)=>{const q=window.imamstoreUnifiedPrice?.quote?.(p);return q?.price>0?q.price:getPrice(p)};
+ const variantPrice=(p,v)=>{const name=variantName(v);const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);return q?.verified&&q.price>0?q.price:NaN};
  const liveProduct=id=>(typeof products!=='undefined'&&Array.isArray(products)?products:[]).find(p=>String(p.id)===String(id));
  const read=()=>{try{const v=JSON.parse(localStorage.getItem(STORAGE)||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x.id==='string'&&typeof x.key==='string'&&Number.isFinite(Number(x.qty))&&Number(x.qty)>0&&Number.isFinite(Number(x.harga))&&Number(x.harga)>0&&Number(x.qty)<=999).slice(0,200).map(x=>({...x,qty:Math.min(999,Math.floor(Number(x.qty))),harga:Number(x.harga)})):[]}catch{return []}};
  const save=v=>{try{localStorage.setItem(STORAGE,JSON.stringify(v));return true}catch(e){console.warn('Cart storage unavailable',e);return false}};
@@ -4651,8 +4651,8 @@ function openVariant(index, source='cart'){
  sheet.dataset.nineEditing='true';
  const catalogOptions=p?window.imamstorePurchaseVariantOptions?.(p)||[]:[];
  const alternate=window.imamstoreV29?.products?.()?.find(x=>String(x.id)===String(original.id));
- const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel),String(original.varian||'')].filter(Boolean))];
- let chosen=String(original.varian||choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
+ const choices=[...new Set([...catalogOptions,...variants(p).map(variantLabel)].filter(Boolean))];
+ let chosen=choices.includes(String(original.varian||''))?String(original.varian):String(choices[0]||''),qty=Math.max(1,Number(original.qty)||1),done=false;
  const variantPrice=name=>{
   const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);
   if(q?.verified&&q.price>0)return q;
@@ -4742,7 +4742,7 @@ function openVariant(index, source='cart'){
   }
   const line=current[pos],newKey=String(line.id)+'|'+chosen;
   const collision=current.findIndex((x,i)=>i!==pos&&String(x.key)===newKey);
-  if(collision>=0){current[collision].qty=(Number(current[collision].qty)||0)+qty;current.splice(pos,1)}
+  if(collision>=0){if((Number(current[collision].qty)||0)+qty>999){message.textContent='Jumlah gabungan melebihi 999.';return}current[collision].qty=(Number(current[collision].qty)||0)+qty;current[collision].harga=priceOf(chosen);current.splice(pos,1)}
   else {line.varian=chosen;line.qty=qty;line.harga=priceOf(chosen);line.key=newKey;if('jumlah'in line)line.jumlah=qty}
   try{
    localStorage.setItem(cartKey,JSON.stringify(current));
@@ -5121,14 +5121,20 @@ const num=v=>{const n=Number(v);return Number.isFinite(n)&&n>0?n:0};
 function active(p,now=Date.now()){const f=p?.flashSale,start=Date.parse(f?.startAt||''),end=Date.parse(f?.endAt||''),price=num(f?.price),normal=num(p?.harga?.normal??p?.harga);return f?.enabled===true&&Number.isFinite(start)&&Number.isFinite(end)&&start<=now&&now<end&&price>0&&price<normal}
 function quote(p,now=Date.now()){const normal=num(p?.harga?.normal)||num(p?.harga),regular=num(p?.harga?.promo),flash=active(p,now);const price=flash?num(p.flashSale.price):(regular>0&&regular<normal?regular:normal);return {normal,price,flash,percent:normal>price?Math.round((normal-price)/normal*100):0,saving:Math.max(0,normal-price),endAt:flash?Date.parse(p.flashSale.endAt):null}}
 function variantQuote(p,name,now=Date.now()){
- const base=quote(p,now);
- const variants=Array.isArray(p?.varian)?p.varian:[];
- const selected=String(name??'').trim().toLocaleLowerCase('id');
- const match=variants.find(v=>String(typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna??'')).trim().toLocaleLowerCase('id')===selected);
- // Varian hanya identitas pilihan. Harga selalu berasal dari harga produk aktif.
- // Jangan mengambil match.harga, match.price, atau harga tersimpan di keranjang.
- const variantFound=!!match;
- return {...base,verified:base.price>0&&(variants.length===0||!selected||variantFound),variantFound};
+ const base=quote(p,now),entries=Array.isArray(p?.varian)?p.varian:[];
+ const normalize=x=>String(x??'').trim().replace(/\s+/g,' ').toLocaleLowerCase('id-ID');
+ const label=v=>typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna??'');
+ const match=entries.find(v=>normalize(label(v))===normalize(name));
+ if(entries.length&&!match)return {...base,price:0,verified:false,variantFound:false};
+ const obj=match&&typeof match==='object'?match:null;
+ const amount=v=>{if(v==null||v==='')return 0;const n=typeof v==='number'?v:Number(String(v).replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.'));return Number.isFinite(n)&&n>0?n:0};
+ const normal=amount(obj?.harga?.normal??obj?.hargaNormal??obj?.normal??obj?.priceNormal) || (typeof obj?.harga==='number'||typeof obj?.harga==='string'?amount(obj.harga):0) || base.normal;
+ const promo=amount(obj?.harga?.promo??obj?.hargaPromo??obj?.promo??obj?.harga_diskon);
+ const fixed=amount(obj?.price??obj?.hargaJual);
+ const variantBase=fixed|| (promo>0&&promo<normal?promo:normal);
+ const flash=base.flash&&amount(p?.flashSale?.price)>0&&amount(p.flashSale.price)<variantBase;
+ const price=flash?amount(p.flashSale.price):variantBase;
+ return {normal:Math.max(normal,price),price,flash,percent:normal>price?Math.round((normal-price)/normal*100):0,saving:Math.max(0,normal-price),endAt:base.endAt,verified:price>0,variantFound:!!match||!entries.length};
 }
 window.nineFlashActive=active;window.nineEffectivePromo=p=>quote(p).price;window.imamstoreUnifiedPrice=Object.freeze({quote,variantQuote,active,version:'refactor-1'});
 const catalog=()=>{try{return window.imamstoreV29?.products?.()||[]}catch{return []}};
@@ -6784,18 +6790,18 @@ const product=()=>{
 const names=p=>(Array.isArray(p?.varian)?p.varian:[]).map(v=>typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna??'')).map(v=>String(v).trim()).filter(Boolean);
 const state={id:null,mode:'cart',busy:false};
 function resolve(){
- const p=product();
- if(!p)return {ok:false,message:'Produk tidak ditemukan'};
- const variants=names(p);
- const current=variants.find(v=>norm(v)===norm(selector.value));
+ const p=product();if(!p)return {ok:false,message:'Produk tidak ditemukan'};
+ const variants=names(p),current=variants.find(v=>norm(v)===norm(selector.value));
  if(variants.length&&!current)return {ok:false,message:'Pilih varian yang tersedia'};
- const count=Number(qty.value);
- if(!Number.isInteger(count)||count<1||count>999)return {ok:false,message:'Jumlah harus 1 sampai 999'};
- const quote=window.imamstoreUnifiedPrice?.quote?.(p);
- const unit=Number(quote?.price);
- if(!Number.isFinite(unit)||unit<=0)return {ok:false,message:'Harga produk belum tersedia'};
+ const count=Number(qty.value);if(!Number.isInteger(count)||count<1||count>999)return {ok:false,message:'Jumlah harus 1 sampai 999'};
+ const variant=current||'Default',quote=window.imamstoreUnifiedPrice?.variantQuote?.(p,variant),unit=Number(quote?.price);
+ if(!quote?.verified||!Number.isFinite(unit)||unit<=0)return {ok:false,message:'Harga varian belum tersedia'};
  if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif'};
- return {ok:true,p,variant:current||'Default',count,unit,quote};
+ const entry=(p.varian||[]).find(v=>norm(typeof v==='string'?v:(v?.nama??v?.name??v?.label??v?.warna))===norm(variant));
+ const raw=entry&&typeof entry==='object'?(entry.stok??entry.stock):null;
+ const stock=raw==null?null:Number(raw);
+ if(stock!==null&&Number.isFinite(stock)&&count>stock)return {ok:false,message:'Jumlah melebihi stok varian'};
+ return {ok:true,p,variant,count,unit,quote};
 }
 function render(){
  if(panel.hidden||!panel.classList.contains('open')||panel.dataset.nineEditing==='true')return;
