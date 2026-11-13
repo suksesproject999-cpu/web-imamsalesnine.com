@@ -2199,11 +2199,13 @@ style="padding:12px;"
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 
 
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
+<script src="/js/vip-firebase-session.js"></script>
 
 
 	
@@ -2240,7 +2242,12 @@ try {
 	
 
 const db = firebase.firestore();
+// R21: token Netlify diverifikasi server sebelum VIP mengakses Firestore.
+const VIP_SESSION_READY = window.VIP_FIREBASE_SESSION.start(firebase.app(), {
+  folder: "warungled", name: "WARUNG LED"
+});
 
+VIP_SESSION_READY.then(() => {
 db.collection("info_distributor")
 .onSnapshot(snap=>{
 
@@ -2268,29 +2275,23 @@ badge.style.display =
 }
 
 });
+}).catch(() => {});
 
 function updateActivity(){
-
-  db.collection("aktivitas_vip")
-  .doc("WARUNG LED")
-  .set({
-
-    nama:"WARUNG LED",
-
-    last_active:
-    firebase.firestore
-    .FieldValue
-    .serverTimestamp()
-
-  });
-
+  return VIP_SESSION_READY.then(() => db.collection("aktivitas_vip")
+    .doc("WARUNG LED")
+    .set({
+      nama:"WARUNG LED",
+      last_active:firebase.firestore.FieldValue.serverTimestamp()
+    })
+  ).catch(err => console.warn("[WARUNG LED] Aktivitas VIP gagal", err && err.code));
 }
 
 </script>
 
 <script>
   
-const URL =
+const IMAM_VIP_GAS_ENDPOINT =
 "https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec";
 
 const VIP_NAME = "WARUNG LED";
@@ -2321,6 +2322,7 @@ ai : "Imam AI"
 
 
 // 🔥 REALTIME PRODUK FIREBASE
+VIP_SESSION_READY.then(() => {
 db.collection("stok")
 .onSnapshot(snapshot => {
 
@@ -2344,6 +2346,7 @@ db.collection("stok")
   );
 
 });
+}).catch(() => {});
 
   
 // ================= ORDER =================
@@ -3453,7 +3456,13 @@ renderKlaim();
 }
 
 // ================= KIRIM =================
-function kirimWA(){
+let vipOrderSaving = false;
+async function kirimWA(){
+  if (vipOrderSaving) return;
+  if (!firebase.auth().currentUser) {
+    await VIP_SESSION_READY.catch(() => {});
+    if (!firebase.auth().currentUser) { alert("Login Firebase VIP belum siap. Masuk kembali."); return; }
+  }
 
   console.log("STOK:", window.stokData);
 
@@ -3513,6 +3522,12 @@ if(cart.length === 0){
     }
   }
 
+  if (tersedia.length === 0) {
+    alert("Tidak ada produk tersedia untuk disimpan.");
+    return;
+  }
+  // Buka jendela WA dalam gesture klik agar browser tidak memblokir setelah await.
+  const vipWhatsAppTab = window.open("about:blank", "_blank");
    const invoiceId =
 invoiceNo;
   // 🔥 kirim hanya yang tersedia
@@ -3580,105 +3595,56 @@ Grand Total : ${formatRupiah(grandTotal)}
 
 `;
 
-  fetch(URL, {
-    method:"POST",
-    mode:"no-cors",
-    body: JSON.stringify({
-      nama:"WARUNG LED",
-      order: pesan,
-      status:"order"
-    })
-  });
-  
-  // =====================
-// SAVE HEADER INVOICE
-// =====================
+  // R21: satu batch atomik; WhatsApp/draft hanya lanjut jika Firestore sukses.
+  vipOrderSaving = true;
+  try {
+    const batch = db.batch();
+    batch.set(db.collection("invoice").doc(invoiceId), {
+      invoice: invoiceId,
+      nama: "WARUNG LED",
+      type: "order",
+      status: "pending",
+      total_item: tersedia.length,
+      total: grandTotal,
+      waktu: firebase.firestore.FieldValue.serverTimestamp(),
+      created_at: Date.now()
+    });
+    tersedia.forEach(item => {
+      const subtotal = (item.harga || 0) * item.qty;
+      const diskon = subtotal * ((item.diskon || 0) / 100);
+      const total = subtotal - diskon;
+      const itemText = `${item.nama} (${item.qty} ${item.satuan}) | Harga ${formatRupiah(item.harga)} | Diskon ${item.diskon || 0}% | Total ${formatRupiah(total)}`;
+      batch.set(db.collection("pesanan").doc(), {
+        nama:"WARUNG LED", produk:item.nama, qty:item.qty, satuan:item.satuan,
+        harga:item.harga || 0, diskon:item.diskon || 0,
+        subtotal:subtotal, total:total, order:itemText,
+        status:"pending", type:"order", invoice:invoiceId,
+        created_at:Date.now(), waktu:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error("[WARUNG LED] Gagal menyimpan order", err);
+    if (vipWhatsAppTab && !vipWhatsAppTab.closed) vipWhatsAppTab.close();
+    alert("Order belum tersimpan (" + (err && err.code || "server-error") + "). Periksa koneksi atau izin lalu coba lagi. Data keranjang tidak dihapus.");
+    return;
+  } finally {
+    vipOrderSaving = false;
+  }
+  // Notifikasi eksternal hanya setelah batch Firestore berhasil.
+  fetch(IMAM_VIP_GAS_ENDPOINT, {
+    method:"POST", mode:"no-cors",
+    body:JSON.stringify({nama:"WARUNG LED",order:pesan,status:"order"})
+  }).catch(err => console.warn("[WARUNG LED] Notifikasi GAS gagal",err));
 
-db.collection("invoice")
-.doc(invoiceId)
-.set({
-
-  invoice: invoiceId,
-
-  nama: "WARUNG LED",
-
-  type: "order",
-
-  status: "pending",
-
-  total_item: tersedia.length,
-
-  total: grandTotal,
-
-  waktu:
-  firebase.firestore
-  .FieldValue
-  .serverTimestamp(),
-
-  created_at: Date.now()
-
-});
-
-  tersedia.forEach(item => {
-
-  const subtotal =
-(item.harga || 0) * item.qty;
-
-const diskon =
-subtotal *
-((item.diskon || 0) / 100);
-
-const total =
-subtotal - diskon;
-
-let itemText =
-
-`${item.nama} ` +
-`(${item.qty} ${item.satuan}) | ` +
-`Harga ${formatRupiah(item.harga)} | ` +
-`Diskon ${item.diskon || 0}% | ` +
-`Total ${formatRupiah(total)}`;
-
-  db.collection("pesanan").add({
-
-  nama:"WARUNG LED",
-
-  produk:item.nama,
-
-  qty:item.qty,
-
-  satuan:item.satuan,
-
-  harga:item.harga || 0,
-
-  diskon:item.diskon || 0,
-
-  subtotal:subtotal,
-
-  total:total,
-
-  order:itemText,
-
-  status:"pending",
-
-  type:"order",
-
-  invoice: invoiceId,
-
-  created_at: Date.now(),
-
-  waktu:
-  firebase.firestore
-  .FieldValue.serverTimestamp()
-
-});
-
-});
-
-  window.open(
-"https://wa.me/6282210109369?text=" +
-encodeURIComponent(pesan)
-);
+  const vipWhatsAppUrl = "https://wa.me/6282210109369?text=" + encodeURIComponent(pesan);
+  if (vipWhatsAppTab && !vipWhatsAppTab.closed) {
+    vipWhatsAppTab.location.href = vipWhatsAppUrl;
+  } else {
+    // Popup diblokir: tawarkan klik manual, tetapi order sudah tersimpan.
+    Swal.fire({icon:"success",title:"Dokumen tersimpan",text:"Klik Lanjutkan untuk membuka WhatsApp.",showCancelButton:true,confirmButtonText:"Buka WhatsApp",cancelButtonText:"Nanti",confirmButtonColor:"#8CC63F"})
+      .then(result => { if (result.isConfirmed) window.open(vipWhatsAppUrl, "_blank") || window.location.assign(vipWhatsAppUrl); });
+  }
 
 localStorage.removeItem(
 "invoiceNo"
@@ -3704,7 +3670,13 @@ renderOrder();
 
 }
 
-function kirimKlaim(){
+let vipClaimSaving = false;
+async function kirimKlaim(){
+  if (vipClaimSaving) return;
+  if (!firebase.auth().currentUser) {
+    await VIP_SESSION_READY.catch(() => {});
+    if (!firebase.auth().currentUser) { alert("Login Firebase VIP belum siap. Masuk kembali."); return; }
+  }
 
   let ket = document.getElementById("ket").value;
 
@@ -3718,6 +3690,7 @@ function kirimKlaim(){
     return;
   }
 
+  const vipWhatsAppTab = window.open("about:blank", "_blank");
   const invoiceId = klaimNo;
 
   let pesan =
@@ -3779,108 +3752,51 @@ ${ket}
 
 `;
 
-  fetch("https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec", {
-    method:"POST",
-    mode:"no-cors",
-    body: JSON.stringify({
-      nama:"WARUNG LED",
-      order: pesan,
-      status:"klaim"
-    })
-  });
-  
-// =====================
-// SAVE HEADER KLAIM
-// =====================
+  // R21: klaim juga atomik agar header dan item tidak terpisah.
+  vipClaimSaving = true;
+  try {
+    const batch = db.batch();
+    batch.set(db.collection("invoice").doc(invoiceId), {
+      invoice:invoiceId, nama:"WARUNG LED", type:"klaim",
+      status:"pending", total_item:cart.length, total:total,
+      keterangan:ket, waktu:firebase.firestore.FieldValue.serverTimestamp(),
+      created_at:Date.now()
+    });
+    cart.forEach(item => {
+      const subtotal = (item.harga || 0) * item.qty;
+      const diskon = subtotal * ((item.diskon || 0) / 100);
+      const amount = subtotal - diskon;
+      const itemText = `${item.nama} (${item.qty} ${item.satuan}) | Harga ${formatRupiah(item.harga)} | Diskon ${item.diskon || 0}% | Total ${formatRupiah(amount)}`;
+      batch.set(db.collection("pesanan").doc(), {
+        nama:"WARUNG LED", produk:item.nama, qty:item.qty, satuan:item.satuan,
+        harga:item.harga || 0, diskon:item.diskon || 0,
+        subtotal:subtotal, total:amount, order:itemText,
+        status:"pending", type:"klaim", invoice:invoiceId,
+        created_at:Date.now(), waktu:firebase.firestore.FieldValue.serverTimestamp()
+      });
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error("[WARUNG LED] Gagal menyimpan klaim",err);
+    if (vipWhatsAppTab && !vipWhatsAppTab.closed) vipWhatsAppTab.close();
+    alert("Klaim belum tersimpan ("+(err && err.code || "server-error")+"). Data tidak dihapus.");
+    return;
+  } finally {
+    vipClaimSaving = false;
+  }
+  fetch(IMAM_VIP_GAS_ENDPOINT, {
+    method:"POST",mode:"no-cors",
+    body:JSON.stringify({nama:"WARUNG LED",order:pesan,status:"klaim"})
+  }).catch(err=>console.warn("[WARUNG LED] Notifikasi GAS klaim gagal",err));
 
-db.collection("invoice")
-.doc(invoiceId)
-.set({
-
-  invoice: invoiceId,
-
-  nama: "WARUNG LED",
-
-  type: "klaim",
-
-  status: "pending",
-
-  total_item: cart.length,
-
-  total: total,
-
-  keterangan: ket,
-
-  waktu:
-  firebase.firestore
-  .FieldValue
-  .serverTimestamp(),
-
-  created_at: Date.now()
-
-});
-
-
-  cart.forEach(item => {
-
-  const subtotal =
-(item.harga || 0) * item.qty;
-
-const diskon =
-subtotal *
-((item.diskon || 0) / 100);
-
-const total =
-subtotal - diskon;
-
-let itemText =
-
-`${item.nama} ` +
-`(${item.qty} ${item.satuan}) | ` +
-`Harga ${formatRupiah(item.harga)} | ` +
-`Diskon ${item.diskon || 0}% | ` +
-`Total ${formatRupiah(total)}`;
-
-  db.collection("pesanan").add({
-
-  nama:"WARUNG LED",
-
-  produk:item.nama,
-
-  qty:item.qty,
-
-  satuan:item.satuan,
-
-  harga:item.harga || 0,
-
-  diskon:item.diskon || 0,
-
-  subtotal:subtotal,
-
-  total:total,
-
-  order:itemText,
-
-  status:"pending",
-
-  type:"klaim",
-
-  invoice: invoiceId,
-
-  created_at: Date.now(),
-
-  waktu:
-  firebase.firestore
-  .FieldValue.serverTimestamp()
-
-});
-
-});
-
-  window.open(
-"https://wa.me/6282210109369?text=" +
-encodeURIComponent(pesan)
-);
+  const vipWhatsAppUrl = "https://wa.me/6282210109369?text=" + encodeURIComponent(pesan);
+  if (vipWhatsAppTab && !vipWhatsAppTab.closed) {
+    vipWhatsAppTab.location.href = vipWhatsAppUrl;
+  } else {
+    // Popup diblokir: tawarkan klik manual, tetapi order sudah tersimpan.
+    Swal.fire({icon:"success",title:"Dokumen tersimpan",text:"Klik Lanjutkan untuk membuka WhatsApp.",showCancelButton:true,confirmButtonText:"Buka WhatsApp",cancelButtonText:"Nanti",confirmButtonColor:"#8CC63F"})
+      .then(result => { if (result.isConfirmed) window.open(vipWhatsAppUrl, "_blank") || window.location.assign(vipWhatsAppUrl); });
+  }
 
 localStorage.removeItem("klaimNo");
 localStorage.removeItem("waktuKlaim");
