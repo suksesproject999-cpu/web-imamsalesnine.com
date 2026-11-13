@@ -4829,7 +4829,7 @@ body.nexai-seller-workspace #sellerCenterFrame{height:100%!important;min-height:
 
 <script>
 
-const URL = "https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec";
+const IMAM_ADMIN_SCRIPT_ENDPOINT = "https://script.google.com/macros/s/AKfycbwztdCQ87hwDrH0fJfxQe-w6JVUwwV5qETTGCe7TEhTXTLzWlbE0jHPZfAetClBTC5QJQ/exec";
 
 
 const firebaseConfig = {
@@ -6224,7 +6224,7 @@ item.kosong
 // UPDATE PER ITEM
 function updateStok(produk, status){
 
-  fetch(URL +
+  fetch(IMAM_ADMIN_SCRIPT_ENDPOINT +
     "?mode=updateStok" +
     "&produk=" + encodeURIComponent(produk) +
     "&status=" + status
@@ -6720,7 +6720,7 @@ async function toggleStok(
 
     await fetch(
 
-      URL,
+      IMAM_ADMIN_SCRIPT_ENDPOINT,
 
       {
 
@@ -6856,7 +6856,7 @@ async function toggleStokLoadGroups(){
 
     const response =
       await fetch(
-        URL +
+        IMAM_ADMIN_SCRIPT_ENDPOINT +
         "?action=getWhatsAppGroups"
       );
 
@@ -7604,7 +7604,7 @@ async function bulkUpdate(status){
 
     await fetch(
 
-      URL,
+      IMAM_ADMIN_SCRIPT_ENDPOINT,
 
       {
 
@@ -7757,7 +7757,7 @@ window.stokLoadWhatsAppGroups = async function(){
 
     const response =
       await fetch(
-        URL +
+        IMAM_ADMIN_SCRIPT_ENDPOINT +
         "?action=getWhatsAppGroups",
         {
           method:"GET"
@@ -10850,7 +10850,7 @@ window.infoProdukSend = async function(){
 
     await fetch(
 
-      URL,
+      IMAM_ADMIN_SCRIPT_ENDPOINT,
 
       {
 
@@ -13072,7 +13072,7 @@ window.smartCampaignSend = async function(){
 
     await fetch(
 
-      URL,
+      IMAM_ADMIN_SCRIPT_ENDPOINT,
 
       {
 
@@ -13242,7 +13242,7 @@ window.smartLoadWhatsAppGroups = async function(){
 
     const response =
       await fetch(
-        URL + "?action=getWhatsAppGroups",
+        IMAM_ADMIN_SCRIPT_ENDPOINT + "?action=getWhatsAppGroups",
         {
           method:"GET"
         }
