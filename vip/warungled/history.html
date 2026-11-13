@@ -1460,10 +1460,8 @@ margin-top:15px;
 
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
 
-<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-check-compat.js"></script>
-<script src="/js/vip-firebase-session.js"></script>
 
 
 <script>
@@ -1495,17 +1493,34 @@ try {
 }
 
   const db = firebase.firestore();
-  const VIP_SESSION_READY = window.VIP_FIREBASE_SESSION.start(firebase.app(), {
-    folder: "warungled", name: "WARUNG LED"
-  });
 
   const VIP_NAME = "WARUNG LED";
 
   function updateActivity() {
-    return VIP_SESSION_READY.then(() => db.collection("aktivitas_vip")
-      .doc("WARUNG LED")
-      .set({nama:"WARUNG LED",last_active:firebase.firestore.FieldValue.serverTimestamp()})
-    ).catch(err => console.warn("[WARUNG LED History] Aktivitas gagal",err && err.code));
+
+    console.log("UPDATE ACTIVITY JALAN");
+
+    db.collection("aktivitas_vip")
+    .doc("WARUNG LED")
+    .set({
+
+      nama: "WARUNG LED",
+
+      last_active:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+    })
+    .then(()=> {
+
+      console.log("BERHASIL SAVE");
+
+    })
+    .catch(err => {
+
+      console.error("GAGAL SAVE", err);
+
+    });
+
   }
 
   let unsubscribe = null;
@@ -1548,8 +1563,6 @@ try {
   }
 
   async function loadData(useDateFilter = true) {
-    try { await VIP_SESSION_READY; }
-    catch (_) { return; }
     const requestId = ++historyRequestId;
     const dateFilter = document.getElementById("filterDate").value;
     const statusFilter = document.getElementById("filterStatus").value;
@@ -2334,49 +2347,114 @@ mode:["css","legacy"]
   }
 
 
-  // R21: operasi fisik hanya melalui backend yang memverifikasi pemilik invoice.
-  async function deleteVipDocument(action, invoiceId, itemId) {
-    await VIP_SESSION_READY;
-    const jwt = localStorage.getItem("token");
-    if (!jwt) throw new Error("Sesi VIP berakhir. Masuk kembali.");
-    const response = await fetch("/.netlify/functions/vip-document-action", {
-      method:"POST",cache:"no-store",credentials:"same-origin",
-      headers:{"Authorization":"Bearer "+jwt,"Content-Type":"application/json"},
-      body:JSON.stringify({action,invoiceId,itemId})
-    });
-    const result = await response.json();
-    if (!response.ok || !result.success) {
-      throw new Error("Dokumen tidak dihapus: "+(result.code || response.status));
+  async function hapusDokumen(
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Hapus seluruh dokumen ini?"
+      )
+    ) {
+      return;
     }
-    return result;
-  }
-  async function hapusDokumen(invoiceId) {
-    if (!confirm("Hapus seluruh dokumen ini?")) return;
+
     try {
-      await deleteVipDocument("deleteInvoice",invoiceId);
-      alert("Dokumen berhasil dihapus");
+
+      const snap =
+      await db
+      .collection("pesanan")
+      .where(
+        "invoice",
+        "==",
+        invoiceId
+      )
+      .get();
+
+      const batch =
+      db.batch();
+
+      snap.forEach(doc => {
+
+        batch.delete(
+          doc.ref
+        );
+
+      });
+
+      batch.delete(
+        db.collection("invoice")
+        .doc(invoiceId)
+      );
+
+      await batch.commit();
+
+      alert(
+        "Dokumen berhasil dihapus"
+      );
+
       closeInvoice();
+
       loadData();
-    } catch (err) {
-      console.error("[VIP] Hapus dokumen gagal",err);
-      alert(err.message || "Gagal menghapus dokumen");
+
     }
+    catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal menghapus dokumen"
+      );
+
+    }
+
   }
 
-  async function hapusItem(itemId,invoiceId) {
-    if (!confirm("Hapus item ini?")) return;
-    try {
-      await deleteVipDocument("deleteItem",invoiceId,itemId);
-      alert("Item berhasil dihapus");
-      await loadData();
-      // Jika invoice menjadi kosong server sudah menghapus header.
-      const snapshot = await db.collection("invoice").doc(invoiceId).get();
-      if (snapshot.exists) lihatFaktur(invoiceId);
-      else closeInvoice();
-    } catch(err) {
-      console.error("[VIP] Hapus item gagal",err);
-      alert(err.message || "Gagal menghapus item");
+  async function hapusItem(
+    itemId,
+    invoiceId
+  ) {
+
+    if (
+      !confirm(
+        "Hapus item ini?"
+      )
+    ) {
+      return;
     }
+
+    try {
+
+      await db
+      .collection("pesanan")
+      .doc(itemId)
+      .delete();
+
+      await recalculateInvoice(
+        invoiceId
+      );
+
+      alert(
+        "Item berhasil dihapus"
+      );
+
+      lihatFaktur(
+        invoiceId
+      );
+
+      loadData();
+
+    }
+    catch(err) {
+
+      console.error(err);
+
+      alert(
+        "Gagal menghapus item"
+      );
+
+    }
+
   }
 
 
