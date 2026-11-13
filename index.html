@@ -9675,73 +9675,10 @@ if(!visitorId){
 }
 
 
-// =====================================
-// REGISTER ONLINE VISITOR
-// =====================================
+// Online visitor Firestore engine dipindahkan ke modul setelah Firebase Auth SDK tersedia.
+// visitorId di atas tetap dipakai fitur lain yang sudah stabil.
 
-db.collection("online_user")
-.doc(visitorId)
-.set({
-
-    online:true,
-
-    device:navigator.platform,
-
-    browser:navigator.userAgent,
-
-    halaman:location.pathname,
-
-    masuk_pada:
-    firebase.firestore.FieldValue.serverTimestamp(),
-
-    last_seen:
-    firebase.firestore.FieldValue.serverTimestamp()
-
-},{
-    merge:true
-});
-
-
-
-// =====================================
-// HEARTBEAT
-// UPDATE LAST SEEN SETIAP 30 DETIK
-// =====================================
-
-setInterval(async()=>{
-
-    if(document.hidden) return;
-    try{
-
-        await db
-        .collection("online_user")
-        .doc(visitorId)
-        .update({
-
-            last_seen:
-            firebase.firestore.FieldValue.serverTimestamp(),
-
-            halaman:
-            location.pathname
-
-        });
-
-    }catch(err){
-
-        console.error(
-            "Heartbeat Error:",
-            err
-        );
-
-    }
-
-},30000);
-  
-  
-  
-  
-  
-  function showSuccess(){
+function showSuccess(){
 
     document
     .getElementById("successOverlay")
@@ -10332,31 +10269,7 @@ renderRating();
 
 
 
-// =====================================
-// REALTIME ONLINE VISITOR — hitung ulang setiap 10 detik
-// =====================================
-let onlineVisitorSnapshot = null;
-function renderOnlineVisitors(){
-    const counter = document.getElementById("onlineCount");
-    if(!counter || !onlineVisitorSnapshot) return;
-    const cutoff = Date.now() - 60000;
-    let online = 0;
-    onlineVisitorSnapshot.forEach(doc=>{
-        const ts = doc.data().last_seen;
-        const ms = ts && typeof ts.toMillis === "function" ? ts.toMillis() : 0;
-        if(ms >= cutoff && ms <= Date.now() + 10000) online++;
-    });
-    counter.textContent = String(online);
-}
-db.collection("online_user").onSnapshot(snap=>{
-    onlineVisitorSnapshot = snap;
-    renderOnlineVisitors();
-},err=>{
-    console.warn("[Nine Online] Gagal membaca pengunjung:",err.code||err.message);
-    const counter = document.getElementById("onlineCount");
-    if(counter) counter.textContent = "–";
-});
-setInterval(renderOnlineVisitors,10000);
+// Penghitung pengguna online dipindahkan ke modul NINE WEB PRESENCE V2.
 
 let rating = 5;
 
@@ -15155,6 +15068,118 @@ else installFinalAISheet();
 ========================================================= -->
 <!-- NINE TAGLINE JS 44 | Firebase / data | https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js -->
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
+<!-- NINE WEB PRESENCE V2 — MAIN WEBSITE ONLY; requires Firebase Auth and dedicated security rules -->
+<script id="nine-main-presence-v2">
+(function(){
+  'use strict';
+  // Penghitung perkiraan pengunjung aktif, bukan total pengunjung historis.
+  // Satu UID Firebase = satu pengguna; beberapa tab dalam akun yang sama dihitung satu.
+  const HEARTBEAT_MS = 60000;
+  const FRESH_MS = 150000;
+  const POLL_MS = 45000;
+  const MAX_COUNT = 500;
+  const NODE_ID = 'onlineCount';
+  const counter = document.getElementById(NODE_ID);
+  if (!counter || !window.firebase?.auth) return;
+
+  const auth = firebase.auth();
+  const store = firebase.firestore();
+  const online = store.collection('main_site_presence');
+  const F = firebase.firestore.FieldValue;
+  const T = firebase.firestore.Timestamp;
+  let currentUid = null;
+  let writePending = false;
+  let readPending = false;
+  let lastWrite = 0;
+  let closing = false;
+  let retryAuth = false;
+
+  function reportError(where,error){
+    console.warn('[Nine Web Presence] '+where+':',error?.code || error?.message || String(error));
+    counter.textContent = '–'; // Jangan menampilkan 0 palsu ketika akses ditolak.
+    counter.title = 'Pengunjung online belum dapat dihitung';
+  }
+  function shouldWork(){return !closing && !document.hidden && navigator.onLine !== false;}
+
+  async function heartbeat(force){
+    if (!shouldWork() || !currentUid || writePending) return;
+    if (Date.now()-lastWrite < (force ? 20000 : HEARTBEAT_MS-1500)) return;
+    writePending = true;
+    try {
+      // Dokumen sengaja hanya berisi 2 field, tanpa IP / user-agent / email.
+      // set tanpa merge memastikan data legacy pada UID ini tidak menghalangi rules baru.
+      await online.doc(currentUid).set({
+        last_seen:F.serverTimestamp(),
+        halaman:'/'
+      });
+      lastWrite = Date.now();
+    } catch (error) {
+      reportError('Gagal mencatat sesi',error);
+    } finally {writePending=false;}
+  }
+
+  async function updateCounter(){
+    if (!shouldWork() || readPending || !currentUid) return;
+    readPending = true;
+    try {
+      // Filter hanya sesi segar, lalu hitung melalui server (lebih hemat dari onSnapshot seluruh koleksi).
+      const cutoff = T.fromMillis(Date.now()-FRESH_MS);
+      const query = online.where('last_seen','>=',cutoff).limit(MAX_COUNT);
+      let count;
+      if (typeof query.count === 'function') {
+        const snapshot = await query.count().get();
+        count = Number(snapshot.data().count);
+      } else {
+        // Cadangan jika API aggregation tidak tersedia; tetap dibatasi.
+        const snapshot = await query.get({source:'server'});
+        count = snapshot.size;
+      }
+      if (!Number.isFinite(count) || count < 0) throw new Error('Invalid count');
+      counter.textContent = count >= MAX_COUNT ? MAX_COUNT+'+' : String(count);
+      counter.title = 'Pengunjung aktif di website utama (perkiraan, diperbarui berkala)';
+    } catch(error){
+      reportError('Gagal menghitung pengunjung',error);
+    } finally{readPending=false;}
+  }
+
+  async function ensureAnonymous(){
+    if (closing || retryAuth || auth.currentUser) return;
+    retryAuth=true;
+    try{await auth.signInAnonymously();}
+    catch(error){reportError('Autentikasi pengunjung tidak tersedia',error);}
+    finally{retryAuth=false;}
+  }
+  // SDK Firebase Authentication sudah dimuat sebelum skrip ini.
+  // Listener ini juga menyesuaikan sesi saat pengunjung login Google/email.
+  auth.onAuthStateChanged(user=>{
+    if (closing) return;
+    if (!user){currentUid=null;lastWrite=0;counter.textContent='–';void ensureAnonymous();return;}
+    if (currentUid!==user.uid){currentUid=user.uid;lastWrite=0;}
+    void heartbeat(true).then(updateCounter);
+  },error=>reportError('Status akun',error));
+
+  let heartbeatTimer=setInterval(()=>void heartbeat(false),HEARTBEAT_MS);
+  let readTimer=setInterval(()=>void updateCounter(),POLL_MS);
+  function onReturn(){if (!shouldWork())return;void heartbeat(true).then(updateCounter);}
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)onReturn();});
+  window.addEventListener('focus',onReturn);
+  window.addEventListener('online',onReturn);
+  window.addEventListener('pagehide',()=>{
+    // Tidak menghapus dokumen: satu UID dapat dipakai di beberapa tab.
+    // Sesi akan tidak dihitung lagi saat timestamp melewati FRESH_MS.
+    closing=true;clearInterval(heartbeatTimer);clearInterval(readTimer);
+  });
+  window.addEventListener('pageshow',event=>{
+    // Browser Back/Forward Cache dapat mengaktifkan halaman lama kembali.
+    if(!event.persisted)return;
+    closing=false;
+    heartbeatTimer=setInterval(()=>void heartbeat(false),HEARTBEAT_MS);
+    readTimer=setInterval(()=>void updateCounter(),POLL_MS);
+    onReturn();
+  });
+})();
+</script>
+
 <!-- SOURCE SECTION | STYLE | Existing versioned module | v17-marketplace-experience-css | original line 34300 -->
 <!-- NINE TAGLINE CSS BLOCK 22 | Menu / navigasi | v17-marketplace-experience-css -->
 <!-- SOURCE SECTION | SCRIPT | Existing versioned module | v17-marketplace-experience-js | original line 34326 -->
