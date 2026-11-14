@@ -1699,7 +1699,11 @@ const presenceUrl = isStoreHost
       const value=data.lastActiveAt;
       lastPresenceMs=value?(typeof value==='number'?value:Date.parse(value)):0;
       if(!Number.isFinite(lastPresenceMs))lastPresenceMs=0;
-    }catch(error){console.warn('Status aktivitas Store:',error);lastPresenceMs=0}
+    
+}catch(error){
+  console.warn('Status aktivitas Store:',error);
+}
+
     renderPresence();
   }
   refreshPresence();
