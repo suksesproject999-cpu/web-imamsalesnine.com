@@ -1668,7 +1668,16 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
    console.warn('[ImamStore katalog] CMS belum bisa dibaca; katalog dasar tetap ditampilkan:',error);
   });
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
-  const presenceUrl='/.netlify/functions/admin-presence';
+  
+const isStoreHost = [
+  'store.imamsalesnine.com',
+  'imamstore.netlify.app'
+].includes(location.hostname);
+
+const presenceUrl = isStoreHost
+  ? '/status-admin'
+  : '/.netlify/functions/admin-presence';
+
   const activeWindowMs=90000;
   let lastPresenceMs=0;
   function renderPresence(){
