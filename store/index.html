@@ -158,8 +158,7 @@ body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.search i{c
 body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.back,
 body:not(.store-header-condensed):not(.store-search-mode) .top-inner>.top-btn{color:#fff}
 body.store-header-condensed:not(.store-search-mode) .top-inner>.search,
-body.store-header-condensed:not(.store-search-mode) #clearSearch,
-body.store-header-condensed:not(.store-search-mode) .top-inner>a[aria-label="Beranda"]{
+body.store-header-condensed:not(.store-search-mode) #clearSearch{
  opacity:0;visibility:hidden;pointer-events:none;
 }
 body.store-header-condensed:not(.store-search-mode) .store-compact-tabs,
@@ -976,7 +975,7 @@ body > .swal2-container:not(.swal2-toast-shown) {
 </style>
 </head>
 <body>
-<header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="https://imamsales.com/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button><button class="store-compact-tab" data-tab="favorit">Favorit</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><a aria-label="Beranda" class="top-btn" href="https://imamsales.com/"><i class="fa-solid fa-house"></i></a></div></header>
+<header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="https://imamsales.com/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button><button class="store-compact-tab" data-tab="favorit">Favorit</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><button aria-label="Buka menu ImamStore" aria-controls="imamstoreMenuDrawer" aria-expanded="false" class="top-btn" id="imamstoreMenuOpen" type="button"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button></div></header>
 <div class="shell">
 <section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>store.imamsales.com</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a href="https://wa.me/6282210109369" id="storeChat" rel="noopener noreferrer" target="_blank" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button aria-pressed="false" id="storeFollow" type="button"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
 <nav aria-label="Navigasi Store" class="tabs"><button class="tab active" data-tab="toko">Toko</button><button class="tab" data-tab="produk">Produk</button><button class="tab" data-tab="kategori">Kategori</button><button class="tab" data-tab="favorit">Favorit</button></nav>
@@ -3275,11 +3274,7 @@ const V=window.V38=window.V38||{};
    document.body.classList.add('imamstore-original-open');
   }else openCart();
  };
- el('s5Checkout').onclick=function(){
-  // Keranjang dan halaman checkout terbuka tanpa memerlukan sesi akun.
-  // Pemeriksaan login pelanggan dilakukan hanya saat tombol Buat Pesanan ditekan.
-  openDraft();
- };
+ el('s5Checkout').onclick=function(){ openDraft(); };
 
  // Product detail original -> existing local cart and checkout simulation.
  window.imamstoreCartBridge=Object.freeze({
@@ -6014,7 +6009,7 @@ function confirmWhatsAppFallback(html,url){
  });
 }
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'){await popup('warning','Login pelanggan diperlukan','Layanan login belum siap. Muat ulang halaman.');return;}if(!await window.nexaiRequireCustomerLogin())return;const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
+async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'){await popup('warning','Layanan login belum siap','Muat ulang halaman dan coba lagi.');return;}if(!await window.nexaiRequireCustomerLogin())return;const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
 // Sinkronisasi final: snapshot checkout wajib cocok dengan katalog aktif.
  const catalog=window.imamstoreV29?.products?.();
  if(!Array.isArray(catalog)||!catalog.length){await popup('warning','Katalog belum siap','Muat ulang data produk sebelum mengirim pesanan.');return}
@@ -6900,10 +6895,10 @@ if(order){
  new MutationObserver(sync).observe(order,{attributes:true,attributeFilter:['disabled','aria-disabled']});
  checkout.addEventListener('click',e=>{
   const btn=e.target.closest('#refPlaceOrder');if(!btn)return;
-  // Izinkan pemeriksaan login pada handler Buat Pesanan terlebih dahulu.
-  // Setelah berhasil login, validasi alamat dan syarat tetap berlaku.
-  const current=window.firebase?.auth?.()?.currentUser;
-  if(!current||current.isAnonymous)return;
+  // Pengunjung tanpa login diarahkan ke modal autentikasi oleh submit().
+  // Seluruh validasi alamat dan ketentuan tetap dijalankan setelah login.
+  const buyer=window.firebase?.auth?.()?.currentUser;
+  if(!buyer||buyer.isAnonymous)return;
   const error=check();
   if(error){
    e.preventDefault();
@@ -7907,77 +7902,176 @@ if(new URLSearchParams(location.search).get('orders')==='1'){open()}
 });
 </script>
 <style id="nexai-customer-login-style">
-#nexaiCustomerLogin[hidden]{display:none!important}
-#nexaiCustomerLogin{position:fixed;inset:0;z-index:2147483645;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.78)}
-#nexaiCustomerLogin .ncl-card{width:min(100%,410px);background:#121911;color:#fff;border:1px solid #557c2d;border-radius:18px;padding:23px;box-shadow:0 16px 55px #0009;font:14px/1.5 Arial,sans-serif}
-#nexaiCustomerLogin h2{margin:0 0 8px;font-size:22px;color:#b9ec6b}
-#nexaiCustomerLogin p{margin:0 0 14px;color:#d5dfce}
-#nexaiCustomerLogin label{display:block;margin:10px 0 4px}
-#nexaiCustomerLogin input{display:block;width:100%;box-sizing:border-box;padding:12px;border:1px solid #5b6855;border-radius:9px;background:#fff;color:#111;font-size:15px}
-#nexaiCustomerLogin button{cursor:pointer;padding:11px 13px;border-radius:9px;border:1px solid #8cc63f;background:#8cc63f;color:#14200d;font-weight:700}
-#nexaiCustomerLogin button:disabled{opacity:.55;cursor:wait}
-#nexaiCustomerLogin .ncl-actions{display:grid;gap:9px;margin-top:16px}
-#nexaiCustomerLogin .ncl-secondary{background:transparent;color:#c9f28b}
-#nexaiCustomerLogin .ncl-close{float:right;background:transparent;color:#fff;border-color:#65745a}
-#nexaiCustomerLogin #nclMessage{margin:12px 0 0;min-height:20px;color:#ffd48d;overflow-wrap:anywhere}
+#nexaiCustomerLogin[hidden]{display:none}
+#nexaiCustomerLogin{position:fixed;inset:0;z-index:2147483645;display:flex;align-items:center;justify-content:center;padding:18px 14px;background:rgba(0,0,0,.76);backdrop-filter:blur(5px);-webkit-backdrop-filter:blur(5px);overscroll-behavior:contain}
+#nexaiCustomerLogin .ncl-card{width:min(100%,470px);max-height:calc(100dvh - 30px);overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;background:#111911;color:#eff4ea;border:1px solid #648b3d;border-radius:24px;padding:clamp(20px,4.7vw,27px);box-shadow:0 24px 80px #000a;font:15px/1.55 system-ui,-apple-system,Arial,sans-serif;animation:ncl-appear .23s ease-out}
+@keyframes ncl-appear{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:none}}
+#nexaiCustomerLogin .ncl-head{display:flex;align-items:flex-start;gap:12px;margin-bottom:18px}
+#nexaiCustomerLogin .ncl-title-wrap{flex:1;min-width:0}
+#nexaiCustomerLogin .ncl-eyebrow{color:#a8c889;font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;margin:0 0 7px}
+#nexaiCustomerLogin h2{font-size:clamp(23px,5vw,29px);line-height:1.17;letter-spacing:-.5px;color:#b9e57d;margin:0 0 10px;font-weight:800}
+#nexaiCustomerLogin .ncl-description{color:#d0ddc9;font-size:13px;line-height:1.65;margin:0}
+#nexaiCustomerLogin .ncl-close{display:grid;place-items:center;flex:0 0 43px;width:43px;height:43px;background:transparent;color:#fff;border:1px solid #667b5a;border-radius:14px;cursor:pointer;font-size:20px}
+#nexaiCustomerLogin .ncl-fields{display:grid;gap:13px}
+#nexaiCustomerLogin .ncl-field{display:grid;gap:7px}
+#nexaiCustomerLogin .ncl-label-row{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+#nexaiCustomerLogin label{font-size:14px;font-weight:650;color:#f3f7ef}
+#nexaiCustomerLogin .ncl-control{position:relative}
+#nexaiCustomerLogin input{display:block;width:100%;height:53px;min-height:53px;padding:12px 14px;border:1px solid #d9e0d4;border-radius:12px;background:#fff;color:#1e271d;font-size:15px;outline:none;font-family:inherit}
+#nexaiCustomerLogin input::placeholder{color:#7e877a}
+#nexaiCustomerLogin input:focus{border-color:#8cc63f;box-shadow:0 0 0 3px rgba(140,198,63,.22)}
+#nexaiCustomerLogin .ncl-control input{padding-right:52px}
+#nexaiCustomerLogin .ncl-eye{position:absolute;right:5px;top:5px;width:43px;height:43px;display:grid;place-items:center;border:0;background:transparent;color:#607259;border-radius:9px;font-size:18px;cursor:pointer}
+#nexaiCustomerLogin .ncl-text-btn{border:0;background:transparent;color:#bbe889;font:700 12px system-ui,-apple-system,Arial,sans-serif;cursor:pointer;padding:5px 0}
+#nexaiCustomerLogin .ncl-text-btn:hover{text-decoration:underline}
+#nexaiCustomerLogin .ncl-actions{display:grid;gap:11px;margin-top:20px}
+#nexaiCustomerLogin .ncl-primary{width:100%;height:53px;background:#8cc63f;color:#15210e;border:1px solid #8cc63f;border-radius:12px;font:800 15px system-ui,-apple-system,Arial,sans-serif;cursor:pointer}
+#nexaiCustomerLogin .ncl-google{width:100%;height:52px;background:transparent;color:#f2f7ec;border:1px solid #65795b;border-radius:12px;font:700 14px system-ui,-apple-system,Arial,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:11px}
+#nexaiCustomerLogin .ncl-google:hover{background:#1d2d1c}
+#nexaiCustomerLogin .ncl-separator{display:flex;align-items:center;gap:12px;color:#a8b4a2;font-size:12px;justify-content:center}
+#nexaiCustomerLogin .ncl-separator:before,#nexaiCustomerLogin .ncl-separator:after{content:"";height:1px;background:#41503c;flex:1}
+#nexaiCustomerLogin .ncl-foot{display:flex;justify-content:center;gap:5px;flex-wrap:wrap;font-size:13px;color:#ccd4c6;margin:4px 0 0;text-align:center}
+#nexaiCustomerLogin .ncl-assurance{font-size:11px;line-height:1.55;color:#a1b19a;text-align:center;margin:15px 0 0}
+#nexaiCustomerLogin #nclMessage{font-size:12px;line-height:1.55;min-height:0;margin:13px 0 0;color:#ffe1a6;overflow-wrap:anywhere}
+#nexaiCustomerLogin #nclMessage:empty{display:none}
+#nexaiCustomerLogin #nclMessage[data-status="success"]{color:#b9e57d}
+#nexaiCustomerLogin .ncl-hidden{display:none}
+#nexaiCustomerLogin button:disabled{opacity:.58;cursor:wait}
+#nexaiCustomerLogin button:focus-visible{outline:2px solid #b9e57d;outline-offset:3px}
+@media(max-width:370px){#nexaiCustomerLogin{padding:9px}#nexaiCustomerLogin .ncl-card{padding:18px;border-radius:20px}#nexaiCustomerLogin h2{font-size:23px}}
+@media(prefers-reduced-motion:reduce){#nexaiCustomerLogin .ncl-card{animation:none}}
 </style>
-<div aria-labelledby="nclTitle" aria-modal="true" hidden="" id="nexaiCustomerLogin" role="dialog">
+<div aria-labelledby="nclTitle" aria-describedby="nclDescription" aria-modal="true" hidden id="nexaiCustomerLogin" role="dialog">
 <section class="ncl-card">
-<button aria-label="Tutup" class="ncl-close" id="nclClose" type="button">×</button>
-<h2 id="nclTitle">Masuk ImamStore</h2>
-<p>Gunakan akun Google atau email untuk checkout dan melihat riwayat pesanan.</p>
-<form autocomplete="on" id="nclForm">
-<label for="nclEmail">Email</label><input autocomplete="email" id="nclEmail" required="" type="email"/>
-<label for="nclPassword">Password</label><input autocomplete="current-password" id="nclPassword" minlength="6" required="" type="password"/>
-<div class="ncl-actions">
-<button id="nclGoogle" type="button">Masuk dengan Google</button>
-<button id="nclEmailLogin" type="submit">Masuk dengan email</button>
-<button class="ncl-secondary" id="nclRegister" type="button">Daftar akun email baru</button>
-<button class="ncl-secondary" id="nclCancel" type="button">Batal</button>
-</div>
-</form>
-<p aria-live="polite" id="nclMessage" role="status"></p>
+ <div class="ncl-head">
+  <div class="ncl-title-wrap"><p class="ncl-eyebrow"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Akun pelanggan ImamStore</p><h2 id="nclTitle">Selamat Datang Kembali</h2><p class="ncl-description" id="nclDescription">Masuk untuk melanjutkan pesanan dan mengelola akun ImamStore.</p></div>
+  <button aria-label="Tutup login" class="ncl-close" id="nclClose" type="button"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button>
+ </div>
+ <form autocomplete="on" id="nclForm">
+  <div class="ncl-fields">
+   <div class="ncl-field"><label for="nclEmail">Alamat Email</label><input autocomplete="email" id="nclEmail" inputmode="email" placeholder="nama@email.com" required type="email" maxlength="254"/></div>
+   <div class="ncl-field" id="nclPasswordGroup"><div class="ncl-label-row"><label for="nclPassword">Kata Sandi</label><button class="ncl-text-btn" id="nclForgot" type="button">Lupa kata sandi?</button></div><div class="ncl-control"><input autocomplete="current-password" id="nclPassword" minlength="6" placeholder="Masukkan kata sandi" required type="password"/><button class="ncl-eye" id="nclShowPassword" type="button" aria-label="Tampilkan kata sandi"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></div></div>
+   <div class="ncl-field ncl-hidden" id="nclConfirmGroup"><label for="nclConfirmPassword">Konfirmasi Kata Sandi</label><div class="ncl-control"><input autocomplete="new-password" id="nclConfirmPassword" minlength="6" placeholder="Ulangi kata sandi" type="password"/><button class="ncl-eye" id="nclShowConfirm" type="button" aria-label="Tampilkan konfirmasi kata sandi"><i class="fa-regular fa-eye" aria-hidden="true"></i></button></div></div>
+  </div>
+  <div class="ncl-actions"><button class="ncl-primary" id="nclEmailLogin" type="submit">Masuk</button><div class="ncl-separator" id="nclOr">atau lanjutkan dengan</div><button class="ncl-google" id="nclGoogle" type="button"><i class="fa-brands fa-google" aria-hidden="true"></i> Lanjutkan dengan Google</button><div class="ncl-foot"><span id="nclFootText">Belum punya akun?</span> <button class="ncl-text-btn" id="nclRegister" type="button">Daftar sekarang</button></div></div>
+ </form>
+ <p aria-live="polite" id="nclMessage" role="status"></p>
+ <p class="ncl-assurance"><i class="fa-solid fa-lock" aria-hidden="true"></i> Login aman melalui Firebase Authentication. Belanja dan menambahkan ke keranjang tidak memerlukan akun.</p>
 </section>
 </div>
 <script id="nexai-customer-login-js">
 (function(){
-'use strict';
-const root=document.getElementById('nexaiCustomerLogin');
-const msg=document.getElementById('nclMessage');
-const form=document.getElementById('nclForm');
-let pending=null,previousFocus=null,busy=false;
-const auth=()=>window.firebase?.auth?.();
-function eligible(){const user=auth()?.currentUser;return !!(user&&!user.isAnonymous)}
-function finish(ok){root.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.();const resolve=pending;pending=null;resolve?.(!!ok)}
-function errorMessage(e){const code=e?.code||'';const messages={
-'auth/popup-blocked':'Popup Google diblokir. Izinkan popup lalu coba lagi.',
-'auth/popup-closed-by-user':'Login Google dibatalkan.',
-'auth/operation-not-allowed':'Metode masuk ini belum tersedia. Silakan pilih cara masuk lainnya atau hubungi layanan pelanggan.',
-'auth/unauthorized-domain':'Login belum tersedia saat ini. Silakan coba lagi atau hubungi layanan pelanggan.',
-'auth/invalid-credential':'Email atau password tidak cocok.',
-'auth/wrong-password':'Email atau password tidak cocok.',
-'auth/user-not-found':'Akun email belum ditemukan.',
-'auth/email-already-in-use':'Email sudah terdaftar. Silakan masuk.',
-'auth/weak-password':'Gunakan password minimal 6 karakter.',
-'auth/network-request-failed':'Koneksi bermasalah. Silakan coba lagi.',
-'auth/account-exists-with-different-credential':'Email sudah terdaftar menggunakan metode login lain.'
-};return messages[code]||'Login belum berhasil. Periksa akun dan koneksi Anda, lalu coba lagi.'}
-function lock(v){busy=v;root.querySelectorAll('button,input').forEach(x=>{if(x.id!=='nclClose'&&x.id!=='nclCancel')x.disabled=v})}
-async function run(action){if(busy)return;lock(true);msg.textContent='Memproses login…';try{await action();if(!eligible())throw new Error('Akun pelanggan belum aktif');finish(true)}catch(e){console.warn('[ImamStore Customer Auth]',e?.code||e?.message);msg.textContent=errorMessage(e)}finally{lock(false)}}
-window.nexaiRequireCustomerLogin=async function(){
-if(!auth()){return false}
-try{await auth().authStateReady?.()}catch(_){}
-if(eligible())return true;
-if(pending)return new Promise(resolve=>{const old=pending;pending=(value)=>{old(value);resolve(value)}});
-previousFocus=document.activeElement;root.hidden=false;document.body.style.overflow='hidden';msg.textContent='';document.getElementById('nclGoogle').focus();
-return new Promise(resolve=>{pending=resolve});
-};
-document.getElementById('nclGoogle').addEventListener('click',()=>run(async()=>{const provider=new firebase.auth.GoogleAuthProvider();await auth().signInWithPopup(provider)}));
-form.addEventListener('submit',e=>{e.preventDefault();run(()=>auth().signInWithEmailAndPassword(document.getElementById('nclEmail').value.trim(),document.getElementById('nclPassword').value))});
-document.getElementById('nclRegister').addEventListener('click',()=>run(()=>auth().createUserWithEmailAndPassword(document.getElementById('nclEmail').value.trim(),document.getElementById('nclPassword').value)));
-['nclClose','nclCancel'].forEach(id=>document.getElementById(id).addEventListener('click',()=>{if(!busy)finish(false)}));
-root.addEventListener('click',e=>{if(e.target===root&&!busy)finish(false)});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!root.hidden&&!busy){e.stopPropagation();finish(false)}});
+ 'use strict';
+ const root=document.getElementById('nexaiCustomerLogin'),form=document.getElementById('nclForm'),msg=document.getElementById('nclMessage');
+ const $=id=>document.getElementById(id);
+ const email=$('nclEmail'),password=$('nclPassword'),confirm=$('nclConfirmPassword');
+ const auth=()=>window.firebase?.auth?.();
+ let mode='login',busy=false,previousFocus=null,previousOverflow='',resolvers=[];
+ function eligible(){const u=auth()?.currentUser;return !!(u&&!u.isAnonymous)}
+ function notify(message='',success=false){msg.textContent=message;msg.dataset.status=success?'success':'error'}
+ function errorMessage(e){const map={
+  'auth/popup-blocked':'Popup Google diblokir browser. Izinkan popup lalu coba lagi.',
+  'auth/popup-closed-by-user':'Login Google dibatalkan.',
+  'auth/operation-not-allowed':'Metode masuk belum tersedia. Hubungi tim ImamStore.',
+  'auth/unauthorized-domain':'Domain toko belum diizinkan untuk login Firebase.',
+  'auth/invalid-credential':'Email atau kata sandi tidak sesuai.',
+  'auth/invalid-login-credentials':'Email atau kata sandi tidak sesuai.',
+  'auth/wrong-password':'Email atau kata sandi tidak sesuai.',
+  'auth/user-not-found':'Akun tidak ditemukan. Periksa email atau daftar akun.',
+  'auth/email-already-in-use':'Email sudah terdaftar. Silakan masuk.',
+  'auth/weak-password':'Kata sandi terlalu lemah. Gunakan minimal enam karakter.',
+  'auth/invalid-email':'Format alamat email belum benar.',
+  'auth/too-many-requests':'Terlalu banyak percobaan. Silakan coba lagi nanti.',
+  'auth/network-request-failed':'Koneksi terputus. Periksa internet lalu coba lagi.',
+  'auth/account-exists-with-different-credential':'Akun ini sudah menggunakan metode login lain.'
+ };return map[e?.code]||'Proses belum berhasil. Periksa data dan koneksi, lalu coba lagi.'}
+ function setMode(next){
+  if(busy)return;
+  mode=next;
+  const reset=next==='reset',register=next==='register';
+  $('nclTitle').textContent=reset?'Pulihkan Kata Sandi':register?'Buat Akun ImamStore':'Selamat Datang Kembali';
+  $('nclDescription').textContent=reset?'Masukkan email terdaftar untuk menerima tautan pemulihan.':register?'Daftar untuk menyimpan riwayat pesanan dan mengelola akun.':'Masuk untuk melanjutkan pesanan dan mengelola akun ImamStore.';
+  $('nclPasswordGroup').classList.toggle('ncl-hidden',reset);
+  $('nclConfirmGroup').classList.toggle('ncl-hidden',!register);
+  $('nclGoogle').classList.toggle('ncl-hidden',reset);
+  $('nclOr').classList.toggle('ncl-hidden',reset);
+  $('nclForgot').classList.toggle('ncl-hidden',register);
+  password.required=!reset;
+  password.autocomplete=register?'new-password':'current-password';
+  confirm.required=register;
+  $('nclEmailLogin').textContent=reset?'Kirim Tautan Pemulihan':register?'Daftar Akun':'Masuk';
+  $('nclFootText').textContent=reset?'Sudah ingat kata sandi?':register?'Sudah punya akun?':'Belum punya akun?';
+  $('nclRegister').textContent=reset||register?'Masuk di sini':'Daftar sekarang';
+  if(!register)confirm.value='';
+  if(reset)password.value='';
+  notify();
+ }
+ function lock(v){busy=v;root.querySelectorAll('button,input').forEach(el=>el.disabled=v)}
+ function finish(ok){
+  if(root.hidden)return;
+  root.hidden=true;document.body.style.overflow=previousOverflow;
+  password.value='';confirm.value='';setMode('login');
+  const all=resolvers.splice(0);all.forEach(resolve=>resolve(!!ok));
+  try{previousFocus?.focus?.({preventScroll:true})}catch{}
+  previousFocus=null;
+  if(ok)window.dispatchEvent(new Event('imamstore:customer-auth'));
+ }
+ async function run(action,progress){
+  if(busy)return false;
+  lock(true);notify(progress);
+  try{
+   await action();
+   if(!eligible())throw new Error('customer-session-required');
+   lock(false);finish(true);return true;
+  }catch(e){console.warn('[ImamStore Auth]',String(e?.code||e?.message||'unknown'));notify(errorMessage(e));return false}
+  finally{lock(false)}
+ }
+ window.nexaiRequireCustomerLogin=async function(){
+  const a=auth();if(!a){console.warn('[ImamStore Auth] Firebase belum siap');return false}
+  try{await a.authStateReady?.()}catch{}
+  if(eligible())return true;
+  return new Promise(resolve=>{
+   resolvers.push(resolve);
+   if(!root.hidden)return;
+   previousFocus=document.activeElement;previousOverflow=document.body.style.overflow;
+   setMode('login');root.hidden=false;document.body.style.overflow='hidden';
+   requestAnimationFrame(()=>email.focus({preventScroll:true}));
+  });
+ };
+ window.imamstoreOpenCustomerLogin=window.nexaiRequireCustomerLogin;
+ form.addEventListener('submit',async event=>{
+  event.preventDefault();if(busy||!form.reportValidity())return;
+  const e=email.value.trim(),p=password.value;
+  if(mode==='reset'){
+   lock(true);notify('Mengirim tautan pemulihan…');
+   try{await auth().sendPasswordResetEmail(e);notify('Jika alamat email terdaftar, tautan pemulihan akan dikirim. Silakan periksa kotak masuk atau spam.',true)}
+   catch(err){console.warn('[ImamStore Auth Reset]',String(err?.code||'unknown'));notify(errorMessage(err))}
+   finally{lock(false)}return;
+  }
+  if(mode==='register'){
+   if(p!==confirm.value){notify('Konfirmasi kata sandi belum sama.');confirm.focus();return}
+   await run(()=>auth().createUserWithEmailAndPassword(e,p),'Mendaftarkan akun…');return;
+  }
+  await run(()=>auth().signInWithEmailAndPassword(e,p),'Memverifikasi akun…');
+ });
+ $('nclGoogle').addEventListener('click',()=>run(()=>auth().signInWithPopup(new firebase.auth.GoogleAuthProvider()),'Menghubungkan akun Google…'));
+ $('nclRegister').addEventListener('click',()=>{setMode(mode==='login'?'register':'login');email.focus()});
+ $('nclForgot').addEventListener('click',()=>{setMode('reset');email.focus()});
+ for(const [btn,id] of [['nclShowPassword','nclPassword'],['nclShowConfirm','nclConfirmPassword']]){
+  $(btn).addEventListener('click',()=>{const field=$(id),visible=field.type==='password';field.type=visible?'text':'password';$(btn).setAttribute('aria-label',visible?'Sembunyikan kata sandi':'Tampilkan kata sandi');$(btn).querySelector('i').className='fa-regular '+(visible?'fa-eye-slash':'fa-eye')});
+ }
+ $('nclClose').addEventListener('click',()=>{if(!busy)finish(false)});
+ root.addEventListener('click',e=>{if(e.target===root&&!busy)finish(false)});
+ document.addEventListener('keydown',e=>{
+  if(root.hidden)return;
+  if(e.key==='Escape'&&!busy){e.preventDefault();e.stopPropagation();finish(false);return}
+  if(e.key==='Tab'){
+   const focusables=[...root.querySelectorAll('button:not(:disabled),input:not(:disabled)')].filter(el=>el.getClientRects().length && !el.closest('.ncl-hidden'));
+   const first=focusables[0],last=focusables.at(-1);
+   if(e.shiftKey&&document.activeElement===first){e.preventDefault();last?.focus()}
+   else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first?.focus()}
+  }
+ },true);
 })();
 </script>
 <style id="nexai-stage5j-premium-css">
@@ -8261,30 +8355,128 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 #s5Cart #refVoucherSaved,#s5Draft #refCheckoutVoucherValue{max-width:62%;white-space:normal;font-size:clamp(11px,2.8vw,13px);text-align:right;color:#648f30}
 @media(min-width:700px){.ref-modal:not([hidden]) .ref-modal-panel:has(.v43-compact-sheet){border-radius:22px 22px 0 0}}
 </style>
-<script id="imamstore-customer-login-entry-v1">
-(function(){'use strict';
-  const params=new URLSearchParams(location.search);
-  if(params.get('login')!=='1')return;
-  const allowed=new Set(['imamsales.com','www.imamsales.com','imamsalesnine.com','www.imamsalesnine.com']);
-  let destination=null;
-  try {
-    const u=new URL(params.get('return')||'',location.origin);
-    if(u.protocol==='https:' && allowed.has(u.hostname))destination=u.origin+'/';
-  }catch(_e){}
-  async function start(){
-    for(let i=0;i<40 && typeof window.nexaiRequireCustomerLogin!=='function';i++)
-      await new Promise(resolve=>setTimeout(resolve,150));
-    if(typeof window.nexaiRequireCustomerLogin!=='function')return;
-    try{
-      const ok=await window.nexaiRequireCustomerLogin();
-      if(ok&&destination){location.replace(destination);return}
-    }catch(e){console.warn('[ImamStore] Login redirect was not completed',e?.code||'unknown')}
-    // Jangan terus memanggil popup setelah pengguna memilih batal.
-    const clean=new URL(location.href);clean.searchParams.delete('login');clean.searchParams.delete('return');
-    history.replaceState(history.state,'',clean.pathname+clean.search+clean.hash);
+<style id="imamstore-customer-menu-style">
+#imamstoreMenuOpen{flex:0 0 40px;min-width:40px;min-height:44px;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
+#imamstoreMenuOpen i{font-size:24px}
+#imamstoreMenuDrawer[hidden],#imamstoreTracking[hidden]{display:none}
+#imamstoreMenuDrawer{position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.55);display:flex;justify-content:flex-end;overscroll-behavior:contain}
+#imamstoreMenuDrawer .ism-panel{width:min(88vw,388px);height:100%;height:100dvh;background:#fff;color:#263229;display:flex;flex-direction:column;box-shadow:-10px 0 42px #0004;animation:ism-open .26s cubic-bezier(.2,.8,.2,1);touch-action:pan-y}
+@keyframes ism-open{from{transform:translateX(100%)}to{transform:translateX(0)}}
+#imamstoreMenuDrawer .ism-head{flex:none;display:flex;align-items:center;gap:12px;padding:19px 16px 15px;background:#fff;border-bottom:1px solid #e7ebe2}
+#imamstoreMenuDrawer .ism-logo{width:47px;height:47px;border-radius:13px;background:#121a12;color:#8cc63f;display:grid;place-items:center;font-size:23px}
+#imamstoreMenuDrawer .ism-identity{flex:1;min-width:0}
+#imamstoreMenuDrawer .ism-identity strong{display:block;font-size:19px}
+#imamstoreMenuDrawer .ism-identity small{display:block;color:#82917a;font-size:11px}
+#imamstoreMenuDrawer .ism-close{width:42px;height:42px;border:0;border-radius:12px;background:#f1f5ed;color:#30412f;font-size:20px;cursor:pointer}
+#imamstoreMenuDrawer .ism-scroll{flex:1;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding:14px 15px 22px;touch-action:pan-y}
+#imamstoreMenuDrawer .ism-group{margin:17px 0 20px}
+#imamstoreMenuDrawer .ism-group-title{display:block;padding:0 9px 8px;color:#718071;font-weight:800;letter-spacing:.095em;font-size:11px}
+#imamstoreMenuDrawer .ism-item[hidden]{display:none}
+#imamstoreMenuDrawer .ism-item{width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:0;background:transparent;color:#314136;padding:11px 8px;border-radius:12px;cursor:pointer;font:inherit}
+#imamstoreMenuDrawer .ism-item:active{background:#f1f8e8}
+#imamstoreMenuDrawer .ism-icon{width:42px;height:42px;flex:0 0 42px;display:grid;place-items:center;background:#f1f8e8;color:#84b93c;border-radius:12px;font-size:18px}
+#imamstoreMenuDrawer .ism-copy{flex:1;min-width:0}
+#imamstoreMenuDrawer .ism-copy strong{display:block;font-size:14px;font-weight:750}
+#imamstoreMenuDrawer .ism-copy small{display:block;color:#879388;font-size:11px;line-height:1.4;margin-top:2px;overflow-wrap:anywhere}
+#imamstoreMenuDrawer .ism-arrow{font-size:14px;color:#86b948}
+#imamstoreMenuDrawer .ism-foot{flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #edf0e8;padding:13px 20px;color:#9aa69a;font-size:11px;background:#fff}
+#imamstoreMenuDrawer .ism-account-label{margin:0 9px 5px;padding:11px 10px;border-radius:11px;background:#f5faef;color:#42563a;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+#imamstoreTracking{position:fixed;inset:0;z-index:2147483300;background:#0009;display:flex;align-items:center;justify-content:center;padding:16px;overscroll-behavior:contain}
+#imamstoreTracking .ism-track-card{width:min(100%,460px);max-height:88dvh;overflow-y:auto;background:#fff;color:#263228;border-radius:20px;padding:21px 19px;box-shadow:0 18px 45px #0003}
+#imamstoreTracking .ism-track-head{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:10px}
+#imamstoreTracking .ism-track-head h2{font-size:21px;margin:0;line-height:1.2}
+#imamstoreTracking .ism-track-close{width:40px;height:40px;border:0;background:#eef5e7;border-radius:12px;color:#405637;font-size:20px}
+#imamstoreTracking p{font-size:13px;line-height:1.55;color:#677569;margin:0 0 19px}
+#imamstoreTracking label{display:block;font-weight:700;font-size:13px;margin:14px 0 7px}
+#imamstoreTracking input,#imamstoreTracking select{width:100%;min-height:48px;border:1px solid #dae3d4;border-radius:10px;background:#fff;color:#263228;padding:10px;font:inherit;font-size:14px}
+#imamstoreTracking .ism-track-submit{width:100%;height:50px;border:0;border-radius:11px;background:#8cc63f;color:#15220d;font-weight:800;margin-top:20px}
+#imamstoreTracking .ism-track-note{font-size:11px;color:#829082;margin-top:13px;line-height:1.6}
+@media(prefers-reduced-motion:reduce){#imamstoreMenuDrawer .ism-panel{animation:none}}
+</style>
+<div id="imamstoreMenuDrawer" role="presentation" hidden>
+ <aside aria-label="Menu ImamStore" aria-modal="true" class="ism-panel" role="dialog">
+  <div class="ism-head"><span class="ism-logo"><i class="fa-solid fa-store" aria-hidden="true"></i></span><div class="ism-identity"><strong>ImamStore</strong><small>Pusat Belanja Imam Sales</small></div><button class="ism-close" id="imamstoreMenuClose" type="button" aria-label="Tutup menu"><i class="fa-solid fa-xmark" aria-hidden="true"></i></button></div>
+  <div class="ism-scroll" id="imamstoreMenuScroll">
+   <section class="ism-group" aria-label="Jelajahi Toko"><span class="ism-group-title">JELAJAHI TOKO</span>
+    <button class="ism-item" data-ism-action="toko"><span class="ism-icon"><i class="fa-solid fa-house"></i></span><span class="ism-copy"><strong>Beranda Toko</strong><small>Kembali ke halaman awal</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="produk"><span class="ism-icon"><i class="fa-solid fa-box-open"></i></span><span class="ism-copy"><strong>Semua Produk</strong><small>Jelajahi katalog ImamStore</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="kategori"><span class="ism-icon"><i class="fa-solid fa-layer-group"></i></span><span class="ism-copy"><strong>Kategori Produk</strong><small>Temukan produk berdasarkan kategori</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="favorit"><span class="ism-icon"><i class="fa-solid fa-heart"></i></span><span class="ism-copy"><strong>Favorit Saya</strong><small>Produk yang sudah disimpan</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+   </section>
+   <section class="ism-group" aria-label="Belanja dan Pesanan"><span class="ism-group-title">BELANJA &amp; PESANAN</span>
+    <button class="ism-item" data-ism-action="keranjang"><span class="ism-icon"><i class="fa-solid fa-cart-shopping"></i></span><span class="ism-copy"><strong>Keranjang Saya</strong><small>Lihat produk yang akan dibeli</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="pesanan"><span class="ism-icon"><i class="fa-solid fa-receipt"></i></span><span class="ism-copy"><strong>Pesanan Saya</strong><small>Riwayat dan status pesanan</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="lacak"><span class="ism-icon"><i class="fa-solid fa-truck-fast"></i></span><span class="ism-copy"><strong>Lacak Pengiriman</strong><small>Gunakan resi dari detail pesanan</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+   </section>
+   <section class="ism-group" aria-label="Akun pelanggan"><span class="ism-group-title">AKUN PELANGGAN</span><p class="ism-account-label" id="imamstoreAccountStatus">Memeriksa sesi akun…</p>
+    <button class="ism-item" data-ism-action="login" id="imamstoreMenuLogin"><span class="ism-icon"><i class="fa-solid fa-user"></i></span><span class="ism-copy"><strong>Masuk / Daftar</strong><small>Kelola akun pelanggan ImamStore</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="logout" id="imamstoreMenuLogout" hidden><span class="ism-icon"><i class="fa-solid fa-right-from-bracket"></i></span><span class="ism-copy"><strong>Keluar</strong><small>Akhiri sesi akun pelanggan</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+   </section>
+   <section class="ism-group" aria-label="Bantuan dan Informasi"><span class="ism-group-title">BANTUAN &amp; INFORMASI</span>
+    <button class="ism-item" data-ism-action="chat"><span class="ism-icon"><i class="fa-brands fa-whatsapp"></i></span><span class="ism-copy"><strong>Chat Admin</strong><small>Bantuan pelanggan dan produk</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+    <button class="ism-item" data-ism-action="website"><span class="ism-icon"><i class="fa-solid fa-globe"></i></span><span class="ism-copy"><strong>Website Imam Sales</strong><small>Kembali ke imamsales.com</small></span><i class="ism-arrow fa-solid fa-chevron-right"></i></button>
+   </section>
+  </div>
+  <footer class="ism-foot"><span>© ImamStore</span><span>Imam Sales</span></footer>
+ </aside>
+</div>
+<div id="imamstoreTracking" hidden role="presentation"><div class="ism-track-card" role="dialog" aria-modal="true" aria-labelledby="imamstoreTrackingTitle"><div class="ism-track-head"><h2 id="imamstoreTrackingTitle"><i class="fa-solid fa-truck-fast" style="color:#8cc63f" aria-hidden="true"></i> Lacak Pengiriman</h2><button id="imamstoreTrackingClose" class="ism-track-close" type="button" aria-label="Tutup pelacakan"><i class="fa-solid fa-xmark"></i></button></div><p>Salin nomor resi yang diisi admin dari <strong>Pesanan Saya</strong>, lalu periksa melalui situs resmi ekspedisi.</p><form id="imamstoreTrackingForm"><label for="imamstoreTrackingCarrier">Ekspedisi</label><select id="imamstoreTrackingCarrier" required><option value="jne">JNE</option><option value="jnt">J&amp;T Express</option><option value="sicepat">SiCepat</option><option value="pos">Pos Indonesia</option></select><label for="imamstoreTrackingResi">Nomor Resi / AWB</label><input id="imamstoreTrackingResi" type="text" placeholder="Tempel nomor resi di sini" autocomplete="off" maxlength="120" required/><button class="ism-track-submit" type="submit"><i class="fa-solid fa-copy" aria-hidden="true"></i> Salin Resi &amp; Buka Ekspedisi</button></form><div class="ism-track-note" id="imamstoreTrackingMessage" aria-live="polite">Status pengiriman ditampilkan di situs ekspedisi, bukan di ImamStore.</div></div></div>
+<script id="imamstore-customer-menu-js">
+(function(){
+ 'use strict';
+ const drawer=document.getElementById('imamstoreMenuDrawer'),trigger=document.getElementById('imamstoreMenuOpen');
+ const track=document.getElementById('imamstoreTracking'),account=document.getElementById('imamstoreAccountStatus');
+ let restoreOverflow='',lastFocus=null,trackFocus=null,trackOverflow='',startX=null,startY=null;
+ function lock(){restoreOverflow=document.body.style.overflow;document.body.style.overflow='hidden'}
+ function unlock(){document.body.style.overflow=restoreOverflow}
+ function show(){if(!drawer.hidden)return;lastFocus=document.activeElement;drawer.hidden=false;trigger.setAttribute('aria-expanded','true');lock();syncAccount();document.getElementById('imamstoreMenuClose').focus({preventScroll:true})}
+ function close(){if(drawer.hidden)return;drawer.hidden=true;trigger.setAttribute('aria-expanded','false');unlock();lastFocus?.focus?.({preventScroll:true})}
+ function loginUser(){const u=window.firebase?.auth?.()?.currentUser;return u&&!u.isAnonymous?u:null}
+ function syncAccount(){
+  const u=loginUser(),inButton=document.getElementById('imamstoreMenuLogin'),outButton=document.getElementById('imamstoreMenuLogout');
+  if(!u){account.textContent='Belanja tanpa login. Masuk hanya untuk membuat pesanan dan melihat riwayat akun.';inButton.hidden=false;outButton.hidden=true}
+  else{account.textContent='Masuk sebagai '+(u.email||u.displayName||'Pelanggan ImamStore');inButton.hidden=true;outButton.hidden=false}
+ }
+ trigger.addEventListener('click',show);
+ document.getElementById('imamstoreMenuClose').addEventListener('click',close);
+ drawer.addEventListener('click',event=>{if(event.target===drawer)close()});
+ const pane=drawer.querySelector('.ism-panel');
+ pane.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY},{passive:true});
+ pane.addEventListener('touchend',event=>{if(startX===null||event.changedTouches.length!==1)return;const dx=event.changedTouches[0].clientX-startX,dy=event.changedTouches[0].clientY-startY;startX=startY=null;if(dx>95&&Math.abs(dx)>Math.abs(dy)*1.5)close()},{passive:true});
+ function navigateTab(tab){
+  window.nineVisitStore?.();
+  if(tab==='produk'&&typeof window.imamstoreShowAllStoreProducts==='function')window.imamstoreShowAllStoreProducts();
+  else {document.querySelector('.tabs [data-tab="'+tab+'"]')?.click();window.storeResetVerticalHeader?.();document.getElementById('panel-'+tab)?.scrollTo({top:0,behavior:'instant'});window.imamstoreRefreshScrollTop?.()}
+ }
+ drawer.querySelectorAll('[data-ism-action]').forEach(btn=>btn.addEventListener('click',async()=>{
+  const action=btn.dataset.ismAction;close();
+  if(['toko','produk','kategori','favorit'].includes(action)){navigateTab(action);return}
+  if(action==='keranjang'){window.imamstoreCartBridge?.openCart?.();return}
+  if(action==='pesanan'){window.nexaiOpenOrders?.();return}
+  if(action==='login'){await window.nexaiRequireCustomerLogin?.();syncAccount();return}
+  if(action==='logout'){
+   const a=window.firebase?.auth?.();if(!loginUser())return;
+   try{await a.signOut();syncAccount();window.imamstoreToast?.('Anda berhasil keluar dari akun','success')}catch(e){console.warn('Logout ImamStore gagal',String(e?.code||'unknown'));alert('Belum berhasil keluar. Silakan coba lagi.')}
+   return;
   }
-  if(document.readyState==='complete')setTimeout(start,50);
-  else window.addEventListener('load',()=>setTimeout(start,50),{once:true});
+  if(action==='lacak'){trackFocus=document.activeElement;trackOverflow=document.body.style.overflow;track.hidden=false;document.body.style.overflow='hidden';document.getElementById('imamstoreTrackingCarrier').focus();return}
+  if(action==='chat'){window.open('https://wa.me/6282210109369','_blank','noopener,noreferrer');return}
+  if(action==='website'){location.href='https://imamsales.com/'}
+ }));
+ function closeTrack(){if(track.hidden)return;track.hidden=true;document.body.style.overflow=trackOverflow;trackFocus?.focus?.({preventScroll:true})}
+ document.getElementById('imamstoreTrackingClose').addEventListener('click',closeTrack);
+ track.addEventListener('click',event=>{if(event.target===track)closeTrack()});
+ document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(!track.hidden){event.preventDefault();closeTrack()}else if(!drawer.hidden){event.preventDefault();close()}},true);
+ document.getElementById('imamstoreTrackingForm').addEventListener('submit',async event=>{
+  event.preventDefault();const resi=document.getElementById('imamstoreTrackingResi').value.trim(),carrier=document.getElementById('imamstoreTrackingCarrier').value;
+  const sites={jne:'https://www.jne.co.id/tracking-package',jnt:'https://www.jet.co.id/track',sicepat:'https://www.sicepat.com/',pos:'https://www.posindonesia.co.id/id/tracking'};
+  const url=sites[carrier];if(!url||!resi){return}
+  const status=document.getElementById('imamstoreTrackingMessage');
+  const copying=navigator.clipboard?.writeText?.(resi);
+  window.open(url,'_blank','noopener,noreferrer');
+  try{if(!copying)throw Error('clipboard-unavailable');await copying;status.textContent='Nomor resi disalin. Tempel di halaman pelacakan ekspedisi.'}catch{status.textContent='Salin nomor resi secara manual, lalu tempel di halaman ekspedisi.'}
+ });
+ const a=window.firebase?.auth?.();a?.onAuthStateChanged?.(syncAccount);window.addEventListener('imamstore:customer-auth',syncAccount);syncAccount();
 })();
 </script>
 </body></html>
