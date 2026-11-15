@@ -1681,14 +1681,17 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   });
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
   
+
 const isStoreHost = [
   'store.imamsalesnine.com',
+  'store.imamsales.com',
   'imamstore.netlify.app'
 ].includes(location.hostname);
 
 const presenceUrl = isStoreHost
   ? '/status-admin'
   : '/.netlify/functions/admin-presence';
+
 
   const activeWindowMs=90000;
   let lastPresenceMs=0;
