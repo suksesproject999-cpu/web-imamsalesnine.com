@@ -13592,46 +13592,110 @@ window.smartLoadWhatsAppGroups = async function(){
 
 
 
-<!-- NEXAI ADMIN PRESENCE — hanya admin utama, tanpa Firebase service account -->
+<!-- ADMIN V5 PRESENCE — heartbeat aktif selama dashboard terlihat, JWT diverifikasi server -->
 <script>
-(function(){
+(function () {
   "use strict";
-  const ENDPOINT="/.netlify/functions/admin-presence";
-  const INTERVAL=30000;
-  const IDLE_AFTER=120000;
-  let lastInteraction=Date.now();
-  let lastSent=0;
-  let sending=false;
 
-  ["pointerdown","keydown","touchstart","scroll"].forEach(function(type){
-    window.addEventListener(type,function(){lastInteraction=Date.now();},{passive:true});
-  });
+  // Endpoint dan JWT Netlify Admin V5 yang sudah digunakan sebelumnya.
+  // Tidak menggunakan Firebase Admin SDK dan tidak membuat sesi baru.
+  const ENDPOINT = "/.netlify/functions/admin-presence";
+  const HEARTBEAT_INTERVAL_MS = 20000;
+  const MIN_SUCCESS_GAP_MS = 15000;
+  const MIN_ATTEMPT_GAP_MS = 8000;
+  const REQUEST_TIMEOUT_MS = 10000;
 
-  async function heartbeat(){
-    if(document.visibilityState!=="visible" || sending) return;
-    if(Date.now()-lastInteraction>IDLE_AFTER) return;
-    if(Date.now()-lastSent<25000) return;
-    if(localStorage.getItem("role")!=="admin") return;
-    const token=localStorage.getItem("token");
-    if(!token) return;
-    sending=true;
-    try{
-      const res=await fetch(ENDPOINT,{
-        method:"POST",
-        headers:{"Authorization":"Bearer "+token},
-        cache:"no-store"
-      });
-      if(res.ok) lastSent=Date.now();
-    }catch(err){
-      console.warn("Admin presence belum tersambung:",err);
-    }finally{
-      sending=false;
+  let sending = false;
+  let lastSuccess = 0;
+  let lastAttempt = 0;
+  let blockedToken = null;
+  let lastWarning = 0;
+
+  function adminToken() {
+    try {
+      return localStorage.getItem("token") || "";
+    } catch (error) {
+      return "";
     }
   }
-  document.addEventListener("visibilitychange",heartbeat);
-  window.addEventListener("focus",heartbeat);
-  setInterval(heartbeat,INTERVAL);
-  setTimeout(heartbeat,1200);
+
+  function warn(message) {
+    // Log tidak pernah berisi token, untuk keamanan.
+    if (Date.now() - lastWarning > 60000 || lastWarning === 0) {
+      console.warn("[Admin V5 Presence] " + message);
+      lastWarning = Date.now();
+    }
+  }
+
+  async function sendHeartbeat() {
+    // Tab tersembunyi tidak boleh terus dianggap online.
+    if (document.visibilityState !== "visible" || sending) return;
+
+    const token = adminToken();
+    if (!token) return;
+
+    // Server (bukan localStorage role) memverifikasi JWT dan klaim admin.
+    // Ini menghindari heartbeat terhenti hanya karena key role tidak tersedia.
+    if (blockedToken === token) return;
+
+    const now = Date.now();
+    if (now - lastSuccess < MIN_SUCCESS_GAP_MS || now - lastAttempt < MIN_ATTEMPT_GAP_MS) return;
+
+    sending = true;
+    lastAttempt = now;
+    const controller = new AbortController();
+    const timeout = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
+
+    try {
+      const response = await fetch(ENDPOINT, {
+        method: "POST",
+        headers: { Authorization: "Bearer " + token },
+        cache: "no-store",
+        signal: controller.signal
+      });
+      if (response.status === 401 || response.status === 403) {
+        blockedToken = token;
+        warn("Sesi JWT ditolak (" + response.status + "). Login ulang Admin V5 diperlukan.");
+        return;
+      }
+      if (!response.ok) {
+        warn("Heartbeat gagal (HTTP " + response.status + "). Periksa Netlify Function.");
+        return;
+      }
+      const payload = await response.json();
+      if (!payload || payload.success !== true) {
+        warn("Endpoint tidak mengembalikan success:true.");
+        return;
+      }
+      // Simpan waktu hanya ketika server berhasil mencatat heartbeat.
+      lastSuccess = Date.now();
+      blockedToken = null;
+    } catch (error) {
+      warn(error && error.name === "AbortError" ? "Heartbeat timeout; akan dicoba ulang." : "Jaringan/endpoint tidak tersedia; akan dicoba ulang.");
+    } finally {
+      clearTimeout(timeout);
+      sending = false;
+    }
+  }
+
+  // Tidak memakai batas idle 2 menit. Selama Admin V5 terlihat, server
+  // menerima heartbeat berkala. Saat berpindah tab/menutup browser, berhenti.
+  document.addEventListener("visibilitychange", function () {
+    if (document.visibilityState === "visible") sendHeartbeat();
+  });
+  window.addEventListener("focus", sendHeartbeat);
+  window.addEventListener("pageshow", sendHeartbeat);
+  window.addEventListener("online", sendHeartbeat);
+  window.addEventListener("storage", function (event) {
+    if (event.key === "token") {
+      blockedToken = null;
+      lastSuccess = 0;
+      lastAttempt = 0;
+      sendHeartbeat();
+    }
+  });
+  setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
+  setTimeout(sendHeartbeat, 1200);
 })();
 </script>
 

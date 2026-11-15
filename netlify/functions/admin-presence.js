@@ -1,105 +1,98 @@
 'use strict';
 
-// Function ini berada di project Netlify WEBSITE UTAMA.
-// Tetap gunakan store dan key asli agar heartbeat dashboard admin tidak terputus.
+// Project: Netlify website utama (bukan project ImamStore).
+// Endpoint publik: GET /.netlify/functions/admin-presence
+// Heartbeat admin: POST endpoint yang sama memakai JWT admin yang sudah ada.
 const jwt = require('jsonwebtoken');
 const { getStore, connectLambda } = require('@netlify/blobs');
 
-const STORE = 'admin-presence';
-const KEY = 'imamsalesnine';
-const ONLINE_MS = 90 * 1000;
+const STORE_NAME = 'admin-presence';
+const STORE_KEY = 'imamsalesnine';
+const ONLINE_WINDOW_MS = 90_000;
 
-function respond(statusCode, data) {
+function json(statusCode, payload) {
   return {
     statusCode,
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
       'Cache-Control': 'no-store, no-cache, max-age=0, must-revalidate',
-      'Pragma': 'no-cache',
-      'Expires': '0'
+      Pragma: 'no-cache',
+      Expires: '0'
     },
-    body: JSON.stringify(data)
+    body: JSON.stringify(payload)
   };
 }
 
-function openPresenceStore(event) {
-  // exports.handler memakai Lambda compatibility mode. SDK Netlify Blobs
-  // membutuhkan context event sebelum getStore() di mode ini.
-  if (typeof connectLambda === 'function') {
-    connectLambda(event);
+function presenceStore(event) {
+  // Penting: pertahankan kredensial eksplisit dari fungsi ORIGINAL bila tersedia.
+  // Patch sebelumnya melewatkannya saat connectLambda tersedia, yang bisa
+  // mengubah jalur akses ke Blobs dan membuat data seolah hilang / GET error.
+  const siteID = process.env.NETLIFY_SITE_ID;
+  const token = process.env.NETLIFY_BLOBS_TOKEN;
+  if (siteID && token) {
+    return getStore({ name: STORE_NAME, siteID, token, consistency: 'strong' });
   }
 
-  // Pembacaan default Netlify Blobs memakai eventual consistency, yang bisa
-  // menampilkan heartbeat lama hingga 60 detik. Pakai strong consistency.
-  const options = { name: STORE, consistency: 'strong' };
-
-  // Kompatibilitas dengan versi lama yang belum menyediakan connectLambda.
-  // Jangan pakai kredensial manual bila context Lambda sudah tersedia.
-  if (typeof connectLambda !== 'function' &&
-      process.env.NETLIFY_SITE_ID && process.env.NETLIFY_BLOBS_TOKEN) {
-    options.siteID = process.env.NETLIFY_SITE_ID;
-    options.token = process.env.NETLIFY_BLOBS_TOKEN;
-  }
-
-  return getStore(options);
+  // Lambda compatibility Netlify: gunakan context hanya jika tidak ada pasangan
+  // kredensial eksplisit. Tidak menambah env var atau dependency baru.
+  if (typeof connectLambda === 'function') connectLambda(event);
+  return getStore({ name: STORE_NAME, consistency: 'strong' });
 }
 
-exports.handler = async (event) => {
+exports.handler = async function handler(event) {
+  const method = String(event?.httpMethod || '').toUpperCase();
   try {
-    const method = String(event?.httpMethod || '').toUpperCase();
-
     if (method === 'GET') {
-      const store = openPresenceStore(event);
-      const saved = await store.get(KEY, { type: 'json', consistency: 'strong' });
-      const timestamp = typeof saved?.lastActiveAt === 'string'
+      const store = presenceStore(event);
+      const saved = await store.get(STORE_KEY, { type: 'json', consistency: 'strong' });
+      const parsed = typeof saved?.lastActiveAt === 'string'
         ? Date.parse(saved.lastActiveAt)
         : NaN;
-      const lastActiveAt = Number.isFinite(timestamp)
-        ? new Date(timestamp).toISOString()
-        : null;
-      const ageMs = Number.isFinite(timestamp) ? Date.now() - timestamp : Infinity;
-      const online = ageMs >= 0 && ageMs < ONLINE_MS;
-
-      return respond(200, { success: true, online, lastActiveAt });
+      const valid = Number.isFinite(parsed) && parsed > 0;
+      const lastActiveAt = valid ? new Date(parsed).toISOString() : null;
+      const age = valid ? Date.now() - parsed : Infinity;
+      return json(200, {
+        success: true,
+        online: age >= 0 && age < ONLINE_WINDOW_MS,
+        lastActiveAt,
+        serverTime: new Date().toISOString()
+      });
     }
 
     if (method !== 'POST') {
-      return respond(405, { success: false, message: 'Method Not Allowed' });
+      return json(405, { success: false, message: 'Method Not Allowed' });
     }
 
     const secret = process.env.JWT_SECRET;
     if (!secret) {
-      return respond(500, { success: false, message: 'Server configuration error' });
+      console.error('[admin-presence] JWT_SECRET is missing');
+      return json(500, { success: false, message: 'Server configuration error' });
     }
 
-    const authorization = event?.headers?.authorization ||
-                          event?.headers?.Authorization || '';
-    const match = String(authorization).match(/^Bearer\s+(.+)$/i);
-    if (!match) {
-      return respond(401, { success: false, message: 'Token diperlukan' });
-    }
+    const header = event?.headers?.authorization || event?.headers?.Authorization || '';
+    const match = String(header).match(/^Bearer\s+(.+)$/i);
+    if (!match) return json(401, { success: false, message: 'Token diperlukan' });
 
-    let payload;
+    let claims;
     try {
-      payload = jwt.verify(match[1], secret, { algorithms: ['HS256'] });
+      claims = jwt.verify(match[1], secret, { algorithms: ['HS256'] });
     } catch (_) {
-      return respond(401, { success: false, message: 'Token tidak valid' });
+      return json(401, { success: false, message: 'Token tidak valid' });
+    }
+    if (claims?.role !== 'admin') {
+      return json(403, { success: false, message: 'Akses ditolak' });
     }
 
-    if (payload?.role !== 'admin') {
-      return respond(403, { success: false, message: 'Akses ditolak' });
-    }
-
-    const store = openPresenceStore(event);
+    const store = presenceStore(event);
     const lastActiveAt = new Date().toISOString();
-    await store.setJSON(KEY, { lastActiveAt });
-
-    return respond(200, { success: true, online: true, lastActiveAt });
-  } catch (error) {
-    console.error('[admin-presence] Failed:', error);
-    return respond(500, {
-      success: false,
-      message: 'Gagal memproses status admin'
-    });
+    await store.setJSON(STORE_KEY, { lastActiveAt });
+    if (process.env.ADMIN_PRESENCE_DEBUG === '1') {
+      console.info('[admin-presence] Admin heartbeat berhasil:', lastActiveAt);
+    }
+    return json(200, { success: true, online: true, lastActiveAt });
+  } catch (err) {
+    // Pesan teknis hanya di log Netlify Functions, bukan dikirim ke publik.
+    console.error('[admin-presence] Error:', err);
+    return json(500, { success: false, message: 'Gagal memproses status admin' });
   }
 };
