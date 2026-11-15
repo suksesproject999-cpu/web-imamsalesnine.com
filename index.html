@@ -15306,11 +15306,21 @@ function tuneImages(root=document){const list=root?.matches?.('img')?[root]:[...
 function wrapAfter(name,getRoot){const f=window[name];if(typeof f!=='function'||f.__v29)return;const w=function(){const out=f.apply(this,arguments);const done=()=>{const r=getRoot?.();if(r){registerRoot(r);tuneImages(r)}};if(out&&typeof out.then==='function')return out.then(v=>{requestAnimationFrame(done);return v});requestAnimationFrame(done);return out};w.__v29=1;window[name]=w;try{eval(name+'=w')}catch(_e){}}
 function installRenderHooks(){wrapAfter('showPage',()=>document.querySelector('main'));wrapAfter('openAI',()=>$('#aiModal'));wrapAfter('openNexaiHybrid',()=>$('#aiModal'))}
 function auth(){try{return firebase.auth()}catch(_e){return null}}
+function isImamsalesNewHost(){return location.hostname==='imamsales.com'||location.hostname==='www.imamsales.com'}
+function accountIdentity(){
+ if(isImamsalesNewHost())return window.ImamAccountBridge?.getUser?.()||null;
+ const local=auth()?.currentUser;
+ return local&&!local.isAnonymous?local:null;
+}
+function storeSignInLink(){
+ return 'https://store.imamsales.com/?login=1&return='+encodeURIComponent(location.origin+'/');
+}
+
 function closeMenu(){const m=$('#topMenu'),o=$('#menuOverlay'),b=$('#menuBtn');m?.classList.remove('show','active');o?.classList.remove('show');b?.classList.remove('active');b?.setAttribute('aria-expanded','false');document.body.classList.remove('menu-open','v24-menu-open','v25-menu-open','v26-menu-open','v27-menu-open','v29-menu-open')}
 function menuItem(title,sub,action,href='#'){const icons={home:'fa-house',mall:'fa-store',ai:'fa-robot',account:'fa-user',track:'fa-truck-fast',vip:'fa-crown',consult:'fa-headset',legal:'fa-scale-balanced',theme:'fa-circle-half-stroke'};const icon=icons[action]||'fa-circle';return `<a class="v29-menu-row" href="${href}" data-v29="${action}"><span class="v37-menu-icon"><i class="fa-solid ${icon}"></i></span><span class="v29-row-copy"><strong>${title}</strong>${sub?`<small>${sub}</small>`:''}</span><i class="fa-solid fa-chevron-right v29-chevron"></i></a>`}
 function renderMenu(){
  const m=$('#topMenu');if(!m)return;
- const L=currentLang(),u=auth()?.currentUser,dark=document.body.classList.contains('dark-mode');
+ const L=currentLang(),u=accountIdentity(),dark=document.body.classList.contains('dark-mode');
  const section=(id,en)=>`<span class="v29-section-label">${T(id,en)}</span>`;
  const accountTitle=u?T('Akun Saya','My Account'):T('Masuk / Daftar','Sign In / Register');
  const accountSub=u?T('Profil dan pengaturan akun','Profile and account settings'):T('Opsional untuk melihat akun','Optional for account features');
@@ -15451,10 +15461,10 @@ function renderLogin(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<sp
 });$('#v29Google')?.addEventListener('click',async()=>{await googleSignIn()});$('#v29ToReg')?.addEventListener('click',()=>renderRegister(body))}
 function renderRegister(body){body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-user-plus"></i>${T('Buat akun','Create account')}</span><h2 class="v29-title">${T('Daftar akun baru','Create your account')}</h2><p class="v29-sub">${T('Buat akun untuk menulis ulasan dan menggunakan fitur pelanggan.','Create an account to post reviews and use customer features.')}</p><div class="v29-field"><label>Email</label><input id="v29RegEmail" class="v29-input" type="email" autocomplete="email" placeholder="nama@email.com"></div><div class="v29-field"><label>Password</label><input id="v29RegPass" class="v29-input" type="password" autocomplete="new-password" minlength="6" placeholder="${T('Minimal 6 karakter','At least 6 characters')}"></div><button type="button" id="v29Register" class="v29-primary">${T('Daftar Akun','Create Account')}</button><div class="v29-switch">${T('Sudah punya akun?','Already have an account?')} <button type="button" id="v29ToLogin">${T('Masuk','Sign In')}</button></div></div>`;wireAuthTop();$('#v29ToLogin')?.addEventListener('click',()=>renderLogin(body));$('#v29Register')?.addEventListener('click',async()=>{const email=$('#v29RegEmail')?.value.trim(),p=$('#v29RegPass')?.value||'';if(!email||p.length<6)return alertBox('info',T('Data belum valid','Invalid information'),T('Gunakan email valid dan password minimal 6 karakter.','Use a valid email and a password of at least 6 characters.'));try{await auth()?.createUserWithEmailAndPassword(email,p);closeAccount()}catch(e){alertBox('error',T('Pendaftaran gagal','Registration failed'),human(e))}})}
 function renderProfile(body,u){
-const n=u.displayName||u.email?.split('@')[0]||'User';
+const n=u.displayName||u.email?.split('@')[0]||'Pelanggan';
 const first=esc(n.charAt(0).toUpperCase());
 body.innerHTML=`<div class="v29-auth v5h-account">${topAuth()}
-<div class="v5h-heading"><span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Semua kebutuhan belanja dan pesanan dalam satu tempat.','Your shopping and orders in one place.')}</p></div>
+<div class="v5h-heading"><span class="v29-kicker"><i class="fa-solid fa-circle-check"></i>${u.__imamstoreBridge?'Akun checkout ImamStore':T('Akun aktif','Account active')}</span><h2 class="v29-title">${T('Akun Saya','My Account')}</h2><p class="v29-sub">${T('Semua kebutuhan belanja dan pesanan dalam satu tempat.','Your shopping and orders in one place.')}</p></div>
 <div class="v29-profile v5h-profile"><div class="v29-avatar">${first}</div><div class="v5h-profile-copy"><strong>${esc(n)}</strong><small>${esc(u.email||'')}</small></div><i class="fa-solid fa-shield-halved v5h-shield" aria-hidden="true"></i></div>
 <section class="v5h-section" aria-label="${T('Layanan pesanan','Order services')}">
 <div class="v5h-section-heading"><strong>${T('Pesanan & Pengiriman','Orders & Delivery')}</strong><small>${T('Akses cepat aktivitas belanja','Quick shopping access')}</small></div>
@@ -15465,9 +15475,35 @@ body.innerHTML=`<div class="v29-auth v5h-account">${topAuth()}
 <button type="button" id="v29Logout" class="v29-secondary v5h-logout"><i class="fa-solid fa-right-from-bracket"></i>${T('Keluar','Sign Out')}</button></div>`;
 wireAuthTop();
 $('#v5hTrack')?.addEventListener('click',()=>{closeAccount();setTimeout(()=>window.nexaiOpenTracking?.(),0)});
-$('#v29Logout')?.addEventListener('click',async()=>{try{await auth()?.signOut();renderAccount()}catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}});
+$('#v29Logout')?.addEventListener('click',async()=>{
+ try{
+  // Sesi main dan store berlainan origin. Sign out keduanya secara eksplisit.
+  const a=auth();if(a?.currentUser&&!a.currentUser.isAnonymous)await a.signOut();
+  if(isImamsalesNewHost()){
+   const result=await window.ImamAccountBridge?.signOut?.();
+   if(result!==true){
+    location.assign('https://store.imamsales.com/account-bridge.html?logout=1&return='+encodeURIComponent(location.origin+'/'));
+    return;
+   }
+  }else{
+   // Navigasi first-party agar logout store juga berlaku saat pengguna datang dari domain lama.
+   location.assign('https://store.imamsales.com/account-bridge.html?logout=1&return='+encodeURIComponent(location.origin+'/'));
+   return;
+  }
+  renderMenu();renderAccount();
+ }catch(e){alertBox('error',T('Gagal keluar','Sign out failed'),human(e))}
+});
 }
-function renderAccount(){const body=$('#v17AccountBody');if(!body)return;const u=auth()?.currentUser;u?renderProfile(body,u):renderLogin(body);registerRoot(body)}
+function renderAccount(){
+ const body=$('#v17AccountBody');if(!body)return;
+ const u=accountIdentity();
+ if(u)renderProfile(body,u);
+ else if(isImamsalesNewHost()){
+  body.innerHTML=`<div class="v29-auth">${topAuth()}<span class="v29-kicker"><i class="fa-solid fa-shield-halved"></i>Akun ImamStore</span><h2 class="v29-title">Masuk / Daftar</h2><p class="v29-sub">Belanja dan melihat katalog tidak perlu login. Untuk pesanan dan riwayat akun, masuk melalui ImamStore.</p><a class="v29-primary" style="display:block;text-align:center;text-decoration:none" id="imamAccountSignIn" href="${storeSignInLink()}">Masuk / Daftar di ImamStore</a></div>`;
+  wireAuthTop();
+ }else renderLogin(body);
+ registerRoot(body)
+}
 function openAccount(){closeMenu();const m=$('#v17AccountModal');if(!m)return;m.classList.remove('v24-account-modal','v25-account-modal','v26-account');m.classList.add('v29-account');if(m.classList.contains('show')&&m.classList.contains('v29-ready'))return;renderAccount();m.setAttribute('aria-hidden','false');document.body.style.overflow='hidden';m.classList.add('show','v29-ready')}
 function syncThemeFromStorage(){const saved=localStorage.getItem('theme');document.body.classList.toggle('dark-mode',saved==='dark')}
 function toggleTheme(){closeMenu();const dark=!document.body.classList.contains('dark-mode');document.body.classList.toggle('dark-mode',dark);localStorage.setItem('theme',dark?'dark':'light');requestAnimationFrame(renderMenu)}
@@ -15680,5 +15716,53 @@ document.addEventListener('keydown',function(e){
     <div id="v17AccountBody" class="v17-sheet-body"></div>
   </div>
 </div>
+<script id="imam-sales-store-account-viewer-v1">
+(function(){'use strict';
+ if(!['imamsales.com','www.imamsales.com'].includes(location.hostname))return;
+ const storeOrigin='https://store.imamsales.com';
+ const frame=document.createElement('iframe');
+ frame.src=storeOrigin+'/account-bridge.html';
+ frame.title='Koneksi akun ImamStore';
+ frame.style.cssText='display:none;width:0;height:0;border:0';
+ frame.setAttribute('aria-hidden','true');frame.tabIndex=-1;
+ let latest=null,ready=false,pending=new Map();
+ const validUser=(u)=>u&&typeof u==='object'&&typeof u.uid==='string'&&u.uid.length>0
+  &&typeof u.email==='string'&&u.email.includes('@')
+  ?Object.freeze({uid:u.uid,email:u.email,displayName:typeof u.displayName==='string'?u.displayName:'',isAnonymous:false,__imamstoreBridge:true}):null;
+ function notify(){
+  window.V29?.renderMenu?.();
+  if(document.getElementById('v17AccountModal')?.classList.contains('show'))
+   window.V17?.renderAccount?.();
+ }
+ window.addEventListener('message',e=>{
+  if(e.origin!==storeOrigin||e.source!==frame.contentWindow||!e.data||e.data.v!==1)return;
+  if(e.data.type==='imamstore:auth-state'){
+   ready=true;latest=validUser(e.data.user);notify();
+  }else if(e.data.type==='imamstore:logout-result'){
+   const done=pending.get(e.data.id);
+   if(done){pending.delete(e.data.id);done(!!e.data.ok)}
+  }
+ });
+ frame.addEventListener('load',()=>{
+  frame.contentWindow?.postMessage({v:1,type:'imamstore:request-state'},storeOrigin);
+ });
+ window.ImamAccountBridge=Object.freeze({
+  getUser:()=>ready?latest:null,
+  isReady:()=>ready,
+  signOut:()=>new Promise(resolve=>{
+   if(!frame.contentWindow){resolve(false);return}
+   const id='logout-'+Date.now()+'-'+Math.random().toString(36).slice(2);
+   const timer=setTimeout(()=>{if(pending.has(id)){pending.delete(id);resolve(false)}},5000);
+   pending.set(id,ok=>{clearTimeout(timer);resolve(ok)});
+   frame.contentWindow.postMessage({v:1,type:'imamstore:logout',id},storeOrigin);
+  })
+ });
+ const mount=()=>document.body.appendChild(frame);
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',mount,{once:true});
+ else mount();
+ window.addEventListener('focus',()=>frame.contentWindow?.postMessage({v:1,type:'imamstore:request-state'},storeOrigin));
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden)frame.contentWindow?.postMessage({v:1,type:'imamstore:request-state'},storeOrigin)});
+})();
+</script>
 </body>
 </html>

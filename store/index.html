@@ -3275,14 +3275,10 @@ const V=window.V38=window.V38||{};
    document.body.classList.add('imamstore-original-open');
   }else openCart();
  };
- el('s5Checkout').onclick=async function(){
-  if(typeof window.nexaiRequireCustomerLogin!=='function'){
-    alert('Login pelanggan belum siap. Muat ulang halaman dan coba lagi.');return;
-  }
-  try{
-    if(!await window.nexaiRequireCustomerLogin())return;
-    openDraft();
-  }catch(e){console.error('Checkout login guard',e);alert('Login gagal. Coba kembali.')}
+ el('s5Checkout').onclick=function(){
+  // Keranjang dan halaman checkout terbuka tanpa memerlukan sesi akun.
+  // Pemeriksaan login pelanggan dilakukan hanya saat tombol Buat Pesanan ditekan.
+  openDraft();
  };
 
  // Product detail original -> existing local cart and checkout simulation.
@@ -6018,7 +6014,7 @@ function confirmWhatsAppFallback(html,url){
  });
 }
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
-async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'||!await window.nexaiRequireCustomerLogin()){await popup('warning','Login pelanggan diperlukan','Masuk menggunakan Google atau email sebelum checkout.');return;}const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
+async function submit(){if(busy||committed)return;if(typeof window.nexaiRequireCustomerLogin!=='function'){await popup('warning','Login pelanggan diperlukan','Layanan login belum siap. Muat ulang halaman.');return;}if(!await window.nexaiRequireCustomerLogin())return;const lines=selected();if(!lines.length){await popup('warning','Keranjang kosong','Pilih setidaknya satu produk untuk melanjutkan.');return}const a=address();const addressIssues=window.imamstoreCustomerCheckoutR7?.validateSavedAddress(a)||[];if(addressIssues.length){await window.imamstoreCustomerCheckoutR7.promptAddress(addressIssues);return}if(!$('refTermsBody')?.checked||!$('refTermsFooter')?.checked){await popup('warning','Syarat & Ketentuan belum disetujui','Centang persetujuan Syarat & Ketentuan sebelum membuat pesanan.');return}const store=db();if(!store){await popup('error','Layanan pemesanan belum tersedia','Kami belum dapat memproses pesanan saat ini. Silakan coba lagi beberapa saat.');return}
 // Sinkronisasi final: snapshot checkout wajib cocok dengan katalog aktif.
  const catalog=window.imamstoreV29?.products?.();
  if(!Array.isArray(catalog)||!catalog.length){await popup('warning','Katalog belum siap','Muat ulang data produk sebelum mengirim pesanan.');return}
@@ -6904,6 +6900,10 @@ if(order){
  new MutationObserver(sync).observe(order,{attributes:true,attributeFilter:['disabled','aria-disabled']});
  checkout.addEventListener('click',e=>{
   const btn=e.target.closest('#refPlaceOrder');if(!btn)return;
+  // Izinkan pemeriksaan login pada handler Buat Pesanan terlebih dahulu.
+  // Setelah berhasil login, validasi alamat dan syarat tetap berlaku.
+  const current=window.firebase?.auth?.()?.currentUser;
+  if(!current||current.isAnonymous)return;
   const error=check();
   if(error){
    e.preventDefault();
@@ -8261,4 +8261,30 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 #s5Cart #refVoucherSaved,#s5Draft #refCheckoutVoucherValue{max-width:62%;white-space:normal;font-size:clamp(11px,2.8vw,13px);text-align:right;color:#648f30}
 @media(min-width:700px){.ref-modal:not([hidden]) .ref-modal-panel:has(.v43-compact-sheet){border-radius:22px 22px 0 0}}
 </style>
+<script id="imamstore-customer-login-entry-v1">
+(function(){'use strict';
+  const params=new URLSearchParams(location.search);
+  if(params.get('login')!=='1')return;
+  const allowed=new Set(['imamsales.com','www.imamsales.com','imamsalesnine.com','www.imamsalesnine.com']);
+  let destination=null;
+  try {
+    const u=new URL(params.get('return')||'',location.origin);
+    if(u.protocol==='https:' && allowed.has(u.hostname))destination=u.origin+'/';
+  }catch(_e){}
+  async function start(){
+    for(let i=0;i<40 && typeof window.nexaiRequireCustomerLogin!=='function';i++)
+      await new Promise(resolve=>setTimeout(resolve,150));
+    if(typeof window.nexaiRequireCustomerLogin!=='function')return;
+    try{
+      const ok=await window.nexaiRequireCustomerLogin();
+      if(ok&&destination){location.replace(destination);return}
+    }catch(e){console.warn('[ImamStore] Login redirect was not completed',e?.code||'unknown')}
+    // Jangan terus memanggil popup setelah pengguna memilih batal.
+    const clean=new URL(location.href);clean.searchParams.delete('login');clean.searchParams.delete('return');
+    history.replaceState(history.state,'',clean.pathname+clean.search+clean.hash);
+  }
+  if(document.readyState==='complete')setTimeout(start,50);
+  else window.addEventListener('load',()=>setTimeout(start,50),{once:true});
+})();
+</script>
 </body></html>

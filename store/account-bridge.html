@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="id"><head><meta charset="utf-8"><meta name="robots" content="noindex,nofollow"><title>Koneksi akun ImamStore</title><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body><p id="message">Menghubungkan akun ImamStore…</p>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+<script>
+(function(){'use strict';
+ const config={apiKey:'AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec',authDomain:'apin-web.firebaseapp.com',projectId:'apin-web',appId:'1:733140414417:web:b6967fd053ac462b2ffaf0'};
+ const allowedParents=new Set(['https://imamsales.com','https://www.imamsales.com']);
+ const allowedReturns=new Set(['imamsales.com','www.imamsales.com','imamsalesnine.com','www.imamsalesnine.com']);
+ const auth=()=>firebase.auth();
+ try{if(!firebase.apps.length)firebase.initializeApp(config)}catch(e){document.getElementById('message').textContent='Layanan akun belum tersedia';return}
+ function profile(user){
+  if(!user||user.isAnonymous||!user.email)return null;
+  return {uid:user.uid,email:user.email,displayName:user.displayName||''};
+ }
+ let origin=null;
+ function sendState(user){
+  if(origin)window.parent.postMessage({v:1,type:'imamstore:auth-state',user:profile(user)},origin);
+ }
+ // Akses halaman penuh untuk logout lintas domain. Return URL divalidasi ketat.
+ const params=new URLSearchParams(location.search);
+ if(window.top===window && params.get('logout')==='1'){
+  let target='https://imamsales.com/';
+  try{const u=new URL(params.get('return')||'');if(u.protocol==='https:'&&allowedReturns.has(u.hostname))target=u.origin+'/'}catch(_){}
+  auth().signOut()
+   .then(()=>location.replace(target))
+   .catch(e=>{
+    console.warn('[ImamStore bridge] logout',e?.code||'unknown');
+    document.getElementById('message').textContent='Logout belum berhasil. Periksa koneksi dan coba lagi.';
+   });
+  return;
+ }
+ if(window.parent===window){document.getElementById('message').textContent='Halaman koneksi akun ImamStore';return}
+ auth().onAuthStateChanged(sendState,()=>sendState(null));
+ window.addEventListener('message',async e=>{
+  if(e.source!==window.parent||!allowedParents.has(e.origin)||!e.data||e.data.v!==1)return;
+  origin=e.origin;
+  if(e.data.type==='imamstore:request-state'){sendState(auth().currentUser);return}
+  if(e.data.type==='imamstore:logout'&&typeof e.data.id==='string'&&e.data.id.startsWith('logout-')){
+   let ok=false;
+   try{await auth().signOut();ok=true}catch(error){console.warn('[ImamStore bridge] logout failed',error?.code||'unknown')}
+   e.source.postMessage({v:1,type:'imamstore:logout-result',id:e.data.id,ok},origin);
+   sendState(auth().currentUser);
+  }
+ });
+})();
+</script></body></html>
