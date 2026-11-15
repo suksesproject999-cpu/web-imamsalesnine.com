@@ -1779,53 +1779,9 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   });
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
   
-const isStoreHost = [
-  'store.imamsalesnine.com',
-  'store.imamsales.com',
-  'imamstore.netlify.app'
-].includes(location.hostname);
+// Admin presence now initializes independently of catalog and Firebase bootstrap.
+  // See the single admin presence controller after this script.
 
-const presenceUrl = isStoreHost
-  ? '/status-admin'
-  : '/.netlify/functions/admin-presence';
-
-  const activeWindowMs=90000;
-  let lastPresenceMs=0;
-  function renderPresence(){
-    const el=$('storeStatus');
-    if(!lastPresenceMs){el.textContent='Status aktivitas belum tersedia';return}
-    const age=Math.max(0,Date.now()-lastPresenceMs);
-    if(age<activeWindowMs){el.textContent='● Online';return}
-    const minutes=Math.floor(age/60000);
-    el.textContent=minutes<60?'Aktif '+Math.max(1,minutes)+' menit lalu':
-      minutes<1440?'Aktif '+Math.floor(minutes/60)+' jam lalu':
-      'Aktif '+Math.floor(minutes/1440)+' hari lalu';
-  }
-  async function refreshPresence(){
-    try{
-      const response=await fetch(presenceUrl + (presenceUrl.includes('?') ? '&' : '?') + '_t=' + Date.now(), {cache:'no-store',headers:{'Accept':'application/json'}});
-      if(!response.ok)throw Error('HTTP '+response.status);
-      const data=await response.json();
-      if(data.success!==true)throw Error('Respons status tidak valid');
-      const value=data.lastActiveAt;
-      lastPresenceMs=value?(typeof value==='number'?value:Date.parse(value)):0;
-      if(!Number.isFinite(lastPresenceMs))lastPresenceMs=0;
-    
-}catch(error){
-  // Data yang tidak bisa diperbarui tidak boleh ditampilkan sebagai "Online" terbaru.
-  lastPresenceMs=0;
-  console.warn('[ImamStore] /status-admin gagal. Periksa proxy Netlify dan admin-presence:',error);
-}
-
-    renderPresence();
-  }
-  refreshPresence();
-  setInterval(refreshPresence,30000);
-  setInterval(renderPresence,15000);
-  document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshPresence()});
-  window.addEventListener('pageshow',event=>{if(event.persisted)refreshPresence()});
-  window.addEventListener('focus',refreshPresence);
-  window.addEventListener('online',refreshPresence);
 
  }catch(e){
   console.error('Katalog gagal menyelesaikan inisialisasi:',e);
@@ -1833,6 +1789,128 @@ const presenceUrl = isStoreHost
   catalogHealth.cmsError=String(e?.code||e?.message||e).slice(0,120);
   if(!products.length)render();
  }
+})();
+</script>
+<script id="imamstore-admin-presence-controller">
+/* ImamStore: satu sumber status admin; tidak bergantung pada katalog atau Auth.
+   Membaca endpoint status yang sudah tersedia, bukan membangun SDK server baru. */
+(()=>{'use strict';
+  const status = document.getElementById('storeStatus');
+  if (!status) return;
+  const storeHosts = new Set([
+    'store.imamsales.com',
+    'store.imamsalesnine.com',
+    'imamstore.netlify.app'
+  ]);
+  const url = storeHosts.has(location.hostname)
+    ? '/status-admin'
+    : '/.netlify/functions/admin-presence';
+  const POLL_MS = 10000;
+  const ONLINE_MS = 90000;
+  const REQUEST_TIMEOUT_MS = 8000;
+  const last = { timestamp:0, checkedAt:0, lastError:'', success:false };
+  let loading = false;
+  let controller = null;
+
+  function parseTimestamp(value) {
+    if (value == null || value === '') return 0;
+    let n = 0;
+    if (typeof value === 'number') n = value;
+    else if (typeof value === 'string') {
+      const v = value.trim();
+      if (/^\d+(?:\.\d+)?$/.test(v)) n = Number(v);
+      else n = Date.parse(v);
+    } else if (typeof value === 'object') {
+      if (typeof value.toMillis === 'function') n = value.toMillis();
+      else if (Number.isFinite(Number(value.seconds))) n = Number(value.seconds)*1000;
+      else if (Number.isFinite(Number(value._seconds))) n = Number(value._seconds)*1000;
+      else if (value.timestamp != null) return parseTimestamp(value.timestamp);
+    }
+    if (!Number.isFinite(n) || n <= 0) return 0;
+    if (n < 1e11) n *= 1000; // Detik Unix vs milidetik.
+    const now = Date.now();
+    if (n > now + 120000 || n < Date.UTC(2020,0,1)) return 0;
+    return Math.floor(n);
+  }
+
+  function paint() {
+    let message;
+    if (!last.timestamp) {
+      message = last.success
+        ? 'Belum ada aktivitas admin'
+        : 'Status aktivitas belum tersedia';
+    } else {
+      const age = Math.max(0,Date.now()-last.timestamp);
+      if (age < ONLINE_MS) message = '● Online';
+      else {
+        const minutes = Math.max(1,Math.floor(age/60000));
+        message = minutes < 60 ? `Aktif ${minutes} menit lalu`
+          : minutes < 1440 ? `Aktif ${Math.floor(minutes/60)} jam lalu`
+          : `Aktif ${Math.floor(minutes/1440)} hari lalu`;
+      }
+    }
+    if (status.textContent !== message) status.textContent = message;
+    status.title = last.lastError
+      ? 'Status terakhir tersedia; pembaruan terbaru gagal: '+last.lastError
+      : last.checkedAt ? 'Diperbarui dari status admin ImamStore' : 'Memuat status admin';
+    status.setAttribute('data-admin-presence',last.timestamp
+      ? (Date.now()-last.timestamp < ONLINE_MS ? 'online':'offline')
+      : 'unknown');
+  }
+
+  async function refresh() {
+    if (loading || document.hidden || navigator.onLine === false) return;
+    loading = true;
+    const timeout = typeof AbortController === 'function' ? new AbortController() : null;
+    controller = timeout;
+    const timer = timeout ? setTimeout(()=>timeout.abort(), REQUEST_TIMEOUT_MS) : null;
+    try {
+      const endpoint = url+(url.includes('?')?'&':'?')+'_t='+Date.now();
+      const response = await fetch(endpoint, {
+        cache:'no-store', credentials:'same-origin',
+        headers:{'Accept':'application/json'},
+        ...(timeout ? {signal:timeout.signal}: {})
+      });
+      if (!response.ok) throw new Error('HTTP '+response.status);
+      const type = response.headers?.get('content-type') || '';
+      if (type && !/\bjson\b/i.test(type)) throw new Error('Endpoint tidak mengirim JSON');
+      const data = await response.json();
+      if (!data || data.success !== true) throw new Error('Respons status tidak valid');
+      const timestamp = parseTimestamp(data.lastActiveAt);
+      // Jika respons server valid dan tidak ada timestamp, artinya belum ada aktivitas.
+      // Jangan hapus timestamp terverifikasi saat respons hanya parsial.
+      if (timestamp) last.timestamp = timestamp;
+      else if (data.lastActiveAt === null || data.lastActiveAt === '') last.timestamp = 0;
+      last.checkedAt = Date.now();
+      last.success = true;
+      last.lastError = '';
+    } catch (error) {
+      // Gangguan sementara tidak menghapus fakta aktivitas admin terakhir.
+      last.lastError = String(error?.message || error).slice(0,100);
+      console.warn('[ImamStore Presence] Gagal membaca '+url+':',last.lastError);
+    } finally {
+      if (timer) clearTimeout(timer);
+      controller = null;
+      loading = false;
+      paint();
+    }
+  }
+  function resume() { paint(); void refresh(); }
+  paint();
+  void refresh();
+  setInterval(()=>{ if (!document.hidden) void refresh(); },POLL_MS);
+  setInterval(paint,5000);
+  document.addEventListener('visibilitychange',()=>{ if (!document.hidden) resume(); });
+  window.addEventListener('focus',resume);
+  window.addEventListener('online',resume);
+  window.addEventListener('pageshow',resume);
+  // Read-only diagnostic, no tokens or private user information exposed.
+  window.imamstorePresenceDiagnostic = () => Object.freeze({
+    endpoint:url, lastActiveAt:last.timestamp ? new Date(last.timestamp).toISOString() : null,
+    lastCheckedAt:last.checkedAt ? new Date(last.checkedAt).toISOString() : null,
+    error:last.lastError || null,
+    status:status.textContent
+  });
 })();
 </script>
 <script id="warehouse-store-engine">
