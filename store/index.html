@@ -1853,9 +1853,17 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
     status.title = last.lastError
       ? 'Status terakhir tersedia; pembaruan terbaru gagal: '+last.lastError
       : last.checkedAt ? 'Diperbarui dari status admin ImamStore' : 'Memuat status admin';
-    status.setAttribute('data-admin-presence',last.timestamp
-      ? (Date.now()-last.timestamp < ONLINE_MS ? 'online':'offline')
-      : 'unknown');
+    const state = last.timestamp
+      ? (Date.now()-last.timestamp < ONLINE_MS ? 'online' : 'offline')
+      : 'unknown';
+    status.setAttribute('data-admin-presence',state);
+    // Detail produk dibuat ulang setelah header sudah Online. Sinkronkan
+    // semua elemen yang saat ini ada, bahkan saat teks header tidak berubah.
+    for (const node of document.querySelectorAll('[data-nine-store-presence],[data-imamstore-store-status]')) {
+      if (node.textContent !== message) node.textContent = message;
+      if (node.getAttribute('data-admin-presence') !== state) node.setAttribute('data-admin-presence',state);
+      if (node.title !== status.title) node.title = status.title;
+    }
   }
 
   async function refresh() {
@@ -1904,6 +1912,9 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   window.addEventListener('focus',resume);
   window.addEventListener('online',resume);
   window.addEventListener('pageshow',resume);
+  // Detail renderer may request an immediate paint after replacing its HTML.
+  // This does not create a second network poll or a second status controller.
+  window.imamstorePresenceSync = paint;
   // Read-only diagnostic, no tokens or private user information exposed.
   window.imamstorePresenceDiagnostic = () => Object.freeze({
     endpoint:url, lastActiveAt:last.timestamp ? new Date(last.timestamp).toISOString() : null,
@@ -4251,7 +4262,7 @@ function nineRenderAllProducts(page=1){
  button('›',Math.min(total,current+1),current===total);
 }
 
-const renderPage=html=>{host.innerHTML=html;host.classList.add('open');document.body.classList.add('imamstore-original-open');host.scrollTop=0;window.imamstoreUnifiedCards?.syncStoreIdentity?.();};
+const renderPage=html=>{host.innerHTML=html;host.classList.add('open');document.body.classList.add('imamstore-original-open');host.scrollTop=0;window.imamstoreUnifiedCards?.syncStoreIdentity?.();window.imamstorePresenceSync?.();};
 window.nineEffectivePromo=window.nineEffectivePromo||((p)=>Number(p.harga?.promo)||0);
 window.nineFlashActive=window.nineFlashActive||(()=>false);
 function imageOf(x){const v=typeof x==='string'?x:(x?.url||x?.src||x?.gambar||'');if(typeof v!=='string'||!v.trim()||/^(?:javascript|blob|file|vbscript):/i.test(v.trim()))return '/images/no-image.png';if(/^data:image\/(?:png|jpeg|jpg|webp|gif|avif);base64,/i.test(v.trim()))return v.trim();try{return new URL(v.trim(),location.origin+'/').href}catch{return '/images/no-image.png'}}
@@ -4361,7 +4372,7 @@ let html = `
         </section>
         <div class="nine-detail-divider"></div>
         <div class="nine-store">
-          <div class="nine-store-identity"><a class="nine-store-avatar" href="https://store.imamsales.com/" aria-label="Kunjungi Store Imam Sales"><i class="fa-solid fa-store"></i></a><div><a class="nine-store-name-link" href="https://store.imamsales.com/">store.imamsales.com</a><small data-nine-store-presence aria-live="polite">Status aktivitas belum tersedia</small></div><button type="button" onclick="nineVisitStore()">Kunjungi</button></div>
+          <div class="nine-store-identity"><a class="nine-store-avatar" href="https://store.imamsales.com/" aria-label="Kunjungi Store Imam Sales"><i class="fa-solid fa-store"></i></a><div><a class="nine-store-name-link" href="https://store.imamsales.com/">store.imamsales.com</a><small data-nine-store-presence aria-live="polite">Memuat status toko...</small></div><button type="button" onclick="nineVisitStore()">Kunjungi</button></div>
           <div class="nine-store-stats"><div><strong data-nine-store-rating aria-live="polite">—</strong><small>Penilaian</small></div><div><strong>${allProducts.length}</strong><small>Produk</small></div><div><strong>—</strong><small>Chat Dibalas</small></div></div>
         </div>
         <div class="nine-detail-divider"></div>
@@ -6497,13 +6508,11 @@ function refresh(){
 }
 // The original homepage's card renderer and delegated product navigation remain authoritative.
 // No alternate catalog, ratings, sold counts, view counts, or promo badges are fabricated.
-const status=$('storeStatus'),storeTitle=document.querySelector('.hero .identity h1');
+const storeTitle=document.querySelector('.hero .identity h1');
 function syncStoreIdentity(){const value=storeTitle?.textContent?.trim();if(!value)return;document.querySelectorAll('#imamstoreLiveOriginalDetail .nine-store-name-link').forEach(el=>{if(el.textContent!==value)el.textContent=value});}
 if(storeTitle)new MutationObserver(syncStoreIdentity).observe(storeTitle,{childList:true,characterData:true,subtree:true});
-function syncPresence(){if(!status)return;const value=status.textContent?.trim();if(!value)return;
- document.querySelectorAll('[data-imamstore-store-status],[data-nine-store-presence]').forEach(el=>{if(el!==status&&el.textContent!==value)el.textContent=value});
-}
-if(status)new MutationObserver(syncPresence).observe(status,{childList:true,characterData:true,subtree:true});
+// Keep API compatibility, but all status updates belong to the single controller.
+const syncPresence=()=>window.imamstorePresenceSync?.();
 window.imamstoreUnifiedCards=Object.freeze({refresh,syncPresence,syncStoreIdentity});
 window.addEventListener('load',()=>{refresh();syncPresence();syncStoreIdentity()});
 document.addEventListener('imamstore:open-product',()=>queueMicrotask(syncStoreIdentity));
