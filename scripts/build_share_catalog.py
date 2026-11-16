@@ -24,7 +24,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
-from PIL import Image, ImageDraw, ImageFont, ImageOps
+from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont, ImageOps
 import qrcode
 
 HOST = 'https://store.imamsales.com'
@@ -205,10 +205,27 @@ def jpg_bytes(image,quality=68):
     return buf.getvalue()
 
 
+def photo_backdrop(source, size, *, blur=36, brightness=0.42):
+    """Photo-colored, edge-to-edge background without hardcoded white bars.
+
+    The background is a blurred, dimmed *copy* of the source. The foreground
+    preserves the full original product artwork and aspect ratio. A landscape
+    WhatsApp OG frame cannot be completely filled by a square/portrait poster
+    without cropping, stretching or adding a background.
+    """
+    canvas=ImageOps.fit(source,size,method=Image.Resampling.LANCZOS)
+    canvas=canvas.filter(ImageFilter.GaussianBlur(blur))
+    canvas=ImageEnhance.Brightness(canvas).enhance(brightness)
+    return canvas
+
+
 def og_picture(source):
-    canvas=Image.new('RGB',(1200,630),'white')
-    fitted=ImageOps.contain(source,(1160,600),Image.Resampling.LANCZOS)
-    canvas.paste(fitted,((1200-fitted.width)//2,(630-fitted.height)//2))
+    """1200x630 preview: full-size, uncropped art on a full-bleed photo backdrop."""
+    width,height=1200,630
+    canvas=photo_backdrop(source,(width,height),blur=34,brightness=0.47)
+    # No artificial white margin. Never stretch or crop the product art itself.
+    fitted=ImageOps.contain(source,(width,height),Image.Resampling.LANCZOS)
+    canvas.paste(fitted,((width-fitted.width)//2,(height-fitted.height)//2))
     data=jpg_bytes(canvas,70)
     if len(data)>200_000:
         data=jpg_bytes(canvas,53)
@@ -235,29 +252,33 @@ def wrap_two(draw, text, fnt, max_width, max_lines=2):
 
 
 def share_poster(source,p,link):
-    canvas=Image.new('RGB',(1200,630),'#ffffff')
+    """Optional photo + QR share card; only the scannable QR stays white."""
+    canvas=photo_backdrop(source,(1200,630),blur=38,brightness=0.33)
     draw=ImageDraw.Draw(canvas)
-    draw.rectangle((0,0,1199,10),fill='#8cc63f')
-    draw.rectangle((18,28,743,600),fill='#f8faf7')
-    fitted=ImageOps.contain(source,(690,530),Image.Resampling.LANCZOS)
-    canvas.paste(fitted,(33+(695-fitted.width)//2,45+(536-fitted.height)//2))
-    draw.text((778,62),'IMAMSTORE',fill='#4f7e27',font=font(30,True))
-    title_font=font(37,True)
-    y=137
-    for line in wrap_two(draw,p.get('nama') or p.get('name') or 'Produk ImamStore',title_font,370,3):
-        draw.text((778,y),line,font=title_font,fill='#263026')
-        y+=53
+    draw.rectangle((747,0,1199,629),fill='#11251b')
+    draw.rectangle((747,0,752,629),fill='#8cc63f')
+    # Original poster fills the available height, without stretching/cropping.
+    fitted=ImageOps.contain(source,(747,630),Image.Resampling.LANCZOS)
+    canvas.paste(fitted,((747-fitted.width)//2,(630-fitted.height)//2))
+    draw=ImageDraw.Draw(canvas)
+    draw.text((778,45),'IMAMSTORE',fill='#a5d66a',font=font(30,True))
+    title_font=font(34,True)
+    y=120
+    for line in wrap_two(draw,p.get('nama') or p.get('name') or 'Produk ImamStore',title_font,390,3):
+        draw.text((778,y),line,font=title_font,fill='#f5faee')
+        y+=48
     amount=price(p)
     if amount:
-        draw.text((778,max(y+18,315)),'Rp '+f'{amount:,}'.replace(',','.'),font=font(36,True),fill='#d5483c')
+        draw.text((778,max(y+14,305)),'Rp '+f'{amount:,}'.replace(',','.'),font=font(34,True),fill='#ff8b73')
     qr=qrcode.QRCode(error_correction=qrcode.constants.ERROR_CORRECT_M,box_size=7,border=2)
     qr.add_data(link); qr.make(fit=True)
-    code=qr.make_image(fill_color='#1c3120',back_color='white').convert('RGB')
+    # White pixels immediately around the QR are required for reliable scanning.
+    code=qr.make_image(fill_color='#17311e',back_color='white').convert('RGB')
     code=code.resize((156,156),Image.Resampling.NEAREST)
-    canvas.paste(code,(985,426))
-    draw.text((777,470),'SCAN UNTUK',font=font(23,True),fill='#415b35')
-    draw.text((777,503),'LIHAT PRODUK',font=font(23,True),fill='#415b35')
-    draw.text((777,571),'store.imamsales.com',font=font(17),fill='#777f75')
+    canvas.paste(code,(994,424))
+    draw.text((778,467),'SCAN UNTUK',font=font(21,True),fill='#d7e8cc')
+    draw.text((778,502),'LIHAT PRODUK',font=font(21,True),fill='#d7e8cc')
+    draw.text((778,575),'store.imamsales.com',font=font(17),fill='#b2c8ad')
     data=jpg_bytes(canvas,72)
     if len(data)>260_000:
         data=jpg_bytes(canvas,55)
