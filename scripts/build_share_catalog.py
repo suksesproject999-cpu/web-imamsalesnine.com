@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Generate public share pages + lightweight OG images + image/QR posters.
 
-Uses ONLY publicly readable cms_products (same Firestore project as ImamStore),
-with store/produk.json as an optional seed. Does NOT write to Firestore.
+Uses read-only service-account OAuth to list cms_products (Firestore project apin-web).
+Credentials MUST be provided via GitHub Actions secret FIREBASE_SERVICE_ACCOUNT_JSON.
+Optional seed is store/produk.json. Does NOT write to Firestore.
 Run from repository root: python scripts/build_share_catalog.py
 Testing: python scripts/build_share_catalog.py --fixture tests/products-fixture.json
 Requires: Pillow, qrcode. Network only required for public CMS and external images.
@@ -34,8 +35,8 @@ MAX_IMAGE = 12 * 1024 * 1024
 HEADERS = {'User-Agent':'ImamStore-ShareSnapshot/1.0', 'Accept':'application/json'}
 
 
-def get_bytes(url: str, timeout=14, max_bytes=MAX_IMAGE) -> bytes:
-    req = urllib.request.Request(url, headers=HEADERS)
+def get_bytes(url: str, timeout=14, max_bytes=MAX_IMAGE, extra_headers=None) -> bytes:
+    req = urllib.request.Request(url, headers={**HEADERS, **(extra_headers or {})})
     with urllib.request.urlopen(req, timeout=timeout) as response:
         length = response.headers.get('Content-Length')
         if length and int(length) > max_bytes:
@@ -64,7 +65,35 @@ def decode_field(v):
     return None
 
 
+def _firestore_bearer_header():
+    """Use scoped service-account OAuth, never credentials embedded in source code."""
+    credential_json = os.environ.get('FIREBASE_SERVICE_ACCOUNT_JSON', '').strip()
+    if not credential_json:
+        raise RuntimeError(
+            'FIREBASE_SERVICE_ACCOUNT_JSON missing. Create a read-only service account '
+            'in Firebase/Google Cloud and save its JSON securely under '
+            'GitHub repository Settings > Secrets and variables > Actions. '
+            'Do not put the JSON in Git or in chat.'
+        )
+    try:
+        from google.oauth2 import service_account
+        from google.auth.transport.requests import Request
+        info = json.loads(credential_json)
+        if info.get('type') != 'service_account' or info.get('project_id') != 'apin-web':
+            raise ValueError('Service account must belong to Firebase project apin-web')
+        credentials = service_account.Credentials.from_service_account_info(
+            info, scopes=['https://www.googleapis.com/auth/datastore'])
+        credentials.refresh(Request())
+        if not credentials.token:
+            raise ValueError('Google OAuth did not return an access token')
+    except Exception as exc:
+        # No credential contents in logs.
+        raise RuntimeError('Firestore authentication failed; verify the GitHub secret and service-account IAM role') from exc
+    return {'Authorization': 'Bearer ' + credentials.token}
+
+
 def load_firestore():
+    auth_headers = _firestore_bearer_header()
     products=[]
     token=None
     for _ in range(200):
@@ -72,7 +101,7 @@ def load_firestore():
         if token:
             qs['pageToken']=token
         url=DB+'/cms_products?'+urllib.parse.urlencode(qs)
-        result=json.loads(get_bytes(url,timeout=24,max_bytes=48*1024*1024).decode('utf-8'))
+        result=json.loads(get_bytes(url,timeout=24,max_bytes=48*1024*1024,extra_headers=auth_headers).decode('utf-8'))
         for row in result.get('documents', []):
             item={k:decode_field(v) for k,v in row.get('fields',{}).items()}
             item['id']=str(item.get('id') or row.get('name','').split('/')[-1])
@@ -294,7 +323,13 @@ def generate(root:Path,items:list):
     used=set()
     for p in sorted(items,key=lambda p:str(p.get('id',''))):
         pid=str(p.get('id',''))
-        if not ID_PATTERN.fullmatch(pid) or pid in used or p.get('active') is False or p.get('deleted') is True:
+        # A service account may read drafts too; only publish storefront-visible items.
+        status=str(p.get('status') or '').strip().lower()
+        visibility=str(p.get('visibility') or '').strip().lower()
+        if (not ID_PATTERN.fullmatch(pid) or pid in used or
+            p.get('active') is False or p.get('deleted') is True or
+            status in ('draft','private','unpublished','deleted','archived','hidden','inactive','pending') or
+            visibility in ('private','hidden','draft','unpublished')):
             continue
         used.add(pid)
         name=clean_text(p.get('nama') or p.get('name') or 'Produk ImamStore',180)
@@ -370,7 +405,7 @@ def main():
         except Exception as e:
             # Do not delete CMS-only snapshots during a transient Firestore outage.
             # The last successfully deployed Share catalog stays available.
-            raise RuntimeError('CMS unavailable; abort without changing generated Share files') from e
+            raise RuntimeError('CMS authentication/list failed; no Share files changed (check FIREBASE_SERVICE_ACCOUNT_JSON and Cloud Datastore Viewer IAM)') from e
     combined={}
     for p in seed:
         if isinstance(p,dict) and ID_PATTERN.fullmatch(str(p.get('id',''))):
