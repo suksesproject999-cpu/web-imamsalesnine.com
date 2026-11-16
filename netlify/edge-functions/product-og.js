@@ -179,6 +179,11 @@ function inlineImage(source) {
 }
 export default async function productOpenGraph(request,context) {
   const url = new URL(request.url);
+	
+if (url.hostname !== 'store.imamsales.com') {
+  return context.next();
+}
+
   const imagePrefix = '/_share-image/';
   if (url.pathname.startsWith(imagePrefix)) {
     const id=decodeURIComponent(url.pathname.slice(imagePrefix.length));
