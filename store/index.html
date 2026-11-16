@@ -53,6 +53,15 @@ html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
 <meta id="imamstoreTwitterCard" name="twitter:card" content="summary">
 <meta id="imamstoreTwitterTitle" name="twitter:title" content="ImamStore | Produk Otomotif">
 <meta id="imamstoreTwitterDescription" name="twitter:description" content="Belanja produk otomotif di ImamStore.">
+<!-- For Netlify preview crawlers, do not capture generic tags before CMS loads. -->
+<script id="imamstore-share-prerender-state">
+(function () {
+  'use strict';
+  var id = new URLSearchParams(location.search).get('product');
+  // Regular visitors are unaffected. Prerender may wait until the product OG image is ready.
+  window.prerenderReady = !(id && /^[A-Za-z0-9_-]{1,120}$/.test(id));
+})();
+</script>
 
 <script type="application/ld+json">
 {
@@ -4775,7 +4784,7 @@ function updateOriginalSticky(){
 // Keep the original layout but make share, wishlist, and product search usable.
 host.addEventListener('click',async e=>{
  const wish=e.target.closest('.wishlist-btn');if(wish){e.preventDefault();e.stopPropagation();window.toggleWishlist(activeProduct()?.id);return}
- const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;const link=new URL('/',location.origin);link.searchParams.set('product',String(p.id));window.imamstoreProductSharePreview?.refresh?.();try{if(navigator.share)await navigator.share({title:String(p.nama||'Produk ImamStore'),text:'Lihat foto dan informasi produk di ImamStore.',url:link.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link.href);share.setAttribute('title','Tautan produk disalin')}else prompt('Salin tautan produk',link.href)}catch(err){if(err?.name!=='AbortError')console.warn('Share failed',err)}}
+ const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;const link=new URL('/',location.origin);link.searchParams.set('product',String(p.id));window.imamstoreProductSharePreview?.refresh?.();try{if(navigator.share)await navigator.share({title:String(p.nama||'Produk ImamStore'),text:String(p.nama||'Produk ImamStore'),url:link.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link.href);share.setAttribute('title','Tautan produk disalin')}else prompt('Salin tautan produk',link.href)}catch(err){if(err?.name!=='AbortError')console.warn('Share failed',err)}}
 },true);
 let searchTimer=null;
 host.addEventListener('input',e=>{if(e.target.id!=='nineDetailSearchInput')return;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{const q=e.target.value.trim().toLocaleLowerCase('id');const results=host.querySelector('#nineDetailSearchResults');if(!results)return;results.replaceChildren();if(q.length<2){results.hidden=true;return}const matches=allProducts.filter(p=>[p.nama,p.brand,p.subbrand,p.kategori,p.sku,p.kode].some(v=>String(v||'').toLocaleLowerCase('id').includes(q))).slice(0,12);if(!matches.length){const empty=document.createElement('p');empty.className='nine-clean-search-empty';empty.textContent='Produk tidak ditemukan';results.append(empty)}else for(const p of matches){const b=document.createElement('button');b.type='button';b.className='nine-clean-search-result';const img=document.createElement('img');img.src=imageOf(p.gambar);img.alt='';img.loading='lazy';const label=document.createElement('span');label.textContent=p.nama;b.append(img,label);b.onclick=()=>{results.hidden=true;document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:p.id}}))};results.append(b)}results.hidden=false},150)});
@@ -8720,7 +8729,11 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   }
   function imageFromProduct(product) {
     const candidates = [product?.gambar, product?.image, product?.thumbnail,
-      ...(Array.isArray(product?.gallery) ? product.gallery : [])];
+      product?.foto, product?.fotoUtama, product?.mainImage,
+      ...(Array.isArray(product?.gallery) ? product.gallery : []),
+      ...(Array.isArray(product?.galeri) ? product.galeri : []),
+      ...(Array.isArray(product?.images) ? product.images : []),
+      ...(Array.isArray(product?.fotoProduk) ? product.fotoProduk : [])];
     for (const v of candidates) {
       const source = typeof v === 'string' ? v : v?.url || v?.src;
       const url = photoURL(source);
@@ -8782,6 +8795,9 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
     named('twitter:image', image, !!image);
     // Diagnostic for validating the finished product preview in a JS-capable browser/prerender service.
     document.documentElement.dataset.imamstoreSharePreview = product && image ? 'ready' : id ? 'loading' : 'store';
+    // Only release a product deep-link capture after product-specific OG tags exist.
+    // Prevent caching a generic/no-photo preview while the Firestore CMS snapshot is pending.
+    if (!id || (product && image)) window.prerenderReady = true;
   }
   function schedule() {
     if (pending) return;
