@@ -128,7 +128,9 @@ async function preparedProduct(id) {
     if (typeof item.nama !== 'string' || !item.nama.trim()) return null;
     const gambar = typeof item.gambar === 'string' && item.gambar.trim() ? item.gambar : '';
     return { id, nama: item.nama, deskripsi: item.deskripsi || '', harga: item.harga || 0,
-      gambar, sharePath: item.sharePath, active: true };
+      gambar, sharePath: item.sharePath,
+      gambarWidth: Number(item.gambarWidth) || 0,
+      gambarHeight: Number(item.gambarHeight) || 0, active: true };
   } catch { return null; }
 }
 
@@ -156,7 +158,7 @@ async function loadProduct(request, id) {
   if (cache.size > 200) cache.delete(cache.keys().next().value);
   return safe;
 }
-function shareImage(photo,id) {
+function shareImage(photo,id,product) {
   if (!photo) return {url:'',kind:'missing'};
   if (photo.kind==='inline') {
     // Image CDN is intended for deployed images. Base64 cannot be used as og:image;
@@ -168,10 +170,13 @@ function shareImage(photo,id) {
   // Netlify Image CDN reliably transforms local deployed images, with a fixed JPG
   // output independent of Accept / User-Agent. Remote images are left untouched
   // unless their domain is explicitly allowlisted by the site's own config.
-  // Generated image is already a small 1200x630 JPEG. Avoid another image
-  // transformation and extra origin latency for WhatsApp and other crawlers.
+  // Generated JPEG is already lightweight. Preserve its actual source ratio.
+  // The static /share-data/<id>.json stores dimensions from the Python generator.
   if (src.origin===ORIGIN && src.pathname.startsWith('/images/share/')) {
-    return {url:src.href,kind:'prebuilt',width:1200,height:630,mime:'image/jpeg'};
+    const w=Number(product?.gambarWidth)||0;
+    const h=Number(product?.gambarHeight)||0;
+    return {url:src.href,kind:'prebuilt',
+      width:w>0&&w<=10000?w:null,height:h>0&&h<=10000?h:null,mime:'image/jpeg'};
   }
   if (src.origin===ORIGIN && !src.pathname.startsWith('/.netlify/') &&
       !src.pathname.startsWith('/_share-image/')) {
@@ -199,7 +204,7 @@ function pageTags(product,id, photo) {
     ? ORIGIN + product.sharePath
     : ORIGIN + '/?product=' + encodeURIComponent(id);
   // Only the shared preview image is transformed. Detail/gallery images stay intact.
-  const preview = shareImage(photo,id);
+  const preview = shareImage(photo,id,product);
   const image = preview.url;
   const pairs = [
     ['property','og:type','website'], ['property','og:site_name','ImamStore'],
@@ -212,9 +217,11 @@ function pageTags(product,id, photo) {
     pairs.push(['property','og:image',image],['property','og:image:secure_url',image],
       ['property','og:image:alt',plain(product.nama || product.name,90)],['name','twitter:image',image]);
     if (preview.kind==='image-cdn' || preview.kind==='prebuilt') {
-      pairs.push(['property','og:image:type','image/jpeg'],
-        ['property','og:image:width',String(preview.width)],
-        ['property','og:image:height',String(preview.height)]);
+      pairs.push(['property','og:image:type','image/jpeg']);
+      if (preview.width && preview.height) {
+        pairs.push(['property','og:image:width',String(preview.width)],
+          ['property','og:image:height',String(preview.height)]);
+      }
     } else if (photo.kind==='inline') {
       const mime = /^data:(image\/(?:png|jpe?g|webp|gif));base64,/i.exec(photo.source)?.[1];
       if (mime) pairs.push(['property','og:image:type',mime==='image/jpg'?'image/jpeg':mime]);

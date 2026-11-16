@@ -192,11 +192,17 @@ def font(size=35, bold=False):
 
 
 def normalize_picture(data):
-    image=Image.open(io.BytesIO(data))
-    image=ImageOps.exif_transpose(image).convert('RGB')
+    image=ImageOps.exif_transpose(Image.open(io.BytesIO(data)))
     if image.width<=0 or image.height<=0:
         raise ValueError('empty image')
-    return image
+    if image.mode in ('RGBA','LA') or 'transparency' in image.info:
+        # JPEG cannot retain alpha. Use the same white underlay typically shown
+        # behind transparent product photos; never enlarge the image canvas.
+        rgba=image.convert('RGBA')
+        base=Image.new('RGBA',rgba.size,(255,255,255,255))
+        base.alpha_composite(rgba)
+        return base.convert('RGB')
+    return image.convert('RGB')
 
 
 def jpg_bytes(image,quality=68):
@@ -220,16 +226,22 @@ def photo_backdrop(source, size, *, blur=36, brightness=0.42):
 
 
 def og_picture(source):
-    """1200x630 preview: full-size, uncropped art on a full-bleed photo backdrop."""
-    width,height=1200,630
-    canvas=photo_backdrop(source,(width,height),blur=34,brightness=0.47)
-    # No artificial white margin. Never stretch or crop the product art itself.
-    fitted=ImageOps.contain(source,(width,height),Image.Resampling.LANCZOS)
-    canvas.paste(fitted,((width-fitted.width)//2,(height-fitted.height)//2))
-    data=jpg_bytes(canvas,70)
-    if len(data)>200_000:
-        data=jpg_bytes(canvas,53)
-    return data
+    """Product OG JPEG in ORIGINAL aspect ratio: no padding, blur, crop or poster overlay.
+
+    A 1:1 product source becomes a 1:1 preview; portrait stays portrait, and
+    landscape stays landscape. Only large files are downscaled for fast sharing.
+    Return bytes and ACTUAL dimensions for Open Graph metadata.
+    """
+    picture=source.copy()
+    if max(picture.size)>1200:
+        picture.thumbnail((1200,1200),Image.Resampling.LANCZOS)
+    # Preserve image details where possible; use a lighter JPEG if necessary.
+    data=jpg_bytes(picture,quality=80)
+    if len(data)>260_000:
+        data=jpg_bytes(picture,quality=69)
+    if len(data)>350_000:
+        data=jpg_bytes(picture,quality=58)
+    return data,picture.width,picture.height
 
 
 def wrap_two(draw, text, fnt, max_width, max_lines=2):
@@ -303,7 +315,11 @@ def share_page(p,meta):
         attrs.extend([('property','og:image',img),('property','og:image:secure_url',img),
                       ('property','og:image:alt',clean_text(p.get('nama'),90)),('name','twitter:image',img)])
         if meta.get('gambar','').startswith('/images/share/'):
-            attrs.extend([('property','og:image:type','image/jpeg'),('property','og:image:width','1200'),('property','og:image:height','630')])
+            attrs.append(('property','og:image:type','image/jpeg'))
+            # Size hints MUST match the actual JPEG (square/portrait/landscape).
+            if int(meta.get('gambarWidth') or 0)>0 and int(meta.get('gambarHeight') or 0)>0:
+                attrs.extend([('property','og:image:width',str(meta['gambarWidth'])),
+                              ('property','og:image:height',str(meta['gambarHeight']))])
     tags='\n'.join(f'<meta {kind}="{quote(k)}" content="{quote(value)}">' for kind,k,value in attrs)
     # Inline redirect runs before first paint; noscript + meta refresh work for other clients.
     return f'''<!doctype html>
@@ -361,11 +377,13 @@ def generate(root:Path,items:list):
             image_data=raw_photo(p,root)
             if image_data:
                 image=normalize_picture(image_data)
-                photo=og_picture(image)
+                photo,img_w,img_h=og_picture(image)
                 digest=hashlib.sha256(photo).hexdigest()[:12]
                 filename=pid+'-'+digest+'.jpg'
                 changed+=write_if_changed(pictures/filename,photo)
                 target['gambar']='/images/share/'+filename
+                target['gambarWidth']=img_w
+                target['gambarHeight']=img_h
                 remove_old_versions(pictures,pid,filename)
                 poster=share_poster(image,p,HOST+target['sharePath'])
                 poster_digest=hashlib.sha256(poster).hexdigest()[:12]
