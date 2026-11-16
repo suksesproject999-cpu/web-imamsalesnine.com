@@ -42,6 +42,17 @@ html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
 <meta name="description" content="Belanja produk otomotif di ImamStore. Temukan berbagai pilihan produk, promo, voucher, dan penawaran menarik lainnya.">
 <link rel="canonical" href="https://store.imamsales.com/">
  <meta property="og:site_name" content="ImamStore">
+<!-- Per-product OG/Twitter metadata is populated from the SAME live catalog as the detail page.
+     For bots (WhatsApp, Facebook, etc.), enable Netlify Prerender extension in the Store project;
+     ordinary client-side meta changes are not sufficient for link previews. -->
+<meta id="imamstoreOgType" property="og:type" content="website">
+<meta id="imamstoreOgLocale" property="og:locale" content="id_ID">
+<meta id="imamstoreOgTitle" property="og:title" content="ImamStore | Produk Otomotif">
+<meta id="imamstoreOgDescription" property="og:description" content="Temukan foto, harga, varian, dan ulasan produk di ImamStore.">
+<meta id="imamstoreOgUrl" property="og:url" content="https://store.imamsales.com/">
+<meta id="imamstoreTwitterCard" name="twitter:card" content="summary">
+<meta id="imamstoreTwitterTitle" name="twitter:title" content="ImamStore | Produk Otomotif">
+<meta id="imamstoreTwitterDescription" name="twitter:description" content="Belanja produk otomotif di ImamStore.">
 
 <script type="application/ld+json">
 {
@@ -4764,7 +4775,7 @@ function updateOriginalSticky(){
 // Keep the original layout but make share, wishlist, and product search usable.
 host.addEventListener('click',async e=>{
  const wish=e.target.closest('.wishlist-btn');if(wish){e.preventDefault();e.stopPropagation();window.toggleWishlist(activeProduct()?.id);return}
- const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;const link=new URL(location.href);link.searchParams.set('product',String(p.id));try{if(navigator.share)await navigator.share({title:p.nama,url:link.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link.href);share.setAttribute('title','Tautan disalin')}else prompt('Salin tautan produk',link.href)}catch(err){if(err?.name!=='AbortError')console.warn('Share failed',err)}}
+ const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;const link=new URL('/',location.origin);link.searchParams.set('product',String(p.id));window.imamstoreProductSharePreview?.refresh?.();try{if(navigator.share)await navigator.share({title:String(p.nama||'Produk ImamStore'),text:'Lihat foto dan informasi produk di ImamStore.',url:link.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link.href);share.setAttribute('title','Tautan produk disalin')}else prompt('Salin tautan produk',link.href)}catch(err){if(err?.name!=='AbortError')console.warn('Share failed',err)}}
 },true);
 let searchTimer=null;
 host.addEventListener('input',e=>{if(e.target.id!=='nineDetailSearchInput')return;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{const q=e.target.value.trim().toLocaleLowerCase('id');const results=host.querySelector('#nineDetailSearchResults');if(!results)return;results.replaceChildren();if(q.length<2){results.hidden=true;return}const matches=allProducts.filter(p=>[p.nama,p.brand,p.subbrand,p.kategori,p.sku,p.kode].some(v=>String(v||'').toLocaleLowerCase('id').includes(q))).slice(0,12);if(!matches.length){const empty=document.createElement('p');empty.className='nine-clean-search-empty';empty.textContent='Produk tidak ditemukan';results.append(empty)}else for(const p of matches){const b=document.createElement('button');b.type='button';b.className='nine-clean-search-result';const img=document.createElement('img');img.src=imageOf(p.gambar);img.alt='';img.loading='lazy';const label=document.createElement('span');label.textContent=p.nama;b.append(img,label);b.onclick=()=>{results.hidden=true;document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:p.id}}))};results.append(b)}results.hidden=false},150)});
@@ -8663,6 +8674,127 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   try{if(!copying)throw Error('clipboard-unavailable');await copying;status.textContent='Nomor resi disalin. Tempel di halaman pelacakan ekspedisi.'}catch{status.textContent='Salin nomor resi secara manual, lalu tempel di halaman ekspedisi.'}
  });
  const a=window.firebase?.auth?.();a?.onAuthStateChanged?.(syncAccount);window.addEventListener('imamstore:customer-auth',syncAccount);syncAccount();
+})();
+</script>
+<script id="imamstore-product-share-metadata">
+/* One social-preview source: products() => same live product ID, name and photo as detail renderer.
+   No new product renderer, no second CMS listener, no Firebase Admin SDK. */
+(function () {
+  'use strict';
+  const DEFAULT_TITLE = 'ImamStore | Toko Online Produk Otomotif';
+  const DEFAULT_DESCRIPTION = 'Temukan produk otomotif, foto, pilihan varian, dan ulasan di ImamStore.';
+  const BASE_URL = 'https://store.imamsales.com/';
+  const fallbackDescription = document.querySelector('meta[name="description"]')?.content || DEFAULT_DESCRIPTION;
+  let lastSignature = '';
+  let pending = false;
+
+  function idFromUrl() {
+    const value = new URLSearchParams(location.search).get('product');
+    return value && /^[A-Za-z0-9_-]{1,120}$/.test(value) ? value : '';
+  }
+  function currentProduct(id) {
+    if (!id) return null;
+    const list = window.imamstoreV29?.products?.();
+    if (Array.isArray(list)) {
+      const product = list.find(p => p && String(p.id) === id && p.active !== false && p.deleted !== true);
+      if (product) return product;
+    }
+    const active = window.imamstoreActiveProduct;
+    return active && String(active.id) === id ? active : null;
+  }
+  function plain(value, limit = 180) {
+    return String(value ?? '')
+      .replace(/<[^>]*>/g, ' ')
+      .replace(/&(?:nbsp|amp|quot|lt|gt);/gi, ' ')
+      .replace(/\s+/g, ' ').trim().slice(0, limit);
+  }
+  function photoURL(value) {
+    if (!value || typeof value !== 'string') return '';
+    try {
+      const url = new URL(value.trim(), BASE_URL);
+      // Data/blobs/private browser URLs cannot be fetched by a preview robot.
+      if (url.protocol !== 'https:') return '';
+      if (/(?:\/no-image\.|\/placeholder\.)/i.test(url.pathname)) return '';
+      return url.href;
+    } catch { return ''; }
+  }
+  function imageFromProduct(product) {
+    const candidates = [product?.gambar, product?.image, product?.thumbnail,
+      ...(Array.isArray(product?.gallery) ? product.gallery : [])];
+    for (const v of candidates) {
+      const source = typeof v === 'string' ? v : v?.url || v?.src;
+      const url = photoURL(source);
+      if (url) return url;
+    }
+    return '';
+  }
+  function writeMeta(selector, attribute, content, enabled = true) {
+    let el = document.head.querySelector(selector);
+    if (!enabled || !content) { el?.remove(); return; }
+    if (!el) {
+      el = document.createElement('meta');
+      el.setAttribute(attribute, selector.startsWith('meta[property=') ? selector.match(/\[property="([^"]+)"\]/)[1] : selector.match(/\[name="([^"]+)"\]/)[1]);
+      document.head.appendChild(el);
+    }
+    if (el.getAttribute('content') !== String(content)) el.setAttribute('content', String(content));
+  }
+  function property(name, value, enabled = true) {
+    writeMeta('meta[property="' + name + '"]', 'property', value, enabled);
+  }
+  function named(name, value, enabled = true) {
+    writeMeta('meta[name="' + name + '"]', 'name', value, enabled);
+  }
+  function priceText(product) {
+    const harga = product?.harga;
+    const normal = Number(typeof harga === 'object' && harga !== null ? harga.normal : harga);
+    const promo = Number(typeof harga === 'object' && harga !== null ? harga.promo : product?.hargaPromo);
+    const best = promo > 0 && (normal <= 0 || promo < normal) ? promo : normal;
+    return Number.isFinite(best) && best > 0 ? 'Harga mulai Rp ' + best.toLocaleString('id-ID') + '.' : '';
+  }
+  function update() {
+    pending = false;
+    const id = idFromUrl();
+    const product = currentProduct(id);
+    const title = product ? plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore' : DEFAULT_TITLE;
+    const intro = product ? plain(product.deskripsi || product.description || '', 145) : '';
+    const description = product ? [intro, priceText(product), 'Lihat foto dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,240) : fallbackDescription;
+    const canonical = id ? BASE_URL + '?product=' + encodeURIComponent(id) : BASE_URL;
+    const image = product ? imageFromProduct(product) : '';
+    const signature = [id, title, description, canonical, image].join('\n');
+    if (signature === lastSignature) return;
+    lastSignature = signature;
+    document.title = title;
+    const canonTag = document.querySelector('link[rel="canonical"]');
+    if (canonTag) canonTag.href = canonical;
+    named('description', description);
+    property('og:type', 'website');
+    property('og:site_name', 'ImamStore');
+    property('og:locale', 'id_ID');
+    property('og:title', title);
+    property('og:description', description);
+    property('og:url', canonical);
+    property('og:image', image, !!image);
+    property('og:image:secure_url', image, !!image);
+    property('og:image:alt', product ? plain(product.nama, 90) : '', !!image);
+    named('twitter:card', image ? 'summary_large_image' : 'summary');
+    named('twitter:title', title);
+    named('twitter:description', description);
+    named('twitter:image', image, !!image);
+    // Diagnostic for validating the finished product preview in a JS-capable browser/prerender service.
+    document.documentElement.dataset.imamstoreSharePreview = product && image ? 'ready' : id ? 'loading' : 'store';
+  }
+  function schedule() {
+    if (pending) return;
+    pending = true;
+    queueMicrotask(update);
+  }
+  document.addEventListener('imamstore:catalog-updated', schedule);
+  document.addEventListener('imamstore:open-product', schedule);
+  window.addEventListener('popstate', schedule);
+  window.addEventListener('pageshow', schedule);
+  document.addEventListener('visibilitychange', function () { if (!document.hidden) schedule(); });
+  window.imamstoreProductSharePreview = Object.freeze({ refresh: schedule, forProduct: currentProduct });
+  schedule();
 })();
 </script>
 <script id="imamstore-direct-product-entry">
