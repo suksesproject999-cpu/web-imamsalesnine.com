@@ -6850,6 +6850,16 @@ window.nineOpenOriginalVoucher=()=>{if(typeof window.imamstoreOpenVoucherSheet==
 // Ulasan publik hanya dari akun pelanggan sungguhan, bukan sesi Firebase anonim.
 // Gunakan modal login ImamStore yang sama dengan checkout, tanpa mesin auth kedua.
 let reviewAuthOpening=false,reviewSaving=false;
+// Toast ringkas untuk pelanggan. Detail layanan tidak boleh tampil di UI.
+function reviewNotice(message,type='info'){
+ if(typeof window.imamstoreToast==='function'){
+  window.imamstoreToast(message,type);return;
+ }
+ if(window.Swal?.fire){
+  window.Swal.fire({toast:true,position:'top',icon:type==='error'?'error':type==='success'?'success':'info',
+   title:message,showConfirmButton:false,timer:2500,timerProgressBar:false});
+ }
+}
 function signedInReviewer(){
  try{const u=window.firebase?.auth?.()?.currentUser;return u&&!u.isAnonymous?u:null}
  catch{return null}
@@ -6858,14 +6868,14 @@ async function requireReviewUser(){
  try{await window.firebase?.auth?.()?.authStateReady?.()}catch{}
  const existing=signedInReviewer();if(existing)return existing;
  if(typeof window.nexaiRequireCustomerLogin!=='function'){
-  window.Swal?.fire({icon:'warning',text:'Login ImamStore belum siap. Muat ulang halaman dan coba lagi.'});return null;
+  reviewNotice('Silakan muat ulang halaman dan coba masuk kembali.','error');return null;
  }
  try{
   const ok=await window.nexaiRequireCustomerLogin();
   return ok?signedInReviewer():null;
  }catch(error){
   console.warn('[ImamStore review login]',error?.code||error?.message||error);
-  window.Swal?.fire({icon:'error',text:'Login belum berhasil. Silakan coba lagi.'});return null;
+  reviewNotice('Belum berhasil masuk. Silakan coba lagi.','error');return null;
  }
 }
 // Cegah form ulasan terbuka untuk tamu; login dahulu, kemudian lanjutkan di produk yang sama.
@@ -6890,9 +6900,9 @@ window.nineSubmitDetailReview=async button=>{
  if(reviewSaving)return;
  const p=getProduct(),store=db(),field=host.querySelector('.nine-review-form textarea');
  const content=field?.value?.trim(),score=rating;
- if(!p||!store){window.Swal?.fire({icon:'info',text:'Layanan ulasan belum tersedia.'});return}
- if(!score||!content){window.Swal?.fire({icon:'warning',text:'Pilih bintang dan isi ulasan terlebih dahulu.'});return}
- if(content.length>1200){window.Swal?.fire({icon:'warning',text:'Ulasan maksimal 1.200 karakter.'});return}
+ if(!p||!store){reviewNotice('Ulasan belum dapat dibuka. Silakan coba lagi.','error');return}
+ if(!score||!content){reviewNotice('Pilih bintang dan tulis ulasan terlebih dahulu.');return}
+ if(content.length>1200){reviewNotice('Ulasan maksimal 1.200 karakter.');return}
  reviewSaving=true;button.disabled=true;
  const productId=String(p.id);
  try{
@@ -6910,12 +6920,10 @@ window.nineSubmitDetailReview=async button=>{
   host.querySelectorAll('#nineReviewStars button').forEach(b=>{
    b.setAttribute('aria-pressed','false');b.style.color='#bbb';
   });
-  window.Swal?.fire({icon:'success',text:'Ulasan berhasil dikirim.'});
+  reviewNotice('Terima kasih! Ulasan berhasil dikirim.','success');
  }catch(e){
   console.warn('[ImamStore review submit]',e?.code||e?.message||e);
-  window.Swal?.fire({icon:'error',text:e?.code==='permission-denied'
-   ?'Izin Firestore menolak ulasan. Periksa aturan akses ulasan_produk.'
-   :'Ulasan gagal dikirim. Periksa koneksi dan coba lagi.'});
+  reviewNotice('Ulasan belum berhasil dikirim. Silakan coba lagi.','error');
  }finally{reviewSaving=false;button.disabled=false}
 };
 // Statistik toko detail mengikuti satu sumber yang sama dengan profil/beranda.
