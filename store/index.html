@@ -3,6 +3,40 @@
 <html lang="id">
 <head>
 <meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/>
+<script id="imamstore-deeplink-first-paint">
+/* Direct product links receive a dedicated first paint, never a briefly visible storefront. */
+(()=>{try{const id=new URL(location.href).searchParams.get('product');if(id&&/^[A-Za-z0-9_-]{1,120}$/.test(id)){document.documentElement.classList.add('imamstore-deeplink-boot')}}catch(_){}})();
+</script>
+<style id="imamstore-deeplink-first-paint-style">
+#imamstoreDeepLinkGate{display:none;position:fixed;inset:0;z-index:2147483005;background:#fff;color:#29302a;font:15px system-ui,-apple-system,Arial,sans-serif;overflow:hidden;opacity:1;transition:opacity .18s ease-out;flex-direction:column}
+html.imamstore-deeplink-boot,html.imamstore-deeplink-boot body{overflow:hidden}
+html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
+#imamstoreDeepLinkGate.dl-revealing{opacity:0;pointer-events:none}
+#imamstoreDeepLinkGate .dl-header{height:64px;display:flex;align-items:center;gap:17px;border-bottom:1px solid #edf0eb;padding:0 20px;flex:none;background:#fff}
+#imamstoreDeepLinkGate .dl-arrow{width:24px;height:2px;background:#29302a;position:relative;border-radius:2px;flex:none}
+#imamstoreDeepLinkGate .dl-arrow:before{content:'';position:absolute;width:10px;height:10px;border-left:2px solid #29302a;border-bottom:2px solid #29302a;transform:rotate(45deg);left:0;top:-4px}
+#imamstoreDeepLinkGate .dl-brand{font-size:16px;font-weight:750}
+#imamstoreDeepLinkGate .dl-canvas{flex:1;min-height:0;overflow:hidden;background:#fff;max-width:880px;width:100%;margin:0 auto}
+#imamstoreDeepLinkGate .dl-picture{width:100%;aspect-ratio:1.04;max-height:49dvh;background:#f3f5f2}
+#imamstoreDeepLinkGate .dl-padding{padding:24px 20px}
+#imamstoreDeepLinkGate .dl-line{height:15px;background:#f0f2ef;border-radius:6px;margin-bottom:15px;width:100%}
+#imamstoreDeepLinkGate .dl-line.dl-price{width:44%;height:28px;background:#e8f1db;margin-bottom:24px}
+#imamstoreDeepLinkGate .dl-line.dl-title{width:86%;height:18px}
+#imamstoreDeepLinkGate .dl-line.dl-short{width:65%}
+#imamstoreDeepLinkGate .dl-footer{border-top:1px solid #edf0eb;display:flex;align-items:center;gap:10px;background:#fff;padding:12px 16px calc(12px + env(safe-area-inset-bottom));flex:none}
+#imamstoreDeepLinkGate .dl-round{width:45px;height:45px;border-radius:13px;background:#edf0eb;flex:none}
+#imamstoreDeepLinkGate .dl-buy{height:49px;background:#e3f0d0;border-radius:12px;flex:1}
+#imamstoreDeepLinkGate .dl-note{padding:12px 20px 0;font-size:12px;color:#8b9587;text-align:center}
+#imamstoreDeepLinkGate .dl-error{display:none;flex:1;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:25px;gap:14px}
+#imamstoreDeepLinkGate .dl-error h2{margin:0;font-size:20px;color:#273126}
+#imamstoreDeepLinkGate .dl-error p{margin:0;color:#697568;line-height:1.6;max-width:320px}
+#imamstoreDeepLinkGate .dl-buttons{display:flex;gap:10px;margin-top:9px;flex-wrap:wrap;justify-content:center}
+#imamstoreDeepLinkGate .dl-buttons button{border-radius:11px;padding:12px 20px;font-weight:700;border:1px solid #cbdcbb;color:#608c2b;background:#fff}
+#imamstoreDeepLinkGate .dl-buttons button:first-child{background:#8cc63f;color:#1e3211;border-color:#8cc63f}
+#imamstoreDeepLinkGate.dl-failed .dl-header,#imamstoreDeepLinkGate.dl-failed .dl-canvas,#imamstoreDeepLinkGate.dl-failed .dl-footer,#imamstoreDeepLinkGate.dl-failed .dl-note{display:none}
+#imamstoreDeepLinkGate.dl-failed .dl-error{display:flex}
+@media(prefers-reduced-motion:reduce){#imamstoreDeepLinkGate{transition:none}}
+</style>
 
 <title>ImamStore | Toko Online Produk Otomotif Nine Autoseries</title>
 <meta name="description" content="Belanja produk otomotif di ImamStore. Temukan berbagai pilihan produk, promo, voucher, dan penawaran menarik lainnya.">
@@ -975,6 +1009,13 @@ body > .swal2-container:not(.swal2-toast-shown) {
 </style>
 </head>
 <body>
+<div id="imamstoreDeepLinkGate" role="status" aria-live="polite" aria-label="Menyiapkan detail produk">
+ <div class="dl-header"><span class="dl-arrow" aria-hidden="true"></span><span class="dl-brand">ImamStore</span></div>
+ <div class="dl-canvas" aria-hidden="true"><div class="dl-picture"></div><div class="dl-padding"><div class="dl-line dl-price"></div><div class="dl-line dl-title"></div><div class="dl-line dl-short"></div></div></div>
+ <div class="dl-note">Menyiapkan detail produk…</div>
+ <div class="dl-footer" aria-hidden="true"><div class="dl-round"></div><div class="dl-round"></div><div class="dl-buy"></div></div>
+ <div class="dl-error" role="alert"><i class="fa-solid fa-box-open" aria-hidden="true" style="font-size:39px;color:#8cc63f"></i><h2>Produk belum bisa ditampilkan</h2><p>Silakan coba kembali atau lihat produk lainnya di ImamStore.</p><div class="dl-buttons"><button type="button" id="imamstoreDeepLinkRetry">Coba Lagi</button><button type="button" id="imamstoreDeepLinkHome">Lihat Toko</button></div></div>
+</div>
 <header class="top"><div class="shell top-inner"><a aria-label="Kembali ke beranda" class="back" href="https://imamsales.com/"><i class="fa-solid fa-arrow-left"></i></a><label class="search"><i class="fa-solid fa-magnifying-glass" style="color:#9b9b9b"></i><input autocomplete="off" id="search" placeholder="Cari di Store Imam Sales"/></label><div aria-label="Navigasi Store saat scroll" class="store-compact-tabs"><button class="store-compact-tab active" data-tab="toko">Toko</button><button class="store-compact-tab" data-tab="produk">Produk</button><button class="store-compact-tab" data-tab="kategori">Kategori</button><button class="store-compact-tab" data-tab="favorit">Favorit</button></div><button aria-label="Cari produk" class="store-compact-search" id="compactSearch" type="button"><i class="fa-solid fa-magnifying-glass"></i></button><button class="top-btn" id="clearSearch" title="Hapus pencarian"><i class="fa-solid fa-xmark"></i></button><button aria-label="Buka menu ImamStore" aria-controls="imamstoreMenuDrawer" aria-expanded="false" class="top-btn" id="imamstoreMenuOpen" type="button"><i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i></button></div></header>
 <div class="shell">
 <section class="hero"><div class="identity"><div class="avatar"><i class="fa-solid fa-store"></i></div><div><h1>store.imamsales.com</h1><p id="storeStatus" style="margin-top:7px">Informasi aktivitas toko sedang dimuat</p></div></div><div class="store-stats"><div class="store-stat"><strong id="storeRating">—</strong><small>Penilaian</small></div><div class="store-stat"><strong id="storeProductCount">—</strong><small>Produk</small></div><div class="store-stat"><strong id="storeFollowers">—</strong><small>Pengikut</small></div><div class="store-stat"><strong id="storeSoldTotal">—</strong><small>Terjual</small></div></div><div class="store-actions"><a href="https://wa.me/6282210109369" id="storeChat" rel="noopener noreferrer" target="_blank" title="Chat WhatsApp Imam Sales"><i class="fa-regular fa-comment-dots"></i> Chat</a><button aria-pressed="false" id="storeFollow" type="button"><i class="fa-regular fa-heart"></i> Ikuti</button></div></section>
@@ -1690,7 +1731,9 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   products=seed.filter(active);
   catalogHealth.visible=products.length;
   render();
-  if(!window.firebase){catalogHealth.cmsError='Firebase SDK belum siap';return;}
+  window.imamstoreDeepLinkCatalogState={phase:'seed',ids:products.map(p=>String(p.id))};
+  document.dispatchEvent(new Event('imamstore:catalog-updated'));
+  if(!window.firebase){catalogHealth.cmsError='Firebase SDK belum siap';window.imamstoreDeepLinkCatalogState={phase:'cms-error',ids:products.map(p=>String(p.id))};document.dispatchEvent(new Event('imamstore:catalog-updated'));return;}
   if(!imamstoreBootstrapFirebaseR8())console.warn('[ImamStore R8 developer] Bootstrap was not completed');
   const db=firebase.firestore();
   // Statistik sama dengan website utama: statistik_produk.
@@ -1772,9 +1815,13 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
    products=merge(seed,docs);
    catalogHealth.visible=products.length;
    render();
+   window.imamstoreDeepLinkCatalogState={phase:'cms',ids:products.map(p=>String(p.id)),fromCache:!!snapshot.metadata?.fromCache};
+   document.dispatchEvent(new Event('imamstore:catalog-updated'));
    console.info('[ImamStore katalog] Sinkron CMS:',catalogHealth.cms,'dokumen,',catalogHealth.cmsNew,'produk baru,',products.length,'produk tampil.');
   },error=>{
    catalogHealth.cmsError=String(error?.code||error?.message||error).slice(0,120);
+   window.imamstoreDeepLinkCatalogState={phase:'cms-error',ids:products.map(p=>String(p.id))};
+   document.dispatchEvent(new Event('imamstore:catalog-updated'));
    console.warn('[ImamStore katalog] CMS belum bisa dibaca; katalog dasar tetap ditampilkan:',error);
   });
   // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
@@ -1788,6 +1835,8 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
   // Jangan kosongkan katalog yang sudah berhasil diperoleh dari JSON / CMS.
   catalogHealth.cmsError=String(e?.code||e?.message||e).slice(0,120);
   if(!products.length)render();
+  window.imamstoreDeepLinkCatalogState={phase:'cms-error',ids:products.map(p=>String(p.id))};
+  document.dispatchEvent(new Event('imamstore:catalog-updated'));
  }
 })();
 </script>
@@ -4600,7 +4649,7 @@ requestAnimationFrame(() => {
     window.__hydrateRealtimeProductStats?.(document);
 });
 
-if(!window.__productTransitionActive){
+if(!window.__productTransitionActive && !options.fromDeepLink){
     requestAnimationFrame(()=>{
         window.scrollProductDetailIntoView?.("smooth");
     });
@@ -4723,7 +4772,7 @@ host.addEventListener('keydown',e=>{const input=e.target.closest('#nineDetailSea
 host.addEventListener('click',e=>{if(e.target.closest('#nineDetailSearchInput,#nineDetailSearchResults'))return;const results=host.querySelector('#nineDetailSearchResults');if(results)results.hidden=true});
 window.addEventListener('popstate',()=>{if(!host.classList.contains('open'))return;const id=new URLSearchParams(location.search).get('product');if(!id){host.classList.remove('open');host.replaceChildren();document.body.classList.remove('imamstore-original-open')}else if(String(activeProduct()?.id)!==id){document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}))}});
 window.imamstoreOriginalDetailActive=true;
-document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:false});refreshWishlist();updateOriginalSticky();document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});
+document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:false,fromDeepLink:e.detail?.fromDeepLink===true});refreshWishlist();updateOriginalSticky();document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('imamstoreOriginalPurchase')?.classList.contains('open'))closePurchase();else if(e.key==='Escape'&&host.classList.contains('open'))close()});
 window.imamstoreOriginalDetailStatus=()=>({active:host.classList.contains('open'),renderer:'original-showProduct',transactionsEnabled:false});
 })();
@@ -8614,6 +8663,76 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   try{if(!copying)throw Error('clipboard-unavailable');await copying;status.textContent='Nomor resi disalin. Tempel di halaman pelacakan ekspedisi.'}catch{status.textContent='Salin nomor resi secara manual, lalu tempel di halaman ekspedisi.'}
  });
  const a=window.firebase?.auth?.();a?.onAuthStateChanged?.(syncAccount);window.addEventListener('imamstore:customer-auth',syncAccount);syncAccount();
+})();
+</script>
+<script id="imamstore-direct-product-entry">
+/* A shared URL has exactly one entry path: wait for the existing catalog, then
+   invoke the existing product renderer. No parallel detail implementation. */
+(()=>{'use strict';
+ const root=document.documentElement;
+ if(!root.classList.contains('imamstore-deeplink-boot'))return;
+ const gate=document.getElementById('imamstoreDeepLinkGate');
+ const target=new URL(location.href).searchParams.get('product');
+ if(!gate||!target)return;
+ let finished=false,opened=false,seedTimer=0,limit=0;
+ const clear=()=>{clearTimeout(seedTimer);clearTimeout(limit);document.removeEventListener('imamstore:catalog-updated',onCatalog);root.classList.remove('imamstore-deeplink-boot');gate.remove()};
+ const showError=()=>{if(finished||opened)return;gate.classList.add('dl-failed')};
+ const reveal=()=>{
+  if(finished)return;finished=true;
+  gate.classList.add('dl-revealing');
+  setTimeout(clear,matchMedia('(prefers-reduced-motion: reduce)').matches?0:210);
+ };
+ const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
+ const readyImage=async()=>{
+  const img=document.querySelector('#imamstoreLiveOriginalDetail #mainProductImage');
+  if(!img)return;
+  const load=img.complete&&img.naturalWidth>0?Promise.resolve():
+   typeof img.decode==='function'?img.decode().catch(()=>{}):
+   new Promise(resolve=>{img.addEventListener('load',resolve,{once:true});img.addEventListener('error',resolve,{once:true})});
+  await Promise.race([load,pause(2400)]);
+ };
+ async function open(){
+  if(finished||opened||new URL(location.href).searchParams.get('product')!==target)return;
+  opened=true;clearTimeout(seedTimer);
+  // This event is also used by product cards. It does not create another detail page.
+  document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:target,fromDeepLink:true}}));
+  // Give the existing renderer and browser time to commit the layout before revealing.
+  await new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve)));
+  const detail=document.getElementById('imamstoreLiveOriginalDetail');
+  if(!detail?.classList.contains('open')||!detail.querySelector('.product-detail')){
+   opened=false;showError();return;
+  }
+  detail.scrollTop=0;
+  const shell=detail.querySelector('.nine-detail-shell');if(shell)shell.scrollTop=0;
+  await readyImage();
+  if(new URL(location.href).searchParams.get('product')===target)reveal();else clear();
+ }
+ function onCatalog(){
+  if(finished||opened)return;
+  const state=window.imamstoreDeepLinkCatalogState;
+  if(!state)return;
+  const found=state.ids?.includes(target);
+  if(state.phase==='cms'){
+   if(found)open();
+   else if(!state.fromCache)showError();
+  }else if(state.phase==='seed'){
+   if(found){clearTimeout(seedTimer);seedTimer=setTimeout(open,900)}
+  }else if(state.phase==='cms-error'){
+   if(found)open();else showError();
+  }
+ }
+ document.addEventListener('imamstore:catalog-updated',onCatalog);
+ onCatalog();
+ limit=setTimeout(()=>{if(!finished&&!opened)showError()},15000);
+ document.getElementById('imamstoreDeepLinkRetry')?.addEventListener('click',()=>location.reload());
+ document.getElementById('imamstoreDeepLinkHome')?.addEventListener('click',()=>{
+  const url=new URL(location.href);url.searchParams.delete('product');
+  history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+  finished=true;clearTimeout(seedTimer);clearTimeout(limit);clear();
+ });
+ window.addEventListener('popstate',()=>{
+  if(!finished&&new URL(location.href).searchParams.get('product')!==target){finished=true;clearTimeout(limit);clear()}
+ });
 })();
 </script>
 </body></html>
