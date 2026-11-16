@@ -42,9 +42,8 @@ html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
 <meta name="description" content="Belanja produk otomotif di ImamStore. Temukan berbagai pilihan produk, promo, voucher, dan penawaran menarik lainnya.">
 <link rel="canonical" href="https://store.imamsales.com/">
  <meta property="og:site_name" content="ImamStore">
-<!-- Per-product OG/Twitter metadata is populated from the SAME live catalog as the detail page.
-     For bots (WhatsApp, Facebook, etc.), enable Netlify Prerender extension in the Store project;
-     ordinary client-side meta changes are not sufficient for link previews. -->
+<!-- Base SEO fallback. Netlify Edge injects real per-product OG tags server-side;
+     the in-browser updater below preserves title/history while navigating the SPA. -->
 <meta id="imamstoreOgType" property="og:type" content="website">
 <meta id="imamstoreOgLocale" property="og:locale" content="id_ID">
 <meta id="imamstoreOgTitle" property="og:title" content="ImamStore | Produk Otomotif">
@@ -53,15 +52,8 @@ html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
 <meta id="imamstoreTwitterCard" name="twitter:card" content="summary">
 <meta id="imamstoreTwitterTitle" name="twitter:title" content="ImamStore | Produk Otomotif">
 <meta id="imamstoreTwitterDescription" name="twitter:description" content="Belanja produk otomotif di ImamStore.">
-<!-- For Netlify preview crawlers, do not capture generic tags before CMS loads. -->
-<script id="imamstore-share-prerender-state">
-(function () {
-  'use strict';
-  var id = new URLSearchParams(location.search).get('product');
-  // Regular visitors are unaffected. Prerender may wait until the product OG image is ready.
-  window.prerenderReady = !(id && /^[A-Za-z0-9_-]{1,120}$/.test(id));
-})();
-</script>
+<!-- Product-specific preview tags are injected into the initial HTML by
+     netlify/edge-functions/product-og.js. This fallback stays for the store homepage. -->
 
 <script type="application/ld+json">
 {
@@ -8736,6 +8728,11 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
       ...(Array.isArray(product?.fotoProduk) ? product.fotoProduk : [])];
     for (const v of candidates) {
       const source = typeof v === 'string' ? v : v?.url || v?.src;
+      // The public Edge image route makes catalog Base64 photos usable in previews.
+      if (typeof source === 'string' && /^data:image\/(?:png|jpe?g|webp|gif);base64,/i.test(source)
+          && /^[A-Za-z0-9_-]{1,120}$/.test(String(product.id ?? ''))) {
+        return BASE_URL + '_share-image/' + encodeURIComponent(String(product.id));
+      }
       const url = photoURL(source);
       if (url) return url;
     }
@@ -8768,6 +8765,8 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
     pending = false;
     const id = idFromUrl();
     const product = currentProduct(id);
+    // Do not overwrite server-side OG metadata with store defaults while CMS loads.
+    if (id && !product) return;
     const title = product ? plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore' : DEFAULT_TITLE;
     const intro = product ? plain(product.deskripsi || product.description || '', 145) : '';
     const description = product ? [intro, priceText(product), 'Lihat foto dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,240) : fallbackDescription;
@@ -8795,9 +8794,8 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
     named('twitter:image', image, !!image);
     // Diagnostic for validating the finished product preview in a JS-capable browser/prerender service.
     document.documentElement.dataset.imamstoreSharePreview = product && image ? 'ready' : id ? 'loading' : 'store';
-    // Only release a product deep-link capture after product-specific OG tags exist.
-    // Prevent caching a generic/no-photo preview while the Firestore CMS snapshot is pending.
-    if (!id || (product && image)) window.prerenderReady = true;
+    // Server-side social previews are resolved before this script executes.
+    // The client updater is retained only for in-app page title/history changes.
   }
   function schedule() {
     if (pending) return;
