@@ -8915,7 +8915,7 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   '<div class="isc-panel"><div class="isc-head"><h2>Bagikan Produk</h2><button class="isc-close" type="button" aria-label="Tutup">×</button></div>'+
   '<p class="isc-product"></p>'+
   '<button class="isc-action isc-link" type="button"><span class="isc-icon"><i class="fa-solid fa-link"></i></span><span><strong>Bagikan Link</strong><small>Pratinjau produk di WhatsApp dan aplikasi lain</small></span></button>'+
-  '<button class="isc-action isc-photo" type="button" disabled><span class="isc-icon"><i class="fa-regular fa-image"></i></span><span><strong>Bagikan Foto + Link</strong><small class="isc-photo-info">Menyiapkan foto produk...</small></span></button>'+
+  '<button class="isc-action isc-photo" type="button" disabled><span class="isc-icon"><i class="fa-regular fa-image"></i></span><span><strong class="isc-photo-label">Bagikan Foto + QR</strong><small class="isc-photo-info">Menyiapkan gambar Share...</small></span></button>'+
   '<button class="isc-action isc-copy" type="button"><span class="isc-icon"><i class="fa-regular fa-copy"></i></span><span><strong>Salin Link</strong><small>Simpan tautan untuk dikirim manual</small></span></button>'+
   '<p class="isc-status" role="status" aria-live="polite"></p>'+
   '<p class="isc-note">Beberapa aplikasi tidak menyertakan teks tautan saat menerima foto. Jika perlu, gunakan Salin Link.</p></div>';
@@ -8933,22 +8933,34 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    try{const url=new URL(s,ORIGIN);if(url.protocol==='https:' && !url.username&&!url.password)return url.href}catch{}
   }return '';
  }
- async function makeFile(p){
-   const src=getImage(p);if(!src)return null;
+ // Metadata kecil yang sudah disiapkan oleh generator, dengan fallback aman
+ // untuk produk baru yang belum masuk snapshot GitHub berikutnya.
+ async function preparedShare(id){
+   try {
+     const res=await fetch('/share-data/'+encodeURIComponent(id)+'.json',{
+       credentials:'omit',cache:'default',signal:AbortSignal.timeout(2200)
+     });
+     if(!res.ok||!(res.headers.get('content-type')||'').includes('json'))return null;
+     const item=await res.json();
+     return item&&String(item.id)===String(id)&&item.sharePath==='/p/'+id+'/' ? item:null;
+   }catch{return null}
+ }
+ async function fetchPhotoAsFile(src,p,isPoster){
    let source=src;
    if(!src.startsWith('data:')){
-     const url=new URL(src);if(url.origin===location.origin&& !url.pathname.startsWith('/.netlify/')&&!url.pathname.startsWith('/_share-image/')){
+     const url=new URL(src,ORIGIN);
+     if(url.origin===location.origin&& !url.pathname.startsWith('/.netlify/')&&
+        !url.pathname.startsWith('/_share-image/')&&!url.pathname.startsWith('/images/share-posters/')){
        const cdn=new URL('/.netlify/images',location.origin);
        cdn.searchParams.set('url',url.pathname+url.search);cdn.searchParams.set('w','960');cdn.searchParams.set('h','504');
        cdn.searchParams.set('fit','contain');cdn.searchParams.set('fm','jpg');cdn.searchParams.set('q','63');source=cdn.href;
      }
    }
-   const res=await fetch(source,{mode:'cors',credentials:'omit',signal:AbortSignal.timeout(18000)});
+   const res=await fetch(source,{mode:'cors',credentials:'omit',signal:AbortSignal.timeout(16000)});
    if(!res.ok)throw Error('photo-request-failed');
    const blob=await res.blob();
    if(!blob.type.startsWith('image/')||blob.size<50||blob.size>6*1024*1024)throw Error('invalid-photo');
-   // Native share targets support JPEG broadly; convert non-JPEG images locally.
-   if(blob.type==='image/jpeg')return new File([blob],'ImamStore-Produk-'+p.id+'.jpg',{type:'image/jpeg'});
+   if(blob.type==='image/jpeg')return {file:new File([blob],'ImamStore-Produk-'+p.id+(isPoster?'-QR':'')+'.jpg',{type:'image/jpeg'}),isPoster};
    const bitmap=await createImageBitmap(blob);
    try{
      const ratio=Math.min(960/bitmap.width,504/bitmap.height,1);
@@ -8956,8 +8968,18 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
      c.getContext('2d',{alpha:false}).drawImage(bitmap,0,0,c.width,c.height);
      const jpeg=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',.7));
      if(!jpeg||jpeg.size>6*1024*1024)throw Error('image-conversion-failed');
-     return new File([jpeg],'ImamStore-Produk-'+p.id+'.jpg',{type:'image/jpeg'});
+     return {file:new File([jpeg],'ImamStore-Produk-'+p.id+'.jpg',{type:'image/jpeg'}),isPoster};
    }finally{bitmap.close?.()}
+ }
+ async function makeFile(p,meta){
+   const choices=[];
+   if(typeof meta?.poster==='string'&&meta.poster.startsWith('/images/share-posters/')){
+     choices.push({source:new URL(meta.poster,ORIGIN).href,isPoster:true});
+   }
+   const base=getImage(p);
+   if(base)choices.push({source:base,isPoster:false});
+   for(const choice of choices){try{return await fetchPhotoAsFile(choice.source,p,choice.isPoster)}catch{}}
+   return null;
  }
  function close(){if(el.hidden)return;el.hidden=true;seq++;payload=null;photo=null;try{lastFocus?.focus({preventScroll:true})}catch{}lastFocus=null}
  function status(message){q('.isc-status').textContent=message}
@@ -8968,13 +8990,27 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    photo=null;const token=++seq;lastFocus=invoker||document.activeElement;
    q('.isc-product').textContent=payload.name;
    q('.isc-photo').disabled=true;
-   q('.isc-photo-info').textContent='Menyiapkan foto produk...';
+   q('.isc-photo-label').textContent='Bagikan Foto + QR';
+   q('.isc-photo-info').textContent='Menyiapkan gambar Share...';
    status('');el.hidden=false;q('.isc-close').focus({preventScroll:true});
-   if(!navigator.share||!navigator.canShare){q('.isc-photo-info').textContent='Perangkat ini belum mendukung berbagi foto langsung';return}
-   makeFile(p).then(file=>{
+   const manifest=preparedShare(String(p.id));
+   manifest.then(meta=>{
      if(token!==seq||el.hidden)return;
-     if(file&&navigator.canShare({files:[file]})){photo=file;q('.isc-photo').disabled=false;q('.isc-photo-info').textContent='Kirim foto asli sebagai lampiran beserta tautan'}
-     else{q('.isc-photo-info').textContent='Foto tidak tersedia untuk dibagikan langsung'}
+     if(meta?.sharePath)payload.link=new URL(meta.sharePath,ORIGIN).href;
+   });
+   if(!navigator.share||!navigator.canShare){
+     q('.isc-photo-info').textContent='Perangkat ini belum mendukung berbagi foto langsung';return;
+   }
+   manifest.then(meta=>makeFile(p,meta)).then(result=>{
+     if(token!==seq||el.hidden)return;
+     if(result?.file&&navigator.canShare({files:[result.file]})){
+       photo=result.file;
+       q('.isc-photo').disabled=false;
+       q('.isc-photo-label').textContent=result.isPoster?'Bagikan Foto + QR':'Bagikan Foto + Link';
+       q('.isc-photo-info').textContent=result.isPoster
+         ? 'Kartu produk dengan QR siap dibagikan'
+         : 'Foto siap dibagikan bersama link';
+     }else q('.isc-photo-info').textContent='Foto tidak tersedia. Gunakan Bagikan Link.';
    }).catch(()=>{if(token===seq&&!el.hidden)q('.isc-photo-info').textContent='Foto belum tersedia. Gunakan Bagikan Link.'});
  }
  async function linkShare(){if(!payload)return;const {name,link}=payload;

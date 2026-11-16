@@ -113,10 +113,34 @@ async function seedProduct(request, id) {
     return Array.isArray(rows) ? rows.find(p => p && String(p.id) === id) || null : null;
   } catch { return null; }
 }
+// Fast path: publicly pre-generated metadata, served as a small static JSON file.
+// The periodic GitHub sync prepares it from the public CMS before any link is shared.
+// When it does not exist yet, preserve the original Firestore/produk.json fallback.
+async function preparedProduct(id) {
+  try {
+    const response = await fetch(ORIGIN + '/share-data/' + encodeURIComponent(id) + '.json', {
+      headers: { Accept: 'application/json' },
+      signal: AbortSignal.timeout(1700),
+    });
+    if (!response.ok || !(response.headers.get('content-type') || '').includes('json')) return null;
+    const item = await response.json();
+    if (!item || String(item.id) !== id || item.sharePath !== '/p/' + id + '/') return null;
+    if (typeof item.nama !== 'string' || !item.nama.trim()) return null;
+    const gambar = typeof item.gambar === 'string' && item.gambar.trim() ? item.gambar : '';
+    return { id, nama: item.nama, deskripsi: item.deskripsi || '', harga: item.harga || 0,
+      gambar, sharePath: item.sharePath, active: true };
+  } catch { return null; }
+}
+
 async function loadProduct(request, id) {
   const key = id;
   const hit = cache.get(key);
   if (hit && hit.until > Date.now()) return hit.product;
+  const ready = await preparedProduct(id);
+  if (ready && photoSource(ready)) {
+    cache.set(key, {product:ready, until:Date.now()+2*60*1000});
+    return ready;
+  }
   // CMS wins, but use seed values for missing fields (matching the web index's merge order).
   // Begin the public seed request at the same time as CMS. When CMS lookup
   // fails or has no public picture, the fallback is already loaded instead of
@@ -144,6 +168,11 @@ function shareImage(photo,id) {
   // Netlify Image CDN reliably transforms local deployed images, with a fixed JPG
   // output independent of Accept / User-Agent. Remote images are left untouched
   // unless their domain is explicitly allowlisted by the site's own config.
+  // Generated image is already a small 1200x630 JPEG. Avoid another image
+  // transformation and extra origin latency for WhatsApp and other crawlers.
+  if (src.origin===ORIGIN && src.pathname.startsWith('/images/share/')) {
+    return {url:src.href,kind:'prebuilt',width:1200,height:630,mime:'image/jpeg'};
+  }
   if (src.origin===ORIGIN && !src.pathname.startsWith('/.netlify/') &&
       !src.pathname.startsWith('/_share-image/')) {
     const transformed=new URL('/.netlify/images',ORIGIN);
@@ -166,7 +195,9 @@ function priceText(product) {
 function pageTags(product,id, photo) {
   const title = plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore';
   const descr = [plain(product.deskripsi || product.description || '',150),priceText(product),'Lihat foto, varian dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,250);
-  const canonical = ORIGIN + '/?product=' + encodeURIComponent(id);
+  const canonical = product.sharePath === '/p/' + id + '/'
+    ? ORIGIN + product.sharePath
+    : ORIGIN + '/?product=' + encodeURIComponent(id);
   // Only the shared preview image is transformed. Detail/gallery images stay intact.
   const preview = shareImage(photo,id);
   const image = preview.url;
@@ -180,7 +211,7 @@ function pageTags(product,id, photo) {
   if (image) {
     pairs.push(['property','og:image',image],['property','og:image:secure_url',image],
       ['property','og:image:alt',plain(product.nama || product.name,90)],['name','twitter:image',image]);
-    if (preview.kind==='image-cdn') {
+    if (preview.kind==='image-cdn' || preview.kind==='prebuilt') {
       pairs.push(['property','og:image:type','image/jpeg'],
         ['property','og:image:width',String(preview.width)],
         ['property','og:image:height',String(preview.height)]);
