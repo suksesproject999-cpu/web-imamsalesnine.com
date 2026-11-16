@@ -8,6 +8,12 @@ const FIRESTORE = 'https://firestore.googleapis.com/v1/projects/apin-web/databas
 const ORIGIN = 'https://store.imamsales.com';
 const PRODUCT_ID = /^[A-Za-z0-9_-]{1,120}$/;
 const MAX_IMAGE_BYTES = 4 * 1024 * 1024;
+// Standard landscape share preview. Only the preview is resized; product gallery stays original.
+const SHARE_WIDTH = 960;
+const SHARE_HEIGHT = 504;
+const SHARE_JPEG_QUALITY = 58;
+const PRODUCT_CDN_TTL = 15 * 60;
+const PRODUCT_STALE_TTL = 30 * 60;
 const cache = new Map();
 
 function validId(id) { return typeof id === 'string' && PRODUCT_ID.test(id); }
@@ -36,7 +42,7 @@ function productFromDocument(doc) {
   return { ...decodeFields(doc.fields), id:String(id) };
 }
 async function requestJson(url, options={}) {
-  const signal = AbortSignal.timeout(4000);
+  const signal = AbortSignal.timeout(3500);
   const response = await fetch(url, { ...options, signal, headers:{Accept:'application/json',...(options.headers||{})} });
   if (!response.ok) {
     if (response.status !== 404) {
@@ -74,26 +80,31 @@ function photoSource(product) {
   return null;
 }
 async function cmsProduct(id) {
-  try {
-    const direct = await requestJson(FIRESTORE+'/cms_products/'+encodeURIComponent(id));
-    const hit = productFromDocument(direct);
-    if (hit && String(hit.id) === id) return hit;
-  } catch { /* Fall through to query */ }
+  // A CMS product ID is not always the Firestore document ID. Try both lookups
+  // concurrently, and return as soon as either finds the real product.
   const values = [{stringValue:id}];
   if (/^(0|[1-9]\d{0,14})$/.test(id)) values.push({integerValue:id});
-  try {
-    const result = await requestJson(FIRESTORE+':runQuery', {
+  const direct = (async () => {
+    const row = await requestJson(FIRESTORE+'/cms_products/'+encodeURIComponent(id));
+    const product = productFromDocument(row);
+    if (product && String(product.id)===id) return product;
+    throw new Error('No matching direct document');
+  })();
+  const query = (async () => {
+    const rows = await requestJson(FIRESTORE+':runQuery', {
       method:'POST',headers:{'Content-Type':'application/json'},
       body:JSON.stringify({structuredQuery:{from:[{collectionId:'cms_products'}],where:{fieldFilter:{field:{fieldPath:'id'},op:'IN',value:{arrayValue:{values}}}},limit:5}})
     });
-    if (Array.isArray(result)) {
-      for (const r of result) {
-        const p = productFromDocument(r.document);
-        if (p && String(p.id) === id) return p;
+    if (Array.isArray(rows)) {
+      for (const row of rows) {
+        const product = productFromDocument(row.document);
+        if (product && String(product.id)===id) return product;
       }
     }
-  } catch { /* Try seed catalog */ }
-  return null;
+    throw new Error('No matching CMS ID');
+  })();
+  try { return await Promise.any([direct, query]); }
+  catch { return null; }
 }
 async function seedProduct(request, id) {
   try {
@@ -116,6 +127,31 @@ async function loadProduct(request, id) {
   if (cache.size > 200) cache.delete(cache.keys().next().value);
   return safe;
 }
+function shareImage(photo,id) {
+  if (!photo) return {url:'',kind:'missing'};
+  if (photo.kind==='inline') {
+    // Image CDN is intended for deployed images. Base64 cannot be used as og:image;
+    // preserve the existing public image endpoint without pretending it's compressed.
+    return {url:ORIGIN+'/_share-image/'+encodeURIComponent(id),kind:'inline'};
+  }
+  let src;
+  try { src=new URL(photo.source); } catch { return {url:'',kind:'missing'}; }
+  // Netlify Image CDN reliably transforms local deployed images, with a fixed JPG
+  // output independent of Accept / User-Agent. Remote images are left untouched
+  // unless their domain is explicitly allowlisted by the site's own config.
+  if (src.origin===ORIGIN && !src.pathname.startsWith('/.netlify/') &&
+      !src.pathname.startsWith('/_share-image/')) {
+    const transformed=new URL('/.netlify/images',ORIGIN);
+    transformed.searchParams.set('url',src.pathname+src.search);
+    transformed.searchParams.set('w',String(SHARE_WIDTH));
+    transformed.searchParams.set('h',String(SHARE_HEIGHT));
+    transformed.searchParams.set('fit','cover');
+    transformed.searchParams.set('fm','jpg');
+    transformed.searchParams.set('q',String(SHARE_JPEG_QUALITY));
+    return {url:transformed.href,kind:'image-cdn',width:SHARE_WIDTH,height:SHARE_HEIGHT,mime:'image/jpeg'};
+  }
+  return {url:src.href,kind:'original'};
+}
 function priceText(product) {
   const normal = Number(typeof product.harga==='object' ? product.harga?.normal : product.harga);
   const promo = Number(typeof product.harga==='object' ? product.harga?.promo : product.hargaPromo);
@@ -126,8 +162,9 @@ function pageTags(product,id, photo) {
   const title = plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore';
   const descr = [plain(product.deskripsi || product.description || '',150),priceText(product),'Lihat foto, varian dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,250);
   const canonical = ORIGIN + '/?product=' + encodeURIComponent(id);
-  // A local image endpoint only serves a source that is already in the public product document.
-  const image = photo?.kind === 'inline' ? ORIGIN+'/_share-image/'+encodeURIComponent(id) : photo?.source || '';
+  // Only the shared preview image is transformed. Detail/gallery images stay intact.
+  const preview = shareImage(photo,id);
+  const image = preview.url;
   const pairs = [
     ['property','og:type','website'], ['property','og:site_name','ImamStore'],
     ['property','og:locale','id_ID'], ['property','og:title',title],
@@ -138,13 +175,17 @@ function pageTags(product,id, photo) {
   if (image) {
     pairs.push(['property','og:image',image],['property','og:image:secure_url',image],
       ['property','og:image:alt',plain(product.nama || product.name,90)],['name','twitter:image',image]);
-    if (photo.kind==='inline') {
+    if (preview.kind==='image-cdn') {
+      pairs.push(['property','og:image:type','image/jpeg'],
+        ['property','og:image:width',String(preview.width)],
+        ['property','og:image:height',String(preview.height)]);
+    } else if (photo.kind==='inline') {
       const mime = /^data:(image\/(?:png|jpe?g|webp|gif));base64,/i.exec(photo.source)?.[1];
       if (mime) pairs.push(['property','og:image:type',mime==='image/jpg'?'image/jpeg':mime]);
     }
   }
   const tags = pairs.map(([attr,key,value])=>`<meta ${attr}="${escapeHtml(key)}" content="${escapeHtml(value)}">`).join('\n');
-  return {tags,title,descr,canonical,image};
+  return {tags,title,descr,canonical,image,imageKind:preview.kind};
 }
 function inject(html,meta) {
   // Only transform HEAD; never modify a product's body, CSS, or JS.
@@ -179,11 +220,8 @@ function inlineImage(source) {
 }
 export default async function productOpenGraph(request,context) {
   const url = new URL(request.url);
-	
-if (url.hostname !== 'store.imamsales.com') {
-  return context.next();
-}
-
+  // This repository also deploys the main website. Never alter responses there.
+  if (url.hostname !== 'store.imamsales.com') return context.next();
   const imagePrefix = '/_share-image/';
   if (url.pathname.startsWith(imagePrefix)) {
     const id=decodeURIComponent(url.pathname.slice(imagePrefix.length));
@@ -216,9 +254,16 @@ if (url.hostname !== 'store.imamsales.com') {
   const headers=new Headers(originResponse.headers);
   headers.delete('content-length'); headers.delete('content-encoding');headers.delete('etag');
   headers.set('Content-Type','text/html; charset=utf-8');
-  // Avoid serving stale metadata when products change. Social sites have their own caches.
+  // Cache identical public product HTML across crawlers and ignore tracking params.
+  // A new deploy invalidates Netlify's deploy-specific cache; CMS changes refresh
+  // after this short TTL. Browser cache remains disabled for HTML.
   headers.set('Cache-Control','public, max-age=0, must-revalidate');
+  headers.set('Netlify-CDN-Cache-Control',
+    `public, max-age=${PRODUCT_CDN_TTL}, stale-while-revalidate=${PRODUCT_STALE_TTL}`);
+  headers.set('Netlify-Vary','query=product');
+  headers.set('Netlify-Cache-Tag','imamstore-og,imamstore-product-'+id);
   headers.set('X-ImamStore-OG',meta.image?'server-image-ready':'server-product-no-image');
+  headers.set('X-ImamStore-OG-Image',meta.imageKind);
   return new Response(inject(html,meta),{status:originResponse.status,headers});
 }
 export const config = { path:['/','/_share-image/:id'] };
