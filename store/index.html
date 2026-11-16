@@ -8557,9 +8557,12 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 #imamstoreMenuOpen{flex:0 0 40px;min-width:40px;min-height:44px;display:grid;place-items:center;-webkit-tap-highlight-color:transparent}
 #imamstoreMenuOpen i{font-size:24px}
 #imamstoreMenuDrawer[hidden],#imamstoreTracking[hidden]{display:none}
-#imamstoreMenuDrawer{position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.55);display:flex;justify-content:flex-end;overscroll-behavior:contain}
-#imamstoreMenuDrawer .ism-panel{width:min(88vw,388px);height:100%;height:100dvh;background:#fff;color:#263229;display:flex;flex-direction:column;box-shadow:-10px 0 42px #0004;animation:ism-open .26s cubic-bezier(.2,.8,.2,1);touch-action:pan-y}
-@keyframes ism-open{from{transform:translateX(100%)}to{transform:translateX(0)}}
+/* Unified menu motion: enter AND exit using GPU-friendly transform and opacity. */
+#imamstoreMenuDrawer{position:fixed;inset:0;z-index:2147483200;background:rgba(0,0,0,.55);display:flex;justify-content:flex-end;overscroll-behavior:contain;opacity:0;pointer-events:none;transition:opacity .3s ease}
+#imamstoreMenuDrawer.ism-open{opacity:1;pointer-events:auto}
+#imamstoreMenuDrawer .ism-panel{width:min(88vw,388px);height:100%;height:100dvh;background:#fff;color:#263229;display:flex;flex-direction:column;box-shadow:-10px 0 42px #0004;transform:translate3d(100%,0,0);transition:transform .34s cubic-bezier(.22,1,.36,1);will-change:transform;backface-visibility:hidden;touch-action:pan-y}
+#imamstoreMenuDrawer.ism-open .ism-panel{transform:translate3d(0,0,0)}
+#imamstoreMenuDrawer.ism-dragging,#imamstoreMenuDrawer.ism-dragging .ism-panel{transition:none}
 #imamstoreMenuDrawer .ism-head{flex:none;display:flex;align-items:center;gap:12px;padding:19px 16px 15px;background:#fff;border-bottom:1px solid #e7ebe2}
 #imamstoreMenuDrawer .ism-logo{width:47px;height:47px;border-radius:13px;background:#121a12;color:#8cc63f;display:grid;place-items:center;font-size:23px}
 #imamstoreMenuDrawer .ism-identity{flex:1;min-width:0}
@@ -8589,7 +8592,7 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 #imamstoreTracking input,#imamstoreTracking select{width:100%;min-height:48px;border:1px solid #dae3d4;border-radius:10px;background:#fff;color:#263228;padding:10px;font:inherit;font-size:14px}
 #imamstoreTracking .ism-track-submit{width:100%;height:50px;border:0;border-radius:11px;background:#8cc63f;color:#15220d;font-weight:800;margin-top:20px}
 #imamstoreTracking .ism-track-note{font-size:11px;color:#829082;margin-top:13px;line-height:1.6}
-@media(prefers-reduced-motion:reduce){#imamstoreMenuDrawer .ism-panel{animation:none}}
+@media(prefers-reduced-motion:reduce){#imamstoreMenuDrawer,#imamstoreMenuDrawer .ism-panel{transition:none}}
 </style>
 <div id="imamstoreMenuDrawer" role="presentation" hidden>
  <aside aria-label="Menu ImamStore" aria-modal="true" class="ism-panel" role="dialog">
@@ -8623,12 +8626,61 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 (function(){
  'use strict';
  const drawer=document.getElementById('imamstoreMenuDrawer'),trigger=document.getElementById('imamstoreMenuOpen');
+ const pane=drawer.querySelector('.ism-panel'),closeButton=document.getElementById('imamstoreMenuClose');
  const track=document.getElementById('imamstoreTracking'),account=document.getElementById('imamstoreAccountStatus');
- let restoreOverflow='',lastFocus=null,trackFocus=null,trackOverflow='',startX=null,startY=null;
+ const reduced=window.matchMedia('(prefers-reduced-motion: reduce)');
+ const EXIT_MS=380;
+ let restoreOverflow='',lastFocus=null,trackFocus=null,trackOverflow='',touch=null;
+ let hideTimer=0,openFrame=0,readyFrame=0,closingCallbacks=[];
+ const isOpen=()=>drawer.classList.contains('ism-open');
  function lock(){restoreOverflow=document.body.style.overflow;document.body.style.overflow='hidden'}
  function unlock(){document.body.style.overflow=restoreOverflow}
- function show(){if(!drawer.hidden)return;lastFocus=document.activeElement;drawer.hidden=false;trigger.setAttribute('aria-expanded','true');lock();syncAccount();document.getElementById('imamstoreMenuClose').focus({preventScroll:true})}
- function close(){if(drawer.hidden)return;drawer.hidden=true;trigger.setAttribute('aria-expanded','false');unlock();lastFocus?.focus?.({preventScroll:true})}
+ function cleanDrag(){touch=null;drawer.classList.remove('ism-dragging');pane.style.transform='';drawer.style.opacity=''}
+ function finishClose(){
+  clearTimeout(hideTimer);hideTimer=0;
+  if(isOpen()||drawer.hidden)return;
+  drawer.hidden=true;cleanDrag();
+  if(track.hidden)unlock();
+  trigger.setAttribute('aria-expanded','false');
+  const callbacks=closingCallbacks.splice(0);
+  const focusTarget=lastFocus;
+  if(track.hidden&&focusTarget?.isConnected)focusTarget.focus({preventScroll:true});
+  callbacks.forEach(fn=>{try{fn()}catch(error){console.error('[ImamStore menu]',error)}});
+ }
+ function show(){
+  if(isOpen())return;
+  clearTimeout(hideTimer);hideTimer=0;
+  if(openFrame)cancelAnimationFrame(openFrame);
+  if(readyFrame)cancelAnimationFrame(readyFrame);
+  closingCallbacks.length=0;
+  cleanDrag();
+  const fresh=drawer.hidden;
+  if(fresh){lastFocus=document.activeElement;lock();drawer.hidden=false}
+  trigger.setAttribute('aria-expanded','true');
+  // Two frames keep the initial offscreen position paintable after [hidden].
+  openFrame=requestAnimationFrame(()=>{
+   readyFrame=requestAnimationFrame(()=>{
+    drawer.classList.add('ism-open');
+    closeButton.focus({preventScroll:true});
+    syncAccount();
+    readyFrame=0;
+   });
+   openFrame=0;
+  });
+ }
+ function close(afterClose){
+  if(typeof afterClose==='function')closingCallbacks.push(afterClose);
+  if(drawer.hidden){const callbacks=closingCallbacks.splice(0);callbacks.forEach(fn=>fn());return}
+  if(openFrame)cancelAnimationFrame(openFrame);
+  if(readyFrame)cancelAnimationFrame(readyFrame);
+  openFrame=readyFrame=0;
+  drawer.classList.remove('ism-open');
+  cleanDrag();
+  trigger.setAttribute('aria-expanded','false');
+  clearTimeout(hideTimer);
+  if(reduced.matches){finishClose();return}
+  hideTimer=setTimeout(finishClose,EXIT_MS);
+ }
  function loginUser(){const u=window.firebase?.auth?.()?.currentUser;return u&&!u.isAnonymous?u:null}
  function syncAccount(){
   const u=loginUser(),inButton=document.getElementById('imamstoreMenuLogin'),outButton=document.getElementById('imamstoreMenuLogout');
@@ -8636,19 +8688,49 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   else{account.textContent='Masuk sebagai '+(u.email||u.displayName||'Pelanggan ImamStore');inButton.hidden=true;outButton.hidden=false}
  }
  trigger.addEventListener('click',show);
- document.getElementById('imamstoreMenuClose').addEventListener('click',close);
+ closeButton.addEventListener('click',()=>close());
  drawer.addEventListener('click',event=>{if(event.target===drawer)close()});
- const pane=drawer.querySelector('.ism-panel');
- pane.addEventListener('touchstart',event=>{if(event.touches.length!==1)return;startX=event.touches[0].clientX;startY=event.touches[0].clientY},{passive:true});
- pane.addEventListener('touchend',event=>{if(startX===null||event.changedTouches.length!==1)return;const dx=event.changedTouches[0].clientX-startX,dy=event.changedTouches[0].clientY-startY;startX=startY=null;if(dx>95&&Math.abs(dx)>Math.abs(dy)*1.5)close()},{passive:true});
+ // Horizontal swipe closes naturally, following the finger; vertical scrolling stays native.
+ pane.addEventListener('touchstart',event=>{
+  if(!isOpen()||event.touches.length!==1)return;
+  const finger=event.touches[0];
+  touch={x:finger.clientX,y:finger.clientY,at:performance.now(),dx:0,dragging:false};
+ },{passive:true});
+ pane.addEventListener('touchmove',event=>{
+  if(!touch||event.touches.length!==1||!isOpen())return;
+  const finger=event.touches[0],dx=finger.clientX-touch.x,dy=finger.clientY-touch.y;
+  if(!touch.dragging){
+   if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)){touch=null;return}
+   if(dx<12||dx<Math.abs(dy)*1.3)return;
+   touch.dragging=true;drawer.classList.add('ism-dragging');
+  }
+  event.preventDefault();
+  const distance=Math.min(pane.clientWidth,Math.max(0,dx));
+  touch.dx=distance;
+  pane.style.transform='translate3d('+distance+'px,0,0)';
+  drawer.style.opacity=String(Math.max(.15,1-distance/Math.max(1,pane.clientWidth)));
+ },{passive:false});
+ function endTouch(){
+  const gesture=touch;touch=null;
+  if(!gesture?.dragging)return;
+  const elapsed=Math.max(1,performance.now()-gesture.at);
+  const shouldClose=gesture.dx>Math.min(130,pane.clientWidth*.30)||(gesture.dx>50&&gesture.dx/elapsed>.55);
+  drawer.classList.remove('ism-dragging');
+  if(shouldClose)close();
+  else{pane.style.transform='';drawer.style.opacity=''}
+ }
+ pane.addEventListener('touchend',endTouch,{passive:true});
+ pane.addEventListener('touchcancel',()=>{touch=null;cleanDrag()},{passive:true});
  function navigateTab(tab){
   window.nineVisitStore?.();
   if(tab==='produk'&&typeof window.imamstoreShowAllStoreProducts==='function')window.imamstoreShowAllStoreProducts();
-  else {document.querySelector('.tabs [data-tab="'+tab+'"]')?.click();window.storeResetVerticalHeader?.();document.getElementById('panel-'+tab)?.scrollTo({top:0,behavior:'instant'});window.imamstoreRefreshScrollTop?.()}
+  else{document.querySelector('.tabs [data-tab="'+tab+'"]')?.click();window.storeResetVerticalHeader?.();document.getElementById('panel-'+tab)?.scrollTo({top:0,behavior:'instant'});window.imamstoreRefreshScrollTop?.()}
  }
  drawer.querySelectorAll('[data-ism-action]').forEach(btn=>btn.addEventListener('click',async()=>{
-  const action=btn.dataset.ismAction;close();
-  if(['toko','produk','kategori','favorit'].includes(action)){navigateTab(action);return}
+  const action=btn.dataset.ismAction;
+  if(['toko','produk','kategori','favorit'].includes(action)){close(()=>navigateTab(action));return}
+  // Popups and navigation need the original user gesture; start them immediately.
+  close();
   if(action==='keranjang'){window.imamstoreCartBridge?.openCart?.();return}
   if(action==='pesanan'){window.nexaiOpenOrders?.();return}
   if(action==='login'){await window.nexaiRequireCustomerLogin?.();syncAccount();return}
@@ -8657,14 +8739,27 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    try{await a.signOut();syncAccount();window.imamstoreToast?.('Anda berhasil keluar dari akun','success')}catch(e){console.warn('Logout ImamStore gagal',String(e?.code||'unknown'));alert('Belum berhasil keluar. Silakan coba lagi.')}
    return;
   }
-  if(action==='lacak'){trackFocus=document.activeElement;trackOverflow=document.body.style.overflow;track.hidden=false;document.body.style.overflow='hidden';document.getElementById('imamstoreTrackingCarrier').focus();return}
+  if(action==='lacak'){trackFocus=trigger;trackOverflow=restoreOverflow;track.hidden=false;document.body.style.overflow='hidden';document.getElementById('imamstoreTrackingCarrier').focus();return}
   if(action==='chat'){window.open('https://wa.me/6282210109369','_blank','noopener,noreferrer');return}
   if(action==='website'){location.href='https://imamsales.com/'}
  }));
  function closeTrack(){if(track.hidden)return;track.hidden=true;document.body.style.overflow=trackOverflow;trackFocus?.focus?.({preventScroll:true})}
  document.getElementById('imamstoreTrackingClose').addEventListener('click',closeTrack);
  track.addEventListener('click',event=>{if(event.target===track)closeTrack()});
- document.addEventListener('keydown',event=>{if(event.key!=='Escape')return;if(!track.hidden){event.preventDefault();closeTrack()}else if(!drawer.hidden){event.preventDefault();close()}},true);
+ document.addEventListener('keydown',event=>{
+  if(event.key==='Escape'){
+   if(!track.hidden){event.preventDefault();closeTrack()}
+   else if(!drawer.hidden){event.preventDefault();close()}
+   return;
+  }
+  if(event.key==='Tab'&&isOpen()&&track.hidden){
+   const focusable=Array.from(pane.querySelectorAll('button:not([hidden]):not([disabled]),a[href],input:not([disabled]),select:not([disabled])')).filter(el=>el.getClientRects().length);
+   if(!focusable.length)return;
+   const first=focusable[0],last=focusable[focusable.length-1];
+   if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus()}
+   else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus()}
+  }
+ },true);
  document.getElementById('imamstoreTrackingForm').addEventListener('submit',async event=>{
   event.preventDefault();const resi=document.getElementById('imamstoreTrackingResi').value.trim(),carrier=document.getElementById('imamstoreTrackingCarrier').value;
   const sites={jne:'https://www.jne.co.id/tracking-package',jnt:'https://www.jet.co.id/track',sicepat:'https://www.sicepat.com/',pos:'https://www.posindonesia.co.id/id/tracking'};
