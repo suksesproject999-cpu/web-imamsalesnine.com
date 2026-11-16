@@ -4776,7 +4776,7 @@ function updateOriginalSticky(){
 // Keep the original layout but make share, wishlist, and product search usable.
 host.addEventListener('click',async e=>{
  const wish=e.target.closest('.wishlist-btn');if(wish){e.preventDefault();e.stopPropagation();window.toggleWishlist(activeProduct()?.id);return}
- const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;const link=new URL('/',location.origin);link.searchParams.set('product',String(p.id));window.imamstoreProductSharePreview?.refresh?.();try{if(navigator.share)await navigator.share({title:String(p.nama||'Produk ImamStore'),text:String(p.nama||'Produk ImamStore'),url:link.href});else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link.href);share.setAttribute('title','Tautan produk disalin')}else prompt('Salin tautan produk',link.href)}catch(err){if(err?.name!=='AbortError')console.warn('Share failed',err)}}
+ const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;window.imamstoreShareChoices?.open(p,share);return}
 },true);
 let searchTimer=null;
 host.addEventListener('input',e=>{if(e.target.id!=='nineDetailSearchInput')return;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{const q=e.target.value.trim().toLocaleLowerCase('id');const results=host.querySelector('#nineDetailSearchResults');if(!results)return;results.replaceChildren();if(q.length<2){results.hidden=true;return}const matches=allProducts.filter(p=>[p.nama,p.brand,p.subbrand,p.kategori,p.sku,p.kode].some(v=>String(v||'').toLocaleLowerCase('id').includes(q))).slice(0,12);if(!matches.length){const empty=document.createElement('p');empty.className='nine-clean-search-empty';empty.textContent='Produk tidak ditemukan';results.append(empty)}else for(const p of matches){const b=document.createElement('button');b.type='button';b.className='nine-clean-search-result';const img=document.createElement('img');img.src=imageOf(p.gambar);img.alt='';img.loading='lazy';const label=document.createElement('span');label.textContent=p.nama;b.append(img,label);b.onclick=()=>{results.hidden=true;document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:p.id}}))};results.append(b)}results.hidden=false},150)});
@@ -8879,6 +8879,121 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
  window.addEventListener('popstate',()=>{
   if(!finished&&new URL(location.href).searchParams.get('product')!==target){finished=true;clearTimeout(limit);clear()}
  });
+})();
+</script>
+<style id="imamstore-share-choice-style">
+#imamstoreShareChoices[hidden]{display:none}
+#imamstoreShareChoices{position:fixed;inset:0;z-index:2147483400;display:flex;align-items:flex-end;justify-content:center;color:#243321;font-family:system-ui,-apple-system,Arial,sans-serif}
+#imamstoreShareChoices .isc-backdrop{position:absolute;inset:0;background:rgba(0,0,0,.55);border:0;width:100%;height:100%}
+#imamstoreShareChoices .isc-panel{position:relative;width:min(100%,520px);border-radius:22px 22px 0 0;background:#fff;box-shadow:0 -8px 35px #0002;padding:18px 18px calc(22px + env(safe-area-inset-bottom,0px));max-height:88dvh;overflow:auto;overscroll-behavior:contain;animation:iscAppear .18s ease-out}
+@keyframes iscAppear{from{opacity:.5;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@media(prefers-reduced-motion:reduce){#imamstoreShareChoices .isc-panel{animation:none}}
+#imamstoreShareChoices .isc-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+#imamstoreShareChoices .isc-head h2{font-size:18px;margin:0;font-weight:800}
+#imamstoreShareChoices .isc-close{border:0;background:#f1f4ed;border-radius:50%;width:36px;height:36px;font-size:23px;color:#465a39}
+#imamstoreShareChoices .isc-product{font-size:13px;color:#586257;line-height:1.4;margin:0 0 15px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+#imamstoreShareChoices .isc-action{display:flex;width:100%;align-items:center;gap:12px;padding:14px 13px;border:1px solid #e4ebdf;border-radius:13px;background:#fff;text-align:left;color:#243321;margin:8px 0;min-height:62px}
+#imamstoreShareChoices .isc-action .isc-icon{width:39px;height:39px;display:grid;place-items:center;border-radius:12px;background:#eff7e7;color:#699c2b;font-size:18px;flex:none}
+#imamstoreShareChoices .isc-action strong{display:block;font-size:14px}
+#imamstoreShareChoices .isc-action small{display:block;font-size:11px;color:#7e877b;margin-top:3px;line-height:1.45}
+#imamstoreShareChoices .isc-action:disabled{opacity:.55;cursor:default}
+#imamstoreShareChoices .isc-action:focus-visible,#imamstoreShareChoices .isc-close:focus-visible{outline:2px solid #8cc63f;outline-offset:3px}
+#imamstoreShareChoices .isc-note{font-size:11px;color:#797f77;line-height:1.5;margin:11px 3px 0}
+#imamstoreShareChoices .isc-status{font-size:12px;min-height:17px;color:#527f24;margin:8px 3px 0}
+</style>
+<script id="imamstore-share-choices-script">
+/* Two explicit share options. Photos become File objects BEFORE the user taps share,
+   preserving the transient user activation required by the native Web Share API.
+   Only the public image is fetched; no login/account/cart code is involved. */
+(function(){'use strict';
+ if(window.imamstoreShareChoices)return;
+ const ORIGIN='https://store.imamsales.com/';
+ const el=document.createElement('div');el.id='imamstoreShareChoices';el.hidden=true;
+ el.setAttribute('role','dialog');el.setAttribute('aria-modal','true');
+ el.setAttribute('aria-label','Bagikan produk');
+ el.innerHTML='<button class="isc-backdrop" type="button" aria-label="Tutup"></button>'+
+  '<div class="isc-panel"><div class="isc-head"><h2>Bagikan Produk</h2><button class="isc-close" type="button" aria-label="Tutup">×</button></div>'+
+  '<p class="isc-product"></p>'+
+  '<button class="isc-action isc-link" type="button"><span class="isc-icon"><i class="fa-solid fa-link"></i></span><span><strong>Bagikan Link</strong><small>Pratinjau produk di WhatsApp dan aplikasi lain</small></span></button>'+
+  '<button class="isc-action isc-photo" type="button" disabled><span class="isc-icon"><i class="fa-regular fa-image"></i></span><span><strong>Bagikan Foto + Link</strong><small class="isc-photo-info">Menyiapkan foto produk...</small></span></button>'+
+  '<button class="isc-action isc-copy" type="button"><span class="isc-icon"><i class="fa-regular fa-copy"></i></span><span><strong>Salin Link</strong><small>Simpan tautan untuk dikirim manual</small></span></button>'+
+  '<p class="isc-status" role="status" aria-live="polite"></p>'+
+  '<p class="isc-note">Beberapa aplikasi tidak menyertakan teks tautan saat menerima foto. Jika perlu, gunakan Salin Link.</p></div>';
+ document.body.append(el);
+ const q=s=>el.querySelector(s);
+ let payload=null,photo=null,seq=0,lastFocus=null;
+ const text=v=>String(v??'').replace(/<[^>]*>/g,' ').replace(/\s+/g,' ').trim();
+ const idOk=v=>v!==null&&v!==undefined&&/^[A-Za-z0-9_-]{1,120}$/.test(String(v));
+ function imageCandidates(p){return [p?.gambar,p?.image,p?.thumbnail,p?.foto,p?.fotoUtama,p?.mainImage,p?.photo,p?.imageUrl,
+  ...(Array.isArray(p?.gallery)?p.gallery:[]),...(Array.isArray(p?.galeri)?p.galeri:[]),...(Array.isArray(p?.images)?p.images:[]),...(Array.isArray(p?.fotoProduk)?p.fotoProduk:[])];}
+ function getImage(p){for(const v of imageCandidates(p)){
+   const s=typeof v==='string'?v:(v?.url||v?.src||v?.gambar||v?.image||'');
+   if(typeof s!=='string'||!s.trim()||/no-image|placeholder/i.test(s))continue;
+   if(/^data:image\/(?:png|jpe?g|webp|gif|avif);base64,/i.test(s))return s;
+   try{const url=new URL(s,ORIGIN);if(url.protocol==='https:' && !url.username&&!url.password)return url.href}catch{}
+  }return '';
+ }
+ async function makeFile(p){
+   const src=getImage(p);if(!src)return null;
+   let source=src;
+   if(!src.startsWith('data:')){
+     const url=new URL(src);if(url.origin===location.origin&& !url.pathname.startsWith('/.netlify/')&&!url.pathname.startsWith('/_share-image/')){
+       const cdn=new URL('/.netlify/images',location.origin);
+       cdn.searchParams.set('url',url.pathname+url.search);cdn.searchParams.set('w','960');cdn.searchParams.set('h','504');
+       cdn.searchParams.set('fit','contain');cdn.searchParams.set('fm','jpg');cdn.searchParams.set('q','63');source=cdn.href;
+     }
+   }
+   const res=await fetch(source,{mode:'cors',credentials:'omit',signal:AbortSignal.timeout(18000)});
+   if(!res.ok)throw Error('photo-request-failed');
+   const blob=await res.blob();
+   if(!blob.type.startsWith('image/')||blob.size<50||blob.size>6*1024*1024)throw Error('invalid-photo');
+   // Native share targets support JPEG broadly; convert non-JPEG images locally.
+   if(blob.type==='image/jpeg')return new File([blob],'ImamStore-Produk-'+p.id+'.jpg',{type:'image/jpeg'});
+   const bitmap=await createImageBitmap(blob);
+   try{
+     const ratio=Math.min(960/bitmap.width,504/bitmap.height,1);
+     const c=document.createElement('canvas');c.width=Math.max(1,Math.round(bitmap.width*ratio));c.height=Math.max(1,Math.round(bitmap.height*ratio));
+     c.getContext('2d',{alpha:false}).drawImage(bitmap,0,0,c.width,c.height);
+     const jpeg=await new Promise(resolve=>c.toBlob(resolve,'image/jpeg',.7));
+     if(!jpeg||jpeg.size>6*1024*1024)throw Error('image-conversion-failed');
+     return new File([jpeg],'ImamStore-Produk-'+p.id+'.jpg',{type:'image/jpeg'});
+   }finally{bitmap.close?.()}
+ }
+ function close(){if(el.hidden)return;el.hidden=true;seq++;payload=null;photo=null;try{lastFocus?.focus({preventScroll:true})}catch{}lastFocus=null}
+ function status(message){q('.isc-status').textContent=message}
+ function open(p,invoker){
+   if(!p||!idOk(p.id))return;
+   const link=new URL('/',location.origin);link.searchParams.set('product',String(p.id));
+   payload={id:String(p.id),name:text(p.nama||p.name||'Produk ImamStore'),link:link.href};
+   photo=null;const token=++seq;lastFocus=invoker||document.activeElement;
+   q('.isc-product').textContent=payload.name;
+   q('.isc-photo').disabled=true;
+   q('.isc-photo-info').textContent='Menyiapkan foto produk...';
+   status('');el.hidden=false;q('.isc-close').focus({preventScroll:true});
+   if(!navigator.share||!navigator.canShare){q('.isc-photo-info').textContent='Perangkat ini belum mendukung berbagi foto langsung';return}
+   makeFile(p).then(file=>{
+     if(token!==seq||el.hidden)return;
+     if(file&&navigator.canShare({files:[file]})){photo=file;q('.isc-photo').disabled=false;q('.isc-photo-info').textContent='Kirim foto asli sebagai lampiran beserta tautan'}
+     else{q('.isc-photo-info').textContent='Foto tidak tersedia untuk dibagikan langsung'}
+   }).catch(()=>{if(token===seq&&!el.hidden)q('.isc-photo-info').textContent='Foto belum tersedia. Gunakan Bagikan Link.'});
+ }
+ async function linkShare(){if(!payload)return;const {name,link}=payload;
+  try{if(navigator.share){await navigator.share({title:name,text:name,url:link});close()}
+  else if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(link);status('Link produk berhasil disalin.')}
+  else{prompt('Salin tautan produk',link)}}catch(e){if(e?.name!=='AbortError')status('Belum berhasil membagikan link. Coba Salin Link.')}}
+ async function photoShare(){if(!photo||!payload||!navigator.canShare?.({files:[photo]}))return;
+  // This call MUST be synchronous with the user's click: no await/fetch before share().
+  const input={files:[photo],title:payload.name,text:payload.name+'\n'+payload.link};
+  try{await navigator.share(input);close()}catch(e){if(e?.name!=='AbortError')status('Belum berhasil membagikan foto. Coba Bagikan Link.')}}
+ async function copy(){if(!payload)return;try{if(navigator.clipboard?.writeText){await navigator.clipboard.writeText(payload.link);status('Link produk berhasil disalin.')}
+  else{prompt('Salin tautan produk',payload.link)}}catch{status('Belum bisa menyalin link. Coba Bagikan Link.')}}
+ q('.isc-backdrop').addEventListener('click',close);
+ q('.isc-close').addEventListener('click',close);
+ q('.isc-link').addEventListener('click',linkShare);
+ q('.isc-photo').addEventListener('click',photoShare);
+ q('.isc-copy').addEventListener('click',copy);
+ document.addEventListener('keydown',e=>{if(!el.hidden&&e.key==='Escape'){e.preventDefault();close()}});
+ window.imamstoreShareChoices=Object.freeze({open,close});
 })();
 </script>
 </body></html>

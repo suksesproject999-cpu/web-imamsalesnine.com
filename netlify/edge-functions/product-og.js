@@ -118,8 +118,13 @@ async function loadProduct(request, id) {
   const hit = cache.get(key);
   if (hit && hit.until > Date.now()) return hit.product;
   // CMS wins, but use seed values for missing fields (matching the web index's merge order).
-  const cms = await cmsProduct(id);
-  const seed = !cms || !photoSource(cms) || !cms.nama ? await seedProduct(request,id) : null;
+  // Begin the public seed request at the same time as CMS. When CMS lookup
+  // fails or has no public picture, the fallback is already loaded instead of
+  // making crawlers wait for a second network round-trip.
+  const cmsTask = cmsProduct(id);
+  const seedTask = seedProduct(request,id);
+  const cms = await cmsTask;
+  const seed = !cms || !photoSource(cms) || !cms.nama ? await seedTask : null;
   const product = cms ? {...(seed||{}),...cms} : seed;
   const safe = product && product.active !== false && product.deleted !== true ? product : null;
   cache.set(key,{product:safe,until:Date.now()+(safe?3*60*1000:25*1000)});
@@ -234,17 +239,17 @@ export default async function productOpenGraph(request,context) {
     const headers={'Content-Type':image.mime,'Cache-Control':'public, max-age=3600','Netlify-CDN-Cache-Control':'public, max-age=3600','X-Content-Type-Options':'nosniff'};
     return new Response(request.method==='HEAD'?null:image.data,{status:200,headers});
   }
-  if (url.pathname !== '/' || request.method !== 'GET') return;
+  if (url.pathname !== '/' || request.method !== 'GET') return context.next();
   const id=url.searchParams.get('product');
-  if (!validId(id)) return;
+  if (!validId(id)) return context.next();
   // Keep non-HTML/API requests on the original route.
   const accept=request.headers.get('accept')||'';
-  if (accept && !accept.includes('text/html') && !accept.includes('*/*')) return;
+  if (accept && !accept.includes('text/html') && !accept.includes('*/*')) return context.next();
   const product = await loadProduct(request,id);
   if (!product) {
     // Do not invent product titles or images. Preserve normal deep-link error behavior.
     console.warn('[ImamStore Share] Product metadata not found:',id);
-    return;
+    return context.next();
   }
   const photo = photoSource(product);
   const meta=pageTags(product,id,photo);
@@ -254,6 +259,8 @@ export default async function productOpenGraph(request,context) {
   const headers=new Headers(originResponse.headers);
   headers.delete('content-length'); headers.delete('content-encoding');headers.delete('etag');
   headers.set('Content-Type','text/html; charset=utf-8');
+  // Cache only public product HTML; the product query key isolates products.
+  // No response with authentication, customer data, or user-specific content is generated.
   // Cache identical public product HTML across crawlers and ignore tracking params.
   // A new deploy invalidates Netlify's deploy-specific cache; CMS changes refresh
   // after this short TTL. Browser cache remains disabled for HTML.
@@ -266,4 +273,4 @@ export default async function productOpenGraph(request,context) {
   headers.set('X-ImamStore-OG-Image',meta.imageKind);
   return new Response(inject(html,meta),{status:originResponse.status,headers});
 }
-export const config = { path:['/','/_share-image/:id'] };
+export const config = { path:['/','/_share-image/:id'], cache:'manual' };
