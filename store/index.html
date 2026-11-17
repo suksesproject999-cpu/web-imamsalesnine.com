@@ -1081,6 +1081,128 @@ function imamstoreBootstrapFirebaseR8(){
 }
 window.imamstoreR8Security=Object.freeze({status:()=>({...imamstoreR8Security})});
 imamstoreBootstrapFirebaseR8();
+/* FAVORIT HYBRID — guest stays in browser, signed-in non-anonymous users sync per Firebase UID.
+ * Single owner for detail, favorites tab, both cart entry points; no account wishlist in localStorage.
+ */
+const imamstoreWishlist=(()=>{'use strict';
+ const KEY='imamstore_wishlist_v32',VALID=/^[A-Za-z0-9_-]{1,120}$/,LIMIT=500;
+ const state={mode:'initializing',uid:'',ready:false,migrating:false,error:''};
+ let cloudIds=new Set(),visibleIds=new Set(),docs=null,off=null,generation=0,authOff=null;
+ let migrationTask=null;
+ const busy=new Set();
+ const valid=x=>VALID.test(String(x??''));
+ const idsFrom=x=>[...new Set((Array.isArray(x)?x:[]).map(v=>String(v&&typeof v==='object'?v.id:v)).filter(valid))].slice(0,LIMIT);
+ function readGuest(){try{return idsFrom(JSON.parse(localStorage.getItem(KEY)||'[]'))}catch{return []}}
+ function writeGuest(next){try{const ids=idsFrom(next);if(ids.length)localStorage.setItem(KEY,JSON.stringify(ids));else localStorage.removeItem(KEY);return true}catch(e){console.warn('[Favorit] Penyimpanan tamu tidak tersedia',e?.name||'storage');return false}}
+ function recalc(){
+  visibleIds=state.mode==='account'?new Set([...cloudIds,...readGuest()]):
+    state.mode==='guest'?new Set(readGuest()):new Set();
+  document.dispatchEvent(new CustomEvent('nine:wishliststate',{detail:{mode:state.mode,ready:state.ready,migrating:state.migrating,error:state.error}}));
+ }
+ function stopListener(){if(off){off();off=null}docs=null;cloudIds=new Set();migrationTask=null;busy.clear()}
+ function guestMode(message=''){
+  ++generation;stopListener();state.mode='guest';state.uid='';state.ready=true;state.migrating=false;state.error=message;recalc();
+ }
+ function removeGuestIds(removed){
+  if(!removed.length)return true;
+  const cut=new Set(removed);return writeGuest(readGuest().filter(id=>!cut.has(id)));
+ }
+ async function mergeGuest(token,uid){
+  if(migrationTask)return migrationTask;
+  const pending=readGuest();if(!pending.length)return;
+  state.migrating=true;state.error='';recalc();
+  migrationTask=(async()=>{
+   // Each write is idempotent. Guest entries are removed ONLY after acknowledged writes.
+   const settled=await Promise.allSettled(pending.map(id=>docs.doc(id).set({productId:id,addedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})));
+   if(token!==generation||state.uid!==uid)return;
+   const succeeded=pending.filter((id,i)=>settled[i].status==='fulfilled');
+   const failed=settled.length-succeeded.length;
+   if(succeeded.length){
+    succeeded.forEach(id=>cloudIds.add(id));
+    if(!removeGuestIds(succeeded))state.error='Favorit berhasil dikirim, tetapi data tamu belum dapat dibersihkan.';
+   }
+   if(failed)state.error='Sebagian favorit belum tersinkron. Periksa koneksi dan login ulang untuk mencoba lagi.';
+   state.migrating=false;recalc();
+  })().finally(()=>{if(token===generation)migrationTask=null});
+  return migrationTask;
+ }
+ function bindAccount(user){
+  ++generation;const token=generation;stopListener();
+  state.mode='account';state.uid=user.uid;state.ready=false;state.migrating=false;state.error='';recalc();
+  try{
+   docs=firebase.firestore().collection('users').doc(user.uid).collection('wishlist');
+   let initial=true;
+   off=docs.onSnapshot(snapshot=>{
+    if(token!==generation)return;
+    cloudIds=new Set(snapshot.docs.map(doc=>String(doc.id)).filter(valid));
+    state.ready=true;if(!readGuest().length)state.error='';
+    recalc();
+    if(initial){initial=false;if(readGuest().length)void mergeGuest(token,user.uid)}
+   },error=>{
+    if(token!==generation)return;
+    state.ready=false;
+    state.error='Gagal membaca favorit akun. Periksa koneksi atau akses Firestore.';
+    console.warn('[Favorit] Listener akun gagal',error?.code||error?.message);
+    recalc();
+   });
+  }catch(error){
+   state.ready=false;state.error='Firestore belum dapat diakses untuk favorit akun.';
+   console.warn('[Favorit] Inisialisasi akun gagal',error?.code||error?.message);recalc();
+  }
+ }
+ async function setFavorite(id,value){
+  id=String(id??'');if(!valid(id))return {ok:false,reason:'invalid'};
+  if(!state.ready||state.mode==='initializing'||state.migrating)return {ok:false,reason:'loading'};
+  if(busy.has(id))return {ok:false,reason:'busy'};
+  const liked=visibleIds.has(id),desired=typeof value==='boolean'?value:!liked;
+  if(desired===liked)return {ok:true,liked,unchanged:true};
+  const session=generation,uid=state.uid;
+  busy.add(id);
+  try{
+   if(state.mode==='guest'){
+    const existing=readGuest();const next=desired?[...existing,id]:existing.filter(x=>x!==id);
+    if(!writeGuest(next))return {ok:false,reason:'storage'};
+   }else if(state.mode==='account'&&docs){
+    const documentRef=docs.doc(id);
+    if(desired)await documentRef.set({productId:id,addedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true});
+    else await documentRef.delete();
+    if(generation!==session||state.uid!==uid)return {ok:false,reason:'session_changed'};
+    if(desired)cloudIds.add(id);else cloudIds.delete(id);
+    // If this ID was brought in by the guest queue, do not let it reappear after a delete.
+    if(readGuest().includes(id)&&!removeGuestIds([id]))return {ok:false,reason:'storage'};
+   }else return {ok:false,reason:'loading'};
+   recalc();
+   document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{id,liked:desired}}));
+   return {ok:true,liked:desired};
+  }catch(error){
+   console.warn('[Favorit] Perubahan belum tersimpan',error?.code||error?.message);
+   return {ok:false,reason:'firebase'};
+  }finally{busy.delete(id)}
+ }
+ async function addMany(values){
+  const unique=idsFrom(values);let added=0,skipped=0,failed=0;
+  if(!state.ready||state.migrating)return {ok:false,added,skipped,failed:unique.length,reason:'loading'};
+  const results=await Promise.all(unique.map(id=>setFavorite(id,true)));
+  results.forEach(r=>{if(!r.ok)failed++;else if(r.unchanged)skipped++;else added++});
+  return {ok:failed===0,added,skipped,failed};
+ }
+ // Auth can be anonymous for browsing product activity. Anonymous sessions remain guests.
+ try{
+  const auth=window.firebase?.auth?.();
+  if(auth?.onAuthStateChanged)authOff=auth.onAuthStateChanged(user=>{
+   if(user&&!user.isAnonymous)bindAccount(user);else guestMode();
+  },error=>guestMode('Firebase Authentication belum dapat dibaca. Favorit disimpan di browser ini.'));
+  else guestMode('Firebase Authentication belum tersedia. Favorit sementara disimpan di browser ini.');
+ }catch(error){guestMode('Koneksi akun belum tersedia. Favorit sementara disimpan di browser ini.')}
+ window.addEventListener('storage',event=>{
+  if(event.key!==KEY)return;
+  recalc();
+  if(state.mode==='account'&&state.ready&&!state.migrating&&readGuest().length)void mergeGuest(generation,state.uid);
+ });
+ return Object.freeze({ids:()=>[...visibleIds],has:id=>visibleIds.has(String(id)),status:()=>({...state}),toggle:id=>setFavorite(id),add:id=>setFavorite(id,true),remove:id=>setFavorite(id,false),addMany});
+})();
+window.imamstoreWishlist=imamstoreWishlist;
+
 
 const $=id=>document.getElementById(id);
 const money=n=>'Rp '+Number(n||0).toLocaleString('id-ID');
@@ -1429,13 +1551,7 @@ function rank(list,mode){
  return a;
 }
 function paint(id,items){$(id).innerHTML=items.length?items.map(card).join(''):'<p class="empty">Belum ada produk.</p>'}
-const FAVORITES_KEY='imamstore_wishlist_v32';
-function favoriteIds(){
- try{
-  const saved=JSON.parse(localStorage.getItem(FAVORITES_KEY)||'[]');
-  return Array.isArray(saved)?[...new Set(saved.map(id=>String(typeof id==='object'?id?.id:id)).filter(Boolean))]:[];
- }catch{return []}
-}
+function favoriteIds(){return window.imamstoreWishlist?.ids()||[];}
 function renderFavorites(){
  const ids=favoriteIds(),index=new Map(products.map(p=>[String(p.id),p]));
  const items=ids.map(id=>index.get(id)).filter(Boolean);
@@ -1445,11 +1561,18 @@ function renderFavorites(){
   grid.dataset.signature=signature;
   grid.innerHTML=items.map(p=>`<div class="favorite-item">${card(p)}<button type="button" class="favorite-remove" data-favorite-toggle="${esc(p.id)}" aria-label="Hapus ${esc(p.nama)} dari favorit" title="Hapus dari favorit"><i class="fa-solid fa-heart" aria-hidden="true"></i></button></div>`).join('');
  }
- $('favoriteCount').textContent=items.length+' produk';
+ const state=window.imamstoreWishlist?.status()||{mode:'initializing',ready:false,migrating:false,error:''};
+ const note=document.querySelector('#panel-favorit .favorite-note');
+ if(note)note.textContent=state.mode==='account'
+  ? (state.migrating?'Menggabungkan favorit dari browser ke akun Firebase…':state.error||'Favorit tersimpan pada akun Firebase dan otomatis sinkron antarperangkat.')
+  :state.mode==='guest'?'Favorit sementara tersimpan di browser ini. Login agar tersinkron ke akun.':'Menyiapkan daftar favorit…';
+ $('favoriteCount').textContent=!state.ready?'Memuat…':items.length+' produk';
+ $('favoriteEmpty').textContent=state.mode==='account'&&!state.ready
+  ?'Favorit akun sedang dimuat dari Firebase…'
+  :'Belum ada produk favorit. Buka detail produk dan tekan ikon hati untuk menyimpannya.';
  $('favoriteEmpty').classList.toggle('hidden',items.length!==0);
 }
-document.addEventListener('nine:wishlistchange',renderFavorites);
-window.addEventListener('storage',e=>{if(e.key===FAVORITES_KEY)renderFavorites()});
+document.addEventListener('nine:wishliststate',renderFavorites);
 // Pencarian semantik ringan berbasis kategori Store realtime; ID hanya relasi internal.
 const searchNormalize=value=>String(value??'').toLocaleLowerCase('id-ID').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').replace(/[^a-z0-9]+/g,' ').trim().replace(/\s+/g,' ');
 function categorySearchTerms(c){
@@ -2757,21 +2880,13 @@ function removeSelectedCart(){
   execute();
  }
 }
-function cartFavoriteSelected(){
- const items=chosen();
- if(!items.length)return;
- // Single wishlist owner: use the existing Firebase-aware toggle, never write
- // localStorage and emit a second event from the cart.
- const user=window.firebase?.auth?.()?.currentUser;
- if(!user){window.V17?.openAccount?.();return}
- const existing=new Set((Array.isArray(wishlist)?wishlist:[]).map(String));
- for(const item of items){
-  if(item.id==null)continue;
-  const id=String(item.id);
-  if(existing.has(id))continue;
-  existing.add(id);
-  if(typeof window.toggleWishlist==='function')window.toggleWishlist(item.id);
- }
+async function cartFavoriteSelected(){
+ const items=chosen(),ids=[...new Set(items.map(item=>String(item.id??'')).filter(Boolean))];
+ if(!ids.length)return;
+ const result=await window.imamstoreWishlist?.addMany(ids);
+ const text=!result?.ok?'Sebagian favorit belum tersimpan. Periksa koneksi atau sesi akun.':
+  result.added?result.added+' produk ditambahkan ke Favorit':'Semua produk terpilih sudah di Favorit';
+ window.imamstoreCartToast?.(text);
 }
 // NINE V4: isolated card component; no DOM repositioning on quantity/header updates.
 let cartEnhancing=false;
@@ -4340,7 +4455,7 @@ let html = `
           <div class="price">Rp ${(window.nineEffectivePromo(product) || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-window.nineEffectivePromo(product)).toLocaleString("id-ID")}</span>` : ""}
         </div><div class="nine-meta-actions">
           <button type="button" class="nine-voucher" onclick="nineOpenOriginalVoucher()"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher</button>
-          <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${renderedProductViews(product.id)} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(Number(sold)||Number(product.terjual)||Number(product.sold)||Number(product.totalTerjual)||0)} terjual</span></div><button class="wishlist-btn" onclick="toggleWishlist(${product.id})" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
+          <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${renderedProductViews(product.id)} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(Number(sold)||Number(product.terjual)||Number(product.sold)||Number(product.totalTerjual)||0)} terjual</span></div><button class="wishlist-btn" type="button" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
         <div class="product-title"><h2>${product.brand ? `<span class="nine-inline-brand">${product.brand}</span> ` : ""}${product.nama}</h2></div>
         <div class="product-highlights">
           <span><i class="fa-solid fa-circle-check"></i><small>${product.stok?.status || "Ready"}</small></span>
@@ -4708,14 +4823,21 @@ let specsStart=null;
 host.addEventListener('touchstart',e=>{const p=e.target.closest('#nineSpecOverlay .nine-sheet-head');if(!p)return;const touch=e.touches[0];if(touch)specsStart={y:touch.clientY,x:touch.clientX}},{passive:true});
 host.addEventListener('touchend',e=>{if(!specsStart)return;const touch=e.changedTouches[0];const start=specsStart;specsStart=null;if(touch&&touch.clientY-start.y>85&&Math.abs(touch.clientX-start.x)<70)window.nineCloseSpecs()},{passive:true});
 window.nineVisitStore=close;
-const WISH_KEY='imamstore_wishlist_v32';
-function readWishlist(){try{const v=JSON.parse(localStorage.getItem(WISH_KEY)||'[]');return Array.isArray(v)?v.map(String).slice(0,500):[]}catch{return []}}
-function refreshWishlist(){wishlist=readWishlist();const p=activeProduct();if(!p)return;const liked=wishlist.includes(String(p.id));host.querySelectorAll('.wishlist-btn').forEach(b=>{b.textContent=liked?'❤️':'🤍';b.setAttribute('aria-pressed',String(liked));b.setAttribute('aria-label',liked?'Hapus dari favorit':'Tambahkan ke favorit')})}
+function refreshWishlist(){
+ wishlist=window.imamstoreWishlist?.ids()||[];
+ const p=activeProduct();if(!p)return;
+ const liked=window.imamstoreWishlist?.has(p.id)===true;
+ host.querySelectorAll('.wishlist-btn').forEach(b=>{b.textContent=liked?'❤️':'🤍';b.setAttribute('aria-pressed',String(liked));b.setAttribute('aria-label',liked?'Hapus dari favorit':'Tambahkan ke favorit')});
+}
 let wishlistToastTimer;
-function wishlistToast(message){let el=host.querySelector('.nine-clean-wishlist-toast');if(!el){el=document.createElement('div');el.className='nine-clean-wishlist-toast';el.setAttribute('role','status');host.append(el)}el.textContent=message;el.hidden=false;clearTimeout(wishlistToastTimer);wishlistToastTimer=setTimeout(()=>{el.hidden=true},1900)}
-window.addEventListener('storage',event=>{if(event.key===WISH_KEY)refreshWishlist()});
-document.addEventListener('nine:wishlistchange',refreshWishlist);
-window.toggleWishlist=id=>{const p=activeProduct();const target=String(id??p?.id??'');if(!target)return;let data=readWishlist();const liked=!data.includes(target);data=liked?[...data,target]:data.filter(x=>x!==target);try{localStorage.setItem(WISH_KEY,JSON.stringify(data))}catch(e){console.warn('Wishlist storage unavailable',e)}refreshWishlist();document.dispatchEvent(new CustomEvent('nine:wishlistchange',{detail:{id:target,liked}}));wishlistToast(liked?'❤️ Ditambahkan ke Produk Favorit':'♡ Dihapus dari Produk Favorit')};
+function wishlistToast(message){let el=document.getElementById('imamstoreWishlistToast');if(!el){el=document.createElement('div');el.id='imamstoreWishlistToast';el.className='nine-clean-wishlist-toast';el.setAttribute('role','status');document.body.append(el)}el.textContent=message;el.hidden=false;clearTimeout(wishlistToastTimer);wishlistToastTimer=setTimeout(()=>{el.hidden=true},1900)}
+document.addEventListener('nine:wishliststate',refreshWishlist);
+window.toggleWishlist=async id=>{
+ const target=String(id??activeProduct()?.id??'');if(!target)return;
+ const result=await window.imamstoreWishlist?.toggle(target);
+ if(!result?.ok){wishlistToast(result?.reason==='loading'?'Menyiapkan favorit akun. Coba lagi sebentar.':'Favorit belum tersimpan. Periksa koneksi lalu coba lagi.');return}
+ if(!result.unchanged)wishlistToast(result.liked?'❤️ Ditambahkan ke Produk Favorit':'♡ Dihapus dari Produk Favorit');
+};
 window.nineToggleDescription=()=>{const d=host.querySelector('#nineDescription');if(d)d.classList.toggle('expanded')};
 function updateOriginalSticky(){
  const p=activeProduct();if(!p)return;
@@ -6415,7 +6537,7 @@ const spec=()=>document.querySelector('#imamstoreLiveOriginalDetail #nineSpecOve
 /* Pengendali tunggal mode edit pada keranjang Stage5. Tanpa aksi geser card. */
 const $=id=>document.getElementById(id),cart=$('s5Cart'),edit=$('refCartEdit'),footer=cart?.querySelector('.ref-cart-footer'),row=footer?.querySelector('.ref-cart-checkout-row');
 if(!cart||!edit||!footer||!row)return;
-const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43',WISH='imamstore_wishlist_v32';
+const KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43';
 let editing=false;
 const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
 const selection=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}catch{return {}}};
@@ -6438,13 +6560,15 @@ edit.addEventListener('click',()=>{editing=!editing;paint()});
 $('s5CartBack')?.addEventListener('click',()=>{editing=false;paint()},true);
 document.addEventListener('imamstore:open-cart',()=>{editing=false;queueMicrotask(paint)});
 document.addEventListener('click',e=>{if(e.target.closest('#s5Cart'))return;if(editing&&cart.classList.contains('open'))return;if(editing){editing=false;paint()}},true);
-actions.querySelector('.v100-favorite').onclick=()=>{
- const lines=selected();if(!lines.length)return;
- let wish;try{wish=JSON.parse(localStorage.getItem(WISH)||'[]')}catch{wish=[]}
- if(!Array.isArray(wish))wish=[];
- for(const x of lines)if(x.id!=null&&!wish.some(v=>String(typeof v==='object'?v.id:v)===String(x.id)))wish.push(String(x.id));
- localStorage.setItem(WISH,JSON.stringify(wish));document.dispatchEvent(new Event('nine:wishlistchange'));
- window.imamstoreCartToast?.('Produk terpilih ditambahkan ke favorit');
+actions.querySelector('.v100-favorite').onclick=async()=>{
+ const ids=[...new Set(selected().map(x=>String(x.id??'')).filter(Boolean))];if(!ids.length)return;
+ const button=actions.querySelector('.v100-favorite');button.disabled=true;
+ try{
+  const result=await window.imamstoreWishlist?.addMany(ids);
+  window.imamstoreCartToast?.(!result?.ok
+   ?'Sebagian favorit belum tersimpan. Periksa koneksi atau sesi akun.'
+   :result.added?result.added+' produk ditambahkan ke Favorit':'Produk terpilih sudah di Favorit');
+ }finally{paint()}
 };
 actions.querySelector('.v100-delete').onclick=async()=>{
  const lines=selected();if(!lines.length)return;
