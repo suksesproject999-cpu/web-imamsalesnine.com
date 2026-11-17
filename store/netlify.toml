@@ -1,2 +1,6 @@
+[build]
+  command = "npm ci --prefix store && mkdir -p store/images store/assets && cp -R images/. store/images/ && cp -R assets/. store/assets/ && cp produk.json store/produk.json && rm -rf store-public && mkdir -p store-public && cp -R store/. store-public/ && rm -rf store-public/netlify store-public/node_modules && rm -f store-public/package.json store-public/package-lock.json store-public/netlify.toml store-public/.env store-public/.env.*"
+  publish = "store-public"
+
 [functions]
   directory = "store/netlify/functions"
