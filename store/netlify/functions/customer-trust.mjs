@@ -19,7 +19,7 @@ function reply(status,data,origin=''){
  return new Response(status===204?null:JSON.stringify(data),{status,headers:h});
 }
 const publicFail=(code,message)=>Object.assign(new Error(message),{status:code,publicMessage:message});
-const reviewId=(uid,orderId,productId)=>createHash('sha256').update(uid+'\0'+orderId+'\0'+productId).digest('hex');
+const reviewId=(uid,productId)=>createHash('sha256').update('imamstore-reviewed-v2\0'+uid+'\0'+productId).digest('hex');
 const itemsFor=(order,productId)=>Array.isArray(order?.items)?order.items.filter(x=>String(x?.productId||'')===productId):[];
 const completed=order=>String(order?.status||'').toLowerCase()==='completed';
 function realUser(decoded){return !!decoded?.uid&&decoded.firebase?.sign_in_provider!=='anonymous'}
@@ -32,22 +32,29 @@ async function ordersFor(db,uid){
   return y-x;
  });
 }
+// The public review collection is a historical ledger. Previous deployments stored
+// one review per order+product. V2 prevents an account from reviewing the same
+// product again, including if a historical review already exists.
+async function accountReviewedProducts(db,uid){
+ const snap=await db.collection('ulasan_produk').where('uid','==',uid).get();
+ return new Set(snap.docs.map(d=>String(d.data()?.productId||'')).filter(productOK));
+}
 async function reviewEntries(db,uid,{productId=''}={}){
- const all=await ordersFor(db,uid),entries=[],seen=new Set();
+ const [all,reviewedProducts]=await Promise.all([ordersFor(db,uid),accountReviewedProducts(db,uid)]);
+ const entries=[],seenItems=new Set(),offered=new Set();
  for(const snap of all){const order=snap.data();
   for(const item of order.items||[]){
    const pid=String(item?.productId||'');if(!productOK(pid)||(productId&&pid!==productId))continue;
-   const key=snap.id+'\0'+pid;if(seen.has(key))continue;seen.add(key);
+   const key=snap.id+'\0'+pid;if(seenItems.has(key))continue;seenItems.add(key);
+   const reviewed=reviewedProducts.has(pid);
+   const reviewable=!reviewed&&!offered.has(pid);offered.add(pid);
    entries.push({orderId:snap.id,productId:pid,productName:String(item?.nama||'Produk ImamStore').slice(0,160),
-    variant:String(item?.varian||'').slice(0,120),reviewId:reviewId(uid,snap.id,pid)});
+    variant:String(item?.varian||'').slice(0,120),reviewed,reviewable});
    if(entries.length>=100)break;
   }
   if(entries.length>=100)break;
  }
- if(!entries.length)return [];
- const refs=entries.map(e=>db.collection('ulasan_produk').doc(e.reviewId));
- const docs=await db.getAll(...refs);
- return entries.map((e,i)=>({...e,reviewed:docs[i].exists,reviewId:undefined}));
+ return entries;
 }
 async function setFollow(db,uid,desired,legacyVisitorId){
  const account=db.collection('store_followers').doc(uid);
@@ -77,16 +84,21 @@ async function submitReview(db,decoded,body){
  if(!Number.isInteger(rating)||rating<1||rating>5)throw publicFail(400,'Pilih penilaian 1 sampai 5 bintang.');
  if(typeof text!=='string'||text.length>1200)throw publicFail(400,'Ulasan maksimal 1.200 karakter.');
  const orderRef=db.collection('orders').doc(orderId);
- const reviewRef=db.collection('ulasan_produk').doc(reviewId(uid,orderId,productId));
+ const reviewRef=db.collection('ulasan_produk').doc(reviewId(uid,productId));
+ const previousReviewQuery=db.collection('ulasan_produk').where('uid','==',uid);
  const statsRef=db.collection('statistik_produk').doc(productId);
  await db.runTransaction(async tx=>{
-  const [orderSnap,reviewSnap]=await Promise.all([tx.get(orderRef),tx.get(reviewRef)]);
+  // Reads come before writes. A deterministic UID/product document prevents
+  // concurrent duplicate submissions, while querying UID rejects historical reviews.
+  const [orderSnap,reviewSnap,oldReviews]=await Promise.all([
+   tx.get(orderRef),tx.get(reviewRef),tx.get(previousReviewQuery)]);
   if(!orderSnap.exists)throw publicFail(403,'Pesanan tidak ditemukan pada akun ini.');
   const order=orderSnap.data();
   if(order.uid!==uid)throw publicFail(403,'Pesanan bukan milik akun ini.');
   if(!completed(order))throw publicFail(403,'Ulasan tersedia setelah pesanan selesai.');
   if(!itemsFor(order,productId).length)throw publicFail(403,'Produk tidak ditemukan dalam pesanan selesai ini.');
-  if(reviewSnap.exists)throw publicFail(409,'Produk dalam pesanan ini sudah diulas.');
+  if(reviewSnap.exists||oldReviews.docs.some(d=>String(d.data()?.productId||'')===productId))
+   throw publicFail(409,'Produk ini sudah pernah diulas oleh akunmu. Terima kasih!');
   tx.create(reviewRef,{uid,orderId,productId,rating,text:text.trim(),nama:nameFor(decoded),
    verifiedPurchase:true,createdAt:FieldValue.serverTimestamp()});
   // Keep existing product card and store star aggregates synced in the same transaction.

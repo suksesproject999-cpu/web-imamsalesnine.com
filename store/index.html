@@ -6857,6 +6857,20 @@ function updateStats(pid,data){
 
 }
 let loadedReviews=[],reviewStream=null;
+const locallyConfirmedReviews=new Set();
+function syncReviewComposer(){
+ const wrapper=host.querySelector('.nine-review-composer'),summary=wrapper?.querySelector(':scope > summary');
+ if(!summary)return;
+ const uid=window.firebase?.auth?.()?.currentUser?.uid||'';
+ const pid=String(getProduct()?.id||'');
+ const reviewed=!!uid&&!!pid&&(loadedReviews.some(r=>r.uid===uid)||locallyConfirmedReviews.has(uid+'::'+pid));
+ wrapper.dataset.reviewed=reviewed?'1':'0';
+ summary.setAttribute('aria-disabled',String(reviewed));
+ summary.innerHTML=reviewed?'✓ Sudah Diulas <i class="fa-solid fa-check-circle" aria-hidden="true"></i>':'Beri Ulasan Pembeli <i class="fa-solid fa-chevron-down" aria-hidden="true"></i>';
+ if(reviewed)wrapper.open=false;
+}
+try{window.firebase?.auth?.()?.onAuthStateChanged(()=>syncReviewComposer())}catch(_){}
+
 const reviewScore=x=>Math.max(0,Math.min(5,Math.round(Number(x.rating??x.bintang??x.stars??0)||0)));
 const reviewBody=x=>String(x.text??x.review??x.comment??x.ulasan??x.komentar??x.content??x.message??'');
 function reviewMedia(x){return Array.isArray(x.media)?x.media:Array.isArray(x.photos)?x.photos:[]}
@@ -6919,7 +6933,7 @@ function reviews(pid){
  reviewStream=store.collection('ulasan_produk').where('productId','==',String(pid)).onSnapshot(snap=>{
   if(token!==reviewToken||activeId!==pid)return;
   loadedReviews=snap.docs.map(doc=>({id:doc.id,...doc.data()})).sort((a,b)=>(b.createdAt?.toMillis?.()||0)-(a.createdAt?.toMillis?.()||0));
-  paintReviews();
+  paintReviews();syncReviewComposer();
  },err=>{
   if(token!==reviewToken)return;
   console.warn('Gagal memuat ulasan',err);
@@ -6996,7 +7010,14 @@ function signedInReviewer(){
  catch{return null}
 }
 async function requireReviewUser(){
- try{await window.firebase?.auth?.()?.authStateReady?.()}catch{}
+ const auth=window.firebase?.auth?.();
+ try{
+  if(typeof auth?.authStateReady==='function')await auth.authStateReady();
+  else if(typeof auth?.onAuthStateChanged==='function')await new Promise(resolve=>{
+   let settled=false,off=()=>{};
+   off=auth.onAuthStateChanged(()=>{if(settled)return;settled=true;off();resolve()},()=>{if(settled)return;settled=true;off();resolve()});
+  });
+ }catch{}
  const existing=signedInReviewer();if(existing)return existing;
  if(typeof window.nexaiRequireCustomerLogin!=='function'){
   reviewNotice('Silakan muat ulang halaman dan coba masuk kembali.','error');return null;
@@ -7036,6 +7057,7 @@ host.addEventListener('click',async event=>{
  event.preventDefault();event.stopPropagation();
  if(reviewAuthOpening)return;
  const wrapper=summary.parentElement;
+ if(wrapper.dataset.reviewed==='1'){reviewNotice('Terima kasih! Produk ini sudah diulas.');return}
  if(wrapper.open){wrapper.open=false;return}
  reviewAuthOpening=true;
  const productId=String(getProduct()?.id||'');
@@ -7045,7 +7067,7 @@ host.addEventListener('click',async event=>{
   if(!gate?.reviewEligibility){reviewNotice('Sistem verifikasi pesanan belum tersedia.','error');return}
   const all=await gate.reviewEligibility(productId);
   if(productId!==String(getProduct()?.id||''))return;
-  const pending=all.filter(x=>!x.reviewed);
+  const pending=all.filter(x=>!x.reviewed&&x.reviewable!==false);
   if(!pending.length){
    reviewNotice(all.length?'Produk dari pesanan ini sudah diulas.':'Ulasan tersedia setelah pesanan produk ini dinyatakan selesai.');return;
   }
@@ -7076,10 +7098,13 @@ window.nineSubmitDetailReview=async button=>{
   const gate=window.imamstoreCustomerTrust;
   if(!gate?.invoke)throw Error('Layanan verifikasi belum tersedia.');
   await gate.invoke('submitReview',{orderId,productId:pid,rating:score,text:content});
+  locallyConfirmedReviews.add(user.uid+'::'+pid);syncReviewComposer();
   if(field)field.value='';rating=0;selectedReviewOrder='';reviewVerifiedOptions=[];
   host.querySelectorAll('#nineReviewStars button').forEach(b=>{b.setAttribute('aria-pressed','false');b.style.color='#bbb'});
   host.querySelector('.nine-review-composer')?.removeAttribute('open');
   gate.onReviewSaved?.(orderId,pid);
+  const reviewUrl=new URL(location.href);reviewUrl.searchParams.delete('reviewOrder');
+  history.replaceState(history.state,'',reviewUrl.pathname+reviewUrl.search+reviewUrl.hash);
   reviewNotice('Terima kasih! Ulasan pembelian terverifikasi berhasil dikirim.','success');
  }catch(e){reviewNotice(e.message||'Ulasan belum berhasil dikirim. Silakan coba lagi.','error')}
  finally{reviewSaving=false;button.disabled=false}
@@ -9307,6 +9332,12 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
 <style id="imamstore-customer-trust-v1-css">
 /* V1 verified reviews / follow. Additive styles; no !important rules. */
 #storeFollow:disabled{opacity:.65;cursor:wait}
+#storeFollow[aria-pressed="false"]{background:transparent;color:#fff}
+#imamstoreTrustToast{position:fixed;top:max(84px,env(safe-area-inset-top));left:50%;transform:translate(-50%,-9px);width:max-content;max-width:calc(100vw - 28px);padding:12px 16px;border-radius:12px;background:#26351e;color:#fff;font:600 13px/1.45 system-ui,-apple-system,Arial,sans-serif;text-align:center;box-shadow:0 9px 30px #0003;z-index:2147483630;opacity:0;pointer-events:none;transition:opacity .17s ease,transform .17s ease}
+#imamstoreTrustToast.visible{opacity:1;transform:translate(-50%,0)}
+#imamstoreTrustToast[data-kind="error"]{background:#a82b22}
+#imamstoreLiveOriginalDetail .nine-review-composer[data-reviewed="1"]>summary{color:#4b7c20;background:#f4faed;cursor:default}
+#imamstoreLiveOriginalDetail .nine-review-composer[data-reviewed="1"]>summary i{color:#75a53d}
 #imamstoreLiveOriginalDetail .nine-review-order-note{font-size:12px;color:#547d29;line-height:1.6;background:#f3f9e9;border:1px solid #d9e9c9;border-radius:8px;padding:9px 11px}
 #imamstoreLiveOriginalDetail .nine-review-order-choices{display:flex;gap:7px;flex-wrap:wrap;padding:5px 0}
 #imamstoreLiveOriginalDetail .nine-review-order-choices button{border:1px solid #c8d8ba;background:#fff;border-radius:8px;color:#506f34;padding:7px 11px;font-size:11px}
@@ -9330,15 +9361,21 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
  const valid=x=>typeof x==='string'&&/^[A-Za-z0-9_-]{1,120}$/.test(x);
  const safeStorage={get(k){try{return localStorage.getItem(k)}catch{return null}},set(k,v){try{localStorage.setItem(k,v);return true}catch{return false}},remove(k){try{localStorage.removeItem(k)}catch{}}};
  const follow={mode:'loading',following:false,busy:false,uid:'',error:''};
+ let trustToastTimer=null;
  const toast=(message,error=false)=>{
-  if(typeof window.imamstoreToast==='function'){window.imamstoreToast(message,error?'error':'success');return}
-  if(window.Swal?.fire)window.Swal.fire({toast:true,position:'top',icon:error?'error':'success',title:message,timer:2400,showConfirmButton:false});
+  let el=document.getElementById('imamstoreTrustToast');
+  if(!el){el=document.createElement('div');el.id='imamstoreTrustToast';el.setAttribute('role','status');
+   el.setAttribute('aria-live','polite');document.body.appendChild(el)}
+  clearTimeout(trustToastTimer);el.textContent=String(message||'');
+  el.dataset.kind=error?'error':'success';el.classList.add('visible');
+  trustToastTimer=setTimeout(()=>el.classList.remove('visible'),3000);
  };
  function paintFollow(){if(!btn)return;
   btn.disabled=follow.busy||follow.mode==='loading'||follow.mode==='error';
-  btn.setAttribute('aria-pressed',String(follow.following));
-  btn.innerHTML=follow.following?'<i class="fa-solid fa-heart"></i> Mengikuti':'<i class="fa-regular fa-heart"></i> Ikuti';
-  btn.title=follow.mode==='error'?'Sesi mengikuti belum dapat dimuat. Muat ulang halaman.':follow.mode==='guest'?'Status mengikuti tersimpan di browser hingga masuk akun':'';
+  const official=follow.mode==='account'&&follow.following===true;
+  btn.setAttribute('aria-pressed',String(official));
+  btn.innerHTML=official?'<i class="fa-solid fa-heart"></i> Mengikuti':'<i class="fa-regular fa-heart"></i> Ikuti';
+  btn.title=follow.mode==='error'?'Status mengikuti belum dapat dimuat. Coba muat ulang halaman.':follow.mode==='guest'?'Masuk ke akun untuk resmi mengikuti ImamStore':'';
  }
  async function invoke(action,payload={}){
   const user=window.firebase?.auth?.()?.currentUser;
@@ -9364,14 +9401,14 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    }
   }catch(e){console.warn('[Ikuti] Data legacy belum dapat dibaca',e?.code||e?.message)}
  }
- let identity=0,stopFollowSnapshot=null;
+ let identity=0,stopFollowSnapshot=null,pendingGuestFollow=false;
  async function bind(user){
   if(stopFollowSnapshot){stopFollowSnapshot();stopFollowSnapshot=null}
   const ticket=++identity;
   follow.busy=false;follow.uid=user?.uid||'';follow.error='';follow.mode='loading';follow.following=false;paintFollow();
   if(!user||user.isAnonymous){
    await seedLegacy();if(ticket!==identity)return;
-   follow.mode='guest';follow.following=safeStorage.get(GUEST)==='1';paintFollow();return;
+   follow.mode='guest';follow.following=false;paintFollow();return;
   }
   try{
    await seedLegacy();if(ticket!==identity)return;
@@ -9379,12 +9416,16 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    follow.mode='account';follow.following=r.following===true;
    // A guest's explicit preference is migrated exactly once, after server acknowledgement.
    const local=safeStorage.get(GUEST),oldId=safeStorage.get(LEGACY);
-   if(local!==null){
-    const saved=await invoke('setFollow',{following:local==='1',legacyVisitorId:oldId||undefined});
+   if(local==='1'){
+    const saved=await invoke('setFollow',{following:true,legacyVisitorId:oldId||undefined});
     if(ticket!==identity)return;
     follow.following=saved.following===true;
     safeStorage.remove(GUEST);safeStorage.remove(LEGACY);
+   }else if(local==='0'){
+    // An old guest "unfollow" preference must never unfollow an account.
+    safeStorage.remove(GUEST);safeStorage.remove(LEGACY);
    }
+   if(pendingGuestFollow){pendingGuestFollow=false;toast(follow.following?'Berhasil mengikuti ImamStore. Status akun tersinkron.':'Status mengikuti belum aktif, coba lagi.',!follow.following)}
    paintFollow();
    // Realtime cross-device status: one UID document per signed-in customer.
    stopFollowSnapshot=window.firebase.firestore().collection('store_followers').doc(user.uid).onSnapshot(doc=>{
@@ -9395,23 +9436,32 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
  }
  if(btn)btn.onclick=async()=>{
   if(follow.busy||!['guest','account'].includes(follow.mode))return;
+  const guest=follow.mode==='guest',ticket=identity;
   follow.busy=true;paintFollow();
-  const desired=!follow.following;
   try{
-   if(follow.mode==='guest'){
-    if(!safeStorage.set(GUEST,desired?'1':'0'))throw Error('Penyimpanan browser tidak tersedia.');
-    // Guest status is intentionally local: no writes to global counter before sign-in.
-    follow.following=desired;
-    toast(desired?'Toko diikuti sementara. Masuk untuk menyimpan ke akun.':'Berhenti mengikuti toko di browser ini.');
+   if(guest){
+    toast('Masuk ke akun terlebih dahulu untuk mengikuti ImamStore.');
+    if(typeof window.nexaiRequireCustomerLogin!=='function')throw Error('Login pelanggan belum tersedia.');
+    const original=safeStorage.get(GUEST);
+    // Record intent, but NEVER render a green "Mengikuti" or increment before login.
+    if(!safeStorage.set(GUEST,'1'))throw Error('Penyimpanan browser belum tersedia.');
+    pendingGuestFollow=true;
+    const loggedIn=await window.nexaiRequireCustomerLogin();
+    if(!loggedIn){pendingGuestFollow=false;
+     if(original===null)safeStorage.remove(GUEST);else safeStorage.set(GUEST,original);
+     toast('Belum mengikuti toko. Kamu bisa masuk kapan saja untuk mengikuti.');
+    }
+    // onAuthStateChanged binds the UID and completes the server transaction.
    }else{
-    const response=await invoke('setFollow',{following:desired});
+    const response=await invoke('setFollow',{following:!follow.following});
+    if(ticket!==identity)return;
     follow.following=response.following===true;
     toast(follow.following?'Berhasil mengikuti ImamStore.':'Berhasil berhenti mengikuti ImamStore.');
    }
-  }catch(e){toast(e.message||'Perubahan belum tersimpan.',true)}
+  }catch(e){pendingGuestFollow=false;toast(e.message||'Perubahan belum tersimpan.',true)}
   finally{follow.busy=false;paintFollow()}
  };
- window.addEventListener('storage',e=>{if(follow.mode==='guest'&&e.key===GUEST){follow.following=safeStorage.get(GUEST)==='1';paintFollow()}});
+ window.addEventListener('storage',e=>{if(follow.mode==='guest'&&e.key===GUEST)paintFollow()});
  function startFollow(){
   const auth=window.firebase?.auth?.();
   if(auth?.onAuthStateChanged)auth.onAuthStateChanged(bind,e=>{follow.mode='error';follow.error=String(e?.message||e);paintFollow()});
@@ -9420,29 +9470,49 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
  // Verified reviews: all eligibility and submissions are decided by the authenticated server.
  let orderStream=null,queueStamp='',queueRows=[],reviewUID='',promptShown=false,promptNode=null,promptTimer=null,queueBusy=false;
  const reviewKey=(orderId,productId)=>String(orderId)+'::'+String(productId);
- const alreadyPrompted=(uid,entry)=>safeStorage.get(PROMPT+uid+'_'+entry.orderId+'_'+entry.productId)==='1';
- function markPrompt(uid,entry){safeStorage.set(PROMPT+uid+'_'+entry.orderId+'_'+entry.productId,'1')}
+ const alreadyPrompted=(uid,entry)=>safeStorage.get(PROMPT+uid+'_'+entry.productId)==='1';
+ function markPrompt(uid,entry){safeStorage.set(PROMPT+uid+'_'+entry.productId,'1')}
  function refreshReviewButtons(){
   const map=new Map(queueRows.map(e=>[reviewKey(e.orderId,e.productId),e]));
   document.querySelectorAll('[data-imam-review-item]').forEach(b=>{
    const e=map.get(b.dataset.imamReviewItem);
-   if(!e)return;
-   b.disabled=e.reviewed===true;
-   b.textContent=e.reviewed?'Sudah Diulas':'Beri Ulasan';
+   b.disabled=!e||e.reviewed===true||e.reviewable===false;
+   b.textContent=!e?'Memeriksa ulasan…':e.reviewed?'Sudah Diulas':e.reviewable===false?'Tersedia di pesanan lain':'Beri Ulasan';
   });
  }
  function closePrompt(){promptNode?.remove();promptNode=null;promptShown=false}
- function reviewPage(id,orderId){
+ async function reviewPage(id,orderId){
   if(!valid(id)||typeof orderId!=='string')return;
-  const url=new URL('/',location.origin);url.searchParams.set('product',id);url.searchParams.set('reviewOrder',orderId);
-  closePrompt();location.assign(url.href);
+  const uid=window.firebase?.auth?.()?.currentUser?.uid;
+  if(!uid||uid!==reviewUID){toast('Sesi pelanggan belum siap. Silakan masuk kembali.',true);return}
+  try{
+   // Never navigate/reload before checking the user's server-side review entitlement.
+   const r=await invoke('reviewEligibility',{productId:id});
+   if(window.firebase?.auth?.()?.currentUser?.uid!==uid)return;
+   const allowed=(r.entries||[]).find(e=>e.productId===id&&e.orderId===orderId&&!e.reviewed&&e.reviewable!==false);
+   if(!allowed){toast('Produk ini sudah diulas atau belum memenuhi syarat penilaian.');void refreshQueue();return}
+   closePrompt();document.getElementById('nexaiOrdersClose')?.click();
+   const url=new URL(location.href);url.searchParams.set('reviewOrder',orderId);
+   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+   const host=document.getElementById('imamstoreLiveOriginalDetail');
+   const ready=()=>String(window.imamstoreActiveProduct?.id||'')===id&&host?.classList.contains('open')&&
+     !!host.querySelector('.nine-review-composer > summary')&&!!host.querySelector('[data-detail-rating="'+id+'"]');
+   if(!ready())document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));
+   const until=Date.now()+6500;
+   while(!ready()&&Date.now()<until)await new Promise(resolve=>setTimeout(resolve,65));
+   if(!ready()){toast('Halaman produk belum siap. Silakan buka detailnya lagi.',true);return}
+   // The detail's verified eligibility handler opens the same form, without a reload.
+   const summary=host.querySelector('.nine-review-composer > summary');
+   if(summary?.parentElement?.dataset.reviewed==='1'){toast('Terima kasih! Produk ini sudah diulas.');return}
+   if(!summary?.parentElement?.open)summary.click();
+  }catch(e){toast(e.message||'Belum dapat membuka ulasan.',true)}
  }
  function showPrompt(){
   if(promptNode||promptShown||!reviewUID||document.visibilityState==='hidden')return;
   if(document.querySelector('#s5Cart.open,#s5Draft.open,#nexaiCustomerLogin:not([hidden]),#nexaiOrdersDialog:not([hidden]),.ref-modal:not([hidden])'))return;
-  const next=queueRows.find(e=>!e.reviewed&&!alreadyPrompted(reviewUID,e));if(!next)return;
+  const next=queueRows.find(e=>!e.reviewed&&e.reviewable!==false&&!alreadyPrompted(reviewUID,e));if(!next)return;
   promptShown=true;markPrompt(reviewUID,next); // Once per order/product on this browser, never spam refreshes.
-  const root=document.createElement('aside');root.className='imam-review-invite';root.setAttribute('role','status');
+  const root=document.createElement('aside');root.className='imam-review-invite';root.dataset.productId=next.productId;root.setAttribute('role','status');
   const title=document.createElement('strong');title.textContent='Pesananmu sudah selesai! 🎉';
   const copy=document.createElement('p');copy.textContent='Terima kasih sudah belanja. Kalau berkenan, yuk bantu ulas '+next.productName+'. Pengalamanmu berarti bagi pembeli lain. 💚';
   const actions=document.createElement('div');actions.className='imam-review-invite-actions';
@@ -9452,11 +9522,12 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
  }
  async function refreshQueue(){
   if(queueBusy||!reviewUID)return;
-  queueBusy=true;
+  const requestedUID=reviewUID;queueBusy=true;
   try{
    const {entries}=await invoke('reviewQueue');
-   if(!reviewUID)return;
+   if(requestedUID!==reviewUID)return; // Ignore stale response after account switch.
    queueRows=Array.isArray(entries)?entries:[];refreshReviewButtons();
+   if(promptNode&&!queueRows.some(e=>!e.reviewed&&e.reviewable!==false&&e.productId===promptNode.dataset.productId))closePrompt();
    if(promptTimer)clearTimeout(promptTimer);
    promptTimer=setTimeout(showPrompt,1300);
   }catch(e){console.warn('[Ulasan] Belum dapat mengecek pesanan selesai',e.message)}
@@ -9472,7 +9543,7 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
      const x=d.data();return d.id+':'+x.status+':'+(x.updatedAt?.toMillis?.()||0)
     }).sort().join('|');
     if(signal===queueStamp)return;queueStamp=signal;
-    if(snap.docs.some(d=>String(d.data()?.status)==='completed'))void refreshQueue();
+    void refreshQueue();
    },e=>console.warn('[Ulasan] Perubahan status pesanan belum terbaca',e.code||e.message));
   }catch(e){console.warn('[Ulasan] Listener riwayat tidak tersedia',e.message)}
  }
@@ -9487,7 +9558,7 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   reviewEligibility:async productId=>(await invoke('reviewEligibility',{productId})).entries,
   reviewQueue:()=>queueRows.slice(),
   onReviewSaved:(orderId,productId)=>{
-   queueRows=queueRows.map(e=>e.orderId===orderId&&e.productId===productId?{...e,reviewed:true}:e);
+   queueRows=queueRows.map(e=>e.productId===productId?{...e,reviewed:true,reviewable:false}:e);
    refreshReviewButtons();closePrompt();void refreshQueue();
   }});
  window.imamstoreCustomerTrust=api;
