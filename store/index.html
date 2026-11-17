@@ -1832,7 +1832,7 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
    document.dispatchEvent(new Event('imamstore:catalog-updated'));
    console.warn('[ImamStore katalog] CMS belum bisa dibaca; katalog dasar tetap ditampilkan:',error);
   });
-  // Gunakan endpoint, batas online 90 detik, dan interval 30 detik milik widget utama.
+  // Status admin dikelola oleh satu listener Firestore terpisah.
   
 // Admin presence now initializes independently of catalog and Firebase bootstrap.
   // See the single admin presence controller after this script.
@@ -1849,136 +1849,81 @@ $('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('
 })();
 </script>
 <script id="imamstore-admin-presence-controller">
-/* ImamStore: satu sumber status admin; tidak bergantung pada katalog atau Auth.
-   Membaca endpoint status yang sudah tersedia, bukan membangun SDK server baru. */
-(()=>{'use strict';
-  const status = document.getElementById('storeStatus');
-  if (!status) return;
-  const storeHosts = new Set([
-    'store.imamsales.com',
-    'store.imamsalesnine.com',
-    'imamstore.netlify.app'
-  ]);
-  const url = storeHosts.has(location.hostname)
-    ? '/status-admin'
-    : '/.netlify/functions/admin-presence';
-  const POLL_MS = 10000;
-  const ONLINE_MS = 90000;
-  const REQUEST_TIMEOUT_MS = 8000;
-  const last = { timestamp:0, checkedAt:0, lastError:'', success:false };
-  let loading = false;
-  let controller = null;
-
-  function parseTimestamp(value) {
-    if (value == null || value === '') return 0;
-    let n = 0;
-    if (typeof value === 'number') n = value;
-    else if (typeof value === 'string') {
-      const v = value.trim();
-      if (/^\d+(?:\.\d+)?$/.test(v)) n = Number(v);
-      else n = Date.parse(v);
-    } else if (typeof value === 'object') {
-      if (typeof value.toMillis === 'function') n = value.toMillis();
-      else if (Number.isFinite(Number(value.seconds))) n = Number(value.seconds)*1000;
-      else if (Number.isFinite(Number(value._seconds))) n = Number(value._seconds)*1000;
-      else if (value.timestamp != null) return parseTimestamp(value.timestamp);
-    }
-    if (!Number.isFinite(n) || n <= 0) return 0;
-    if (n < 1e11) n *= 1000; // Detik Unix vs milidetik.
-    const now = Date.now();
-    if (n > now + 120000 || n < Date.UTC(2020,0,1)) return 0;
-    return Math.floor(n);
+/* Single Firebase Firestore listener for Store header + product detail.
+   No Netlify proxy, no legacy polling, no second Firebase app. */
+(()=>{
+  'use strict';
+  const status=document.getElementById('storeStatus');
+  if(!status)return;
+  const COLLECTION='store_public',DOCUMENT='imamstore_status',ONLINE_MS=90000;
+  let lastTimestamp=0,serverSynced=false,lastError='';
+  let lastCheckedAt=0;
+  function timestampMs(value){
+    if(value?.toMillis)return value.toMillis();
+    if(typeof value?.seconds==='number')return value.seconds*1000;
+    if(typeof value==='number')return value<1e11?value*1000:value;
+    if(typeof value==='string')return Date.parse(value)||0;
+    return 0;
   }
-
-  function paint() {
+  function paint(){
+    const now=Date.now(),valid=Number.isFinite(lastTimestamp)&&lastTimestamp>0&&lastTimestamp<=now+120000;
+    const age=valid?Math.max(0,now-lastTimestamp):Infinity;
+    const online=valid&&age<ONLINE_MS&&serverSynced&&navigator.onLine!==false;
     let message;
-    if (!last.timestamp) {
-      message = last.success
-        ? 'Belum ada aktivitas admin'
-        : 'Status aktivitas belum tersedia';
-    } else {
-      const age = Math.max(0,Date.now()-last.timestamp);
-      if (age < ONLINE_MS) message = '● Online';
-      else {
-        const minutes = Math.max(1,Math.floor(age/60000));
-        message = minutes < 60 ? `Aktif ${minutes} menit lalu`
-          : minutes < 1440 ? `Aktif ${Math.floor(minutes/60)} jam lalu`
-          : `Aktif ${Math.floor(minutes/1440)} hari lalu`;
-      }
-    }
-    if (status.textContent !== message) status.textContent = message;
-    status.title = last.lastError
-      ? 'Status terakhir tersedia; pembaruan terbaru gagal: '+last.lastError
-      : last.checkedAt ? 'Diperbarui dari status admin ImamStore' : 'Memuat status admin';
-    const state = last.timestamp
-      ? (Date.now()-last.timestamp < ONLINE_MS ? 'online' : 'offline')
-      : 'unknown';
-    status.setAttribute('data-admin-presence',state);
-    // Detail produk dibuat ulang setelah header sudah Online. Sinkronkan
-    // semua elemen yang saat ini ada, bahkan saat teks header tidak berubah.
-    for (const node of document.querySelectorAll('[data-nine-store-presence],[data-imamstore-store-status]')) {
-      if (node.textContent !== message) node.textContent = message;
-      if (node.getAttribute('data-admin-presence') !== state) node.setAttribute('data-admin-presence',state);
-      if (node.title !== status.title) node.title = status.title;
+    if(online) message='● Online';
+    else if(valid&&age>=ONLINE_MS){
+      const minutes=Math.max(1,Math.floor(age/60000));
+      message=minutes<60?`Aktif ${minutes} menit lalu`:
+        minutes<1440?`Aktif ${Math.floor(minutes/60)} jam lalu`:
+        `Aktif ${Math.floor(minutes/1440)} hari lalu`;
+    } else if(!serverSynced){message='Status aktivitas belum tersedia';}
+    else {message='Belum ada aktivitas admin';}
+    const state=online?'online':(valid&&age>=ONLINE_MS?'offline':'unknown');
+    const title=lastError?'Status admin tidak dapat diperbarui: '+lastError:
+      serverSynced?'Status aktivitas tersinkron dari Firebase Firestore':'Menunggu status Firebase Firestore';
+    for(const el of [status,...document.querySelectorAll('[data-nine-store-presence],[data-imamstore-store-status]')]){
+      if(el.textContent!==message)el.textContent=message;
+      if(el.getAttribute('data-admin-presence')!==state)el.setAttribute('data-admin-presence',state);
+      if(el.title!==title)el.title=title;
     }
   }
-
-  async function refresh() {
-    if (loading || document.hidden || navigator.onLine === false) return;
-    loading = true;
-    const timeout = typeof AbortController === 'function' ? new AbortController() : null;
-    controller = timeout;
-    const timer = timeout ? setTimeout(()=>timeout.abort(), REQUEST_TIMEOUT_MS) : null;
-    try {
-      const endpoint = url+(url.includes('?')?'&':'?')+'_t='+Date.now();
-      const response = await fetch(endpoint, {
-        cache:'no-store', credentials:'same-origin',
-        headers:{'Accept':'application/json'},
-        ...(timeout ? {signal:timeout.signal}: {})
-      });
-      if (!response.ok) throw new Error('HTTP '+response.status);
-      const type = response.headers?.get('content-type') || '';
-      if (type && !/\bjson\b/i.test(type)) throw new Error('Endpoint tidak mengirim JSON');
-      const data = await response.json();
-      if (!data || data.success !== true) throw new Error('Respons status tidak valid');
-      const timestamp = parseTimestamp(data.lastActiveAt);
-      // Jika respons server valid dan tidak ada timestamp, artinya belum ada aktivitas.
-      // Jangan hapus timestamp terverifikasi saat respons hanya parsial.
-      if (timestamp) last.timestamp = timestamp;
-      else if (data.lastActiveAt === null || data.lastActiveAt === '') last.timestamp = 0;
-      last.checkedAt = Date.now();
-      last.success = true;
-      last.lastError = '';
-    } catch (error) {
-      // Gangguan sementara tidak menghapus fakta aktivitas admin terakhir.
-      last.lastError = String(error?.message || error).slice(0,100);
-      console.warn('[ImamStore Presence] Gagal membaca '+url+':',last.lastError);
-    } finally {
-      if (timer) clearTimeout(timer);
-      controller = null;
-      loading = false;
-      paint();
-    }
-  }
-  function resume() { paint(); void refresh(); }
-  paint();
-  void refresh();
-  setInterval(()=>{ if (!document.hidden) void refresh(); },POLL_MS);
-  setInterval(paint,5000);
-  document.addEventListener('visibilitychange',()=>{ if (!document.hidden) resume(); });
-  window.addEventListener('focus',resume);
-  window.addEventListener('online',resume);
-  window.addEventListener('pageshow',resume);
-  // Detail renderer may request an immediate paint after replacing its HTML.
-  // This does not create a second network poll or a second status controller.
-  window.imamstorePresenceSync = paint;
-  // Read-only diagnostic, no tokens or private user information exposed.
-  window.imamstorePresenceDiagnostic = () => Object.freeze({
-    endpoint:url, lastActiveAt:last.timestamp ? new Date(last.timestamp).toISOString() : null,
-    lastCheckedAt:last.checkedAt ? new Date(last.checkedAt).toISOString() : null,
-    error:last.lastError || null,
-    status:status.textContent
+  window.imamstorePresenceSync=paint; // existing detail renderer relies on this API
+  window.imamstorePresenceDiagnostic=()=>Object.freeze({
+    source:'firestore',path:COLLECTION+'/'+DOCUMENT,
+    lastActiveAt:lastTimestamp?new Date(lastTimestamp).toISOString():null,
+    lastCheckedAt:lastCheckedAt?new Date(lastCheckedAt).toISOString():null,
+    serverSynced,error:lastError||null,status:status.textContent
   });
+  paint();
+  setInterval(paint,5000); // local elapsed-time paint only; NOT a server poll
+  window.addEventListener('online',paint);
+  window.addEventListener('offline',()=>{serverSynced=false;paint()});
+  window.addEventListener('pageshow',paint);
+  document.addEventListener('visibilitychange',()=>{if(!document.hidden)paint()});
+  try{
+    if(!window.firebase?.apps?.length||typeof firebase.firestore!=='function')
+      throw new Error('Firebase Web SDK belum siap');
+    const ref=firebase.firestore().collection(COLLECTION).doc(DOCUMENT);
+    ref.onSnapshot({includeMetadataChanges:true},snapshot=>{
+      const candidate=snapshot.exists?timestampMs(snapshot.data()?.lastActiveAt):0;
+      if(Number.isFinite(candidate)&&candidate>0&&candidate<Date.now()+120000)
+        lastTimestamp=Math.floor(candidate);
+      else lastTimestamp=0;
+      serverSynced=!snapshot.metadata.fromCache&&navigator.onLine!==false;
+      lastCheckedAt=Date.now();
+      lastError='';paint();
+    },error=>{
+      serverSynced=false;
+      lastError=String(error?.code||error?.message||'listener-error').slice(0,120);
+      console.warn('[ImamStore Firebase Presence] Listener error:',lastError);
+      paint();
+    });
+  }catch(error){
+    serverSynced=false;
+    lastError=String(error?.message||error).slice(0,120);
+    console.warn('[ImamStore Firebase Presence] Tidak dapat memulai:',lastError);
+    paint();
+  }
 })();
 </script>
 <script id="warehouse-store-engine">

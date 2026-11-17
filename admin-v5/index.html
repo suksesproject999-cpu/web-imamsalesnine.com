@@ -13592,110 +13592,83 @@ window.smartLoadWhatsAppGroups = async function(){
 
 
 
-<!-- ADMIN V5 PRESENCE — heartbeat aktif selama dashboard terlihat, JWT diverifikasi server -->
-<script>
-(function () {
-  "use strict";
-
-  // Endpoint dan JWT Netlify Admin V5 yang sudah digunakan sebelumnya.
-  // Tidak menggunakan Firebase Admin SDK dan tidak membuat sesi baru.
-  const ENDPOINT = "/.netlify/functions/admin-presence";
-  const HEARTBEAT_INTERVAL_MS = 20000;
-  const MIN_SUCCESS_GAP_MS = 15000;
-  const MIN_ATTEMPT_GAP_MS = 8000;
-  const REQUEST_TIMEOUT_MS = 10000;
-
-  let sending = false;
-  let lastSuccess = 0;
-  let lastAttempt = 0;
-  let blockedToken = null;
-  let lastWarning = 0;
-
-  function adminToken() {
-    try {
-      return localStorage.getItem("token") || "";
-    } catch (error) {
-      return "";
-    }
-  }
-
-  function warn(message) {
-    // Log tidak pernah berisi token, untuk keamanan.
-    if (Date.now() - lastWarning > 60000 || lastWarning === 0) {
-      console.warn("[Admin V5 Presence] " + message);
-      lastWarning = Date.now();
-    }
-  }
-
-  async function sendHeartbeat() {
-    // Tab tersembunyi tidak boleh terus dianggap online.
-    if (document.visibilityState !== "visible" || sending) return;
-
-    const token = adminToken();
-    if (!token) return;
-
-    // Server (bukan localStorage role) memverifikasi JWT dan klaim admin.
-    // Ini menghindari heartbeat terhenti hanya karena key role tidak tersedia.
-    if (blockedToken === token) return;
-
-    const now = Date.now();
-    if (now - lastSuccess < MIN_SUCCESS_GAP_MS || now - lastAttempt < MIN_ATTEMPT_GAP_MS) return;
-
-    sending = true;
-    lastAttempt = now;
-    const controller = new AbortController();
-    const timeout = setTimeout(function () { controller.abort(); }, REQUEST_TIMEOUT_MS);
-
-    try {
-      const response = await fetch(ENDPOINT, {
-        method: "POST",
-        headers: { Authorization: "Bearer " + token },
-        cache: "no-store",
-        signal: controller.signal
+<!-- ADMIN V5 PRESENCE — Firebase Authentication -> Store Netlify Function (no JWT/Blobs) -->
+<script id="imam-admin-firebase-presence">
+(()=>{
+  'use strict';
+  // Endpoint runs ONLY on the separate ImamStore Netlify project.
+  const ENDPOINT='https://store.imamsales.com/.netlify/functions/admin-presence';
+  const HEARTBEAT_MS=20000;
+  const MIN_SUCCESS_MS=15000;
+  const MIN_ATTEMPT_MS=8000;
+  const REQUEST_TIMEOUT_MS=10000;
+  let busy=false,lastAttempt=0,lastSuccess=0,lastError='',lastWarn=0;
+  let rejectedUid='',refreshTokenNext=false,authReady=false;
+  const auth=()=>{
+    try{return typeof firebase!=='undefined'&&firebase.apps?.length?firebase.auth():null}
+    catch{return null}
+  };
+  const visible=()=>document.visibilityState==='visible' && navigator.onLine!==false;
+  const warn=message=>{
+    lastError=message;
+    if(Date.now()-lastWarn>60000){console.warn('[Admin Presence Firebase] '+message);lastWarn=Date.now()}
+  };
+  async function heartbeat(){
+    const a=auth(),user=a?.currentUser;
+    if(!a||!authReady||!user||user.isAnonymous||!visible()||busy||rejectedUid===user.uid)return;
+    const now=Date.now();
+    if(now-lastSuccess<MIN_SUCCESS_MS||now-lastAttempt<MIN_ATTEMPT_MS)return;
+    busy=true;lastAttempt=now;
+    const ctl=new AbortController();
+    const timer=setTimeout(()=>ctl.abort(),REQUEST_TIMEOUT_MS);
+    try{
+      // Firebase Web SDK refreshes ID tokens; the old 30-minute Netlify JWT is never used.
+      const idToken=await user.getIdToken(refreshTokenNext);
+      refreshTokenNext=false;
+      if(a.currentUser?.uid!==user.uid||!visible())return;
+      const response=await fetch(ENDPOINT,{
+        method:'POST',mode:'cors',cache:'no-store',
+        headers:{Authorization:'Bearer '+idToken},
+        signal:ctl.signal
       });
-      if (response.status === 401 || response.status === 403) {
-        blockedToken = token;
-        warn("Sesi JWT ditolak (" + response.status + "). Login ulang Admin V5 diperlukan.");
-        return;
+      if(response.status===401){
+        refreshTokenNext=true;warn('Firebase ID Token ditolak. Akan refresh token pada heartbeat selanjutnya.');return;
       }
-      if (!response.ok) {
-        warn("Heartbeat gagal (HTTP " + response.status + "). Periksa Netlify Function.");
-        return;
+      if(response.status===403){
+        rejectedUid=user.uid;warn('Akun Firebase ini bukan admin presence yang diizinkan.');return;
       }
-      const payload = await response.json();
-      if (!payload || payload.success !== true) {
-        warn("Endpoint tidak mengembalikan success:true.");
-        return;
-      }
-      // Simpan waktu hanya ketika server berhasil mencatat heartbeat.
-      lastSuccess = Date.now();
-      blockedToken = null;
-    } catch (error) {
-      warn(error && error.name === "AbortError" ? "Heartbeat timeout; akan dicoba ulang." : "Jaringan/endpoint tidak tersedia; akan dicoba ulang.");
-    } finally {
-      clearTimeout(timeout);
-      sending = false;
-    }
+      if(!response.ok){warn('Server heartbeat HTTP '+response.status);return;}
+      const result=await response.json();
+      if(result?.success!==true){warn('Respons heartbeat tidak valid.');return;}
+      lastSuccess=Date.now();lastError='';
+    }catch(error){
+      warn(error?.name==='AbortError'?'Heartbeat timeout.':'Heartbeat tidak tersambung: '+String(error?.code||error?.message||'network-error'));
+    }finally{clearTimeout(timer);busy=false;}
   }
-
-  // Tidak memakai batas idle 2 menit. Selama Admin V5 terlihat, server
-  // menerima heartbeat berkala. Saat berpindah tab/menutup browser, berhenti.
-  document.addEventListener("visibilitychange", function () {
-    if (document.visibilityState === "visible") sendHeartbeat();
-  });
-  window.addEventListener("focus", sendHeartbeat);
-  window.addEventListener("pageshow", sendHeartbeat);
-  window.addEventListener("online", sendHeartbeat);
-  window.addEventListener("storage", function (event) {
-    if (event.key === "token") {
-      blockedToken = null;
-      lastSuccess = 0;
-      lastAttempt = 0;
-      sendHeartbeat();
+  const a=auth();
+  if(!a){warn('Firebase Auth belum tersedia di dashboard.');return;}
+  a.onAuthStateChanged(user=>{
+    authReady=true;
+    rejectedUid='';refreshTokenNext=false;lastAttempt=0;
+    if(!user||user.isAnonymous){
+      lastError='Firebase admin belum login. Login melalui panel Pesanan Admin V5 agar status Online aktif.';
+      return;
     }
+    void heartbeat();
+  },error=>warn('Pemantau sesi Firebase gagal: '+String(error?.code||error?.message||error)));
+  document.addEventListener('visibilitychange',()=>{if(visible())void heartbeat();});
+  window.addEventListener('focus',()=>{if(visible())void heartbeat();});
+  window.addEventListener('online',()=>{if(visible())void heartbeat();});
+  window.addEventListener('pageshow',()=>{if(visible())void heartbeat();});
+  setInterval(()=>{if(visible())void heartbeat();},HEARTBEAT_MS);
+  // Read-only diagnostics; does not expose passwords, JWT, or Firebase ID tokens.
+  window.imamAdminPresenceDiagnostic=()=>Object.freeze({
+    endpoint:ENDPOINT,
+    firebaseSignedIn:!!(auth()?.currentUser&&!auth().currentUser.isAnonymous),
+    lastSuccessAt:lastSuccess?new Date(lastSuccess).toISOString():null,
+    lastError:lastError||null,
+    waitingForFirebase:!auth()?.currentUser
   });
-  setInterval(sendHeartbeat, HEARTBEAT_INTERVAL_MS);
-  setTimeout(sendHeartbeat, 1200);
 })();
 </script>
 
