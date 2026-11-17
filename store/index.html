@@ -4124,11 +4124,19 @@ const noOp=()=>{};
 const formatRupiah=n=>'Rp '+Math.round(Number(n)||0).toLocaleString('id-ID');
 const formatProductSold=n=>window.imamstoreFormatSold(n);
 const updateStickySummary=noOp,initStickyCheckout=noOp,nineSyncHeaderCart=noOp,updateDetailProductBadge=noOp;
+// Satu sumber nilai views yang sudah dikonfirmasi oleh Firestore server.
+// Jangan mengambil angka awal dari katalog/cache untuk toast share-link.
+const confirmedProductViews=new Map();
 let viewUnsubscribe=null,viewProductId='';
+function renderedProductViews(id){
+ const n=confirmedProductViews.get(String(id));
+ return n===undefined?'—':n.toLocaleString('id-ID');
+}
 function syncProductViews(id,views){
  const n=Number(views);
  if(!Number.isFinite(n)||n<0)return;
  const key=String(id),value=Math.floor(n);
+ confirmedProductViews.set(key,value);
  const product=allProducts.find(p=>String(p.id)===key);
  if(product)product.views=value;
  if(String(activeProduct()?.id)===key){
@@ -4148,8 +4156,12 @@ function subscribeProductViews(id){
  try{
   if(!window.firebase?.apps?.length)return;
   viewUnsubscribe=window.firebase.firestore().collection('statistik_produk').doc(key)
-   .onSnapshot(snapshot=>{
+   .onSnapshot({includeMetadataChanges:true},snapshot=>{
+    // Cache / local pending writes dapat berisi nilai sementara seperti '1'.
+    // Teruskan ke tampilan dan toast hanya setelah konfirmasi server.
+    if(snapshot.metadata?.fromCache||snapshot.metadata?.hasPendingWrites)return;
     if(snapshot.exists)syncProductViews(key,snapshot.data()?.views);
+    else syncProductViews(key,0);
    },error=>console.warn('Statistik dilihat belum tersedia:',error));
  }catch(error){console.warn('Listener statistik dilihat:',error)}
 }
@@ -4170,7 +4182,7 @@ async function incrementProductView(productId){
    views:window.firebase.firestore.FieldValue.increment(1),
    lastViewedAt:window.firebase.firestore.FieldValue.serverTimestamp()
   },{merge:true});
-  const snapshot=await ref.get();
+  const snapshot=await ref.get({source:'server'});
   const views=Number(snapshot.data()?.views);
   if(Number.isFinite(views)){syncProductViews(id,views);return views}
  }catch(error){
@@ -4275,7 +4287,7 @@ if(!window.__nineHandlingHistory){
 Promise.resolve()
     .then(() => options.skipView ? null : (window.V54Views ? window.V54Views.visit(product.id) : incrementProductView(product.id)))
     .then((views) => {
-        if(Number.isFinite(Number(views))){
+        if(views!==null&&views!==undefined&&Number.isFinite(Number(views))){
             product.views = Number(views);
             requestAnimationFrame(() => {
                 if(typeof installInterestBadge === "function"){
@@ -4328,7 +4340,7 @@ let html = `
           <div class="price">Rp ${(window.nineEffectivePromo(product) || product.harga?.normal || 0).toLocaleString("id-ID")}</div>${window.nineEffectivePromo(product) && product.harga?.normal>window.nineEffectivePromo(product) ? `<span class="nine-saving">Hemat Rp ${(product.harga.normal-window.nineEffectivePromo(product)).toLocaleString("id-ID")}</span>` : ""}
         </div><div class="nine-meta-actions">
           <button type="button" class="nine-voucher" onclick="nineOpenOriginalVoucher()"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher</button>
-          <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${Number(product.views||0).toLocaleString("id-ID")} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(Number(sold)||Number(product.terjual)||Number(product.sold)||Number(product.totalTerjual)||0)} terjual</span></div><button class="wishlist-btn" onclick="toggleWishlist(${product.id})" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
+          <div class="nine-meta-stats"><span class="nine-detail-views" data-detail-views="${product.id}">${renderedProductViews(product.id)} dilihat</span><span class="detail-product-sold" data-detail-sold="${product.id}">${formatProductSold(Number(sold)||Number(product.terjual)||Number(product.sold)||Number(product.totalTerjual)||0)} terjual</span></div><button class="wishlist-btn" onclick="toggleWishlist(${product.id})" aria-label="Favorit">${wishlist.some(w=>String(w)===String(product.id)) ? "❤️" : "🤍"}</button></div>
         <div class="product-title"><h2>${product.brand ? `<span class="nine-inline-brand">${product.brand}</span> ` : ""}${product.nama}</h2></div>
         <div class="product-highlights">
           <span><i class="fa-solid fa-circle-check"></i><small>${product.stok?.status || "Ready"}</small></span>
@@ -6604,50 +6616,84 @@ window.imamstoreRealtime=Object.freeze({identity,status:()=>({productId:session?
 watchAuth();sync();
 })();
 </script><style id="imamstore-original-review-toast-v58-style">#imamstoreLiveOriginalDetail .gallery-main{position:relative;isolation:isolate}#imamstoreLiveOriginalDetail .nine-review-toast-stack{position:absolute;left:10px;bottom:10px;z-index:25;display:flex;flex-direction:column;gap:5px;max-width:min(86%,440px);pointer-events:none}#imamstoreLiveOriginalDetail .nine-review-toast{display:flex;align-items:center;gap:7px;max-width:100%;width:max-content;box-sizing:border-box;padding:6px 10px;border-radius:24px;background:rgba(255,255,255,.97);border:1px solid #e8e8e8;box-shadow:0 4px 12px #0002;color:#242424;font-size:clamp(11px,2.8vw,13px);font-weight:600;line-height:1.3;transition:opacity .32s,transform .32s;overflow:hidden}#imamstoreLiveOriginalDetail .nine-review-toast i{color:#8cc63f;flex-shrink:0}#imamstoreLiveOriginalDetail .nine-review-toast span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0}#imamstoreLiveOriginalDetail .nine-review-toast.nine-enter{opacity:0;transform:translateY(15px)}#imamstoreLiveOriginalDetail .nine-review-toast.nine-exit{opacity:0;transform:translateY(-10px)}@media(prefers-reduced-motion:reduce){#imamstoreLiveOriginalDetail .nine-review-toast{transition:none}}</style><script id="imamstore-original-review-toast-v58-script">(()=>{'use strict';
-// Migrated from original NEXAI toast stack: Firestore reviews and view count, no synthetic reviews.
+// Satu sumber views: event nine:views-updated dari listener Firestore detail.
+// Ulasan tetap dibaca terpisah, tetapi toast views TIDAK mengambil statistik lagi.
 const root=document.getElementById('imamstoreLiveOriginalDetail');if(!root)return;
-let active='',items=[],cursor=0,epoch=0,lastFetch=0,pending=false,activeActivity=null;
+let active='',items=[],reviewItems=[],verifiedViews=null,cursor=0,epoch=0,lastFetch=0,pending=false,activeActivity=null;
 const valid=id=>/^[A-Za-z0-9_-]{1,120}$/.test(id);
 const db=()=>{try{return window.firebase?.apps?.length?firebase.firestore():null}catch(_){return null}};
 const getId=()=>{if(!root.classList.contains('open'))return '';const id=new URLSearchParams(location.search).get('product')||'';return valid(id)?id:''};
 const reviewText=d=>[d.text,d.review,d.comment,d.ulasan,d.komentar,d.content,d.message].find(x=>typeof x==='string'&&x.trim())?.trim()||'';
 const gallery=()=>root.querySelector('.product-detail .gallery-main');
-function clear(){root.querySelectorAll('.nine-review-toast-stack').forEach(e=>e.remove());items=[];cursor=0;lastFetch=0;activeActivity=null}
-async function refresh(id,stamp){if(pending)return;const d=db();if(!d)return;pending=true;
+function viewsText(){return verifiedViews===null?'':verifiedViews.toLocaleString('id-ID')+' kali dilihat'}
+function rebuildItems(){
+ items=[...reviewItems];
+ if(verifiedViews!==null&&verifiedViews>0)items.push({icon:'fa-eye',text:viewsText()});
+ if(items.length)cursor%=items.length;else cursor=0;
+}
+function clear(){
+ root.querySelectorAll('.nine-review-toast-stack').forEach(e=>e.remove());
+ items=[];reviewItems=[];verifiedViews=null;cursor=0;lastFetch=0;activeActivity=null;
+}
+function ensureProduct(id){
+ if(id!==active){active=id;epoch++;clear();pending=false;}
+}
+function syncVisibleViews(){
+ const text=viewsText();
+ for(const toast of root.querySelectorAll('.nine-review-toast-stack .nine-review-toast')){
+  if(!toast.querySelector('i.fa-eye'))continue;
+  const label=toast.querySelector('span');
+  if(verifiedViews!==null&&verifiedViews>0){if(label)label.textContent=text;}
+  else toast.remove();
+ }
+}
+// Event dari syncProductViews; dijalankan hanya sesudah snapshot server terkonfirmasi.
+document.addEventListener('nine:views-updated',event=>{
+ const detail=event.detail||{},id=String(detail.productId||'');
+ if(!id||id!==getId())return;
+ const n=Number(detail.views);
+ if(!Number.isSafeInteger(n)||n<0)return;
+ ensureProduct(id);
+ verifiedViews=n;
+ rebuildItems();
+ syncVisibleViews();
+});
+async function refresh(id,stamp){
+ if(pending)return;
+ const d=db();if(!d)return;
+ pending=true;
  try{
-  // Original data collections; bounded reads avoid scanning the entire review history.
-  const [reviews,stats]=await Promise.allSettled([
-   d.collection('ulasan_produk').where('productId','==',id).limit(60).get(),
-   d.collection('statistik_produk').doc(id).get()
-  ]);
+  // HANYA ulasan: tidak ada GET kedua untuk statistik_produk.
+  const reviews=await d.collection('ulasan_produk').where('productId','==',id).limit(60).get();
   if(stamp!==epoch||id!==getId())return;
-  const arr=reviews.status==='fulfilled'?reviews.value.docs.map(doc=>reviewText(doc.data()||{})).filter(Boolean):[];
-  const views=stats.status==='fulfilled'&&stats.value.exists?Number(stats.value.data()?.views)||0:0;
-  items=arr.map(t=>({icon:'fa-comment-dots',text:arr.length+' ulasan: "'+t.slice(0,140)+'"'}));
-  if(views>0)items.push({icon:'fa-eye',text:Math.floor(views).toLocaleString('id-ID')+' kali dilihat'});
-  if(views>0){root.querySelectorAll('[data-detail-views]').forEach(el=>{if(String(el.getAttribute('data-detail-views'))===id)el.textContent=Math.floor(views).toLocaleString('id-ID')+' dilihat'})}
+  const arr=reviews.docs.map(doc=>reviewText(doc.data()||{})).filter(Boolean);
+  reviewItems=arr.map(t=>({icon:'fa-comment-dots',text:arr.length+' ulasan: "'+t.slice(0,140)+'"'}));
+  rebuildItems();
   lastFetch=Date.now();cursor=0;
  }catch(e){console.warn('[ImamStore review toast]',e?.message||e)}finally{pending=false}
 }
-function push(extra){const g=gallery();if(!g||(!extra&&!items.length)||document.hidden)return;
- let stack=g.querySelector('.nine-review-toast-stack');if(!stack){stack=document.createElement('div');stack.className='nine-review-toast-stack';stack.setAttribute('aria-live','off');g.appendChild(stack)}
+function push(extra){
+ const g=gallery();if(!g||(!extra&&!items.length)||document.hidden)return;
+ let stack=g.querySelector('.nine-review-toast-stack');
+ if(!stack){stack=document.createElement('div');stack.className='nine-review-toast-stack';stack.setAttribute('aria-live','off');g.appendChild(stack)}
  const item=extra||items[cursor++%items.length],el=document.createElement('div');el.className='nine-review-toast nine-enter';
  const icon=document.createElement('i');icon.className='fa-solid '+item.icon;icon.setAttribute('aria-hidden','true');
  const label=document.createElement('span');label.textContent=item.text;el.append(icon,label);stack.appendChild(el);
  requestAnimationFrame(()=>requestAnimationFrame(()=>el.classList.remove('nine-enter')));
  while(stack.children.length>3)stack.firstElementChild.remove();
- setTimeout(()=>{el.classList.add('nine-exit');setTimeout(()=>el.remove(),350)},11000)
+ setTimeout(()=>{el.classList.add('nine-exit');setTimeout(()=>el.remove(),350)},11000);
 }
-async function tick(){const id=getId();if(id!==active){active=id;epoch++;clear();pending=false}if(!id||!gallery())return;
+async function tick(){
+ const id=getId();ensureProduct(id);
+ if(!id||!gallery())return;
  if(!lastFetch||Date.now()-lastFetch>45000){const stamp=epoch;await refresh(id,stamp)}
- if(id===getId())push()
+ if(id===getId())push();
 }
 document.addEventListener('nine:toast-activity',e=>{const x=e.detail||{};if(String(x.productId)===getId()&&x.text)push({icon:x.icon||'fa-bell',text:String(x.text)})});
 document.addEventListener('nine:toast-presence',e=>{const x=e.detail||{},n=Number(x.count);if(String(x.productId)===getId()&&Number.isFinite(n)&&n>=2)push({icon:'fa-user',text:n+' orang sedang melihat produk ini'})});
 setTimeout(tick,900);setInterval(tick,3300);
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)tick()});
 })();
-
 (function(){
 'use strict';
 const TYPES={cart:['fa-cart-shopping','Seseorang menambahkan produk ini ke keranjang'],favorite:['fa-heart','Seseorang menambahkan produk ini ke favorit'],checkout:['fa-credit-card','Seseorang memulai checkout produk ini'],order:['fa-bag-shopping','Seseorang membuat pesanan produk ini (menunggu konfirmasi)']};
