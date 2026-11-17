@@ -1564,11 +1564,11 @@ function renderFavorites(){
  const state=window.imamstoreWishlist?.status()||{mode:'initializing',ready:false,migrating:false,error:''};
  const note=document.querySelector('#panel-favorit .favorite-note');
  if(note)note.textContent=state.mode==='account'
-  ? (state.migrating?'Menggabungkan favorit dari browser ke akun Firebase…':state.error||'Favorit tersimpan pada akun Firebase dan otomatis sinkron antarperangkat.')
+  ? (state.migrating?'Menggabungkan favorit dari browser ke akun Firebase…':state.error||'Favorit tersimpan otomatis pada akun anda .')
   :state.mode==='guest'?'Favorit sementara tersimpan di browser ini. Login agar tersinkron ke akun.':'Menyiapkan daftar favorit…';
  $('favoriteCount').textContent=!state.ready?'Memuat…':items.length+' produk';
  $('favoriteEmpty').textContent=state.mode==='account'&&!state.ready
-  ?'Favorit akun sedang dimuat dari Firebase…'
+  ?'Favorit akun sedang dimuat…'
   :'Belum ada produk favorit. Buka detail produk dan tekan ikon hati untuk menyimpannya.';
  $('favoriteEmpty').classList.toggle('hidden',items.length!==0);
 }
@@ -8265,7 +8265,7 @@ if(new URLSearchParams(location.search).get('orders')==='1'){open()}
   <div class="ncl-actions"><button class="ncl-primary" id="nclEmailLogin" type="submit">Masuk</button><div class="ncl-separator" id="nclOr">atau lanjutkan dengan</div><button class="ncl-google" id="nclGoogle" type="button"><i class="fa-brands fa-google" aria-hidden="true"></i> Lanjutkan dengan Google</button><div class="ncl-foot"><span id="nclFootText">Belum punya akun?</span> <button class="ncl-text-btn" id="nclRegister" type="button">Daftar sekarang</button></div></div>
  </form>
  <p aria-live="polite" id="nclMessage" role="status"></p>
- <p class="ncl-assurance"><i class="fa-solid fa-lock" aria-hidden="true"></i> Login aman melalui Firebase Authentication. Belanja dan menambahkan ke keranjang tidak memerlukan akun.</p>
+ <p class="ncl-assurance"><i class="fa-solid fa-lock" aria-hidden="true"></i> Belanja dan menambahkan ke keranjang tidak memerlukan akun.</p>
 </section>
 </div>
 <script id="nexai-customer-login-js">
