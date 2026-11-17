@@ -1188,6 +1188,13 @@ text-shadow:0 2px 8px rgba(0,0,0,.65);
 }
 #btnLike{
 color:#ff2d55;
+background:transparent;
+border:0;
+padding:0;
+display:inline-flex;
+align-items:center;
+justify-content:center;
+line-height:1;
 }
 #btnComment{
 color:#ffffff;
@@ -9084,8 +9091,7 @@ Melayani dengan sepenuh hati
 </div>
 <!-- Like -->
 <div class="social-item">
-<i class="fa-regular fa-heart action-icon" id="btnLike">
-</i>
+<button class="fa-regular fa-heart action-icon" id="btnLike" type="button" aria-label="Ikuti ImamStore" title="Ikuti ImamStore"></button>
 <span id="likeCount">0</span>
 </div>
 <!-- Komentar -->
@@ -9601,32 +9607,7 @@ header.classList.remove("scrolled");
 <script>
   
   
-  // =====================================
-// VISITOR ID
-// =====================================
-
-let visitorId =
-localStorage.getItem("visitor_id");
-
-if(!visitorId){
-
-    visitorId =
-    Date.now().toString(36)
-    +
-    Math.random()
-    .toString(36)
-    .substring(2,10);
-
-    localStorage.setItem(
-        "visitor_id",
-        visitorId
-    );
-
-}
-
-
-// Online visitor Firestore engine dipindahkan ke modul setelah Firebase Auth SDK tersedia.
-// visitorId di atas tetap dipakai fitur lain yang sudah stabil.
+  // Main site follow routed to ImamStore. Firebase presence has its own UID engine.
 
 function showSuccess(){
 
@@ -9683,95 +9664,15 @@ db.collection("interaksi_web")
 
 
 
-let liked = false;
-
-(async()=>{
-
-const likeDoc =
-await db
-.collection("user_like")
-.doc(visitorId)
-.get();
-
-liked =
-likeDoc.exists &&
-likeDoc.data().liked===true;
-
-renderLike();
-
-})();
-
-
-document
-.getElementById("btnLike")
-.onclick = async()=>{
-
-const counterRef =
-db.collection("interaksi_web")
-.doc("landing");
-
-const userRef =
-db.collection("user_like")
-.doc(visitorId);
-
-const userSnap =
-await userRef.get();
-
-const sudahLike =
-userSnap.exists &&
-userSnap.data().liked===true;
-
-if(sudahLike){
-
-const counterSnap =
-await counterRef.get();
-
-const total =
-counterSnap.data().like || 0;
-
-if(total>0){
-
-await counterRef.update({
-
-like:
-firebase.firestore.FieldValue.increment(-1)
-
+// WEBSITE UTAMA — IKUTI TOKO TERPUSAT DI IMAMSTORE.
+// Tidak menulis interaksi_web/landing.like atau user_like dari browser anonim.
+// Status Mengikuti baru ditentukan setelah Firebase pelanggan aktif di Store.
+const mainStoreFollowButton = document.getElementById('btnLike');
+mainStoreFollowButton.addEventListener('click', () => {
+    // Perpindahan halaman hanya membuka ajakan Ikuti. GET tidak boleh otomatis
+    // menambah/mengurangi followers; transaksi dilakukan lewat tombol di Store.
+    window.location.assign('https://store.imamsales.com/?intent=follow');
 });
-
-}
-
-await userRef.set({
-
-liked:false
-
-});
-
-liked=false;
-
-}else{
-
-await counterRef.update({
-
-like:
-firebase.firestore.FieldValue.increment(1)
-
-});
-
-await userRef.set({
-
-liked:true
-
-});
-
-liked=true;
-
-}
-
-renderLike();
-
-};
-
-
 
 
 document
@@ -9829,36 +9730,6 @@ initRating();
 loadComments();
 
 };
-
-
-function renderLike(){
-
-const btn =
-document.getElementById("btnLike");
-
-if(liked){
-
-btn.classList.remove("fa-regular");
-btn.classList.add("fa-solid");
-
-btn.classList.add("like-pop");
-
-setTimeout(()=>{
-
-btn.classList.remove("like-pop");
-
-},350);
-
-}else{
-
-btn.classList.remove("fa-solid");
-btn.classList.add("fa-regular");
-
-}
-
-}
-
-
 
 
 function closeComment(){

@@ -9402,13 +9402,30 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
   }catch(e){console.warn('[Ikuti] Data legacy belum dapat dibaca',e?.code||e?.message)}
  }
  let identity=0,stopFollowSnapshot=null,pendingGuestFollow=false;
+ // Lanjutan dari tombol hati website utama. Query hanya membuka UI: tidak
+ // boleh membuat akun Follow secara otomatis dari kunjungan GET.
+ let entryFollowIntent=false,entryFollowShown=false;
+ try{entryFollowIntent=new URL(location.href).searchParams.get('intent')==='follow'}catch{}
+ function revealEntryFollowIntent(){
+  if(!entryFollowIntent||entryFollowShown||!btn||!['guest','account'].includes(follow.mode))return;
+  entryFollowShown=true;
+  try{const url=new URL(location.href);url.searchParams.delete('intent');
+   history.replaceState(history.state,'',url.pathname+url.search+url.hash);
+  }catch{}
+  requestAnimationFrame(()=>{
+   btn.scrollIntoView({behavior:'smooth',block:'center'});
+   try{btn.focus({preventScroll:true})}catch{}
+   toast(follow.mode==='guest'?'Masuk lalu tekan Ikuti untuk mengikuti ImamStore.':
+    follow.following?'Akunmu sudah mengikuti ImamStore.':'Tekan Ikuti untuk mengikuti ImamStore.');
+  });
+ }
  async function bind(user){
   if(stopFollowSnapshot){stopFollowSnapshot();stopFollowSnapshot=null}
   const ticket=++identity;
   follow.busy=false;follow.uid=user?.uid||'';follow.error='';follow.mode='loading';follow.following=false;paintFollow();
   if(!user||user.isAnonymous){
    await seedLegacy();if(ticket!==identity)return;
-   follow.mode='guest';follow.following=false;paintFollow();return;
+   follow.mode='guest';follow.following=false;paintFollow();revealEntryFollowIntent();return;
   }
   try{
    await seedLegacy();if(ticket!==identity)return;
@@ -9432,6 +9449,7 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
     if(ticket!==identity||follow.mode!=='account')return;
     follow.following=doc.exists&&doc.data()?.active===true;paintFollow();
    },e=>console.warn('[Ikuti] Sinkron akun belum tersedia',e.code||e.message));
+   revealEntryFollowIntent();
   }catch(e){if(ticket!==identity)return;follow.mode='error';follow.error=e.message;paintFollow();console.warn('[Ikuti]',e.message)}
  }
  if(btn)btn.onclick=async()=>{
