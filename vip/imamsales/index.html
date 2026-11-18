@@ -23,6 +23,7 @@
     BRIDGE: "Meminta sesi Firebase dari server...",
     SDK_APP: "Memuat Firebase App...",
     SDK_AUTH: "Memuat Firebase Authentication...",
+    FIREBASE_PERSISTENCE: "Menyiapkan sesi browser yang aman...",
     FIREBASE_SIGNIN: "Mengaktifkan akun VIP di Firebase...",
     CLAIMS: "Memeriksa izin akun VIP...",
     DASHBOARD: "Membuka dashboard VIP..."
@@ -52,6 +53,9 @@
     else if (code.startsWith("VERIFY_HTTP_500") || code.startsWith("BRIDGE_HTTP_5")) msg = "Function Netlify mengalami kesalahan server. Periksa Function Logs website utama.";
     else if (code.startsWith("FIREBASE_AUTH_INVALID_API_KEY") || code.startsWith("FIREBASE_AUTH_API_KEY_NOT_VALID")) msg = "Firebase API Key tidak diterima. Periksa konfigurasi web app Firebase.";
     else if (code.startsWith("FIREBASE_AUTH_UNAUTHORIZED_DOMAIN")) msg = "Domain website utama belum diizinkan oleh Firebase Authentication.";
+    else if (code.startsWith("FIREBASE_AUTH_OPERATION_NOT_ALLOWED")) msg = "Operasi login Firebase ditolak. Periksa pengaturan Firebase Authentication.";
+    else if (code.startsWith("PERSISTENCE_")) msg = "Penyimpanan sesi browser gagal. Periksa izin penyimpanan browser atau dukungan Firebase SDK.";
+    else if (code.startsWith("SIGNIN_")) msg = "Firebase gagal memproses custom token. Periksa kode pemeriksaan dan log browser, tanpa membagikan token.";
     else if (code.startsWith("FIREBASE_AUTH_INVALID_CUSTOM_TOKEN") || code.startsWith("FIREBASE_AUTH_CUSTOM_TOKEN_MISMATCH")) msg = "Firebase menolak custom token. Periksa project dan Service Account Firebase di Netlify utama.";
     else if (code.startsWith("SDK_")) msg = "Firebase SDK gagal dimuat. Periksa jaringan, pemblokir konten, atau koneksi ke gstatic.com.";
     else if (code.includes("_NETWORK")) msg = "Browser gagal terhubung ke layanan. Periksa jaringan dan endpoint Netlify.";
@@ -120,13 +124,29 @@
     }
     if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     const auth = firebase.auth();
+    // Firebase documents SESSION as the literal value "session". Do not depend
+    // on firebase.auth.Auth.Persistence existing in every compat build.
+    stage('FIREBASE_PERSISTENCE');
     try {
-      stage('FIREBASE_SIGNIN');
-      await auth.setPersistence(firebase.auth.Auth.Persistence.SESSION);
+      if (typeof auth.setPersistence !== 'function') throw vipError('PERSISTENCE_METHOD_MISSING');
+      await auth.setPersistence('session');
+    } catch (err) {
+      if (err?.vipCode) throw err;
+      if (err && /^auth\/[a-z0-9-]+$/i.test(String(err.code || ''))) throw err;
+      if (err?.name === 'SecurityError') throw vipError('PERSISTENCE_BROWSER_SECURITY_ERROR');
+      if (err?.name === 'TypeError') throw vipError('PERSISTENCE_TYPE_ERROR');
+      throw vipError('PERSISTENCE_UNKNOWN_ERROR');
+    }
+    stage('FIREBASE_SIGNIN');
+    try {
+      if (typeof auth.signInWithCustomToken !== 'function') throw vipError('SIGNIN_METHOD_MISSING');
       await auth.signInWithCustomToken(payload.firebaseToken);
     } catch (err) {
+      if (err?.vipCode) throw err;
       if (err && /^auth\/[a-z0-9-]+$/i.test(String(err.code || ''))) throw err;
-      throw vipError('FIREBASE_SIGNIN_FAILED');
+      if (err?.name === 'TypeError') throw vipError('SIGNIN_TYPE_ERROR');
+      if (err?.name === 'NetworkError') throw vipError('SIGNIN_NETWORK_ERROR');
+      throw vipError('SIGNIN_UNKNOWN_ERROR');
     }
     stage('CLAIMS');
     let session;
