@@ -1,120 +1,55 @@
-(async function () {
+(async function(){
+  'use strict';
+  const path=window.location.pathname;
+  if (path.startsWith('/login')) return;
+  const isVip=/^\/vip\/([^/]+)/.exec(path);
+  const isProduct=path==='/adminb.html';
+  const isAdmin=path.startsWith('/admin') && !isProduct;
+  if(!isVip && !isProduct && !isAdmin)return;
 
-    const token = localStorage.getItem("token");
-    const role = localStorage.getItem("role");
-
-    const path = window.location.pathname;
-
-    // Login page tidak perlu dicek
-    if (path.startsWith("/login")) {
-        return;
+  let token,expectedRole,scopedKey;
+  if(isVip){
+    const folder=isVip[1];
+    expectedRole='vip';
+    scopedKey='imamsales:session:vip:'+folder;
+    token=localStorage.getItem(scopedKey)
+      || (localStorage.getItem('role')==='vip'?localStorage.getItem('token'):null);
+  } else if(isAdmin){
+    expectedRole='admin';
+    scopedKey='imamsales:session:admin';
+    token=localStorage.getItem(scopedKey)
+      || (localStorage.getItem('role')==='admin'?localStorage.getItem('token'):null);
+  } else {
+    expectedRole='product_admin';
+    scopedKey='imamsales:session:product_admin';
+    token=localStorage.getItem(scopedKey)
+      || (localStorage.getItem('role')==='product_admin'?localStorage.getItem('token'):null);
+  }
+  if(!token){ window.location.replace('/login'); return; }
+  try{
+    const res=await fetch('/.netlify/functions/verify-token',{
+      method:'GET',cache:'no-store',headers:{Authorization:'Bearer '+token}
+    });
+    if(!res.ok){
+      // A transient server error must not destroy a still-valid session.
+      if(res.status===401 || res.status===403){
+        localStorage.removeItem(scopedKey);
+        window.location.replace('/login');
+      }
+      return;
     }
-
-    // Halaman yang diproteksi
-    if (path.startsWith("/admin") || path.startsWith("/vip")) {
-
-        if (!token || !role) {
-
-            localStorage.clear();
-            window.location.href = "/login";
-            return;
-        }
-
-        try {
-
-            const res = await fetch(
-                "/.netlify/functions/verify-token",
-                {
-                    method: "GET",
-                    headers: {
-                        Authorization: "Bearer " + token
-                    }
-                }
-            );
-
-            const data = await res.json();
-
-            if (!res.ok || !data.success || !data.user) {
-
-                localStorage.clear();
-                window.location.href = "/login";
-                return;
-            }
-
-            const userRole = data.user.role;
-
-
-            // ==========================
-            // PRODUCT ADMIN
-            // ==========================
-
-            if (
-                path === "/adminb.html" &&
-                userRole !== "product_admin"
-            ) {
-
-                localStorage.clear();
-                window.location.href = "/login";
-                return;
-            }
-
-
-            // ==========================
-            // ADMIN
-            // ==========================
-
-            if (
-                path.startsWith("/admin") &&
-                path !== "/adminb.html" &&
-                userRole !== "admin"
-            ) {
-
-                localStorage.clear();
-                window.location.href = "/login";
-                return;
-            }
-
-
-            // ==========================
-            // VIP
-            // ==========================
-
-            if (
-                path.startsWith("/vip") &&
-                userRole !== "vip"
-            ) {
-
-                localStorage.clear();
-                window.location.href = "/login";
-                return;
-            }
-
-
-            // ==========================
-            // PROTEKSI FOLDER VIP
-            // ==========================
-
-            if (userRole === "vip") {
-
-                const urlParts =
-                    window.location.pathname.split("/");
-
-                const currentFolder =
-                    urlParts[2];
-
-                if (currentFolder !== data.user.folder) {
-
-                    localStorage.clear();
-                    window.location.href = "/login";
-                    return;
-                }
-            }
-
-        } catch (err) {
-
-            localStorage.clear();
-            window.location.href = "/login";
-        }
+    const result=await res.json();
+    const user=result?.user;
+    if(!result?.success || !user || user.role!==expectedRole ||
+      (isVip && user.folder!==isVip[1])){
+      // A mistaken URL or a wrong role must not erase another role's credentials.
+      window.location.replace('/login');
+      return;
     }
-
+    // One-time migration from legacy token to namespaced token.
+    if(localStorage.getItem(scopedKey)!==token)localStorage.setItem(scopedKey,token);
+  }catch(e){
+    // Avoid localStorage.clear() and redirect loops on offline/network failures.
+    console.warn('[ImamSales Session] Pemeriksaan server sementara gagal:',e?.name||'network');
+  }
 })();

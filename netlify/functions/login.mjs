@@ -10,7 +10,7 @@ const headers = {
   'Cache-Control': 'no-store, max-age=0',
 };
 const json = (status, payload) => new Response(JSON.stringify(payload), { status, headers });
-const issue = (role, secret, extra = {}) => jwt.sign({ role, ...extra }, secret, { expiresIn: '30m' });
+const issue = (role, secret, extra = {}) => jwt.sign({ role, ...extra }, secret, { expiresIn: '90m' });
 
 export default async function handler(request) {
   if (request.method !== 'POST') return json(405, { success: false, message: 'Method Not Allowed' });

@@ -63,7 +63,7 @@ export default async function handler(request) {
   }
   const expireAt = Number(user.exp) * 1000;
   if (!Number.isSafeInteger(expireAt) || expireAt <= Date.now() ||
-      expireAt > Date.now() + 31 * 60 * 1000) {
+      expireAt > Date.now() + 91 * 60 * 1000) {
     return json(401, { success: false, message: 'Expired session' });
   }
 

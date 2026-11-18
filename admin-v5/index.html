@@ -8006,7 +8006,7 @@ function adminV5R24StopLegacy(){
 }
 
 async function adminV5R24VerifyNetlifyAdmin(){
-  const token=localStorage.getItem('token');
+  const token=(localStorage.getItem('imamsales:session:admin') || (localStorage.getItem('role') === 'admin' ? localStorage.getItem('token') : null));
   if(!token)throw new Error('Sesi Netlify Admin tidak tersedia.');
   const result=await fetch('/.netlify/functions/verify-token',{
     method:'GET',cache:'no-store',headers:{Authorization:'Bearer '+token}
@@ -8643,7 +8643,7 @@ const res = await fetch(
 
       Authorization:
       "Bearer " +
-      localStorage.getItem("token")
+      (localStorage.getItem('imamsales:session:admin') || (localStorage.getItem('role') === 'admin' ? localStorage.getItem('token') : null))
 
     },
 
@@ -9336,7 +9336,12 @@ async function logoutAdmin(){
 
     // Cabut juga JWT Netlify Admin, bukan hanya sesi Firebase.
     // Jangan localStorage.clear(): preferensi aplikasi lain harus tetap utuh.
-    for (const key of ['token','role','nama','folder']) localStorage.removeItem(key);
+    localStorage.removeItem('imamsales:session:admin');
+    if (localStorage.getItem('role') === 'admin') {
+      localStorage.removeItem('token');
+      localStorage.removeItem('role');
+    }
+    // Do not delete folder-scoped VIP tokens or Firebase VIP named sessions.
 
     /*
       Redirect setelah logout
@@ -13879,7 +13884,7 @@ window.smartLoadWhatsAppGroups = async function(){
   collection=db.collection('store_warehouses');
   unsubscribe=collection.onSnapshot(snap=>{records=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(Number(a.order)||0)-(Number(b.order)||0)||String(a.city||'').localeCompare(String(b.city||'')));render();status(records.length+' gudang tersinkron realtime.');},err=>status('Gagal membaca gudang: '+err.message));
  }
- launch.addEventListener('click',()=>{if(localStorage.getItem('role')!=='admin'){alert('Hanya Admin yang dapat mengelola gudang.');return}overlay.classList.add('open');init()});
+ launch.addEventListener('click',()=>{if(!adminV5LegacyAuthorized){alert('Hanya Admin yang dapat mengelola gudang.');return}overlay.classList.add('open');init()});
  by('whAdminClose').onclick=()=>overlay.classList.remove('open');
  overlay.addEventListener('click',e=>{if(e.target===overlay)overlay.classList.remove('open')});
  by('whReset').onclick=reset;
@@ -14026,7 +14031,7 @@ launch?.addEventListener("click",()=>{
    },e=>status.textContent='Gagal membaca kategori: '+e.message);
   }catch(e){status.textContent='Firestore belum siap: '+e.message}
  }
- open.addEventListener('click',()=>{if(localStorage.getItem('role')!=='admin'){alert('Hanya Admin yang dapat mengubah kata kunci.');return}
+ open.addEventListener('click',()=>{if(!adminV5LegacyAuthorized){alert('Hanya Admin yang dapat mengubah kata kunci.');return}
   document.getElementById('site-menu-dropdown')?.classList.remove('open');
   overlay.classList.add('open');connect();
  });
@@ -14254,7 +14259,7 @@ function formatDate(ts){
 }
 function validAdmin(user){return !!user && !user.isAnonymous && user.uid===ADMIN_FIREBASE_UID;}
 function ensureNetlifyAdmin(){
- const token=localStorage.getItem("token");
+ const token=(localStorage.getItem('imamsales:session:admin') || (localStorage.getItem('role') === 'admin' ? localStorage.getItem('token') : null));
  if(!token)return Promise.reject(new Error("Silakan login Admin V5 melalui Netlify terlebih dahulu."));
  return fetch("/.netlify/functions/verify-token",{headers:{Authorization:"Bearer "+token},cache:"no-store"})
  .then(async r=>{const d=await r.json();if(!r.ok||!d.success||d.user?.role!=="admin")throw Error("Role Netlify bukan admin atau sesi berakhir.");return true;});
