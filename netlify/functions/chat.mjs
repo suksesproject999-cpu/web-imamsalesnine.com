@@ -1,16 +1,29 @@
 import { createRequire } from 'node:module';
-import { requestAsLegacyEvent, legacyResponseAsWeb } from './_shared/legacy-adapter.mjs';
 const require = createRequire(import.meta.url);
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
+// Modern Netlify runtime may place included_files alongside the compiled entry,
+// or preserve netlify/functions/ under its working directory. Resolve actual
+// existing files; do not treat an absent sidecar as a successful initialization.
+const ASSET_ROOTS = [...new Set([
+  __dirname,
+  path.join(process.cwd(), 'netlify', 'functions'),
+  path.join(process.cwd(), 'functions'),
+  path.join(__dirname, 'netlify', 'functions')
+])];
+function assetFile(section, filename) {
+  for (const root of ASSET_ROOTS) {
+    const candidate = path.join(root, section, filename);
+    if (fs.existsSync(candidate)) return candidate;
+  }
+  return path.join(__dirname, section, filename);
+}
+
 import fs from 'node:fs';
 import path from 'node:path';
 import { pathToFileURL } from 'node:url';
-import { Readable } from 'node:stream';
-import formidableModule from 'formidable';
-const { formidable } = formidableModule;
 
 let ainexSystem={
   VERSION:"off",
@@ -22,7 +35,7 @@ let ainexSystem={
   recordResponse:()=>{},
   runSelfTests:()=>({version:"off",ok:false,passed:0,failed:0,total:0,results:[]})
 };
-try{ainexSystem=require("./ainex/ainex-system.js");}
+try{ainexSystem=require(assetFile("ainex", "ainex-system.js"));}
 catch(e){console.warn("AINEX system sidecar warning:",e.message);}
 
 const PRODUCT_REMOTE_URL=process.env.NEXAI_PRODUCT_JSON_URL||"https://imamsalesnine.com/produk.json";
@@ -32,19 +45,19 @@ const PUBLIC_IMAGE_ENABLED=process.env.NEXAI_PUBLIC_IMAGE==="1";
 const IMAGE_MODEL=process.env.NEXAI_IMAGE_MODEL||"gpt-image-1";
 
 function readJSON(file,fallback){try{return JSON.parse(fs.readFileSync(file,"utf8"));}catch{return fallback;}}
-const knowledgeDB=readJSON(path.join(__dirname,"data","product_knowledge_center.json"),{products:[]});
-const businessDB=readJSON(path.join(__dirname,"data","business_knowledge.json"),{});
-const brandDB=readJSON(path.join(__dirname,"data","brand_knowledge.json"),{});
-const vehicleClassDB=readJSON(path.join(__dirname,"data","product_vehicle_classification_v1.json"),{groups:{}});
-const productLifecycleDB=readJSON(path.join(__dirname,"data","product_lifecycle_v1.json"),{policy:{default_status:"active",status_rules:{}},products:{}});
-const recommendationShortlistDB=readJSON(path.join(__dirname,"data","recommended_product_shortlist_v1.json"),{policy:{},curated_socket_products:{},product_socket_catalog:{}});
-const vehicleIntelligenceDB=readJSON(path.join(__dirname,"data","vehicle_intelligence_kamar4_v3_normalized.json"),{vehicles:[]});
+const knowledgeDB=readJSON(assetFile("data","product_knowledge_center.json"),{products:[]});
+const businessDB=readJSON(assetFile("data","business_knowledge.json"),{});
+const brandDB=readJSON(assetFile("data","brand_knowledge.json"),{});
+const vehicleClassDB=readJSON(assetFile("data","product_vehicle_classification_v1.json"),{groups:{}});
+const productLifecycleDB=readJSON(assetFile("data","product_lifecycle_v1.json"),{policy:{default_status:"active",status_rules:{}},products:{}});
+const recommendationShortlistDB=readJSON(assetFile("data","recommended_product_shortlist_v1.json"),{policy:{},curated_socket_products:{},product_socket_catalog:{}});
+const vehicleIntelligenceDB=readJSON(assetFile("data","vehicle_intelligence_kamar4_v3_normalized.json"),{vehicles:[]});
 
-const RUNTIME_ENGINE_FILE=path.join(__dirname,"data","nexai_runtime_engine_v1_1.mjs");
-const RUNTIME_DATA_ROOT=path.join(__dirname,"data");
+const RUNTIME_ENGINE_FILE=assetFile("data","nexai_runtime_engine_v1_1.mjs");
+const RUNTIME_DATA_ROOT=path.dirname(RUNTIME_ENGINE_FILE);
 let nexaiRuntimePromise=null;
 
-const AINEX_AGENT_FILE=path.join(__dirname,"agent","ainex-agent.mjs");
+const AINEX_AGENT_FILE=assetFile("agent","ainex-agent.mjs");
 let ainexAgentModulePromise=null;
 async function getAinexAgentModule(){
   if(ainexAgentModulePromise)return ainexAgentModulePromise;
@@ -78,32 +91,43 @@ async function getNexaiRuntime(){
   return nexaiRuntimePromise;
 }
 
-let productCache=null,productCacheAt=0;
+let productCache=null,productCacheAt=0,productCacheSource="none";
 const PRODUCT_TTL=60000;
 
 async function loadProducts(){
   const now=Date.now();
-  if(Array.isArray(productCache)&&productCache.length&&now-productCacheAt<PRODUCT_TTL)return productCache;
+  if(Array.isArray(productCache)&&now-productCacheAt<PRODUCT_TTL)return productCache;
 
   try{
-    const r=await fetch(PRODUCT_REMOTE_URL,{headers:{"Accept":"application/json"}});
+    const r=await fetch(PRODUCT_REMOTE_URL,{headers:{"Accept":"application/json"},signal:AbortSignal.timeout(5000)});
     if(r.ok){
       const data=await r.json();
       if(Array.isArray(data)&&data.length){
-        productCache=data;productCacheAt=now;return data;
+        productCache=data;productCacheAt=now;productCacheSource="remote";return data;
       }
     }
   }catch(e){console.warn("Product remote warning:",e.message);}
 
-  for(const file of[
+  const paths=[
     path.join(process.cwd(),"produk.json"),
     path.join(process.cwd(),"public","produk.json"),
-    path.join(__dirname,"..","..","produk.json")
-  ]){
+    ...ASSET_ROOTS.map(root=>path.join(root,"..","..","produk.json")),
+    ...ASSET_ROOTS.map(root=>path.join(root,"produk.json"))
+  ];
+  for(const file of new Set(paths)){
     const data=readJSON(file,null);
-    if(Array.isArray(data)&&data.length){productCache=data;productCacheAt=now;return data;}
+    if(Array.isArray(data)&&data.length){
+      productCache=data;productCacheAt=now;productCacheSource="local";return data;
+    }
   }
-  throw new Error("Data produk resmi tidak berhasil dimuat.");
+  // Do not kill all chat routes when a *live* catalog is temporarily unavailable.
+  // unifiedProducts([]) below still uses the official Product Knowledge Center;
+  // price/stock remain unspecified rather than invented.
+  productCache=[];productCacheAt=now;
+  productCacheSource=Array.isArray(knowledgeDB.products)&&knowledgeDB.products.length
+    ? "knowledge_only":"none";
+  console.warn("AINEX live product catalog unavailable; source:",productCacheSource);
+  return productCache;
 }
 
 function normalize(v){return String(v||"").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g,"").replace(/[^a-z0-9\s.+/-]/g," ").replace(/\s+/g," ").trim();}
@@ -1601,9 +1625,20 @@ async function callAI({products,message,route,state,memory,image,explicitProduct
 
 async function generateImage(prompt){if(!PUBLIC_IMAGE_ENABLED||!process.env.OPENAI_API_KEY)return null;const r=await fetch("https://api.openai.com/v1/images/generations",{method:"POST",headers:{"Content-Type":"application/json","Authorization":`Bearer ${process.env.OPENAI_API_KEY}`},body:JSON.stringify({model:IMAGE_MODEL,prompt,size:"1024x1024"})});const d=await r.json();if(!r.ok)throw new Error(d?.error?.message||"Image generation gagal.");const b=d?.data?.[0]?.b64_json;return b?`data:image/png;base64,${b}`:null;}
 
-async function parseMultipartEvent(event){if(!event.body)throw new Error("Empty body");const b=Buffer.from(event.body,event.isBase64Encoded?"base64":"utf8"),req=new Readable();req.push(b);req.push(null);req.headers={...(event.headers||{}),"content-length":b.length};req.method=event.httpMethod;req.url="/";const form=formidable({multiples:false});return await new Promise((resolve,reject)=>form.parse(req,(e,fields,files)=>e?reject(e):resolve({fields:fields||{},files:files||{}})));}
+async function parseMultipartEvent(event){
+  // Netlify's modern Request.formData() has already parsed the request once.
+  // No formidable, legacy Lambda body conversion, or temporary-file writes.
+  if(event.parsedForm)return event.parsedForm;
+  throw new Error("FormData tidak tersedia pada request chat.");
+}
 function fieldValue(fields,key,f=""){const v=fields?.[key];return Array.isArray(v)?(v[0]??f):(v??f);}
-function imageData(files){const v=files?.image;if(!v)return null;const f=Array.isArray(v)?v[0]:v;if(!f?.filepath)return null;return`data:${f.mimetype||"image/jpeg"};base64,${fs.readFileSync(f.filepath).toString("base64")}`;}
+function imageData(files){
+  const v=files?.image;
+  if(!v)return null;
+  const f=Array.isArray(v)?v[0]:v;
+  return f?.dataUrl||null;
+}
+
 function normalizeReplyFormatting(value){
   if(typeof value!=="string")return value;
   let s=value;
@@ -1655,12 +1690,25 @@ const legacyHandler=async event=>ainexSystem.runRequest({method:event?.httpMetho
     const allOk=report.ok&&runtimeCheck.ok;
     return response(allOk?200:503,{reply:allOk?"AINEX self-test + runtime PASS.":"AINEX self-test/runtime menemukan regression.",route:"selftest",usedAI:false,usedWeb:false,selftest:report,runtimeCheck});
   }
-  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,runtimeEngine:fs.existsSync(RUNTIME_ENGINE_FILE),checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
+  if(event.httpMethod==="GET"&&String(event.queryStringParameters?.health||"")==="1")return response(200,{status:"ok",productCount:products.length,identityCoverage:identityCoverageStats(liveProducts,products),knowledgeCenterProducts:(knowledgeDB.products||[]).length,knowledgeQuality:{catalogVerified:(knowledgeDB.products||[]).filter(x=>x.catalog?.verified).length,descriptions:(knowledgeDB.products||[]).filter(x=>x.catalog?.description).length,specs:(knowledgeDB.products||[]).filter(x=>Object.keys(x.catalog?.specifications||{}).length).length,visuals:(knowledgeDB.products||[]).filter(x=>x.visual?.main).length},masterBrand:brandDB.master_brand,subbrands:brandDB.subbrands,runtimeEngine:fs.existsSync(RUNTIME_ENGINE_FILE),
+    diagnostic:{
+      catalogSource:productCacheSource,
+      openaiConfigured:!!process.env.OPENAI_API_KEY,
+      knowledgeCenterFound:fs.existsSync(assetFile("data","product_knowledge_center.json")),
+      ainexSystemVersion:ainexSystem.VERSION||"off",
+      agentFileFound:fs.existsSync(AINEX_AGENT_FILE),
+      runtimeEngineFound:fs.existsSync(RUNTIME_ENGINE_FILE)
+    },checks:Object.fromEntries(["R9","R10","V9PRO","MS3-SLIM","Q6-PRO","H6-LH2"].map(code=>[code,resolveProducts(products,code,1)[0]?pSku(resolveProducts(products,code,1)[0]):null]))});
   const{fields,files}=await parseMultipartEvent(event),rawMessage=String(fieldValue(fields,"message","")).trim(),memory=safeParse(fieldValue(fields,"memory","[]"),[]),productMemory=safeParse(fieldValue(fields,"productMemory","[]"),[]),img=imageData(files);
   const message=ainexSystem.normalizeAliases(rawMessage);
   ainexSystem.updateRequestMeta({message:rawMessage,normalized_message:message});
   if(!message&&!img)return response(400,{reply:"Pesan kosong.",image:null});
   const explicit=resolvePositiveProductsGlobal(products,message,4),route=classify(message,explicit.length>0);
+  // Photo sent without an identifiable SKU: do not reply "product not identified"
+  // before giving the vision model a chance to inspect the supplied image.
+  if(img && !explicit.length && (route.type.startsWith("product_") || route.type==="catalog_page")) {
+    route.type="general";
+  }
   if(route.type==="business_profile"){const r=businessReply(message);if(r)return response(200,{reply:r,image:null,route:"business_profile",usedAI:false,usedWeb:false});}
   if(route.type==="brand_knowledge"){const r=brandReply(message,products);if(r)return response(200,{reply:r,image:null,route:"brand_knowledge",usedAI:false,usedWeb:false});}
   if(route.type==="smalltalk")return response(200,{reply:smalltalk(message),image:null,route:"smalltalk",usedAI:false,usedWeb:false});
@@ -1926,10 +1974,58 @@ const legacyHandler=async event=>ainexSystem.runRequest({method:event?.httpMetho
  }catch(e){console.error("AINEX V3 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data AINEX sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message,route:"runtime_error"});}
 });
 
-// HTTP runtime adapter. The original handler, response shape and business logic
-// remain unchanged; only the Netlify entry point uses the modern Request API.
+// Netlify Functions modern Request/Response entry. No Lambda compatibility
+// adapter is required for this endpoint; specifically, multipart bytes are
+// read exactly once using native Request.formData().
+function webResponse(reply) {
+  return new Response(reply.body??"",{
+    status:Number(reply.statusCode||200),
+    headers:reply.headers||{"Content-Type":"application/json"}
+  });
+}
+
 export default async function handler(request) {
-  const event = await requestAsLegacyEvent(request);
-  const result = await legacyHandler(event);
-  return legacyResponseAsWeb(result);
+  const url=new URL(request.url);
+  const method=request.method.toUpperCase();
+  const event={
+    httpMethod:method,
+    path:url.pathname,
+    headers:Object.fromEntries(request.headers.entries()),
+    queryStringParameters:Object.fromEntries(url.searchParams.entries()),
+    body:null,
+    isBase64Encoded:false
+  };
+  if(method==="POST"){
+    const mime=request.headers.get("content-type")||"";
+    if(!/^(?:multipart\/form-data|application\/x-www-form-urlencoded)(?:;|$)/i.test(mime.trim())){
+      return webResponse(response(415,{reply:"Gunakan FormData untuk mengirim pesan AI.",error:"UNSUPPORTED_CONTENT_TYPE",route:"request_error"}));
+    }
+    try{
+      const form=await request.formData();
+      const fields={},files={};
+      for(const [key,value] of form.entries()){
+        if(typeof value==="string"){
+          if(fields[key]===undefined)fields[key]=value;
+          else if(Array.isArray(fields[key]))fields[key].push(value);
+          else fields[key]=[fields[key],value];
+        }else if(key==="image"){
+          const maxBytes=12*1024*1024;
+          if(value.size>maxBytes){
+            return webResponse(response(413,{reply:"Ukuran gambar maksimal 12 MB.",error:"IMAGE_TOO_LARGE",route:"request_error"}));
+          }
+          if(!/^image\/(?:jpeg|png|webp|gif)$/i.test(value.type)){
+            return webResponse(response(415,{reply:"Format gambar harus JPG, PNG, WebP, atau GIF.",error:"IMAGE_TYPE_UNSUPPORTED",route:"request_error"}));
+          }
+          const bytes=Buffer.from(await value.arrayBuffer());
+          files.image={dataUrl:`data:${value.type};base64,${bytes.toString("base64")}`};
+        }
+      }
+      event.parsedForm={fields,files};
+    }catch(e){
+      console.error("AINEX FormData parse error:",e?.message||e);
+      return webResponse(response(400,{reply:"Pesan atau gambar tidak berhasil dibaca. Coba ulangi.",error:"FORMDATA_PARSE_FAILED",route:"request_error"}));
+    }
+  }
+  const result=await legacyHandler(event);
+  return webResponse(result);
 }
