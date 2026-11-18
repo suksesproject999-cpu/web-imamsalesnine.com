@@ -1,5 +1,6 @@
-const products = require("../../produk.json");
-const visualMap = require("../../product-visual-map.json");
+import { requestAsLegacyEvent, legacyResponseAsWeb } from './_shared/legacy-adapter.mjs';
+import products from '../../produk.json' with { type: 'json' };
+import visualMap from '../../product-visual-map.json' with { type: 'json' };
 
 const norm = (s="") => String(s).toLowerCase().replace(/[^a-z0-9]+/g," ").trim();
 const pub = (p="") => !p ? "" : (/^https?:\/\//i.test(p) ? p : "https://imamsalesnine.com/" + String(p).replace(/^\/+/,""));
@@ -46,7 +47,7 @@ function searchProducts(q,limit=10){
 }
 function response(status,obj){return {statusCode:status,headers:{"content-type":"application/json; charset=utf-8","cache-control":"public, max-age=60"},body:JSON.stringify(obj)}}
 
-exports.handler = async (event) => {
+const legacyHandler = async (event) => {
   try {
     if(event.httpMethod!=="GET") return response(405,{error:"Method not allowed"});
     const q=event.queryStringParameters||{};
@@ -92,3 +93,11 @@ exports.handler = async (event) => {
     return response(500,{error:"Internal server error"});
   }
 };
+
+// HTTP runtime adapter. The original handler, response shape and business logic
+// remain unchanged; only the Netlify entry point uses the modern Request API.
+export default async function handler(request) {
+  const event = await requestAsLegacyEvent(request);
+  const result = await legacyHandler(event);
+  return legacyResponseAsWeb(result);
+}

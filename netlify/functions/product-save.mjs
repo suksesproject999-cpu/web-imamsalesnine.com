@@ -1,5 +1,7 @@
-const { verifyToken } = require("./utils/auth");
-const admin = require("firebase-admin");
+import { requestAsLegacyEvent, legacyResponseAsWeb } from './_shared/legacy-adapter.mjs';
+import authUtils from './utils/auth.js';
+import admin from 'firebase-admin';
+const { verifyToken } = authUtils;
 
 function initFirebase() {
   if (admin.apps.length) return;
@@ -34,7 +36,7 @@ function response(statusCode, payload) {
   };
 }
 
-exports.handler = async (event) => {
+const legacyHandler = async (event) => {
   if (event.httpMethod !== "POST") {
     return response(405, {
       success: false,
@@ -99,3 +101,11 @@ exports.handler = async (event) => {
     });
   }
 };
+
+// HTTP runtime adapter. The original handler, response shape and business logic
+// remain unchanged; only the Netlify entry point uses the modern Request API.
+export default async function handler(request) {
+  const event = await requestAsLegacyEvent(request);
+  const result = await legacyHandler(event);
+  return legacyResponseAsWeb(result);
+}

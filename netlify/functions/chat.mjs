@@ -1,10 +1,16 @@
+import { createRequire } from 'node:module';
+import { requestAsLegacyEvent, legacyResponseAsWeb } from './_shared/legacy-adapter.mjs';
+const require = createRequire(import.meta.url);
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-exports.config={api:{bodyParser:false}};
-const fs=require("fs");
-const path=require("path");
-const {pathToFileURL}=require("url");
-const {Readable}=require("stream");
-const {formidable}=require("formidable");
+import fs from 'node:fs';
+import path from 'node:path';
+import { pathToFileURL } from 'node:url';
+import { Readable } from 'node:stream';
+import formidableModule from 'formidable';
+const { formidable } = formidableModule;
 
 let ainexSystem={
   VERSION:"off",
@@ -1616,7 +1622,7 @@ function normalizeResponseBody(body){
 }
 function response(statusCode,body){const normalizedBody=normalizeResponseBody(body);const contracted=ainexSystem.applyAnswerContract(normalizedBody);ainexSystem.recordResponse(contracted,statusCode);return{statusCode,headers:{"Content-Type":"application/json","Cache-Control":"no-store","X-AINEX-Version":ainexSystem.VERSION||"off"},body:JSON.stringify(contracted)};}
 
-exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"",path:event?.path||""},async()=>{
+const legacyHandler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"",path:event?.path||""},async()=>{
  try{
   const liveProducts=await loadProducts();
   const products=unifiedProducts(liveProducts);
@@ -1919,3 +1925,11 @@ exports.handler=async event=>ainexSystem.runRequest({method:event?.httpMethod||"
   return response(200,{reply:ai.reply,image:generated,route:route.type,usedAI:true,usedWeb:ai.usedWeb,sources:ai.sources,agent:agentResult?{used:!!agentResult.used,mode:agentResult.mode||"off",request_id:agentResult.request_id||null,tools:agentResult.tools||[],duration_ms:agentResult.duration_ms||0,fallback:!!agentResult.fallback,reason:agentResult.reason||null}:null,state:{activeProduct:state.activeProduct,vehicle:state.vehicle}});
  }catch(e){console.error("AINEX V3 RUNTIME ERROR:",e);return response(500,{reply:"Maaf, data AINEX sedang tidak dapat dimuat. Silakan coba lagi sebentar.",image:null,error:e.message,route:"runtime_error"});}
 });
+
+// HTTP runtime adapter. The original handler, response shape and business logic
+// remain unchanged; only the Netlify entry point uses the modern Request API.
+export default async function handler(request) {
+  const event = await requestAsLegacyEvent(request);
+  const result = await legacyHandler(event);
+  return legacyResponseAsWeb(result);
+}
