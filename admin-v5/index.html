@@ -4811,6 +4811,26 @@ body.nexai-seller-workspace #sellerCenterFrame{height:100%!important;min-height:
   </div>
 </div>
 
+<!-- ADMIN V5 R24: indikator sesi Firebase Admin, memakai form login yang sudah ada di Kelola Pesanan -->
+<style id="admin-v5-r24-auth-style">
+#adminV5R24AuthBanner{position:fixed;top:12px;right:12px;z-index:11000;max-width:min(380px,calc(100vw - 24px));padding:13px 15px;border-radius:11px;border:1px solid #d1def0;background:#eaf3ff;box-shadow:0 7px 24px rgba(15,34,66,.18);color:#182f50;font:13px/1.55 system-ui,Arial,sans-serif}
+#adminV5R24AuthBanner[hidden]{display:none}
+#adminV5R24AuthBanner[data-state="error"]{background:#fff0f0;border-color:#f2b7b7;color:#8d2020}
+#adminV5R24AuthBanner strong{display:block;margin-bottom:4px;font-size:14px}
+#adminV5R24AuthBanner p{margin:0 0 10px;white-space:normal}
+#adminV5R24AuthBanner .admin-r24-actions{display:flex;gap:8px;flex-wrap:wrap}
+#adminV5R24AuthBanner button{border:0;border-radius:8px;padding:8px 12px;background:#8cc63f;color:#14240b;font:700 12px system-ui,Arial,sans-serif;cursor:pointer}
+#adminV5R24AuthBanner button.admin-r24-secondary{background:#fff;color:#28394f;border:1px solid #c6d2df}
+</style>
+<div id="adminV5R24AuthBanner" role="status" aria-live="polite" data-state="waiting">
+  <strong id="adminV5R24AuthTitle">Memeriksa Firebase Admin...</strong>
+  <p id="adminV5R24AuthText">Menyiapkan akses pesanan, invoice, dan aktivitas VIP.</p>
+  <div class="admin-r24-actions">
+    <button type="button" id="adminV5R24LoginBtn">Login Firebase Admin</button>
+    <button type="button" class="admin-r24-secondary" id="adminV5R24RetryBtn">Cek ulang</button>
+  </div>
+</div>
+
 <script src="/js/auth.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
@@ -4853,6 +4873,11 @@ try {
 }
 
 const db = firebase.firestore();
+const ADMIN_V5_R24_UID = "U7XnPGpjjUNAYnwuoMh68I8guT33";
+let adminV5LegacyAuthorized = false;
+let adminV5VipActivityUnsubscribe = null;
+let adminV5AuthGeneration = 0;
+let adminV5LegacySessionUid = null;
 
 const vipPath = {
 
@@ -4935,6 +4960,7 @@ const tabsConfig = {
 
 // ================= UPDATE STATUS =================
 async function updateStatus(row,status){
+  if (!requireAdminV5R24Access()) return;
 
   const card =
   document.querySelector(
@@ -5137,6 +5163,7 @@ await db
 
 
 async function cekPengaturWaktuDelete(){
+    if (!adminV5LegacyAuthorized || firebase.auth().currentUser?.uid !== ADMIN_V5_R24_UID) return;
 
     const now = new Date();
 
@@ -5272,9 +5299,11 @@ console.log(
 
 
 setInterval(()=>{
-
-    cekPengaturWaktuDelete();
-
+    if (!adminV5LegacyAuthorized) return;
+    cekPengaturWaktuDelete().catch(error=>{
+      console.error('[Admin-V5 R24] Timer pemeriksaan VIP gagal:', error?.code||error?.message||error);
+      adminV5R24Banner('error', 'Pemeriksaan timer gagal', 'Periksa sesi Firebase Admin dan izin pengatur_waktu_delete.');
+    });
 },60000);
 
 
@@ -5282,6 +5311,10 @@ setInterval(()=>{
 
 // ================= LOAD DATA =================
 function loadData(){
+  if (!adminV5LegacyAuthorized || firebase.auth().currentUser?.uid !== ADMIN_V5_R24_UID) {
+    adminV5R24Banner('login', 'Autentikasi Firebase Admin diperlukan', 'Untuk membaca invoice dan pesanan VIP, masuk dengan akun Firebase Admin yang sama dengan panel Kelola Pesanan.');
+    return;
+  }
 
   const currentVIP =
   document.getElementById("filterVIP").value;
@@ -5419,6 +5452,11 @@ unsubscribePesanan = db
 
     },100);
 
+}, error=>{
+    if (!adminV5LegacyAuthorized) return;
+    console.error('[Admin-V5 R24] Listener pesanan gagal:', error?.code||error?.message||error);
+    adminV5R24Banner('error', 'Daftar pesanan belum terbaca',
+      'Firestore '+String(error?.code||'error')+'. Cek UID Firebase Admin dan Rules R24, lalu tekan Cek ulang.');
 });
 
 }
@@ -5941,8 +5979,9 @@ function loadStokAdmin(){
 }
 
 function loadVIPActivity(){
-
-  db.collection("aktivitas_vip")
+  if (!adminV5LegacyAuthorized || firebase.auth().currentUser?.uid !== ADMIN_V5_R24_UID) return;
+  if (adminV5VipActivityUnsubscribe) adminV5VipActivityUnsubscribe();
+  adminV5VipActivityUnsubscribe = db.collection("aktivitas_vip")
   .onSnapshot(snapshot=>{
 
     let html = "";
@@ -6106,6 +6145,11 @@ document.getElementById(
 ).innerHTML =
 `👥 Pengguna Aktif (${snapshot.size})`;
 
+  }, error=>{
+    if (!adminV5LegacyAuthorized) return;
+    console.error('[Admin-V5 R24] Listener aktivitas VIP gagal:', error?.code||error?.message||error);
+    adminV5R24Banner('error', 'Aktivitas VIP belum terbaca',
+      'Firestore '+String(error?.code||'error')+'. Cek UID Firebase Admin dan Rules R24, lalu tekan Cek ulang.');
   });
 
 }
@@ -6254,6 +6298,7 @@ async function toggleStok(
   nama,
   kosong
 ){
+  if (!requireAdminV5R24Access()) return;
 
   /* =======================================================
      STATUS BARU
@@ -7050,6 +7095,7 @@ function getSelected(){
 ========================================================= */
 
 async function bulkUpdate(status){
+  if (!requireAdminV5R24Access()) return;
 
   /* =======================================================
      AMBIL PRODUK TERPILIH
@@ -7929,9 +7975,118 @@ function toggleAll(el){
 
 
 // ================= AUTO LOAD =================
-loadData();
+// ================= ADMIN V5 R24 — JWT + FIREBASE ADMIN SESSION =================
+// R24 memblokir akses /pesanan, /invoice, /aktivitas_vip bagi browser tanpa Firebase Admin.
+// Jangan membuka Rules; mulai ulang listener SETELAH Firebase Admin terverifikasi.
+function adminV5R24Banner(state,title,description){
+  const card=document.getElementById('adminV5R24AuthBanner');
+  if(!card)return;
+  card.hidden = state === 'ready';
+  card.dataset.state=state;
+  document.getElementById('adminV5R24AuthTitle').textContent=title;
+  document.getElementById('adminV5R24AuthText').textContent=description;
+  const login=document.getElementById('adminV5R24LoginBtn');
+  login.hidden = state === 'checking';
+  login.textContent = state === 'netlify' ? 'Login Netlify lagi' : 'Login Firebase Admin';
+}
+
+function adminV5R24StopLegacy(){
+  adminV5LegacyAuthorized=false;
+  adminV5LegacySessionUid=null;
+  if(unsubscribePesanan){unsubscribePesanan();unsubscribePesanan=null;}
+  if(adminV5VipActivityUnsubscribe){adminV5VipActivityUnsubscribe();adminV5VipActivityUnsubscribe=null;}
+  if(renderTimer){clearTimeout(renderTimer);renderTimer=null;}
+  allData=[]; firstLoad=true;
+  const orders=document.getElementById('data');
+  if(orders)orders.replaceChildren();
+  const active=document.getElementById('vip-active-list');
+  if(active)active.replaceChildren();
+  const heading=document.getElementById('vip-active-title');
+  if(heading)heading.textContent='Pengguna Aktif (menunggu login admin)';
+}
+
+async function adminV5R24VerifyNetlifyAdmin(){
+  const token=localStorage.getItem('token');
+  if(!token)throw new Error('Sesi Netlify Admin tidak tersedia.');
+  const result=await fetch('/.netlify/functions/verify-token',{
+    method:'GET',cache:'no-store',headers:{Authorization:'Bearer '+token}
+  });
+  if(!result.ok)throw new Error('Sesi Netlify Admin tidak valid atau sudah berakhir.');
+  const payload=await result.json();
+  if(payload?.success!==true||payload.user?.role!=='admin')
+    throw new Error('Role Netlify tidak memiliki akses Admin.');
+  return true;
+}
+
+function requireAdminV5R24Access(){
+  const user=firebase.auth().currentUser;
+  if(adminV5LegacyAuthorized && user?.uid===ADMIN_V5_R24_UID && !user.isAnonymous)return true;
+  adminV5R24Banner('login','Firebase Admin belum terverifikasi',
+    'Login Firebase Admin dulu sebelum mengubah stok, pesanan, atau invoice VIP.');
+  return false;
+}
+
+async function adminV5R24SyncSession(user){
+  const generation=++adminV5AuthGeneration;
+  adminV5R24StopLegacy();
+  if(!user || user.isAnonymous){
+    adminV5R24Banner('login','Login Firebase Admin diperlukan',
+      'Login Netlify saja belum cukup untuk Rules R24. Buka Kelola Pesanan lalu Login Firebase Admin.');
+    return;
+  }
+  if(user.uid!==ADMIN_V5_R24_UID){
+    adminV5R24Banner('login','Akun Firebase bukan Admin terdaftar',
+      'Akun ini tidak memiliki UID Firebase Admin yang diizinkan oleh Rules. Gunakan akun Admin Firebase yang benar.');
+    return;
+  }
+  adminV5R24Banner('checking','Memeriksa sesi Netlify Admin...',
+    'Memvalidasi peran Admin sebelum mengaktifkan data invoice dan pesanan VIP.');
+  try{
+    await adminV5R24VerifyNetlifyAdmin();
+    // Firebase auth dan Netlify JWT harus masih konsisten ketika operasi async selesai.
+    if(generation!==adminV5AuthGeneration || firebase.auth().currentUser?.uid!==user.uid)return;
+    adminV5LegacyAuthorized=true;
+    adminV5LegacySessionUid=user.uid;
+    adminV5R24Banner('ready','','');
+    loadData();
+    loadVIPActivity();
+    cekPengaturWaktuDelete().catch(error=>{
+      console.error('[Admin-V5 R24] Timer awal gagal:',error?.code||error?.message||error);
+    });
+  }catch(error){
+    if(generation!==adminV5AuthGeneration)return;
+    adminV5R24StopLegacy();
+    adminV5R24Banner('netlify','Verifikasi Netlify Admin gagal',
+      String(error?.message||'Sesi Netlify perlu diulang.'));
+  }
+}
+
+// Mulai tanpa akses: Firebase SDK perlu menyelesaikan pemulihan sesi dahulu.
+adminV5R24Banner('checking','Memeriksa Firebase Admin...',
+  'Menunggu status login Firebase sebelum membaca data VIP yang dilindungi.');
+document.getElementById('adminV5R24LoginBtn').addEventListener('click',()=>{
+  if(document.getElementById('adminV5R24AuthBanner')?.dataset.state==='netlify'){
+    window.location.assign('/login');return;
+  }
+  const open=document.getElementById('nineOrderLaunch');
+  if(open)open.click();
+  else adminV5R24Banner('error','Panel login Firebase tidak ditemukan',
+    'Periksa apakah panel Kelola Pesanan pada Admin V5 dimuat dengan benar.');
+});
+document.getElementById('adminV5R24RetryBtn').addEventListener('click',()=>{
+  void adminV5R24SyncSession(firebase.auth().currentUser);
+});
+firebase.auth().onAuthStateChanged(user=>{
+  void adminV5R24SyncSession(user);
+},error=>{
+  adminV5R24StopLegacy();
+  console.error('[Admin-V5 R24] Firebase Auth:',error?.code||error?.message||error);
+  adminV5R24Banner('error','Sesi Firebase Admin gagal',
+    String(error?.code||'auth-error')+'. Coba login Firebase ulang.');
+});
+// stok tetap publik dibaca sesuai Rules aktif. Menulisnya tetap harus Firebase Admin.
 loadStokAdmin();
-loadVIPActivity();
+
 
 function renderVIPControl(){
 
@@ -8181,6 +8336,7 @@ deleteData(rowId);
 
 
 async function deleteData(row){
+  if (!requireAdminV5R24Access()) return;
 
   if(!confirm(
     "Yakin mau hapus data ini?"
@@ -8747,6 +8903,7 @@ function copyAI(btn){
 }
 
 async function cancelDelete(id){
+  if (!requireAdminV5R24Access()) return;
 
   const doc = await db
   .collection("pesanan")
@@ -8822,6 +8979,7 @@ async function cancelDelete(id){
 }
 
 async function approveDeleteInvoice(invoice){
+  if (!requireAdminV5R24Access()) return;
 
   if(
     !confirm(
@@ -8876,6 +9034,7 @@ await db
 
 
 async function rejectDeleteInvoice(invoice){
+  if (!requireAdminV5R24Access()) return;
 
   if(
     !confirm(
@@ -9174,6 +9333,10 @@ async function logoutAdmin(){
 
     }
 
+
+    // Cabut juga JWT Netlify Admin, bukan hanya sesi Firebase.
+    // Jangan localStorage.clear(): preferensi aplikasi lain harus tetap utuh.
+    for (const key of ['token','role','nama','folder']) localStorage.removeItem(key);
 
     /*
       Redirect setelah logout
@@ -14005,7 +14168,7 @@ launch?.addEventListener("click",()=>{
 <script id="imamstore-r17-admin-orders-page">
 (function(){
 "use strict";
-const ADMIN_FIREBASE_UID = "U7XnPGpjjUNAYnwuoMh68I8guT33";
+const ADMIN_FIREBASE_UID = ADMIN_V5_R24_UID;
 const launch=document.getElementById("nineOrderLaunch"),panel=document.getElementById("nineOrderPanel");
 const $=id=>document.getElementById(id);
 const statMode=$("nineMetricMode"),statAuth=$("nineMetricAuth"),statCount=$("nineMetricCount"),statAccess=$("nineMetricAccess");
