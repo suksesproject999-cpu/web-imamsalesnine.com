@@ -43,12 +43,11 @@ async function login(){
     } else {
       card.classList.add('shake');
       setTimeout(()=>card.classList.remove('shake'),300);
-      error.textContent = data.message || 'Login gagal';
+      error.textContent = 'Akun atau kata sandi tidak sesuai. Silakan coba kembali.';
     }
   } catch(err) {
     loading.style.display = 'none';
-    error.textContent = err?.message === 'Folder VIP tidak valid.' || err?.message === 'Role akun tidak dikenal.'
-      ? err.message : 'Server tidak dapat dihubungi';
+    error.textContent = 'Proses masuk belum berhasil. Silakan coba kembali.';
   }
 }
 document.getElementById('password').addEventListener('keydown', e=>{
