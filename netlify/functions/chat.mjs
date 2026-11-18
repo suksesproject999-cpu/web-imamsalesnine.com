@@ -2,23 +2,23 @@ import { createRequire } from 'node:module';
 const require = createRequire(import.meta.url);
 import { fileURLToPath } from 'node:url';
 import { dirname } from 'node:path';
-const __dirname = dirname(fileURLToPath(import.meta.url));
+const AINEX_ENTRY_DIR = dirname(fileURLToPath(import.meta.url));
 
 // Modern Netlify runtime may place included_files alongside the compiled entry,
 // or preserve netlify/functions/ under its working directory. Resolve actual
 // existing files; do not treat an absent sidecar as a successful initialization.
 const ASSET_ROOTS = [...new Set([
-  __dirname,
+  AINEX_ENTRY_DIR,
   path.join(process.cwd(), 'netlify', 'functions'),
   path.join(process.cwd(), 'functions'),
-  path.join(__dirname, 'netlify', 'functions')
+  path.join(AINEX_ENTRY_DIR, 'netlify', 'functions')
 ])];
 function assetFile(section, filename) {
   for (const root of ASSET_ROOTS) {
     const candidate = path.join(root, section, filename);
     if (fs.existsSync(candidate)) return candidate;
   }
-  return path.join(__dirname, section, filename);
+  return path.join(AINEX_ENTRY_DIR, section, filename);
 }
 
 import fs from 'node:fs';
