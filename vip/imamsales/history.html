@@ -19,16 +19,16 @@
   const headerNode = document.querySelector(".verify h1");
   let activeStage = "AWAL";
   const stages = {
-    VERIFY: "Memeriksa sesi VIP...",
-    BRIDGE: "Meminta sesi Firebase dari server...",
-    SDK_APP: "Memuat Firebase App...",
-    SDK_AUTH: "Memuat Firebase Authentication...",
-    SDK_APP_CHECK: "Memuat Firebase App Check...",
-    APP_CHECK: "Memvalidasi reCAPTCHA Enterprise...",
-    FIREBASE_PERSISTENCE: "Menyiapkan sesi browser yang aman...",
-    FIREBASE_SIGNIN: "Mengaktifkan akun VIP di Firebase...",
-    CLAIMS: "Memeriksa izin akun VIP...",
-    DASHBOARD: "Membuka dashboard VIP..."
+    VERIFY: "Memeriksa akses akun...",
+    BRIDGE: "Menyiapkan akses...",
+    SDK_APP: "Menyiapkan halaman...",
+    SDK_AUTH: "Menyiapkan halaman...",
+    SDK_APP_CHECK: "Memeriksa keamanan sesi...",
+    APP_CHECK: "Memeriksa keamanan sesi...",
+    FIREBASE_PERSISTENCE: "Menyiapkan sesi akun...",
+    FIREBASE_SIGNIN: "Menghubungkan akun...",
+    CLAIMS: "Memastikan hak akses...",
+    DASHBOARD: "Membuka halaman..."
   };
   function stage(name) {
     activeStage = name;
@@ -69,35 +69,24 @@
       safeFailurePart(err?.code || err?.cause?.code) + '_' + safeFailureCategory(err));
   }
   function showError(err) {
+    // Detail teknis tidak ditampilkan dalam UI publik.
     const code = safelyClassify(err);
-    let msg = "Halaman VIP belum dapat dibuka. Lihat kode di bawah untuk mengetahui layanan yang gagal.";
-    if (code === "LOGIN_EXPIRED") msg = "Sesi login habis. Silakan login kembali.";
-    else if (code === "VIP_ACCOUNT_NOT_MATCHED") msg = "Akun VIP tidak sesuai dengan folder ini.";
-    else if (code === "VIP_NAME_MISSING") msg = "Nama VIP belum tersedia di data sesi login.";
-    else if (code.startsWith("VERIFY_HTTP_404") || code.startsWith("BRIDGE_HTTP_404")) msg = "Endpoint Netlify belum ditemukan. Periksa deploy Function di website utama.";
-    else if (code.startsWith("VERIFY_HTTP_500") || code.startsWith("BRIDGE_HTTP_5")) msg = "Function Netlify mengalami kesalahan server. Periksa Function Logs website utama.";
-    else if (code.startsWith("FIREBASE_AUTH_INVALID_API_KEY") || code.startsWith("FIREBASE_AUTH_API_KEY_NOT_VALID")) msg = "Firebase API Key tidak diterima. Periksa konfigurasi web app Firebase.";
-    else if (code.startsWith("FIREBASE_AUTH_UNAUTHORIZED_DOMAIN")) msg = "Domain website utama belum diizinkan oleh Firebase Authentication.";
-    else if (code.startsWith("FIREBASE_AUTH_OPERATION_NOT_ALLOWED")) msg = "Operasi login Firebase ditolak. Periksa pengaturan Firebase Authentication.";
-    else if (code.startsWith("PERSISTENCE_")) msg = "Penyimpanan sesi browser gagal. Periksa izin penyimpanan browser atau dukungan Firebase SDK.";
-    else if (code.startsWith("APP_CHECK_") || code.startsWith("SDK_APP_CHECK")) msg = "Firebase App Check atau reCAPTCHA Enterprise belum berhasil. Periksa pendaftaran domain website utama dan pengaturan App Check Firebase.";
-    else if (code.startsWith("SIGNIN_")) msg = "Firebase gagal memproses custom token. Kode pemeriksaan kini memuat jenis error yang aman untuk dibagikan.";
-    else if (code.startsWith("FIREBASE_AUTH_INVALID_CUSTOM_TOKEN") || code.startsWith("FIREBASE_AUTH_CUSTOM_TOKEN_MISMATCH")) msg = "Firebase menolak custom token. Periksa project dan Service Account Firebase di Netlify utama.";
-    else if (code.startsWith("SDK_")) msg = "Firebase SDK gagal dimuat. Periksa jaringan, pemblokir konten, atau koneksi ke gstatic.com.";
-    else if (code.includes("_NETWORK")) msg = "Browser gagal terhubung ke layanan. Periksa jaringan dan endpoint Netlify.";
+    let msg = "Halaman belum dapat dibuka. Silakan coba kembali beberapa saat lagi.";
+    if (code === "LOGIN_EXPIRED") {
+      msg = "Sesi Anda telah berakhir. Silakan masuk kembali untuk melanjutkan.";
+    } else if (code === "VIP_ACCOUNT_NOT_MATCHED" || code === "VIP_NAME_MISSING") {
+      msg = "Akun ini tidak memiliki akses ke halaman yang diminta. Silakan masuk menggunakan akun yang sesuai.";
+    } else if (code.includes("_NETWORK") || code.endsWith("_UNAVAILABLE")) {
+      msg = "Koneksi sedang mengalami gangguan. Periksa jaringan Anda, lalu coba kembali.";
+    }
     statusNode.id = "vip-error";
     statusNode.textContent = msg;
-    const diagnostic = document.createElement("p");
-    diagnostic.id = "vip-diagnostic-code";
-    diagnostic.style.cssText = "margin:12px auto 0;font-size:12px;line-height:1.5;color:#d4e5ff;overflow-wrap:anywhere";
-    diagnostic.textContent = "Kode pemeriksaan: " + code + " | Tahap: " + activeStage;
-    statusNode.insertAdjacentElement("afterend", diagnostic);
+    // Hindari menampilkan kode internal, nama teknologi, atau tahapan sistem.
+    document.getElementById("vip-diagnostic-code")?.remove();
     actionsNode.hidden = false;
     const spinner = document.querySelector(".vipux-spinner");
     if (spinner) spinner.remove();
     if (headerNode) headerNode.textContent = "Informasi Akun";
-    // No access token, Firebase token, credential, account name or URL is logged/displayed.
-    console.warn("[VIP R24] Kode pemeriksaan:",code,"tahap:",activeStage);
   }
   async function fetchVipJson(path, options, name) {
     stage(name);
