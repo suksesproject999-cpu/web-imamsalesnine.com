@@ -151,6 +151,13 @@ def photo_candidates(p):
 
 
 def raw_photo(p, root:Path):
+    # R34: Root repository product images are authoritative.
+    # Admin CMS may save /images/produk/... while the actual file lives in
+    # ROOT/images/produk/...; on Netlify these can be copied to store/images.
+    # Resolve only safe local paths; retain the existing HTTPS fallback.
+    root = root.resolve()
+    store_root = (root/'store').resolve()
+    public_root = (root/'images').resolve()
     for value in photo_candidates(p):
         try:
             if value.startswith('data:image/'):
@@ -164,12 +171,22 @@ def raw_photo(p, root:Path):
             if parsed.scheme!='https' or parsed.username or parsed.password:
                 continue
             if parsed.hostname in ('store.imamsales.com','www.store.imamsales.com'):
-                path=urllib.parse.unquote(parsed.path).lstrip('/')
-                # Don't allow path traversal or access outside store folder.
-                local=(root/'store'/path).resolve()
-                if local.is_relative_to((root/'store').resolve()) and local.is_file() and local.stat().st_size<=MAX_IMAGE:
-                    return local.read_bytes()
-            # Remote photo fallback. Skip local/private IP literals.
+                rel=urllib.parse.unquote(parsed.path).lstrip('/')
+                # Product originals are in root/images/produk in this repository.
+                # Keep store fallback for older assets and other store-local files.
+                candidates=[]
+                if rel.startswith('images/produk/') or rel.startswith('images/share/'):
+                    candidates.append((root/rel).resolve())
+                candidates.append((store_root/rel).resolve())
+                for local in candidates:
+                    if not local.is_file() or local.stat().st_size>MAX_IMAGE:
+                        continue
+                    if local.is_relative_to(store_root) or (
+                        rel.startswith(('images/produk/','images/share/')) and
+                        local.is_relative_to(public_root)
+                    ):
+                        return local.read_bytes()
+            # Existing remote fallback for HTTPS product pictures; no new public API.
             host=parsed.hostname or ''
             if host in ('localhost','0.0.0.0','::1') or host.endswith('.local'):
                 continue
@@ -179,7 +196,6 @@ def raw_photo(p, root:Path):
         except Exception as e:
             print(f'[foto] kandidat gagal: {type(e).__name__}',file=sys.stderr)
     return None
-
 
 def font(size=35, bold=False):
     names=(
