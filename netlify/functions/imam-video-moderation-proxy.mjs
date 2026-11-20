@@ -1,5 +1,5 @@
 /**
- * ImamStore R39.4 — Netlify Functions (modern Request/Response API).
+ * ImamStore R39.5 — Netlify Functions (modern Request/Response API).
  * Replaces only the R39.3 main-site proxy, preserving its security contract.
  *
  * IMPORTANT: Do not put admin or Firebase secrets into this source file.
@@ -7,7 +7,23 @@
  * Netlify Admin session, App Check, and the moderator's UID/role.
  */
 const STORE_ENDPOINT = 'https://store.imamsales.com/.netlify/functions/video-social';
-const ADMIN_ORIGIN = 'https://imamsalesnine.com';
+// Both public domains currently serve the Admin V5 website. Do not add arbitrary origins.
+const ADMIN_ORIGIN = 'https://imamsalesnine.com'; // Fixed upstream Origin expected by Store
+const ALLOWED_ADMIN_ORIGINS = new Set([
+  'https://imamsalesnine.com',
+  'https://imamsales.com',
+]);
+function canonicalOrigin(raw) {
+  try {
+    const u = new URL(raw);
+    if (u.protocol !== 'https:' || u.username || u.password ||
+        u.pathname !== '/' || u.search || u.hash) return '';
+    return u.origin;
+  } catch { return ''; }
+}
+function safeOriginLabel(raw) {
+  return String(raw || '(kosong)').slice(0, 120).replace(/[^a-zA-Z0-9:/.?_-]/g, '?');
+}
 const ACTIONS = new Set(['moderatorStatus', 'listPending', 'listReported', 'moderate']);
 const JSON_HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
@@ -29,8 +45,9 @@ export default async function imamVideoModerationProxy(request) {
   }
 
   const origin = request.headers.get('origin') || '';
-  if (origin && origin !== ADMIN_ORIGIN) {
-    return respond(403, 'Origin tidak diizinkan untuk moderator.');
+  if (origin && !ALLOWED_ADMIN_ORIGINS.has(canonicalOrigin(origin))) {
+    // Only the origin value is shown; never return or log credentials.
+    return respond(403, 'Origin tidak diizinkan untuk moderator: ' + safeOriginLabel(origin));
   }
 
   // Reject clearly oversized requests before reading the body.
