@@ -26,7 +26,7 @@ async function verifyAdminSession(event,token){
  if(!session||session.length>8192)throw Object.assign(new Error('Sesi Admin V5 tidak tersedia. Login kembali melalui Admin V5.'),{status:401});
  // Reuse Admin V5's existing server-side verify-token role check, not a second password flow.
  // The endpoint can be configured if the admin domain changes; no client-provided URL.
- const verifier=String(process.env.ADMIN_V5_VERIFY_URL||'https://imamsalesnine.com/.netlify/functions/verify-token');
+ const verifier=String(process.env.ADMIN_V5_VERIFY_URL||'https://www.imamsalesnine.com/.netlify/functions/verify-token');
  let result;
  try{result=await fetch(verifier,{method:'GET',headers:{Authorization:'Bearer '+session,Accept:'application/json'},redirect:'error',cache:'no-store'});}
  catch{throw Object.assign(new Error('Tidak dapat menghubungi verifikasi Admin V5.'),{status:503});}
