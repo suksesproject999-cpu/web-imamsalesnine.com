@@ -15,7 +15,7 @@
  const msg=(iframe,type,value)=>{try{iframe?.contentWindow?.postMessage({source:'imamstore-video-bridge',type,...value},origin)}catch{}};
  const media=()=>[...host.querySelectorAll('.gallery-thumb > img,.gallery-thumb > button.nine-video-thumb')].filter(x=>x.tagName==='BUTTON'||(x.getAttribute('src')&&x.style.display!=='none'));
  const stopStage=()=>{const mount=host.querySelector('#nineVideoStage');if(!mount)return;msg(mount.querySelector('iframe'),'stop',{});mount.hidden=true;host.querySelector('#mainProductImage')?.removeAttribute('hidden');state.videoUrl=''};
- const selectVideo=button=>{const url=button?.dataset.url;if(!url)return;const mount=host.querySelector('#nineVideoStage');if(!mount)return;let iframe=mount.querySelector('iframe');if(!iframe){iframe=document.createElement('iframe');iframe.src=path+'?mode=player';iframe.title='Video produk';iframe.allow='fullscreen; picture-in-picture';iframe.setAttribute('allowfullscreen','');mount.append(iframe)}const entry={url,poster:button.dataset.poster,title:button.dataset.title};iframe.onload=()=>msg(iframe,'render',{entry});msg(iframe,'render',{entry});mount.hidden=false;host.querySelector('#mainProductImage')?.setAttribute('hidden','');state.videoUrl=url;media().forEach(x=>x.classList.toggle('active',x===button));setCount();};
+ const selectVideo=button=>{const url=button?.dataset.url;if(!url)return;const mount=host.querySelector('#nineVideoStage');if(!mount)return;let iframe=mount.querySelector('iframe');if(!iframe){iframe=document.createElement('iframe');iframe.src=path+'?mode=player';iframe.title='Video produk';iframe.allow='fullscreen';iframe.setAttribute('allowfullscreen','');mount.append(iframe)}const entry={url,poster:button.dataset.poster,title:button.dataset.title};iframe.onload=()=>msg(iframe,'render',{entry});msg(iframe,'render',{entry});mount.hidden=false;host.querySelector('#mainProductImage')?.setAttribute('hidden','');state.videoUrl=url;media().forEach(x=>x.classList.toggle('active',x===button));setCount();};
  const setCount=()=>{const arr=media();const label=host.querySelector('.gallery-main .nine-gallery-count');if(!label)return;label.textContent=(Math.max(0,arr.findIndex(x=>x.classList.contains('active')))+1)+' / '+arr.length;host.querySelectorAll('.gallery-main .nine-gallery-prev,.gallery-main .nine-gallery-next').forEach(b=>b.disabled=arr.length<2)};
  const step=delta=>{const arr=media();if(arr.length<2)return;const active=arr.findIndex(x=>x.classList.contains('active'));const next=arr[(Math.max(0,active)+delta+arr.length)%arr.length];if(next.tagName==='BUTTON')selectVideo(next);else{stopStage();window.changeGallery?.(next);setCount()}};
  window.addEventListener('click',e=>{const b=e.target?.closest?.('#imamstoreLiveOriginalDetail .gallery-main .nine-gallery-prev,#imamstoreLiveOriginalDetail .gallery-main .nine-gallery-next');if(!b||!host.classList.contains('open')||!state.gallery?.querySelector('button.nine-video-thumb'))return;e.preventDefault();e.stopImmediatePropagation();step(b.classList.contains('nine-gallery-next')?1:-1)},true);
@@ -39,6 +39,7 @@
    const shop=host.querySelector('.product-detail .nine-store');if(!shop)return;
    mount=document.createElement('section');mount.id='nineVideoRelatedMount';
    mount.className='nine-video-related';mount.setAttribute('aria-label','Video terkait produk');
+   for(const eventName of ['contextmenu','dragstart','selectstart'])mount.addEventListener(eventName,event=>event.preventDefault());
    shop.before(mount);
   }
   const list=related(p),sig=JSON.stringify(list.map(x=>[x.productId,x.url,x.poster,x.title,x.price]));
@@ -61,7 +62,7 @@
    const card=document.createElement('button');card.type='button';card.className='nine-video-related-card';
    card.setAttribute('aria-label','Putar video '+item.title);
    const imageUrl=item.poster||item.productImage;
-   if(imageUrl){const cover=document.createElement('img');cover.src=imageUrl;cover.alt='';cover.loading='lazy';cover.decoding='async';card.append(cover)}
+   if(imageUrl){const cover=document.createElement('img');cover.draggable=false;cover.src=imageUrl;cover.alt='';cover.loading='lazy';cover.decoding='async';card.append(cover)}
    const play=document.createElement('span');play.className='nine-video-related-play';
    play.textContent='▶';play.setAttribute('aria-hidden','true');
    const name=document.createElement('span');name.className='nine-video-related-title';
@@ -102,12 +103,15 @@
  }
  // Reuse the ORIGINAL Store's .nine-review-toast DOM: same Firestore data, same timing.
  // This module only forwards visible toast text to the video iframe; no second toast engine.
- let lastToastSignature='';
+ let lastToastSignature='';const sourceToastIds=new WeakMap();let nextSourceToastId=0;
  function forwardOriginalToast(){
   const frame=state.feed?.querySelector('iframe');if(!frame||state.feed.hidden)return;
   const active=state.feedItems[state.feedIndex],pid=String(active?.productId||'');
   const sourceIsSame=pid===idOf();
-  const messages=sourceIsSame?[...host.querySelectorAll('.gallery-main .nine-review-toast-stack .nine-review-toast:not(.nine-exit)')].slice(-2).map(el=>({text:String(el.querySelector('span')?.textContent||'').slice(0,150),icon:[...el.querySelector('i')?.classList||[]].find(c=>/^fa-[a-z0-9-]{2,42}$/.test(c)&&c!=='fa-solid')||'fa-bell'})).filter(x=>x.text):[];
+  const messages=sourceIsSame?[...host.querySelectorAll('.gallery-main .nine-review-toast-stack .nine-review-toast:not(.nine-exit)')].slice(-40).map(el=>{
+   if(!sourceToastIds.has(el))sourceToastIds.set(el,++nextSourceToastId);
+   return {id:sourceToastIds.get(el),text:String(el.querySelector('span')?.textContent||'').slice(0,150),icon:[...el.querySelector('i')?.classList||[]].find(c=>/^fa-[a-z0-9-]{2,42}$/.test(c)&&c!=='fa-solid')||'fa-bell'};
+  }).filter(x=>x.text):[];
   const signature=JSON.stringify([pid,messages]);if(signature===lastToastSignature)return;
   lastToastSignature=signature;msg(frame,'toast-snapshot',{productId:pid,messages});
  }
@@ -116,7 +120,6 @@
  const feedItem=(id,url)=>state.feedItems.find(x=>String(x.productId)===id&&x.url===url);
  const feedFrame=()=>state.feed?.querySelector('iframe');
  function updateVideoCommerce(productId,videoUrl){const item=feedItem(productId,videoUrl);if(item&&!state.feed?.hidden)msg(feedFrame(),'product-update',{productId,videoUrl,item:enrichVideo(item)})}
- function socialApi(body){const uri='/.netlify/functions/video-social';return uri}
  async function requestSocial(message){const id=String(message.productId||''),videoUrl=String(message.videoUrl||''),entry=feedItem(id,videoUrl),iframe=feedFrame();if(!iframe||!entry)return;const type=message.type;let result;
   try{
    const sdk=window.firebase;if(!sdk?.auth)throw Error('Firebase Auth belum tersedia.');const auth=sdk.auth();let user=auth.currentUser;
@@ -124,7 +127,7 @@
    if(mutation&&!user){if(document.getElementById('nexaiCustomerLogin')?.hidden===false)throw Error('Selesaikan proses login dahulu.');user=(await auth.signInAnonymously()).user}
    const token=user?await user.getIdToken():'';
    const headers={'Accept':'application/json'};if(token)headers.Authorization='Bearer '+token;
-   const endpoint=new URL(socialApi(),location.origin),opts={cache:'no-store',credentials:'same-origin',headers};
+   const endpoint=new URL('/.netlify/functions/video-social',location.origin),opts={cache:'no-store',credentials:'same-origin',headers};
    if(!mutation){endpoint.searchParams.set('productId',id);endpoint.searchParams.set('videoUrl',videoUrl);opts.method='GET'}
    else{
     if(!user)throw Error('Sesi anonim belum siap.');const app=sdk.appCheck?.();if(!app?.getToken)throw Error('Firebase App Check belum tersedia.');const appToken=(await app.getToken(false))?.token;if(!appToken)throw Error('App Check belum siap.');
@@ -136,13 +139,13 @@
   }catch(e){result={success:false,message:String(e?.message||'Jaringan bermasalah.').slice(0,170)}}
   if(state.feed&&!state.feed.hidden)msg(iframe,'social-result',{action:type,productId:id,videoUrl,result});
  }
- function openFeed(items,index=0){const list=items.filter(x=>x.url);if(!list.length)return;state.feedItems=list.map(enrichVideo);state.feedIndex=index;let root=state.feed;if(!root){root=document.createElement('div');root.id='imamstoreR36Feed';root.hidden=true;const iframe=document.createElement('iframe');iframe.src=path+'?mode=feed';iframe.title='Video Terkait Produk';iframe.allow='fullscreen; picture-in-picture';iframe.setAttribute('allowfullscreen','');root.append(iframe);document.body.append(root);state.feed=root}const iframe=root.querySelector('iframe');root.hidden=false;if(state.overflowBefore===null)state.overflowBefore=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';iframe.onload=()=>{msg(iframe,'render',{items:state.feedItems,index});sendCartCount();lastToastSignature='';forwardOriginalToast()};msg(iframe,'render',{items:state.feedItems,index});window.imamstoreRefreshCartBadge?.();sendCartCount();lastToastSignature='';queueMicrotask(forwardOriginalToast)}
+ function openFeed(items,index=0){const list=items.filter(x=>x.url);if(!list.length)return;state.feedItems=list.map(enrichVideo);state.feedIndex=index;let root=state.feed;if(!root){root=document.createElement('div');root.id='imamstoreR36Feed';root.hidden=true;const iframe=document.createElement('iframe');iframe.src=path+'?mode=feed';iframe.title='Video Terkait Produk';iframe.allow='fullscreen';iframe.setAttribute('allowfullscreen','');root.append(iframe);document.body.append(root);state.feed=root}const iframe=root.querySelector('iframe');root.hidden=false;if(state.overflowBefore===null)state.overflowBefore=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';iframe.onload=()=>{msg(iframe,'render',{items:state.feedItems,index});sendCartCount();lastToastSignature='';forwardOriginalToast()};msg(iframe,'render',{items:state.feedItems,index});window.imamstoreRefreshCartBadge?.();sendCartCount();lastToastSignature='';queueMicrotask(forwardOriginalToast)}
  function closeFeed(){if(!state.feed)return;msg(state.feed.querySelector('iframe'),'stop',{});state.feed.hidden=true;document.documentElement.style.overflow=state.overflowBefore??'';state.overflowBefore=null}
  window.addEventListener('message',e=>{if(e.origin!==origin||e.data?.source!=='imamstore-video-ui')return;const galleryFrame=host.querySelector('#nineVideoStage iframe'),feedFrame=state.feed?.querySelector('iframe');if(![galleryFrame?.contentWindow,feedFrame?.contentWindow].includes(e.source))return;
    if(e.data.type==='ready'){if(e.source===galleryFrame?.contentWindow){const selected=host.querySelector('.nine-video-thumb.active');if(selected)msg(galleryFrame,'render',{entry:{url:selected.dataset.url,poster:selected.dataset.poster,title:selected.dataset.title}})}if(e.source===feedFrame?.contentWindow){msg(feedFrame,'render',{items:state.feedItems,index:state.feedIndex});sendCartCount()}return}
    if(e.source===galleryFrame?.contentWindow&&e.data.type==='gallery-step'){step(Number(e.data.delta)<0?-1:1);return}
-   if(e.source===feedFrame?.contentWindow){if(e.data.type==='video-selected'){state.feedIndex=state.feedItems.findIndex(x=>String(x.productId)===String(e.data.productId||''));if(state.feedIndex<0)state.feedIndex=0;lastToastSignature='';forwardOriginalToast();return}if(['social-state','social-like','social-comment','social-report'].includes(e.data.type)){void requestSocial(e.data);return}if(e.data.type==='close'){closeFeed();return}if(e.data.type==='open-search'){closeFeed();host.querySelector('#nineDetailSearchInput')?.focus();return}if(e.data.type==='cart'){closeFeed();window.goCart?.();return}if(['open-product','buy','add-cart','open-voucher','open-reviews'].includes(e.data.type)){const id=String(e.data.productId||'');if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!catalog().some(p=>String(p.id)===id))return;closeFeed();if(e.data.type==='buy')state.pendingBuy=id;if(e.data.type==='add-cart')state.pendingCart=id;if(e.data.type==='open-voucher')state.pendingVoucher=id;if(e.data.type==='open-reviews')state.pendingReviews=id;if(id!==idOf())document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id,skipView:e.data.type==='open-product'&&e.data.fromVideoThumbnail===true}}));else if(e.data.type==='buy'){state.pendingBuy='';window.openBuySheet?.()}else if(e.data.type==='add-cart'){state.pendingCart='';window.openCartSheet?.()}else if(e.data.type==='open-voucher'){state.pendingVoucher='';window.nineOpenOriginalVoucher?.()}else if(e.data.type==='open-reviews'){state.pendingReviews='';window.nineOpenReviews?.()}else if(e.data.type==='open-product'&&e.data.fromVideoThumbnail===true){const scroller=host.querySelector('.nine-detail-shell');if(scroller)scroller.scrollTop=0;host.scrollTop=0}return}}
+   if(e.source===feedFrame?.contentWindow){if(e.data.type==='video-selected'){state.feedIndex=state.feedItems.findIndex(x=>String(x.productId)===String(e.data.productId||'')&&x.url===String(e.data.videoUrl||''));if(state.feedIndex<0)state.feedIndex=0;lastToastSignature='';forwardOriginalToast();return}if(['social-state','social-like','social-comment','social-report'].includes(e.data.type)){void requestSocial(e.data);return}if(e.data.type==='close'){closeFeed();return}if(e.data.type==='open-search'){closeFeed();host.querySelector('#nineDetailSearchInput')?.focus();return}if(e.data.type==='cart'){closeFeed();window.goCart?.();return}if(['open-product','buy','add-cart','open-voucher','open-reviews'].includes(e.data.type)){const id=String(e.data.productId||'');if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!catalog().some(p=>String(p.id)===id))return;closeFeed();if(e.data.type==='buy')state.pendingBuy=id;if(e.data.type==='add-cart')state.pendingCart=id;if(e.data.type==='open-voucher')state.pendingVoucher=id;if(e.data.type==='open-reviews')state.pendingReviews=id;if(id!==idOf())document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id,skipView:e.data.type==='open-product'&&e.data.fromVideoThumbnail===true}}));else if(e.data.type==='buy'){state.pendingBuy='';window.openBuySheet?.()}else if(e.data.type==='add-cart'){state.pendingCart='';window.openCartSheet?.()}else if(e.data.type==='open-voucher'){state.pendingVoucher='';window.nineOpenOriginalVoucher?.()}else if(e.data.type==='open-reviews'){state.pendingReviews='';window.nineOpenReviews?.()}else if(e.data.type==='open-product'&&e.data.fromVideoThumbnail===true){const scroller=host.querySelector('.nine-detail-shell');if(scroller)scroller.scrollTop=0;host.scrollTop=0}return}}
  });
  document.addEventListener('imamstore:flash-price-change',()=>{if(state.feed?.hidden===false)for(const item of state.feedItems)updateVideoCommerce(String(item.productId),item.url)});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.feed&&!state.feed.hidden)closeFeed()});
- window.imamstoreR36={refresh,closeFeed,version:'R38.1-related-native'};
+ window.imamstoreR36={refresh,closeFeed,version:'R41-video-clean-fifo'};
 })();
