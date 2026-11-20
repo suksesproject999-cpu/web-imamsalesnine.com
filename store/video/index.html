@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex"><title>Video Terkait Produk | ImamStore</title>
+<style>
+:root{font-family:system-ui,-apple-system,Arial,sans-serif;color:#212121;background:#fff}*{box-sizing:border-box}html,body{padding:0;margin:0;width:100%;height:100%;overscroll-behavior:contain}button{font:inherit;cursor:pointer}button:focus-visible{outline:2px solid #86c33f;outline-offset:2px}#single[hidden],#related[hidden],#feed[hidden],#relatedEmpty[hidden],#viewAll[hidden],#feedFallback[hidden]{display:none}
+/* Product video inside the existing photo gallery */
+#single{background:#090a08;height:100dvh;min-height:180px;display:grid;place-items:center}#single video{display:block;width:100%;height:100%;object-fit:contain;background:#090a08}
+#single .placeholder{color:#b9b9b9;text-align:center;font-size:13px;padding:20px}
+/* Horizontal related video cards, matching the reference's portrait thumbnails. */
+#related{padding:13px 12px;background:#fff;height:334px;overflow:hidden}
+.related-head{display:flex;align-items:center;justify-content:space-between;gap:8px;height:35px;margin-bottom:8px}
+.related-head h2{margin:0;font-size:16px;line-height:1.3;font-weight:700}
+.related-head button{border:0;background:none;color:#8b8b8b;font-size:26px;min-width:36px;min-height:35px}
+.related-track{display:flex;gap:9px;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x proximity;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch;scrollbar-width:none;height:268px;padding:0 0 4px}
+.related-track::-webkit-scrollbar{display:none}
+.related-card{flex:0 0 clamp(145px,41vw,196px);width:clamp(145px,41vw,196px);height:264px;display:block;position:relative;border-radius:9px;overflow:hidden;background:linear-gradient(155deg,#172018,#2b241c);border:0;padding:0;scroll-snap-align:start;text-align:left;color:white}
+.related-cover{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.related-card:after{content:"";position:absolute;inset:42% 0 0;background:linear-gradient(transparent,#000a 58%,#000c)}
+.related-play{position:absolute;left:50%;top:45%;transform:translate(-50%,-50%);border-radius:50%;width:41px;height:41px;background:#0009;display:grid;place-items:center;color:white;font-size:18px;z-index:1}
+.related-title{position:absolute;bottom:10px;left:9px;right:9px;font-size:12px;font-weight:700;line-height:1.3;z-index:1;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+#relatedEmpty{height:240px;display:grid;place-items:center;text-align:center;color:#777;font-size:13px}
+/* Full screen portrait immersive vertical video feed. */
+#feed{position:fixed;inset:0;background:#050505;color:#fff;overflow:hidden}
+.feed-visual{position:absolute;inset:0;display:grid;place-items:center;background:radial-gradient(circle at center,#202820,#050505)}
+.feed-visual video{width:100%;height:100%;object-fit:contain;display:block}
+.feed-shade{position:absolute;inset:0;background:linear-gradient(#0008,transparent 23%,transparent 51%,#000b);pointer-events:none}
+.feed-head{position:absolute;left:0;right:0;top:0;z-index:3;display:flex;align-items:center;gap:8px;padding:calc(13px + env(safe-area-inset-top)) 13px 10px;color:white}
+.feed-head button{background:#0005;color:white;border:0;width:36px;height:36px;border-radius:50%;display:grid;place-items:center;font-size:23px}
+.feed-head strong{flex:1;min-width:0;text-align:center;font-size:18px;line-height:1.2;font-weight:750}
+.feed-head .search-cart{display:flex;align-items:center;gap:4px}.feed-head .search-cart button{width:33px;height:33px;font-size:20px}.feed-head .count{font-size:13px;color:#fff;background:#0007;border-radius:20px;padding:5px 9px;white-space:nowrap}
+.feed-ops{position:absolute;right:12px;bottom:calc(185px + env(safe-area-inset-bottom));z-index:4;display:grid;gap:16px;text-align:center}
+.feed-ops button{background:none;color:white;border:0;font-size:29px;line-height:1;display:grid;justify-items:center;gap:5px;min-width:55px;text-shadow:0 2px 8px #0009}
+.feed-ops button small{font-size:11px;font-weight:600}
+.feed-ops button.liked{color:#ff5869}
+.feed-desc{position:absolute;left:17px;right:80px;bottom:calc(188px + env(safe-area-inset-bottom));z-index:3;text-shadow:0 2px 8px #000a}
+.feed-desc strong{font-size:13px;display:block;max-height:48px;overflow:hidden}
+.feed-desc small{color:#e0e0e0;display:block;margin-top:6px;font-size:11px}
+.feed-product{position:absolute;bottom:calc(13px + env(safe-area-inset-bottom));left:14px;right:14px;z-index:4;border-radius:13px;background:#fff;color:#222;box-shadow:0 8px 30px #0009;overflow:hidden}
+.product-head{background:#f25e36;color:white;font-weight:700;font-size:11px;padding:8px 12px}
+.product-body{display:grid;grid-template-columns:88px minmax(0,1fr);gap:9px;padding:8px}
+.product-body>img{width:88px;height:107px;object-fit:contain;border-radius:6px;background:#f2f2f2}
+.product-copy{min-width:0;display:flex;flex-direction:column;gap:5px}
+.product-copy .price{font-size:20px;font-weight:800;color:#ee4d2d;line-height:1.1}
+.product-copy .title{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;font-size:12px;line-height:1.28}
+.product-copy .sold{font-size:11px;color:#777}
+.product-actions{display:flex;gap:7px;margin-top:auto}
+.product-actions button{flex:1;border:0;border-radius:8px;padding:8px 6px;font-size:12px;font-weight:800}
+.product-actions .open{background:#edf5e3;color:#486d24}
+.product-actions .buy{background:#ee4d2d;color:white}
+.feed-fallback{color:#fff9;background:#0008;padding:10px 16px;border-radius:13px;text-align:center;font-size:13px}
+.feed-hint{position:absolute;left:50%;transform:translateX(-50%);bottom:0;opacity:.7;font-size:10px;z-index:5;white-space:nowrap}
+@media(min-width:760px){#feed{max-width:480px;left:50%;transform:translateX(-50%)}body:has(#feed:not([hidden])){background:#111}}
+</style></head><body>
+<main id="single" hidden aria-label="Pemutar video utama"><div class="placeholder">Pilih thumbnail video untuk memutar.</div></main>
+<section id="related" hidden aria-label="Video terkait produk"><header class="related-head"><h2>Video Terkait Produk</h2><button id="viewAll" type="button" aria-label="Lihat semua video terkait">›</button></header><div id="track" class="related-track" aria-label="Geser video ke kiri atau kanan"></div><div id="relatedEmpty" hidden>Belum ada video untuk tipe produk ini.</div></section>
+<section id="feed" hidden aria-label="Halaman video terkait produk">
+ <div class="feed-visual"><video id="feedVideo" playsinline muted preload="none" loop></video><div id="feedFallback" class="feed-fallback" hidden>Video belum tersedia.</div></div><div class="feed-shade"></div>
+ <header class="feed-head"><button id="goBack" type="button" aria-label="Kembali">‹</button><strong>Video Terkait Produk</strong><div class="search-cart"><button type="button" id="search" aria-label="Cari produk">⌕</button><button type="button" id="cart" aria-label="Keranjang">🛒</button></div><span id="feedCount" class="count">1/1</span></header>
+ <div class="feed-desc"><strong id="feedTitle"></strong><small>Geser atas/bawah untuk video lainnya</small></div>
+ <div class="feed-ops"><button type="button" id="like" aria-label="Sukai video">♡<small>Suka</small></button><button type="button" id="review" aria-label="Buka komentar dan ulasan">♧<small>Komentar</small></button><button type="button" id="sound" aria-label="Aktifkan suara">◖))<small>Suara</small></button><button type="button" id="next" aria-label="Video berikutnya">⋯<small>Lainnya</small></button></div>
+ <div class="feed-product"><div class="product-head">Produk terkait • ImamStore</div><div class="product-body"><img id="productImage" alt="Foto produk terkait"><div class="product-copy"><strong class="price" id="productPrice">Lihat harga</strong><span class="title" id="productTitle"></span><span class="sold" id="productSold"></span><div class="product-actions"><button class="open" id="openProduct">Lihat Produk</button><button class="buy" id="buyProduct">Beli Sekarang</button></div></div></div></div>
+ <small class="feed-hint">Ketuk video untuk jeda / putar</small>
+</section>
+<script>
+(()=>{'use strict';const qs=new URLSearchParams(location.search),mode=['player','feed'].includes(qs.get('mode'))?qs.get('mode'):'related';const main=document.getElementById(mode==='player'?'single':mode==='feed'?'feed':'related');main.hidden=false;
+ const origin=location.origin,send=(type,data={})=>parent.postMessage({source:'imamstore-video-ui',type,mode,...data},origin);
+ const url=(v,kind)=>{if(typeof v!=='string'||v.length>1800)return '';try{const u=new URL(v,origin+'/');if(u.protocol!=='https:'&&u.origin!==origin)return '';return new RegExp(kind==='video'?'\\.(?:mp4|webm)$':'\\.(?:jpe?g|png|webp|avif)$','i').test(u.pathname)?u.href:''}catch{return ''}};
+ const txt=(v,n=110)=>String(v??'').replace(/[\x00-\x1f]/g,' ').trim().slice(0,n);
+ let items=[],selected=0,player=null,feedVideo=document.getElementById('feedVideo');
+ function stop(){if(player){player.pause();player.removeAttribute('src');player.load();player=null}if(feedVideo){feedVideo.pause();feedVideo.removeAttribute('src');feedVideo.load()}document.querySelectorAll('video').forEach(v=>v.pause())}
+ function renderPlayer(item){stop();main.replaceChildren();const source=url(item?.url,'video');if(!source){const error=document.createElement('p');error.className='placeholder';error.textContent='Video tidak tersedia.';main.append(error);return}const v=document.createElement('video');v.controls=true;v.playsInline=true;v.preload='metadata';v.setAttribute('aria-label',txt(item.title||'Video produk'));const poster=url(item.poster,'poster');if(poster)v.poster=poster;v.src=source;main.append(v);player=v}
+ function renderRelated(rows){items=(Array.isArray(rows)?rows:[]).slice(0,30).filter(row=>url(row?.url,'video'));const track=document.getElementById('track');track.replaceChildren();document.getElementById('relatedEmpty').hidden=items.length>0;document.getElementById('viewAll').hidden=items.length===0;
+  items.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.className='related-card';b.setAttribute('aria-label','Lihat video '+txt(item.title));const poster=url(item.poster,'poster');if(poster){const img=document.createElement('img');img.className='related-cover';img.loading='lazy';img.src=poster;img.alt='';b.append(img)}const play=document.createElement('span');play.className='related-play';play.textContent='▶';const title=document.createElement('span');title.className='related-title';title.textContent=txt(item.title);b.append(play,title);b.onclick=()=>send('open-feed',{index:i});track.append(b)});
+ }
+ function renderFeed(rows,index){items=(Array.isArray(rows)?rows:[]).slice(0,30).filter(row=>url(row?.url,'video'));if(!items.length){document.getElementById('feedFallback').hidden=false;return}showFeed(Number.isFinite(Number(index))?Math.trunc(Number(index)):0)}
+ function showFeed(index){stop();selected=(index%items.length+items.length)%items.length;const item=items[selected];document.getElementById('feedCount').textContent=(selected+1)+'/'+items.length;document.getElementById('feedTitle').textContent=txt(item.title||item.productName);document.getElementById('productTitle').textContent=txt(item.productName||item.title);const img=document.getElementById('productImage');const photo=url(item.productImage||item.poster,'poster');if(photo)img.src=photo;else img.removeAttribute('src');const price=Number(item.price);document.getElementById('productPrice').textContent=Number.isFinite(price)&&price>0?'Rp '+Math.round(price).toLocaleString('id-ID'):'Lihat harga';document.getElementById('productSold').textContent=Number(item.sold)>0?Math.round(Number(item.sold)).toLocaleString('id-ID')+' terjual':'ImamStore';
+  const movie=feedVideo,source=url(item.url,'video'),poster=url(item.poster,'poster');document.getElementById('feedFallback').hidden=Boolean(source);if(poster)movie.poster=poster;else movie.removeAttribute('poster');if(source){movie.muted=true;movie.src=source;movie.load();void movie.play().catch(()=>{});}document.getElementById('sound').innerHTML='◖))<small>Suara</small>';document.getElementById('like').classList.remove('liked');document.getElementById('like').innerHTML='♡<small>Suka</small>';
+ }
+ const selectedId=()=>String(items[selected]?.productId||'');document.getElementById('viewAll').onclick=()=>send('open-feed',{index:0});document.getElementById('goBack').onclick=()=>send('close');document.getElementById('next').onclick=()=>showFeed(selected+1);
+ document.getElementById('sound').onclick=()=>{feedVideo.muted=!feedVideo.muted;document.getElementById('sound').innerHTML=feedVideo.muted?'◖))<small>Suara</small>':'♫<small>Nyala</small>'};
+ document.getElementById('like').onclick=()=>{const b=document.getElementById('like');b.classList.toggle('liked');b.innerHTML=b.classList.contains('liked')?'♥<small>Disukai</small>':'♡<small>Suka</small>'};
+ document.getElementById('search').onclick=()=>send('open-search');document.getElementById('cart').onclick=()=>send('cart',{productId:selectedId()});document.getElementById('review').onclick=()=>send('open-reviews',{productId:selectedId()});document.getElementById('openProduct').onclick=()=>send('open-product',{productId:selectedId()});document.getElementById('buyProduct').onclick=()=>send('buy',{productId:selectedId()});feedVideo.onclick=()=>{if(feedVideo.paused)void feedVideo.play().catch(()=>{});else feedVideo.pause()};
+ let start=null;document.getElementById('feed').addEventListener('touchstart',e=>{if(e.touches.length!==1||e.target.closest('button'))return;start={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
+ document.getElementById('feed').addEventListener('touchend',e=>{if(!start||e.changedTouches.length!==1)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;start=null;if(Math.abs(dy)>65&&Math.abs(dy)>Math.abs(dx)*1.2)showFeed(selected+(dy<0?1:-1))},{passive:true});
+ window.addEventListener('wheel',e=>{if(mode==='feed'&&Math.abs(e.deltaY)>20)showFeed(selected+(e.deltaY>0?1:-1))},{passive:true});
+ window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==origin||e.data?.source!=='imamstore-video-bridge')return;if(e.data.type==='stop'){stop();return}if(e.data.type==='render'){if(mode==='player')renderPlayer(e.data.entry);if(mode==='related')renderRelated(e.data.items);if(mode==='feed')renderFeed(e.data.items,e.data.index)}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});send('ready');
+})();
+</script></body></html>
