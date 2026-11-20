@@ -13,6 +13,29 @@ import {getFirestore,FieldValue,Timestamp} from 'firebase-admin/firestore';
 const PRODUCT='cms_products',VIDEOS='video_social',LIMITS='video_social_limits',QUEUE='video_comment_moderation';
 const okId=id=>/^[A-Za-z0-9_-]{1,120}$/.test(String(id??''));
 const baseURL='https://store.imamsales.com';
+const ADMIN_V5_ORIGIN='https://imamsalesnine.com';
+const ALLOWED_ORIGINS=new Set([baseURL,ADMIN_V5_ORIGIN]);
+const MODERATOR_ACTIONS=new Set(['moderatorStatus','listPending','listReported','moderate']);
+const adminUid=()=>String(process.env.FIREBASE_ADMIN_UID||'').trim();
+async function verifyAdminSession(event,token){
+ const requiredUid=adminUid();
+ if(!requiredUid)throw Object.assign(new Error('FIREBASE_ADMIN_UID belum dikonfigurasi pada project Netlify Store.'),{status:503});
+ if(!token?.uid||token.firebase?.sign_in_provider==='anonymous'||token.uid!==requiredUid)
+  throw Object.assign(new Error('Firebase UID ini bukan UID admin pengelola pesanan ImamStore.'),{status:403});
+ const session=String(event.headers?.['x-imam-admin-session']||event.headers?.['X-Imam-Admin-Session']||'').trim();
+ if(!session||session.length>8192)throw Object.assign(new Error('Sesi Admin V5 tidak tersedia. Login kembali melalui Admin V5.'),{status:401});
+ // Reuse Admin V5's existing server-side verify-token role check, not a second password flow.
+ // The endpoint can be configured if the admin domain changes; no client-provided URL.
+ const verifier=String(process.env.ADMIN_V5_VERIFY_URL||'https://imamsalesnine.com/.netlify/functions/verify-token');
+ let result;
+ try{result=await fetch(verifier,{method:'GET',headers:{Authorization:'Bearer '+session,Accept:'application/json'},redirect:'error',cache:'no-store'});}
+ catch{throw Object.assign(new Error('Tidak dapat menghubungi verifikasi Admin V5.'),{status:503});}
+ let data;
+ try{data=await result.json()}catch{data=null}
+ if(!result.ok||data?.success!==true||data?.user?.role!=='admin')
+  throw Object.assign(new Error('Sesi Admin V5 tidak valid atau tidak memiliki role admin.'),{status:403});
+}
+
 const mediaPath=v=>{if(typeof v!=='string'||v.length>1800)return '';try{const u=new URL(v,baseURL);if(u.protocol!=='https:'||!/^\.(?:mp4|webm)$/i.test('.'+u.pathname.split('.').pop()))return '';return u.origin+u.pathname}catch{return ''}};
 const cleanText=(v,n)=>String(v??'').replace(/[\u0000-\u001f\u007f]/g,' ').replace(/\s+/g,' ').trim().slice(0,n);
 const json=(status,obj,headers={})=>({statusCode:status,headers:{'Content-Type':'application/json; charset=utf-8','Cache-Control':'no-store','X-Content-Type-Options':'nosniff','Vary':'Origin',...headers},body:JSON.stringify(obj)});
@@ -36,7 +59,24 @@ async function reportComment(db,videoRef,uid,commentId){if(!okId(commentId))thro
  const target=videoRef.collection('comments').doc(commentId),marker=target.collection('reports').doc(uid),queue=db.collection(QUEUE).doc(commentId);
  await db.runTransaction(async tx=>{const [c,m,q]=await tx.getAll(target,marker,queue);if(!c.exists||c.data().status!=='approved')throw Object.assign(new Error('Komentar tidak ditemukan.'),{status:404});if(m.exists)return;tx.create(marker,{createdAt:Timestamp.fromMillis(now())});tx.update(target,{reportCount:FieldValue.increment(1)});if(q.exists)tx.update(queue,{reports:clamp(q.data().reports)+1})});return {message:'Laporan diterima untuk ditinjau.'};}
 async function moderate(db,body){const action=body.decision,commentId=String(body.commentId||'');if(!['approve','reject','hide'].includes(action)||!okId(commentId))throw Object.assign(new Error('Parameter moderasi salah.'),{status:400});const q=db.collection(QUEUE).doc(commentId);let result={};await db.runTransaction(async tx=>{const queued=await tx.get(q);if(!queued.exists)throw Object.assign(new Error('Komentar tidak ditemukan.'),{status:404});const {videoKey}=queued.data();const videoRef=db.collection(VIDEOS).doc(videoKey),commentRef=videoRef.collection('comments').doc(commentId);const [c,v]=await tx.getAll(commentRef,videoRef);if(!c.exists)throw Object.assign(new Error('Komentar tidak ditemukan.'),{status:404});const previous=c.data().status,next=action==='approve'?'approved':action==='hide'?'hidden':'rejected';if(previous!==next){tx.update(commentRef,{status:next,moderatedAt:Timestamp.fromMillis(now())});tx.update(q,{status:next,moderatedAt:Timestamp.fromMillis(now())});if(previous==='approved'||next==='approved'){const change=(next==='approved'?1:0)-(previous==='approved'?1:0);tx.set(videoRef,{comments:Math.max(0,clamp(v.data()?.comments)+change)},{merge:true})}}result={status:next};});return result;}
-export async function handler(event){try{const method=event.httpMethod||'GET';if(!['GET','POST'].includes(method))return fail(405,'Metode tidak didukung.');if(method==='POST'){const origin=event.headers?.origin||event.headers?.Origin;if(origin&&origin!==baseURL)return fail(403,'Origin tidak diizinkan.');if((event.body||'').length>12000)return fail(413,'Permintaan terlalu besar.')}const services=getServices(),{db}=services;let body={};if(method==='POST'){try{body=JSON.parse(event.body||'{}')}catch{return fail(400,'JSON tidak valid.')}}const action=method==='GET'?'state':String(body.action||'');const uidToken=await authenticated(services,event,action!=='state');if(action==='listPending'||action==='listReported'||action==='moderate'){if(uidToken?.admin!==true)return fail(403,'Khusus Firebase Admin.');if(action==='listPending'||action==='listReported'){const snap=action==='listPending'?await db.collection(QUEUE).where('status','==','pending').limit(50).get():await db.collection(QUEUE).where('reports','>=',1).limit(50).get();return json(200,{success:true,items:snap.docs.map(d=>({id:d.id,...d.data(),createdAt:d.data().createdAt?.toMillis?.()||0})).map(x=>({...x,createdAt:typeof x.createdAt==='number'?x.createdAt:0}))})}await checkApp(services,event);return json(200,{success:true,...await moderate(db,body)})}
+async function runHandler(event){try{const method=event.httpMethod||'GET';if(!['GET','POST'].includes(method))return fail(405,'Metode tidak didukung.');if(method==='POST'){const origin=event.headers?.origin||event.headers?.Origin;if(origin&&!ALLOWED_ORIGINS.has(origin))return fail(403,'Origin tidak diizinkan.');if((event.body||'').length>12000)return fail(413,'Permintaan terlalu besar.')}const services=getServices(),{db}=services;let body={};if(method==='POST'){try{body=JSON.parse(event.body||'{}')}catch{return fail(400,'JSON tidak valid.')}}const action=method==='GET'?'state':String(body.action||'');const origin=event.headers?.origin||event.headers?.Origin;if(method==='POST'&&origin===ADMIN_V5_ORIGIN&&!MODERATOR_ACTIONS.has(action))return fail(403,'Origin Admin V5 khusus moderasi.');const uidToken=await authenticated(services,event,action!=='state');if(MODERATOR_ACTIONS.has(action)){await checkApp(services,event);await verifyAdminSession(event,uidToken);if(action==='moderatorStatus')return json(200,{success:true,uid:uidToken.uid,authorized:true});if(action==='listPending'||action==='listReported'){const snap=action==='listPending'?await db.collection(QUEUE).where('status','==','pending').limit(50).get():await db.collection(QUEUE).where('reports','>=',1).limit(50).get();return json(200,{success:true,items:snap.docs.map(d=>({id:d.id,...d.data(),createdAt:d.data().createdAt?.toMillis?.()||0})).map(x=>({...x,createdAt:typeof x.createdAt==='number'?x.createdAt:0}))})}return json(200,{success:true,...await moderate(db,body)})}
  const productId=String(method==='GET'?event.queryStringParameters?.productId||'':body.productId||'');const videoUrl=String(method==='GET'?event.queryStringParameters?.videoUrl||'':body.videoUrl||'');const v=await validateVideo(db,productId,videoUrl);if(action==='state')return json(200,{success:true,...await state({db,videoRef:v.videoRef},uidToken?.uid)});await checkApp(services,event);if(action==='toggleLike')return json(200,{success:true,...await like(db,v.videoRef,uidToken.uid)});if(action==='comment')return json(200,{success:true,...await comment(db,v.videoRef,uidToken.uid,body.text,productId,v.canonical)});if(action==='report')return json(200,{success:true,...await reportComment(db,v.videoRef,uidToken.uid,String(body.commentId||''))});return fail(400,'Aksi tidak dikenal.');
  }catch(e){if(!e.status)console.error('[R39 social]',e?.code||e?.message||'unknown');return fail(e.status||503,e.status?e.message:'Layanan interaksi video belum tersedia. Coba lagi.')}
+}
+
+export async function handler(event){
+ const origin=String(event.headers?.origin||event.headers?.Origin||'');
+ const isAllowed=ALLOWED_ORIGINS.has(origin);
+ const cors=isAllowed?{
+  'Access-Control-Allow-Origin':origin,
+  'Access-Control-Allow-Methods':'GET, POST, OPTIONS',
+  'Access-Control-Allow-Headers':'Content-Type, Authorization, X-Firebase-AppCheck, X-Imam-Admin-Session',
+  'Vary':'Origin'
+ }:{};
+ if(event.httpMethod==='OPTIONS'){
+  if(!isAllowed)return fail(403,'Origin tidak diizinkan.');
+  return {statusCode:204,headers:{...cors,'Cache-Control':'no-store'},body:''};
+ }
+ const response=await runHandler(event);
+ return {...response,headers:{...response.headers,...cors}};
 }

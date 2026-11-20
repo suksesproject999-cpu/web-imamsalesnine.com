@@ -1,8 +1,8 @@
 /* ImamStore R39.1 — Admin V5 video moderation navigation.
-   Navigation only: never stores credentials, grants roles, or changes seller data. */
+   Uses the existing Admin V5 domain and session; navigation only. */
 (()=>{
   'use strict';
-  const DEST='https://store.imamsales.com/video/moderasi.html';
+  const DEST='/admin-v5/video/moderasi.html';
   function visit(){ window.location.assign(DEST); }
   function createMenuButton(){
     const button=document.createElement('button');
