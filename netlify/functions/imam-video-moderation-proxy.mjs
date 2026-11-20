@@ -1,5 +1,5 @@
 /**
- * ImamStore R39.5 — Netlify Functions (modern Request/Response API).
+ * ImamStore R39.6 — Netlify Functions (modern Request/Response API).
  * Replaces only the R39.3 main-site proxy, preserving its security contract.
  *
  * IMPORTANT: Do not put admin or Firebase secrets into this source file.
@@ -11,6 +11,7 @@ const STORE_ENDPOINT = 'https://store.imamsales.com/.netlify/functions/video-soc
 const ADMIN_ORIGIN = 'https://imamsalesnine.com'; // Fixed upstream Origin expected by Store
 const ALLOWED_ADMIN_ORIGINS = new Set([
   'https://imamsalesnine.com',
+  'https://www.imamsalesnine.com',
   'https://imamsales.com',
 ]);
 function canonicalOrigin(raw) {
