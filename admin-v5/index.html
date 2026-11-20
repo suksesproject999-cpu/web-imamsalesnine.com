@@ -13695,7 +13695,7 @@ window.smartLoadWhatsAppGroups = async function(){
       frame.addEventListener("load",check);
       if(!frame.dataset.nexaiSourceReady){
         frame.dataset.nexaiSourceReady="1";
-        frame.srcdoc=decodeSellerCenter();
+        frame.srcdoc=decodeSellerCenter().replace('</body>', '<script src="/admin-v5/video/product-video.js"><' + '/script></body>');
       }
       check();
     }).finally(()=>{sellerLoadPromise=null;});
