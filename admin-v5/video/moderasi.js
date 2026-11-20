@@ -4,7 +4,7 @@
 (()=>{
  'use strict';
  const CONFIG={apiKey:'AIzaSyBkyMCw47sYQb2BBkGMxgfsXppozWw4Cec',authDomain:'apin-web.firebaseapp.com',projectId:'apin-web',storageBucket:'apin-web.firebasestorage.app',messagingSenderId:'733140414417',appId:'1:733140414417:web:b6967fd053ac462b2ffaf0'};
- const API='https://store.imamsales.com/.netlify/functions/video-social';
+ const API='/.netlify/functions/imam-video-moderation-proxy';
  const $=id=>document.getElementById(id);
  const identity=$('identity'),status=$('message'),warning=$('warning'),tools=$('tools'),list=$('list'),retry=$('retry');
  let firebaseUser=null,netlifySession='',ready=false,appCheckReady=false,mode='listPending',epoch=0,busy=false;
@@ -28,7 +28,7 @@
   if(!appCheck?.token)throw Error('Token App Check tidak tersedia.');
   let response;
   try{response=await fetch(API,{method:'POST',cache:'no-store',headers:{'Content-Type':'application/json','Authorization':'Bearer '+idToken,'X-Firebase-AppCheck':appCheck.token,'X-Imam-Admin-Session':netlifySession},body:JSON.stringify({action,...params})})}
-  catch{throw Error('Gagal menghubungi Netlify Store. Periksa jaringan, CORS, dan log Function.');}
+  catch{throw Error('Tidak dapat menghubungi Function moderasi di domain Admin V5. Periksa deploy project website utama.');}
   const data=await response.json().catch(()=>({success:false,message:'Respons server tidak valid.'}));
   if(!response.ok||data?.success!==true){const error=Error(data?.message||'Akses ditolak.');error.status=response.status;throw error}
   return data;
