@@ -4818,6 +4818,58 @@ host.addEventListener('click',e=>{if(e.target.closest('#nineDetailSearchInput,#n
 window.addEventListener('popstate',()=>{if(!host.classList.contains('open'))return;const id=new URLSearchParams(location.search).get('product');if(!id){host.classList.remove('open');host.replaceChildren();document.body.classList.remove('imamstore-original-open')}else if(String(activeProduct()?.id)!==id){document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}))}});
 window.imamstoreOriginalDetailActive=true;
 document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:false,fromDeepLink:e.detail?.fromDeepLink===true});refreshWishlist();updateOriginalSticky();document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});
+/* Sinkronisasi galeri detail saat CMS selesai memuat, tanpa membuka produk ulang.
+   Re-render showProduct di sini akan mencatat view kedua kali, mengulang toast,
+   mengubah pilihan varian dan scroll. Karena itu cukup media gallery yang dihidratasi. */
+function syncOpenDetailGalleryFromCms(){
+ if(window.imamstoreDeepLinkCatalogState?.phase!=='cms'||!host.classList.contains('open'))return;
+ const id=String(currentProduct?.id??'');
+ if(!id||new URLSearchParams(location.search).get('product')!==id)return;
+ const raw=products.find(p=>String(p.id)===id);
+ if(!raw)return;
+ const data=adapt(raw);
+ const urls=[data.gambar,...data.gallery];
+ const gallery=host.querySelector('.product-detail .gallery-thumb');
+ const main=host.querySelector('.product-detail #mainProductImage');
+ const count=host.querySelector('.product-detail .nine-gallery-count');
+ if(!main||!gallery||!count||!urls.length)return;
+ const absolute=value=>{try{return new URL(value,location.origin+'/').href}catch{return value}};
+ const wanted=urls.map(absolute);
+ const previous=[...gallery.querySelectorAll('img')];
+ // Firestore onSnapshot can fire repeatedly, even without changes to product media.
+ // Never disturb focus, photo selection or DOM if the thumbnail list is already current.
+ if(previous.length===wanted.length&&previous.every((img,i)=>absolute(img.getAttribute('src')||'')===wanted[i]))return;
+ const chosen=previous.find(img=>img.classList.contains('active'))?.getAttribute('src')||main.getAttribute('src')||'';
+ const match=wanted.indexOf(absolute(chosen));
+ const index=match<0?0:match;
+ const nodes=document.createDocumentFragment();
+ wanted.forEach((url,i)=>{
+  const image=document.createElement('img');
+  image.src=url;
+  image.alt=i===0?'Foto utama':'Foto '+(i+1);
+  image.loading='lazy';
+  if(i===index)image.classList.add('active');
+  if(i>0)image.onerror=()=>{image.style.display='none'};
+  image.onclick=()=>window.changeGallery?.(image);
+  nodes.appendChild(image);
+ });
+ gallery.replaceChildren(nodes);
+ if(absolute(main.getAttribute('src')||'')!==wanted[index])main.src=wanted[index];
+ count.textContent=(index+1)+' / '+wanted.length;
+ host.querySelectorAll('.gallery-main .nine-gallery-prev,.gallery-main .nine-gallery-next').forEach(button=>{button.disabled=wanted.length<2});
+ // Media fields in the already-open renderer must match the hydrated gallery.
+ // Leave views, sales stats, listener handles, toast state and price untouched.
+ currentProduct.gambar=data.gambar;
+ currentProduct.gallery=data.gallery;
+ const activeRaw=window.imamstoreActiveProduct;
+ if(String(activeRaw?.id??'')===id){
+  for(const key of ['gambar','gallery','galeri','images']){
+   if(Object.prototype.hasOwnProperty.call(raw,key))activeRaw[key]=raw[key];
+  }
+ }
+}
+document.addEventListener('imamstore:catalog-updated',syncOpenDetailGalleryFromCms);
+
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('imamstoreOriginalPurchase')?.classList.contains('open'))closePurchase();else if(e.key==='Escape'&&host.classList.contains('open'))close()});
 window.imamstoreOriginalDetailStatus=()=>({active:host.classList.contains('open'),renderer:'original-showProduct',transactionsEnabled:false});
 })();
@@ -9154,8 +9206,8 @@ if(auth?.onAuthStateChanged)auth.onAuthStateChanged(async u=>{
    if(found)open();
    else if(!state.fromCache)showError();
   }else if(state.phase==='seed'){
-   // Small grace period for Firestore to override seed data, not a fixed 900-ms wait.
-   if(found){clearTimeout(seedTimer);seedTimer=setTimeout(open,180)}
+   // Prefer the full Firestore catalog on direct entry; offline/slow CMS still falls back to seed.
+   if(found){clearTimeout(seedTimer);seedTimer=setTimeout(open,2200)}
   }else if(state.phase==='cms-error'){
    if(found)open();else showError();
   }
