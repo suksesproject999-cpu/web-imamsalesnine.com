@@ -11,7 +11,7 @@
  const norm=v=>tidy(v,100).toLocaleLowerCase('id-ID').replace(/\s+/g,' ');
  const typeOf=p=>{for(const key of ['tipeProduk','tipe','type','subkategori','subKategori','kategori']){const v=p?.[key];if(typeof v==='string'&&v.trim())return norm(v)}return ''};
  const related=p=>{if(!p)return [];const type=typeOf(p),out=[],seen=new Set();for(const q of [p,...catalog()]){if(String(q?.id)!==String(p.id)&&(!type||typeOf(q)!==type))continue;for(const v of videos(q)){const key=v.productId+'::'+v.url;if(seen.has(key))continue;seen.add(key);out.push(v);if(out.length>=28)return out}}return out};
- const state={id:'',gallery:null,videoUrl:'',videoSig:'',relatedSig:'',reviewUrls:[],reviewFiles:[],feed:null,feedItems:[],pendingBuy:'',pendingReviews:'',feedIndex:0,reviewSubmit:null,overflowBefore:null};
+ const state={id:'',gallery:null,videoUrl:'',videoSig:'',relatedSig:'',reviewUrls:[],reviewFiles:[],feed:null,feedItems:[],pendingBuy:'',pendingCart:'',pendingVoucher:'',pendingReviews:'',feedIndex:0,reviewSubmit:null,overflowBefore:null};
  const msg=(iframe,type,value)=>{try{iframe?.contentWindow?.postMessage({source:'imamstore-video-bridge',type,...value},origin)}catch{}};
  const media=()=>[...host.querySelectorAll('.gallery-thumb > img,.gallery-thumb > button.nine-video-thumb')].filter(x=>x.tagName==='BUTTON'||(x.getAttribute('src')&&x.style.display!=='none'));
  const stopStage=()=>{const mount=host.querySelector('#nineVideoStage');if(!mount)return;msg(mount.querySelector('iframe'),'stop',{});mount.hidden=true;host.querySelector('#mainProductImage')?.removeAttribute('hidden');state.videoUrl=''};
@@ -76,18 +76,60 @@
  }
  function wrapReview(){if(state.reviewSubmit===window.nineSubmitDetailReview)return;const original=window.nineSubmitDetailReview;if(typeof original!=='function'||original.__r36Wrapped)return;const wrapper=async(...args)=>{if(state.reviewFiles.length){const node=host.querySelector('.nine-review-media-status');if(node)node.textContent='Foto/video belum terkirim: perlu backend upload media terverifikasi. Hapus lampiran untuk mengirim ulasan teks.';return}return original.apply(window,args)};wrapper.__r36Wrapped=true;window.nineSubmitDetailReview=wrapper;state.reviewSubmit=wrapper}
  function resetReview(){state.reviewUrls.forEach(URL.revokeObjectURL);state.reviewFiles=[];state.reviewUrls=[]}
- function refresh(){if(!host.classList.contains('open')){stopStage();return}const id=idOf();if(!id)return;const p=current();if(!p)return;if(state.id!==id){stopStage();resetReview();state.id=id;state.gallery=null;state.videoSig='';state.relatedSig=''}initGallery(p);initRelated(p);reviewMedia();wrapReview();if(state.pendingBuy===id){state.pendingBuy='';window.openBuySheet?.()}if(state.pendingReviews===id){state.pendingReviews='';window.nineOpenReviews?.()}}
+ function refresh(){if(!host.classList.contains('open')){stopStage();return}const id=idOf();if(!id)return;const p=current();if(!p)return;if(state.id!==id){stopStage();resetReview();state.id=id;state.gallery=null;state.videoSig='';state.relatedSig=''}initGallery(p);initRelated(p);reviewMedia();wrapReview();if(state.pendingBuy===id){state.pendingBuy='';window.openBuySheet?.()}if(state.pendingCart===id){state.pendingCart='';window.openCartSheet?.()}if(state.pendingVoucher===id){state.pendingVoucher='';window.nineOpenOriginalVoucher?.()}if(state.pendingReviews===id){state.pendingReviews='';window.nineOpenReviews?.()}}
  let queued=false;const schedule=()=>{if(!queued){queued=true;queueMicrotask(()=>{queued=false;refresh()})}};
  new MutationObserver(schedule).observe(host,{childList:true,attributes:true,attributeFilter:['class']});
  document.addEventListener('imamstore:catalog-updated',schedule);document.addEventListener('imamstore:open-product',schedule);window.addEventListener('pageshow',schedule);schedule();
  const sendCartCount=()=>{const badge=document.getElementById('nineHeaderCartCount');const count=badge&&!badge.hidden?Math.max(0,Number(badge.textContent)||0):0;const frame=state.feed?.querySelector('iframe');if(frame)msg(frame,'cart-count',{count})};document.addEventListener('nine:cartchange',()=>{window.imamstoreRefreshCartBadge?.();sendCartCount()});window.addEventListener('storage',e=>{if(e.key==='imamstore_cart_stage5'){window.imamstoreRefreshCartBadge?.();sendCartCount()}});
- function openFeed(items,index=0){const list=items.filter(x=>x.url);if(!list.length)return;state.feedItems=list;state.feedIndex=index;let root=state.feed;if(!root){root=document.createElement('div');root.id='imamstoreR36Feed';root.hidden=true;const iframe=document.createElement('iframe');iframe.src=path+'?mode=feed';iframe.title='Video Terkait Produk';iframe.allow='fullscreen; picture-in-picture';iframe.setAttribute('allowfullscreen','');root.append(iframe);document.body.append(root);state.feed=root}const iframe=root.querySelector('iframe');root.hidden=false;if(state.overflowBefore===null)state.overflowBefore=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';iframe.onload=()=>{msg(iframe,'render',{items:list,index});sendCartCount()};msg(iframe,'render',{items:list,index});window.imamstoreRefreshCartBadge?.();sendCartCount()}
+
+ /* Video feed is a VIEW of the existing catalog/pricing/stats, not another commerce system. */
+ const money=n=>Number.isFinite(Number(n))&&Number(n)>0?Number(n):0;
+ function enrichVideo(item){
+  const p=catalog().find(x=>String(x.id)===String(item.productId));if(!p)return item;
+  const q=typeof window.imamstoreUnifiedPrice?.quote==='function'?window.imamstoreUnifiedPrice.quote(p):null;
+  const normal=money(q?.normal??p.harga?.normal),price=money(q?.price??window.nineEffectivePromo?.(p)??p.harga?.promo??p.harga?.normal);
+  const discountPercent=q?.percent??(normal>price&&price>0?Math.round((normal-price)/normal*100):0);
+  const saving=q?.saving??Math.max(0,normal-price);
+  const active=String(idOf())===String(p.id),viewsEl=active?host.querySelector('[data-detail-views="'+CSS.escape(String(p.id))+'"]'):null;
+  const soldEl=active?host.querySelector('[data-detail-sold="'+CSS.escape(String(p.id))+'"]'):null;
+  const ratingEl=active?host.querySelector('[data-detail-rating="'+CSS.escape(String(p.id))+'"]'):null;
+  const sold=money(p.terjual??p.sold??p.totalTerjual),views=Number(p.views);
+  const soldLabel=soldEl?.textContent?.trim()||((Number.isFinite(Number(p.terjual??p.sold??p.totalTerjual))&&Number(p.terjual??p.sold??p.totalTerjual)>=0)?(window.imamstoreFormatSold?.(sold)||sold.toLocaleString('id-ID'))+' terjual':'');
+  const viewsLabel=viewsEl?.textContent?.trim()||((Number.isFinite(views)&&views>=0)?Math.floor(views).toLocaleString('id-ID')+' dilihat':'');
+  const rawRating=ratingEl?.textContent?.trim()||'',ratingLabel=rawRating&&rawRating!=='—'&&/\d/.test(rawRating)?'★ '+rawRating:'';
+  const warranty=typeof p.garansi?.lama==='string'&&p.garansi.lama.trim()?('Garansi '+p.garansi.lama.trim()):'';
+  return {...item,price,originalPrice:normal,discountPercent,saving,warranty,viewsLabel:viewsLabel.includes('—')?'':viewsLabel,soldLabel,ratingLabel,voucherAvailable:!!host.querySelector('.nine-voucher')||!!p.voucher||!!p.vouchers,productName:String(p.nama||item.productName||''),productImage:safeUrl(p.gambar,'poster')||item.productImage};
+ }
+ const feedItem=(id,url)=>state.feedItems.find(x=>String(x.productId)===id&&x.url===url);
+ const feedFrame=()=>state.feed?.querySelector('iframe');
+ function updateVideoCommerce(productId,videoUrl){const item=feedItem(productId,videoUrl);if(item&&!state.feed?.hidden)msg(feedFrame(),'product-update',{productId,videoUrl,item:enrichVideo(item)})}
+ function socialApi(body){const uri='/.netlify/functions/video-social';return uri}
+ async function requestSocial(message){const id=String(message.productId||''),videoUrl=String(message.videoUrl||''),entry=feedItem(id,videoUrl),iframe=feedFrame();if(!iframe||!entry)return;const type=message.type;let result;
+  try{
+   const sdk=window.firebase;if(!sdk?.auth)throw Error('Firebase Auth belum tersedia.');const auth=sdk.auth();let user=auth.currentUser;
+   const mutation=type!=='social-state';
+   if(mutation&&!user){if(document.getElementById('nexaiCustomerLogin')?.hidden===false)throw Error('Selesaikan proses login dahulu.');user=(await auth.signInAnonymously()).user}
+   const token=user?await user.getIdToken():'';
+   const headers={'Accept':'application/json'};if(token)headers.Authorization='Bearer '+token;
+   const endpoint=new URL(socialApi(),location.origin),opts={cache:'no-store',credentials:'same-origin',headers};
+   if(!mutation){endpoint.searchParams.set('productId',id);endpoint.searchParams.set('videoUrl',videoUrl);opts.method='GET'}
+   else{
+    if(!user)throw Error('Sesi anonim belum siap.');const app=sdk.appCheck?.();if(!app?.getToken)throw Error('Firebase App Check belum tersedia.');const appToken=(await app.getToken(false))?.token;if(!appToken)throw Error('App Check belum siap.');
+    headers['X-Firebase-AppCheck']=appToken;headers['Content-Type']='application/json';opts.method='POST';
+    const action=type==='social-like'?'toggleLike':type==='social-comment'?'comment':type==='social-report'?'report':'';
+    if(!action)throw Error('Aksi video tidak dikenali.');opts.body=JSON.stringify({action,productId:id,videoUrl,text:message.text,commentId:message.commentId});
+   }
+   const res=await fetch(endpoint,opts);const data=await res.json().catch(()=>({message:'Respons server tidak tersedia.'}));result=res.ok?data:{success:false,message:data?.message||'Server tidak tersedia.'};
+  }catch(e){result={success:false,message:String(e?.message||'Jaringan bermasalah.').slice(0,170)}}
+  if(state.feed&&!state.feed.hidden)msg(iframe,'social-result',{action:type,productId:id,videoUrl,result});
+ }
+ function openFeed(items,index=0){const list=items.filter(x=>x.url);if(!list.length)return;state.feedItems=list.map(enrichVideo);state.feedIndex=index;let root=state.feed;if(!root){root=document.createElement('div');root.id='imamstoreR36Feed';root.hidden=true;const iframe=document.createElement('iframe');iframe.src=path+'?mode=feed';iframe.title='Video Terkait Produk';iframe.allow='fullscreen; picture-in-picture';iframe.setAttribute('allowfullscreen','');root.append(iframe);document.body.append(root);state.feed=root}const iframe=root.querySelector('iframe');root.hidden=false;if(state.overflowBefore===null)state.overflowBefore=document.documentElement.style.overflow;document.documentElement.style.overflow='hidden';iframe.onload=()=>{msg(iframe,'render',{items:state.feedItems,index});sendCartCount()};msg(iframe,'render',{items:state.feedItems,index});window.imamstoreRefreshCartBadge?.();sendCartCount()}
  function closeFeed(){if(!state.feed)return;msg(state.feed.querySelector('iframe'),'stop',{});state.feed.hidden=true;document.documentElement.style.overflow=state.overflowBefore??'';state.overflowBefore=null}
  window.addEventListener('message',e=>{if(e.origin!==origin||e.data?.source!=='imamstore-video-ui')return;const galleryFrame=host.querySelector('#nineVideoStage iframe'),feedFrame=state.feed?.querySelector('iframe');if(![galleryFrame?.contentWindow,feedFrame?.contentWindow].includes(e.source))return;
    if(e.data.type==='ready'){if(e.source===galleryFrame?.contentWindow){const selected=host.querySelector('.nine-video-thumb.active');if(selected)msg(galleryFrame,'render',{entry:{url:selected.dataset.url,poster:selected.dataset.poster,title:selected.dataset.title}})}if(e.source===feedFrame?.contentWindow){msg(feedFrame,'render',{items:state.feedItems,index:state.feedIndex});sendCartCount()}return}
    if(e.source===galleryFrame?.contentWindow&&e.data.type==='gallery-step'){step(Number(e.data.delta)<0?-1:1);return}
-   if(e.source===feedFrame?.contentWindow){if(e.data.type==='close'){closeFeed();return}if(e.data.type==='open-search'){closeFeed();host.querySelector('#nineDetailSearchInput')?.focus();return}if(e.data.type==='cart'){closeFeed();window.goCart?.();return}if(['open-product','buy','open-reviews'].includes(e.data.type)){const id=String(e.data.productId||'');if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!catalog().some(p=>String(p.id)===id))return;closeFeed();if(e.data.type==='buy')state.pendingBuy=id;if(e.data.type==='open-reviews')state.pendingReviews=id;if(id!==idOf())document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));else if(e.data.type==='buy'){state.pendingBuy='';window.openBuySheet?.()}else if(e.data.type==='open-reviews'){state.pendingReviews='';window.nineOpenReviews?.()}return}}
+   if(e.source===feedFrame?.contentWindow){if(['social-state','social-like','social-comment','social-report'].includes(e.data.type)){void requestSocial(e.data);return}if(e.data.type==='close'){closeFeed();return}if(e.data.type==='open-search'){closeFeed();host.querySelector('#nineDetailSearchInput')?.focus();return}if(e.data.type==='cart'){closeFeed();window.goCart?.();return}if(['open-product','buy','add-cart','open-voucher','open-reviews'].includes(e.data.type)){const id=String(e.data.productId||'');if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!catalog().some(p=>String(p.id)===id))return;closeFeed();if(e.data.type==='buy')state.pendingBuy=id;if(e.data.type==='add-cart')state.pendingCart=id;if(e.data.type==='open-voucher')state.pendingVoucher=id;if(e.data.type==='open-reviews')state.pendingReviews=id;if(id!==idOf())document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));else if(e.data.type==='buy'){state.pendingBuy='';window.openBuySheet?.()}else if(e.data.type==='add-cart'){state.pendingCart='';window.openCartSheet?.()}else if(e.data.type==='open-voucher'){state.pendingVoucher='';window.nineOpenOriginalVoucher?.()}else if(e.data.type==='open-reviews'){state.pendingReviews='';window.nineOpenReviews?.()}return}}
  });
- window.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.feed&&!state.feed.hidden)closeFeed()});
+ document.addEventListener('imamstore:flash-price-change',()=>{if(state.feed?.hidden===false)for(const item of state.feedItems)updateVideoCommerce(String(item.productId),item.url)});window.addEventListener('keydown',e=>{if(e.key==='Escape'&&state.feed&&!state.feed.hidden)closeFeed()});
  window.imamstoreR36={refresh,closeFeed,version:'R38.1-related-native'};
 })();

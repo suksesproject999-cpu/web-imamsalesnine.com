@@ -88,6 +88,43 @@
 .feed-sheet-info i{font-size:23px;padding-top:4px}.feed-sheet-info p{margin:0;font-size:13px;line-height:1.55}
 .feed-sheet-action{background:#8cc63f;color:#1b2c12;border:0;border-radius:12px;padding:14px;font-weight:750;min-height:46px}
 @media(max-width:360px){.feed-desc{right:70px}.feed-product{left:8px;right:8px}.feed-ops{right:6px}}
+
+/* R39 — product purchase card reads the canonical Store product fields. */
+.feed-product{left:12px;right:12px;bottom:calc(13px + env(safe-area-inset-bottom));border-radius:14px}
+.product-head{min-height:36px;padding:8px 12px;display:flex;align-items:center;gap:7px;font-size:12px}
+.product-body{display:grid;grid-template-columns:90px minmax(0,1fr);gap:10px;padding:9px}
+.product-body>img{width:90px;height:123px;object-fit:contain}
+.product-copy{gap:4px;min-width:0}
+.product-price-row{display:flex;gap:8px;align-items:center;min-width:0;flex-wrap:wrap}
+.product-copy .price{font-size:clamp(18px,5vw,24px)}
+.product-discount{font-size:10px;font-weight:700;background:#fff0ea;color:#e55036;border-radius:4px;padding:3px 5px}
+.product-old-row{font-size:10px;color:#8a8a8a;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.product-old-row[hidden],.product-discount[hidden],.product-voucher[hidden]{display:none}
+.product-old-row span{color:#e65335}
+.product-voucher{align-self:flex-start;background:#fff8f4;border:1px solid #ffccc0;color:#e65536;padding:3px 7px;border-radius:5px;font-size:10px;font-weight:700}
+.product-copy .title{font-size:12px;line-height:1.3}
+.product-stats{font-size:10px;color:#777;line-height:1.3;white-space:normal}
+.product-actions{gap:8px;margin-top:auto}
+.product-actions .cart-add{flex:0 0 48px;background:#fff3eb;color:#e95432;border:1px solid #f5b8a3;font-size:20px}
+.product-actions .buy{flex:1;font-size:12px;min-height:37px}
+.feed-ops{bottom:calc(215px + env(safe-area-inset-bottom))}
+.feed-desc{bottom:calc(215px + env(safe-area-inset-bottom))}
+.feed-sheet-panel{max-height:80dvh}
+.feed-comment-note{font-size:12px;line-height:1.4;color:#777;margin:0}
+.feed-comment-list{overflow-y:auto;overscroll-behavior:contain;min-height:90px;max-height:35dvh;display:grid;gap:10px}
+.feed-comment-list article{padding:10px 0;border-bottom:1px solid #e7e7e7}
+.feed-comment-list article strong{font-size:12px;color:#333}
+.feed-comment-list article time{display:inline;margin-left:8px;color:#999;font-size:10px}
+.feed-comment-list article p{white-space:pre-wrap;overflow-wrap:anywhere;margin:6px 0;font-size:13px;line-height:1.45}
+.feed-comment-list article button{border:0;background:none;color:#7d7d7d;font-size:11px;padding:0}
+.feed-comment-list>p{color:#777;font-size:13px;text-align:center}
+.feed-comment-form{display:flex;flex-direction:column;gap:8px}
+.feed-comment-form label{font-size:12px;font-weight:700}
+.feed-comment-form textarea{width:100%;resize:vertical;min-height:68px;border:1px solid #ddd;border-radius:9px;padding:10px;font:inherit;font-size:13px}
+.feed-comment-form button{align-self:flex-end;background:#8cc63f;border:0;border-radius:9px;padding:10px 17px;font-size:12px;font-weight:750;color:#243d13}
+.feed-comment-form button:disabled{opacity:.55}
+.feed-comment-status{font-size:12px;color:#4e6f35;min-height:17px}
+@media(max-width:370px){.feed-product{left:6px;right:6px}.product-body{grid-template-columns:76px minmax(0,1fr)}.product-body>img{width:76px;height:114px}.feed-ops{right:6px}}
 </style></head><body>
 <main id="single" hidden aria-label="Pemutar video utama"><div class="placeholder">Pilih thumbnail video untuk memutar.</div></main>
 <section id="related" hidden aria-label="Video terkait produk"><header class="related-head"><h2>Video Terkait Produk</h2><button id="viewAll" type="button" aria-label="Lihat semua video terkait">›</button></header><div id="track" class="related-track" aria-label="Geser video ke kiri atau kanan"></div><div id="relatedEmpty" hidden>Belum ada video untuk tipe produk ini.</div></section>
@@ -95,11 +132,32 @@
  <div class="feed-visual"><div class="feed-ambient" id="feedAmbient" aria-hidden="true"></div><video id="feedVideo" playsinline muted preload="none" loop></video><div id="feedFallback" class="feed-fallback" hidden>Video belum tersedia.</div></div><div class="feed-shade"></div>
  <header class="feed-head"><button id="goBack" type="button" aria-label="Kembali">‹</button><strong>Video Terkait Produk</strong><div class="search-cart"><button type="button" id="search" aria-label="Cari produk">⌕</button><button type="button" id="cart" class="feed-cart-btn" aria-label="Keranjang"><i class="fa-solid fa-cart-shopping" aria-hidden="true"></i><span id="feedCartCount" class="feed-cart-count" hidden></span></button></div><span id="feedCount" class="count">1/1</span></header>
  <div class="feed-desc"><strong id="feedTitle"></strong><small>Geser atas/bawah untuk video lainnya</small></div>
- <div class="feed-ops"><button type="button" id="like" aria-label="Suka video di perangkat ini" aria-pressed="false"><i class="fa-regular fa-heart" aria-hidden="true"></i><small>Suka</small></button><button type="button" id="review" aria-label="Komentar dan ulasan produk"><i class="fa-regular fa-comment-dots" aria-hidden="true"></i><small>Komentar</small></button><button type="button" id="sound" aria-label="Aktifkan suara"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i><small>Suara</small></button><button type="button" id="next" aria-label="Lihat semua video terkait"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i><small>Lainnya</small></button></div>
- <div class="feed-product"><div class="product-head">Produk terkait • ImamStore</div><div class="product-body"><img id="productImage" alt="Foto produk terkait"><div class="product-copy"><strong class="price" id="productPrice">Lihat harga</strong><span class="title" id="productTitle"></span><span class="sold" id="productSold"></span><div class="product-actions"><button class="open" id="openProduct">Lihat Produk</button><button class="buy" id="buyProduct">Beli Sekarang</button></div></div></div></div>
+ <div class="feed-ops"><button type="button" id="like" aria-label="Suka video publik" aria-pressed="false"><i class="fa-regular fa-heart" aria-hidden="true"></i><small>Suka</small></button><button type="button" id="review" aria-label="Komentar video publik"><i class="fa-regular fa-comment-dots" aria-hidden="true"></i><small>Komentar</small></button><button type="button" id="sound" aria-label="Aktifkan suara"><i class="fa-solid fa-volume-xmark" aria-hidden="true"></i><small>Suara</small></button><button type="button" id="next" aria-label="Lihat semua video terkait"><i class="fa-solid fa-ellipsis" aria-hidden="true"></i><small>Lainnya</small></button></div>
+ <div class="feed-product" aria-label="Informasi dan pembelian produk">
+  <div class="product-head" id="productWarranty"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i> Produk terkait • ImamStore</div>
+  <div class="product-body"><img id="productImage" alt="Foto produk terkait">
+    <div class="product-copy">
+      <div class="product-price-row"><strong class="price" id="productPrice">Lihat harga</strong><span id="productDiscount" class="product-discount" hidden></span></div>
+      <div class="product-old-row" id="productOldRow" hidden><del id="productOldPrice"></del><span id="productSaving"></span></div>
+      <button id="productVoucher" type="button" class="product-voucher"><i class="fa-solid fa-ticket" aria-hidden="true"></i> Voucher <i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button>
+      <span class="title" id="productTitle"></span>
+      <span class="product-stats" id="productStats"></span>
+      <div class="product-actions"><button type="button" class="cart-add" id="productAddCart" aria-label="Masukkan produk ke keranjang"><i class="fa-solid fa-cart-plus" aria-hidden="true"></i></button><button type="button" class="buy" id="buyProduct">Beli Sekarang</button></div>
+    </div>
+  </div>
+</div>
  <div class="feed-status" id="feedStatus" role="status" aria-live="polite" hidden></div>
  <div id="feedVideoList" class="feed-sheet" hidden role="dialog" aria-modal="true" aria-label="Pilih video terkait"><button type="button" class="feed-sheet-backdrop" data-close-list aria-label="Tutup daftar video"></button><div class="feed-sheet-panel"><div class="feed-sheet-head"><strong>Video Terkait Produk</strong><button type="button" data-close-list aria-label="Tutup">×</button></div><div class="feed-sheet-list" id="feedVideoOptions"></div></div></div>
- <div id="feedComments" class="feed-sheet" hidden role="dialog" aria-modal="true" aria-label="Komentar produk"><button type="button" class="feed-sheet-backdrop" data-close-comments aria-label="Tutup komentar"></button><div class="feed-sheet-panel"><div class="feed-sheet-head"><strong>Komentar & Ulasan Produk</strong><button type="button" data-close-comments aria-label="Tutup">×</button></div><div class="feed-sheet-info"><i class="fa-solid fa-shield-halved" aria-hidden="true"></i><p>Komentar produk terhubung ke ulasan pembelian terverifikasi di ImamStore. Penilaian baru hanya dapat dikirim setelah pesanan memenuhi syarat.</p></div><button type="button" id="goProductReviews" class="feed-sheet-action">Buka Ulasan Produk</button></div></div>
+ <div id="feedComments" class="feed-sheet" hidden role="dialog" aria-modal="true" aria-label="Komentar publik video">
+  <button type="button" class="feed-sheet-backdrop" data-close-comments aria-label="Tutup komentar"></button>
+  <div class="feed-sheet-panel">
+    <div class="feed-sheet-head"><strong>Komentar Video <span id="commentCount"></span></strong><button type="button" data-close-comments aria-label="Tutup">×</button></div>
+    <p class="feed-comment-note">Diskusi publik tanpa login manual. Komentar baru ditinjau sebelum tampil. Ini bukan ulasan pembeli.</p>
+    <div id="videoCommentList" class="feed-comment-list" aria-live="polite"><p>Memuat komentar...</p></div>
+    <form id="videoCommentForm" class="feed-comment-form"><label for="videoCommentText">Tulis komentar</label><textarea id="videoCommentText" maxlength="500" minlength="2" required rows="3" placeholder="Tulis komentar tentang video ini (maks. 500 karakter)"></textarea><button type="submit" id="videoCommentSubmit">Kirim Komentar</button></form>
+    <div id="videoCommentStatus" class="feed-comment-status" role="status" aria-live="polite"></div>
+  </div>
+</div>
  <small class="feed-hint">Geser atas/bawah untuk pindah video</small>
 </section>
 <script>
@@ -108,16 +166,19 @@
  const url=(v,kind)=>{if(typeof v!=='string'||v.length>1800)return '';try{const u=new URL(v,origin+'/');if(u.protocol!=='https:'&&u.origin!==origin)return '';return new RegExp(kind==='video'?'\\.(?:mp4|webm)$':'\\.(?:jpe?g|png|webp|avif)$','i').test(u.pathname)?u.href:''}catch{return ''}};
  const txt=(v,n=110)=>String(v??'').replace(/[\x00-\x1f]/g,' ').trim().slice(0,n);
  let items=[],selected=0,player=null,feedVideo=document.getElementById('feedVideo'),statusTimer=null;
- const videoKey=item=>'imamstore_video_like_local_r38:'+String(item?.productId||'')+':'+String(item?.url||'');
- const likedLocal=item=>{try{return localStorage.getItem(videoKey(item))==='1'}catch{return false}};
- const setLikedUI=item=>{const on=likedLocal(item),b=document.getElementById('like');b.classList.toggle('liked',on);b.setAttribute('aria-pressed',String(on));b.querySelector('i').className=on?'fa-solid fa-heart':'fa-regular fa-heart';b.querySelector('small').textContent=on?'Disukai':'Suka'};
+ let socialCurrent={likes:0,comments:0,liked:false,list:[]},socialBusy=false;
+ const socialKey=item=>String(item?.productId||'')+'|'+String(item?.url||'');
+ const socialRequest=(type,extra={})=>{const item=items[selected];if(item)send(type,{productId:String(item.productId),videoUrl:item.url,...extra})};
+ const socialLabel=n=>n>999?(n/1000).toFixed(1).replace(/\.0$/,'')+'rb':String(Math.max(0,n||0));
+ function setSocialUI(){const b=document.getElementById('like');b.classList.toggle('liked',!!socialCurrent.liked);b.setAttribute('aria-pressed',String(!!socialCurrent.liked));b.disabled=socialBusy;b.querySelector('i').className=socialCurrent.liked?'fa-solid fa-heart':'fa-regular fa-heart';b.querySelector('small').textContent='Suka'+(socialCurrent.likes?' · '+socialLabel(socialCurrent.likes):'');const c=document.getElementById('review');c.querySelector('small').textContent='Komentar'+(socialCurrent.comments?' · '+socialLabel(socialCurrent.comments):'');document.getElementById('commentCount').textContent='('+socialCurrent.comments+')';}
+ function renderComments(){const root=document.getElementById('videoCommentList');root.replaceChildren();const list=socialCurrent.list||[];if(!list.length){const p=document.createElement('p');p.textContent='Belum ada komentar yang disetujui.';root.append(p);return}for(const comment of list){const article=document.createElement('article');const head=document.createElement('strong');head.textContent='Pengunjung';const time=document.createElement('time');time.textContent=comment.createdAt?new Date(comment.createdAt).toLocaleDateString('id-ID'):'';const body=document.createElement('p');body.textContent=comment.text||'';const report=document.createElement('button');report.type='button';report.textContent='Laporkan';report.onclick=()=>socialRequest('social-report',{commentId:comment.id});article.append(head,time,body,report);root.append(article)}}
  const notice=msg=>{const box=document.getElementById('feedStatus');box.textContent=msg;box.hidden=false;clearTimeout(statusTimer);statusTimer=setTimeout(()=>box.hidden=true,3000)};
  const listSheet=document.getElementById('feedVideoList'),commentsSheet=document.getElementById('feedComments');
  const dismissSheets=()=>{listSheet.hidden=true;commentsSheet.hidden=true};
  function pickList(){const mount=document.getElementById('feedVideoOptions');mount.replaceChildren();items.forEach((item,i)=>{const btn=document.createElement('button');btn.type='button';btn.setAttribute('aria-current',String(i===selected));btn.setAttribute('aria-label','Putar '+txt(item.title));const cover=url(item.poster||item.productImage,'poster');if(cover){const img=document.createElement('img');img.src=cover;img.alt='';img.loading='lazy';btn.append(img)}const title=document.createElement('span');title.textContent=txt(item.title||item.productName,76);btn.append(title);btn.onclick=()=>{dismissSheets();showFeed(i)};mount.append(btn)});if(!items.length){const t=document.createElement('p');t.textContent='Belum ada video terkait.';mount.append(t)}listSheet.hidden=false;feedVideo.pause()}
  document.querySelectorAll('[data-close-list]').forEach(b=>b.addEventListener('click',()=>{listSheet.hidden=true;void feedVideo.play().catch(()=>{})}));
  document.querySelectorAll('[data-close-comments]').forEach(b=>b.addEventListener('click',()=>{commentsSheet.hidden=true;void feedVideo.play().catch(()=>{})}));
- document.getElementById('goProductReviews').onclick=()=>{dismissSheets();send('open-reviews',{productId:selectedId()})};
+ const commentForm=document.getElementById('videoCommentForm');commentForm.addEventListener('submit',e=>{e.preventDefault();const input=document.getElementById('videoCommentText'),value=input.value.trim();if(value.length<2||value.length>500){document.getElementById('videoCommentStatus').textContent='Isi 2–500 karakter.';return}document.getElementById('videoCommentSubmit').disabled=true;document.getElementById('videoCommentStatus').textContent='Mengirim...';socialRequest('social-comment',{text:value})});
  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&(!listSheet.hidden||!commentsSheet.hidden)){e.preventDefault();dismissSheets()}});
 
  function stop(){if(player){player.pause();player.removeAttribute('src');player.load();player=null}if(feedVideo){feedVideo.pause();feedVideo.removeAttribute('src');feedVideo.load()}document.querySelectorAll('video').forEach(v=>v.pause())}
@@ -126,18 +187,41 @@
   items.forEach((item,i)=>{const b=document.createElement('button');b.type='button';b.className='related-card';b.setAttribute('aria-label','Lihat video '+txt(item.title));const poster=url(item.poster,'poster');if(poster){const img=document.createElement('img');img.className='related-cover';img.loading='lazy';img.src=poster;img.alt='';b.append(img)}const play=document.createElement('span');play.className='related-play';play.textContent='▶';const title=document.createElement('span');title.className='related-title';title.textContent=txt(item.title);b.append(play,title);b.onclick=()=>send('open-feed',{index:i});track.append(b)});
  }
  function renderFeed(rows,index){items=(Array.isArray(rows)?rows:[]).slice(0,30).filter(row=>url(row?.url,'video'));dismissSheets();if(!items.length){document.getElementById('feedFallback').hidden=false;return}showFeed(Number.isFinite(Number(index))?Math.trunc(Number(index)):0)}
- function showFeed(index){stop();selected=(index%items.length+items.length)%items.length;const item=items[selected];document.getElementById('feedCount').textContent=(selected+1)+'/'+items.length;document.getElementById('feedTitle').textContent=txt(item.title||item.productName);document.getElementById('productTitle').textContent=txt(item.productName||item.title);const img=document.getElementById('productImage');const photo=url(item.productImage||item.poster,'poster');if(photo)img.src=photo;else img.removeAttribute('src');const price=Number(item.price);document.getElementById('productPrice').textContent=Number.isFinite(price)&&price>0?'Rp '+Math.round(price).toLocaleString('id-ID'):'Lihat harga';document.getElementById('productSold').textContent=Number(item.sold)>0?Math.round(Number(item.sold)).toLocaleString('id-ID')+' terjual':'ImamStore';
-  const movie=feedVideo,source=url(item.url,'video'),poster=url(item.poster||item.productImage,'poster');document.getElementById('feedAmbient').style.backgroundImage=poster?'url('+JSON.stringify(poster)+')':'';document.getElementById('feedFallback').hidden=Boolean(source);if(poster)movie.poster=poster;else movie.removeAttribute('poster');if(source){movie.muted=true;movie.src=source;movie.load();void movie.play().catch(()=>{});}document.getElementById('sound').querySelector('i').className='fa-solid fa-volume-xmark';document.getElementById('sound').querySelector('small').textContent='Suara';setLikedUI(item);
+ function renderProduct(item){
+   document.getElementById('productTitle').textContent=txt(item.productName||item.title);
+   const img=document.getElementById('productImage'),photo=url(item.productImage||item.poster,'poster');if(photo)img.src=photo;else img.removeAttribute('src');
+   const price=Number(item.price),normal=Number(item.originalPrice),discount=Math.max(0,Number(item.discountPercent)||0),saving=Math.max(0,Number(item.saving)||0);
+   const rupiah=n=>'Rp '+Math.round(n).toLocaleString('id-ID');
+   document.getElementById('productPrice').textContent=Number.isFinite(price)&&price>0?rupiah(price):'Lihat harga';
+   const promo=document.getElementById('productDiscount');promo.hidden=!(normal>price&&price>0&&discount>0);promo.textContent='-'+discount+'%';
+   const old=document.getElementById('productOldRow');old.hidden=!(normal>price&&price>0);document.getElementById('productOldPrice').textContent=old.hidden?'':rupiah(normal);document.getElementById('productSaving').textContent=old.hidden?'':'Hemat '+rupiah(saving);
+   const voucher=document.getElementById('productVoucher');voucher.hidden=!item.voucherAvailable;
+   const stats=[item.ratingLabel,item.soldLabel,item.viewsLabel].filter(x=>typeof x==='string'&&x.trim());document.getElementById('productStats').textContent=stats.join('  ·  ');
+   const warranty=document.getElementById('productWarranty');warranty.replaceChildren();const shield=document.createElement('i');shield.className='fa-solid fa-shield-halved';shield.setAttribute('aria-hidden','true');warranty.append(shield,document.createTextNode(' '+(txt(item.warranty,65)||'Produk terkait • ImamStore')));
+ }
+ function showFeed(index){stop();selected=(index%items.length+items.length)%items.length;const item=items[selected];document.getElementById('feedCount').textContent=(selected+1)+'/'+items.length;document.getElementById('feedTitle').textContent=txt(item.title||item.productName);renderProduct(item);
+   const movie=feedVideo,source=url(item.url,'video'),poster=url(item.poster||item.productImage,'poster');document.getElementById('feedAmbient').style.backgroundImage=poster?'url('+JSON.stringify(poster)+')':'';document.getElementById('feedFallback').hidden=Boolean(source);if(poster)movie.poster=poster;else movie.removeAttribute('poster');if(source){movie.muted=true;movie.src=source;movie.load();void movie.play().catch(()=>{})}document.getElementById('sound').querySelector('i').className='fa-solid fa-volume-xmark';document.getElementById('sound').querySelector('small').textContent='Suara';socialCurrent={likes:0,comments:0,liked:false,list:[]};socialBusy=false;setSocialUI();socialRequest('social-state');
  }
  const selectedId=()=>String(items[selected]?.productId||'');document.getElementById('viewAll').onclick=()=>send('open-feed',{index:0});document.getElementById('goBack').onclick=()=>{dismissSheets();send('close')};document.getElementById('next').onclick=pickList;
  feedVideo.onloadedmetadata=()=>{feedVideo.style.objectFit=feedVideo.videoWidth/feedVideo.videoHeight<0.86?'cover':'contain'};
  document.getElementById('sound').onclick=()=>{feedVideo.muted=!feedVideo.muted;document.getElementById('sound').querySelector('i').className=feedVideo.muted?'fa-solid fa-volume-xmark':'fa-solid fa-volume-high';document.getElementById('sound').querySelector('small').textContent=feedVideo.muted?'Suara':'Nyala'};
- document.getElementById('like').onclick=()=>{const item=items[selected];if(!item)return;const next=!likedLocal(item);try{if(next)localStorage.setItem(videoKey(item),'1');else localStorage.removeItem(videoKey(item));setLikedUI(item);notice(next?'Disukai di perangkat ini (belum tersinkron ke akun).':'Suka perangkat ini dibatalkan.')}catch{notice('Penyimpanan lokal tidak tersedia. Suka belum tersimpan.')}};
- document.getElementById('search').onclick=()=>send('open-search');document.getElementById('cart').onclick=()=>send('cart',{productId:selectedId()});document.getElementById('review').onclick=()=>{commentsSheet.hidden=false;feedVideo.pause()};document.getElementById('openProduct').onclick=()=>send('open-product',{productId:selectedId()});document.getElementById('buyProduct').onclick=()=>send('buy',{productId:selectedId()});feedVideo.onclick=()=>{if(feedVideo.paused)void feedVideo.play().catch(()=>{});else feedVideo.pause()};
+ document.getElementById('like').onclick=()=>{if(socialBusy)return;socialBusy=true;setSocialUI();socialRequest('social-like')};
+ document.getElementById('search').onclick=()=>send('open-search');document.getElementById('cart').onclick=()=>send('cart',{productId:selectedId()});document.getElementById('review').onclick=()=>{commentsSheet.hidden=false;feedVideo.pause();renderComments();socialRequest('social-state')};document.getElementById('productVoucher').onclick=()=>send('open-voucher',{productId:selectedId()});document.getElementById('productAddCart').onclick=()=>send('add-cart',{productId:selectedId()});document.getElementById('buyProduct').onclick=()=>send('buy',{productId:selectedId()});feedVideo.onclick=()=>{if(feedVideo.paused)void feedVideo.play().catch(()=>{});else feedVideo.pause()};
  let start=null;document.getElementById('feed').addEventListener('touchstart',e=>{if(!listSheet.hidden||!commentsSheet.hidden||e.touches.length!==1||e.target.closest('button'))return;start={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
  document.getElementById('feed').addEventListener('touchend',e=>{if(!start||e.changedTouches.length!==1)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;start=null;if(Math.abs(dy)>65&&Math.abs(dy)>Math.abs(dx)*1.2)showFeed(selected+(dy<0?1:-1))},{passive:true});
  window.addEventListener('wheel',e=>{if(mode==='feed'&&listSheet.hidden&&commentsSheet.hidden&&Math.abs(e.deltaY)>30)showFeed(selected+(e.deltaY>0?1:-1))},{passive:true});
- window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==origin||e.data?.source!=='imamstore-video-bridge')return;if(e.data.type==='stop'){stop();dismissSheets();return}if(e.data.type==='cart-count'&&mode==='feed'){const n=Math.max(0,Math.floor(Number(e.data.count)||0)),badge=document.getElementById('feedCartCount');badge.hidden=!n;badge.textContent=n>99?'99+':String(n);return}if(e.data.type==='gallery-step'&&mode==='player')return;if(e.data.type==='render'){if(mode==='player')renderPlayer(e.data.entry);if(mode==='related')renderRelated(e.data.items);if(mode==='feed')renderFeed(e.data.items,e.data.index)}});
- document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});send('ready');
+ window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==origin||e.data?.source!=='imamstore-video-bridge')return;if(e.data.type==='stop'){stop();dismissSheets();return}if(e.data.type==='cart-count'&&mode==='feed'){const n=Math.max(0,Math.floor(Number(e.data.count)||0)),badge=document.getElementById('feedCartCount');badge.hidden=!n;badge.textContent=n>99?'99+':String(n);return}if(e.data.type==='gallery-step'&&mode==='player')return;
+  if(e.data.type==='social-result'&&mode==='feed'){
+    if(socialKey(items[selected])!==String(e.data.productId||'')+'|'+String(e.data.videoUrl||''))return;
+    const data=e.data.result||{},action=e.data.action;
+    if(!data.success){if(action==='social-like'){socialBusy=false;setSocialUI()}if(action==='social-comment')document.getElementById('videoCommentSubmit').disabled=false;const err=data.message||'Layanan interaksi video belum tersedia.';if(action==='social-comment')document.getElementById('videoCommentStatus').textContent=err;else notice(err);return}
+    if(action==='social-state'){socialCurrent={likes:Number(data.likes)||0,comments:Number(data.comments)||0,liked:!!data.liked,list:Array.isArray(data.list)?data.list:[]};setSocialUI();if(!commentsSheet.hidden)renderComments()}
+    if(action==='social-like'){socialBusy=false;socialCurrent.likes=Number(data.likes)||0;socialCurrent.liked=!!data.liked;setSocialUI()}
+    if(action==='social-comment'){document.getElementById('videoCommentSubmit').disabled=false;document.getElementById('videoCommentText').value='';document.getElementById('videoCommentStatus').textContent=data.message||'Komentar menunggu moderasi.'}
+    if(action==='social-report')notice('Laporan diterima untuk ditinjau.');return
+  }
+  if(e.data.type==='product-update'&&mode==='feed'){const id=String(e.data.productId||'');const uri=String(e.data.videoUrl||'');const matching=items.find(x=>String(x.productId)===id&&x.url===uri);if(matching){Object.assign(matching,e.data.item||{});if(matching===items[selected])renderProduct(matching)}return}
+  if(e.data.type==='render'){if(mode==='player')renderPlayer(e.data.entry);if(mode==='related')renderRelated(e.data.items);if(mode==='feed')renderFeed(e.data.items,e.data.index)}});
+ document.addEventListener('visibilitychange',()=>{if(document.hidden)stop()});if(mode==='feed')setInterval(()=>{if(!document.hidden&&listSheet.hidden&&commentsSheet.hidden&&items.length)socialRequest('social-state')},20000);send('ready');
 })();
 </script></body></html>
