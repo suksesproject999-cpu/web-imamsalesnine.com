@@ -1,0 +1,1 @@
+(()=>{'use strict';const host=document.getElementById('imamstore-original-dom-host');if(!host)return;host.hidden=true;host.setAttribute('inert','');host.setAttribute('aria-hidden','true');window.imamstoreOriginalModules={status:'markup-and-scoped-css-only',checkoutEnabled:false,source:'index(20261109-133316).html'};})();

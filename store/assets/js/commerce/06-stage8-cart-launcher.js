@@ -1,0 +1,1 @@
+document.getElementById('s8CartLauncher').addEventListener('click',()=>document.dispatchEvent(new Event('imamstore:open-cart')));
