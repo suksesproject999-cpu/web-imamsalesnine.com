@@ -1,0 +1,30 @@
+/* ===== extracted original style: imamstore-deeplink-first-paint-style ===== */
+
+/* One lightweight first paint for a direct product URL. No skeleton or forced image wait. */
+#imamstoreDeepLinkGate{
+ display:none;position:fixed;inset:0;z-index:2147483005;
+ align-items:center;justify-content:center;flex-direction:column;
+ background:#fff;color:#263426;font:15px system-ui,-apple-system,Arial,sans-serif;
+ opacity:1;transition:opacity .2s ease-out;overflow:hidden;
+}
+html.imamstore-deeplink-boot,html.imamstore-deeplink-boot body{overflow:hidden}
+html.imamstore-deeplink-boot #imamstoreDeepLinkGate{display:flex}
+#imamstoreDeepLinkGate.dl-revealing{opacity:0;pointer-events:none}
+#imamstoreDeepLinkGate .dl-loader{display:flex;align-items:center;justify-content:center;flex-direction:column;gap:17px;transform:translateY(-8px)}
+#imamstoreDeepLinkGate .dl-spinner{
+ display:block;width:54px;height:54px;flex:none;border-radius:50%;
+ border:4px solid #e7f1df;border-top-color:#81bd3c;border-right-color:#81bd3c;
+ animation:imamstoreDlSpin .85s linear infinite;
+}
+@keyframes imamstoreDlSpin{to{transform:rotate(360deg)}}
+#imamstoreDeepLinkGate .dl-brand{font-size:19px;font-weight:750;letter-spacing:.1px;line-height:1.4}
+#imamstoreDeepLinkGate .dl-error{display:none;align-items:center;justify-content:center;flex-direction:column;text-align:center;padding:25px;gap:14px;max-width:410px}
+#imamstoreDeepLinkGate .dl-error h2{margin:0;font-size:20px;color:#273126}
+#imamstoreDeepLinkGate .dl-error p{margin:0;color:#697568;line-height:1.6;max-width:320px}
+#imamstoreDeepLinkGate .dl-buttons{display:flex;gap:10px;margin-top:9px;flex-wrap:wrap;justify-content:center}
+#imamstoreDeepLinkGate .dl-buttons button{border-radius:11px;padding:12px 20px;font-weight:700;border:1px solid #cbdcbb;color:#608c2b;background:#fff}
+#imamstoreDeepLinkGate .dl-buttons button:first-child{background:#8cc63f;color:#1e3211;border-color:#8cc63f}
+#imamstoreDeepLinkGate.dl-failed .dl-loader{display:none}
+#imamstoreDeepLinkGate.dl-failed .dl-error{display:flex}
+@media(prefers-reduced-motion:reduce){#imamstoreDeepLinkGate{transition:none}#imamstoreDeepLinkGate .dl-spinner{animation:none}}
+
