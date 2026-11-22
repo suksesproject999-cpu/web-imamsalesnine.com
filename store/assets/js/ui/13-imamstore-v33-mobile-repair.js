@@ -1,8 +1,8 @@
 (()=>{'use strict';
 const detail=document.getElementById('imamstoreLiveOriginalDetail');if(!detail)return;
 const lightbox=document.getElementById('s9Lightbox');
-function hideLightbox(){if(lightbox){lightbox.classList.remove('open');lightbox.style.display='none'}document.body.classList.remove('imamstore-lightbox-open')}
-function showLightbox(){if(lightbox){lightbox.style.display='flex';lightbox.classList.add('open');document.body.classList.add('imamstore-lightbox-open')}}
+function hideLightbox(){if(lightbox){lightbox.classList.remove('open');lightbox.style.display='none';lightbox.setAttribute('aria-hidden','true')}document.body.classList.remove('imamstore-lightbox-open')}
+function showLightbox(){if(lightbox){lightbox.style.display='flex';lightbox.classList.add('open');lightbox.setAttribute('aria-hidden','false');document.body.classList.add('imamstore-lightbox-open')}}
 const x=document.getElementById('s9LightboxClose');if(x)x.addEventListener('click',e=>{e.preventDefault();e.stopImmediatePropagation();hideLightbox()},true);
 lightbox?.addEventListener('click',e=>{if(e.target===lightbox)hideLightbox()});
 window.openLightbox=function(){const im=detail.querySelector('#mainProductImage');const target=document.getElementById('s9LightboxImage');if(!im||!target)return;target.src=im.currentSrc||im.src;target.onerror=()=>{target.onerror=null;const fallback=detail.querySelector('.gallery-thumb img');if(fallback)target.src=fallback.currentSrc||fallback.src};showLightbox()};
