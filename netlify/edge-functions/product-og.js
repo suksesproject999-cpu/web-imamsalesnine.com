@@ -197,12 +197,40 @@ function priceText(product) {
   const actual = promo > 0 && (!normal || promo < normal) ? promo : normal;
   return Number.isFinite(actual) && actual > 0 ? 'Harga Rp '+Math.round(actual).toLocaleString('id-ID')+'.' : '';
 }
+// Public product markup only. Do not invent stock, rating, warranty or reviews.
+// Keep JSON-LD in the initial HTML; never mutate checkout or product UI.
+function productJsonLd(product,id,image) {
+  const name=plain(product.nama || product.name || '',180);
+  if (!name) return '';
+  // The actual content currently lives at /?product=<id>; /p/<id>/ is a
+  // pre-generated instant redirect. Do not claim that redirect as an Offer URL.
+  const productUrl=ORIGIN+'/?product='+encodeURIComponent(id);
+  const data={'@context':'https://schema.org','@type':'Product',name,url:productUrl};
+  const description=plain(product.deskripsi || product.description || '',500);
+  if (description) data.description=description;
+  if (image && /^https:\/\//i.test(image)) data.image=[image];
+  const brand=plain(
+    typeof product.merek==='string' ? product.merek :
+    typeof product.brand==='string' ? product.brand : '',90);
+  if (brand) data.brand={'@type':'Brand',name:brand};
+  const sku=plain(typeof product.sku==='string' ? product.sku : '',90);
+  if (sku) data.sku=sku;
+  const normal=Number(typeof product.harga==='object' ? product.harga?.normal : product.harga);
+  const promo=Number(typeof product.harga==='object' ? product.harga?.promo : product.hargaPromo);
+  const price=promo>0 && (!normal || promo<normal) ? promo : normal;
+  if (Number.isFinite(price) && price>0 && price<=1e12) {
+    data.offers={'@type':'Offer',url:productUrl,priceCurrency:'IDR',price:String(Math.round(price))};
+  }
+  // Escape characters that could terminate a script element in an HTML response.
+  return JSON.stringify(data).replace(/</g,'\\u003c').replace(/&/g,'\\u0026')
+    .replace(/\u2028/g,'\\u2028').replace(/\u2029/g,'\\u2029');
+}
+
 function pageTags(product,id, photo) {
   const title = plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore';
   const descr = [plain(product.deskripsi || product.description || '',150),priceText(product),'Lihat foto, varian dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,250);
-  const canonical = product.sharePath === '/p/' + id + '/'
-    ? ORIGIN + product.sharePath
-    : ORIGIN + '/?product=' + encodeURIComponent(id);
+  // The real product content is currently at the query URL. /p/<id>/ redirects there.
+  const canonical = ORIGIN + '/?product=' + encodeURIComponent(id);
   // Only the shared preview image is transformed. Detail/gallery images stay intact.
   const preview = shareImage(photo,id,product);
   const image = preview.url;
@@ -228,7 +256,8 @@ function pageTags(product,id, photo) {
     }
   }
   const tags = pairs.map(([attr,key,value])=>`<meta ${attr}="${escapeHtml(key)}" content="${escapeHtml(value)}">`).join('\n');
-  return {tags,title,descr,canonical,image,imageKind:preview.kind};
+  return {tags,title,descr,canonical,image,imageKind:preview.kind,
+    productSchema:productJsonLd(product,id,image)};
 }
 function inject(html,meta) {
   // Only transform HEAD; never modify a product's body, CSS, or JS.
@@ -243,7 +272,9 @@ function inject(html,meta) {
     `<meta name="description" content="${escapeHtml(meta.descr)}">`);
   updated = updated.replace(/<link\b[^>]*rel\s*=\s*["']canonical["'][^>]*>/i,
     `<link rel="canonical" href="${escapeHtml(meta.canonical)}">`);
-  updated = updated.replace(/<head\b([^>]*)>/i,(match)=>match+'\n<!-- ImamStore: OG metadata generated server-side -->\n'+meta.tags+'\n');
+  const schemaTag=meta.productSchema
+    ? '<script id="imamstore-product-jsonld" type="application/ld+json">'+meta.productSchema+'</script>\n' : '';
+  updated = updated.replace(/<head\b([^>]*)>/i,(match)=>match+'\n<!-- ImamStore: OG metadata generated server-side -->\n'+meta.tags+'\n'+schemaTag);
   return updated+body;
 }
 
@@ -276,6 +307,31 @@ export default async function productOpenGraph(request,context) {
     if (!image) return new Response('Not found',{status:404,headers:{'Cache-Control':'no-store'}});
     const headers={'Content-Type':image.mime,'Cache-Control':'public, max-age=3600','Netlify-CDN-Cache-Control':'public, max-age=3600','X-Content-Type-Options':'nosniff'};
     return new Response(request.method==='HEAD'?null:image.data,{status:200,headers});
+  }
+  // SEO-2B.2: /p/<id>/ is a social-preview redirect to /?product=<id>.
+  // Make its canonical point at the real product content until /p/ is
+  // served as an actual product page. Preserve the existing redirect & OG tags.
+  const shareMatch = /^\/p\/([A-Za-z0-9_-]{1,120})\/$/.exec(url.pathname);
+  if (shareMatch && request.method === 'GET') {
+    const accept = request.headers.get('accept') || '';
+    if (accept && !accept.includes('text/html') && !accept.includes('*/*')) return context.next();
+    const original = await context.next();
+    if (!original.ok || !(original.headers.get('content-type') || '').includes('text/html')) return original;
+    const html = await original.text();
+    // Update only canonical, not OG images, titles, scripts or redirect mechanics.
+    const canonicalTag = /<link\b(?=[^>]*\brel\s*=\s*["']canonical["'])[^>]*>/i;
+    if (!canonicalTag.test(html)) {
+      const headers = new Headers(original.headers);
+      headers.delete('content-length'); headers.delete('content-encoding'); headers.delete('etag');
+      return new Response(html, {status: original.status, headers});
+    }
+    const canonicalUrl = ORIGIN + '/?product=' + encodeURIComponent(shareMatch[1]);
+    const output = html.replace(canonicalTag, '<link rel="canonical" href="' + escapeHtml(canonicalUrl) + '">');
+    const headers = new Headers(original.headers);
+    headers.delete('content-length'); headers.delete('content-encoding'); headers.delete('etag');
+    headers.set('Content-Type', 'text/html; charset=utf-8');
+    headers.set('X-ImamStore-SEO', 'redirect-canonical-aligned');
+    return new Response(output, {status: original.status, headers});
   }
   if (url.pathname !== '/' || request.method !== 'GET') return context.next();
   const id=url.searchParams.get('product');
@@ -311,4 +367,4 @@ export default async function productOpenGraph(request,context) {
   headers.set('X-ImamStore-OG-Image',meta.imageKind);
   return new Response(inject(html,meta),{status:originResponse.status,headers});
 }
-export const config = { path:['/','/_share-image/:id'], cache:'manual' };
+export const config = { path:['/','/_share-image/:id','/p/:id/'], cache:'manual' };

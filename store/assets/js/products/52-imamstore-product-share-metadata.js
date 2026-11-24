@@ -91,7 +91,13 @@
     const title = product ? plain(product.nama || product.name || 'Produk ImamStore', 90) + ' | ImamStore' : DEFAULT_TITLE;
     const intro = product ? plain(product.deskripsi || product.description || '', 145) : '';
     const description = product ? [intro, priceText(product), 'Lihat foto dan ulasan di ImamStore.'].filter(Boolean).join(' ').slice(0,240) : fallbackDescription;
-    const canonical = id ? BASE_URL + '?product=' + encodeURIComponent(id) : BASE_URL;
+    // Respect the canonical already served by Netlify for the exact product.
+    // Do not point new/unsynced CMS products to a potentially missing /p/ page.
+    const existingCanonical = document.querySelector('link[rel="canonical"]')?.href || '';
+    const sharedCanonical = id ? BASE_URL + 'p/' + encodeURIComponent(id) + '/' : '';
+    const canonical = id
+      ? (existingCanonical === sharedCanonical ? sharedCanonical : BASE_URL + '?product=' + encodeURIComponent(id))
+      : BASE_URL;
     const image = product ? imageFromProduct(product) : '';
     const signature = [id, title, description, canonical, image].join('\n');
     if (signature === lastSignature) return;
