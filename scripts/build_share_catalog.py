@@ -436,6 +436,10 @@ def generate(root:Path,items:list):
                 match=re.match(r'^([A-Za-z0-9_-]+)-([0-9a-f]{12})\.jpg$',file.name)
                 if match and match.group(1) not in used:
                     file.unlink();changed+=1
+    # SEO-3A: Only the canonical product URLs belong in the sitemap.
+    # /p/<id>/ is still an instant redirect; its destination is /?product=<id>.
+    from build_store_sitemap import update_from_generated
+    changed += update_from_generated(root, used)
     print(f'ImamStore Share: {count} products, {with_photo} optimized images, {changed} changed files')
 
 
