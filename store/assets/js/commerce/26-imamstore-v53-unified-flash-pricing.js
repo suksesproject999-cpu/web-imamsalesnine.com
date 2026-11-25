@@ -42,8 +42,15 @@ function variantQuote(p,name,now=Date.now()){
    if(flat&&normal<flat)normal=flat;
   }
  }
- const flash=active(p,now)&&amount(p.flashSale.price)<regular;
- const price=flash?amount(p.flashSale.price):regular;
+ // Variant-specific pricing has priority. A global flash price must not flatten
+ // different SKU prices. Optionally a SKU can define its own flash price, using
+ // the product flash schedule (only when product flash is enabled and active).
+ const explicit=!!obj&&(amount(obj?.harga?.normal??obj.hargaNormal??obj.normal??obj.priceNormal)>0||amount(obj?.price??obj.hargaJual??obj.harga_jual??(typeof obj.harga!=='object'?obj.harga:null))>0||amount(obj?.harga?.promo??obj.hargaPromo??obj.promo??obj.harga_diskon)>0);
+ const variantFlash=amount(obj?.flashSale?.price??obj?.harga?.flash??obj?.flashPrice);
+ const useFlash=active(p,now);
+ const flashPrice=useFlash?(variantFlash||(!explicit?amount(p.flashSale.price):0)):0;
+ const flash=flashPrice>0&&flashPrice<regular;
+ const price=flash?flashPrice:regular;
  normal=Math.max(normal,price);
  return {normal,price,flash,percent:normal>price?Math.round((normal-price)/normal*100):0,saving:Math.max(0,normal-price),endAt:flash?Date.parse(p.flashSale.endAt):null,verified:Number.isFinite(price)&&price>0,variantFound:!!found||!entries.length};
 }
@@ -53,7 +60,8 @@ const catalog=()=>{try{return window.imamstoreV29?.products?.()||[]}catch{return
 const find=id=>catalog().find(p=>String(p.id)===String(id));
 function updateCart(){let lines;try{lines=JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return false}if(!Array.isArray(lines)||!lines.length)return false;
  let changed=false;for(const line of lines){const p=find(line.id);if(!p)continue;const q=variantQuote(p,line.varian);const next=q.verified?q.price:0;
-  if(next>0&&amount(line.harga)!==next){line.harga=next;changed=true}}
+  if(next>0&&amount(line.harga)!==next){line.harga=next;changed=true}
+  const photo=window.imamstorePurchaseVariantPhotos?.(p,line.varian)?.[0];if(photo&&photo!==line.gambar){line.gambar=photo;changed=true}}
  if(changed){try{localStorage.setItem(KEY,JSON.stringify(lines))}catch{return false}
   document.dispatchEvent(new CustomEvent('imamstore:prices-updated'));
   window.__nexaiCoreRenderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
@@ -77,7 +85,7 @@ function refreshCheckoutPrices(){
  return changed;
 }
 function updateDetail(){const root=document.getElementById('imamstoreLiveOriginalDetail');if(!root?.classList.contains('open'))return;
- const current=window.imamstoreActiveProduct,p=current&&(find(current.id)||current);if(!p)return;const q=quote(p),info=root.querySelector('.product-info');if(!info)return;
+ const current=window.imamstoreActiveProduct,p=current&&(find(current.id)||current);if(!p)return;const selected=root.querySelector('#varian')?.value||'';const q=(Array.isArray(p.varian)&&p.varian.length)?variantQuote(p,selected):quote(p);if(!q.verified)return;const info=root.querySelector('.product-info');if(!info)return;
  setText(info.querySelector('.nine-price-row .price'),fmt(q.price));
  const old=info.querySelector('.nine-old-price');if(old){const html=q.percent?`<del>${fmt(q.normal)}</del><span class="nine-discount-percent">-${q.percent}%</span>`:'';if(old.innerHTML!==html)old.innerHTML=html}
  const priceRow=info.querySelector('.nine-price-row');let saving=priceRow?.querySelector('.nine-saving');
@@ -100,7 +108,7 @@ let lastState='';function tick(){const now=Date.now(),data=catalog();
  updateDetail();
 }
 document.addEventListener('click',e=>{if(e.target.closest('#refPlaceOrder,#s5Checkout')){updateCart();updateDetail()}},true);
-document.addEventListener('imamstore:open-product',()=>setTimeout(tick,0));document.addEventListener('imamstore:open-cart',()=>setTimeout(tick,0));
+document.addEventListener('imamstore:variant-detail-updated',updateDetail);document.addEventListener('imamstore:open-product',()=>setTimeout(tick,0));document.addEventListener('imamstore:open-cart',()=>setTimeout(tick,0));
 window.addEventListener('storage',()=>setTimeout(updateDetail,0));
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{tick();setInterval(tick,1000)},{once:true});else{tick();setInterval(tick,1000)}
 })();

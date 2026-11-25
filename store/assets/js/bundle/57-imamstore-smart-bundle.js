@@ -68,7 +68,7 @@ function render(){
   const mainline=document.createElement('div');mainline.className='issb-line';
   if(i===0)mainline.append(text('span','issb-main-badge','Utama'));
   else{const ck=document.createElement('input');ck.type='checkbox';ck.className='issb-check';ck.checked=s.enabled;ck.dataset.issbCheck=String(p.id);ck.setAttribute('aria-label','Pilih '+String(p.nama||p.id));mainline.append(ck)}
-  const photo=document.createElement('img');photo.className='issb-photo';photo.alt='';photo.loading='lazy';photo.src=image(p);mainline.append(photo);
+  const photo=document.createElement('img');photo.className='issb-photo';photo.alt='';photo.loading='lazy';photo.src=window.imamstorePurchaseVariantPhotos?.(p,s.variant)?.[0]||image(p);mainline.append(photo);
   const info=document.createElement('div');info.className='issb-info';info.append(text('strong','issb-name',p.nama||'Produk'));
   if(p.sku)info.append(text('small','issb-sku','SKU: '+p.sku));
   info.append(text('b','issb-price',!picked?'Tidak dipilih':hasVar&&!s.variant?'Pilih varian':q?.verified?money(q.price):'Harga tidak tersedia'));

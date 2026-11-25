@@ -512,7 +512,12 @@ window.backToProducts=()=>{closePurchase();close()};
 window.goCart=()=>{close();document.dispatchEvent(new Event('imamstore:open-cart'))};
 // Original detail purchase actions now use a real local cart bridge (no Firebase writes).
 let purchaseMode='cart';
-function activeProduct(){return window.imamstoreActiveProduct||null}
+function activeProduct(){
+ const p=window.imamstoreActiveProduct;
+ if(!p)return null;
+ const newest=window.imamstoreV29?.products?.().find(x=>String(x.id)===String(p.id));
+ return newest||p;
+}
 function variantOptions(p){return Array.isArray(p?.varian)?p.varian.map(v=>typeof v==='string'?v:String(v?.nama||v?.name||v?.label||'')).filter(Boolean):[]}
 window.imamstorePurchaseVariantOptions=variantOptions;
 function purchaseVariantPhotos(product,selectedName){
@@ -535,6 +540,44 @@ function purchaseVariantPhotos(product,selectedName){
  return [...new Set(out)];
 }
 window.imamstorePurchaseVariantPhotos=purchaseVariantPhotos;
+/* V1 SKU media renderer: never re-run showProduct (no duplicate views/toasts).
+   Build photo collection from the selected SKU followed by common catalog gallery. */
+function syncSelectedVariantGallery(variant,force=false){
+ if(!host.classList.contains('open'))return;
+ const p=activeProduct();if(!p||String(p.id)!==String(currentProduct?.id))return;
+ const photos=purchaseVariantPhotos(p,variant),base=adapt(p);
+ const all=(photos.length?photos:[base.gambar,...base.gallery]).map(imageOf);
+ const wanted=[...new Set(all)].filter(x=>x&&x!=='/images/no-image.png');
+ if(!wanted.length)return;
+ const root=host.querySelector('.product-detail');
+ const thumb=root?.querySelector('.gallery-thumb'),main=root?.querySelector('#mainProductImage'),count=root?.querySelector('.nine-gallery-count');
+ if(!thumb||!main||!count)return;
+ const prior=[...thumb.querySelectorAll('img')],normalize=url=>{try{return new URL(url,location.origin+'/').href}catch{return url}};
+ const same=prior.length===wanted.length&&prior.every((x,i)=>normalize(x.getAttribute('src')||'')===normalize(wanted[i]));
+ if(same&&!force)return;
+ const chosen=same?(prior.findIndex(x=>x.classList.contains('active'))):0;
+ const index=chosen<0?0:chosen;
+ const nodes=document.createDocumentFragment();
+ for(const [i,url] of wanted.entries()){
+  const im=document.createElement('img');im.src=url;im.alt=i===0?'Foto varian / utama':'Foto '+(i+1);im.loading='lazy';
+  if(i===index)im.classList.add('active');if(i>0)im.onerror=()=>{im.style.display='none'};
+  im.onclick=()=>window.changeGallery?.(im);nodes.append(im);
+ }
+ thumb.replaceChildren(nodes);
+ if(normalize(main.getAttribute('src')||'')!==normalize(wanted[index]))main.src=wanted[index];
+ count.textContent=(index+1)+' / '+wanted.length;
+ root.querySelectorAll('.gallery-main .nine-gallery-prev,.gallery-main .nine-gallery-next').forEach(x=>x.disabled=wanted.length<2);
+}
+document.addEventListener('imamstore:variant-selected',e=>{
+ const p=activeProduct(),id=String(e.detail?.id||''),value=String(e.detail?.variant||'');
+ if(!p||!host.classList.contains('open')||String(p.id)!==id)return;
+ const options=variantOptions(p);if(options.length&&!options.includes(value))return;
+ selectedVariant=value||'Default';
+ const field=host.querySelector('#varian');if(field)field.value=selectedVariant;
+ syncSelectedVariantGallery(selectedVariant);
+ updateOriginalSticky();
+ document.dispatchEvent(new CustomEvent('imamstore:variant-detail-updated',{detail:{id,variant:selectedVariant}}));
+});
 function openPurchase(mode){
  const p=activeProduct();if(!p)return;
  purchaseMode=mode;
@@ -614,8 +657,9 @@ function updateOriginalSticky(){
  const raw=p.harga;const price=Number(typeof raw==='object'?(raw.promo||raw.normal):raw)||0;
  host.querySelectorAll('#stickyName').forEach(x=>x.textContent=p.nama||'');
  host.querySelectorAll('#stickyVariant').forEach(x=>x.textContent=selectedVariant);
- host.querySelectorAll('#stickyTotal,.sticky-price-copy').forEach(x=>x.textContent=formatRupiah(price*selectedQty));
- const im=host.querySelector('#stickyImage');if(im&&typeof p.gambar==='string')im.src=p.gambar;
+ const quoted=window.imamstoreUnifiedPrice?.variantQuote?.(p,selectedVariant);const effective=quoted?.verified?quoted.price:price;
+ host.querySelectorAll('#stickyTotal,.sticky-price-copy').forEach(x=>x.textContent=formatRupiah(effective*selectedQty));
+ const im=host.querySelector('#stickyImage');const selectedPhoto=purchaseVariantPhotos(p,selectedVariant)[0]||p.gambar;if(im&&selectedPhoto)im.src=imageOf(selectedPhoto);
  host.querySelectorAll('#stickyQty').forEach(x=>x.textContent=selectedQty);
 }
 // Keep the original layout but make share, wishlist, and product search usable.
@@ -625,7 +669,7 @@ host.addEventListener('click',async e=>{
 },true);
 window.addEventListener('popstate',()=>{if(!host.classList.contains('open'))return;const id=new URLSearchParams(location.search).get('product');if(!id){host.classList.remove('open');host.replaceChildren();document.body.classList.remove('imamstore-original-open')}else if(String(activeProduct()?.id)!==id){document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}))}});
 window.imamstoreOriginalDetailActive=true;
-document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:e.detail?.skipView===true,fromDeepLink:e.detail?.fromDeepLink===true});refreshWishlist();updateOriginalSticky();document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});
+document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:e.detail?.skipView===true,fromDeepLink:e.detail?.fromDeepLink===true});refreshWishlist();syncSelectedVariantGallery(selectedVariant);updateOriginalSticky();document.dispatchEvent(new Event('imamstore:variant-detail-updated'));document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});
 /* Sinkronisasi galeri detail saat CMS selesai memuat, tanpa membuka produk ulang.
    Re-render showProduct di sini akan mencatat view kedua kali, mengulang toast,
    mengubah pilihan varian dan scroll. Karena itu cukup media gallery yang dihidratasi. */
@@ -676,7 +720,7 @@ function syncOpenDetailGalleryFromCms(){
   }
  }
 }
-document.addEventListener('imamstore:catalog-updated',syncOpenDetailGalleryFromCms);
+document.addEventListener('imamstore:catalog-updated',()=>{syncOpenDetailGalleryFromCms();syncSelectedVariantGallery(selectedVariant);document.dispatchEvent(new Event('imamstore:variant-detail-updated'));});
 
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('imamstoreOriginalPurchase')?.classList.contains('open'))closePurchase();else if(e.key==='Escape'&&host.classList.contains('open'))close()});
 window.imamstoreOriginalDetailStatus=()=>({active:host.classList.contains('open'),renderer:'original-showProduct',transactionsEnabled:false});
