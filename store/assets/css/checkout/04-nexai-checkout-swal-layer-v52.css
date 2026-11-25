@@ -3,6 +3,20 @@
 body > .swal2-container:not(.swal2-toast-shown) {
   z-index: 2147483644 !important;
 }
+/* Toast Swal.fire untuk aksi tambah keranjang: terlihat di atas bottom sheet. */
+body > .swal2-container.imamstore-cart-add-container {
+  z-index:2147483610;
+  padding-top:max(90px,env(safe-area-inset-top));
+}
+.imamstore-cart-add-container .swal2-popup.imamstore-cart-add-toast {
+  border-radius:13px;
+  box-shadow:0 10px 28px #0003;
+  font-size:13px;
+}
+.imamstore-cart-add-container .imamstore-cart-add-toast .swal2-title {
+  font-size:14px;
+  line-height:1.4;
+}
 
 /* ===== extracted original style: unnamed-style-46 ===== */
 
@@ -115,7 +129,12 @@ body > .swal2-container:not(.swal2-toast-shown) {
 #imamstoreOriginalPurchase #imamstorePurchaseAction{
  flex:0 0 auto;min-height:44px;height:44px;padding:8px 11px;
  margin:0;font-size:15px;font-weight:650;border-radius:7px;
+ transition:background-color .16s ease,color .16s ease,transform .12s ease;
 }
+#imamstoreOriginalPurchase #imamstorePurchaseAction:active:not(:disabled){transform:scale(.97);filter:brightness(.92)}
+#imamstoreOriginalPurchase #imamstorePurchaseAction.is-processing{background:#648f2d;color:#fff}
+#imamstoreOriginalPurchase #imamstorePurchaseAction.is-confirmed{background:#2e7d32;color:#fff}
+#imamstoreOriginalPurchase #imamstorePurchaseAction.is-failed{background:#b42318;color:#fff}
 #imamstoreOriginalPurchase #refPurchaseBadge:empty,#imamstoreOriginalPurchase #refPurchaseSaving:empty{display:none}
 /* Layar rendah: footer tidak terpotong, sementara daftar varian tetap area scroll. */
 @media(max-height:640px){

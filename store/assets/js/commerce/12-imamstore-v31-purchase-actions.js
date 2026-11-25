@@ -11,7 +11,8 @@ const money=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
 const safeQty=n=>Math.max(1,Math.min(999,Math.floor(Number(n)||1)));
 const readCart=()=>{try{const x=JSON.parse(localStorage.getItem(CART)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
 const modeTitle={cart:'Masukkan Keranjang',buy:'Lihat Ringkasan Pesanan',editCart:'Konfirmasi',editCheckout:'Konfirmasi'};
-const state={kind:null,productId:'',variant:'',qty:1,qtyInvalid:false,lineKey:'',checkoutLineId:'',checkoutIndex:-1,busy:false,submitError:'',returnFocus:null};
+const state={kind:null,productId:'',variant:'',qty:1,qtyInvalid:false,lineKey:'',checkoutLineId:'',checkoutIndex:-1,busy:false,submitError:'',submitStatus:'',returnFocus:null};
+let cartSuccessCloseTimer=0;
 const isOpen=()=>!sheet.hidden&&sheet.classList.contains('open')&&!!state.kind;
 const product=()=>state.productId?window.imamstoreCartBridge?.getProduct?.(state.productId)||null:null;
 const entries=p=>Array.isArray(p?.varian)?p.varian:[];
@@ -130,7 +131,10 @@ function render(){
  const err=r.ok?state.submitError:r.error;
  if(message){message.textContent=err;message.hidden=!err}
  action.disabled=!r.ok||state.busy;
- action.textContent=modeTitle[state.kind]||'Konfirmasi';
+ action.classList.toggle('is-processing',state.kind==='cart'&&state.submitStatus==='processing');
+ action.classList.toggle('is-confirmed',state.kind==='cart'&&state.submitStatus==='success');
+ action.classList.toggle('is-failed',state.kind==='cart'&&state.submitStatus==='failed');
+ action.textContent=state.kind==='cart'&&state.submitStatus==='success'?'✓ Berhasil Ditambahkan':state.kind==='cart'&&state.submitStatus==='processing'?'Memproses…':state.kind==='cart'&&state.submitStatus==='failed'?'Gagal · Coba Lagi':modeTitle[state.kind]||'Konfirmasi';
  if(!state.qtyInvalid)qtyInput.value=String(state.qty);
  [...sheet.querySelectorAll('.ref-v45-variant-grid button')].forEach(b=>b.setAttribute('aria-pressed',String(normalize(b.textContent)===normalize(state.variant))));
  if(p)refreshImage(p);
@@ -149,7 +153,7 @@ function open(kind,id,variant,qty,key='',lineId='',checkoutIndex=-1){
  state.kind=kind;state.productId=String(id);state.lineKey=String(key||'');state.checkoutLineId=String(lineId||'');state.checkoutIndex=checkoutIndex;
  const available=options(p);
  state.variant=available.find(x=>normalize(x)===normalize(variant))||available[0];
- state.qty=safeQty(qty);state.qtyInvalid=false;state.busy=false;state.submitError='';state.returnFocus=document.activeElement;
+ state.qty=safeQty(qty);state.qtyInvalid=false;state.busy=false;state.submitError='';state.submitStatus='';state.returnFocus=document.activeElement;
  clearTimeout(photoTimeout);photoCache.token=(photoCache.token||0)+1;photoCache.key='';
  delete sheet.dataset.nineEditing;
  const title=$('imamstorePurchaseTitle');if(title)title.textContent=p.nama||'Produk';
@@ -159,12 +163,14 @@ function open(kind,id,variant,qty,key='',lineId='',checkoutIndex=-1){
  return true;
 }
 function close(focus=true){
+ clearTimeout(cartSuccessCloseTimer);
  if(!sheet.hidden){sheet.classList.remove('open');sheet.hidden=true}
  delete sheet.dataset.commerceMode;delete sheet.dataset.nineEditing;
  clearTimeout(photoTimeout);photoCache.token=(photoCache.token||0)+1;photoCache.key='';
  sheet.querySelector('.imamstore-purchase-panel')?.style.removeProperty('transform');
  const prior=state.returnFocus;
- state.kind=null;state.productId='';state.lineKey='';state.checkoutLineId='';state.checkoutIndex=-1;state.qtyInvalid=false;state.busy=false;state.submitError='';
+ state.kind=null;state.productId='';state.lineKey='';state.checkoutLineId='';state.checkoutIndex=-1;state.qtyInvalid=false;state.busy=false;state.submitError='';state.submitStatus='';
+ action.classList.remove('is-processing','is-confirmed','is-failed');
  action.disabled=false;
  if(focus&&prior?.isConnected&&typeof prior.focus==='function')prior.focus({preventScroll:true});
 }
@@ -211,30 +217,58 @@ function commitCheckout(r){
 function submit(){
  if(!isOpen()||state.busy)return;
  const r=resolve();render();if(!r.ok)return;
- state.busy=true;action.disabled=true;
- let result;
- try{
-  if(state.kind==='editCart')result=commitCart(r);
-  else if(state.kind==='editCheckout')result=commitCheckout(r);
-  else {
-   const bridge=window.imamstoreCartBridge;
-   result=state.kind==='buy'?bridge?.previewBuy?.(r.p.id,r.name,r.count):bridge?.addProduct?.(r.p.id,r.name,r.count);
+ const kind=state.kind;
+ state.busy=true;state.submitError='';
+ if(kind==='cart'){state.submitStatus='processing';render()}
+ else action.disabled=true;
+ // Penambahan keranjang ditunda sebentar supaya status klik bisa terlihat.
+ // Mode checkout dan edit tetap memakai alur commit yang sama seperti sebelumnya.
+ const commit=()=>{
+  if(!isOpen()||state.kind!==kind)return;
+  let result;
+  try{
+   if(kind==='editCart')result=commitCart(r);
+   else if(kind==='editCheckout')result=commitCheckout(r);
+   else {
+    const bridge=window.imamstoreCartBridge;
+    result=kind==='buy'?bridge?.previewBuy?.(r.p.id,r.name,r.count):bridge?.addProduct?.(r.p.id,r.name,r.count);
+   }
+   if(!result?.ok){
+    state.submitError=result?.message||'Gagal memproses produk';
+    if(kind==='cart'){
+     state.submitStatus='failed';
+     window.imamstoreCartAddFeedback?.({ok:false,message:state.submitError});
+    }
+    return;
+   }
+   if(kind==='cart'){
+    // Satu write melalui CartBridge, tidak pernah menulis localStorage dari UI.
+    window.imamstoreRefreshCartBadge?.();
+    document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'purchase-add'}}));
+    document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'cart',ids:[String(r.p.id)]}}));
+    state.submitStatus='success';
+    render();
+    window.imamstoreCartAddFeedback?.({ok:true,message:'Produk berhasil masuk ke keranjang'});
+    cartSuccessCloseTimer=setTimeout(()=>{if(isOpen()&&state.kind==='cart'&&state.submitStatus==='success')close(false)},650);
+    return;
+   }
+   close(false);
+   if(kind==='buy'){
+    $('imamstoreLiveOriginalDetail')?.classList.remove('open');
+    document.body.classList.remove('imamstore-original-open');
+   }else window.imamstoreToast?.('Varian dan jumlah berhasil diperbarui','success');
+  }catch(err){
+   console.error('Commerce sheet submit error',err);
+   state.submitError='Terjadi kendala. Silakan coba lagi.';
+   if(kind==='cart'){state.submitStatus='failed';window.imamstoreCartAddFeedback?.({ok:false,message:state.submitError})}
+  }finally{
+   // Pertahankan pengunci hingga sheet sukses ditutup agar tidak double-add.
+   if(kind==='cart'&&state.submitStatus==='success')render();
+   else{state.busy=false;render()}
   }
-  if(!result?.ok){state.submitError=result?.message||'Gagal memproses produk';return}
-  const kind=state.kind;
-  close(false);
-  if(kind==='cart'){
-   window.imamstoreRefreshCartBadge?.();
-   document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'purchase-add'}}));
-   // Only cart additions confirmed by the canonical cart bridge create a public activity.
-   document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'cart',ids:[String(r.p.id)]}}));
-   window.imamstoreToast?.('Produk berhasil masuk ke keranjang','success');
-  }else if(kind==='buy'){
-   $('imamstoreLiveOriginalDetail')?.classList.remove('open');
-   document.body.classList.remove('imamstore-original-open');
-  }else window.imamstoreToast?.('Varian dan jumlah berhasil diperbarui','success');
- }catch(err){console.error('Commerce sheet submit error',err);state.submitError='Terjadi kendala. Silakan coba lagi.'}
- finally{state.busy=false;render()}
+ };
+ if(kind==='cart')setTimeout(commit,90);
+ else commit();
 }
 function notifyVariant(){
  if(!state.productId||!state.variant)return;

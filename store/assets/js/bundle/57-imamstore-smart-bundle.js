@@ -25,6 +25,14 @@ function available(p,variant){
  return st===null?null:st;
 }
 const state=new Map();let currentId='',renderScheduled=false;
+let submitBusy=false,submitStatus='',submitResetTimer=0;
+function resetSubmit(){clearTimeout(submitResetTimer);submitBusy=false;submitStatus=''}
+function submitFinished(ok){
+ submitBusy=false;submitStatus=ok?'success':'error';
+ clearTimeout(submitResetTimer);
+ submitResetTimer=setTimeout(()=>{submitStatus='';schedule()},1400);
+ schedule();
+}
 const text=(tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.className=cls;el.textContent=String(value??'');return el};
 function button(cls,value,action,id,variant){
  const b=text('button',cls,value);b.type='button';b.dataset.issbAction=action;
@@ -47,7 +55,7 @@ function render(){
  const ids=[...new Set(main.bundleProductIds.map(String))].filter(x=>x&&x!==id).slice(0,3);
  const extras=ids.map(find).filter(active);
  if(!extras.length)return hide(slot);
- if(currentId!==id){currentId=id;state.clear()}
+ if(currentId!==id){currentId=id;state.clear();resetSubmit()}
  const rows=[main,...extras],idsInUse=new Set(rows.map(p=>String(p.id)));
  for(const old of [...state.keys()])if(!idsInUse.has(old))state.delete(old);
  const wrap=document.createElement('div');wrap.className='issb-panel';
@@ -88,7 +96,12 @@ function render(){
  }
  const bottom=document.createElement('div');bottom.className='issb-summary';
  const amount=document.createElement('div');amount.append(text('small','','Estimasi subtotal'));amount.append(text('strong','',invalid?'Lengkapi pilihan':money(total)));
- const submit=button('issb-submit','Tambah '+selected+' Produk ke Keranjang','submit');submit.disabled=invalid||selectedExtra<1;
+ const submitLabel=submitBusy?'Memproses…':submitStatus==='success'?'✓ Berhasil Ditambahkan':submitStatus==='error'?'Gagal · Coba Lagi':'Tambah '+selected+' Produk ke Keranjang';
+ const submit=button('issb-submit',submitLabel,'submit');
+ submit.disabled=invalid||selectedExtra<1||submitBusy||submitStatus==='success';
+ if(submitBusy)submit.classList.add('issb-submit--processing');
+ if(submitStatus==='success')submit.classList.add('issb-submit--success');
+ if(submitStatus==='error')submit.classList.add('issb-submit--error');
  bottom.append(amount,submit);wrap.append(bottom);
  wrap.append(text('p','issb-note','Harga dan stok akan dicek ulang ketika ditambahkan ke keranjang. Voucher dan ongkir dihitung saat checkout.'));
  slot.replaceChildren(wrap);slot.hidden=false;
@@ -104,14 +117,22 @@ document.addEventListener('click',event=>{
  else if(action==='plus'&&s)s.qty=Math.min(999,s.qty+1);
  else if(action==='minus'&&s)s.qty=Math.max(1,s.qty-1);
  else if(action==='submit'){
-  if(b.disabled)return;
+  if(b.disabled||submitBusy)return;
   const main=find(currentId),ids=[String(currentId),...(main?.bundleProductIds||[]).map(String)];
   const lines=[...new Set(ids)].filter(id=>state.get(id)?.enabled).map(id=>({id,variant:state.get(id)?.variant||'',qty:state.get(id)?.qty||1}));
-  const result=window.imamstoreCartBridge?.addProducts?.(lines);
-  const message=result?.message||'Keranjang belum siap';
-  if(window.imamstoreToast)window.imamstoreToast(message,result?.ok?'success':'error');
-  else if(!result?.ok)console.warn('Smart Bundle:',message);
-  if(result?.ok)window.imamstoreRefreshCartBadge?.();
+  submitBusy=true;submitStatus='';
+  b.disabled=true;b.classList.add('issb-submit--processing');b.textContent='Memproses…';
+  // Beri kesempatan tombol berubah sebelum penyimpanan sinkron berlangsung.
+  const requestProductId=currentId;
+  setTimeout(()=>{
+   if(requestProductId!==currentId){resetSubmit();return}
+   let result;
+   try{result=window.imamstoreCartBridge?.addProducts?.(lines)||{ok:false,message:'Keranjang belum siap'}}
+   catch(err){console.error('Smart Bundle add:',err);result={ok:false,message:'Gagal menambahkan produk. Coba lagi.'}}
+   submitFinished(result.ok===true);
+   if(result.ok)window.imamstoreRefreshCartBadge?.();
+   window.imamstoreCartAddFeedback?.({ok:result.ok===true,message:result.message});
+  },90);
   return;
  }
  schedule();
