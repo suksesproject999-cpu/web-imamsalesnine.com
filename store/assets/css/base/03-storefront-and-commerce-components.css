@@ -325,14 +325,14 @@ button,a,[role="button"],input,select,textarea{-webkit-tap-highlight-color:trans
 .nine-clean-product-tile img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:9px}
 .nine-clean-product-tile span{font-size:12px;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .nine-clean-product-tile strong{font-size:13px;color:#e95535}
-#relatedProducts{display:flex;gap:10px;overflow-x:auto}#relatedProducts .nine-clean-product-tile{flex:0 0 145px}
-#recentProducts,#nineAllProductsGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+
+
 #nineAllPagination{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:16px}
 #nineAllPagination button{padding:7px 12px;border:1px solid #ddd;border-radius:8px;background:white;color:#222}
 .nine-clean-wishlist-toast{position:fixed;z-index:2147483100;top:105px;left:50%;transform:translateX(-50%);background:#242424;color:white;padding:12px 18px;border-radius:12px;box-shadow:0 8px 25px #0003;white-space:nowrap;max-width:94vw;font-size:13px}
 .nine-clean-wishlist-toast[hidden]{display:none}
 .nine-clean-qty{display:flex;justify-content:center;align-items:center;gap:20px;margin:18px auto}.nine-clean-qty button{width:42px;height:42px;border:1px solid #ddd;border-radius:12px;background:#f5f5f5;font-size:24px}.nine-clean-qty output{font-size:20px;font-weight:700;min-width:28px;text-align:center}
-@media(min-width:650px){#recentProducts,#nineAllProductsGrid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
 
 /* ===== extracted original style: nexai-final-revision ===== */
 
@@ -377,12 +377,70 @@ body:has(#s5Cart.open)
 #imamstoreLiveOriginalDetail #nineAllProductsGrid .nine-unified-recommendation{width:100%}
 
 /* ===== extracted original style: nexai-v73-original-store-cards ===== */
-
-#imamstoreLiveOriginalDetail .nine-detail-shell #relatedProducts>.nine-profile-reused-card,
-#imamstoreLiveOriginalDetail .nine-detail-shell #recentProducts>.nine-profile-reused-card{
- flex:0 0 clamp(145px,42vw,205px);width:clamp(145px,42vw,205px);
- max-width:205px;scroll-snap-align:start
+/* Card sizing for all three detail sections uses one geometry source.
+   Keep related / recent horizontal; the recommendation area remains a grid. */
+#imamstoreLiveOriginalDetail .nine-detail-shell {
+  --nine-detail-card-gap: 10px;
+  --nine-detail-card-width: calc((100% - 10px) / 2);
 }
+#imamstoreLiveOriginalDetail .nine-detail-shell #nineAllProductsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--nine-detail-card-gap);
+}
+#imamstoreLiveOriginalDetail .nine-detail-shell #relatedProducts,
+#imamstoreLiveOriginalDetail .nine-detail-shell #recentProducts {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: var(--nine-detail-card-gap);
+  width: 100%;
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0 12px;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
+  -webkit-overflow-scrolling: touch;
+}
+#imamstoreLiveOriginalDetail .nine-detail-shell #relatedProducts > .nine-profile-reused-card,
+#imamstoreLiveOriginalDetail .nine-detail-shell #recentProducts > .nine-profile-reused-card {
+  flex: 0 0 var(--nine-detail-card-width);
+  width: var(--nine-detail-card-width);
+  min-width: 0;
+  max-width: none;
+  scroll-snap-align: start;
+}
+#imamstoreLiveOriginalDetail .nine-detail-shell #relatedProducts > .nine-related-see-all {
+  flex: 0 0 var(--nine-detail-card-width);
+  width: var(--nine-detail-card-width);
+  min-width: 0;
+  max-width: none;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 1px solid #e9e9e9;
+  border-radius: 7px;
+  background: #fff;
+  color: #888;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  scroll-snap-align: end;
+}
+@media (min-width: 650px) {
+  #imamstoreLiveOriginalDetail .nine-detail-shell {
+    --nine-detail-card-width: calc((100% - 30px) / 4);
+  }
+  #imamstoreLiveOriginalDetail .nine-detail-shell #nineAllProductsGrid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+
+
 #imamstoreLiveOriginalDetail .nine-profile-reused-card .marketplace-image-wrap img{
  width:100%;height:100%;object-fit:contain
 }
