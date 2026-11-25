@@ -634,24 +634,29 @@ function brandLogoCandidates(brand){
   brandLogoResolved.set(name,'');
  },true);
 })();
-function render(){
+// Hanya daftar produk yang perlu dihitung ulang ketika kata pencarian berubah.
+// Render area promo, kategori, beranda dan favorit tetap pada jalur render penuh.
+function renderProductResults(){
+ const needle=searchNormalize(query);
  const filtered=products.filter(p=>{
   if(activeStoreCategory&&!(Array.isArray(p.storeCategories)&&p.storeCategories.includes(activeStoreCategory)))return false;
   if(activeBrand&&String(p.brand||'').toLowerCase()!==activeBrand.toLowerCase())return false;
-  return searchMatches(p,searchNormalize(query));
+  return searchMatches(p,needle);
  });
- const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
- renderFlashSale();
- paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
  const ordered=rank(filtered,sort);
- if(query&&sort==='populer'){
-  const needle=searchNormalize(query);
+ if(needle&&sort==='populer'){
   ordered.sort((a,b)=>searchRelevance(b,needle)-searchRelevance(a,needle));
  }
  $('allGrid').innerHTML=ordered.length?ordered.map(card).join(''):'';
  $('productCount').textContent=filtered.length+' produk';
  $('storeProductCount').textContent=products.length;
  $('empty').classList.toggle('hidden',filtered.length!==0);
+}
+function render(){
+ const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
+ renderFlashSale();
+ paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
+ renderProductResults();
  renderFavorites();
  refreshStoreSold();
  const enabled=storeCategories.filter(c=>c.active!==false);
@@ -832,8 +837,21 @@ document.addEventListener('contextmenu',e=>{
 },true);
 document.addEventListener('dragstart',e=>{if(e.target.closest('img'))e.preventDefault()});
 document.addEventListener('keydown',e=>{const c=e.target.closest('[data-product-id]');if(c&&(e.key==='Enter'||e.key===' ')){e.preventDefault();c.click()}});
-$('search').addEventListener('input',e=>{activeStoreCategory='';activeBrand='';query=e.target.value.trim().toLowerCase();render();if(query)changeTab('produk')});
-$('clearSearch').onclick=()=>{query='';activeStoreCategory='';activeBrand='';$('search').value='';render();$('search').focus()};
+// Input harus responsif: jangan bangun ulang seluruh beranda per huruf.
+// Render hasil produk dijadwalkan setelah pengguna berhenti mengetik sebentar.
+let searchGridTimer=0;
+$('search').addEventListener('input',e=>{
+ activeStoreCategory='';activeBrand='';
+ query=e.target.value.trim().toLowerCase();
+ if(query)changeTab('produk');
+ clearTimeout(searchGridTimer);
+ searchGridTimer=setTimeout(()=>{searchGridTimer=0;renderProductResults()},120);
+});
+$('clearSearch').onclick=()=>{
+ clearTimeout(searchGridTimer);searchGridTimer=0;
+ query='';activeStoreCategory='';activeBrand='';
+ $('search').value='';renderProductResults();$('search').focus();
+};
 (async()=>{
  const seed=[];
  try{
