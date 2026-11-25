@@ -562,14 +562,12 @@ function galleryMediaForProduct(product,focus=null){
   if(!url||seen.has(url))return;
   seen.add(url);result.push({url,variant});
  };
- const names=variantOptions(product),focused=focus?(names.find(name=>normalizeSkuPhotoLabel(name)===normalizeSkuPhotoLabel(focus))||null):null;
- if(focused)purchaseVariantPhotos(product,focused).forEach(url=>add(url,focused));
+ const names=variantOptions(product);
  ['gambar','image','foto','thumbnail'].forEach(key=>add(product?.[key]));
  ['gallery','galeri','images','fotoTambahan'].forEach(key=>{
   const values=product?.[key];if(Array.isArray(values))values.forEach(value=>add(value));
  });
  for(const name of names){
-  if(name===focused)continue;
   purchaseVariantPhotos(product,name).forEach(url=>add(url,name));
  }
  // Produk tanpa foto utama tetap menampilkan media SKU; fallback hanya saat semua kosong.
@@ -582,31 +580,44 @@ window.imamstoreGalleryDiagnostic=()=>{
   displayed:host.querySelectorAll('.product-detail .gallery-thumb img').length};
 };
 function syncSelectedVariantGallery(variant=galleryVariantFocus,force=false){
+ // KEDIP-FREE-GALLERY-20261126: ubah kelas aktif, jangan bongkar <img> yang sama.
  if(!host.classList.contains('open'))return;
  const p=activeProduct();if(!p||String(p.id)!==String(currentProduct?.id))return;
- const media=galleryMediaForProduct(p,variant);
+ const media=galleryMediaForProduct(p);
  const wanted=media.length?media:[{url:'/images/no-image.png',variant:''}];
  const root=host.querySelector('.product-detail');
  const thumb=root?.querySelector('.gallery-thumb'),main=root?.querySelector('#mainProductImage'),count=root?.querySelector('.nine-gallery-count');
  if(!thumb||!main||!count)return;
- const prior=[...thumb.querySelectorAll('img')];
  const normalize=url=>{try{return new URL(url,location.origin+'/').href}catch{return url}};
+ const prior=[...thumb.querySelectorAll('img')];
+ const oldActive=prior.find(x=>x.classList.contains('active'));
+ const current=normalize(oldActive?.getAttribute('src')||main.getAttribute('src')||'');
+ const preferred=force&&variant?(purchaseVariantPhotos(p,variant)[0]||''):'';
+ const desired=normalize(preferred);
+ const chosen=force?(Math.max(0,wanted.findIndex(x=>normalize(x.url)===desired))):Math.max(0,wanted.findIndex(x=>normalize(x.url)===current));
  const same=prior.length===wanted.length&&prior.every((x,i)=>normalize(x.getAttribute('src')||'')===normalize(wanted[i].url));
- // Pertahankan pilihan thumbnail ketika CMS mengirim snapshot ulang tanpa perubahan media.
- if(same&&!force)return;
- const chosen=force?0:Math.max(0,wanted.findIndex(x=>normalize(x.url)===normalize(prior.find(y=>y.classList.contains('active'))?.getAttribute('src')||main.getAttribute('src')||'')));
- const nodes=document.createDocumentFragment();
- wanted.forEach(({url,variant:mediaVariant},i)=>{
-  const im=document.createElement('img');im.src=url;
-  im.alt=mediaVariant?'Foto '+mediaVariant:(i===0?'Foto utama':'Foto '+(i+1));
-  if(mediaVariant){im.title='Foto varian '+mediaVariant;im.dataset.variantLabel=mediaVariant;}
-  im.loading='lazy';
-  if(i===chosen)im.classList.add('active');
-  if(i>0)im.onerror=()=>{im.style.display='none'};
-  im.onclick=()=>window.changeGallery?.(im);nodes.append(im);
- });
- thumb.replaceChildren(nodes);
- if(normalize(main.getAttribute('src')||'')!==normalize(wanted[chosen].url))main.src=wanted[chosen].url;
+ if(!same){
+  // Pertahankan node/img yang URL-nya sama, termasuk status load dan event klik.
+  const byUrl=new Map(prior.map(node=>[normalize(node.getAttribute('src')||''),node]));
+  const fragment=document.createDocumentFragment();
+  wanted.forEach(({url,variant:mediaVariant},i)=>{
+   let im=byUrl.get(normalize(url));
+   if(!im){
+    im=document.createElement('img');im.src=url;im.loading='lazy';
+    im.onerror=()=>{im.style.display='none'};
+    im.onclick=()=>window.changeGallery?.(im);
+   }
+   im.alt=mediaVariant?'Foto '+mediaVariant:(i===0?'Foto utama':'Foto '+(i+1));
+   if(mediaVariant){im.title='Foto varian '+mediaVariant;im.dataset.variantLabel=mediaVariant;}
+   else{im.removeAttribute('title');delete im.dataset.variantLabel;}
+   fragment.append(im);
+  });
+  thumb.replaceChildren(fragment);
+ }
+ const images=[...thumb.querySelectorAll('img')];
+ images.forEach((im,i)=>im.classList.toggle('active',i===chosen));
+ const selected=wanted[chosen]?.url||'/images/no-image.png';
+ if(normalize(main.getAttribute('src')||'')!==normalize(selected))main.src=selected;
  count.textContent=(chosen+1)+' / '+wanted.length;
  root.querySelectorAll('.gallery-main .nine-gallery-prev,.gallery-main .nine-gallery-next').forEach(x=>x.disabled=wanted.length<2);
 }

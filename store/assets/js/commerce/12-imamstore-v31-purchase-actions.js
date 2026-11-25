@@ -53,16 +53,31 @@ function photoSources(p,variant=state.variant){
 }
 /* Preload sebelum mengganti src: URL yang rusak tidak sempat muncul sebagai broken-image. */
 function showPhoto(image,url){
+ // KEDIP-FREE-PREVIEW-20261126: preload/decode; satu swap setelah valid, abaikan respon lama.
  clearTimeout(photoTimeout);
  photoCache.token=(photoCache.token||0)+1;
  const token=photoCache.token;
- if(url===FALLBACK_IMAGE){if(image.src!==FALLBACK_IMAGE)image.src=FALLBACK_IMAGE;return}
+ if(url===FALLBACK_IMAGE){
+  if(image.src!==FALLBACK_IMAGE)image.src=FALLBACK_IMAGE;
+  image.removeAttribute('aria-busy');delete image.dataset.pendingVariant;
+  return;
+ }
+ if(image.src===url&&image.complete&&image.naturalWidth>0){
+  image.removeAttribute('aria-busy');delete image.dataset.pendingVariant;
+  return;
+ }
+ image.setAttribute('aria-busy','true');image.dataset.pendingVariant=state.variant;
  const probe=new Image();
  const fail=()=>{if(photoCache.token!==token||!isOpen())return;advancePhoto()};
- probe.onload=()=>{
+ probe.onload=async()=>{
   if(photoCache.token!==token||!isOpen())return;
   if(!probe.naturalWidth){fail();return}
-  clearTimeout(photoTimeout);if(image.src!==url)image.src=url;
+  clearTimeout(photoTimeout);
+  // Decode selesai sebelum source gambar yang terlihat diganti.
+  if(typeof probe.decode==='function'){try{await probe.decode()}catch(_){}}
+  if(photoCache.token!==token||!isOpen())return;
+  if(image.src!==url)image.src=url;
+  image.removeAttribute('aria-busy');delete image.dataset.pendingVariant;
  };
  probe.onerror=fail;
  photoTimeout=setTimeout(fail,12000);
@@ -77,10 +92,13 @@ function refreshImage(p){
  const image=$('imamstorePurchaseImage');if(!image)return;
  const urls=photoSources(p),key=String(p?.id)+'|'+state.variant+'|'+urls.join('\n');
  if(photoCache.key!==key){
+  const sameProduct=photoCache.productId===String(p?.id);
   photoCache.key=key;photoCache.productId=String(p?.id);photoCache.urls=urls;photoCache.index=0;
-  /* Jangan menampilkan gambar SKU lama atau produk umum sebagai SKU baru.
-     Placeholder tampil sampai foto SKU yang diverifikasi berhasil dimuat. */
-  if(image.src!==FALLBACK_IMAGE)image.src=FALLBACK_IMAGE;
+  // Untuk SKU dalam produk sama, jangan bolak-balik ke placeholder.
+  // Foto lama bertahan hanya selama preload; aria-busy menandai pemuatan.
+  if(!sameProduct||!image.complete||image.naturalWidth===0){
+   if(image.src!==FALLBACK_IMAGE)image.src=FALLBACK_IMAGE;
+  }
   showPhoto(image,urls[0]||FALLBACK_IMAGE);
  }
  image.alt=p?.nama||'Foto produk';
