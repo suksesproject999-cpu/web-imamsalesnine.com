@@ -199,7 +199,7 @@ let html = `
 <div class="nine-detail-shell" id="nineDetailShell">
   <div class="nine-detail-topbar">
     <button type="button" onclick="backToProducts()" aria-label="Kembali"><i class="fa-solid fa-arrow-left"></i></button>
-    <div class="nine-search-capsule"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="nineDetailSearchInput" type="search" autocomplete="off" placeholder="Cari lampu LED, Projector, Foglamp..." aria-label="Cari produk"><div id="nineDetailSearchResults" class="nine-detail-search-results" role="listbox" hidden></div></div>
+    <div class="nine-search-capsule"><i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i><input id="nineDetailSearchInput" type="search" autocomplete="off" placeholder="Cari lampu LED, Projector, Foglamp..." aria-label="Cari produk"></div>
     <button type="button" class="nine-header-cart" onclick="goCart()" aria-label="Keranjang"><i class="fa-solid fa-cart-shopping"></i><span id="nineHeaderCartCount" hidden></span></button>
     <button type="button" class="nine-share-btn" data-share-product="${product.id}" aria-label="Bagikan produk"><i class="fa-solid fa-share-nodes"></i></button>
   </div>
@@ -620,17 +620,6 @@ host.addEventListener('click',async e=>{
  const wish=e.target.closest('.wishlist-btn');if(wish){e.preventDefault();e.stopPropagation();window.toggleWishlist(activeProduct()?.id);return}
  const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;window.imamstoreShareChoices?.open(p,share);return}
 },true);
-let searchTimer=null;
-host.addEventListener('input',e=>{
- if(e.target.id!=='nineDetailSearchInput')return;
- clearTimeout(searchTimer);
- searchTimer=setTimeout(()=>{
-  // Renderer bersama memakai API pencarian yang sama dengan beranda.
-  window.imamstoreSmartSearchUI?.renderDetail(host,e.target.value);
- },150);
-});
-host.addEventListener('keydown',e=>{const input=e.target.closest('#nineDetailSearchInput');if(!input)return;const results=host.querySelector('#nineDetailSearchResults');if(e.key==='Escape'){if(results)results.hidden=true;input.blur()}else if(e.key==='Enter'&&results&&!results.hidden){const first=results.querySelector('button');if(first){e.preventDefault();first.click()}}});
-host.addEventListener('click',e=>{if(e.target.closest('#nineDetailSearchInput,#nineDetailSearchResults'))return;const results=host.querySelector('#nineDetailSearchResults');if(results)results.hidden=true});
 window.addEventListener('popstate',()=>{if(!host.classList.contains('open'))return;const id=new URLSearchParams(location.search).get('product');if(!id){host.classList.remove('open');host.replaceChildren();document.body.classList.remove('imamstore-original-open')}else if(String(activeProduct()?.id)!==id){document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}))}});
 window.imamstoreOriginalDetailActive=true;
 document.addEventListener('imamstore:open-product',async e=>{const id=e.detail?.id;let data=[];try{data=typeof products!=='undefined'&&Array.isArray(products)?products:[]}catch{}const p=data.find(x=>String(x.id)===String(id));if(!p)return;window.imamstoreActiveProduct=p;allProducts=data.map(adapt);try{await showProduct(adapt(p).nama,{skipView:e.detail?.skipView===true,fromDeepLink:e.detail?.fromDeepLink===true});refreshWishlist();updateOriginalSticky();document.body.classList.remove('stage4-detail-open')}catch(err){console.error('Original renderer failed',err);host.classList.remove('open');document.body.classList.remove('imamstore-original-open');window.Swal?.fire({icon:'error',text:'Detail produk belum berhasil dimuat.'})}});

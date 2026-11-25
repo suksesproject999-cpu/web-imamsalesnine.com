@@ -1,16 +1,69 @@
-/* Smart Search Pro 2B: daftar yang sama untuk pencarian beranda dan detail. */
-.iss-search-list{background:#fff;color:#202a20;border:1px solid #dfe8d9;border-radius:14px;box-shadow:0 12px 34px rgba(20,35,18,.19);overflow-y:auto;overscroll-behavior:contain;max-height:min(52dvh,440px);-webkit-overflow-scrolling:touch}
+/* Smart Search Pro 2E — satu popup responsif beranda/detail. */
+.iss-search-list{
+ position:fixed;z-index:2400;display:flex;flex-direction:column;
+ box-sizing:border-box;overflow:hidden;
+ background:#fff;color:#202820;
+ border:1px solid #e3e8dd;border-radius:16px;
+ box-shadow:0 14px 38px rgba(16,34,14,.19);
+ font-family:Arial,Helvetica,sans-serif;
+ -webkit-tap-highlight-color:transparent;
+}
+/* Detail memakai overlay z-index 2050000. Mode dihitung dari input aktif,
+   bukan bergantung pada class body yang bisa terlambat saat navigasi. */
+.iss-search-list.iss-search-over-detail{z-index:2147482001}
 .iss-search-list[hidden]{display:none}
-.iss-home-suggestions{position:fixed;z-index:2400;padding:4px}
-.iss-search-row{display:flex;align-items:center;gap:10px;width:100%;min-height:70px;padding:8px 9px;border:0;border-bottom:1px solid #eef1ed;border-radius:8px;background:#fff;color:inherit;text-align:left;font:inherit;cursor:pointer}
+.iss-search-heading{
+ flex:0 0 auto;padding:10px 14px 9px;
+ border-bottom:1px solid #f0f2ee;
+ background:#fbfdf9;color:#63765a;
+ font-size:11px;letter-spacing:.02em;font-weight:700;
+}
+.iss-search-results{
+ min-height:0;overflow-y:auto;overscroll-behavior:contain;
+ -webkit-overflow-scrolling:touch;scrollbar-width:thin;
+}
+.iss-search-row{
+ box-sizing:border-box;display:grid;grid-template-columns:52px minmax(0,1fr);
+ align-items:center;gap:12px;width:100%;min-height:80px;
+ padding:10px 12px;margin:0;
+ border:0;border-bottom:1px solid #f0f2ee;border-radius:0;
+ background:#fff;color:#202820;text-align:left;
+ font:inherit;cursor:pointer;touch-action:manipulation;
+}
 .iss-search-row:last-child{border-bottom:0}
-.iss-search-row:active,.iss-search-row:hover,.iss-search-row:focus-visible{background:#f3f9ec;outline-offset:-2px}
-.iss-search-row:focus-visible{outline:2px solid #7cba38}
-.iss-search-image{flex:0 0 48px;width:48px;height:48px;object-fit:contain;border:1px solid #ebeee9;border-radius:8px;background:#fff}
-.iss-search-copy{min-width:0;flex:1;display:flex;flex-direction:column;gap:4px}
-.iss-search-copy strong{font-size:12px;font-weight:650;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere}
-.iss-search-copy small{color:#687568;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.iss-search-price{flex:0 0 auto;max-width:90px;color:#dd552d;text-align:right;font-size:11px;font-weight:750;line-height:1.3}
-.iss-search-empty{padding:15px 12px;color:#667366;font-size:12px;text-align:center}
-#imamstoreLiveOriginalDetail .nine-detail-search-results.iss-search-list{position:absolute;top:calc(100% + 8px);left:0;width:min(92vw,380px);max-height:min(50dvh,400px);z-index:150;padding:4px;box-sizing:border-box}
-@media(max-width:420px){.iss-search-row{gap:8px;padding:8px 6px}.iss-search-image{width:42px;height:42px;flex-basis:42px}.iss-search-price{max-width:78px;font-size:10px}}
+.iss-search-row:active,.iss-search-row:hover{background:#f5faee}
+.iss-search-row:focus-visible{outline:2px solid #8cc63f;outline-offset:-3px;background:#f5faee}
+.iss-search-image{
+ box-sizing:border-box;width:52px;height:52px;
+ border:1px solid #edf0e9;border-radius:10px;
+ object-fit:contain;background:#fff;
+}
+.iss-search-main{display:flex;flex-direction:column;gap:7px;min-width:0}
+.iss-search-title{
+ display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;
+ color:#202820;font-size:13px;line-height:1.36;font-weight:700;
+ overflow-wrap:anywhere;
+}
+.iss-search-meta{display:flex;align-items:center;gap:9px;min-width:0}
+.iss-search-sku{
+ flex:1 1 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;
+ white-space:nowrap;color:#788276;font-size:10.5px;line-height:1.4;
+}
+.iss-search-price{
+ flex:0 0 auto;color:#dc5432;font-size:12px;
+ line-height:1.4;font-weight:750;white-space:nowrap;font-variant-numeric:tabular-nums;
+}
+.iss-search-empty{padding:18px 14px;text-align:center;font-size:12px;color:#71806a;line-height:1.5}
+@media(min-width:721px){
+ .iss-search-row{grid-template-columns:56px minmax(0,1fr);min-height:84px}
+ .iss-search-image{width:56px;height:56px}
+ .iss-search-title{font-size:14px}
+ .iss-search-price{font-size:13px}
+}
+@media(max-width:350px){
+ .iss-search-row{grid-template-columns:46px minmax(0,1fr);gap:9px;padding:9px 10px;min-height:72px}
+ .iss-search-image{width:46px;height:46px}
+ .iss-search-title{font-size:12px}
+ .iss-search-sku{font-size:10px}
+ .iss-search-price{font-size:11px}
+}
