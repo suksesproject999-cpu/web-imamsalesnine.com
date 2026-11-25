@@ -621,7 +621,14 @@ host.addEventListener('click',async e=>{
  const share=e.target.closest('[data-share-product]');if(share){e.preventDefault();const p=activeProduct();if(!p)return;window.imamstoreShareChoices?.open(p,share);return}
 },true);
 let searchTimer=null;
-host.addEventListener('input',e=>{if(e.target.id!=='nineDetailSearchInput')return;clearTimeout(searchTimer);searchTimer=setTimeout(()=>{const q=e.target.value.trim().toLocaleLowerCase('id');const results=host.querySelector('#nineDetailSearchResults');if(!results)return;results.replaceChildren();if(q.length<2){results.hidden=true;return}const matches=allProducts.filter(p=>[p.nama,p.brand,p.subbrand,p.kategori,p.sku,p.kode].some(v=>String(v||'').toLocaleLowerCase('id').includes(q))).slice(0,12);if(!matches.length){const empty=document.createElement('p');empty.className='nine-clean-search-empty';empty.textContent='Produk tidak ditemukan';results.append(empty)}else for(const p of matches){const b=document.createElement('button');b.type='button';b.className='nine-clean-search-result';const img=document.createElement('img');img.src=imageOf(p.gambar);img.alt='';img.loading='lazy';const label=document.createElement('span');label.textContent=p.nama;b.append(img,label);b.onclick=()=>{results.hidden=true;document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id:p.id}}))};results.append(b)}results.hidden=false},150)});
+host.addEventListener('input',e=>{
+ if(e.target.id!=='nineDetailSearchInput')return;
+ clearTimeout(searchTimer);
+ searchTimer=setTimeout(()=>{
+  // Renderer bersama memakai API pencarian yang sama dengan beranda.
+  window.imamstoreSmartSearchUI?.renderDetail(host,e.target.value);
+ },150);
+});
 host.addEventListener('keydown',e=>{const input=e.target.closest('#nineDetailSearchInput');if(!input)return;const results=host.querySelector('#nineDetailSearchResults');if(e.key==='Escape'){if(results)results.hidden=true;input.blur()}else if(e.key==='Enter'&&results&&!results.hidden){const first=results.querySelector('button');if(first){e.preventDefault();first.click()}}});
 host.addEventListener('click',e=>{if(e.target.closest('#nineDetailSearchInput,#nineDetailSearchResults'))return;const results=host.querySelector('#nineDetailSearchResults');if(results)results.hidden=true});
 window.addEventListener('popstate',()=>{if(!host.classList.contains('open'))return;const id=new URLSearchParams(location.search).get('product');if(!id){host.classList.remove('open');host.replaceChildren();document.body.classList.remove('imamstore-original-open')}else if(String(activeProduct()?.id)!==id){document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}))}});

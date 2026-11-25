@@ -525,6 +525,9 @@ function categorySearchTerms(c){
  const raw=[c.name,c.description,c.deskripsi,c.keywords,c.aliases,c.searchKeywords,c.kataKunci];
  return raw.flatMap(v=>Array.isArray(v)?v:[v]).filter(v=>typeof v==='string').flatMap(v=>v.split(/[,;\n]+/)).map(searchNormalize).filter(Boolean);
 }
+// Pencarian kode produk mengabaikan pemisah (ETZ 6V = ETZ6V, T10-4014 = T10 4014).
+// Gunakan hanya sebagai tambahan; pencarian nama, brand, kategori dan banyak kata tetap sama.
+const searchCompact=value=>searchNormalize(value).replace(/\s+/g,'');
 function searchMatches(p,needle){
  if(!needle)return true;
  const categories=(Array.isArray(p.storeCategories)?p.storeCategories:[])
@@ -532,10 +535,46 @@ function searchMatches(p,needle){
  const fields=[p.nama,p.brand,p.kategori,p.deskripsi,p.sku,p.kode,p.fungsi,p.aplikasi,p.tags,...categories.flatMap(categorySearchTerms)];
  const normalized=fields.map(searchNormalize).filter(Boolean);
  if(normalized.some(v=>v.includes(needle)))return true;
+ const compact=searchCompact(needle);
+ if(compact.length>=3&&[p.sku,p.kode,p.nama].some(value=>searchCompact(value).includes(compact)))return true;
  // Semua kata boleh tersebar di nama, deskripsi, dan kategori, tetapi wajib semuanya cocok.
  const words=needle.split(' ').filter(Boolean);
  return words.length>1&&words.every(word=>normalized.some(v=>v.split(' ').some(token=>token.startsWith(word))));
 }
+// Urutkan hasil hanya ketika mode sort adalah populer. Sort murah/mahal/terbaru tetap asli.
+function searchRelevance(p,needle){
+ if(!needle)return 0;
+ const compact=searchCompact(needle);
+ const codes=[p.sku,p.kode].map(searchNormalize).filter(Boolean);
+ if(codes.some(v=>v===needle||searchCompact(v)===compact))return 1000;
+ if(codes.some(v=>v.startsWith(needle)||searchCompact(v).startsWith(compact)))return 850;
+ if(codes.some(v=>v.includes(needle)||searchCompact(v).includes(compact)))return 700;
+ const name=searchNormalize(p.nama);
+ if(name===needle)return 650;
+ if(name.startsWith(needle))return 550;
+ if(name.includes(needle))return 450;
+ if(compact.length>=3&&searchCompact(name).includes(compact))return 350;
+ return 100;
+}
+// Smart Search Pro 2B: satu API pencarian dari katalog aktif (seed + CMS),
+// memakai pencocokan/ranking, foto, dan harga yang sama dengan kartu ImamStore.
+window.imamstoreSmartSearchData=Object.freeze({
+ find(text,limit=8){
+  const needle=searchNormalize(text);
+  if(needle.length<2)return [];
+  const max=Math.max(1,Math.min(12,Number(limit)||8));
+  return products.filter(p=>searchMatches(p,needle))
+   .sort((a,b)=>searchRelevance(b,needle)-searchRelevance(a,needle))
+   .slice(0,max)
+   .map(p=>({
+    id:String(p.id),
+    name:String(p.nama||''),
+    sku:String(p.sku||p.kode||''),
+    image:productImageUrl(p.gambar),
+    price:Number(price(p))
+   }));
+ }
+});
 function openStoreFilter(type,value){
  activeStoreCategory=type==='category'?value:'';
  activeBrand=type==='brand'?value:'';
@@ -604,7 +643,12 @@ function render(){
  const discounted=rank(products.filter(p=>normal(p)>price(p)&&price(p)>0),'promo');
  renderFlashSale();
  paint('promoGrid',discounted.slice(0,4));paint('topGrid',rank(products,'terlaris').slice(0,4));paint('homeGrid',products.slice(0,8));
- $('allGrid').innerHTML=filtered.length?rank(filtered,sort).map(card).join(''):'';
+ const ordered=rank(filtered,sort);
+ if(query&&sort==='populer'){
+  const needle=searchNormalize(query);
+  ordered.sort((a,b)=>searchRelevance(b,needle)-searchRelevance(a,needle));
+ }
+ $('allGrid').innerHTML=ordered.length?ordered.map(card).join(''):'';
  $('productCount').textContent=filtered.length+' produk';
  $('storeProductCount').textContent=products.length;
  $('empty').classList.toggle('hidden',filtered.length!==0);
