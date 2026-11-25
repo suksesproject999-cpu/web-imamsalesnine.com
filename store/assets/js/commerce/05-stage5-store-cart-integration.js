@@ -7,6 +7,7 @@
  const getPrice=p=>typeof price==='function'?price(p):Number(p.harga?.promo||p.harga?.normal||0);
  const variantName=v=>v==null?'':typeof v==='string'?v:String(v.nama||v.name||v.label||v.warna||'');
  const variantPrice=(p,v)=>{const name=variantName(v);const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);return q?.verified&&q.price>0?q.price:NaN};
+ const variantImage=(p,variant)=>safeUrl(window.imamstorePurchaseVariantPhotos?.(p,variant)?.[0]||p?.gambar?.url||p?.gambar?.src||p?.gambar);
  const stockValue=v=>{if(v==null||v==='')return NaN;if(typeof v==='object')return stockValue(v.jumlah??v.qty??v.stock??v.quantity??v.available);const n=Number(v);return Number.isFinite(n)&&n>=0?Math.floor(n):NaN};
  const liveProduct=id=>(typeof products!=='undefined'&&Array.isArray(products)?products:[]).find(p=>String(p.id)===String(id));
  const read=()=>{try{const v=JSON.parse(localStorage.getItem(STORAGE)||'[]');return Array.isArray(v)?v.filter(x=>x&&typeof x.id==='string'&&typeof x.key==='string'&&Number.isFinite(Number(x.qty))&&Number(x.qty)>0&&Number.isFinite(Number(x.harga))&&Number(x.harga)>0&&Number(x.qty)<=999).slice(0,200).map(x=>({...x,qty:Math.min(999,Math.floor(Number(x.qty))),harga:Number(x.harga)})):[]}catch{return []}};
@@ -119,7 +120,7 @@
    const unit=variantPrice(p,v||null);if(!Number.isFinite(unit)||unit<=0)return {ok:false,message:'Harga produk tidak valid'};
    if(old){old.qty+=count;old.harga=unit;}else{
     if(data.length>=200)return {ok:false,message:'Keranjang penuh'};
-    data.push({key,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:safeUrl(p.gambar?.url||p.gambar?.src||p.gambar),qty:count});
+    data.push({key,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:variantImage(p,variant),qty:count});
    }
    return save(data)?{ok:true,message:'Ditambahkan ke keranjang'}:{ok:false,message:'Penyimpanan keranjang gagal'};
   },
@@ -149,7 +150,7 @@
     if(old){old.qty=existing+qty;old.harga=unit;}
     else{
      if(next.length>=200)return {ok:false,message:'Keranjang penuh'};
-     next.push({key,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:safeUrl(p.gambar?.url||p.gambar?.src||p.gambar),qty});
+     next.push({key,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:variantImage(p,variant),qty});
     }
    }
    if(!save(next))return {ok:false,message:'Gagal menyimpan keranjang. Tidak ada produk yang ditambahkan'};
@@ -170,7 +171,7 @@
    const rawStock=(v&&typeof v==='object'?(v.stok??v.stock):null)??p.stok??p.stock;
    const stock=stockValue(rawStock);
    if(Number.isFinite(stock)&&stock>=0&&count>stock)return {ok:false,message:'Stok tidak mencukupi'};
-   openDraft([{key:String(p.id)+'|'+variant,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:safeUrl(p.gambar?.url||p.gambar?.src||p.gambar),qty:count}]);
+   openDraft([{key:String(p.id)+'|'+variant,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:variantImage(p,variant),qty:count}]);
    return {ok:true,message:'Simulasi ringkasan pesanan dibuka'};
   }
  });

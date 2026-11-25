@@ -37,11 +37,14 @@ function canonicalPhoto(value){
 function photoSources(p,variant=state.variant){
  const seen=new Set(),urls=[];
  const add=value=>{const url=canonicalPhoto(value);if(url&&!seen.has(url)&&!url.endsWith('/images/no-image.png')){seen.add(url);urls.push(url)}};
- (window.imamstorePurchaseVariantPhotos?.(p,variant)||[]).forEach(add);
- ['gambar','image','foto','thumbnail'].forEach(key=>add(p?.[key]));
- ['gallery','galeri','images','fotoTambahan'].forEach(key=>{const a=p?.[key];if(Array.isArray(a))a.forEach(add)});
+ const skuPhotos=window.imamstorePurchaseVariantPhotos?.(p,variant)||[];
+ if(skuPhotos.length)skuPhotos.forEach(add);
+ else {
+  ['gambar','image','foto','thumbnail'].forEach(key=>add(p?.[key]));
+  ['gallery','galeri','images','fotoTambahan'].forEach(key=>{const a=p?.[key];if(Array.isArray(a))a.forEach(add)});
+ }
  /* Gambar detail yang sudah sukses dimuat boleh menjadi cadangan, hanya jika ID produknya sama. */
- if(String(window.imamstoreActiveProduct?.id??'')===String(p?.id??'')){
+ if(!skuPhotos.length&&String(window.imamstoreActiveProduct?.id??'')===String(p?.id??'')){
   const main=$('imamstoreLiveOriginalDetail')?.querySelector('#mainProductImage');
   if(main?.complete&&main.naturalWidth>0)add(main.currentSrc||main.src);
  }
@@ -151,7 +154,7 @@ function open(kind,id,variant,qty,key='',lineId='',checkoutIndex=-1){
  delete sheet.dataset.nineEditing;
  const title=$('imamstorePurchaseTitle');if(title)title.textContent=p.nama||'Produk';
  sheet.dataset.commerceMode=kind;sheet.hidden=false;sheet.classList.add('open');
- choicesFor(p);render();
+ choicesFor(p);notifyVariant();render();
  sheet.querySelector('.ref-v45-variant-grid')?.scrollTo({top:0,behavior:'instant'});
  return true;
 }
@@ -187,7 +190,7 @@ function commitCart(r){
  const newKey=String(r.p.id)+'|'+r.name;
  if(data.some((x,i)=>i!==idx&&String(x.key)===newKey))return {ok:false,message:'Varian ini sudah ada di keranjang. Ubah jumlah pada baris tersebut.'};
  const oldKey=String(data[idx].key);
- data[idx]={...data[idx],id:String(r.p.id),nama:String(r.p.nama||data[idx].nama),gambar:r.p.gambar||data[idx].gambar,varian:r.name,qty:r.count,harga:r.unit,key:newKey};
+ data[idx]={...data[idx],id:String(r.p.id),nama:String(r.p.nama||data[idx].nama),gambar:window.imamstorePurchaseVariantPhotos?.(r.p,r.name)?.[0]||r.p.gambar||data[idx].gambar,varian:r.name,qty:r.count,harga:r.unit,key:newKey};
  try{
   localStorage.setItem(CART,JSON.stringify(data));
   if(oldKey!==newKey){let saved={};try{saved=JSON.parse(localStorage.getItem(SELECTION)||'{}')||{}}catch{};if(Object.hasOwn(saved,oldKey)){saved[newKey]=saved[oldKey];delete saved[oldKey];localStorage.setItem(SELECTION,JSON.stringify(saved))}}
@@ -200,7 +203,7 @@ function commitCheckout(r){
  const index=state.checkoutLineId?current.findIndex(x=>String(x.__checkoutLineId||'')===state.checkoutLineId):state.checkoutIndex;
  if(index<0||!current[index]||String(current[index].id)!==state.productId||String(current[index].key)!==state.lineKey)return {ok:false,message:'Produk checkout berubah. Buka ulang editor.'};
  const next=current.map(x=>({...x}));
- next[index]={...next[index],varian:r.name,qty:r.count,harga:r.unit,key:String(r.p.id)+'|'+r.name};
+ next[index]={...next[index],varian:r.name,qty:r.count,harga:r.unit,gambar:window.imamstorePurchaseVariantPhotos?.(r.p,r.name)?.[0]||r.p.gambar||next[index].gambar,key:String(r.p.id)+'|'+r.name};
  if('jumlah'in next[index])next[index].jumlah=r.count;
  if(!window.imamstoreV43?.commitCheckoutItems?.(next))return {ok:false,message:'Gagal menyinkronkan checkout dan keranjang. Periksa pilihan varian.'};
  return {ok:true};
@@ -233,7 +236,11 @@ function submit(){
  }catch(err){console.error('Commerce sheet submit error',err);state.submitError='Terjadi kendala. Silakan coba lagi.'}
  finally{state.busy=false;render()}
 }
-select.addEventListener('change',()=>{if(!isOpen())return;state.variant=select.value;state.submitError='';render()});
+function notifyVariant(){
+ if(!state.productId||!state.variant)return;
+ document.dispatchEvent(new CustomEvent('imamstore:variant-selected',{detail:{id:state.productId,variant:state.variant,source:state.kind}}));
+}
+select.addEventListener('change',()=>{if(!isOpen())return;state.variant=select.value;state.submitError='';notifyVariant();render()});
 qtyInput.addEventListener('input',()=>{if(!isOpen())return;const v=Number(qtyInput.value);if(Number.isSafeInteger(v)&&v>=1&&v<=999){state.qty=v;state.qtyInvalid=false;state.submitError='';render()}else{state.qtyInvalid=true;state.submitError='';render()}});
 qtyInput.addEventListener('change',()=>{if(!isOpen())return;state.qty=safeQty(qtyInput.value);state.qtyInvalid=false;state.submitError='';render()});
 $('imamstoreQtyMinus')?.addEventListener('click',()=>{if(!isOpen())return;state.qty=safeQty(state.qty-1);state.qtyInvalid=false;state.submitError='';render()});
