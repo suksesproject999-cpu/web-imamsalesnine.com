@@ -242,6 +242,8 @@ let html = `
           <div class="nine-store-stats"><div><strong data-nine-store-rating aria-live="polite">—</strong><small>Penilaian</small></div><div><strong>${allProducts.length}</strong><small>Produk</small></div><div><strong>—</strong><small>Chat Dibalas</small></div></div>
         </div>
         <div class="nine-detail-divider"></div>
+        <section class="issb-slot" id="imamstoreSmartBundleSlot" hidden aria-label="Beli Bersamaan"></section>
+        <div class="nine-detail-divider issb-slot-divider" id="imamstoreSmartBundleDivider" hidden></div>
         <section class="nine-store-related" aria-label="Produk lain di toko ini">
           <div class="nine-store-related-head"><h3>Produk Lain di Toko Ini</h3></div>
           <div id="relatedProducts" class="nine-store-related-track" aria-label="Geser untuk melihat produk lain"></div>
@@ -418,6 +420,7 @@ stroke-linejoin="round">
 `;
 
 renderPage(html, false);
+document.dispatchEvent(new CustomEvent('imamstore:bundle-detail',{detail:{id:String(product.id)}}));
 
 const stickyPrice = document.getElementById("stickyPrice");
 

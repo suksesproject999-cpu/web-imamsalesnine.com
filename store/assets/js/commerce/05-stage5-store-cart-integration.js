@@ -123,6 +123,42 @@
    }
    return save(data)?{ok:true,message:'Ditambahkan ke keranjang'}:{ok:false,message:'Penyimpanan keranjang gagal'};
   },
+  // Smart Bundle: validate every item first, then write exactly once.
+  // No bundle-specific storage, pricing snapshot or partial cart writes.
+  addProducts(lines){
+   if(!Array.isArray(lines)||lines.length<2||lines.length>4)return {ok:false,message:'Pilih produk utama dan minimal satu pelengkap'};
+   const next=read(),keys=new Set();
+   for(const line of lines){
+    const p=liveProduct(line?.id);
+    if(!p)return {ok:false,message:'Produk tidak tersedia di katalog'};
+    if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif: '+String(p.nama||p.id)};
+    const variants=Array.isArray(p.varian)?p.varian:[],variant=String(line?.variant??'');
+    const v=variants.find(x=>variantName(x)===variant);
+    if(variants.length&&!v)return {ok:false,message:'Pilih varian: '+String(p.nama||p.id)};
+    const qty=Number(line?.qty);
+    if(!Number.isSafeInteger(qty)||qty<1||qty>999)return {ok:false,message:'Jumlah produk tidak valid'};
+    const key=String(p.id)+'|'+variant;
+    if(keys.has(key))return {ok:false,message:'Produk yang sama dipilih dua kali'};
+    keys.add(key);
+    const stock=stockValue((v&&typeof v==='object'?(v.stok??v.stock):null)??p.stok??p.stock);
+    const old=next.find(x=>x.key===key),existing=old?.qty||0;
+    if(existing+qty>999)return {ok:false,message:'Jumlah keranjang melebihi batas'};
+    if(Number.isFinite(stock)&&existing+qty>stock)return {ok:false,message:'Stok tidak cukup: '+String(p.nama||p.id)};
+    const unit=variantPrice(p,v||null);
+    if(!Number.isFinite(unit)||unit<=0)return {ok:false,message:'Harga belum tersedia: '+String(p.nama||p.id)};
+    if(old){old.qty=existing+qty;old.harga=unit;}
+    else{
+     if(next.length>=200)return {ok:false,message:'Keranjang penuh'};
+     next.push({key,id:String(p.id),nama:String(p.nama||''),varian:variant,harga:unit,gambar:safeUrl(p.gambar?.url||p.gambar?.src||p.gambar),qty});
+    }
+   }
+   if(!save(next))return {ok:false,message:'Gagal menyimpan keranjang. Tidak ada produk yang ditambahkan'};
+   window.__nexaiCoreRenderCart?.();
+   window.imamstoreV43?.sync?.();
+   window.imamstoreRefreshCartBadge?.();
+   document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'smart-bundle',count:lines.length}}));
+   return {ok:true,message:lines.length+' produk berhasil ditambahkan'};
+  },
   openCart(){openCart()},
   previewBuy(id,variant,qty){
    const p=liveProduct(id);if(!p)return {ok:false,message:'Produk tidak ditemukan'};
