@@ -520,10 +520,14 @@ function activeProduct(){
 }
 function variantOptions(p){return Array.isArray(p?.varian)?p.varian.map(v=>typeof v==='string'?v:String(v?.nama||v?.name||v?.label||'')).filter(Boolean):[]}
 window.imamstorePurchaseVariantOptions=variantOptions;
+function normalizeSkuPhotoLabel(value){
+ const clean=String(value??'').normalize('NFKC').trim().replace(/[‐‑‒–—−]/g,'-');
+ return clean.replace(/\s*-\s*/g,' - ').replace(/\s+/g,' ').toLocaleLowerCase('id-ID');
+}
 function purchaseVariantPhotos(product,selectedName){
  const entries=Array.isArray(product?.varian)?product.varian:[];
  const selected=entries.find(v=>v&&typeof v==='object'&&
-  String(v.nama||v.name||v.label||'')===String(selectedName));
+  normalizeSkuPhotoLabel(v.nama||v.name||v.label||'')===normalizeSkuPhotoLabel(selectedName));
  if(!selected)return [];
  const out=[];
  const add=value=>{
@@ -558,7 +562,7 @@ function galleryMediaForProduct(product,focus=null){
   if(!url||seen.has(url))return;
   seen.add(url);result.push({url,variant});
  };
- const names=variantOptions(product),focused=focus&&names.includes(focus)?focus:null;
+ const names=variantOptions(product),focused=focus?(names.find(name=>normalizeSkuPhotoLabel(name)===normalizeSkuPhotoLabel(focus))||null):null;
  if(focused)purchaseVariantPhotos(product,focused).forEach(url=>add(url,focused));
  ['gambar','image','foto','thumbnail'].forEach(key=>add(product?.[key]));
  ['gallery','galeri','images','fotoTambahan'].forEach(key=>{
@@ -609,8 +613,9 @@ function syncSelectedVariantGallery(variant=galleryVariantFocus,force=false){
 document.addEventListener('imamstore:variant-selected',e=>{
  const p=activeProduct(),id=String(e.detail?.id||''),value=String(e.detail?.variant||'');
  if(!p||!host.classList.contains('open')||String(p.id)!==id)return;
- const options=variantOptions(p);if(options.length&&!options.includes(value))return;
- selectedVariant=value||'Default';
+ const options=variantOptions(p),matched=options.find(name=>normalizeSkuPhotoLabel(name)===normalizeSkuPhotoLabel(value));
+ if(options.length&&!matched)return;
+ selectedVariant=matched||value||'Default';
  galleryVariantFocus=selectedVariant;
  const field=host.querySelector('#varian');if(field)field.value=selectedVariant;
  // Pilihan SKU merupakan aksi eksplisit: tampilkan fotonya sebagai foto pertama.
@@ -626,7 +631,7 @@ function openPurchase(mode){
  const selector=panel.querySelector('#imamstorePurchaseVariant');selector.replaceChildren();
  if(!options.length)selector.append(new Option('Default','Default'));
  else options.forEach(v=>selector.append(new Option(v,v)));
- selector.value=options.includes(selectedVariant)?selectedVariant:(options[0]||'Default');
+ selector.value=options.find(name=>normalizeSkuPhotoLabel(name)===normalizeSkuPhotoLabel(selectedVariant))||(options[0]||'Default');
  panel.querySelector('#imamstorePurchaseTitle').textContent=p.nama||'Produk';
  const sheetImage=panel.querySelector('#imamstorePurchaseImage');
  const activeImage=host.querySelector('#mainProductImage');

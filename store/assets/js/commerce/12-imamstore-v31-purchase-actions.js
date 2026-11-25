@@ -65,7 +65,7 @@ function showPhoto(image,url){
   clearTimeout(photoTimeout);if(image.src!==url)image.src=url;
  };
  probe.onerror=fail;
- photoTimeout=setTimeout(fail,3800);
+ photoTimeout=setTimeout(fail,12000);
  probe.src=url;
 }
 function advancePhoto(){
@@ -77,14 +77,10 @@ function refreshImage(p){
  const image=$('imamstorePurchaseImage');if(!image)return;
  const urls=photoSources(p),key=String(p?.id)+'|'+state.variant+'|'+urls.join('\n');
  if(photoCache.key!==key){
-  const sameProduct=photoCache.productId===String(p?.id);
   photoCache.key=key;photoCache.productId=String(p?.id);photoCache.urls=urls;photoCache.index=0;
-  /* Gambar yang sudah sukses dimuat boleh bertahan selama varian produk yang sama berganti. */
-  if(!sameProduct||!image.complete||image.naturalWidth===0){
-   const detail=$('imamstoreLiveOriginalDetail')?.querySelector('#mainProductImage');
-   const usable=String(window.imamstoreActiveProduct?.id??'')===String(p?.id)&&detail?.complete&&detail.naturalWidth>0;
-   image.src=usable?(detail.currentSrc||detail.src):FALLBACK_IMAGE;
-  }
+  /* Jangan menampilkan gambar SKU lama atau produk umum sebagai SKU baru.
+     Placeholder tampil sampai foto SKU yang diverifikasi berhasil dimuat. */
+  if(image.src!==FALLBACK_IMAGE)image.src=FALLBACK_IMAGE;
   showPhoto(image,urls[0]||FALLBACK_IMAGE);
  }
  image.alt=p?.nama||'Foto produk';
