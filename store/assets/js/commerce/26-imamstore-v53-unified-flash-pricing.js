@@ -84,16 +84,34 @@ function refreshCheckoutPrices(){
  }
  return changed;
 }
+/* Badge Flash Sale adalah status kampanye katalog, BUKAN indikasi bahwa
+ * flash price memberi diskon tambahan terhadap promo/varian yang dipilih.
+ * Samakan kelayakan kampanye dengan flashIsActive di core 02 (harga flash
+ * < harga normal). Sinkronkan sebelum pemeriksaan quote varian agar saat
+ * pilihan varian belum valid sekalipun badge/countdown tidak menghilang. */
+function syncDetailFlashCampaign(root,p,now=Date.now()){
+ const badge=root.querySelector('.nine-detail-flash-badge');
+ if(!badge)return;
+ const live=active(p,now)&&amount(p?.flashSale?.price)<amount(p?.harga?.normal??p?.harga);
+ badge.hidden=!live;
+ const timer=badge.querySelector('[data-nine-flash-end]');
+ if(!timer)return;
+ const end=live?Date.parse(p.flashSale.endAt):0;
+ timer.setAttribute('data-nine-flash-end',live?String(p.flashSale.endAt):'');
+ if(!live||!Number.isFinite(end)||end<=now){setText(timer,'Berakhir --:--:--');return}
+ const sec=Math.max(0,Math.ceil((end-now)/1000));
+ const h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;
+ setText(timer,`Berakhir ${[h,m,s].map(x=>String(x).padStart(2,'0')).join(':')}`);
+}
 function updateDetail(){const root=document.getElementById('imamstoreLiveOriginalDetail');if(!root?.classList.contains('open'))return;
- const current=window.imamstoreActiveProduct,p=current&&(find(current.id)||current);if(!p)return;const selected=root.querySelector('#varian')?.value||'';const q=(Array.isArray(p.varian)&&p.varian.length)?variantQuote(p,selected):quote(p);if(!q.verified)return;const info=root.querySelector('.product-info');if(!info)return;
+ const current=window.imamstoreActiveProduct,p=current&&(find(current.id)||current);if(!p)return;
+ syncDetailFlashCampaign(root,p);
+ const selected=root.querySelector('#varian')?.value||'';const q=(Array.isArray(p.varian)&&p.varian.length)?variantQuote(p,selected):quote(p);if(!q.verified)return;const info=root.querySelector('.product-info');if(!info)return;
  setText(info.querySelector('.nine-price-row .price'),fmt(q.price));
  const old=info.querySelector('.nine-old-price');if(old){const html=q.percent?`<del>${fmt(q.normal)}</del><span class="nine-discount-percent">-${q.percent}%</span>`:'';if(old.innerHTML!==html)old.innerHTML=html}
  const priceRow=info.querySelector('.nine-price-row');let saving=priceRow?.querySelector('.nine-saving');
  if(q.saving>0&&priceRow&&!saving){saving=document.createElement('span');saving.className='nine-saving';priceRow.append(saving)}
  if(saving){if(q.saving>0)setText(saving,'Hemat '+fmt(q.saving));else saving.remove()}
- const banner=root.querySelector('.nine-detail-flash-badge [data-nine-flash-end]');const flash=root.querySelector('.nine-detail-flash-badge');if(flash)flash.hidden=!q.flash;
- if(banner){const end=q.endAt||0,running=q.flash&&end>Date.now();if(flash)flash.hidden=!running;
-  if(running){const sec=Math.max(0,Math.ceil((end-Date.now())/1000)),h=Math.floor(sec/3600),m=Math.floor(sec%3600/60),s=sec%60;setText(banner,`Berakhir ${[h,m,s].map(x=>String(x).padStart(2,'0')).join(':')}`)}else setText(banner,'Berakhir --:--:--')}
  setText(root.querySelector('#stickyPrice'),fmt(q.price));setText(root.querySelector('#stickyNormalPrice'),q.percent?fmt(q.normal):'');
  const qty=Number(root.querySelector('#stickyQty')?.textContent)||1;setText(root.querySelector('#stickyTotal'),fmt(q.price*qty));
 }
