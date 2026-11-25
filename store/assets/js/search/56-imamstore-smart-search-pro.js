@@ -1,5 +1,6 @@
-/* Smart Search Pro 2D — satu dropdown untuk beranda + detail.
- * Rendering ringan per frame; tanpa timer 150 ms atau query Firebase baru.
+/* Smart Search Pro 2E — pemulihan saran pada input detail dinamis.
+ * Capture-phase menangani input/focus yang ditahan handler fitur lain.
+ * Tap ulang pada kolom pencarian yang sudah berisi query membuka saran kembali.
  */
 (()=>{'use strict';
  const data=window.imamstoreSmartSearchData;
@@ -41,7 +42,9 @@
 
  function hide(){
   if(frame){cancelAnimationFrame(frame);frame=0;}
+  if(positionFrame){cancelAnimationFrame(positionFrame);positionFrame=0;}
   popup.hidden=true;
+  popup.classList.remove('iss-search-over-detail');
   if(activeInput)activeInput.setAttribute('aria-expanded','false');
  }
  function switchInput(input){
@@ -107,6 +110,10 @@
  function positionPopup(){
   positionFrame=0;
   if(popup.hidden||!activeInput||!activeInput.isConnected)return;
+  const detailMode=activeInput.id==='nineDetailSearchInput';
+  // Host detail dibuat ulang saat membuka produk; cek kondisi terkini.
+  if(detailMode&&!detailHost.classList.contains('open'))return hide();
+  popup.classList.toggle('iss-search-over-detail',detailMode);
   const r=activeInput.getBoundingClientRect();
   const v=window.visualViewport;
   const vx=v?.offsetLeft||0,vy=v?.offsetTop||0;
@@ -116,13 +123,15 @@
   const left=vw<=720?vx+margin:Math.min(vx+vw-width-margin,Math.max(vx+margin,r.left));
   const below=vy+vh-r.bottom-8-margin;
   const above=r.top-vy-margin-8;
-  const placeAbove=below<142&&above>below;
-  const available=Math.max(90,placeAbove?above:below);
+  // Utamakan bawah kolom; pindahkan ke atas hanya jika benar-benar muat.
+  const placeAbove=below<130&&above>=180&&above>below;
+  const available=Math.max(76,placeAbove?above:below);
   const height=Math.min(390,available);
   popup.style.width=width+'px';
   popup.style.left=left+'px';
   popup.style.maxHeight=height+'px';
-  popup.style.top=(placeAbove?Math.max(vy+margin,r.top-height-8):r.bottom+8)+'px';
+  const proposedTop=placeAbove?r.top-height-8:r.bottom+8;
+  popup.style.top=Math.max(vy+margin,Math.min(proposedTop,vy+vh-height-margin))+'px';
  }
  function schedulePosition(){
   if(popup.hidden||positionFrame)return;
@@ -199,24 +208,41 @@
   if(next){e.preventDefault();next.focus()}
   else if(e.key==='ArrowUp'&&index===0){e.preventDefault();activeInput?.focus()}
  }
- mainInput.addEventListener('input',handleInput);
- mainInput.addEventListener('focus',handleFocus);
- mainInput.addEventListener('keydown',handleKeydown);
- detailHost.addEventListener('input',handleInput);
- detailHost.addEventListener('focusin',handleFocus);
- detailHost.addEventListener('keydown',handleKeydown);
- document.addEventListener('compositionstart',e=>{if(isSearchInput(e.target))composing=true});
+ // Input detail merupakan elemen dinamis. Capture-phase memastikan event
+ // tetap sampai ke satu handler meskipun modul lain menghentikan bubbling.
+ document.addEventListener('input',handleInput,true);
+ document.addEventListener('focusin',handleFocus,true);
+ document.addEventListener('keydown',handleKeydown,true);
+ document.addEventListener('compositionstart',e=>{if(isSearchInput(e.target))composing=true},true);
  document.addEventListener('compositionend',e=>{
   if(!isSearchInput(e.target))return;
   composing=false;scheduleRender(e.target);
- });
- popup.addEventListener('keydown',handleKeydown);
+ },true);
+ function searchFieldFromTarget(target){
+  if(isSearchInput(target))return target;
+  const capsule=target?.closest?.('.nine-search-capsule,.search');
+  const input=capsule?.querySelector?.('#nineDetailSearchInput,#search');
+  return isSearchInput(input)?input:null;
+ }
  document.addEventListener('pointerdown',e=>{
-  if(!popup.contains(e.target)&&e.target!==activeInput)hide();
- });
+  if(popup.contains(e.target)||searchFieldFromTarget(e.target))return;
+  hide();
+ },true);
+ // Pada HP pengguna bisa menutup keyboard lalu menyentuh kolom lagi.
+ // Jika input sudah fokus, focusin tidak muncul ulang; tap tetap harus membuka saran.
+ document.addEventListener('pointerup',e=>{
+  const input=searchFieldFromTarget(e.target);
+  if(input&&input.value.trim().length>=2)scheduleRender(input);
+ },true);
+ // Tutup jika panel detail ditutup, bukan hanya pada event pembuka produk.
+ new MutationObserver(()=>{
+  if(!detailHost.classList.contains('open')&&activeInput?.id==='nineDetailSearchInput')hide();
+ }).observe(detailHost,{attributes:true,attributeFilter:['class']});
  document.addEventListener('imamstore:open-product',hide);
  document.addEventListener('imamstore:catalog-updated',()=>{
-  if(!popup.hidden&&activeInput?.isConnected)scheduleRender(activeInput);
+  // Saran yang pernah kosong akan diperbarui saat produk CMS selesai dimuat.
+  if(activeInput?.isConnected&&activeInput.value.trim().length>=2&&
+     (!popup.hidden||document.activeElement===activeInput))scheduleRender(activeInput);
  });
  document.getElementById('clearSearch')?.addEventListener('click',hide);
  window.addEventListener('resize',schedulePosition,{passive:true});

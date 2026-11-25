@@ -1,4 +1,4 @@
-/* Smart Search Pro 2D — satu desain dropdown untuk beranda dan detail. */
+/* Smart Search Pro 2E — satu popup responsif beranda/detail. */
 .iss-search-list{
  position:fixed;z-index:2400;display:flex;flex-direction:column;
  box-sizing:border-box;overflow:hidden;
@@ -8,8 +8,9 @@
  font-family:Arial,Helvetica,sans-serif;
  -webkit-tap-highlight-color:transparent;
 }
-/* Detail memakai overlay z-index 2050000; dropdown harus di atasnya. */
-body.imamstore-original-open .iss-search-list{z-index:2050001}
+/* Detail memakai overlay z-index 2050000. Mode dihitung dari input aktif,
+   bukan bergantung pada class body yang bisa terlambat saat navigasi. */
+.iss-search-list.iss-search-over-detail{z-index:2050001}
 .iss-search-list[hidden]{display:none}
 .iss-search-heading{
  flex:0 0 auto;padding:10px 14px 9px;
