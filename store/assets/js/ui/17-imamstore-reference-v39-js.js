@@ -18,7 +18,8 @@ function swipeSheet(panel,close){
  handle.addEventListener('touchend',finish,{passive:true});handle.addEventListener('touchcancel',finish,{passive:true});
 }
 swipeSheet(modal.querySelector('.ref-modal-panel'),closeModal);
-const purchase=$('imamstoreOriginalPurchase');if(purchase){const p=purchase.querySelector('.imamstore-purchase-panel');swipeSheet(p,()=>{$('imamstorePurchaseClose')?.click()});}
+// Swipe panel pembelian dikelola sekali oleh v42 whole-sheet controller.
+// Tidak lagi dipasang handler swipe pembelian kedua di sini.
 function currentSum(){
  const lines=read().filter(x=>window.imamstoreV43?.isSelected?.(x.key)!==false);
  return {count:lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0),0),sum:lines.reduce((n,x)=>n+Math.max(0,Number(x.qty)||0)*Math.max(0,Number(x.harga)||0),0)};
