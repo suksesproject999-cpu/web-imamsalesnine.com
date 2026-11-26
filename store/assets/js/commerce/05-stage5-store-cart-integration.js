@@ -6,9 +6,20 @@
  const fmt=n=>'Rp '+Math.round(Math.max(0,Number(n)||0)).toLocaleString('id-ID');
  const getPrice=p=>typeof price==='function'?price(p):Number(p.harga?.promo||p.harga?.normal||0);
  const variantName=v=>v==null?'':typeof v==='string'?v:String(v.nama||v.name||v.label||v.warna||'');
- // 'Default' is the sole canonical cart identity for a product without actual variants.
- // A product that defines a real 'Default' variant still uses its real variant record.
- const cartVariant=(p,variant)=>Array.isArray(p?.varian)&&p.varian.length?String(variant??''):'Default';
+ // Selaraskan nama varian dengan Commerce Sheet; jangan membandingkan teks mentah.
+ const normalizedVariant=x=>String(x??'').trim().replace(/\s+/g,' ').toLocaleLowerCase('id-ID');
+ const findVariant=(variants,name)=>{
+  const found=(variants||[]).filter(v=>normalizedVariant(variantName(v))===normalizedVariant(name));
+  return found.length===1?found[0]:null; // Nama ambigu ditolak, bukan dipilih sembarang.
+ };
+ // 'Default' adalah identitas tunggal produk yang memang tidak punya varian.
+ // Untuk SKU nyata gunakan nama resmi dari katalog (bukan string tampilan/DOM).
+ const cartVariant=(p,variant)=>{
+  const variants=Array.isArray(p?.varian)?p.varian:[];
+  if(!variants.length)return 'Default';
+  const found=findVariant(variants,variant);
+  return found?String(variantName(found)).trim().replace(/\s+/g,' '):String(variant??'').trim().replace(/\s+/g,' ');
+ };
  const variantPrice=(p,v)=>{const name=variantName(v);const q=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);return q?.verified&&q.price>0?q.price:NaN};
  const variantImage=(p,variant)=>safeUrl(window.imamstorePurchaseVariantPhotos?.(p,variant)?.[0]||p?.gambar?.url||p?.gambar?.src||p?.gambar);
  const stockValue=v=>{if(v==null||v==='')return NaN;if(typeof v==='object')return stockValue(v.jumlah??v.qty??v.stock??v.quantity??v.available);const n=Number(v);return Number.isFinite(n)&&n>=0?Math.floor(n):NaN};
@@ -62,7 +73,7 @@
  const save=v=>{try{localStorage.setItem(STORAGE,JSON.stringify(v));return true}catch(e){console.warn('Cart storage unavailable',e);return false}};
  const text=(id,value)=>{el(id).textContent=String(value??'')};
  function row(x,editable){const wrap=document.createElement('div');wrap.className='s5-item';const img=document.createElement('img');img.src=safeUrl(x.gambar);img.alt='';const main=document.createElement('main'),name=document.createElement('h3');name.textContent=x.nama;main.append(name);const desc=document.createElement('p');desc.textContent=[x.varian,fmt(x.harga)].filter(Boolean).join(' · ');main.append(desc);const qty=document.createElement('div');qty.className='s5-qty';if(editable){const minus=document.createElement('button');minus.textContent='−';minus.setAttribute('aria-label','Kurangi jumlah');minus.onclick=()=>update(x.key,-1);qty.append(minus)}const label=document.createElement('span');label.textContent='Jumlah: '+x.qty;qty.append(label);if(editable){const plus=document.createElement('button');plus.textContent='+';plus.setAttribute('aria-label','Tambah jumlah');plus.onclick=()=>update(x.key,1);qty.append(plus)}main.append(qty);wrap.append(img,main);return wrap}
- function update(key,delta){const data=read(),x=data.find(i=>i.key===key);if(!x)return;const p=liveProduct(x.id);if(delta>0&&p){const v=(Array.isArray(p.varian)?p.varian:[]).find(y=>variantName(y)===x.varian);const rawStock=(v&&typeof v==='object'?(v.stok??v.stock):null)??p.stok??p.stock;const stock=stockValue(rawStock);if(Number.isFinite(stock)&&stock>=0&&x.qty>=stock){if(window.Swal?.fire)window.Swal.fire({icon:'info',text:'Jumlah melebihi stok tersedia.',confirmButtonText:'OK'});else console.warn('Jumlah melebihi stok tersedia.');return}}x.qty=Math.min(999,x.qty+delta);if(!save(data.filter(i=>i.qty>0)))console.warn('ImamStore: cart update not saved');renderCart();window.__nineSyncVisibleTotals?.();document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'qty-change',id:x.id}}))}
+ function update(key,delta){const data=read(),x=data.find(i=>i.key===key);if(!x)return;const p=liveProduct(x.id);if(delta>0&&p){const v=findVariant(Array.isArray(p.varian)?p.varian:[],x.varian);const rawStock=(v&&typeof v==='object'?(v.stok??v.stock):null)??p.stok??p.stock;const stock=stockValue(rawStock);if(Number.isFinite(stock)&&stock>=0&&x.qty>=stock){if(window.Swal?.fire)window.Swal.fire({icon:'info',text:'Jumlah melebihi stok tersedia.',confirmButtonText:'OK'});else console.warn('Jumlah melebihi stok tersedia.');return}}x.qty=Math.min(999,x.qty+delta);if(!save(data.filter(i=>i.qty>0)))console.warn('ImamStore: cart update not saved');renderCart();window.__nineSyncVisibleTotals?.();document.dispatchEvent(new CustomEvent('nine:cartchange',{detail:{source:'qty-change',id:x.id}}))}
  function total(data){return fmt(data.reduce((a,x)=>a+(Number(x.harga)||0)*Math.max(1,Number(x.qty)||1),0))}
  function cartDeleteToast(count){
  const message=count===1?'Produk dihapus dari keranjang':count+' produk dihapus dari keranjang';
@@ -112,7 +123,7 @@
  const warnings=[];const checked=[];
  for(const line of data){const p=liveProduct(line.id);if(!p){warnings.push(line.nama+': data produk belum tersedia; tunggu katalog dimuat.');continue}
  if(p.active===false||p.deleted===true||p.aktif===false||p.status==='nonaktif'){warnings.push(line.nama+': produk tidak aktif.');continue}
- const variants=Array.isArray(p.varian)?p.varian:[];const v=variants.find(x=>variantName(x)===line.varian);
+ const variants=Array.isArray(p.varian)?p.varian:[];const v=findVariant(variants,line.varian);
  if(variants.length&&!v){warnings.push(line.nama+': varian sudah tidak tersedia.');continue}
  const rawStock=(v&&typeof v==='object'?(v.stok??v.stock):null)??p.stok??p.stock;const stock=stockValue(rawStock);
  if(Number.isFinite(stock)&&stock>=0&&line.qty>stock){warnings.push(line.nama+': stok kurang dari jumlah dalam keranjang.');continue}
@@ -158,7 +169,7 @@
    const p=liveProduct(id);if(!p)return {ok:false,message:'Produk tidak ditemukan'};
    const variants=Array.isArray(p.varian)?p.varian:[];
    variant=cartVariant(p,variant);
-   const v=variants.find(x=>variantName(x)===variant);
+   const v=findVariant(variants,variant);
    if(variants.length&&!v)return {ok:false,message:'Pilih varian yang tersedia'};
    const count=Math.floor(Number(qty));if(!Number.isFinite(count)||count<1||count>999)return {ok:false,message:'Jumlah tidak valid'};
    if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif'};
@@ -183,7 +194,7 @@
     if(!p)return {ok:false,message:'Produk tidak tersedia di katalog'};
     if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif: '+String(p.nama||p.id)};
     const variants=Array.isArray(p.varian)?p.varian:[],variant=cartVariant(p,line?.variant);
-    const v=variants.find(x=>variantName(x)===variant);
+    const v=findVariant(variants,variant);
     if(variants.length&&!v)return {ok:false,message:'Pilih varian: '+String(p.nama||p.id)};
     const qty=Number(line?.qty);
     if(!Number.isSafeInteger(qty)||qty<1||qty>999)return {ok:false,message:'Jumlah produk tidak valid'};
@@ -212,7 +223,7 @@
   openCart(){openCart()},
   previewBuy(id,variant,qty){
    const p=liveProduct(id);if(!p)return {ok:false,message:'Produk tidak ditemukan'};
-   const variants=Array.isArray(p.varian)?p.varian:[];variant=cartVariant(p,variant);const v=variants.find(x=>variantName(x)===variant);
+   const variants=Array.isArray(p.varian)?p.varian:[];variant=cartVariant(p,variant);const v=findVariant(variants,variant);
    if(variants.length&&!v)return {ok:false,message:'Pilih varian yang tersedia'};
    const count=Math.floor(Number(qty));if(!Number.isFinite(count)||count<1||count>999)return {ok:false,message:'Jumlah tidak valid'};
    if(p.aktif===false||p.active===false||p.deleted===true||p.status==='nonaktif')return {ok:false,message:'Produk tidak aktif'};
