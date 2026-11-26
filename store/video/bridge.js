@@ -81,7 +81,7 @@
  let queued=false;const schedule=()=>{if(!queued){queued=true;queueMicrotask(()=>{queued=false;refresh()})}};
  new MutationObserver(schedule).observe(host,{childList:true,attributes:true,attributeFilter:['class']});
  document.addEventListener('imamstore:catalog-updated',schedule);document.addEventListener('imamstore:open-product',schedule);window.addEventListener('pageshow',schedule);schedule();
- const sendCartCount=()=>{const badge=document.getElementById('nineHeaderCartCount');const count=badge&&!badge.hidden?Math.max(0,Number(badge.textContent)||0):0;const frame=state.feed?.querySelector('iframe');if(frame)msg(frame,'cart-count',{count})};document.addEventListener('nine:cartchange',()=>{window.imamstoreRefreshCartBadge?.();sendCartCount()});window.addEventListener('storage',e=>{if(e.key==='imamstore_cart_stage5'){window.imamstoreRefreshCartBadge?.();sendCartCount()}});
+ const sendCartCount=()=>{/* ImamStore badge rapi R1: numeric count, not formatted badge text. */const count=Math.max(0,Math.floor(Number(window.imamstoreRefreshCartBadge?.())||0));const frame=state.feed?.querySelector('iframe');if(frame)msg(frame,'cart-count',{count})};document.addEventListener('nine:cartchange',()=>{window.imamstoreRefreshCartBadge?.();sendCartCount()});window.addEventListener('storage',e=>{if(e.key==='imamstore_cart_stage5'){window.imamstoreRefreshCartBadge?.();sendCartCount()}});
 
  /* Video feed is a VIEW of the existing catalog/pricing/stats, not another commerce system. */
  const money=n=>Number.isFinite(Number(n))&&Number(n)>0?Number(n):0;

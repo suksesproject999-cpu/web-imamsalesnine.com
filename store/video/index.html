@@ -53,7 +53,8 @@
 
 /* R38: consistent cart badge and reference-aligned video screens */
 .feed-head .search-cart .feed-cart-btn{position:relative;width:40px;height:40px;font-size:21px}
-.feed-head .search-cart .feed-cart-count{position:absolute;right:-4px;top:-5px;display:grid;place-items:center;min-width:19px;height:19px;padding:0 4px;border-radius:30px;border:2px solid #191919;background:#e6533a;color:#fff;font-size:11px;font-weight:750;text-shadow:none}
+/* ImamStore badge rapi R1: video uses same pill as detail. */
+.feed-head .search-cart .feed-cart-count{position:absolute;right:0;top:0;transform:translate(20%,-12%);display:grid;place-items:center;min-width:20px;height:20px;padding:0 5px;border-radius:999px;border:2px solid #161616;background:#e6533a;color:#fff;font-size:10px;font-weight:800;line-height:1;font-variant-numeric:tabular-nums;white-space:nowrap;text-shadow:none;pointer-events:none}
 .feed-head .search-cart .feed-cart-count[hidden]{display:none}
 
 
@@ -315,7 +316,7 @@
  let start=null,suppressFeedTapUntil=0;document.getElementById('feed').addEventListener('touchstart',e=>{if(!listSheet.hidden||!commentsSheet.hidden||e.touches.length!==1||e.target.closest('button'))return;start={x:e.touches[0].clientX,y:e.touches[0].clientY}},{passive:true});
  document.getElementById('feed').addEventListener('touchend',e=>{if(!start||e.changedTouches.length!==1)return;const dx=e.changedTouches[0].clientX-start.x,dy=e.changedTouches[0].clientY-start.y;start=null;if(Math.abs(dy)>65&&Math.abs(dy)>Math.abs(dx)*1.2){suppressFeedTapUntil=performance.now()+400;showFeed(selected+(dy<0?1:-1))}},{passive:true});
  window.addEventListener('wheel',e=>{if(mode==='feed'&&listSheet.hidden&&commentsSheet.hidden&&Math.abs(e.deltaY)>30)showFeed(selected+(e.deltaY>0?1:-1))},{passive:true});
- window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==origin||e.data?.source!=='imamstore-video-bridge')return;if(e.data.type==='stop'){stop();dismissSheets();return}if(e.data.type==='toast-snapshot'&&mode==='feed'){if(String(e.data.productId||'')===selectedId())queueOriginalToasts(e.data.messages);return}if(e.data.type==='cart-count'&&mode==='feed'){const n=Math.max(0,Math.floor(Number(e.data.count)||0)),badge=document.getElementById('feedCartCount');badge.hidden=!n;badge.textContent=n>99?'99+':String(n);return}if(e.data.type==='gallery-step'&&mode==='player')return;
+ window.addEventListener('message',e=>{if(e.source!==parent||e.origin!==origin||e.data?.source!=='imamstore-video-bridge')return;if(e.data.type==='stop'){stop();dismissSheets();return}if(e.data.type==='toast-snapshot'&&mode==='feed'){if(String(e.data.productId||'')===selectedId())queueOriginalToasts(e.data.messages);return}if(e.data.type==='cart-count'&&mode==='feed'){const n=Math.max(0,Math.floor(Number(e.data.count)||0)),badge=document.getElementById('feedCartCount');badge.hidden=!n;badge.textContent=n>99?'99+':String(n);badge.setAttribute('aria-hidden','true');document.getElementById('cart')?.setAttribute('aria-label','Keranjang, '+n+' barang');return}if(e.data.type==='gallery-step'&&mode==='player')return;
   if(e.data.type==='social-result'&&mode==='feed'){
     if(socialKey(items[selected])!==String(e.data.productId||'')+'|'+String(e.data.videoUrl||''))return;
     const data=e.data.result||{},action=e.data.action;

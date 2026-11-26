@@ -15,8 +15,12 @@
   for(const id of ['nineHeaderCartCount','s4CartCount']){
    const el=document.getElementById(id);
    if(!el)continue;
-   el.textContent=String(count);
+   // ImamStore badge rapi R1: visual 99+; actual quantity stays numeric.
+   el.textContent=count>99?'99+':String(count);
    el.hidden=count===0;
+   el.setAttribute('aria-hidden','true');
+   const button=el.closest('button');
+   if(button)button.setAttribute('aria-label','Keranjang, '+count+' barang');
   }
   const countLabel=document.getElementById('refCartCount');
   if(countLabel)countLabel.textContent='('+count+')';
