@@ -1,6 +1,6 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),KEY='imamstore_cart_stage5',SEL='imamstore_cart_selection_v43',fmt=n=>'Rp'+Math.round(Number(n)||0).toLocaleString('id-ID');
-const read=()=>{try{const x=JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
+const read=()=>{try{const x=window.imamstoreCartBridge?.getLines?.()||JSON.parse(localStorage.getItem(KEY)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
 const selection=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}catch{return {}}};
 const isSelected=k=>selection()[String(k)]!==false;
 const writeSelection=map=>{try{localStorage.setItem(SEL,JSON.stringify(map))}catch{};sync()};
@@ -186,11 +186,14 @@ window.imamstoreV43=Object.freeze({
     if(!before||String(before.id)!==String(after.id))return false;
     const oldIndex=nextCart.findIndex(x=>String(x.key)===String(before.key));
     if(oldIndex<0)return false;
-    const newKey=String(after.id)+'|'+String(after.varian);
+    const p=window.imamstoreCartBridge?.getProduct?.(after.id);
+    const canonical=p?window.imamstoreVariantIdentity?.forLine(p,after):null;
+    if(!canonical)return false;
+    const newKey=canonical.key;
     const duplicate=nextCart.findIndex((x,j)=>j!==oldIndex&&String(x.key)===newKey);
     // Do not silently merge selected and unselected lines, which changes checkout quantities.
     if(duplicate>=0)return false;
-    nextCart[oldIndex]={...nextCart[oldIndex],varian:after.varian,qty:after.qty,harga:after.harga,key:newKey};
+    nextCart[oldIndex]={...nextCart[oldIndex],variantId:canonical.variantId,varian:canonical.name,qty:after.qty,harga:after.harga,key:newKey};
     if(String(before.key)!==newKey){
      selectionMap[newKey]=selectionMap[String(before.key)]!==false;
      delete selectionMap[String(before.key)];

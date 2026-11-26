@@ -28,7 +28,8 @@ function quote(p,now=Date.now()){
 }
 function variantQuote(p,name,now=Date.now()){
  const base=quote(p,now),entries=Array.isArray(p?.varian)?p.varian:[];
- const found=entries.find(x=>norm(label(x))===norm(name));
+ const canonical=window.imamstoreVariantIdentity?.resolve(p,typeof name==='object'?name:String(name??''));
+ const found=canonical?.record||(entries.find(x=>norm(label(x))===norm(name)));
  if(entries.length&&!found)return {...base,price:0,verified:false,variantFound:false};
  const obj=found&&typeof found==='object'?found:null;
  let normal=base.normal,regular=base.price;
@@ -58,10 +59,11 @@ window.nineFlashActive=active;window.nineEffectivePromo=p=>quote(p).price;
 window.imamstoreUnifiedPrice=Object.freeze({quote,variantQuote,active,version:'R2-canonical'});
 const catalog=()=>{try{return window.imamstoreV29?.products?.()||[]}catch{return []}};
 const find=id=>catalog().find(p=>String(p.id)===String(id));
-function updateCart(){let lines;try{lines=JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return false}if(!Array.isArray(lines)||!lines.length)return false;
- let changed=false;for(const line of lines){const p=find(line.id);if(!p)continue;const q=variantQuote(p,line.varian);const next=q.verified?q.price:0;
+function updateCart(){let lines;try{lines=window.imamstoreCartBridge?.getLines?.()||JSON.parse(localStorage.getItem(KEY)||'[]')}catch{return false}if(!Array.isArray(lines)||!lines.length)return false;
+ let changed=false;for(const line of lines){const p=find(line.id);if(!p)continue;const canonical=window.imamstoreVariantIdentity?.forLine(p,line);if(!canonical)continue;const q=variantQuote(p,canonical.name);
+  if(line.varian!==canonical.name){line.varian=canonical.name;changed=true}const next=q.verified?q.price:0;
   if(next>0&&amount(line.harga)!==next){line.harga=next;changed=true}
-  const photo=window.imamstorePurchaseVariantPhotos?.(p,line.varian)?.[0];if(photo&&photo!==line.gambar){line.gambar=photo;changed=true}}
+  const photo=window.imamstorePurchaseVariantPhotos?.(p,canonical.name)?.[0];if(photo&&photo!==line.gambar){line.gambar=photo;changed=true}}
  if(changed){try{localStorage.setItem(KEY,JSON.stringify(lines))}catch{return false}
   document.dispatchEvent(new CustomEvent('imamstore:prices-updated'));
   window.__nexaiCoreRenderCart?.();window.imamstoreV43?.sync?.();window.imamstoreRefreshCartBadge?.();
@@ -74,9 +76,10 @@ function refreshCheckoutPrices(){
  if(!draft?.classList.contains('open')||!Array.isArray(lines)||!lines.length)return false;
  let changed=false;const latest=lines.map(line=>{
   const p=find(line.id);if(!p)return line;
-  const quote=variantQuote(p,line.varian);if(!quote.verified)return line;
-  if(Number(line.harga)===quote.price)return line;
-  changed=true;return {...line,harga:quote.price};
+  const canonical=window.imamstoreVariantIdentity?.forLine(p,line);if(!canonical)return line;
+  const quote=variantQuote(p,canonical.name);if(!quote.verified)return line;
+  if(Number(line.harga)===quote.price&&line.varian===canonical.name)return line;
+  changed=true;return {...line,varian:canonical.name,variantId:canonical.variantId,key:canonical.key,harga:quote.price};
  });
  if(changed){window.__nexaiCheckoutLines=latest;
   document.dispatchEvent(new CustomEvent('imamstore:checkout-variant-updated',{detail:{items:latest,source:'reprice'}}));

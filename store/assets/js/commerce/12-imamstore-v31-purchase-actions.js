@@ -9,7 +9,7 @@ const normalize=x=>String(x??'').trim().replace(/\s+/g,' ').toLocaleLowerCase('i
 const label=x=>typeof x==='string'?x:String(x?.nama??x?.name??x?.label??x?.warna??'');
 const money=n=>'Rp'+Math.round(n).toLocaleString('id-ID');
 const safeQty=n=>Math.max(1,Math.min(999,Math.floor(Number(n)||1)));
-const readCart=()=>{try{const x=JSON.parse(localStorage.getItem(CART)||'[]');return Array.isArray(x)?x:[]}catch{return []}};
+const readCart=()=>{try{return window.imamstoreCartBridge?.getLines?.()||JSON.parse(localStorage.getItem(CART)||'[]')||[]}catch{return []}};
 const modeTitle={cart:'Masukkan Keranjang',buy:'Lihat Ringkasan Pesanan',editCart:'Konfirmasi',editCheckout:'Konfirmasi'};
 const state={kind:null,productId:'',variant:'',qty:1,qtyInvalid:false,lineKey:'',checkoutLineId:'',checkoutIndex:-1,busy:false,submitError:'',submitStatus:'',returnFocus:null};
 const isOpen=()=>!sheet.hidden&&sheet.classList.contains('open')&&!!state.kind;
@@ -192,7 +192,10 @@ function openEditor(index,source='cart'){
  const lines=checkout?window.__nexaiCheckoutLines:readCart();
  const line=Array.isArray(lines)?lines[index]:null;if(!line)return false;
  const stableId=String(line.__checkoutLineId||'');
- return open(checkout?'editCheckout':'editCart',line.id,line.varian,line.qty,line.key,stableId,index);
+ const p=window.imamstoreCartBridge?.getProduct?.(line.id);
+ const canonical=p?window.imamstoreVariantIdentity?.forLine(p,line):null;
+ if(!canonical)return false;
+ return open(checkout?'editCheckout':'editCart',line.id,canonical.name,line.qty,line.key,stableId,index);
 }
 function syncAfterCartChange(){
  window.__nexaiCoreRenderCart?.();
@@ -205,10 +208,11 @@ function syncAfterCartChange(){
 function commitCart(r){
  const data=readCart(),idx=data.findIndex(x=>String(x.key)===state.lineKey&&String(x.id)===state.productId);
  if(idx<0)return {ok:false,message:'Baris keranjang berubah. Tutup dan buka lagi editor.'};
- const newKey=String(r.p.id)+'|'+r.name;
+ const identity=window.imamstoreVariantIdentity?.resolve(r.p,r.name);if(!identity)return {ok:false,message:'Identitas varian belum tersedia'};
+ const newKey=identity.key;
  if(data.some((x,i)=>i!==idx&&String(x.key)===newKey))return {ok:false,message:'Varian ini sudah ada di keranjang. Ubah jumlah pada baris tersebut.'};
  const oldKey=String(data[idx].key);
- data[idx]={...data[idx],id:String(r.p.id),nama:String(r.p.nama||data[idx].nama),gambar:window.imamstorePurchaseVariantPhotos?.(r.p,r.name)?.[0]||r.p.gambar||data[idx].gambar,varian:r.name,qty:r.count,harga:r.unit,key:newKey};
+ data[idx]={...data[idx],id:String(r.p.id),nama:String(r.p.nama||data[idx].nama),gambar:window.imamstorePurchaseVariantPhotos?.(r.p,r.name)?.[0]||r.p.gambar||data[idx].gambar,variantId:identity.variantId,varian:identity.name,qty:r.count,harga:r.unit,key:newKey};
  try{
   localStorage.setItem(CART,JSON.stringify(data));
   if(oldKey!==newKey){let saved={};try{saved=JSON.parse(localStorage.getItem(SELECTION)||'{}')||{}}catch{};if(Object.hasOwn(saved,oldKey)){saved[newKey]=saved[oldKey];delete saved[oldKey];localStorage.setItem(SELECTION,JSON.stringify(saved))}}
@@ -221,7 +225,8 @@ function commitCheckout(r){
  const index=state.checkoutLineId?current.findIndex(x=>String(x.__checkoutLineId||'')===state.checkoutLineId):state.checkoutIndex;
  if(index<0||!current[index]||String(current[index].id)!==state.productId||String(current[index].key)!==state.lineKey)return {ok:false,message:'Produk checkout berubah. Buka ulang editor.'};
  const next=current.map(x=>({...x}));
- next[index]={...next[index],varian:r.name,qty:r.count,harga:r.unit,gambar:window.imamstorePurchaseVariantPhotos?.(r.p,r.name)?.[0]||r.p.gambar||next[index].gambar,key:String(r.p.id)+'|'+r.name};
+ const identity=window.imamstoreVariantIdentity?.resolve(r.p,r.name);if(!identity)return {ok:false,message:'Identitas varian belum tersedia'};
+ next[index]={...next[index],variantId:identity.variantId,varian:identity.name,qty:r.count,harga:r.unit,gambar:window.imamstorePurchaseVariantPhotos?.(r.p,identity.name)?.[0]||r.p.gambar||next[index].gambar,key:identity.key};
  if('jumlah'in next[index])next[index].jumlah=r.count;
  if(!window.imamstoreV43?.commitCheckoutItems?.(next))return {ok:false,message:'Gagal menyinkronkan checkout dan keranjang. Periksa pilihan varian.'};
  return {ok:true};

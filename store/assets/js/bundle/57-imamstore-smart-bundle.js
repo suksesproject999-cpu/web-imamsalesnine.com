@@ -119,7 +119,11 @@ document.addEventListener('click',event=>{
  else if(action==='submit'){
   if(b.disabled||submitBusy)return;
   const main=find(currentId),ids=[String(currentId),...(main?.bundleProductIds||[]).map(String)];
-  const lines=[...new Set(ids)].filter(id=>state.get(id)?.enabled).map(id=>({id,variant:state.get(id)?.variant||'',qty:state.get(id)?.qty||1}));
+  const lines=[...new Set(ids)].filter(id=>state.get(id)?.enabled).map(id=>{
+   const p=window.imamstoreCartBridge?.getProduct?.(id);
+   const identity=p?window.imamstoreVariantIdentity?.resolve(p,state.get(id)?.variant||''):null;
+   return {id,variant:state.get(id)?.variant||'',variantId:identity?.variantId||'',qty:state.get(id)?.qty||1};
+  });
   submitBusy=true;submitStatus='';
   b.disabled=true;b.classList.add('issb-submit--processing');b.textContent='Memproses…';
   // Beri kesempatan tombol berubah sebelum penyimpanan sinkron berlangsung.

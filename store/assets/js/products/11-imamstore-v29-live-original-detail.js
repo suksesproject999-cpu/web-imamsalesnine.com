@@ -526,7 +526,8 @@ function normalizeSkuPhotoLabel(value){
 }
 function purchaseVariantPhotos(product,selectedName){
  const entries=Array.isArray(product?.varian)?product.varian:[];
- const selected=entries.find(v=>v&&typeof v==='object'&&
+ const current=window.imamstoreVariantIdentity?.resolve(product,selectedName);
+ const selected=current?.record&&typeof current.record==='object'?current.record:entries.find(v=>v&&typeof v==='object'&&
   normalizeSkuPhotoLabel(v.nama||v.name||v.label||'')===normalizeSkuPhotoLabel(selectedName));
  if(!selected)return [];
  const out=[];
