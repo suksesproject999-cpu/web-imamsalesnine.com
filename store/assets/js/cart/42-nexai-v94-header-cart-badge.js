@@ -12,6 +12,14 @@
  };
  const refresh=()=>{
   const count=countItems();
+   // The floating badge consumes the *same* numeric cart count as the header.
+   const floating=document.getElementById('s8CartLauncherCount');
+   if(floating){
+    floating.textContent=count>99?'99+':String(count);
+    floating.hidden=count===0;
+   }
+   const launcher=document.getElementById('s8CartLauncher');
+   if(launcher)launcher.setAttribute('aria-label',count>0?'Buka keranjang, '+count+' produk':'Buka keranjang');
   for(const id of ['nineHeaderCartCount','s4CartCount']){
    const el=document.getElementById(id);
    if(!el)continue;

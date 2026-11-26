@@ -49,7 +49,41 @@
 /* ===== extracted original style: stage5-cart-style ===== */
 .s5-sheet{display:none;position:fixed;inset:0;z-index:2100000;background:#fff;color:#222;overflow:auto;overscroll-behavior:contain}.s5-sheet.open{display:block}.s5-sheet header{position:sticky;top:0;z-index:1;display:flex;gap:18px;align-items:center;padding:18px;background:#fff;border-bottom:1px solid #ddd}.s5-sheet header button{border:0;background:#f2f2f2;padding:10px;border-radius:10px}.s5-body{max-width:750px;margin:auto;padding:20px 16px 80px}.s5-item{display:flex;gap:12px;padding:16px 0;border-bottom:1px solid #eee}.s5-item img{width:76px;height:76px;object-fit:contain}.s5-item main{flex:1;min-width:0}.s5-item h3{font-size:15px}.s5-qty{display:flex;align-items:center;gap:10px;margin-top:8px}.s5-qty button{border:1px solid #ddd;border-radius:8px;background:#fff;padding:6px 12px}.s5-primary{width:100%;margin-top:20px;border:0;border-radius:12px;padding:15px;background:#8cc63f;color:#fff;font-weight:700}.s5-primary:disabled{opacity:.5}.s5-note{font-size:13px;color:#777;margin-top:14px;line-height:1.6}#s5CartTotal,#s5DraftTotal{font-size:20px;font-weight:700;margin-top:20px}
 /* ===== extracted original style: stage8-ux-css ===== */
-#s8CartLauncher{position:fixed;right:16px;bottom:18px;z-index:1050;border:0;border-radius:999px;background:#8cc63f;color:#17210d;font:700 14px/1.2 Arial,sans-serif;box-shadow:0 6px 24px #0003;padding:14px 18px;cursor:pointer}body.stage4-detail-open #s8CartLauncher,body:has(.s5-sheet.open) #s8CartLauncher{display:none}.s4-actions{display:flex;flex-wrap:wrap;gap:8px}.s4-actions button{flex:1 1 42%;min-width:0}#s4Add{background:#eef8df;color:#3e6b0e;border:1px solid #8cc63f}@media(max-width:390px){.s4-actions button{font-size:12px;padding:12px 5px}}
+/* Stage 8 floating cart: single owner for size, positioning, and motion. */
+#s8CartLauncher{
+ position:fixed;right:16px;bottom:calc(16px + env(safe-area-inset-bottom));
+ z-index:1050;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+ box-sizing:border-box;min-width:130px;height:50px;max-width:calc(100vw - 32px);
+ padding:0 15px;border:1px solid #86ba38;border-radius:999px;
+ background:#8cc63f;color:#23330f;font:700 14px/1.2 Arial,sans-serif;
+ box-shadow:0 5px 18px rgba(34,57,22,.16);cursor:pointer;
+ touch-action:manipulation;-webkit-tap-highlight-color:transparent;
+ opacity:1;visibility:visible;transform:translate3d(0,0,0) scale(1);
+ transition:transform .22s ease,opacity .22s ease,box-shadow .18s ease,background-color .18s ease,visibility 0s;
+}
+#s8CartLauncher>i{flex:none;width:18px;text-align:center;font-size:16px}
+#s8CartLauncher .s8-cart-launcher-label{white-space:nowrap}
+#s8CartLauncher .s8-cart-launcher-badge{
+ position:absolute;top:-7px;right:-4px;display:flex;align-items:center;justify-content:center;
+ box-sizing:border-box;min-width:20px;height:20px;padding:0 4px;
+ border:2px solid #fff;border-radius:999px;background:#e6533a;color:#fff;
+ font:800 10px/1 Arial,sans-serif;font-variant-numeric:tabular-nums;
+}
+#s8CartLauncher .s8-cart-launcher-badge[hidden]{display:none}
+#s8CartLauncher.is-scroll-hidden{
+ opacity:0;visibility:hidden;pointer-events:none;
+ transform:translate3d(0,72px,0) scale(.95);
+ transition:transform .22s ease,opacity .22s ease,visibility 0s linear .22s;
+}
+#s8CartLauncher:active:not(.is-scroll-hidden){
+ background:#82b83a;box-shadow:0 2px 9px rgba(34,57,22,.12);
+ transform:scale(.96);
+}
+#s8CartLauncher:focus-visible{outline:3px solid #4f7d24;outline-offset:3px}
+body.stage4-detail-open #s8CartLauncher,body:has(.s5-sheet.open) #s8CartLauncher{display:none}
+@media(prefers-reduced-motion:reduce){
+ #s8CartLauncher,#s8CartLauncher.is-scroll-hidden{transition:none}
+}.s4-actions{display:flex;flex-wrap:wrap;gap:8px}.s4-actions button{flex:1 1 42%;min-width:0}#s4Add{background:#eef8df;color:#3e6b0e;border:1px solid #8cc63f}@media(max-width:390px){.s4-actions button{font-size:12px;padding:12px 5px}}
 /* ===== extracted original style: stage9-lightbox-css ===== */
 #s9Lightbox{display:none;position:fixed;inset:0;z-index:2300000;background:rgba(0,0,0,.96);align-items:center;justify-content:center}#s9Lightbox.open{display:flex}#s9LightboxImage{max-width:90vw;max-height:86dvh;object-fit:contain}#s9Lightbox button{position:absolute;border:0;background:#ffffff2b;color:white;font-size:32px;border-radius:50%;width:46px;height:46px;cursor:pointer}#s9LightboxClose{top:20px;right:20px}#s9LightboxPrev{left:12px;top:50%}#s9LightboxNext{right:12px;top:50%}
 /* ===== extracted original style: integration-warning-style ===== */
