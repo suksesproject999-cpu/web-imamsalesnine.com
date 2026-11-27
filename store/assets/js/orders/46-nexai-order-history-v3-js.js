@@ -9,7 +9,7 @@ const el=(tag,cls,content)=>{const e=document.createElement(tag);if(cls)e.classN
 const val=v=>v===null||v===undefined||String(v).trim()===''?'Belum tersedia':String(v);
 const rupiah=n=>Number.isFinite(Number(n))?'Rp'+Math.round(Number(n)).toLocaleString('id-ID'):'Belum tersedia';
 const date=v=>{try{const d=v?.toDate?.()||(v?.seconds?new Date(v.seconds*1000):v?new Date(v):null);return d&&!isNaN(d.getTime())?d.toLocaleString('id-ID',{dateStyle:'medium',timeStyle:'short'}):'Belum tersedia'}catch{return 'Belum tersedia'}};
-const statuses={checkout_created:'Menunggu konfirmasi',pending:'Menunggu konfirmasi',confirmed:'Dikonfirmasi',processing:'Diproses',packed:'Dikemas',shipped:'Dikirim',delivered:'Terkirim',completed:'Selesai',cancelled:'Dibatalkan',canceled:'Dibatalkan'};
+const statuses={expired:'Kedaluwarsa',checkout_created:'Menunggu konfirmasi',pending:'Menunggu konfirmasi',confirmed:'Dikonfirmasi',processing:'Diproses',packed:'Dikemas',shipped:'Dikirim',delivered:'Terkirim',completed:'Selesai',cancelled:'Dibatalkan',canceled:'Dibatalkan'};
 const status=v=>statuses[String(v||'').toLowerCase()]||val(v);
 const line=(parent,label,value)=>{const row=el('div','nexai-invoice-line');row.append(el('span','',label),el('strong','',val(value)));parent.append(row)};
 const section=(heading)=>{const node=el('section','nexai-invoice-section');node.append(el('h3','',heading));invoiceBody.append(node);return node};
@@ -17,10 +17,11 @@ function closeInvoice(){invoice.hidden=true;invoiceBody.replaceChildren();detail
 function close(){loadToken++;closeInvoice();dialog.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.()}
 function showInvoice(data){
  detailFocus=document.activeElement;invoiceBody.replaceChildren();
- const id=val(data.orderId),customer=data.customer||{},totals=data.totals||{},items=Array.isArray(data.items)?data.items:[];
+ const id=val(data.orderNumber||data.orderId),customer=data.customer||{},totals=data.totals||{},items=Array.isArray(data.items)?data.items:[];
  const heading=section('Informasi pesanan');
  line(heading,'Nomor pesanan',id);line(heading,'Dibuat',date(data.createdAt));line(heading,'Diperbarui',date(data.updatedAt));
- line(heading,'Status pesanan',status(data.status));line(heading,'Metode pemesanan',data.channel==='whatsapp'?'Konfirmasi via WhatsApp':val(data.channel));
+ line(heading,'Status pesanan',status(data.status));
+ if(data.paymentDueAt&&String(data.status||'')==='checkout_created')line(heading,'Selesaikan pembayaran sebelum',date(data.paymentDueAt));line(heading,'Metode pemesanan',data.channel==='whatsapp'?'Konfirmasi via WhatsApp':val(data.channel));
  const productSection=section('Produk yang dipesan');
  if(!items.length)productSection.append(el('p','nexai-invoice-footnote','Rincian produk belum tersedia.'));
  items.forEach(x=>{
@@ -50,13 +51,13 @@ function showInvoice(data){
  if(data.catatan){const notes=section('Catatan pelanggan');notes.append(el('p','nexai-invoice-footnote',data.catatan))}
  const foot=el('p','nexai-invoice-footnote','Ini rincian pesanan, bukan bukti pembayaran. Total dan ongkir akhir mengikuti konfirmasi penjual. Nomor pesanan bukan nomor resi.');
  invoiceBody.append(foot);
- const copy=el('button','nexai-invoice-primary','Salin nomor pesanan');copy.type='button';copy.addEventListener('click',()=>copyId(id,copy));invoiceBody.append(copy);
+ const copy=el('button','nexai-invoice-primary','Salin nomor pesanan');copy.type='button';copy.addEventListener('click',()=>copyId(id,copy));invoiceBody.append(copy);reportAction(data,invoiceBody);
  invoice.hidden=false;invoice.querySelector('.nexai-invoice-panel').scrollTop=0;document.getElementById('nexaiInvoiceClose')?.focus();
 }
-async function copyId(id,button){try{await navigator.clipboard.writeText(id);button.textContent='Nomor berhasil disalin'}catch{window.prompt('Salin nomor pesanan:',id)}}
+async function copyId(id,button){try{await navigator.clipboard.writeText(id);button.textContent='Nomor berhasil disalin'}catch{if(window.Swal?.fire){await window.Swal.fire({title:'Nomor pesanan',text:id,confirmButtonColor:'#8cc63f'});}else{button.textContent='Salin manual: '+id;}}}
 function renderOrder(data){
  const card=el('article','nexai-order-card'),top=el('div','nexai-order-top'),left=el('div');
- left.append(el('strong','',date(data.createdAt)),el('span','nexai-order-number','No. '+val(data.orderId)));
+ left.append(el('strong','',date(data.createdAt)),el('span','nexai-order-number','No. '+val(data.orderNumber||data.orderId)));
  top.append(left,el('span','nexai-status',status(data.status)));card.append(top);
  const items=Array.isArray(data.items)?data.items:[];
  const names=items.map(x=>x.nama||x.name||x.title).filter(Boolean);
@@ -64,11 +65,11 @@ function renderOrder(data){
  const total=el('div','nexai-order-money');total.append(el('span','','Total pesanan'),el('strong','',rupiah(data.totals?.totalBayar)));card.append(total);
  const actions=el('div','nexai-order-actions');
  const detail=el('button','nexai-detail-btn','Lihat Rincian');detail.type='button';detail.addEventListener('click',()=>showInvoice(data));
- const copy=el('button','','Salin Nomor');copy.type='button';copy.addEventListener('click',()=>copyId(val(data.orderId),copy));
- const waUrl=window.imamstoreOrderWhatsAppURL?.(data);
+ const copy=el('button','','Salin Nomor');copy.type='button';copy.addEventListener('click',()=>copyId(val(data.orderNumber||data.orderId),copy));
+ const waUrl=window.imamstoreOrderWhatsAppURL?.({...data,orderId:data.orderNumber||data.orderId});
  if(waUrl){const wa=el('a','nexai-detail-btn','Kirim via WhatsApp');wa.href=waUrl;wa.target='_blank';wa.rel='noopener noreferrer';
   wa.style.cssText='display:inline-flex;align-items:center;text-decoration:none;border:1px solid #8cc63f;border-radius:8px;padding:8px 11px;color:#4b7721;font-size:13px;font-weight:700;background:#fff';actions.append(wa)}
- actions.append(detail,copy);
+ actions.append(detail,copy);reportAction(data,actions);
  if(String(data.status||'').toLowerCase()==='completed'){
   const unique=new Map(items.filter(x=>/^[A-Za-z0-9_-]{1,120}$/.test(String(x.productId||''))).map(x=>[String(x.productId),x]));
   for(const [pid,item] of unique){
@@ -80,6 +81,47 @@ function renderOrder(data){
   }
  }
  card.append(actions);return card;
+}
+// R3: payment report is accessible from Pesanan Saya even after checkout/WhatsApp.
+// It never marks the order as paid: Admin still verifies actual bank settlement.
+async function reportPaid(data,button){
+ if(data.status!=='checkout_created'||!data.paymentDueAt)return;
+ const due=data.paymentDueAt?.toDate?.()||new Date(data.paymentDueAt);
+ if(!Number.isFinite(due.getTime())||due.getTime()<=Date.now()){
+  button.textContent='Batas pembayaran telah lewat';button.disabled=true;return;
+ }
+ if(!window.Swal?.fire){
+  message.textContent='Konfirmasi pembayaran belum siap. Silakan hubungi toko melalui WhatsApp.';return;
+ }
+ const decision=await Swal.fire({title:'Sudah melakukan pembayaran?',
+  text:'Laporan akan dikirim ke toko untuk diperiksa. Laporan ini bukan bukti pembayaran berhasil.',
+  icon:'question',showCancelButton:true,confirmButtonText:'Ya, laporkan',cancelButtonText:'Batal',
+  confirmButtonColor:'#8cc63f'});
+ if(!decision.isConfirmed)return;
+ const user=window.firebase?.auth?.()?.currentUser;
+ if(!user||user.isAnonymous){await Swal.fire({icon:'warning',title:'Silakan masuk kembali'});return}
+ button.disabled=true;const original=button.textContent;button.textContent='Mengirim laporan…';
+ try{
+  const token=await user.getIdToken();
+  const response=await fetch('/.netlify/functions/checkout-security',{
+   method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
+   cache:'no-store',body:JSON.stringify({action:'report_payment',orderId:data.orderId})});
+  const result=await response.json();
+  if(!response.ok||result?.success!==true)throw Error(result?.code||'REPORT_FAILED');
+  await Swal.fire({icon:'success',title:'Laporan diterima',
+   text:'Toko akan memeriksa pembayaranmu. Kamu dapat memantau pesanan di sini.',confirmButtonColor:'#8cc63f'});
+  await open();
+ }catch(err){button.textContent=original;button.disabled=false;
+  await Swal.fire({icon:'error',title:'Laporan belum terkirim',
+   text:'Coba beberapa saat lagi atau hubungi toko melalui WhatsApp.',confirmButtonColor:'#8cc63f'});
+ }
+}
+function reportAction(data,actions){
+ if(data.status!=='checkout_created'||!data.paymentDueAt||data.paymentReportedAt)return;
+ const due=data.paymentDueAt?.toDate?.()||new Date(data.paymentDueAt);
+ if(!Number.isFinite(due.getTime())||Date.now()>=due.getTime())return;
+ const btn=el('button','nexai-detail-btn','Laporkan Pembayaran');btn.type='button';
+ btn.addEventListener('click',()=>reportPaid(data,btn));actions.append(btn);
 }
 async function open(){
  const token=++loadToken;previousFocus=document.activeElement;dialog.hidden=false;document.body.style.overflow='hidden';document.getElementById('nexaiOrdersClose')?.focus();list.replaceChildren();message.textContent='Memeriksa akun pelanggan…';

@@ -167,7 +167,7 @@ function quoteHash(quote){return hash(JSON.stringify({items:quote.items,totals:q
 function summary(quote){return {quoteHash:quoteHash(quote),version:quote.version,items:quote.items.map(({productId,variantId,nama,varian,qty,harga,flash})=>({productId,variantId,nama,varian,qty,harga,flash})),
  totals:quote.totals,vouchers:quote.vouchers,stockStatus:quote.stockStatus,
  warnings:quote.warnings,shippingPotential:quote.shippingPotential};}
-function receipt(order,duplicate=false){return {orderId:order.orderId,totals:order.totals,
+function receipt(order,duplicate=false){return {orderId:order.orderId,orderNumber:order.orderNumber||order.orderId,totals:order.totals,
   items:order.items,vouchers:order.vouchers,duplicate,checkoutStatus:order.status,
   paymentDueAt:order.paymentDueAt?.toDate?.()?.toISOString?.()||
    (order.paymentDueAt instanceof Date?order.paymentDueAt.toISOString():null)};}
@@ -176,10 +176,22 @@ function payloadDigest(data){
  return hash(JSON.stringify({items:data.items,voucherCodes:{product:codes.product||'',shipping:codes.shipping||''},
   customer:data.customer,ekspedisi:data.ekspedisi,catatan:data.catatan,quoteHash:data.quoteHash}));
 }
+// R3: a customer-facing 12-character order number, while Firestore document ID
+// remains stable for stock reservations, voucher claims and request idempotency.
+// Collision is fail-closed through a unique Firestore document created atomically.
+const ORDER_ALPHABET='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+function publicOrderNumber(key){
+ let n=BigInt('0x'+key.slice(0,14));
+ let result='';
+ for(let i=0;i<9;i++){result=ORDER_ALPHABET[Number(n%32n)]+result;n/=32n;}
+ return 'IS-'+result;
+}
 function metaRefs(db,uid,requestId,now){
  const key=hash('request\0'+uid+'\0'+requestId);
+ const number=publicOrderNumber(key);
  return {attempt:db.collection('checkout_request_keys').doc(key),
   order:db.collection('orders').doc('ORD-'+key.slice(0,48)),
+  orderNumber:number,numberRef:db.collection('checkout_order_numbers').doc(number),
   rate:db.collection('checkout_order_limits').doc(hash('rate\0'+uid+'\0'+Math.floor(now/600000)))};
 }
 function verifiedUser(uid){if(typeof uid!=='string'||uid.length<1||uid.length>128)fail('AUTH_REQUIRED',401)}
@@ -249,7 +261,7 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const timestamp=serverTimestamp();
   // Time is authoritative server time. Legacy R1 orders without dueAt are excluded from auto-expiry.
   const paymentDueAt=expiryEnabled?new Date(Date.now()+60*60_000):null;
-  const order={orderId:meta.order.id,uid,customer:req.customer,ekspedisi:req.ekspedisi,
+  const order={orderId:meta.order.id,orderNumber:meta.orderNumber,uid,customer:req.customer,ekspedisi:req.ekspedisi,
    catatan:req.catatan,items:quote.orderItems.map(i=>({...i})),totals:{...quote.totals},
    vouchers:{...quote.vouchers},status:'checkout_created',channel:'whatsapp',
    createdAt:timestamp,updatedAt:timestamp,...(paymentDueAt?{paymentDueAt}:{})};
@@ -259,6 +271,7 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
    orderId:meta.order.id,uid,state:'reserved',items:allocations,
    ...(paymentDueAt?{expiresAt:paymentDueAt}:{}),createdAt:timestamp,updatedAt:timestamp});
   tx.create(meta.order,order);
+  tx.create(meta.numberRef,{orderId:meta.order.id,uid,createdAt:timestamp});
   // Preserve permanent Variant ID privately without changing the legacy order schema.
   tx.create(db.collection('checkout_order_variants').doc(meta.order.id),{
    orderId:meta.order.id,uid,items:quote.items.map(x=>({productId:x.productId,variantId:x.variantId,qty:x.qty})),

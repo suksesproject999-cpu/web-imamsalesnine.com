@@ -360,77 +360,62 @@ function openWhatsAppFromClick(url){
  window.location.assign(url);
  return true;
 }
-async function confirmWhatsAppRequired(id,url,paymentDueAt=null,checkoutAccount=null){
+async function confirmWhatsAppRequired(id,url,paymentDueAt=null,checkoutAccount=null,orderNumber=null){
+ // Scoped styles for new secondary action; no old rule overrides or !important.
+ if(!document.getElementById('imamR3OrderUxStyle')){
+  const style=document.createElement('style');style.id='imamR3OrderUxStyle';
+  style.textContent='.imam-r3-order-link,.imam-r13-wa-popup .swal2-cancel{background:#fff;border:1px solid #aecf88;color:#426f20;border-radius:12px;padding:13px 18px;font:inherit;font-weight:700;min-height:48px;cursor:pointer}.imam-r3-order-link:focus-visible,.imam-r13-wa-popup .swal2-cancel:focus-visible{outline:3px solid #8cc63f;outline-offset:2px}.imam-r3-due{padding:12px 14px;border-radius:12px;background:#f5f9ee;color:#4b5c3c;text-align:left;line-height:1.5}';
+  document.head.append(style);
+ }
+
+ const clean=str=>String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
  const dueMs=Date.parse(paymentDueAt||'');
  const hasDue=Number.isFinite(dueMs)&&secureTransport();
  const dueText=hasDue?new Date(dueMs).toLocaleString('id-ID',{
   timeZone:'Asia/Jakarta',day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'}):'';
- const paymentInfo=hasDue?`<p class="imam-r13-footnote"><b>Batas reservasi pembayaran: ${dueText} WIB.</b>
-  Jika tidak terverifikasi tepat waktu, stok otomatis dilepaskan.</p>
-  <p class="imam-r13-footnote">Sudah transfer? Laporkan setelah benar-benar membayar.
-  Laporan bukan bukti pembayaran sah dan hanya memberi satu tambahan waktu 30 menit.</p>
-  <button type="button" class="imam-r2-report-payment" data-imam-r2-report>Lapor Sudah Transfer</button>
-  <p class="imam-r13-footnote" data-imam-r2-feedback aria-live="polite"></p>`:'';
- async function reportPaymentFromDialog(root){
-  const btn=root.querySelector('[data-imam-r2-report]'),feedback=root.querySelector('[data-imam-r2-feedback]');
-  if(!btn||!checkoutAccount)return;
-  btn.addEventListener('click',async()=>{
-   if(btn.disabled)return;
-   if(!window.confirm('Anda benar-benar sudah transfer? Laporan tidak sama dengan verifikasi bank.'))return;
-   btn.disabled=true;feedback.textContent='Mengirim laporan pembayaran...';
-   try{const res=await secureCall(checkoutAccount,{action:'report_payment',orderId:id});
-    const waktu=new Date(res.paymentDueAt).toLocaleString('id-ID',{timeZone:'Asia/Jakarta',dateStyle:'medium',timeStyle:'short'});
-    feedback.textContent='Laporan tercatat, menunggu verifikasi Admin. Tenggat baru: '+waktu+' WIB.';
-   }catch(err){feedback.textContent=err?.publicMessage||'Laporan gagal. Hubungi Admin dengan bukti transfer.';btn.disabled=false;}
-  });
- }
-
- const clean=str=>String(str).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+ const dueInfo=hasDue?`<div class="imam-r13-footnote imam-r3-due">Selesaikan pembayaran sebelum <b>${clean(dueText)} WIB</b>.<br>
+  Pesanan yang belum dikonfirmasi hingga batas waktu dapat dibatalkan otomatis.</div>`:'';
  const html=`<div class="imam-r13-success-content">
   <div class="imam-r13-check-mark" aria-hidden="true"><svg viewBox="0 0 72 72" width="72" height="72"><circle cx="36" cy="36" r="32" fill="#eff8e5" stroke="#a4d56b" stroke-width="2"/><path d="m21 37 10 10 21-23" fill="none" stroke="#6cab2e" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-  <div class="imam-r13-eyebrow">LANGKAH 1 SELESAI</div>
-  <h2 id="imamR13ModalTitle">Pesanan berhasil dicatat</h2>
-  <p class="imam-r13-lead">Pesanan Anda telah tersimpan. Lanjutkan ke WhatsApp agar admin menerima pesan konfirmasi.</p>
-  <div class="imam-r13-receipt"><span>Nomor pesanan</span><strong>${clean(id)}</strong><small>Nomor ini bukan nomor resi pengiriman.</small></div>
-  <div class="imam-r13-steps"><div><span class="imam-r13-step-icon done">✓</span><span>Tercatat di sistem</span></div><div><span class="imam-r13-step-icon next">2</span><span>Konfirmasi ke admin via WhatsApp</span></div></div>
-  ${paymentInfo}
-  <p class="imam-r13-footnote">Setelah WhatsApp terbuka, tekan <b>Kirim</b> untuk menyampaikan format pesanan. Status pesanan dapat dipantau melalui <b>Pesanan Saya</b>.</p>
+  <h2 id="imamR13ModalTitle">Pesanan berhasil dibuat</h2>
+  <p class="imam-r13-lead">Pesananmu sudah tercatat. Lanjutkan ke WhatsApp untuk mendapatkan petunjuk pembayaran.</p>
+  <div class="imam-r13-receipt"><span>Nomor pesanan</span><strong>${clean(orderNumber||id)}</strong><small>Simpan nomor ini untuk memeriksa pesananmu.</small></div>
+  ${dueInfo}
+  <p class="imam-r13-footnote">Setelah membayar, buka <b>Pesanan Saya</b> untuk melaporkan pembayaran dan memantau statusnya.</p>
  </div>`;
+ const openOrders=()=>{if(typeof window.nexaiOpenOrders==='function'){window.nexaiOpenOrders();return true;}return false;};
  const release=lockWaDialog(id);
  try{
   if(window.Swal?.fire){
    const result=await Swal.fire({
-    html,icon:undefined,showConfirmButton:true,showDenyButton:false,showCancelButton:false,
-    showCloseButton:false,allowOutsideClick:false,allowEscapeKey:false,allowEnterKey:true,
+    html,icon:undefined,showConfirmButton:true,showDenyButton:false,showCancelButton:true,
+    showCloseButton:false,allowOutsideClick:false,allowEscapeKey:false,
     returnFocus:false,focusConfirm:true,buttonsStyling:false,
-    confirmButtonText:'<i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Kirim Pesanan via WhatsApp',
-    customClass:{popup:'imam-r13-wa-popup',confirmButton:'imam-r13-wa-confirm',actions:'imam-r13-wa-actions'},
+    confirmButtonText:'<i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Lanjutkan via WhatsApp',
+    cancelButtonText:'Lihat Pesanan Saya',
+    customClass:{popup:'imam-r13-wa-popup',confirmButton:'imam-r13-wa-confirm',cancelButton:'imam-r3-order-link',actions:'imam-r13-wa-actions'},
     width:'min(94vw,470px)',padding:0,
-    didOpen:(popup)=>{void reportPaymentFromDialog(popup)},
     preConfirm:()=>{openWhatsAppFromClick(url);return true}
    });
-   if(!result?.isConfirmed)return await confirmWhatsAppFallback(html,url,reportPaymentFromDialog);
-   return true;
+   if(result?.isConfirmed)return true;
+   if(result?.dismiss===window.Swal.DismissReason.cancel){if(openOrders())return true;}
+   return await confirmWhatsAppFallback(html,url,openOrders);
   }
-  return await confirmWhatsAppFallback(html,url,reportPaymentFromDialog);
+  return await confirmWhatsAppFallback(html,url,openOrders);
  }finally{release()}
 }
-function confirmWhatsAppFallback(html,url,reportPaymentFromDialog){
+function confirmWhatsAppFallback(html,url,openOrders){
  return new Promise(resolve=>{
   const shade=document.createElement('div');shade.className='imam-r13-fallback-shade';
   shade.setAttribute('role','presentation');
   shade.innerHTML='<section class="imam-r13-wa-popup imam-r13-fallback" role="dialog" aria-modal="true" aria-labelledby="imamR13ModalTitle">'+html
-   +'<div class="imam-r13-wa-actions"><button type="button" class="imam-r13-wa-confirm"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Kirim Pesanan via WhatsApp</button></div></section>';
-  const btn=shade.querySelector('button');const stop=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation()}};
+   +'<div class="imam-r13-wa-actions"><button type="button" class="imam-r13-wa-confirm"><i class="fa-brands fa-whatsapp" aria-hidden="true"></i> Lanjutkan via WhatsApp</button><button type="button" class="imam-r3-order-link">Lihat Pesanan Saya</button></div></section>';
+  const btn=shade.querySelector('.imam-r13-wa-confirm'),orders=shade.querySelector('.imam-r3-order-link');
+  const stop=e=>{if(e.key==='Escape'){e.preventDefault();e.stopPropagation()}};
   document.addEventListener('keydown',stop,true);document.body.appendChild(shade);
-  // Register one report handler on this modal instance only.
-  if(typeof reportPaymentFromDialog==='function')void reportPaymentFromDialog(shade);
-  btn.focus();
-  btn.addEventListener('click',()=>{
-   openWhatsAppFromClick(url);
-   document.removeEventListener('keydown',stop,true);
-   shade.remove();resolve(true)
-  },{once:true});
+  function done(){document.removeEventListener('keydown',stop,true);shade.remove();resolve(true)}
+  btn.focus();btn.addEventListener('click',()=>{openWhatsAppFromClick(url);done()},{once:true});
+  orders.addEventListener('click',()=>{done();openOrders()},{once:true});
  });
 }
 async function ranking(ids){try{if(typeof window.updateTopSellingRanking==='function')return void window.updateTopSellingRanking(ids);const store=db();if(!store)return;const snaps=await Promise.all(ids.map(async id=>{const s=await store.collection('statistik_produk').doc(id).get();return {id,sold:Number(s.data()?.terjual)||0}}));snaps.sort((a,b)=>b.sold-a.sold);await store.collection('marketplace_config').doc('top_selling').set({productIds:snaps.slice(0,15).map(x=>Number.isNaN(Number(x.id))?x.id:Number(x.id)),limit:15,updatedAt:firebase.firestore.FieldValue.serverTimestamp()},{merge:true})}catch(e){console.warn('Ranking best effort',e)}}
@@ -606,12 +591,12 @@ try{
 committed=true; window.imamstoreCheckoutLastError=null; /* Firestore mengonfirmasi commit: jangan izinkan submit ulang dari checkout yang sama. */
 /* R5: order activity denotes a RECORDED REQUEST, not payment/verified purchase. */
 try{document.dispatchEvent(new CustomEvent('nine:productactivity',{detail:{type:'order',ids:[...grouped.keys()]}}))}catch{};
-if(note)note.textContent='Pesanan '+d.orderId+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
+if(note)note.textContent='Pesanan '+(serverReceipt?.orderNumber||d.orderId)+' berhasil tercatat.';/* Konfirmasi sukses ditampilkan melalui modal checkout, tanpa toast lintas halaman. */
 button.textContent='Pesanan tercatat';
 /* R13: proses aman = commit orders -> bersihkan item terpesan ->
    tampilkan dialog WA wajib -> buka chat hanya dari klik, tidak submit ulang. */
 const waItems=serverReceipt?.items||items,waTotals=serverReceipt?.totals||summary,waVouchers=serverReceipt?.vouchers||order.vouchers;
-const waUrl='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message({...d,createdAt:new Date()},waItems,waTotals,waVouchers));
+const waUrl='https://wa.me/'+ADMIN+'?text='+encodeURIComponent(message({...d,orderId:serverReceipt?.orderNumber||d.orderId,createdAt:new Date()},waItems,waTotals,waVouchers));
 /* Keranjang dikonsolidasikan segera setelah server mengonfirmasi commit.
    Menutup tab saat dialog WA aktif tidak mengembalikan item yang sudah dipesan. */
 try{
@@ -623,7 +608,7 @@ try{
  window.dispatchEvent(new Event('storage'));
  window.imamstoreV43?.sync?.();window.imamstoreReferenceV38?.refresh?.();
 }catch(e){console.warn('[ImamStore developer] Sinkronisasi keranjang pasca-order',e)}
-await confirmWhatsAppRequired(d.orderId,waUrl,serverReceipt?.paymentDueAt,checkoutUser);
+await confirmWhatsAppRequired(d.orderId,waUrl,serverReceipt?.paymentDueAt,checkoutUser,serverReceipt?.orderNumber);
 /* Setelah dialog sukses selesai, tutup checkout dan hapus hanya state transaksi sementara. */
 window.__nexaiCheckoutLines=null;window.__nexaiCheckoutMode=null;window.imamstoreV43?.endCheckout?.();
 const draft=$('s5Draft');
