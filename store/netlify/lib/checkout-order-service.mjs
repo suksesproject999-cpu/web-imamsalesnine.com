@@ -3,11 +3,12 @@
  * Uses 1.2 quote engine and the existing Firestore database. No UI hooks.
  * API must verify Firebase Auth bearer token before calling these functions.
  * Account-limited vouchers require verified, migrated server redemption ledger.
- * Does NOT reserve inventory. Do not claim oversell protection.
+ * Atomically reserves CMS saleable stock when creating each order. Legacy orders are unchanged.
  */
 import {createHash} from 'node:crypto';
 import {quoteCheckout,CheckoutQuoteError,MAX_CHECKOUT_LINES} from './checkout-quote.mjs';
 import {CHECKOUT_VOUCHERS} from './checkout-vouchers.mjs';
+import {allocationPlan,stockPatches} from './checkout-stock.mjs';
 
 const ID=/^[A-Za-z0-9_-]{1,120}$/;
 const NONCE=/^[A-Za-z0-9_-]{16,100}$/;
@@ -237,12 +238,20 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const rateSnap=snapshots[snapshots.length-1];
   const count=rateSnap.exists?rateSnap.data()?.count:0;
   if(!Number.isSafeInteger(count)||count<0||count>=6)fail('ORDER_RATE_LIMITED',429);
+  // RESERVE saleable CMS stock atomically in the SAME transaction as the order.
+  // Retry on concurrent checkout re-reads CMS; a second order cannot spend the same 100 units.
+  const allocations=allocationPlan(quote.items,products);
+  const stockWrites=stockPatches(products,allocations,-1);
   // All Firestore reads must precede writes, including implicit order-exists check.
   const timestamp=serverTimestamp();
   const order={orderId:meta.order.id,uid,customer:req.customer,ekspedisi:req.ekspedisi,
    catatan:req.catatan,items:quote.orderItems.map(i=>({...i})),totals:{...quote.totals},
    vouchers:{...quote.vouchers},status:'checkout_created',channel:'whatsapp',
    createdAt:timestamp,updatedAt:timestamp};
+  for(const [id,patch] of stockWrites)tx.set(db.collection('cms_products').doc(id),patch,{merge:true});
+  // One immutable record of stock held by this order. Admin can release it exactly once.
+  tx.create(db.collection('checkout_stock_reservations').doc(meta.order.id),{
+   orderId:meta.order.id,uid,state:'reserved',items:allocations,createdAt:timestamp,updatedAt:timestamp});
   tx.create(meta.order,order);
   // Preserve permanent Variant ID privately without changing the legacy order schema.
   tx.create(db.collection('checkout_order_variants').doc(meta.order.id),{

@@ -14203,10 +14203,25 @@ async function saveAdminOrder(orderId,newStatus,newResi){
  const orderRef=store.collection('orders').doc(orderId);
  const ledgerRef=store.collection('order_sale_ledger').doc(orderId);
  return store.runTransaction(async tx=>{
-  const [orderSnap,ledgerSnap]=await Promise.all([tx.get(orderRef),tx.get(ledgerRef)]);
+  const reservationRef=store.collection('checkout_stock_reservations').doc(orderId);
+  const [orderSnap,ledgerSnap,reservationSnap]=await Promise.all([
+   tx.get(orderRef),tx.get(ledgerRef),tx.get(reservationRef)]);
   if(!orderSnap.exists)throw new Error('Pesanan tidak ditemukan.');
   const order=orderSnap.data()||{},units=quantities(order.items);
   const counted=ledgerSnap.exists&&ledgerSnap.data()?.counted===true;
+  const inventory=reservationSnap.exists?reservationSnap.data():null;
+  const inventoryState=inventory?.state;
+  const oldStatus=String(order.status||'');
+  // New orders reserve inventory at creation. Admin cannot reopen a released/committed order.
+  if(inventory){
+   if(inventory.orderId!==orderId||!Array.isArray(inventory.items))throw new Error('Ledger stok tidak sesuai.');
+   if(inventoryState==='released'&&newStatus!=='cancelled')throw new Error('Pesanan batal tidak bisa dibuka ulang. Buat pesanan baru.');
+   if(inventoryState==='committed'&&newStatus==='cancelled')throw new Error('Stok terjual perlu proses retur dan verifikasi barang fisik.');
+   if(inventoryState==='committed'&&newStatus==='checkout_created')throw new Error('Pesanan terkonfirmasi tidak boleh dikembalikan ke status awal.');
+   if(inventoryState==='reserved'&&SOLD_STATUSES.has(oldStatus))throw new Error('Status dan ledger stok perlu audit sebelum diperbarui.');
+  }
+  const release=!!inventory&&inventoryState==='reserved'&&newStatus==='cancelled';
+  const commitInventory=!!inventory&&inventoryState==='reserved'&&SOLD_STATUSES.has(newStatus);
   const nextCounted=SOLD_STATUSES.has(newStatus);
   const delta=Number(nextCounted)-Number(counted);
   const statRefs=[];
@@ -14218,9 +14233,57 @@ async function saveAdminOrder(orderId,newStatus,newResi){
     statRefs.push({ref,snap,id,qty});
    }
   }
+  // Cancellation restores only stock that THIS order previously reserved.
+  // Legacy orders (no reservation doc) never create fake stock on cancellation.
+  const stockWrites=[];
+  if(release){
+   const groups=new Map();
+   for(const item of inventory.items){
+    const id=String(item?.productId||''),qty=Number(item?.qty);
+    if(!/^[A-Za-z0-9_-]{1,120}$/.test(id)||!Number.isSafeInteger(qty)||qty<1||
+       !['shared','variant'].includes(item?.scope))throw new Error('Ledger reservasi stok rusak.');
+    if(item.scope==='variant'&&!/^[A-Za-z0-9_-]{1,120}$/.test(String(item.variantId||'')))throw new Error('ID varian reservasi tidak sesuai.');
+    const entry=groups.get(id)||[];entry.push(item);groups.set(id,entry);
+   }
+   for(const [id,entries] of groups){
+    const ref=store.collection('cms_products').doc(id),snap=await tx.get(ref);
+    if(!snap.exists)throw new Error('Produk untuk pengembalian stok tidak ditemukan: '+id);
+    const d=snap.data()||{},updated={id};
+    let main=d.stok??d.stock;
+    let variants=Array.isArray(d.varian)?d.varian.map(x=>x&&typeof x==='object'?{...x}:x):null;
+    const changeStock=(src,qty)=>{
+     const obj=src&&typeof src==='object'&&!Array.isArray(src)?{...src}:null;
+     const field=obj?['jumlah','qty','stock','quantity'].find(k=>obj[k]!=null):null;
+     const raw=obj?(field?obj[field]:null):src;
+     if(raw===null||raw===undefined||raw==='')throw new Error('Stok produk tidak valid.');
+     if(typeof raw==='string'&&!/^(0|[1-9]\d*)$/.test(raw.trim()))throw new Error('Stok produk tidak valid.');
+     const n=Number(raw);
+     if(!Number.isSafeInteger(n)||n<0||!Number.isSafeInteger(n+qty))throw new Error('Stok produk tidak valid.');
+     if(!obj)return n+qty;
+     obj[field]=n+qty;
+     if(obj.status==='Habis'&&n+qty>0)obj.status='Ready';
+     return obj;
+    };
+    for(const item of entries){
+     if(item.scope==='shared')main=changeStock(main,item.qty);
+     else{
+      if(!variants)throw new Error('Daftar varian tidak tersedia untuk pengembalian stok.');
+      const idx=variants.findIndex(v=>v&&typeof v==='object'&&v.variantId===item.variantId);
+      if(idx<0||variants[idx].stok==null&&variants[idx].stock==null)throw new Error('Varian stok tidak ditemukan.');
+      variants[idx].stok=changeStock(variants[idx].stok??variants[idx].stock,item.qty);
+     }
+    }
+    if(entries.some(x=>x.scope==='shared'))updated.stok=main;
+    if(entries.some(x=>x.scope==='variant'))updated.varian=variants;
+    stockWrites.push({ref,updated});
+   }
+  }
   const changes={status:newStatus,updatedAt:FV.serverTimestamp()};
   const previousResi=String(order.resi??order.awb??order.trackingNumber??'');
   if(newResi!==undefined&&newResi!==previousResi)changes.resi=newResi;
+  for(const {ref,updated} of stockWrites)tx.set(ref,updated,{merge:true});
+  if(release||commitInventory)tx.update(reservationRef,{
+   state:release?'released':'committed',updatedAt:FV.serverTimestamp()});
   tx.update(orderRef,changes);
   let affected=0;
   for(const {ref,snap,id,qty} of statRefs){
