@@ -10,6 +10,27 @@ import {CheckoutQuoteError} from '../lib/checkout-quote.mjs';
 import {CheckoutServerError,quoteForUser,createForUser} from '../lib/checkout-order-service.mjs';
 const ORIGINS=new Set(['https://store.imamsales.com','https://store.imamsalesnine.com']);
 const MAX_BODY_BYTES=12_288;
+const STAGING_CONTEXTS=new Set(['deploy-preview','branch-deploy']);
+const PRODUCTION_FIREBASE_PROJECT='apin-web';
+/* Isolated preview guard: a Netlify Deploy Preview must never silently use
+ * production Firebase Admin credentials. Read-only and writes both stop until
+ * its Firebase project and service-account identity are explicitly separate. */
+function isolatedStaging(){
+ const project=String(process.env.FIREBASE_PROJECT_ID||'').trim();
+ const email=String(process.env.FIREBASE_CLIENT_EMAIL||'').trim();
+ return process.env.CHECKOUT_STAGING_ISOLATED==='true'&&
+   project.length>0&&project!==PRODUCTION_FIREBASE_PROJECT&&
+   email.endsWith('@'+project+'.iam.gserviceaccount.com');
+}
+function previewMode(){return STAGING_CONTEXTS.has(process.env.CONTEXT||'')}
+function previewOriginAllowed(origin,request){
+ if(!previewMode()||!isolatedStaging()||!origin)return false;
+ try{
+  const input=new URL(origin),target=new URL(request.url);
+  return input.origin===target.origin&&input.protocol==='https:'&&
+   input.hostname.endsWith('.netlify.app');
+ }catch{return false}
+}
 // Per-instance best-effort throttle; durable 6-per-10min create limit lives in Firestore.
 const QUOTE_THROTTLE=new Map();
 function quoteAllowed(uid){
@@ -44,7 +65,7 @@ const MESSAGES={
 function respond(status,obj,origin=''){
  const h=new Headers({'Content-Type':'application/json; charset=utf-8',
   'Cache-Control':'private, no-store, max-age=0','X-Content-Type-Options':'nosniff','Vary':'Origin'});
- if(ORIGINS.has(origin)){
+ if(ORIGINS.has(origin)||(previewMode()&&isolatedStaging()&&origin.startsWith('https://')&&origin.endsWith('.netlify.app'))){
   h.set('Access-Control-Allow-Origin',origin);
   h.set('Access-Control-Allow-Methods','POST, OPTIONS');
   h.set('Access-Control-Allow-Headers','Authorization, Content-Type');
@@ -53,7 +74,10 @@ function respond(status,obj,origin=''){
 }
 export default async function handler(request){
  const origin=request.headers.get('origin')||'';
- if(origin&&!ORIGINS.has(origin))return respond(403,{success:false,code:'ORIGIN_FORBIDDEN'},origin);
+ if(previewMode()&&!isolatedStaging())
+  return respond(503,{success:false,code:'STAGING_NOT_ISOLATED'},origin);
+ if(origin&&!ORIGINS.has(origin)&&!previewOriginAllowed(origin,request))
+  return respond(403,{success:false,code:'ORIGIN_FORBIDDEN'},origin);
  if(request.method==='OPTIONS')return respond(204,null,origin);
  if(request.method!=='POST')return respond(405,{success:false,code:'METHOD_NOT_ALLOWED'},origin);
  if(!/^application\/json(?:;|$)/i.test(request.headers.get('content-type')||''))
