@@ -95,10 +95,66 @@ function claimsFor(db,uid,codes){return codes.map(code=>({code,ref:db.collection
 function redemptionRefs(db,uid,request){
  return claimsFor(db,uid,voucherCodesFrom(request).filter(code=>CHECKOUT_VOUCHERS.some(v=>v.code===code&&v.maxUsesPerAccount!=null)));
 }
-function entitlements(refs,snapshots,enabled){
- const map=new Map();
- for(let i=0;i<refs.length;i++)map.set(refs[i].code,enabled&&!snapshots[i].exists);
- return map;
+const CANCELLED=new Set(['cancelled','canceled','dibatalkan','batal','rejected','ditolak']);
+const FINISHED=new Set(['completed','complete','paid','confirmed','delivered','selesai','lunas']);
+const statusOf=order=>String(order?.status||'').trim().toLowerCase();
+const statusUsage=order=>CANCELLED.has(statusOf(order))?'cancelled':FINISHED.has(statusOf(order))?'used':'reserved';
+/** Verify historical usage from authoritative Firestore orders, including legacy voucher-name snapshots.
+ * Fail closed if history cannot be read completely. This is a bounded bridge until migration. */
+async function readVoucherHistory(db,uid,codes){
+ if(!codes.length)return new Map();
+ const collection=db.collection('orders');
+ if(typeof collection.where!=='function')return null; // older in-memory mocks only
+ let snapshots;
+ try{snapshots=await collection.where('uid','==',uid).limit(201).get()}
+ catch(_){fail('VOUCHER_HISTORY_UNAVAILABLE',503)}
+ if(!Array.isArray(snapshots.docs)||snapshots.docs.length>200)fail('VOUCHER_HISTORY_TOO_LARGE',503);
+ const result=new Map(codes.map(code=>[code,{state:'available',orders:[]} ]));
+ for(const doc of snapshots.docs){
+  const order=doc.data();
+  if(order?.uid!==uid)continue;
+  for(const code of codes){
+   const v=CHECKOUT_VOUCHERS.find(x=>x.code===code);
+   if(!v)continue;
+   const productName=String(order?.vouchers?.product||order?.totals?.productVoucherName||'').trim();
+   const shipping=order?.vouchers?.shipping;
+   const shippingName=String((typeof shipping==='object'&&shipping?shipping.name:shipping)||order?.totals?.shippingVoucherName||'').trim();
+   const shippingCode=typeof shipping==='object'&&shipping?String(shipping.code||''):'';
+   const applied=v.type==='shipping_fixed'?(shippingCode===code||shippingName===v.name):productName===v.name;
+   if(!applied)continue;
+   const entry=result.get(code);entry.orders.push(doc.id);
+   const state=statusUsage(order);
+   if(state==='used'||(state==='reserved'&&entry.state!=='used'))entry.state=state;
+  }
+ }
+ return result;
+}
+async function claimOrderStates(db,refs,snapshots,tx=null){
+ const result=new Map();
+ for(let i=0;i<refs.length;i++){
+  const snap=snapshots[i];if(!snap?.exists)continue;
+  const orderId=snap.data()?.orderId;
+  if(typeof orderId!=='string'||!/^ORD-[A-Za-z0-9_-]{16,100}$/.test(orderId)){result.set(refs[i].code,'used');continue}
+  const ref=db.collection('orders').doc(orderId),old=tx?await tx.get(ref):await ref.get();
+  result.set(refs[i].code,old.exists?statusUsage(old.data()):'used');
+ }
+ return result;
+}
+function entitlements(refs,snapshots,enabled,history,claimStates){
+ const result=new Map();
+ for(let i=0;i<refs.length;i++){
+  const code=refs[i].code,historyState=history?.get(code)?.state;
+  if(historyState==='used'){result.set(code,'used');continue}
+  if(historyState==='reserved'){result.set(code,'reserved');continue}
+  if(snapshots[i]?.exists){
+   const state=claimStates?.get(code)||'used';
+   result.set(code,state==='cancelled'?true:state);
+   continue;
+  }
+  // Valid history scan proves no past use, even when older ledger readiness flag is OFF.
+  result.set(code,history?true:(enabled?true:'unverified'));
+ }
+ return result;
 }
 function quoteFor(request,products,entitlement,now){
  return quoteCheckout({items:request.items,voucherCodes:request.voucherCodes},{products,
@@ -137,9 +193,11 @@ export async function quoteForUser({db,seedCatalog,uid,body,now=Date.now(),vouch
  const claims=redemptionRefs(db,uid,req);
  const docs=await Promise.all(productRefs.map(x=>x.ref.get()));
  const ledger=await Promise.all(claims.map(x=>x.ref.get()));
+ const history=await readVoucherHistory(db,uid,claims.map(x=>x.code));
+ const claimStates=await claimOrderStates(db,claims,ledger);
  const map=new Map(productRefs.map((x,i)=>[x.id,docs[i]]));
  const products=prepareProducts(req.items,seed,map);
- const quote=quoteFor(req,products,entitlements(claims,ledger,voucherLedgerReady),now);
+ const quote=quoteFor(req,products,entitlements(claims,ledger,voucherLedgerReady,history,claimStates),now);
  return summary(quote);
 }
 /** Server-only write, OFF in HTTP handler unless explicit gate enabled.
@@ -154,6 +212,8 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
  const meta=metaRefs(db,uid,req.requestId,now);
  const productRefs=[...new Set(req.items.map(x=>x.productId))].map(id=>({id,ref:db.collection('cms_products').doc(id)}));
  const claims=redemptionRefs(db,uid,req);
+ // Browser cannot write new /orders after R24 cutover; legacy account history is read-only.
+ const history=await readVoucherHistory(db,uid,claims.map(x=>x.code));
  return db.runTransaction(async tx=>{
   const refs=[meta.attempt,...productRefs.map(x=>x.ref),...claims.map(x=>x.ref),meta.rate];
   const snapshots=await Promise.all(refs.map(ref=>tx.get(ref)));
@@ -169,7 +229,9 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const products=prepareProducts(req.items,seed,cms);
   const firstClaim=1+productRefs.length;
   const claimSnapshots=snapshots.slice(firstClaim,firstClaim+claims.length);
-  const quote=quoteFor(req,products,entitlements(claims,claimSnapshots,voucherLedgerReady),Date.now());
+  // Firestore transaction rechecks the order belonging to every prior claim before a reuse.
+  const claimStates=await claimOrderStates(db,claims,claimSnapshots,tx);
+  const quote=quoteFor(req,products,entitlements(claims,claimSnapshots,voucherLedgerReady,history,claimStates),Date.now());
   // Prevent price / voucher / variant changes between quote and order creation.
   if(quoteHash(quote)!==req.quoteHash)fail('QUOTE_CHANGED',409);
   const rateSnap=snapshots[snapshots.length-1];
@@ -187,7 +249,14 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
    orderId:meta.order.id,uid,items:quote.items.map(x=>({productId:x.productId,variantId:x.variantId,qty:x.qty})),
    createdAt:timestamp});
   tx.create(meta.attempt,{uid,orderId:meta.order.id,payloadDigest:digest,createdAt:timestamp});
-  for(const x of claims)tx.create(x.ref,{uid,code:x.code,orderId:meta.order.id,createdAt:timestamp});
+  for(let i=0;i<claims.length;i++){
+   const x=claims[i],payload={uid,code:x.code,orderId:meta.order.id,state:'reserved',createdAt:timestamp};
+   if(claimSnapshots[i].exists){
+    // Only a cancelled order may release its previous voucher reservation.
+    if(claimStates.get(x.code)!=='cancelled')fail('VOUCHER_RESERVED',409);
+    tx.set(x.ref,payload);
+   }else tx.create(x.ref,payload);
+  }
   tx.set(meta.rate,{count:count+1,updatedAt:timestamp});
   return receipt(order,false);
  });

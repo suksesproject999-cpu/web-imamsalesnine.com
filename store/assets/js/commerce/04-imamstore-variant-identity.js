@@ -36,5 +36,39 @@
   return fromName||null;
  }
  function cartKey(p,selected){return resolve(p,selected)?.key||''}
- window.imamstoreVariantIdentity=Object.freeze({norm,label,entries,stable,resolve,forLine,cartKey,version:'variant-id-r1'});
+ // Shared stock contract for Add to Cart, Buy Now, cart editing and checkout UI.
+ // A variant with its own stock uses that SKU; otherwise variants share product stock.
+ function parseStock(value){
+  if(value==null||value==='')return null;
+  const raw=typeof value==='object'?(value.jumlah??value.qty??value.stock??value.quantity):value;
+  if(raw==null||raw==='')return null;
+  if(typeof raw!=='number'&&(typeof raw!=='string'||!/^(0|[1-9]\d*)$/.test(raw.trim())))return null;
+  const quantity=Number(raw);
+  return Number.isSafeInteger(quantity)&&quantity>=0?quantity:null;
+ }
+ function stockInfo(p,selected,lines=[],excludeKey=''){
+  const match=resolve(p,selected);
+  if(!match)return {stock:null,inCart:0,remaining:0,source:'unknown',known:false};
+  const specific=match.record&&(match.record.stok??match.record.stock);
+  const variantOwn=specific!==null&&specific!==undefined&&specific!=='';
+  const raw=variantOwn?specific:(p?.stok??p?.stock);
+  const stock=parseStock(raw);
+  const scope=variantOwn?'variant':'product';
+  let inCart=0;
+  for(const line of Array.isArray(lines)?lines:[]){
+   if(String(line?.id)!==String(p?.id)||String(line.key)===String(excludeKey)&&excludeKey)continue;
+   const linked=forLine(p,line);
+   if(!linked)continue;
+   if(scope==='variant'&&linked.variantId!==match.variantId)continue;
+   if(scope==='product'){
+    const otherOwn=linked.record&&(linked.record.stok??linked.record.stock);
+    if(otherOwn!==undefined&&otherOwn!==null&&otherOwn!=='')continue;
+   }
+   const n=Number(line.qty);
+   if(!Number.isSafeInteger(n)||n<0)return {stock,inCart,remaining:0,source:scope,known:false};
+   inCart+=n;
+  }
+  return {stock,inCart,remaining:stock===null?0:Math.max(0,stock-inCart),source:scope,known:stock!==null};
+ }
+ window.imamstoreVariantIdentity=Object.freeze({norm,label,entries,stable,resolve,forLine,cartKey,stockInfo,version:'variant-id-r2-stock'});
 })();

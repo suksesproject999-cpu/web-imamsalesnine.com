@@ -143,7 +143,8 @@ function stockValue(v) {
 function effectiveStock(p,variant) {
   const specific=variant.record?.stok??variant.record?.stock;
   const specificQty=stockValue(specific);
-  return specificQty===null?stockValue(p.stok??p.stock):specificQty;
+  return specificQty===null?{quantity:stockValue(p.stok??p.stock),source:'product'}:
+    {quantity:specificQty,source:'variant'};
 }
 function getProduct(products, productId) {
   if (products instanceof Map) return products.get(productId);
@@ -193,6 +194,9 @@ function applyVoucher(code,slot,subtotal,{map,now,entitlements}) {
     if (!Number.isSafeInteger(v.maxUsesPerAccount)||v.maxUsesPerAccount<1) fail('TRUSTED_VOUCHERS_INVALID');
     // This entitlement MUST come from a server-side transaction, NEVER request body.
     const eligibility=entitlements instanceof Map?entitlements.get(code):undefined;
+    if (eligibility === 'used') fail('VOUCHER_ALREADY_USED');
+    if (eligibility === 'reserved') fail('VOUCHER_RESERVED');
+    if (eligibility === 'unverified') fail('VOUCHER_LEDGER_NOT_READY');
     if (eligibility !== true) fail('VOUCHER_USAGE_UNVERIFIED');
   }
   if (typeof v.name!=='string' || !v.name.trim() || v.name.length>180) fail('TRUSTED_VOUCHERS_INVALID');
@@ -212,7 +216,7 @@ export function quoteCheckout(request, trusted) {
   if (!Array.isArray(request.items) || !request.items.length || request.items.length>MAX_CHECKOUT_LINES) fail('LINE_COUNT_INVALID');
   if (request.voucherCodes!==undefined) keys(request.voucherCodes,['product','shipping']);
   const selected=request.voucherCodes||{};
-  const used=new Set(),items=[],orderItems=[],warnings=[];
+  const used=new Set(),stockAllocated=new Map(),items=[],orderItems=[],warnings=[];
   let subtotal=0,totalItem=0;
   for(const line of request.items) {
     keys(line,['productId','variantId','qty'],['productId','qty']);
@@ -227,11 +231,14 @@ export function quoteCheckout(request, trusted) {
     if (used.has(key)) fail('DUPLICATE_LINE');
     used.add(key);
     const price=quoteVariant(p,variant,time);
-    const available=effectiveStock(p,variant);
+    const inventory=effectiveStock(p,variant),available=inventory.quantity;
+    const scope=productId+'|'+(inventory.source==='variant'?variant.variantId:'shared');
+    const allocated=(stockAllocated.get(scope)||0)+qty;
+    stockAllocated.set(scope,allocated);
     if (available===null) {
       if (stockPolicy==='strict') fail('STOCK_UNVERIFIED');
       warnings.push('STOCK_UNVERIFIED');
-    } else if (available<qty) fail('STOCK_INSUFFICIENT');
+    } else if (available<allocated) fail('STOCK_INSUFFICIENT');
     // Names are derived exclusively from trusted catalog.
     const name=String(p.nama??p.name??p.title??'').trim();
     if (!name || name.length>200) fail('CATALOG_NAME_INVALID');

@@ -16,12 +16,15 @@ const isOpen=()=>!sheet.hidden&&sheet.classList.contains('open')&&!!state.kind;
 const product=()=>state.productId?window.imamstoreCartBridge?.getProduct?.(state.productId)||null:null;
 const entries=p=>Array.isArray(p?.varian)?p.varian:[];
 const options=p=>{const vals=entries(p).map(label).map(x=>x.trim()).filter(Boolean);return vals.length?[...new Set(vals)]:['Default']};
-function stockNumber(value){
- if(value==null||value==='')return null;
- if(typeof value==='object')return stockNumber(value.jumlah??value.qty??value.stock??value.quantity??value.available);
- const n=Number(value);return Number.isFinite(n)&&n>=0?Math.floor(n):null;
+// One stock resolver shared with CartBridge; quantity limits differ only by purchase mode.
+function inventoryFor(p,variant){
+ const identity=window.imamstoreVariantIdentity;
+ const chosen=identity?.resolve(p,variant);
+ if(!chosen)return {stock:null,inCart:0,remaining:0,known:false};
+ const lines=state.kind==='buy'?[]:state.kind==='editCheckout'?(window.__nexaiCheckoutLines||[]):readCart();
+ const excluded=(state.kind==='editCart'||state.kind==='editCheckout')?state.lineKey:'';
+ return identity.stockInfo(p,{variantId:chosen.variantId},lines,excluded);
 }
-function stockFor(p,variant){const entry=entries(p).find(x=>normalize(label(x))===normalize(variant));const v=entry&&typeof entry==='object'?(entry.stok??entry.stock??entry.quantity??entry.qty):null;return stockNumber(v??p?.stok??p?.stock)}
 /* R3: penggunaan URL gambar dan fallback identik antara thumbnail dan preview. */
 const FALLBACK_IMAGE='data:image/svg+xml;charset=utf-8,'+encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="200" viewBox="0 0 200 200"><rect width="200" height="200" rx="16" fill="#f5f5f5"/><g fill="none" stroke="#b5bdb0" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"><rect x="28" y="39" width="144" height="119" rx="12"/><circle cx="72" cy="78" r="13"/><path d="M40 143l43-43 25 25 25-30 27 48"/></g></svg>');
 const photoCache={key:'',urls:[],index:0};
@@ -110,16 +113,18 @@ function resolve(){
  const available=options(p);
  const name=available.find(x=>normalize(x)===normalize(state.variant));
  if(!name)return {ok:false,p,error:'Pilihan varian sudah tidak tersedia'};
+ const ident=window.imamstoreVariantIdentity?.resolve(p,name);
+ if(entries(p).length&&(!ident||ident.variantId.startsWith('legacy-')))return {ok:false,p,error:'Varian belum memiliki Variant ID resmi. Hubungi admin toko.'};
  const count=Number(state.qty);
  const qtyInvalid=state.qtyInvalid||!Number.isSafeInteger(count)||count<1||count>999;
  const quote=window.imamstoreUnifiedPrice?.variantQuote?.(p,name);
  const unit=Number(quote?.price);
  if(!quote?.verified||!Number.isFinite(unit)||unit<=0)return {ok:false,p,error:'Harga varian belum tersedia'};
- const stock=stockFor(p,name);
- if(qtyInvalid)return {ok:false,p,quote,unit,stock,error:'Jumlah harus 1–999'};
- const alreadyInCart=state.kind==='cart'?readCart().filter(x=>String(x.id)===state.productId&&normalize(x.varian)===normalize(name)).reduce((n,x)=>n+Number(x.qty||0),0):0;
- if(stock!==null&&count+alreadyInCart>stock)return {ok:false,p,quote,unit,stock,error:'Jumlah melebihi stok; tersisa '+Math.max(0,stock-alreadyInCart)+' untuk varian ini'};
- return {ok:true,p,name,count,quote,unit,stock};
+ const inventory=inventoryFor(p,name);
+ if(qtyInvalid)return {ok:false,p,quote,unit,inventory,error:'Jumlah harus 1–999'};
+ if(!inventory.known)return {ok:false,p,quote,unit,inventory,error:'Stok resmi belum dapat dipastikan. Hubungi admin toko.'};
+ if(count>inventory.remaining)return {ok:false,p,quote,unit,inventory,error:'Jumlah melebihi stok; tersedia '+inventory.remaining+' untuk pilihan ini'};
+ return {ok:true,p,name,count,quote,unit,inventory};
 }
 function setText(id,str){const node=$(id);if(node&&node.textContent!==str)node.textContent=str}
 function render(){
@@ -138,9 +143,12 @@ function render(){
  setText('refPurchaseSaving',r.ok&&q.saving>0?'Hemat '+money(q.saving):'');
  setText('ninePurchaseBudgetValue',!state.qtyInvalid&&r.unit>0?money(r.unit*state.qty):'—');
  setText('ninePurchaseBudgetLabel','Total belanja · '+state.qty+' pcs');
- const stock=r.stock??(p?stockFor(p,state.variant):null);
- const inCart=state.kind==='cart'?readCart().filter(x=>String(x.id)===state.productId&&normalize(x.varian)===normalize(state.variant)).reduce((n,x)=>n+Number(x.qty||0),0):0;
- setText('refPurchaseStock',stock===null?'Stok: Perlu konfirmasi':'Stok: '+stock+(inCart?' · Sisa untuk keranjang: '+Math.max(0,stock-inCart):''));
+ const inv=r.inventory||(p?inventoryFor(p,state.variant):{known:false});
+ const stockLabel=!inv.known?'Stok resmi: Belum diverifikasi':
+  'Stok tersedia: '+inv.stock+' pcs'+
+  (state.kind==='buy'?' · Beli Sekarang: '+inv.remaining+' pcs':
+   ' · '+(state.kind==='cart'?'Bisa ditambah: ':'Bisa dipilih: ')+inv.remaining+' pcs');
+ setText('refPurchaseStock',stockLabel);
  const err=r.ok?state.submitError:r.error;
  if(message){message.textContent=err;message.hidden=!err}
  action.disabled=!r.ok||state.busy;

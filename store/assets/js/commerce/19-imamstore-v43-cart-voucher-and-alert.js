@@ -19,7 +19,77 @@ const currentScope=()=>checkoutActive()?'checkout':'cart';
 const activeVouchers=()=>voucherState[currentScope()];
 const resetCheckoutVouchers=()=>{voucherState.checkout={product:null,shipping:null};};
 
-const eligible=(v,sum)=>!!v&&sum>=Number(v.min||0)&&(!v.expired||Date.now()<=new Date(v.expired+'T23:59:59').getTime());
+// Voucher authorization is always a server quote. Never mark a limited voucher eligible just from UI rules.
+const voucherApi='/.netlify/functions/checkout-security';
+let voucherPending=false;
+const voucherError={
+ VOUCHER_LEDGER_NOT_READY:'Riwayat voucher belum siap. Lanjutkan tanpa voucher untuk sementara.',
+ VOUCHER_HISTORY_UNAVAILABLE:'Riwayat voucher belum dapat diperiksa. Coba lagi.',
+ VOUCHER_HISTORY_TOO_LARGE:'Riwayat voucher akun perlu ditinjau admin.',
+ VOUCHER_ALREADY_USED:'Voucher ini sudah digunakan akunmu.',
+ VOUCHER_RESERVED:'Voucher sedang dipakai di pesanan akunmu yang belum dibatalkan.',
+ VOUCHER_MINIMUM_NOT_MET:'Minimum pembelian untuk voucher belum terpenuhi.',
+ VOUCHER_EXPIRED:'Voucher sudah melewati masa berlaku.',
+ STOCK_UNVERIFIED:'Stok belum diverifikasi, voucher belum bisa dihitung.',
+ STOCK_INSUFFICIENT:'Jumlah produk melebihi stok yang tersedia.',
+ VARIANT_ID_REQUIRED:'Ada varian produk yang belum memiliki Variant ID resmi.',
+ QUOTE_RATE_LIMITED:'Terlalu banyak pemeriksaan. Coba lagi nanti.',
+ SESSION_INVALID:'Sesi login habis. Masuk kembali.'
+};
+function voucherRequestItems(lines){
+ if(!Array.isArray(lines)||!lines.length||lines.length>10)throw new Error('Pilih 1–10 produk yang valid sebelum memakai voucher.');
+ return lines.map(line=>{
+  const p=window.imamstoreCartBridge?.getProduct?.(line.id),identity=p?window.imamstoreVariantIdentity?.forLine?.(p,line):null;
+  if(!p||!identity)throw new Error('Data produk atau varian berubah. Perbarui keranjang.');
+  const qty=Number(line.qty);
+  if(!Number.isSafeInteger(qty)||qty<1||qty>999)throw new Error('Jumlah produk tidak valid.');
+  const item={productId:String(p.id),qty};
+  if(Array.isArray(p.varian)&&p.varian.length){
+   if(!/^[A-Za-z0-9_-]{1,120}$/.test(identity.variantId)||identity.variantId.startsWith('legacy-'))
+    throw new Error('Varian perlu diterbitkan ulang melalui Admin.');
+   item.variantId=identity.variantId;
+  }
+  return item;
+ });
+}
+async function verifyVoucherChoice(v,scope){
+ const lines=scope==='checkout'?checkoutLines():selected();
+ const items=voucherRequestItems(lines),chosen=voucherState[scope];
+ const auth=window.firebase?.auth?.(),user=auth?.currentUser;
+ if(!user||user.isAnonymous)throw new Error('Masuk menggunakan akun pelanggan sebelum memakai voucher.');
+ const token=await user.getIdToken();
+ if(!token)throw new Error('Sesi login berakhir. Masuk kembali.');
+ const codes={product:chosen.product?.id||'',shipping:chosen.shipping?.id||''};
+ codes[slotOf(v)]=v.id;
+ let response,body;
+ try{response=await fetch(voucherApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+  body:JSON.stringify({action:'quote',items,voucherCodes:codes}),cache:'no-store',credentials:'same-origin'});}
+ catch(_){throw new Error('Server voucher belum dapat dihubungi. Coba lagi.');}
+ try{body=await response.json()}catch(_){throw new Error('Balasan server voucher tidak valid.');}
+ if(!response.ok||body?.success!==true)throw new Error(voucherError[body?.code]||body?.message||'Voucher belum dapat digunakan.');
+ const local=calculateQuote(lines,{...chosen,[slotOf(v)]:v});
+ if(body?.totals?.subtotal!==local.subtotal||body?.totals?.productDiscount!==local.productDiscount||
+    body?.totals?.totalBayar!==local.total||Number(body?.shippingPotential||0)!==local.shippingPotential)
+  throw new Error('Harga atau nilai voucher berubah. Muat ulang produk dan checkout.');
+ return {items,scope};
+}
+async function chooseVoucher(v,scope,active){
+ if(voucherPending)return;
+ if(active){voucherState[scope][slotOf(v)]=null;sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher();return}
+ voucherPending=true;
+ const list=document.getElementById('v43VoucherList');if(list)list.setAttribute('aria-busy','true');
+ try{
+  const before=JSON.stringify((scope==='checkout'?checkoutLines():selected()).map(x=>[x.id,x.variantId,x.key,x.qty,x.harga]));
+  await verifyVoucherChoice(v,scope);
+  const after=JSON.stringify((scope==='checkout'?checkoutLines():selected()).map(x=>[x.id,x.variantId,x.key,x.qty,x.harga]));
+  if(scope!==currentScope()||before!==after)throw new Error('Keranjang berubah selama verifikasi. Silakan pilih voucher kembali.');
+  voucherState[scope][slotOf(v)]=v;
+  sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));
+  openVoucher();
+ }catch(err){alertUI(err?.message||'Voucher belum dapat digunakan.','warning')}
+ finally{voucherPending=false;const current=document.getElementById('v43VoucherList');if(current)current.removeAttribute('aria-busy')}
+}
+const eligible=(v,sum)=>!!v&&sum>=Number(v.min||0)&&(!v.expired||Date.now()<=Date.parse(v.expired+'T23:59:59.999+07:00'));
 const voucherValue=(v,sum)=>{if(!eligible(v,sum))return 0;let d=v.type==='product_percent'?Math.floor(sum*Number(v.discount||0)/100):Number(v.discount||0);if(v.maxDiscount!=null)d=Math.min(d,Number(v.maxDiscount));return Math.max(0,Math.min(sum,Math.floor(d)))};
 // Pricing Engine 5K: satu quote immutable untuk setiap permukaan transaksi.
 const checkoutLines=()=>checkoutActive()?window.__nexaiCheckoutLines:null;
@@ -103,13 +173,12 @@ function openVoucher(){
   root.querySelector('#v43SelectionCount').textContent=selectedCount?selectedCount+' voucher dipilih':'Belum ada voucher dipilih';
   root.querySelector('#v43VoucherDone').onclick=close;
   const code=root.querySelector('#v43VoucherCode');
-  const applyCode=()=>{
+  const applyCode=async()=>{
    const input=code.value.trim().toUpperCase(),v=vouchers.find(x=>x.id.toUpperCase()===input);
    if(!input){alertUI('Masukkan kode voucher terlebih dahulu.');return}
    if(!v){alertUI('Kode voucher tidak dikenal. Silakan pilih voucher yang tersedia.');return}
    if(!eligible(v,sum)){alertUI('Voucher belum memenuhi minimal belanja '+money(v.min)+' atau masa berlakunya telah habis.');return}
-   chosen[slotOf(v)]=v;
-   sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher();
+   await chooseVoucher(v,currentScope(),chosen[slotOf(v)]?.id===v.id);
   };
   root.querySelector('#v43VoucherApply').onclick=applyCode;
   code.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCode()}});
@@ -123,12 +192,12 @@ function openVoucher(){
    const expiry=v.expired?new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tidak dibatasi';
    row.querySelector('small').textContent='Min. '+money(v.min)+' · Sampai '+expiry;
    const stateLabel=row.querySelector('.v43-voucher-state');
-   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Voucher produk aktif'):(!ok?(sum<Number(v.min||0)?'Belanja kurang '+money(Number(v.min||0)-sum):'Tidak berlaku'):'Tersedia untuk dipilih');
+   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Dipilih · Diverifikasi server'):(!ok?(sum<Number(v.min||0)?'Belanja kurang '+money(Number(v.min||0)-sum):'Tidak berlaku'):'Periksa kelayakan akun di server');
    const btn=row.querySelector('.ref-v43-choose');
-   btn.textContent=active?'Batalkan':ok?'Gunakan':'Belum sesuai';btn.disabled=!ok&&!active;
+   btn.textContent=active?'Batalkan':ok?'Periksa & Pakai':'Belum sesuai';btn.disabled=!ok&&!active;
    btn.setAttribute('aria-pressed',String(active));
    btn.setAttribute('aria-label',(active?'Batalkan':'Gunakan')+' '+v.name);
-   btn.onclick=()=>{chosen[slot]=active?null:v;sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher()};
+   btn.onclick=()=>chooseVoucher(v,currentScope(),active);
    row.querySelector('.ref-v43-terms').onclick=()=>terms(v);
    list.append(row);
   });
