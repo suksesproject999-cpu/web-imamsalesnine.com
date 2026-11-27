@@ -13,7 +13,7 @@ const ID=/^[A-Za-z0-9_-]{1,120}$/;
 const NONCE=/^[A-Za-z0-9_-]{16,100}$/;
 const CUSTOMER_FIELDS=['nama','wa','email','provinsi','kota','kodepos','alamat'];
 const ALLOWED_QUOTE=['action','items','voucherCodes'];
-const ALLOWED_CREATE=[...ALLOWED_QUOTE,'requestId','customer','ekspedisi','catatan'];
+const ALLOWED_CREATE=[...ALLOWED_QUOTE,'requestId','customer','ekspedisi','catatan','quoteHash'];
 const OWN=(o,k)=>Object.prototype.hasOwnProperty.call(o,k);
 const hash=s=>createHash('sha256').update(s).digest('hex');
 export class CheckoutServerError extends Error{
@@ -55,8 +55,9 @@ function normalize(body,creating){
  const request={items,voucherCodes:vouchers};
  if(!creating)return request;
  if(typeof body.requestId!=='string'||!NONCE.test(body.requestId))fail('REQUEST_ID_INVALID');
+ if(typeof body.quoteHash!=='string'||!/^[a-f0-9]{64}$/.test(body.quoteHash))fail('QUOTE_HASH_REQUIRED');
  if(!str(body.ekspedisi,1,100)||!body.ekspedisi.trim()||!str(body.catatan,0,500))fail('SHIPPING_INVALID');
- return {...request,requestId:body.requestId,customer:customerCheck(body.customer),
+ return {...request,requestId:body.requestId,quoteHash:body.quoteHash,customer:customerCheck(body.customer),
    ekspedisi:body.ekspedisi.trim(),catatan:body.catatan.trim()};
 }
 function indexSeed(seed){
@@ -103,7 +104,10 @@ function quoteFor(request,products,entitlement,now){
  return quoteCheckout({items:request.items,voucherCodes:request.voucherCodes},{products,
   vouchers:CHECKOUT_VOUCHERS,voucherEntitlements:entitlement,now,stockPolicy:'strict'});
 }
-function summary(quote){return {version:quote.version,items:quote.items.map(({productId,variantId,nama,varian,qty,harga,flash})=>({productId,variantId,nama,varian,qty,harga,flash})),
+/* Bind buyer consent to exactly one server-verified quote (including names, variant IDs, price and vouchers).
+ * This is not an authorization token; server recalculates it in the Firestore transaction. */
+function quoteHash(quote){return hash(JSON.stringify({items:quote.items,totals:quote.totals,vouchers:quote.vouchers}));}
+function summary(quote){return {quoteHash:quoteHash(quote),version:quote.version,items:quote.items.map(({productId,variantId,nama,varian,qty,harga,flash})=>({productId,variantId,nama,varian,qty,harga,flash})),
  totals:quote.totals,vouchers:quote.vouchers,stockStatus:quote.stockStatus,
  warnings:quote.warnings,shippingPotential:quote.shippingPotential};}
 function receipt(order,duplicate=false){return {orderId:order.orderId,totals:order.totals,
@@ -111,7 +115,7 @@ function receipt(order,duplicate=false){return {orderId:order.orderId,totals:ord
 function payloadDigest(data){
  const codes=data.voucherCodes||{};
  return hash(JSON.stringify({items:data.items,voucherCodes:{product:codes.product||'',shipping:codes.shipping||''},
-  customer:data.customer,ekspedisi:data.ekspedisi,catatan:data.catatan}));
+  customer:data.customer,ekspedisi:data.ekspedisi,catatan:data.catatan,quoteHash:data.quoteHash}));
 }
 function metaRefs(db,uid,requestId,now){
  const key=hash('request\0'+uid+'\0'+requestId);
@@ -166,6 +170,8 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const firstClaim=1+productRefs.length;
   const claimSnapshots=snapshots.slice(firstClaim,firstClaim+claims.length);
   const quote=quoteFor(req,products,entitlements(claims,claimSnapshots,voucherLedgerReady),Date.now());
+  // Prevent price / voucher / variant changes between quote and order creation.
+  if(quoteHash(quote)!==req.quoteHash)fail('QUOTE_CHANGED',409);
   const rateSnap=snapshots[snapshots.length-1];
   const count=rateSnap.exists?rateSnap.data()?.count:0;
   if(!Number.isSafeInteger(count)||count<0||count>=6)fail('ORDER_RATE_LIMITED',429);

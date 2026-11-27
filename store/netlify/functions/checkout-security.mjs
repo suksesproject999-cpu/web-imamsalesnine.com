@@ -35,6 +35,8 @@ const MESSAGES={
  VOUCHER_MINIMUM_NOT_MET:'Minimal pembelian voucher belum terpenuhi.',
  ORDER_RATE_LIMITED:'Terlalu banyak permintaan. Coba kembali nanti.',
  REQUEST_ID_INVALID:'ID permintaan tidak valid.',
+ QUOTE_HASH_REQUIRED:'Konfirmasi harga server belum lengkap. Buka kembali checkout.',
+ QUOTE_CHANGED:'Harga, varian, atau voucher berubah. Perbarui ringkasan dan coba lagi.',
  LINE_COUNT_INVALID:'Maksimal 10 jenis produk per pesanan.',
  CUSTOMER_INVALID:'Alamat dan data penerima perlu diperiksa.',
  SHIPPING_INVALID:'Pilihan ekspedisi atau catatan tidak sesuai.',
