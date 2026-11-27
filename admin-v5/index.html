@@ -4383,12 +4383,22 @@ body.nexai-seller-workspace #sellerCenterFrame{height:100%!important;min-height:
 .imam-r3-status-trigger{width:100%;min-height:48px;display:flex;justify-content:space-between;align-items:center;text-align:left;background:#fff;border:1px solid #cbd5e1;border-radius:12px;padding:12px 16px;color:#172033;font:inherit;cursor:pointer}
 .imam-r3-status-trigger::after{content:'⌄';font-size:22px;color:#6e942c}
 .imam-r3-status-trigger:focus-visible,.imam-r3-option:focus-visible{outline:3px solid #8cc63f;outline-offset:2px}
-.imam-r3-shade{position:fixed;inset:0;z-index:2147483000;background:rgba(15,23,42,.6);display:flex;justify-content:center;align-items:flex-end;padding:14px;box-sizing:border-box}
+.imam-r3-shade{position:fixed;inset:0;z-index:2147483600;background:rgba(15,23,42,.6);display:flex;justify-content:center;align-items:flex-end;padding:14px;box-sizing:border-box}
 .imam-r3-panel{background:#fff;color:#172033;width:min(100%,480px);max-height:80dvh;overflow:auto;border-radius:20px;padding:18px;box-shadow:0 20px 60px rgba(0,0,0,.24)}
-.imam-r3-panel h3{margin:2px 0 15px;font-size:18px}
+.imam-r3-panel h3{margin:2px 0 10px;font-size:18px}
+.imam-r3-help{font-size:13px;line-height:1.5;margin:0 0 12px;color:#52634e}
 .imam-r3-option,.imam-r3-cancel{display:block;width:100%;padding:14px 16px;min-height:48px;border:0;border-bottom:1px solid #e5e7eb;text-align:left;font:inherit;background:#fff;color:inherit;cursor:pointer}
 .imam-r3-option[aria-pressed=true]{background:#eff8e5;color:#4f7b21;font-weight:700;border-radius:10px}
 .imam-r3-cancel{text-align:center;color:#64748b;margin-top:10px;border:1px solid #e5e7eb;border-radius:12px}
+.imam-r3-option:hover,.imam-r3-cancel:hover{background:#f3f8ed}
+.imam-r3-option:active,.imam-r3-cancel:active,.imam-r3-status-trigger:active{transform:scale(.985);filter:brightness(.96)}
+.imam-r3-option:disabled{color:#9da5ac;cursor:not-allowed}
+.imam-r3-status-trigger.is-open{border-color:#7eae39;background:#f3fae9;box-shadow:0 0 0 3px #8cc63f29}
+.imam-r3-status-trigger.is-changed{border-color:#8cc63f;background:#f5fbed;font-weight:700}
+.imam-r3-status-trigger:disabled{cursor:not-allowed;opacity:.55}
+.imam-r3-panel{overscroll-behavior:contain}
+@media(min-width:640px){.imam-r3-shade{align-items:center}}
+@media(prefers-reduced-motion:no-preference){.imam-r3-panel{animation:imamR4Enter .18s ease-out}@keyframes imamR4Enter{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}}
 </style>
 </head>
 
@@ -4876,20 +4886,21 @@ function adminV5Notice(message){
 }
 // Enhance all remaining Admin root selects while retaining native elements for existing logic.
 function adminV5ModernSelect(select){
- if(select.dataset.imamR3Select||select.multiple||select.size>1||select.hidden)return;
+ if(select.dataset.imamR3Select||select.hidden||select.multiple||select.size>1)return;
  select.dataset.imamR3Select='true';select.hidden=true;
- const trigger=document.createElement('button');trigger.type='button';trigger.className='imam-r3-status-trigger';
+ const trigger=document.createElement('button');trigger.type='button';trigger.className='imam-r3-status-trigger';trigger.setAttribute('aria-haspopup','dialog');trigger.setAttribute('aria-expanded','false');
  function refresh(){trigger.textContent=select.selectedOptions?.[0]?.textContent||'Pilih';trigger.disabled=select.disabled;}
  refresh();select.insertAdjacentElement('afterend',trigger);select.addEventListener('change',refresh);
  trigger.addEventListener('click',()=>{
   refresh();if(select.disabled)return;
+  trigger.classList.add('is-open');trigger.setAttribute('aria-expanded','true');
   const shade=document.createElement('div');shade.className='imam-r3-shade';
   const panel=document.createElement('section');panel.className='imam-r3-panel';
   panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');panel.setAttribute('aria-label','Pilih opsi');
   panel.append(Object.assign(document.createElement('h3'),{textContent:'Pilih opsi'}));
   const prev=document.activeElement;
-  function close(){document.removeEventListener('keydown',key,true);shade.remove();prev?.focus?.();}
-  function key(e){if(e.key==='Escape'){e.preventDefault();close();}}
+  function close(){document.removeEventListener('keydown',key,true);shade.remove();trigger.classList.remove('is-open');trigger.setAttribute('aria-expanded','false');prev?.focus?.();}
+  function key(e){if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();}}
   for(const option of select.options){
    const btn=document.createElement('button');btn.type='button';btn.className='imam-r3-option';
    btn.textContent=option.textContent;btn.disabled=option.disabled;
@@ -14184,6 +14195,48 @@ launch?.addEventListener("click",()=>{
 #nineOrderPanel .nine-feedback{margin-top:10px;color:#596b4d;font-size:13px;line-height:1.6;min-height:20px}
 @media (max-width:860px){#nineOrderPanel .nine-meta{grid-template-columns:repeat(2,minmax(0,1fr))}#nineOrderPanel .nine-order-body{grid-template-columns:1fr}#nineOrderPanel .nine-editor{grid-template-columns:1fr}#nineOrderPanel .nine-auth-grid{grid-template-columns:1fr 1fr}#nineOrderPanel .nine-auth-grid .nine-wide{grid-column:1/-1}}
 @media (max-width:560px){#nineOrderLaunch{right:12px;bottom:12px;padding:12px 14px;border-radius:12px}#nineOrderPanel .nine-topbar{padding:16px 12px 12px}#nineOrderPanel .nine-body{padding:12px}#nineOrderPanel .nine-meta{grid-template-columns:1fr 1fr}#nineOrderPanel .nine-topline{align-items:flex-start}#nineOrderPanel .nine-toolbar{width:100%}#nineOrderPanel .nine-toolbar button{flex:1}#nineOrderPanel .nine-auth-grid{grid-template-columns:1fr}#nineOrderPanel .nine-product{grid-template-columns:52px 1fr}#nineOrderPanel .nine-product img,#nineOrderPanel .nine-product .placeholder{width:52px;height:52px}#nineOrderPanel .nine-product strong{grid-column:2;text-align:left;min-width:0;margin-top:6px}#nineOrderPanel .nine-kv{grid-template-columns:96px 1fr}}
+/* R4: order workspace remains readable on a phone; all buttons visibly respond. */
+#nineOrderPanel .nine-topbar{flex:none}
+#nineOrderPanel .nine-title p{max-width:60ch}
+#nineOrderPanel button{transition:background-color .14s ease,box-shadow .14s ease,transform .12s ease,opacity .12s ease}
+#nineOrderPanel button:focus-visible{outline:3px solid #8cc63f;outline-offset:3px}
+#nineOrderPanel button:not(:disabled):active{transform:scale(.985);filter:brightness(.94)}
+#nineOrderPanel button:disabled{cursor:not-allowed;opacity:.55;box-shadow:none}
+#nineOrderPanel .nine-action-btn:not(:disabled):hover,#nineOrderPanel .nine-toolbar button:not(:disabled):hover{filter:brightness(.95)}
+#nineOrderPanel .nine-action-btn.is-loading::before{content:'';display:inline-block;vertical-align:-2px;width:14px;height:14px;margin-right:9px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:imamR4Spin .7s linear infinite}
+@keyframes imamR4Spin{to{transform:rotate(360deg)}}
+#nineOrderPanel .nine-action-btn.is-saved{background:#e7f5e3;color:#1e6a32;border:1px solid #b7d8ab}
+#nineOrderPanel .nine-editor .nine-field-status{font-size:12px;color:#6c7a62;min-height:19px;line-height:1.45}
+#nineOrderPanel .nine-editor .nine-field-status.is-dirty{color:#527e27;font-weight:700}
+#nineOrderPanel .nine-feedback[data-state="error"]{color:#b42318;font-weight:700}
+#nineOrderPanel .nine-feedback[data-state="success"]{color:#236c3b;font-weight:700}
+#nineOrderPanel .nine-feedback[data-state="progress"]{color:#4e6e2d}
+#nineOrderPanel .nine-feedback{overflow-wrap:anywhere}
+#nineOrderPanel .nine-editor .nine-action-btn{min-height:49px}
+#nineOrderPanel .nine-editor .imam-r3-status-trigger{min-height:49px}
+#nineOrderPanel .nine-editor input:focus-visible{outline:3px solid #8cc63f5c;outline-offset:2px}
+#nineOrderPanel .nine-editor .nine-verification{display:flex;flex-direction:row;align-items:flex-start;gap:10px;line-height:1.5;font-size:13px;cursor:pointer}
+#nineOrderPanel .nine-editor .nine-verification input{width:20px;height:20px;min-width:20px;margin-top:2px;accent-color:#7ba832}
+#nineOrderPanel .nine-editor .nine-verification[hidden]{display:none}
+@media(max-width:650px){
+ #nineOrderPanel .nine-shell{height:100dvh;overflow-y:auto;overscroll-behavior:contain}
+ #nineOrderPanel .nine-topbar{position:sticky;top:0;padding:11px 14px 10px;box-shadow:0 3px 12px #0002}
+ #nineOrderPanel .nine-topline{display:grid;grid-template-columns:1fr;gap:9px}
+ #nineOrderPanel .nine-title h2{font-size:19px;line-height:1.25}
+ #nineOrderPanel .nine-title p{display:none}
+ #nineOrderPanel .nine-toolbar{display:grid;grid-template-columns:1fr 1fr;gap:8px;width:100%}
+ #nineOrderPanel .nine-toolbar button{min-height:42px;padding:9px 11px;font-size:13px}
+ #nineOrderPanel .nine-meta{display:flex;gap:8px;margin-top:10px}
+ #nineOrderPanel .nine-metric{display:none}
+ #nineOrderPanel .nine-metric:nth-child(3),#nineOrderPanel .nine-metric:nth-child(4){display:flex;align-items:center;justify-content:space-between;flex:1;gap:6px;padding:7px 10px;border-radius:10px;min-width:0}
+ #nineOrderPanel .nine-metric small{font-size:11px;margin:0}
+ #nineOrderPanel .nine-metric strong{font-size:13px}
+ #nineOrderPanel .nine-body{flex:none;overflow:visible;padding:12px}
+ #nineOrderPanel .nine-order-footer{padding:14px}
+ #nineOrderPanel .nine-editor{grid-template-columns:minmax(0,1fr);gap:11px}
+ #nineOrderPanel .nine-editor .nine-action-btn{width:100%;min-width:0}
+}
+@media(prefers-reduced-motion:reduce){#nineOrderPanel button{transition:none}#nineOrderPanel .nine-action-btn.is-loading::before{animation-duration:1.4s}}
 </style>
 <button type="button" id="nineOrderLaunch">📦 Kelola Pesanan</button>
 <section id="nineOrderPanel" aria-label="Pesanan ImamStore" role="dialog" aria-modal="true">
@@ -14192,7 +14245,7 @@ launch?.addEventListener("click",()=>{
   <div class="nine-topline">
    <div class="nine-title">
     <h2>Kelola Pesanan ImamStore</h2>
-    <p>Tampilan kerja dibuat seperti halaman faktur agar nyaman membaca rincian pembeli, produk, pembayaran, dan status pesanan.</p>
+    <p>Periksa rincian pesanan, validasi pembayaran, lalu perbarui status dengan aman.</p>
    </div>
    <div class="nine-toolbar">
     <button type="button" class="nine-secondary" id="nineOrderClose">Tutup</button>
@@ -14423,7 +14476,7 @@ function closePanel(){panel.classList.remove('active');document.body.style.remov
 launch.addEventListener('click',openPanel);
 $("nineOrderClose").addEventListener('click',closePanel);
 panel.addEventListener('click',e=>{if(e.target===panel)closePanel();});
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('active'))closePanel();});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&panel.classList.contains('active')&&!document.querySelector('.imam-r3-shade'))closePanel();});
 $("nineOrderSignIn").addEventListener("click",async()=>{
  try{await ensureNetlifyAdmin();await firebase.auth().signInWithEmailAndPassword($("nineOrderEmail").value.trim(),$("nineOrderPass").value);$("nineOrderPass").value="";await check();}
  catch(e){$("nineOrderPass").value="";msg("Verifikasi belum berhasil. Periksa akun Anda dan coba kembali.");}
@@ -14512,30 +14565,46 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
  }
  // R3: Order status uses a keyboard-friendly dialog, never the browser's native select UI.
  function orderStatusPicker(select,trigger){
+  if(select.disabled||document.getElementById('imamR3StatusShade'))return;
   const options=STATUS_OPTIONS.filter(v=>v!=='expired');
-  const existing=document.getElementById('imamR3StatusShade');if(existing)existing.remove();
   const shade=document.createElement('div');shade.id='imamR3StatusShade';shade.className='imam-r3-shade';
-  const panel=document.createElement('section');panel.className='imam-r3-panel';
-  panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');
-  panel.setAttribute('aria-label','Pilih status pesanan');
-  const heading=el('h3','', 'Pilih Status Pesanan');panel.append(heading);
-  options.forEach(v=>{const btn=el('button','imam-r3-option',STATUS_LABEL[v]||v);btn.type='button';
+  const dialog=el('section','imam-r3-panel');dialog.setAttribute('role','dialog');dialog.setAttribute('aria-modal','true');
+  dialog.setAttribute('aria-labelledby','imamR4StatusTitle');
+  const heading=el('h3','', 'Pilih Status Pesanan');heading.id='imamR4StatusTitle';dialog.append(heading);
+  const helper=el('p','imam-r3-help','Status baru belum berlaku sampai tombol Simpan Perubahan ditekan.');
+  dialog.append(helper);
+  options.forEach(v=>{
+   const btn=el('button','imam-r3-option',STATUS_LABEL[v]||v);btn.type='button';
    btn.setAttribute('aria-pressed',String(select.value===v));
-   btn.addEventListener('click',()=>{select.value=v;select.dispatchEvent(new Event('change',{bubbles:true}));
-    trigger.textContent=STATUS_LABEL[v]||v;close();});panel.append(btn)});
+   btn.addEventListener('click',()=>{
+    select.value=v;select.dispatchEvent(new Event('change',{bubbles:true}));close();
+   });dialog.append(btn);
+  });
   const cancel=el('button','imam-r3-cancel','Batal');cancel.type='button';cancel.addEventListener('click',close);
-  panel.append(cancel);shade.append(panel);document.body.append(shade);
+  dialog.append(cancel);shade.append(dialog);
   const prev=document.activeElement;
-  function key(e){if(e.key==='Escape'){e.preventDefault();close();}}
-  function close(){document.removeEventListener('keydown',key,true);shade.remove();prev?.focus?.();}
+  trigger.setAttribute('aria-expanded','true');trigger.classList.add('is-open');
+  document.body.append(shade);
+  function close(){document.removeEventListener('keydown',key,true);shade.remove();trigger.classList.remove('is-open');trigger.setAttribute('aria-expanded','false');prev?.focus?.();}
+  function key(e){
+   if(e.key==='Escape'){e.preventDefault();e.stopImmediatePropagation();close();return;}
+   if(e.key==='Tab'){
+    const controls=[...dialog.querySelectorAll('button:not(:disabled)')];
+    if(!controls.length)return;
+    const idx=controls.indexOf(document.activeElement);
+    if(e.shiftKey&&(idx<=0)){e.preventDefault();controls[controls.length-1].focus();}
+    else if(!e.shiftKey&&idx===controls.length-1){e.preventDefault();controls[0].focus();}
+   }
+  }
   shade.addEventListener('click',e=>{if(e.target===shade)close()});
-  document.addEventListener('keydown',key,true);panel.querySelector('[aria-pressed="true"]')?.focus();
+  document.addEventListener('keydown',key,true);
+  dialog.querySelector('[aria-pressed="true"]')?.focus();
  }
  async function confirmOrderUpdate(orderNumber,newStatus){
   if(!window.Swal?.fire)return false; // No native confirm fallback on financial actions.
   const result=await Swal.fire({title:'Simpan perubahan pesanan?',
    text:'Pesanan '+orderNumber+' akan diubah menjadi '+(STATUS_LABEL[newStatus]||newStatus)+'.',
-   icon:'question',showCancelButton:true,confirmButtonText:'Ya, simpan',cancelButtonText:'Batal',
+   target:panel,icon:'question',showCancelButton:true,confirmButtonText:'Ya, simpan',cancelButtonText:'Batal',
    confirmButtonColor:'#8cc63f'});
   return result.isConfirmed===true;
  }
@@ -14562,47 +14631,92 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
   rightCol.append(renderSummary(d));
   const note=el('div','nine-section');note.append(el('h4','', 'Catatan & Pengiriman'));
   const noteGrid=el('div','nine-kv');
-  [['Status teknis',d.status||'checkout_created'],['Nomor resi',d.awb||d.resi||d.trackingNumber||'-'],['Ekspedisi',getExpedition(d)],['Catatan',d.catatan||d.notes||'-']].forEach(([k,v])=>{noteGrid.append(el('strong','',k),el('span','',maybe(v)));});
+  [['Tahap pesanan',STATUS_LABEL[d.status]||STATUS_LABEL.checkout_created],['Nomor resi',d.awb||d.resi||d.trackingNumber||'-'],['Ekspedisi',getExpedition(d)],['Catatan',d.catatan||d.notes||'-']].forEach(([k,v])=>{noteGrid.append(el('strong','',k),el('span','',maybe(v)));});
   note.append(noteGrid);
+  const noteStatusValue=noteGrid.children[1],noteResiValue=noteGrid.children[3];
   if(d.paymentDueAt){
    note.append(el('p','nine-feedback','Batas reservasi: '+formatDate(d.paymentDueAt)));
-   if(d.paymentReportedAt)note.append(el('p','nine-feedback','PEMBELI MELAPOR SUDAH TRANSFER. BELUM TERVERIFIKASI — cek mutasi rekening.'));
+   if(d.paymentReportedAt)note.append(el('p','nine-feedback','Pembeli melaporkan pembayaran. Cocokkan dengan mutasi rekening sebelum mengonfirmasi.'));
   }
   rightCol.append(note);
   body.append(rightCol);card.append(body);
   const footer=el('div','nine-order-footer');
   const editor=el('div','nine-editor');
-  const statusField=el('div','nine-field');statusField.append(el('label','', 'Ubah status'));const status=el('select');
+  const statusField=el('div','nine-field');
+  const labelStatus=el('label','', 'Ubah Status');statusField.append(labelStatus);
+  const status=el('select');
   STATUS_OPTIONS.forEach(v=>{const opt=el('option','',STATUS_LABEL[v]||v);opt.value=v;if(v==='expired')opt.disabled=true;status.append(opt);});
   status.value=STATUS_OPTIONS.includes(d.status)?d.status:'checkout_created';
+  const originalStatus=status.value;
+  let savedStatus=originalStatus;
+  let savedResi=safe(d.awb||d.resi||d.trackingNumber).slice(0,120);
   status.hidden=true;statusField.append(status);
   const statusTrigger=el('button','imam-r3-status-trigger',STATUS_LABEL[status.value]||status.value);
   statusTrigger.type='button';statusTrigger.setAttribute('aria-haspopup','dialog');
+  statusTrigger.setAttribute('aria-expanded','false');statusTrigger.setAttribute('aria-label','Pilih status pesanan');
+  labelStatus.id='imamR4StatusLabel'+doc.id;statusTrigger.setAttribute('aria-labelledby',labelStatus.id);
   statusTrigger.addEventListener('click',()=>orderStatusPicker(status,statusTrigger));
-  statusField.append(statusTrigger);
-  const awbField=el('div','nine-field');awbField.append(el('label','', 'Nomor resi / AWB'));const awb=el('input');awb.placeholder='Isi setelah pesanan dikirim';awb.maxLength=120;awb.value=safe(d.awb||d.resi||d.trackingNumber).slice(0,120);awbField.append(awb);
-  const verifyField=el('label','nine-field');
+  const pendingHint=el('small','nine-field-status','Belum ada perubahan');
+  pendingHint.setAttribute('aria-live','polite');
+  statusField.append(statusTrigger,pendingHint);
+  const awbField=el('div','nine-field');awbField.append(el('label','', 'Nomor Resi / AWB'));
+  const awb=el('input');awb.placeholder='Isi setelah pesanan dikirim';awb.maxLength=120;awb.value=savedResi;awbField.append(awb);
+  const verifyField=el('label','nine-field nine-verification');
   const verifyPayment=el('input');verifyPayment.type='checkbox';verifyPayment.checked=false;
-  verifyField.append(verifyPayment,el('span','', 'Pembayaran benar-benar sudah diverifikasi dari mutasi bank / sumber resmi'));
-  verifyField.hidden=d.status!=='checkout_created';
-  if(d.status==='expired'){status.disabled=true;statusTrigger.disabled=true;}
-  const save=el('button','nine-action-btn','Simpan Status');
-  const feedback=el('div','nine-feedback','');feedback.setAttribute('aria-live','polite');
+  verifyField.append(verifyPayment,el('span','', 'Saya sudah memeriksa dan memastikan pembayaran masuk melalui mutasi bank atau sumber resmi.'));
+  verifyField.hidden=savedStatus!=='checkout_created';
+  const locked=originalStatus==='expired';
+  if(locked){status.disabled=true;statusTrigger.disabled=true;awb.disabled=true;verifyField.hidden=true;}
+  const save=el('button','nine-action-btn','Simpan Perubahan');save.type='button';
+  const feedback=el('div','nine-feedback','');feedback.setAttribute('role','status');feedback.setAttribute('aria-live','polite');
+  let saving=false;
+  function dirty(){return status.value!==savedStatus||safe(awb.value)!==savedResi;}
+  function refreshEditor(){
+   const changed=dirty();
+   statusTrigger.textContent=STATUS_LABEL[status.value]||status.value;
+   statusTrigger.classList.toggle('is-changed',status.value!==savedStatus);
+   pendingHint.classList.toggle('is-dirty',changed);
+   pendingHint.textContent=locked?'Pesanan kedaluwarsa hanya dapat diperiksa.':changed?'Perubahan belum disimpan':'Belum ada perubahan';
+   if(!saving){save.disabled=locked||!changed||!authorized;save.textContent=save.classList.contains('is-saved')?'Berhasil Disimpan':'Simpan Perubahan';save.classList.remove('is-loading');}
+   verifyField.hidden=locked||savedStatus!=='checkout_created';
+  }
+  status.addEventListener('change',()=>{feedback.textContent='';delete feedback.dataset.state;save.classList.remove('is-saved');refreshEditor();});
+  awb.addEventListener('input',()=>{feedback.textContent='';delete feedback.dataset.state;save.classList.remove('is-saved');refreshEditor();});
+  verifyPayment.addEventListener('change',()=>{feedback.textContent='';delete feedback.dataset.state;});
+  refreshEditor();
   save.addEventListener('click',async()=>{
-   if(busy||!authorized||!validAdmin(firebase.auth().currentUser))return;
-   if(!await confirmOrderUpdate(safe(d.orderNumber||d.orderId||doc.id),status.value))return;
-   busy=true;save.disabled=true;
+   if(busy||saving||locked||!dirty())return;
+   if(!authorized||!validAdmin(firebase.auth().currentUser)){
+    feedback.dataset.state='error';feedback.textContent='Akses Admin belum aktif. Masuk kembali sebelum menyimpan.';return;
+   }
+   const nextStatus=status.value,nextResi=safe(awb.value).slice(0,120);
+   if(savedStatus==='checkout_created'&&SOLD_STATUSES.has(nextStatus)&&!verifyPayment.checked){
+    feedback.dataset.state='error';feedback.textContent='Centang verifikasi hanya setelah dana benar-benar diterima dan diperiksa.';
+    verifyPayment.focus();return;
+   }
+   if(!await confirmOrderUpdate(safe(d.orderNumber||d.orderId||doc.id),nextStatus))return;
+   busy=true;saving=true;save.disabled=true;save.classList.add('is-loading');
+   save.textContent='Menyimpan...';statusTrigger.disabled=true;awb.disabled=true;verifyPayment.disabled=true;
+   feedback.dataset.state='progress';feedback.textContent='Menyimpan perubahan pesanan...';
    try{
     await ensureNetlifyAdmin();
-    const resi=safe(awb.value).slice(0,120);
-    const outcome=await saveAdminOrder(doc.id,status.value,resi,verifyPayment.checked);
-    badge.className='nine-status '+status.value;
-    badge.textContent=STATUS_LABEL[status.value]||status.value;
-    const salesNote=outcome.delta>0?' Statistik terjual bertambah '+outcome.affected+' unit.':outcome.delta<0?' Statistik terjual dikoreksi '+outcome.affected+' unit.':' Statistik terjual tidak berubah.';
-    feedback.textContent='Status dan resi berhasil diperbarui.'+salesNote;
-    msg('Perubahan berhasil disimpan dan disinkronkan.');
+    const outcome=await saveAdminOrder(doc.id,nextStatus,nextResi,verifyPayment.checked);
+    badge.className='nine-status '+nextStatus;
+    badge.textContent=STATUS_LABEL[nextStatus]||nextStatus;
+    savedStatus=nextStatus;savedResi=nextResi;d.status=nextStatus;d.resi=nextResi;
+    noteStatusValue.textContent=STATUS_LABEL[nextStatus]||nextStatus;noteResiValue.textContent=nextResi||'-';
+    const salesNote=outcome.delta>0?' Data penjualan sudah diperbarui.':outcome.delta<0?' Data penjualan sudah disesuaikan.':'';
+    feedback.dataset.state='success';feedback.textContent='Perubahan berhasil disimpan.'+salesNote;
+    save.classList.add('is-saved');save.textContent='Berhasil Disimpan';
+    verifyPayment.checked=false;
+    msg('Perubahan pesanan berhasil disimpan.');
+   }catch(e){
+    feedback.dataset.state='error';feedback.textContent='Perubahan belum tersimpan: '+String(e?.message||'Silakan coba kembali.');
+    msg('Gagal menyimpan perubahan pesanan. Periksa pesan pada kartu pesanan.');
+   }finally{
+    busy=false;saving=false;statusTrigger.disabled=locked;awb.disabled=locked;verifyPayment.disabled=false;
+    save.classList.remove('is-loading');refreshEditor();
    }
-   catch(e){feedback.textContent='Gagal menyimpan perubahan. Periksa izin admin atau coba lagi.';msg('Gagal menyimpan: '+e.message);} finally{busy=false;save.disabled=false;}
   });
   editor.append(statusField,awbField,verifyField,save);footer.append(editor,feedback);card.append(footer);
   return card;
