@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded',function(){
 const dialog=document.getElementById('nexaiOrdersDialog'),message=document.getElementById('nexaiOrdersMessage'),list=document.getElementById('nexaiOrdersList');
 const invoice=document.getElementById('nexaiInvoiceDialog'),invoiceBody=document.getElementById('nexaiInvoiceBody');
 if(!dialog||!message||!list||!invoice||!invoiceBody)return;
-let previousFocus=null,detailFocus=null,loading=false,loadToken=0;
+let previousFocus=null,detailFocus=null,loadToken=0;
 const el=(tag,cls,content)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(content!==undefined)e.textContent=String(content??'');return e};
 const val=v=>v===null||v===undefined||String(v).trim()===''?'Belum tersedia':String(v);
 const rupiah=n=>Number.isFinite(Number(n))?'Rp'+Math.round(Number(n)).toLocaleString('id-ID'):'Belum tersedia';
@@ -14,7 +14,7 @@ const status=v=>statuses[String(v||'').toLowerCase()]||val(v);
 const line=(parent,label,value)=>{const row=el('div','nexai-invoice-line');row.append(el('span','',label),el('strong','',val(value)));parent.append(row)};
 const section=(heading)=>{const node=el('section','nexai-invoice-section');node.append(el('h3','',heading));invoiceBody.append(node);return node};
 function closeInvoice(){invoice.hidden=true;invoiceBody.replaceChildren();detailFocus?.focus?.()}
-function close(){loadToken++;closeInvoice();dialog.hidden=true;document.body.style.removeProperty('overflow');previousFocus?.focus?.()}
+function close(){loadToken++;closeInvoice();dialog.hidden=true;document.body.style.removeProperty('overflow');list.replaceChildren();historyCount=0;historyCursor=null;hasMoreOrders=false;historyUid='';dialog.removeAttribute('data-owner-uid');renderHistoryPager();previousFocus?.focus?.()}
 function showInvoice(data){
  detailFocus=document.activeElement;invoiceBody.replaceChildren();
  const id=val(data.orderNumber||data.orderId),customer=data.customer||{},totals=data.totals||{},items=Array.isArray(data.items)?data.items:[];
@@ -123,22 +123,104 @@ function reportAction(data,actions){
  const btn=el('button','nexai-detail-btn','Laporkan Pembayaran');btn.type='button';
  btn.addEventListener('click',()=>reportPaid(data,btn));actions.append(btn);
 }
+// R6: Firestore-side newest-first pagination; never sort a random limited set.
+// Privacy remains enforced by the Firebase Auth UID and /orders security rules.
+const HISTORY_PAGE_SIZE=10;
+const pager=el('div','nexai-orders-pager-r6');pager.id='nexaiOrdersPagerR6';pager.hidden=true;
+const pagerCount=el('p','nexai-orders-count-r6');pagerCount.setAttribute('aria-live','polite');
+const moreOrders=el('button','nexai-orders-more-r6','Muat 10 Pesanan Lagi');moreOrders.type='button';
+const pagerDone=el('p','nexai-orders-done-r6','Semua pesanan dari akun ini sudah ditampilkan.');
+pager.append(pagerCount,moreOrders,pagerDone);list.insertAdjacentElement('afterend',pager);
+if(!document.getElementById('nexaiOrdersPaginationStyleR6')){
+ const css=el('style');css.id='nexaiOrdersPaginationStyleR6';css.textContent=`
+  #nexaiOrdersPagerR6[hidden]{display:none}
+  #nexaiOrdersPagerR6{padding:14px 12px 20px;text-align:center;border-top:1px solid #e8eddf;margin-top:10px}
+  #nexaiOrdersPagerR6 .nexai-orders-count-r6{font-size:13px;line-height:1.55;color:#566154;margin:0 0 12px}
+  #nexaiOrdersPagerR6 .nexai-orders-more-r6{width:100%;max-width:400px;min-height:49px;border:1px solid #8cc63f;border-radius:13px;background:#8cc63f;color:#1c2c13;font-weight:700;font-size:14px;font-family:inherit;cursor:pointer;transition:background .15s ease,transform .15s ease,opacity .15s ease}
+  #nexaiOrdersPagerR6 .nexai-orders-more-r6:active{transform:scale(.975);background:#a2d85d}
+  #nexaiOrdersPagerR6 .nexai-orders-more-r6:focus-visible{outline:3px solid #577f29;outline-offset:3px}
+  #nexaiOrdersPagerR6 .nexai-orders-more-r6:disabled{opacity:.65;cursor:progress;transform:none}
+  #nexaiOrdersPagerR6 .nexai-orders-done-r6{color:#647263;font-size:12px;line-height:1.5;margin:4px 0}
+  @media(prefers-reduced-motion:reduce){#nexaiOrdersPagerR6 .nexai-orders-more-r6{transition:none}}
+ `;document.head.append(css);
+}
+let historyCursor=null,historyCount=0,historyUid='',hasMoreOrders=false,requestInFlight=false;
+function renderHistoryPager(){
+ pager.hidden=historyCount===0;
+ moreOrders.hidden=!hasMoreOrders;
+ pagerDone.hidden=hasMoreOrders;
+ pagerCount.textContent=hasMoreOrders
+  ?'Sudah tampil '+historyCount+' pesanan. Pesanan yang lebih lama masih bisa dilihat.'
+  :'Total '+historyCount+' pesanan dari akun ini telah ditampilkan.';
+}
+async function loadHistoryPage(older=false){
+ if(requestInFlight||(older&&(!hasMoreOrders||!historyCursor)))return;
+ const serial=loadToken,uid=historyUid;
+ const current=window.firebase?.auth?.()?.currentUser;
+ if(!current||current.isAnonymous||current.uid!==uid){
+  message.textContent='Akun pelanggan berubah. Silakan buka kembali Pesanan Saya.';return;
+ }
+ requestInFlight=true;moreOrders.disabled=true;
+ const oldText=moreOrders.textContent;moreOrders.textContent='Memuat pesanan…';
+ message.textContent=older?'Memuat pesanan lebih lama…':'Mengambil pesanan terbaru dari akun ini…';
+ try{
+  // +1 look-ahead, so the button disappears precisely at the end of the history.
+  let query=firebase.firestore().collection('orders')
+   .where('uid','==',uid).orderBy('createdAt','desc').limit(HISTORY_PAGE_SIZE+1);
+  if(older)query=query.startAfter(historyCursor);
+  // Do not silently show stale cached data as if it were the latest orders.
+  const snap=await query.get({source:'server'});
+  if(serial!==loadToken||dialog.hidden||firebase.auth().currentUser?.uid!==uid)return;
+  const page=snap.docs.slice(0,HISTORY_PAGE_SIZE);
+  const fragment=document.createDocumentFragment();
+  page.forEach(d=>fragment.append(renderOrder({...d.data(),orderId:d.data().orderId||d.id})));
+  if(older){list.append(fragment);historyCount+=page.length;}
+  else{list.replaceChildren(fragment);historyCount=page.length;}
+  historyCursor=page.length?page[page.length-1]:older?historyCursor:null;
+  hasMoreOrders=snap.docs.length>HISTORY_PAGE_SIZE;
+  renderHistoryPager();
+  message.textContent=historyCount
+   ?'Menampilkan '+historyCount+' pesanan, dari yang terbaru. '+(hasMoreOrders?'Pilih Muat 10 Pesanan Lagi untuk melihat pesanan sebelumnya.':'Seluruh riwayat dari akun ini sudah ditampilkan.')
+   :'Belum ada pesanan di akun ini. Jika baru memesan, pastikan akun yang digunakan sama dengan saat checkout.';
+ }catch(e){
+  if(serial!==loadToken)return;
+  console.warn('ImamStore order history read failed',e);
+  const base=historyCount?'Pesanan yang sudah tampil tetap tersimpan di layar. ':'Riwayat pesanan belum dapat ditampilkan. ';
+  const problem=e?.code==='permission-denied'?'Periksa akun yang sedang digunakan lalu coba lagi.':
+   e?.code==='failed-precondition'?'Layanan riwayat pesanan sedang disiapkan. Hubungi toko jika perlu bantuan.':
+   'Periksa koneksi internet lalu pilih Perbarui.';
+  message.textContent=base+problem;
+ }finally{
+  if(serial===loadToken){requestInFlight=false;moreOrders.disabled=false;moreOrders.textContent=oldText;}
+ }
+}
 async function open(){
- const token=++loadToken;previousFocus=document.activeElement;dialog.hidden=false;document.body.style.overflow='hidden';document.getElementById('nexaiOrdersClose')?.focus();list.replaceChildren();message.textContent='Memeriksa akun pelanggan…';
+ const wasHidden=dialog.hidden;
+ const token=++loadToken;
+ if(wasHidden)previousFocus=document.activeElement;
+ dialog.hidden=false;document.body.style.overflow='hidden';
+ document.getElementById('nexaiOrdersClose')?.focus();
+ message.textContent='Memeriksa akun pelanggan…';
  try{
   if(!window.firebase?.auth||!window.firebase?.firestore){message.textContent='Layanan akun belum siap. Silakan coba lagi.';return}
   const auth=firebase.auth();await auth.authStateReady?.();if(token!==loadToken)return;
   const user=auth.currentUser;
-  if(!user||user.isAnonymous){message.textContent='Masuk menggunakan Google atau email untuk melihat pesanan akun Anda.';const b=el('button','nexai-orders-open','Masuk ke akun pelanggan');b.type='button';b.addEventListener('click',async()=>{if(await window.nexaiRequireCustomerLogin?.()){close();open()}});list.append(b);return}
-  message.textContent='Memuat riwayat pesanan…';
-  const snap=await firebase.firestore().collection('orders').where('uid','==',user.uid).limit(40).get();
-  if(token!==loadToken)return;
-  const docs=snap.docs.map(d=>({...d.data(),orderId:d.data().orderId||d.id})).sort((a,b)=>(b.createdAt?.seconds||0)-(a.createdAt?.seconds||0)).slice(0,10);
-  if(!docs.length){message.textContent='Belum ada pesanan yang terhubung ke akun ini.';return}
-  message.textContent='Menampilkan '+docs.length+' pesanan terbaru dari akun ini.';
-  docs.forEach(d=>list.append(renderOrder(d)));
- }catch(e){if(token!==loadToken)return;console.warn('Order history read failed',e);message.textContent=e?.code==='permission-denied'?'Riwayat pesanan belum dapat ditampilkan. Silakan masuk kembali atau hubungi layanan pelanggan.':'Riwayat pesanan belum dapat dimuat. Periksa koneksi dan coba lagi.'}
+  if(!user||user.isAnonymous){
+   list.replaceChildren();historyUid='';historyCount=0;historyCursor=null;hasMoreOrders=false;renderHistoryPager();
+   message.textContent='Masuk menggunakan akun yang dipakai saat checkout agar pesanan Anda dapat ditampilkan.';
+   const b=el('button','nexai-orders-open','Masuk ke akun pelanggan');b.type='button';
+   b.addEventListener('click',async()=>{if(await window.nexaiRequireCustomerLogin?.()){close();open()}});list.append(b);return;
+  }
+  historyUid=user.uid;
+  // Do not destroy the previous list before a new successful server response.
+  // If the customer changes account, never expose the prior account's cards.
+  if(dialog.dataset.ownerUid!==user.uid){list.replaceChildren();historyCount=0;historyCursor=null;hasMoreOrders=false;renderHistoryPager();}
+  dialog.dataset.ownerUid=user.uid;
+  requestInFlight=false;
+  await loadHistoryPage(false);
+ }catch(e){if(token!==loadToken)return;console.warn('ImamStore order history auth failed',e);message.textContent='Akun pelanggan belum siap. Silakan coba lagi.'}
 }
+moreOrders.addEventListener('click',()=>loadHistoryPage(true));
 window.nexaiOpenOrders=open;
 document.getElementById('nexaiOrdersRefresh')?.addEventListener('click',open);
 document.getElementById('nexaiOrdersClose')?.addEventListener('click',close);
