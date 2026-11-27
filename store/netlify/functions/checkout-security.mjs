@@ -8,6 +8,7 @@ import {FieldValue} from 'firebase-admin/firestore';
 import {getPresenceFirebase} from '../lib/firebase-admin.mjs';
 import {CheckoutQuoteError} from '../lib/checkout-quote.mjs';
 import {CheckoutServerError,quoteForUser,createForUser} from '../lib/checkout-order-service.mjs';
+import {reportPayment} from '../lib/checkout-expiry.mjs';
 const ORIGINS=new Set(['https://store.imamsales.com','https://store.imamsalesnine.com']);
 const MAX_BODY_BYTES=12_288;
 const STAGING_CONTEXTS=new Set(['deploy-preview','branch-deploy']);
@@ -43,6 +44,12 @@ function quoteAllowed(uid){
 }
 const MESSAGES={
  AUTH_REQUIRED:'Silakan masuk menggunakan akun pelanggan.',
+ REPORT_INVALID:'Nomor pesanan tidak valid.',
+ ORDER_NOT_FOUND:'Pesanan tidak ditemukan pada akun ini.',
+ RESERVATION_MISSING:'Pesanan tidak memiliki reservasi aktif.',
+ ORDER_NOT_PENDING:'Pesanan sudah tidak menunggu pembayaran.',
+ RESERVATION_EXPIRED:'Waktu pembayaran telah berakhir. Hubungi admin untuk pemeriksaan transfer.',
+ PAYMENT_ALREADY_REPORTED:'Laporan pembayaran untuk pesanan ini sudah diterima.',
  REQUEST_SHAPE_INVALID:'Data permintaan checkout tidak sesuai.',
  REQUEST_ID_REUSED:'Permintaan ini sudah pernah digunakan untuk pesanan lain.',
  PRODUCT_UNAVAILABLE:'Produk tidak tersedia atau sudah dinonaktifkan.',
@@ -60,6 +67,7 @@ const MESSAGES={
  VOUCHER_EXPIRED:'Voucher sudah berakhir.',
  VOUCHER_MINIMUM_NOT_MET:'Minimal pembelian voucher belum terpenuhi.',
  ORDER_RATE_LIMITED:'Terlalu banyak permintaan. Coba kembali nanti.',
+ ORDER_ALREADY_CLOSED:'Pesanan ini sudah dibatalkan atau kedaluwarsa. Buat pesanan baru.',
  REQUEST_ID_INVALID:'ID permintaan tidak valid.',
  QUOTE_HASH_REQUIRED:'Konfirmasi harga server belum lengkap. Buka kembali checkout.',
  QUOTE_CHANGED:'Harga, varian, atau voucher berubah. Perbarui ringkasan dan coba lagi.',
@@ -112,17 +120,28 @@ export default async function handler(request){
    const data=await quoteForUser(args);
    return respond(200,{success:true,...data},origin);
   }
+  if(body?.action==='report_payment'){
+   if(process.env.CHECKOUT_SECURITY_WRITE_ENABLED!=='true')
+    return respond(503,{success:false,code:'ORDER_WRITE_NOT_ACTIVATED'},origin);
+   if(!body||Object.keys(body).sort().join(',')!=='action,orderId')
+    return respond(400,{success:false,code:'REQUEST_SHAPE_INVALID'},origin);
+   const data=await reportPayment({db,uid:decoded.uid,orderId:body.orderId,
+    serverTimestamp:()=>FieldValue.serverTimestamp()});
+   return respond(200,{success:true,...data},origin);
+  }
   if(body?.action==='create'){
    // Default OFF — do NOT activate until Rules cutover and Stage 1.4 client integration.
    if(process.env.CHECKOUT_SECURITY_WRITE_ENABLED!=='true')
     return respond(503,{success:false,code:'ORDER_WRITE_NOT_ACTIVATED',
      message:'Pembuatan pesanan aman belum diaktifkan.'},origin);
-   const data=await createForUser({...args,serverTimestamp:()=>FieldValue.serverTimestamp()});
+   const data=await createForUser({...args,expiryEnabled:process.env.CHECKOUT_STOCK_EXPIRY_ENABLED==='true',
+    serverTimestamp:()=>FieldValue.serverTimestamp()});
    return respond(200,{success:true,...data},origin);
   }
   return respond(400,{success:false,code:'ACTION_INVALID'},origin);
  }catch(err){
-  if(err instanceof CheckoutQuoteError||err instanceof CheckoutServerError){
+  if(err instanceof CheckoutQuoteError||err instanceof CheckoutServerError||String(err?.code||'').startsWith('REPORT_')||
+   ['ORDER_NOT_FOUND','RESERVATION_MISSING','ORDER_NOT_PENDING','RESERVATION_EXPIRED','PAYMENT_ALREADY_REPORTED'].includes(err?.code)){
    const code=err.code||'CHECKOUT_INVALID',status=err instanceof CheckoutServerError?err.status:400;
    return respond(status,{success:false,code,message:MESSAGES[code]||'Data checkout perlu diperiksa kembali.'},origin);
   }

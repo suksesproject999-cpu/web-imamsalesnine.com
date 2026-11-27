@@ -14181,8 +14181,8 @@ const list=$("nineOrderList"),empty=$("nineOrderEmpty");
 const more=$("nineOrderMore"),paging=$("nineOrderPagination");
 let authorized=false,busy=false;
 let oldestCursor=null,loadingOrders=false,queryEpoch=0,orderCount=0;
-const STATUS_OPTIONS=["checkout_created","confirmed","processing","packed","shipped","delivered","completed","cancelled"];
-const STATUS_LABEL={checkout_created:"Menunggu konfirmasi",confirmed:"Dikonfirmasi",processing:"Diproses",packed:"Dikemas",shipped:"Dikirim",delivered:"Terkirim",completed:"Selesai",cancelled:"Dibatalkan"};
+const STATUS_OPTIONS=["checkout_created","confirmed","processing","packed","shipped","delivered","completed","cancelled","expired"];
+const STATUS_LABEL={checkout_created:"Menunggu konfirmasi",confirmed:"Dikonfirmasi",processing:"Diproses",packed:"Dikemas",shipped:"Dikirim",delivered:"Terkirim",completed:"Selesai",cancelled:"Dibatalkan",expired:"Kedaluwarsa"};
 
 // Selaras dengan R14: perbarui status, statistik terjual, dan ledger dalam satu transaksi.
 const SOLD_STATUSES=new Set(['confirmed','processing','packed','shipped','delivered','completed']);
@@ -14197,7 +14197,8 @@ function quantities(items){
  }
  return result;
 }
-async function saveAdminOrder(orderId,newStatus,newResi){
+async function saveAdminOrder(orderId,newStatus,newResi,paymentVerified=false){
+ if(newStatus==='expired')throw new Error('Status Kedaluwarsa hanya diproses sistem otomatis.');
  if(!STATUS_OPTIONS.includes(newStatus))throw new Error('Status tidak valid.');
  const store=firebase.firestore(), FV=firebase.firestore.FieldValue;
  const orderRef=store.collection('orders').doc(orderId);
@@ -14212,6 +14213,15 @@ async function saveAdminOrder(orderId,newStatus,newResi){
   const inventory=reservationSnap.exists?reservationSnap.data():null;
   const inventoryState=inventory?.state;
   const oldStatus=String(order.status||'');
+  if(oldStatus==='expired')throw new Error('Pesanan telah kedaluwarsa. Pembayaran terlambat memerlukan pemeriksaan manual dan pesanan baru.');
+  // Checkout cannot be confirmed unless bank/payment record has been verified by Admin.
+  if(inventoryState==='reserved'&&SOLD_STATUSES.has(newStatus)){
+   if(!paymentVerified)throw new Error('Verifikasi pembayaran terlebih dahulu melalui mutasi bank atau sumber pembayaran resmi.');
+   const cutoff=inventory.expiresAt?.toMillis?.()??
+    (inventory.expiresAt?.toDate?.()?.getTime?.()??new Date(inventory.expiresAt||0).getTime());
+   if(Number.isFinite(cutoff)&&cutoff>0&&Date.now()>=cutoff)
+    throw new Error('Reservasi sudah melewati tenggat. Jangan konfirmasi; periksa pengembalian dana atau stok baru.');
+  }
   // New orders reserve inventory at creation. Admin cannot reopen a released/committed order.
   if(inventory){
    if(inventory.orderId!==orderId||!Array.isArray(inventory.items))throw new Error('Ledger stok tidak sesuai.');
@@ -14459,14 +14469,24 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
   const note=el('div','nine-section');note.append(el('h4','', 'Catatan & Pengiriman'));
   const noteGrid=el('div','nine-kv');
   [['Status teknis',d.status||'checkout_created'],['Nomor resi',d.awb||d.resi||d.trackingNumber||'-'],['Ekspedisi',getExpedition(d)],['Catatan',d.catatan||d.notes||'-']].forEach(([k,v])=>{noteGrid.append(el('strong','',k),el('span','',maybe(v)));});
-  note.append(noteGrid);rightCol.append(note);
+  note.append(noteGrid);
+  if(d.paymentDueAt){
+   note.append(el('p','nine-feedback','Batas reservasi: '+formatDate(d.paymentDueAt)));
+   if(d.paymentReportedAt)note.append(el('p','nine-feedback','PEMBELI MELAPOR SUDAH TRANSFER. BELUM TERVERIFIKASI — cek mutasi rekening.'));
+  }
+  rightCol.append(note);
   body.append(rightCol);card.append(body);
   const footer=el('div','nine-order-footer');
   const editor=el('div','nine-editor');
   const statusField=el('div','nine-field');statusField.append(el('label','', 'Ubah status'));const status=el('select');
-  STATUS_OPTIONS.forEach(v=>{const opt=el('option','',STATUS_LABEL[v]||v);opt.value=v;status.append(opt);});
+  STATUS_OPTIONS.forEach(v=>{const opt=el('option','',STATUS_LABEL[v]||v);opt.value=v;if(v==='expired')opt.disabled=true;status.append(opt);});
   status.value=STATUS_OPTIONS.includes(d.status)?d.status:'checkout_created';statusField.append(status);
   const awbField=el('div','nine-field');awbField.append(el('label','', 'Nomor resi / AWB'));const awb=el('input');awb.placeholder='Isi setelah pesanan dikirim';awb.maxLength=120;awb.value=safe(d.awb||d.resi||d.trackingNumber).slice(0,120);awbField.append(awb);
+  const verifyField=el('label','nine-field');
+  const verifyPayment=el('input');verifyPayment.type='checkbox';verifyPayment.checked=false;
+  verifyField.append(verifyPayment,el('span','', 'Pembayaran benar-benar sudah diverifikasi dari mutasi bank / sumber resmi'));
+  verifyField.hidden=d.status!=='checkout_created';
+  if(d.status==='expired'){status.disabled=true;}
   const save=el('button','nine-action-btn','Simpan Status');
   const feedback=el('div','nine-feedback','');feedback.setAttribute('aria-live','polite');
   save.addEventListener('click',async()=>{
@@ -14476,7 +14496,7 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
    try{
     await ensureNetlifyAdmin();
     const resi=safe(awb.value).slice(0,120);
-    const outcome=await saveAdminOrder(doc.id,status.value,resi);
+    const outcome=await saveAdminOrder(doc.id,status.value,resi,verifyPayment.checked);
     badge.className='nine-status '+status.value;
     badge.textContent=STATUS_LABEL[status.value]||status.value;
     const salesNote=outcome.delta>0?' Statistik terjual bertambah '+outcome.affected+' unit.':outcome.delta<0?' Statistik terjual dikoreksi '+outcome.affected+' unit.':' Statistik terjual tidak berubah.';
@@ -14485,7 +14505,7 @@ function field(label,value){const wrap=el('div','nine-kv');wrap.append(el('stron
    }
    catch(e){feedback.textContent='Gagal menyimpan perubahan. Periksa izin admin atau coba lagi.';msg('Gagal menyimpan: '+e.message);} finally{busy=false;save.disabled=false;}
   });
-  editor.append(statusField,awbField,save);footer.append(editor,feedback);card.append(footer);
+  editor.append(statusField,awbField,verifyField,save);footer.append(editor,feedback);card.append(footer);
   return card;
  }
  // R17: query TERBARU dilakukan di Firestore, bukan sort sesudah limit.

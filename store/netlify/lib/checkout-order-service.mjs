@@ -96,7 +96,7 @@ function claimsFor(db,uid,codes){return codes.map(code=>({code,ref:db.collection
 function redemptionRefs(db,uid,request){
  return claimsFor(db,uid,voucherCodesFrom(request).filter(code=>CHECKOUT_VOUCHERS.some(v=>v.code===code&&v.maxUsesPerAccount!=null)));
 }
-const CANCELLED=new Set(['cancelled','canceled','dibatalkan','batal','rejected','ditolak']);
+const CANCELLED=new Set(['cancelled','canceled','dibatalkan','batal','rejected','ditolak','expired','kedaluwarsa']);
 const FINISHED=new Set(['completed','complete','paid','confirmed','delivered','selesai','lunas']);
 const statusOf=order=>String(order?.status||'').trim().toLowerCase();
 const statusUsage=order=>CANCELLED.has(statusOf(order))?'cancelled':FINISHED.has(statusOf(order))?'used':'reserved';
@@ -168,7 +168,9 @@ function summary(quote){return {quoteHash:quoteHash(quote),version:quote.version
  totals:quote.totals,vouchers:quote.vouchers,stockStatus:quote.stockStatus,
  warnings:quote.warnings,shippingPotential:quote.shippingPotential};}
 function receipt(order,duplicate=false){return {orderId:order.orderId,totals:order.totals,
-  items:order.items,vouchers:order.vouchers,duplicate,checkoutStatus:order.status};}
+  items:order.items,vouchers:order.vouchers,duplicate,checkoutStatus:order.status,
+  paymentDueAt:order.paymentDueAt?.toDate?.()?.toISOString?.()||
+   (order.paymentDueAt instanceof Date?order.paymentDueAt.toISOString():null)};}
 function payloadDigest(data){
  const codes=data.voucherCodes||{};
  return hash(JSON.stringify({items:data.items,voucherCodes:{product:codes.product||'',shipping:codes.shipping||''},
@@ -206,7 +208,7 @@ export async function quoteForUser({db,seedCatalog,uid,body,now=Date.now(),vouch
  * max 6 distinct create orders per 10-min UID bucket, with idempotent retries free.
  */
 export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
- serverTimestamp,voucherLedgerReady=false}){
+ serverTimestamp,voucherLedgerReady=false,expiryEnabled=false}){
  verifiedUser(uid);
  verifiedDependencies({db,seedCatalog,serverTimestamp});
  const req=normalize(body,true),seed=indexSeed(seedCatalog),digest=payloadDigest(req);
@@ -224,6 +226,7 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
     fail('REQUEST_ID_REUSED',409);
    const orderSnap=await tx.get(meta.order);
    if(!orderSnap.exists||orderSnap.data()?.uid!==uid)fail('ORDER_REFERENCE_BROKEN',503);
+   if(CANCELLED.has(statusOf(orderSnap.data())))fail('ORDER_ALREADY_CLOSED',409);
    return receipt(orderSnap.data(),true);
   }
   const cms=new Map(productRefs.map((p,i)=>[p.id,snapshots[1+i]]));
@@ -244,14 +247,17 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const stockWrites=stockPatches(products,allocations,-1);
   // All Firestore reads must precede writes, including implicit order-exists check.
   const timestamp=serverTimestamp();
+  // Time is authoritative server time. Legacy R1 orders without dueAt are excluded from auto-expiry.
+  const paymentDueAt=expiryEnabled?new Date(Date.now()+60*60_000):null;
   const order={orderId:meta.order.id,uid,customer:req.customer,ekspedisi:req.ekspedisi,
    catatan:req.catatan,items:quote.orderItems.map(i=>({...i})),totals:{...quote.totals},
    vouchers:{...quote.vouchers},status:'checkout_created',channel:'whatsapp',
-   createdAt:timestamp,updatedAt:timestamp};
+   createdAt:timestamp,updatedAt:timestamp,...(paymentDueAt?{paymentDueAt}:{})};
   for(const [id,patch] of stockWrites)tx.set(db.collection('cms_products').doc(id),patch,{merge:true});
   // One immutable record of stock held by this order. Admin can release it exactly once.
   tx.create(db.collection('checkout_stock_reservations').doc(meta.order.id),{
-   orderId:meta.order.id,uid,state:'reserved',items:allocations,createdAt:timestamp,updatedAt:timestamp});
+   orderId:meta.order.id,uid,state:'reserved',items:allocations,
+   ...(paymentDueAt?{expiresAt:paymentDueAt}:{}),createdAt:timestamp,updatedAt:timestamp});
   tx.create(meta.order,order);
   // Preserve permanent Variant ID privately without changing the legacy order schema.
   tx.create(db.collection('checkout_order_variants').doc(meta.order.id),{
