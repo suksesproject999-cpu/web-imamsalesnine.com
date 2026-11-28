@@ -5,7 +5,49 @@ const selection=()=>{try{return JSON.parse(localStorage.getItem(SEL)||'{}')||{}}
 const isSelected=k=>selection()[String(k)]!==false;
 const writeSelection=map=>{try{localStorage.setItem(SEL,JSON.stringify(map))}catch{};sync()};
 const selected=()=>read().filter(x=>isSelected(x.key));
-const alertUI=(text,icon='info')=>window.Swal?.fire?window.Swal.fire({icon,text:String(text),confirmButtonColor:'#8cc63f',confirmButtonText:'OK',width:'min(90vw,410px)',customClass:{popup:'imamstore-swal-popup'}}):console.warn(text);
+// One unobtrusive in-sheet notice replaces blocking browser and SweetAlert dialogs.
+// Only fixed customer-facing copy is passed here; backend and SDK messages stay in logs.
+function voucherUiStyle(){
+ if(document.getElementById('imamVoucherUxStyle'))return;
+ const style=document.createElement('style');style.id='imamVoucherUxStyle';
+ style.textContent=`
+ .v43-voucher-sheet #v43VoucherFeedback{margin:0 0 12px;padding:12px 14px;border-radius:12px;background:#fff6ec;border:1px solid #f3d6b9;color:#76441d;font-size:13px;line-height:1.5;outline-offset:2px}
+ .v43-voucher-sheet #v43VoucherFeedback[data-kind="success"]{background:#f2f9e9;border-color:#bcdba3;color:#395e20}
+ .v43-voucher-sheet #v43VoucherFeedback[hidden]{display:none}
+ #imamVoucherToast{position:fixed;left:50%;bottom:calc(98px + env(safe-area-inset-bottom,0px));transform:translate(-50%,12px);width:max-content;max-width:min(92vw,460px);padding:11px 15px;border-radius:13px;background:#29352a;color:#fff;box-shadow:0 10px 28px rgba(0,0,0,.22);z-index:2147483200;font-size:13px;font-weight:600;line-height:1.45;opacity:0;pointer-events:none;transition:transform .2s ease,opacity .2s ease;text-align:center}
+ #imamVoucherToast.is-visible{opacity:1;transform:translate(-50%,0)}
+ #imamVoucherToast[data-kind="error"]{background:#493523}
+ #imamVoucherToast::before{content:"✓";display:inline-block;margin-right:7px}
+ #imamVoucherToast[data-kind="error"]::before{content:"!"}
+ .v43-voucher-sheet .ref-v43-choose,.v43-voucher-sheet #v43VoucherApply,.v43-voucher-sheet #v43VoucherDone,.v43-voucher-sheet .ref-v43-terms{min-height:42px;cursor:pointer;touch-action:manipulation;-webkit-tap-highlight-color:transparent;transition:background-color .16s ease,transform .12s ease,box-shadow .16s ease,opacity .16s ease}
+ @media(hover:hover){.v43-voucher-sheet .ref-v43-choose:not(:disabled):hover,.v43-voucher-sheet #v43VoucherApply:not(:disabled):hover,.v43-voucher-sheet #v43VoucherDone:not(:disabled):hover{filter:brightness(.96);box-shadow:0 2px 10px rgba(40,70,19,.14)}}
+ .v43-voucher-sheet .ref-v43-choose:not(:disabled):active,.v43-voucher-sheet #v43VoucherApply:not(:disabled):active,.v43-voucher-sheet #v43VoucherDone:not(:disabled):active{transform:scale(.96);filter:brightness(.91)}
+ .v43-voucher-sheet button:focus-visible{outline:3px solid #8cc63f;outline-offset:3px}
+ .v43-voucher-sheet button:disabled{cursor:not-allowed;opacity:.65}
+ .v43-voucher-sheet .ref-v43-choose.is-verifying,.v43-voucher-sheet #v43VoucherApply.is-verifying{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
+ .v43-voucher-sheet .is-verifying::before{content:"";display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:imamVoucherSpin .8s linear infinite}
+ @keyframes imamVoucherSpin{to{transform:rotate(360deg)}}
+ @media(prefers-reduced-motion:reduce){.v43-voucher-sheet button{transition:none}.v43-voucher-sheet .is-verifying::before{animation-duration:1.6s}}
+ `;
+ (document.head||document.documentElement).append(style);
+}
+let voucherToastTimer=null;
+function voucherFeedback(text,kind='error'){
+ const node=document.getElementById('v43VoucherFeedback');
+ if(!node)return;
+ node.textContent=String(text||'');node.dataset.kind=kind;node.hidden=!text;
+ node.setAttribute('role',kind==='error'?'alert':'status');
+ if(!text)return;
+ if(kind==='error'){node.setAttribute('tabindex','-1');node.focus({preventScroll:true})}
+ let toast=document.getElementById('imamVoucherToast');
+ if(!toast){toast=document.createElement('div');toast.id='imamVoucherToast';toast.setAttribute('aria-hidden','true');document.body.append(toast)}
+ toast.textContent=String(text);toast.dataset.kind=kind;
+ if(voucherToastTimer)clearTimeout(voucherToastTimer);
+ toast.classList.add('is-visible');
+ voucherToastTimer=setTimeout(()=>{toast.classList.remove('is-visible');voucherToastTimer=null},3600);
+}
+function alertUI(text){voucherFeedback(text,'error')}
+
 const money=n=>fmt(n);
 const vouchers=[
  {id:'BELANJA50',name:'Voucher Belanja',description:'Potongan Belanja Rp5.000',type:'product_fixed',discount:5000,min:500000,maxDiscount:null,expired:'2026-12-31',icon:'fa-tags',limit:'1 Voucher / Akun'},
@@ -19,34 +61,54 @@ const currentScope=()=>checkoutActive()?'checkout':'cart';
 const activeVouchers=()=>voucherState[currentScope()];
 const resetCheckoutVouchers=()=>{voucherState.checkout={product:null,shipping:null};};
 
-// Voucher authorization is always a server quote. Never mark a limited voucher eligible just from UI rules.
+// A quote is advisory and not a payment commitment. Checkout always validates again.
 const voucherApi='/.netlify/functions/checkout-security';
 let voucherPending=false;
-const voucherError={
- VOUCHER_LEDGER_NOT_READY:'Riwayat voucher belum siap. Lanjutkan tanpa voucher untuk sementara.',
- VOUCHER_HISTORY_UNAVAILABLE:'Riwayat voucher belum dapat diperiksa. Coba lagi.',
- VOUCHER_HISTORY_TOO_LARGE:'Riwayat voucher akun perlu ditinjau admin.',
- VOUCHER_ALREADY_USED:'Voucher ini sudah digunakan akunmu.',
- VOUCHER_RESERVED:'Voucher sedang dipakai di pesanan akunmu yang belum dibatalkan.',
- VOUCHER_MINIMUM_NOT_MET:'Minimum pembelian untuk voucher belum terpenuhi.',
- VOUCHER_EXPIRED:'Voucher sudah melewati masa berlaku.',
- STOCK_UNVERIFIED:'Stok belum diverifikasi, voucher belum bisa dihitung.',
- STOCK_INSUFFICIENT:'Jumlah produk melebihi stok yang tersedia.',
- VARIANT_ID_REQUIRED:'Ada varian produk yang belum memiliki Variant ID resmi.',
- QUOTE_RATE_LIMITED:'Terlalu banyak pemeriksaan. Coba lagi nanti.',
- SESSION_INVALID:'Sesi login habis. Masuk kembali.'
-};
+const voucherError=Object.freeze({
+ VOUCHER_LEDGER_NOT_READY:'Voucher belum dapat digunakan sementara. Coba lagi nanti atau lanjut tanpa voucher.',
+ VOUCHER_HISTORY_UNAVAILABLE:'Riwayat penggunaan voucher sedang tidak tersedia. Silakan coba lagi.',
+ VOUCHER_HISTORY_TOO_LARGE:'Voucher pada akun ini perlu bantuan toko. Hubungi layanan pelanggan.',
+ VOUCHER_ALREADY_USED:'Voucher ini sudah pernah digunakan oleh akun kamu.',
+ VOUCHER_RESERVED:'Voucher ini masih digunakan pada pesanan lain yang aktif.',
+ VOUCHER_MINIMUM_NOT_MET:'Total belanja belum memenuhi minimum penggunaan voucher.',
+ VOUCHER_EXPIRED:'Masa berlaku voucher sudah berakhir.',
+ VOUCHER_NOT_FOUND:'Voucher tidak ditemukan. Pilih promo lain yang tersedia.',
+ VOUCHER_INACTIVE:'Voucher belum tersedia saat ini.',
+ STOCK_UNVERIFIED:'Ketersediaan produk belum dapat dipastikan. Coba lagi nanti.',
+ STOCK_INSUFFICIENT:'Jumlah produk melebihi stok yang tersedia. Periksa kembali keranjang.',
+ VARIANT_ID_REQUIRED:'Varian produk ini perlu diperbarui. Silakan hubungi toko.',
+ QUOTE_CHANGED:'Harga atau potongan telah berubah. Periksa total belanja terbaru.',
+ QUOTE_RATE_LIMITED:'Terlalu banyak percobaan. Coba lagi beberapa saat.',
+ SESSION_INVALID:'Sesi akun kamu berakhir. Silakan masuk kembali.',
+ AUTH_REQUIRED:'Masuk ke akun pelanggan untuk menggunakan voucher.'
+});
+function customerError(message){const error=new Error(message);error.customerSafe=true;return error}
+function voucherErrorMessage(err){
+ if(err?.customerSafe===true)return err.message;
+ const code=String(err?.code||'').toLowerCase(),message=String(err?.message||'');
+ if(code==='auth/network-request-failed'||/network-request-failed|failed to fetch|networkerror|load failed|timeout|timed out|aborterror/i.test(message)||['unavailable','deadline-exceeded'].includes(code))
+  return 'Koneksi sedang terganggu. Voucher belum diterapkan. Periksa internet lalu coba lagi.';
+ if(['auth/user-token-expired','auth/id-token-expired','auth/invalid-user-token','auth/requires-recent-login','auth/user-disabled'].includes(code))
+  return 'Sesi akun perlu diperbarui. Silakan masuk kembali, lalu coba voucher.';
+ if(['auth/too-many-requests','resource-exhausted'].includes(code))
+  return 'Terlalu banyak percobaan. Silakan coba beberapa saat lagi.';
+ return 'Voucher belum dapat diperiksa saat ini. Silakan coba lagi.';
+}
+function voucherDeadline(promise,millis=15000){
+ let timer;
+ return Promise.race([Promise.resolve(promise),new Promise((_,reject)=>{timer=setTimeout(()=>reject(customerError('Koneksi terlalu lama merespons. Periksa internet, lalu coba lagi.')),millis)})]).finally(()=>clearTimeout(timer));
+}
 function voucherRequestItems(lines){
- if(!Array.isArray(lines)||!lines.length||lines.length>10)throw new Error('Pilih 1–10 produk yang valid sebelum memakai voucher.');
+ if(!Array.isArray(lines)||!lines.length||lines.length>10)throw customerError('Pilih 1–10 produk sebelum menggunakan voucher.');
  return lines.map(line=>{
   const p=window.imamstoreCartBridge?.getProduct?.(line.id),identity=p?window.imamstoreVariantIdentity?.forLine?.(p,line):null;
-  if(!p||!identity)throw new Error('Data produk atau varian berubah. Perbarui keranjang.');
+  if(!p||!identity)throw customerError('Produk atau varian sudah berubah. Perbarui keranjang, lalu coba lagi.');
   const qty=Number(line.qty);
-  if(!Number.isSafeInteger(qty)||qty<1||qty>999)throw new Error('Jumlah produk tidak valid.');
+  if(!Number.isSafeInteger(qty)||qty<1||qty>999)throw customerError('Jumlah produk perlu diperbaiki sebelum memakai voucher.');
   const item={productId:String(p.id),qty};
   if(Array.isArray(p.varian)&&p.varian.length){
    if(!/^[A-Za-z0-9_-]{1,120}$/.test(identity.variantId)||identity.variantId.startsWith('legacy-'))
-    throw new Error('Varian perlu diterbitkan ulang melalui Admin.');
+    throw customerError('Varian produk belum siap untuk pembayaran. Hubungi toko.');
    item.variantId=identity.variantId;
   }
   return item;
@@ -56,38 +118,78 @@ async function verifyVoucherChoice(v,scope){
  const lines=scope==='checkout'?checkoutLines():selected();
  const items=voucherRequestItems(lines),chosen=voucherState[scope];
  const auth=window.firebase?.auth?.(),user=auth?.currentUser;
- if(!user||user.isAnonymous)throw new Error('Masuk menggunakan akun pelanggan sebelum memakai voucher.');
- const token=await user.getIdToken();
- if(!token)throw new Error('Sesi login berakhir. Masuk kembali.');
+ if(!user||user.isAnonymous)throw customerError('Masuk ke akun pelanggan untuk menggunakan voucher.');
+ // Firebase may reject token refresh with network AuthError; never display its raw message.
+ const token=await voucherDeadline(user.getIdToken());
+ if(!token)throw customerError('Sesi akun berakhir. Silakan masuk kembali.');
  const codes={product:chosen.product?.id||'',shipping:chosen.shipping?.id||''};
  codes[slotOf(v)]=v.id;
  let response,body;
- try{response=await fetch(voucherApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
-  body:JSON.stringify({action:'quote',items,voucherCodes:codes}),cache:'no-store',credentials:'same-origin'});}
- catch(_){throw new Error('Server voucher belum dapat dihubungi. Coba lagi.');}
- try{body=await response.json()}catch(_){throw new Error('Balasan server voucher tidak valid.');}
- if(!response.ok||body?.success!==true)throw new Error(voucherError[body?.code]||body?.message||'Voucher belum dapat digunakan.');
+ try{
+  response=await voucherDeadline(fetch(voucherApi,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+   body:JSON.stringify({action:'quote',items,voucherCodes:codes}),cache:'no-store',credentials:'same-origin'}));
+ }catch(err){
+  if(err?.customerSafe)throw err;
+  throw customerError('Koneksi sedang terganggu. Voucher belum diterapkan. Periksa internet lalu coba lagi.');
+ }
+ try{body=await voucherDeadline(response.json())}
+ catch(_){throw customerError('Voucher belum dapat diperiksa saat ini. Silakan coba lagi.')}
+ if(!response.ok||body?.success!==true){
+  // Server error text is for diagnostics only: never render body.message.
+  const code=typeof body?.code==='string'?body.code:'';
+  const friendly=Object.prototype.hasOwnProperty.call(voucherError,code)?voucherError[code]:
+   (response.status===401?'Sesi akun berakhir. Silakan masuk kembali.':
+    response.status===429?'Terlalu banyak percobaan. Silakan coba beberapa saat lagi.':
+    response.status>=500?'Layanan voucher sedang terganggu. Silakan coba lagi.':
+    'Voucher belum dapat digunakan. Silakan periksa pilihan kamu.');
+  throw customerError(friendly);
+ }
  const local=calculateQuote(lines,{...chosen,[slotOf(v)]:v});
  if(body?.totals?.subtotal!==local.subtotal||body?.totals?.productDiscount!==local.productDiscount||
     body?.totals?.totalBayar!==local.total||Number(body?.shippingPotential||0)!==local.shippingPotential)
-  throw new Error('Harga atau nilai voucher berubah. Muat ulang produk dan checkout.');
+  throw customerError('Harga atau potongan telah berubah. Periksa total belanja, lalu coba lagi.');
  return {items,scope};
 }
-async function chooseVoucher(v,scope,active){
+function voucherBusy(target,pending){
+ const controls=document.querySelectorAll('.v43-voucher-sheet .ref-v43-choose,.v43-voucher-sheet #v43VoucherApply,.v43-voucher-sheet #v43VoucherDone');
+ for(const button of controls){
+  if(pending){
+   if(!button.hasAttribute('data-voucher-label'))button.dataset.voucherLabel=button.textContent;
+   button.disabled=true;
+   button.classList.toggle('is-verifying',button===target);
+   if(button===target)button.textContent='Memeriksa…';
+  }else{
+   if(button.dataset.voucherLabel){button.textContent=button.dataset.voucherLabel;delete button.dataset.voucherLabel}
+   button.classList.remove('is-verifying');
+   if(button.classList.contains('ref-v43-choose'))button.disabled=button.dataset.allowed==='false';
+   else button.disabled=false;
+  }
+ }
+ const list=document.getElementById('v43VoucherList');if(list)list.setAttribute('aria-busy',String(pending));
+}
+async function chooseVoucher(v,scope,active,target){
  if(voucherPending)return;
- if(active){voucherState[scope][slotOf(v)]=null;sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));openVoucher();return}
- voucherPending=true;
- const list=document.getElementById('v43VoucherList');if(list)list.setAttribute('aria-busy','true');
+ if(active){
+  voucherState[scope][slotOf(v)]=null;sync();window.imamstoreReferenceV38?.refresh?.();
+  document.dispatchEvent(new Event('imamstore:quote-refresh'));
+  openVoucher();voucherFeedback('Voucher berhasil dibatalkan.','success');return;
+ }
+ voucherPending=true;voucherFeedback('', 'info');voucherBusy(target,true);
  try{
   const before=JSON.stringify((scope==='checkout'?checkoutLines():selected()).map(x=>[x.id,x.variantId,x.key,x.qty,x.harga]));
   await verifyVoucherChoice(v,scope);
   const after=JSON.stringify((scope==='checkout'?checkoutLines():selected()).map(x=>[x.id,x.variantId,x.key,x.qty,x.harga]));
-  if(scope!==currentScope()||before!==after)throw new Error('Keranjang berubah selama verifikasi. Silakan pilih voucher kembali.');
+  if(scope!==currentScope()||before!==after)throw customerError('Isi keranjang berubah. Periksa pilihan produk dan coba voucher lagi.');
+  // If the user closed the sheet while checking, do not silently apply the voucher.
+  if(!document.querySelector('.v43-voucher-sheet')||document.querySelector('.ref-modal')?.hidden)return;
   voucherState[scope][slotOf(v)]=v;
   sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));
   openVoucher();
- }catch(err){alertUI(err?.message||'Voucher belum dapat digunakan.','warning')}
- finally{voucherPending=false;const current=document.getElementById('v43VoucherList');if(current)current.removeAttribute('aria-busy')}
+  voucherFeedback(slotOf(v)==='shipping'?'Voucher ongkir dipilih. Nilai potongan menunggu biaya pengiriman.':'Voucher berhasil digunakan. Potongan sudah masuk ke total produk.','success');
+ }catch(err){
+  console.warn('[ImamStore voucher diagnostics]',String(err?.code||'unknown'));
+  voucherFeedback(voucherErrorMessage(err),'error');
+ }finally{voucherPending=false;voucherBusy(target,false)}
 }
 const eligible=(v,sum)=>!!v&&sum>=Number(v.min||0)&&(!v.expired||Date.now()<=Date.parse(v.expired+'T23:59:59.999+07:00'));
 const voucherValue=(v,sum)=>{if(!eligible(v,sum))return 0;let d=v.type==='product_percent'?Math.floor(sum*Number(v.discount||0)/100):Number(v.discount||0);if(v.maxDiscount!=null)d=Math.min(d,Number(v.maxDiscount));return Math.max(0,Math.min(sum,Math.floor(d)))};
@@ -162,12 +264,13 @@ function terms(v){
  });
 }
 function openVoucher(){
+ voucherUiStyle();
  const lines=checkoutActive()?checkoutLines():selected(),chosen=activeVouchers();
  const sum=lines.reduce((a,x)=>a+Number(x.harga||0)*Number(x.qty||0),0);
  modal('<div class="v43-compact-sheet v43-voucher-sheet">'+
  '<header class="v43-compact-head"><h2>Voucher & Promo</h2><p>Pilih satu voucher produk dan satu voucher ongkir.</p></header>'+
- '<div class="v43-compact-scroll"><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher" autocomplete="off" aria-label="Kode voucher"><button type="button" id="v43VoucherApply">Pakai</button></div>'+
- '<div id="v43VoucherList"></div><p class="v43-compact-hint">Voucher ongkir yang dipilih menunggu perhitungan biaya kirim oleh admin. Total produk belum dikurangi ongkir.</p></div>'+
+ '<div class="v43-compact-scroll"><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher" autocomplete="off" aria-label="Kode voucher"><button type="button" id="v43VoucherApply">Gunakan</button></div><p id="v43VoucherFeedback" role="status" aria-live="polite" hidden></p>'+
+ '<div id="v43VoucherList"></div><p class="v43-compact-hint">Potongan ongkir dihitung setelah biaya kirim ditentukan. Total produk belum termasuk ongkir.</p></div>'+
  '<footer class="v43-compact-foot"><span id="v43SelectionCount" role="status"></span><button class="ref-green" type="button" id="v43VoucherDone">Selesai</button></footer></div>',root=>{
   const selectedCount=Object.values(chosen).filter(Boolean).length;
   root.querySelector('#v43SelectionCount').textContent=selectedCount?selectedCount+' voucher dipilih':'Belum ada voucher dipilih';
@@ -177,8 +280,8 @@ function openVoucher(){
    const input=code.value.trim().toUpperCase(),v=vouchers.find(x=>x.id.toUpperCase()===input);
    if(!input){alertUI('Masukkan kode voucher terlebih dahulu.');return}
    if(!v){alertUI('Kode voucher tidak dikenal. Silakan pilih voucher yang tersedia.');return}
-   if(!eligible(v,sum)){alertUI('Voucher belum memenuhi minimal belanja '+money(v.min)+' atau masa berlakunya telah habis.');return}
-   await chooseVoucher(v,currentScope(),chosen[slotOf(v)]?.id===v.id);
+   if(!eligible(v,sum)){alertUI(Date.now()>Date.parse(v.expired+'T23:59:59.999+07:00')?'Masa berlaku voucher ini sudah berakhir.':'Tambahkan belanja '+money(Math.max(0,Number(v.min)-sum))+' lagi untuk menggunakan voucher.');return}
+   await chooseVoucher(v,currentScope(),chosen[slotOf(v)]?.id===v.id,root.querySelector('#v43VoucherApply'));
   };
   root.querySelector('#v43VoucherApply').onclick=applyCode;
   code.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();applyCode()}});
@@ -192,12 +295,12 @@ function openVoucher(){
    const expiry=v.expired?new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tidak dibatasi';
    row.querySelector('small').textContent='Min. '+money(v.min)+' · Sampai '+expiry;
    const stateLabel=row.querySelector('.v43-voucher-state');
-   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Dipilih · Diverifikasi server'):(!ok?(sum<Number(v.min||0)?'Belanja kurang '+money(Number(v.min||0)-sum):'Tidak berlaku'):'Periksa kelayakan akun di server');
+   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Potongan diterapkan'):(!ok?(sum<Number(v.min||0)?'Tambah belanja '+money(Number(v.min||0)-sum):'Masa berlaku berakhir'):'Bisa dipilih untuk pesanan ini');
    const btn=row.querySelector('.ref-v43-choose');
-   btn.textContent=active?'Batalkan':ok?'Periksa & Pakai':'Belum sesuai';btn.disabled=!ok&&!active;
+   btn.textContent=active?'Batalkan':ok?'Gunakan':'Belum sesuai';btn.disabled=!ok&&!active;btn.dataset.allowed=String(ok||active);
    btn.setAttribute('aria-pressed',String(active));
    btn.setAttribute('aria-label',(active?'Batalkan':'Gunakan')+' '+v.name);
-   btn.onclick=()=>chooseVoucher(v,currentScope(),active);
+   btn.onclick=()=>chooseVoucher(v,currentScope(),active,btn);
    row.querySelector('.ref-v43-terms').onclick=()=>terms(v);
    list.append(row);
   });
@@ -219,8 +322,7 @@ function sync(){const lines=read(),sel=selected(),all=lines.length>0&&sel.length
 // Cart, checkout and detail route to this voucher sheet; original voucher policy is not yet restored.
 window.nineOpenOriginalVoucher=openVoucher;window.imamstoreOpenVoucherSheet=openVoucher;
 for(const id of ['refCartVoucher','refCheckoutVoucher']){const el=$(id);if(el)el.onclick=e=>{e.preventDefault();openVoucher()}}
-// Convert browser alerts from older handlers to SweetAlert2 where available.
-// Browser alert is not monkey-patched globally.
+// Voucher notices stay inside the voucher sheet; global dialogs remain unchanged.
 const cart=$('s5CartItems');if(cart){new MutationObserver(()=>queueMicrotask(sync)).observe(cart,{childList:true});}
 window.addEventListener('storage',sync);document.addEventListener('imamstore:open-product',()=>queueMicrotask(sync));document.addEventListener('imamstore:cart-changed',sync);
 window.imamstoreV43=Object.freeze({
