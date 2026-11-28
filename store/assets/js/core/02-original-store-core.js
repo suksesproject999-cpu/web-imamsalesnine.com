@@ -360,7 +360,7 @@ function feature(p){
  let hash=0;for(const c of String(p.id))hash=(hash*31+c.charCodeAt(0))>>>0;
  return parts[(Math.floor(Date.now()/300000)+hash)%parts.length];
 }
-const STORE_VOUCHER_SNAPSHOT=[{"id":"BELANJA50","name":"Voucher Belanja","description":"Potongan Belanja Rp5.000","type":"product_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-tags","badge":"HOT","limit":"1 Voucher / Akun"},{"id":"DISKON10","name":"Diskon Produk 10%","description":"Diskon produk 10%","type":"product_percent","discount":10,"min":100000,"maxDiscount":500,"expired":"2026-12-31","icon":"fa-percent","badge":"PROMO","limit":"1 Voucher / Akun"},{"id":"ONGKIR5","name":"Diskon Ongkir","description":"Potongan Ongkir Rp5.000","type":"shipping_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-truck","badge":"HEMAT","limit":"1 Voucher / Akun"}];
+const STORE_VOUCHER_SNAPSHOT=[{"id":"BELANJA50","name":"Voucher Belanja","description":"Potongan Belanja Rp5.000","type":"product_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-tags","badge":"HOT","limit":"5 Penggunaan / Akun"},{"id":"DISKON10","name":"Diskon Produk 10%","description":"Diskon produk 10%","type":"product_percent","discount":10,"min":100000,"maxDiscount":500,"expired":"2026-12-31","icon":"fa-percent","badge":"PROMO","limit":"5 Penggunaan / Akun"},{"id":"ONGKIR5","name":"Diskon Ongkir","description":"Potongan Ongkir Rp5.000","type":"shipping_fixed","discount":5000,"min":500000,"maxDiscount":null,"expired":"2026-12-31","icon":"fa-truck","badge":"HEMAT","limit":"5 Penggunaan / Akun"}];
 let activeVouchers=[];
 function validVoucher(v){
  if(!v||!v.id||!v.name)return false;
