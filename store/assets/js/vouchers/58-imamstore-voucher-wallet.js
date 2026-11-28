@@ -1,179 +1,177 @@
-/* ImamStore R9 Voucher Wallet — storefront UI only.
- * A saved voucher is not a redeemed voucher. Counts come exclusively from secure API.
- * Loaded after checkout and login scripts. No localStorage entitlement or grant.
+/* ImamStore R10 — Store voucher saving UI (clean replacement of R9).
+ * Save/unsave is optional. Checkout redemption and 5-use quota are separate.
+ * No duplicate DOM handlers, no localStorage claims, no raw backend errors.
  */
 (()=>{'use strict';
- const rail=document.getElementById('storeVouchers'),section=document.getElementById('voucherSection');
- if(!rail||!section||window.imamstoreVoucherWallet)return;
+ const section=document.getElementById('voucherSection');
+ const rail=document.getElementById('storeVouchers');
+ if(!section||!rail||window.imamstoreVoucherWallet)return;
  const API='/.netlify/functions/checkout-security';
  const CODES=Object.freeze({'Voucher Belanja':'BELANJA50','Diskon Produk 10%':'DISKON10','Diskon Ongkir':'ONGKIR5'});
  const LIMIT=5;
- let authUid='',generation=0,busy='',loading=false,balances=null,error='',savedOnly=false,toastTimer=0;
- const getUser=()=>{const u=window.firebase?.auth?.()?.currentUser;return u&&!u.isAnonymous?u:null};
- const text=(value)=>String(value??'');
- const validBalance=(item)=>item&&Number.isSafeInteger(item.limit)&&item.limit===LIMIT&&
-   ['used','reserved','remaining'].every(k=>Number.isSafeInteger(item[k])&&item[k]>=0)&&
-   item.used+item.reserved+item.remaining===item.limit&&typeof item.claimed==='boolean';
- const copy={
-  AUTH_REQUIRED:'Masuk ke akun ImamStore untuk menyimpan voucher.',
-  SESSION_INVALID:'Sesi akun sudah berakhir. Silakan masuk kembali.',
-  CUSTOMER_REQUIRED:'Gunakan akun pelanggan untuk mengklaim voucher.',
-  VOUCHER_EXPIRED:'Masa berlaku voucher sudah berakhir.',
-  VOUCHER_UNAVAILABLE:'Voucher ini sudah tidak tersedia.',
-  QUOTE_RATE_LIMITED:'Terlalu banyak percobaan. Coba lagi sebentar.',
-  WALLET_UNAVAILABLE:'Voucher belum dapat disimpan. Silakan coba lagi.',
-  VOUCHER_WALLET_NOT_READY:'Klaim voucher belum tersedia. Silakan coba kembali.',
-  STAGING_NOT_ISOLATED:'Pratinjau belum dapat digunakan untuk klaim voucher.'
- };
- const failCopy=code=>copy[code]||'Koneksi sedang terganggu. Periksa internet lalu coba lagi.';
- function node(tag,className,value){const e=document.createElement(tag);if(className)e.className=className;if(value!==undefined)e.textContent=text(value);return e}
- function message(s='',kind='info'){
-  const elem=document.getElementById('iwcMessage');if(!elem)return;
-  elem.textContent=s;elem.hidden=!s;elem.dataset.kind=kind;
+ let balance=null,version=0,pending='',loading=false,savedOnly=false,timer=0;
+ const user=()=>{const u=window.firebase?.auth?.()?.currentUser;return u&&!u.isAnonymous?u:null};
+ const create=(tag,cls,value)=>{const el=document.createElement(tag);if(cls)el.className=cls;if(value!==undefined)el.textContent=String(value);return el};
+ const isValid=v=>v&&v.limit===LIMIT&&['used','reserved','remaining'].every(k=>Number.isSafeInteger(v[k])&&v[k]>=0)
+  &&v.used+v.reserved+v.remaining===LIMIT&&typeof v.saved==='boolean';
+ const errors={AUTH_REQUIRED:'Masuk ke akun ImamStore untuk menyimpan voucher.',SESSION_INVALID:'Sesi akun berakhir. Silakan masuk lagi.',
+  CUSTOMER_REQUIRED:'Gunakan akun pelanggan untuk menyimpan voucher.',VOUCHER_EXPIRED:'Masa berlaku voucher telah berakhir.',
+  VOUCHER_UNAVAILABLE:'Voucher ini sudah tidak tersedia.',QUOTE_RATE_LIMITED:'Terlalu banyak percobaan. Coba sebentar lagi.',
+  VOUCHER_WALLET_NOT_READY:'Fitur simpan voucher belum tersedia. Silakan coba lagi.',WALLET_UNAVAILABLE:'Daftar voucher tersimpan belum bisa diperbarui.',
+  STAGING_NOT_ISOLATED:'Penyimpanan voucher belum tersedia di pratinjau.',
+  TIMEOUT:'Koneksi terlalu lama. Silakan coba lagi.'};
+ const readable=e=>errors[e?.code]||'Koneksi sedang terganggu. Periksa internet dan coba lagi.';
+ function notice(message='',kind='info'){
+  const p=document.getElementById('iwcMessage');if(!p)return;
+  p.textContent=message;p.hidden=!message;p.dataset.kind=kind;
  }
- function toast(s,kind='success'){
-  let elem=document.getElementById('iwcToast');if(!elem){elem=node('div');elem.id='iwcToast';elem.setAttribute('aria-live','polite');document.body.append(elem)}
-  elem.textContent=s;elem.dataset.kind=kind;elem.classList.add('visible');
-  clearTimeout(toastTimer);toastTimer=setTimeout(()=>elem.classList.remove('visible'),3200);
+ function toast(message,kind='success'){
+  let el=document.getElementById('iwcToast');
+  if(!el){el=create('div');el.id='iwcToast';el.setAttribute('role','status');el.setAttribute('aria-live','polite');document.body.append(el)}
+  el.textContent=message;el.dataset.kind=kind;el.classList.add('visible');
+  clearTimeout(timer);timer=setTimeout(()=>el.classList.remove('visible'),2900);
  }
- function ensureHeader(){
+ function header(){
   const head=section.querySelector('.section-head');if(!head)return;
   if(!document.getElementById('iwcMyVouchers')){
-   const btn=node('button','iwc-my-vouchers','Voucher Saya');btn.type='button';btn.id='iwcMyVouchers';
-   btn.setAttribute('aria-pressed','false');btn.addEventListener('click',async()=>{
-    if(!getUser()){
+   const btn=create('button','iwc-my-vouchers','Voucher Saya');btn.type='button';btn.id='iwcMyVouchers';
+   btn.setAttribute('aria-pressed','false');head.append(btn);
+   btn.addEventListener('click',async()=>{
+    if(!user()){
      if(typeof window.nexaiRequireCustomerLogin==='function'){
-      const ok=await window.nexaiRequireCustomerLogin();if(ok)await refresh();
-     }else toast('Masuk ke akun ImamStore untuk melihat voucher tersimpan.','error');
+      const ok=await window.nexaiRequireCustomerLogin();
+      if(ok){savedOnly=true;btn.setAttribute('aria-pressed','true');btn.textContent='Semua Voucher';await refresh();}
+     }else toast('Masuk untuk melihat voucher tersimpan.','error');
      return;
     }
-    savedOnly=!savedOnly;btn.setAttribute('aria-pressed',String(savedOnly));btn.textContent=savedOnly?'Semua Voucher':'Voucher Saya';paint();
-   });head.append(btn);
+    savedOnly=!savedOnly;btn.setAttribute('aria-pressed',String(savedOnly));
+    btn.textContent=savedOnly?'Semua Voucher':'Voucher Saya';render();
+   });
   }
   if(!document.getElementById('iwcMessage')){
-   const p=node('p','iwc-message');p.id='iwcMessage';p.hidden=true;p.setAttribute('role','status');p.setAttribute('aria-live','polite');head.after(p);
+   const p=create('p','iwc-message');p.id='iwcMessage';p.hidden=true;p.setAttribute('role','status');p.setAttribute('aria-live','polite');head.after(p);
   }
  }
- function enhance(){
-  ensureHeader();
-  for(const card of rail.children){
+ function setupCards(){
+  header();
+  for(const card of [...rail.children]){
    if(!card.matches('article.store-voucher')||card.classList.contains('iwc-card'))continue;
-   const name=card.querySelector('b')?.textContent?.trim()||'';const code=CODES[name];
-   if(!code)continue; // no action on unknown marketing promotions
-   const old=card.querySelector('div');if(!old)continue;
+   const title=card.querySelector('b')?.textContent?.trim()||'';
+   const code=CODES[title];if(!code)continue;
+   const copy=card.querySelector('div');if(!copy)continue;
    card.classList.add('iwc-card');card.dataset.walletCode=code;
-   const info=node('div','iwc-info');const icon=card.querySelector('.voucher-icon');
-   if(icon)info.append(icon);
-   old.classList.add('iwc-copy');info.append(old);
-   for(const sm of old.querySelectorAll('small')){
-    if(/Gunakan saat checkout/i.test(sm.textContent))sm.remove();
-   }
-   if(code==='DISKON10')old.append(node('small','iwc-offer','Maksimal potongan Rp500'));
+   const info=create('div','iwc-info');const icon=card.querySelector('.voucher-icon');if(icon)info.append(icon);
+   copy.classList.add('iwc-copy');info.append(copy);
+   for(const small of copy.querySelectorAll('small'))if(/Gunakan saat checkout/i.test(small.textContent))small.remove();
+   if(code==='DISKON10'&&!copy.querySelector('.iwc-offer'))copy.append(create('small','iwc-offer','Maks. potongan Rp500'));
    card.prepend(info);
-   const usage=node('div','iwc-usage','Memuat status voucher…');usage.setAttribute('aria-live','polite');card.append(usage);
-   const action=node('button','iwc-action','Memuat…');action.type='button';action.disabled=true;
-   action.dataset.state='loading';action.dataset.code=code;card.append(action);
-   card.append(node('div','iwc-note','Klaim gratis · Pemakaian dihitung saat membuat pesanan'));
+   const state=create('div','iwc-usage','Memuat status…');state.setAttribute('aria-live','polite');card.append(state);
+   const action=create('button','iwc-action','Memuat…');action.type='button';action.dataset.code=code;action.disabled=true;card.append(action);
   }
-  paint();
+  render();
  }
- function setCard(card,label,kind,caption,disabled,state){
-  const usage=card.querySelector('.iwc-usage'),action=card.querySelector('.iwc-action');
-  if(usage){usage.textContent=label;usage.dataset.kind=kind}
-  if(action){action.textContent=caption;action.disabled=disabled;action.dataset.state=state||'ready';action.setAttribute('aria-label',caption+' — '+card.querySelector('b')?.textContent)}
+ function updateCard(card,status,action,mode,disabled=false,kind='info'){
+  const state=card.querySelector('.iwc-usage'),button=card.querySelector('.iwc-action');
+  if(state){state.textContent=status;state.dataset.kind=kind}
+  if(button){button.textContent=action;button.dataset.state=mode;button.disabled=disabled;
+   const name=card.querySelector('b')?.textContent||'voucher';
+   button.setAttribute('aria-label',mode==='unsave'?`Hapus ${name} dari Voucher Saya`:mode==='save'?`Simpan ${name} untuk nanti`:action+' '+name);
+   button.setAttribute('aria-pressed',String(mode==='unsave'));
+  }
  }
- function paint(){
+ function render(){
   let visible=0;
   for(const card of rail.querySelectorAll('.iwc-card')){
-   const code=card.dataset.walletCode,b=balances?.[code],u=getUser();
-   const claimed=!!b?.claimed;
-   const isVisible=!savedOnly||claimed;card.hidden=!isVisible;
-   if(!isVisible)continue;visible++;
-   if(!u){setCard(card,'Masuk untuk menyimpan dan melihat jatah.','info','Klaim Voucher',false,'ready');continue}
-   if(busy===code){setCard(card,'Menyimpan voucher ke akun…','info','Menyimpan…',true,'loading');continue}
-   if(loading){setCard(card,'Memeriksa voucher akun…','info','Memeriksa…',true,'loading');continue}
-   if(!validBalance(b)){
-    setCard(card,'Jatah belum dapat ditampilkan. Coba lagi.','error','Perbarui Status',false,'retry');continue;
-   }
-   const left=b.remaining,used=b.used,held=b.reserved;
-   if(b.status==='expired'){
-    setCard(card,'Masa berlaku voucher berakhir.','used','Sudah Berakhir',true,'used');continue;
-   }
-   const status=left===0?(held>0?'Semua jatah sedang dipakai pada pesanan aktif.':'Sudah digunakan 5 dari 5 kali.'):
-    (held>0?`Tersedia ${left} dari 5 · ${held} sedang digunakan pada pesanan`:`Tersedia ${left} dari 5 penggunaan`);
-   if(left===0){setCard(card,status,'used',claimed?'Jatah Habis':'Tidak Tersedia',true,'used');continue}
-   if(claimed){setCard(card,status,'info','✓ Tersimpan',true,'saved');continue}
-   setCard(card,status,'info','Klaim Voucher',false,'ready');
+   const b=balance?.[card.dataset.walletCode],logged=user();
+   const isSaved=b?.saved===true;
+   card.hidden=savedOnly&&!isSaved;if(card.hidden)continue;visible++;
+   if(!logged){updateCard(card,'Simpan untuk nanti · gunakan langsung di checkout.','Simpan','save');continue}
+   if(pending===card.dataset.walletCode){updateCard(card,'Memperbarui daftar voucher…','Menyimpan…','loading',true);continue}
+   if(loading){updateCard(card,'Memeriksa status voucher…','Memuat…','loading',true);continue}
+   if(!isValid(b)){updateCard(card,'Jatah belum dapat diperiksa.','Coba Lagi','retry',false,'error');continue}
+   const held=b.reserved,remaining=b.remaining;
+   let status=b.status==='expired'?'Masa berlaku berakhir':remaining===0?
+    (held>0?`Jatah masih dipakai pada ${held} pesanan`:'Jatah 5 kali telah habis'):
+    `Sisa ${remaining}/5${held>0?` · ${held} dalam pesanan aktif`:''}`;
+   if(isSaved)status='Tersimpan · '+status;
+   if(isSaved){updateCard(card,status,'Hapus','unsave');continue}
+   if(b.status==='expired'||remaining===0){updateCard(card,status,'Tidak tersedia','disabled',true,'used');continue}
+   updateCard(card,status,'Simpan','save');
   }
   let empty=document.getElementById('iwcEmpty');
-  if(savedOnly&&visible===0&&rail.querySelector('.iwc-card')){
-   if(!empty){empty=node('p','iwc-empty','Belum ada voucher tersimpan di akun ini. Pilih Semua Voucher untuk melihat promo.');empty.id='iwcEmpty';rail.after(empty)}
+  if(savedOnly&&visible===0){
+   if(!empty){empty=create('p','iwc-empty','Belum ada voucher yang disimpan. Pilih Semua Voucher untuk melihat promo.');empty.id='iwcEmpty';rail.after(empty)}
    empty.hidden=false;
   }else if(empty)empty.hidden=true;
  }
- async function request(action,code,user){
-  const withTimeout=(promise,ms=12000)=>Promise.race([promise,new Promise((_,reject)=>setTimeout(()=>reject(new Error('TIMEOUT')),ms))]);
-  const token=await withTimeout(user.getIdToken());
-  const controller=new AbortController();const timeout=setTimeout(()=>controller.abort(),12000);
+ async function api(action,code,account){
+  const timeout=12000;
+  let tokenTimer;
+  const token=await Promise.race([account.getIdToken(),new Promise((_,reject)=>{tokenTimer=setTimeout(()=>{const e=new Error('TIMEOUT');e.code='TIMEOUT';reject(e)},timeout)})]).finally(()=>clearTimeout(tokenTimer));
+  const controller=new AbortController();const id=setTimeout(()=>controller.abort(),timeout);
   try{
-   const response=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify(code?{action,code}:{action}),cache:'no-store',credentials:'same-origin',signal:controller.signal});
-   const result=await withTimeout(response.json());
-   if(!response.ok||result.success!==true){const e=new Error('API');e.code=result.code||'UNKNOWN';throw e}
-   return result;
-  }finally{clearTimeout(timeout)}
+   const response=await fetch(API,{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+token},
+    body:JSON.stringify(code?{action,code}:{action}),credentials:'same-origin',cache:'no-store',signal:controller.signal});
+   const data=await response.json();
+   if(!response.ok||data.success!==true){const err=new Error('API_ERROR');err.code=data.code||'UNKNOWN';throw err}
+   return data;
+  }finally{clearTimeout(id)}
  }
  async function refresh(){
-  const user=getUser(),uid=user?.uid||'',g=++generation;
-  authUid=uid;balances=null;error='';loading=!!user;paint();
-  if(!user){loading=false;paint();return}
+  const account=user(),current=account?.uid||'',myVersion=++version;
+  balance=null;loading=!!account;notice('');render();
+  if(!account){loading=false;render();return}
   try{
-   const result=await request('voucher_status',null,user);
-   if(g!==generation||getUser()?.uid!==uid)return;
-   if(!result.vouchers||!Object.keys(CODES).every(name=>validBalance(result.vouchers[CODES[name]])))throw new Error('STATUS_INVALID');
-   balances=result.vouchers;
-   message('');
-  }catch(e){if(g!==generation)return;error=e.code||'UNAVAILABLE';message('Status voucher belum dapat diperbarui. Periksa koneksi lalu coba lagi.','error')}
-  finally{if(g===generation){loading=false;paint()}}
+   const res=await api('voucher_status',null,account);
+   if(myVersion!==version||user()?.uid!==current)return;
+   if(!res.vouchers||!Object.values(CODES).every(code=>isValid(res.vouchers[code])))throw new Error('INVALID_STATUS');
+   balance=res.vouchers;
+  }catch(e){if(myVersion===version)notice('Status voucher belum dapat dimuat. Coba lagi sebentar.','error')}
+  finally{if(myVersion===version){loading=false;render()}}
  }
- async function claim(code){
-  if(busy)return;
-  let user=getUser();
-  if(!user){
-   if(typeof window.nexaiRequireCustomerLogin!=='function'){toast('Masuk ke akun ImamStore untuk mengklaim voucher.','error');return}
+ async function changeSaved(code,wantSaved){
+  if(pending||loading)return;
+  let account=user();
+  if(!account){
+   if(typeof window.nexaiRequireCustomerLogin!=='function'){toast('Masuk untuk menyimpan voucher.','error');return}
    const ok=await window.nexaiRequireCustomerLogin();if(!ok)return;
-   user=getUser();if(!user)return;
-   await refresh();
+   await refresh();account=user();if(!account)return;
   }
-  if(busy||loading)return;
-  const b=balances?.[code];
-  if(!validBalance(b)){await refresh();return}
-  if(b.claimed||b.remaining===0||b.status==='expired')return;
-  const uid=user.uid,g=generation;busy=code;paint();
+  let old=balance?.[code];if(!isValid(old)){await refresh();return}
+  if(old.saved===wantSaved)return;
+  if(wantSaved&&(old.remaining===0||old.status==='expired'))return;
+  const current=account.uid,myVersion=version;
+  pending=code;render();
   try{
-   const result=await request('voucher_claim',code,user);
-   if(g!==generation||getUser()?.uid!==uid)return;
-   if(result.code!==code||result.claimed!==true)throw new Error('CLAIM_UNCONFIRMED');
-   balances[code]={...b,claimed:true};
-   message('Voucher berhasil disimpan. Gunakan ketika checkout sesuai ketentuan.','success');
-   toast(result.alreadyClaimed?'Voucher sudah tersimpan di akun.':'Voucher berhasil diklaim!');
+   const result=await api(wantSaved?'voucher_save':'voucher_unsave',code,account);
+   if(myVersion!==version||user()?.uid!==current)return;
+   if(result.code!==code||result.saved!==wantSaved)throw new Error('RESULT_INVALID');
+   balance[code]={...old,saved:wantSaved};
+   const msg=wantSaved?'Voucher disimpan untuk nanti.':'Voucher dihapus dari Voucher Saya. Tetap bisa digunakan saat checkout.';
+   notice(msg,'success');toast(wantSaved?'Voucher berhasil disimpan.':'Voucher dihapus dari simpanan.');
    window.dispatchEvent(new CustomEvent('imamstore:voucher-wallet-update',{detail:{code}}));
-  }catch(e){if(g!==generation)return;const msg=failCopy(e.code);message(msg,'error');toast(msg,'error')}
-  finally{busy='';if(g===generation)paint()}
+  }catch(e){if(myVersion===version){const msg=readable(e);notice(msg,'error');toast(msg,'error')}}
+  finally{pending='';if(myVersion===version)render()}
  }
- rail.addEventListener('click',e=>{const btn=e.target.closest('.iwc-action');if(!btn)return;
-  if(btn.dataset.state==='retry'){void refresh();return}
-  if(btn.disabled)return;
-  const code=btn.dataset.code;if(code&&Object.values(CODES).includes(code))void claim(code);
+ rail.addEventListener('click',event=>{
+  const button=event.target.closest('.iwc-action');if(!button||button.disabled)return;
+  const mode=button.dataset.state,code=button.dataset.code;
+  if(!Object.values(CODES).includes(code))return;
+  if(mode==='retry')void refresh();
+  if(mode==='save'||mode==='unsave')void changeSaved(code,mode==='save');
  });
- // The original store code replaces the rail when promotions reload; enhance only new children.
- new MutationObserver(()=>enhance()).observe(rail,{childList:true});
- try{const auth=window.firebase?.auth?.();if(auth?.onAuthStateChanged)auth.onAuthStateChanged(()=>{
-  savedOnly=false;const toggle=document.getElementById('iwcMyVouchers');if(toggle){toggle.setAttribute('aria-pressed','false');toggle.textContent='Voucher Saya'}
-  void refresh();
- });else{enhance();paint()}}
- catch(e){enhance();paint()}
- document.addEventListener('visibilitychange',()=>{if(!document.hidden&&getUser())void refresh()});
- window.addEventListener('imamstore:voucher-wallet-update',()=>{if(getUser()&&!busy)void refresh()});
+ // Only direct card replacements, not mutations to card internals.
+ new MutationObserver(()=>setupCards()).observe(rail,{childList:true});
+ try{
+  const auth=window.firebase?.auth?.();
+  if(auth?.onAuthStateChanged)auth.onAuthStateChanged(()=>{
+   savedOnly=false;const btn=document.getElementById('iwcMyVouchers');
+   if(btn){btn.setAttribute('aria-pressed','false');btn.textContent='Voucher Saya'}
+   void refresh();
+  });
+ }catch(_){/* Login and refresh buttons remain accessible. */}
+ document.addEventListener('visibilitychange',()=>{if(!document.hidden&&user())void refresh()});
+ window.addEventListener('imamstore:voucher-wallet-update',()=>{if(user()&&!pending)void refresh()});
  window.imamstoreVoucherWallet=Object.freeze({refresh});
- enhance();
+ setupCards();void refresh();
 })();

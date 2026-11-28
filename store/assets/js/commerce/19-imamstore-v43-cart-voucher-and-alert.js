@@ -89,7 +89,7 @@ async function refreshVoucherUsage(root,subtotal,selectedVouchers){
    else if(!minOk)label='Tambah belanja '+money(v.min-subtotal)+' · Sisa '+available+' dari '+limit;
    else if(held>0)label='Sedang digunakan pada '+held+' pesanan · Sisa '+available+' dari '+limit;
    else label='Tersedia '+available+' dari '+limit+' penggunaan';
-   if(quota.claimed===true)label='✓ Tersimpan · '+label;
+   if(quota.saved===true)label='✓ Disimpan · '+label;
    if(selected)label='✓ Dipilih · '+label;
    update(row,label,actionAllowed);
   }

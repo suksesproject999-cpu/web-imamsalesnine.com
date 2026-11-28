@@ -1,13 +1,12 @@
-/* ImamStore R9.1 — compact voucher cards + natural two-axis touch gestures.
-   Presentation only; claim, account quotas, status and checkout logic stay in R9 JS/backend. */
+/* ImamStore R10 — clean compact Save Voucher UI.
+   No stacked overrides; natural horizontal/vertical gestures, 5-use quota is server-owned. */
 #voucherSection{padding:12px 10px 14px}
 #voucherSection .section-head{margin:0 2px 9px;gap:8px}
 #voucherSection .iwc-my-vouchers{border:1px solid #c4dea8;background:#f4faec;color:#4e7b27;border-radius:999px;min-height:34px;padding:6px 11px;font-size:11.5px;font-weight:750;white-space:nowrap;touch-action:manipulation;transition:background .15s,transform .12s}
 #voucherSection .iwc-my-vouchers:active{transform:scale(.96);background:#e5f1d7}
 #voucherSection .iwc-my-vouchers[aria-pressed="true"]{background:#e1f2d0;color:#355c19}
 #voucherSection .iwc-my-vouchers:focus-visible{outline:3px solid #8cc63f;outline-offset:2px}
-/* A horizontal rail must NOT force pan-x: vertical finger swipes must scroll the page.
-   Let the browser choose the axis naturally; native horizontal dragging still works. */
+/* Let the browser choose the swipe axis: vertical page scroll must work over cards. */
 #voucherSection .store-vouchers{display:flex;align-items:stretch;gap:9px;overflow-x:auto;overflow-y:hidden;overscroll-behavior-x:contain;overscroll-behavior-y:auto;scroll-snap-type:x proximity;scroll-padding-inline:2px;-webkit-overflow-scrolling:touch;touch-action:auto;scrollbar-width:none;padding:2px 2px 9px}
 #voucherSection .store-vouchers::-webkit-scrollbar{display:none}
 #voucherSection .store-voucher.iwc-card{flex:0 0 min(65vw,232px);width:min(65vw,232px);max-width:232px;min-width:0;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) auto;grid-template-rows:auto auto;align-content:start;align-items:end;gap:6px 6px;padding:9px 10px 9px 9px;border:1px solid #e1e9d8;border-left:4px solid #8cc63f;border-radius:11px;background:#fff;box-shadow:0 3px 10px rgba(23,41,20,.07);scroll-snap-align:start;overflow:hidden}
@@ -17,7 +16,7 @@
 #voucherSection .iwc-card .iwc-copy b{display:block;color:#202a20;font-size:12.5px;font-weight:800;line-height:1.3;white-space:normal;overflow-wrap:normal}
 #voucherSection .iwc-card .iwc-copy small{display:block;margin-top:2px;color:#657264;font-size:10.5px;line-height:1.32;white-space:normal;overflow-wrap:break-word}
 #voucherSection .iwc-card .iwc-copy .iwc-offer{color:#4d7d25;font-weight:750}
-/* Quota and action share the final row instead of stacking full-width blocks. */
+/* Server-owned remaining uses and optional save action share one compact row. */
 #voucherSection .iwc-card .iwc-usage{grid-column:1;min-width:0;align-self:center;padding:0;border-radius:0;background:transparent;font-size:10px;color:#526a45;line-height:1.3;min-height:0;overflow-wrap:break-word}
 #voucherSection .iwc-card .iwc-usage[data-kind="error"]{background:transparent;color:#885d27}
 #voucherSection .iwc-card .iwc-usage[data-kind="used"]{background:transparent;color:#70776e}
@@ -26,10 +25,9 @@
 #voucherSection .iwc-card .iwc-action:active:not(:disabled){transform:scale(.96);background:#79b32d}
 #voucherSection .iwc-card .iwc-action:focus-visible{outline:3px solid #4c8021;outline-offset:2px}
 #voucherSection .iwc-card .iwc-action:disabled{opacity:.78;cursor:default;box-shadow:none}
-#voucherSection .iwc-card .iwc-action[data-state="saved"]{background:#edf6e5;border-color:#c3dba9;color:#4b7829;opacity:1}
+#voucherSection .iwc-card .iwc-action[data-state="unsave"]{background:#edf6e5;border-color:#c3dba9;color:#4b7829;opacity:1}
+#voucherSection .iwc-card .iwc-action[data-state="unsave"]:hover{background:#e2f0d4}
 #voucherSection .iwc-card .iwc-action[data-state="loading"]:before{content:"";display:inline-block;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;height:11px;width:11px;flex:0 0 11px;animation:iwc-spin .85s linear infinite}
-/* Note already implicit in "Klaim" and account usage; it unnecessarily doubled card height. */
-#voucherSection .iwc-card .iwc-note{display:none}
 #voucherSection .iwc-message{font-size:11.5px;line-height:1.45;color:#5b6b50;margin:0 2px 8px;min-height:0}
 #voucherSection .iwc-message[hidden]{display:none}
 #voucherSection .iwc-empty{padding:12px 14px;color:#657060;font-size:12px;line-height:1.45}

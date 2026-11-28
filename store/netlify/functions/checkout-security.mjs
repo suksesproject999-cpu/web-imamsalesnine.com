@@ -9,7 +9,7 @@ import {getPresenceFirebase} from '../lib/firebase-admin.mjs';
 import {CheckoutQuoteError} from '../lib/checkout-quote.mjs';
 import {CheckoutServerError,quoteForUser,createForUser,voucherStatusForUser} from '../lib/checkout-order-service.mjs';
 import {reportPayment} from '../lib/checkout-expiry.mjs';
-import {VoucherWalletError,readVoucherWallet,claimVoucherForUser,attachWalletToUsage} from '../lib/checkout-voucher-wallet.mjs';
+import {VoucherWalletError,readVoucherWallet,setVoucherSavedForUser,attachSavedToUsage} from '../lib/checkout-voucher-wallet.mjs';
 const ORIGINS=new Set(['https://store.imamsales.com','https://store.imamsalesnine.com']);
 const MAX_BODY_BYTES=12_288;
 const STAGING_CONTEXTS=new Set(['deploy-preview','branch-deploy']);
@@ -60,7 +60,7 @@ const MESSAGES={
  STOCK_INSUFFICIENT:'Stok tidak mencukupi. Perbarui jumlah pesanan.',
  VOUCHER_USAGE_UNVERIFIED:'Hak voucher belum dapat diverifikasi.',
  WALLET_UNAVAILABLE:'Voucher belum dapat disimpan. Silakan coba lagi.',
- VOUCHER_WALLET_NOT_READY:'Klaim voucher belum tersedia. Silakan coba kembali.',
+ VOUCHER_WALLET_NOT_READY:'Simpan voucher belum tersedia. Silakan coba kembali.',
  VOUCHER_LEDGER_NOT_READY:'Pemeriksaan riwayat voucher belum siap. Coba tanpa voucher.',
  VOUCHER_HISTORY_UNAVAILABLE:'Riwayat voucher sedang tidak tersedia. Coba kembali.',
  VOUCHER_HISTORY_TOO_LARGE:'Riwayat voucher akun perlu ditinjau admin.',
@@ -125,16 +125,16 @@ export default async function handler(request){
    if(!quoteAllowed(decoded.uid))return respond(429,{success:false,code:'QUOTE_RATE_LIMITED'},origin);
    const data=await voucherStatusForUser(args);
    const wallet=await readVoucherWallet({db,uid:decoded.uid});
-   return respond(200,{success:true,...data,vouchers:attachWalletToUsage(data.vouchers,wallet)},origin);
+   return respond(200,{success:true,...data,vouchers:attachSavedToUsage(data.vouchers,wallet)},origin);
   }
-  if(body?.action==='voucher_claim'){
+  if(body?.action==='voucher_save'||body?.action==='voucher_unsave'){
    if(process.env.CHECKOUT_SECURITY_WRITE_ENABLED!=='true')
-    return respond(503,{success:false,code:'VOUCHER_WALLET_NOT_READY',message:'Klaim voucher belum tersedia. Silakan coba kembali.'},origin);
+    return respond(503,{success:false,code:'VOUCHER_WALLET_NOT_READY',message:'Simpan voucher belum tersedia. Silakan coba kembali.'},origin);
    if(!body||Object.keys(body).sort().join(',')!=='action,code'||typeof body.code!=='string')
     return respond(400,{success:false,code:'REQUEST_SHAPE_INVALID'},origin);
    if(!quoteAllowed(decoded.uid))return respond(429,{success:false,code:'QUOTE_RATE_LIMITED'},origin);
-   const claim=await claimVoucherForUser({db,uid:decoded.uid,code:body.code});
-   return respond(200,{success:true,...claim},origin);
+   const saved=await setVoucherSavedForUser({db,uid:decoded.uid,code:body.code,saved:body.action==='voucher_save'});
+   return respond(200,{success:true,...saved},origin);
   }
   if(body?.action==='quote'){
    if(!quoteAllowed(decoded.uid))return respond(429,{success:false,code:'QUOTE_RATE_LIMITED',message:'Terlalu banyak permintaan harga. Coba kembali.'},origin);
