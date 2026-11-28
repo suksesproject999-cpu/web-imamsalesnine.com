@@ -10,9 +10,9 @@ export const CHECKOUT_VOUCHER_POLICY_VERSION = 'v43-2026-11-27';
 
 export const CHECKOUT_VOUCHERS = Object.freeze([
   Object.freeze({ code: 'BELANJA50', name: 'Voucher Belanja', type: 'product_fixed', discount: 5000,
-    minimumSubtotal: 500000, maxDiscount: null, expiresOn: '2026-12-31', maxUsesPerAccount: 1 }),
+    minimumSubtotal: 500000, maxDiscount: null, expiresOn: '2026-12-31', maxUsesPerAccount: 5 }),
   Object.freeze({ code: 'DISKON10', name: 'Diskon Produk 10%', type: 'product_percent', discount: 10,
-    minimumSubtotal: 100000, maxDiscount: 500, expiresOn: '2026-12-31', maxUsesPerAccount: 1 }),
+    minimumSubtotal: 100000, maxDiscount: 500, expiresOn: '2026-12-31', maxUsesPerAccount: 5 }),
   Object.freeze({ code: 'ONGKIR5', name: 'Diskon Ongkir', type: 'shipping_fixed', discount: 5000,
-    minimumSubtotal: 500000, maxDiscount: null, expiresOn: '2026-12-31', maxUsesPerAccount: 1 }),
+    minimumSubtotal: 500000, maxDiscount: null, expiresOn: '2026-12-31', maxUsesPerAccount: 5 }),
 ]);

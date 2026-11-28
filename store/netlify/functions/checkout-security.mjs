@@ -7,7 +7,7 @@ import catalogSeed from '../../produk.json' with {type:'json'};
 import {FieldValue} from 'firebase-admin/firestore';
 import {getPresenceFirebase} from '../lib/firebase-admin.mjs';
 import {CheckoutQuoteError} from '../lib/checkout-quote.mjs';
-import {CheckoutServerError,quoteForUser,createForUser} from '../lib/checkout-order-service.mjs';
+import {CheckoutServerError,quoteForUser,createForUser,voucherStatusForUser} from '../lib/checkout-order-service.mjs';
 import {reportPayment} from '../lib/checkout-expiry.mjs';
 const ORIGINS=new Set(['https://store.imamsales.com','https://store.imamsalesnine.com']);
 const MAX_BODY_BYTES=12_288;
@@ -62,7 +62,8 @@ const MESSAGES={
  VOUCHER_HISTORY_UNAVAILABLE:'Riwayat voucher sedang tidak tersedia. Coba kembali.',
  VOUCHER_HISTORY_TOO_LARGE:'Riwayat voucher akun perlu ditinjau admin.',
  VOUCHER_ALREADY_USED:'Voucher sudah pernah dipakai akun ini.',
- VOUCHER_RESERVED:'Voucher sedang digunakan pada pesanan aktif akun ini.',
+ VOUCHER_RESERVED:'Semua jatah voucher sedang digunakan pada pesanan aktif.',
+ VOUCHER_LIMIT_REACHED:'Voucher ini sudah digunakan sebanyak 5 kali oleh akun kamu.',
  VOUCHER_UNAVAILABLE:'Voucher tidak tersedia untuk pesanan ini.',
  VOUCHER_EXPIRED:'Voucher sudah berakhir.',
  VOUCHER_MINIMUM_NOT_MET:'Minimal pembelian voucher belum terpenuhi.',
@@ -115,6 +116,13 @@ export default async function handler(request){
    return respond(403,{success:false,code:'CUSTOMER_REQUIRED',message:MESSAGES.AUTH_REQUIRED},origin);
   const args={db,seedCatalog:catalogSeed,uid:decoded.uid,body,
    voucherLedgerReady:process.env.CHECKOUT_VOUCHER_LEDGER_READY==='true'};
+  if(body?.action==='voucher_status'){
+   if(!body||Object.keys(body).sort().join(',')!=='action')
+    return respond(400,{success:false,code:'REQUEST_SHAPE_INVALID'},origin);
+   if(!quoteAllowed(decoded.uid))return respond(429,{success:false,code:'QUOTE_RATE_LIMITED'},origin);
+   const data=await voucherStatusForUser(args);
+   return respond(200,{success:true,...data},origin);
+  }
   if(body?.action==='quote'){
    if(!quoteAllowed(decoded.uid))return respond(429,{success:false,code:'QUOTE_RATE_LIMITED',message:'Terlalu banyak permintaan harga. Coba kembali.'},origin);
    const data=await quoteForUser(args);

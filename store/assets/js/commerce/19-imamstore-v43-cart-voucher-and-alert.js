@@ -24,6 +24,7 @@ function voucherUiStyle(){
  .v43-voucher-sheet .ref-v43-choose:not(:disabled):active,.v43-voucher-sheet #v43VoucherApply:not(:disabled):active,.v43-voucher-sheet #v43VoucherDone:not(:disabled):active{transform:scale(.96);filter:brightness(.91)}
  .v43-voucher-sheet button:focus-visible{outline:3px solid #8cc63f;outline-offset:3px}
  .v43-voucher-sheet button:disabled{cursor:not-allowed;opacity:.65}
+ .v43-voucher-sheet .v43-voucher-state{display:block;line-height:1.45;max-width:100%;overflow-wrap:anywhere}
  .v43-voucher-sheet .ref-v43-choose.is-verifying,.v43-voucher-sheet #v43VoucherApply.is-verifying{display:inline-flex;align-items:center;justify-content:center;gap:7px;white-space:nowrap}
  .v43-voucher-sheet .is-verifying::before{content:"";display:inline-block;width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;border-radius:50%;animation:imamVoucherSpin .8s linear infinite}
  @keyframes imamVoucherSpin{to{transform:rotate(360deg)}}
@@ -47,12 +48,65 @@ function voucherFeedback(text,kind='error'){
  voucherToastTimer=setTimeout(()=>{toast.classList.remove('is-visible');voucherToastTimer=null},3600);
 }
 function alertUI(text){voucherFeedback(text,'error')}
+// Read-only per-account balance; checkout quote/create remain authoritative.
+// No quota is stored in localStorage and no technical backend message reaches customers.
+let voucherUsageSequence=0;
+async function refreshVoucherUsage(root,subtotal,selectedVouchers){
+ const id=++voucherUsageSequence;
+ const rows=[...root.querySelectorAll('[data-voucher-code]')];
+ const auth=window.firebase?.auth?.(),user=auth?.currentUser;
+ const update=(row,text,enabled)=>{
+  if(!root.isConnected||id!==voucherUsageSequence)return;
+  const label=row.querySelector('.v43-voucher-state'),btn=row.querySelector('.ref-v43-choose');
+  if(label)label.textContent=text;
+  if(btn){btn.disabled=!enabled;btn.dataset.allowed=String(enabled)}
+ };
+ if(!user||user.isAnonymous){
+  for(const row of rows)update(row,'Masuk untuk melihat jatah voucher',row.dataset.eligible==='true');
+  return;
+ }
+ try{
+  const token=await voucherDeadline(user.getIdToken());
+  if(!token)throw new Error('NO_TOKEN');
+  const response=await voucherDeadline(fetch(voucherApi,{method:'POST',
+   headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},
+   body:JSON.stringify({action:'voucher_status'}),cache:'no-store',credentials:'same-origin'}));
+  const body=await voucherDeadline(response.json());
+  if(!response.ok||body?.success!==true||!body?.vouchers)throw new Error('STATUS_UNAVAILABLE');
+  for(const row of rows){
+   const v=vouchers.find(x=>x.id===row.dataset.voucherCode);if(!v)continue;
+   const quota=body.vouchers[v.id];
+   const selected=row.dataset.isActive==='true';
+   const minOk=subtotal>=v.min;
+   const timeOk=Date.now()<=Date.parse(v.expired+'T23:59:59.999+07:00');
+   if(!quota||!Number.isSafeInteger(quota.remaining))throw new Error('BAD_BALANCE');
+   const available=Math.max(0,quota.remaining),limit=Math.max(0,quota.limit),used=Math.max(0,quota.used),held=Math.max(0,quota.reserved);
+   const actionAllowed=selected||(available>0&&minOk&&timeOk);
+   let label;
+   if(!timeOk||quota.status==='expired')label='Masa berlaku voucher berakhir';
+   else if(available===0&&held>0)label='Jatah penuh · '+used+' sudah dipakai, '+held+' sedang digunakan pada pesanan';
+   else if(available===0)label='Sudah digunakan '+used+' dari '+limit+' kali';
+   else if(!minOk)label='Tambah belanja '+money(v.min-subtotal)+' · Sisa '+available+' dari '+limit;
+   else if(held>0)label='Sedang digunakan pada '+held+' pesanan · Sisa '+available+' dari '+limit;
+   else label='Tersedia '+available+' dari '+limit+' penggunaan';
+   if(selected)label='✓ Dipilih · '+label;
+   update(row,label,actionAllowed);
+  }
+ }catch(err){
+  // No invented "5 left" claim when a network/auth read fails.
+  for(const row of rows){
+   const active=row.dataset.isActive==='true';
+   const canTry=row.dataset.eligible==='true';
+   update(row,(active?'✓ Dipilih · ':'')+'Jatah belum dapat ditampilkan. Pemeriksaan dilakukan saat digunakan.',active||canTry);
+  }
+ }
+}
 
 const money=n=>fmt(n);
 const vouchers=[
- {id:'BELANJA50',name:'Voucher Belanja',description:'Potongan Belanja Rp5.000',type:'product_fixed',discount:5000,min:500000,maxDiscount:null,expired:'2026-12-31',icon:'fa-tags',limit:'1 Voucher / Akun'},
- {id:'DISKON10',name:'Diskon Produk 10%',description:'Diskon produk 10%',type:'product_percent',discount:10,min:100000,maxDiscount:500,expired:'2026-12-31',icon:'fa-percent',limit:'1 Voucher / Akun'},
- {id:'ONGKIR5',name:'Diskon Ongkir',description:'Potongan Ongkir Rp5.000',type:'shipping_fixed',discount:5000,min:500000,maxDiscount:null,expired:'2026-12-31',icon:'fa-truck',limit:'1 Voucher / Akun'}
+ {id:'BELANJA50',name:'Voucher Belanja',description:'Potongan Belanja Rp5.000',type:'product_fixed',discount:5000,min:500000,maxDiscount:null,expired:'2026-12-31',icon:'fa-tags',limit:'Maksimal 5 penggunaan per akun'},
+ {id:'DISKON10',name:'Diskon Produk 10%',description:'Diskon produk 10%',type:'product_percent',discount:10,min:100000,maxDiscount:500,expired:'2026-12-31',icon:'fa-percent',limit:'Maksimal 5 penggunaan per akun'},
+ {id:'ONGKIR5',name:'Diskon Ongkir',description:'Potongan Ongkir Rp5.000',type:'shipping_fixed',discount:5000,min:500000,maxDiscount:null,expired:'2026-12-31',icon:'fa-truck',limit:'Maksimal 5 penggunaan per akun'}
 ];
 const slotOf=v=>v?.type==='shipping_fixed'?'shipping':'product';
 const voucherState={cart:{product:null,shipping:null},checkout:{product:null,shipping:null}};
@@ -68,7 +122,8 @@ const voucherError=Object.freeze({
  VOUCHER_LEDGER_NOT_READY:'Voucher belum dapat digunakan sementara. Coba lagi nanti atau lanjut tanpa voucher.',
  VOUCHER_HISTORY_UNAVAILABLE:'Riwayat penggunaan voucher sedang tidak tersedia. Silakan coba lagi.',
  VOUCHER_HISTORY_TOO_LARGE:'Voucher pada akun ini perlu bantuan toko. Hubungi layanan pelanggan.',
- VOUCHER_ALREADY_USED:'Voucher ini sudah pernah digunakan oleh akun kamu.',
+ VOUCHER_ALREADY_USED:'Jatah voucher untuk akun kamu sudah habis.',
+ VOUCHER_LIMIT_REACHED:'Voucher ini sudah digunakan 5 kali oleh akun kamu.',
  VOUCHER_RESERVED:'Voucher ini masih digunakan pada pesanan lain yang aktif.',
  VOUCHER_MINIMUM_NOT_MET:'Total belanja belum memenuhi minimum penggunaan voucher.',
  VOUCHER_EXPIRED:'Masa berlaku voucher sudah berakhir.',
@@ -185,7 +240,7 @@ async function chooseVoucher(v,scope,active,target){
   voucherState[scope][slotOf(v)]=v;
   sync();window.imamstoreReferenceV38?.refresh?.();document.dispatchEvent(new Event('imamstore:quote-refresh'));
   openVoucher();
-  voucherFeedback(slotOf(v)==='shipping'?'Voucher ongkir dipilih. Nilai potongan menunggu biaya pengiriman.':'Voucher berhasil digunakan. Potongan sudah masuk ke total produk.','success');
+  voucherFeedback(slotOf(v)==='shipping'?'Voucher ongkir dipilih. Nilai potongan menunggu biaya pengiriman.':'Voucher dipilih. Potongan tercantum pada ringkasan, jatah digunakan setelah pesanan dibuat.','success');
  }catch(err){
   console.warn('[ImamStore voucher diagnostics]',String(err?.code||'unknown'));
   voucherFeedback(voucherErrorMessage(err),'error');
@@ -270,7 +325,7 @@ function openVoucher(){
  modal('<div class="v43-compact-sheet v43-voucher-sheet">'+
  '<header class="v43-compact-head"><h2>Voucher & Promo</h2><p>Pilih satu voucher produk dan satu voucher ongkir.</p></header>'+
  '<div class="v43-compact-scroll"><div class="ref-v43-voucher-input"><input id="v43VoucherCode" placeholder="Masukkan kode voucher" autocomplete="off" aria-label="Kode voucher"><button type="button" id="v43VoucherApply">Gunakan</button></div><p id="v43VoucherFeedback" role="status" aria-live="polite" hidden></p>'+
- '<div id="v43VoucherList"></div><p class="v43-compact-hint">Potongan ongkir dihitung setelah biaya kirim ditentukan. Total produk belum termasuk ongkir.</p></div>'+
+ '<div id="v43VoucherList"></div><p class="v43-compact-hint">Setiap jenis voucher dapat digunakan maksimal 5 kali per akun. Pesanan aktif menahan jatah sementara. Potongan ongkir dihitung setelah biaya kirim ditentukan.</p></div>'+
  '<footer class="v43-compact-foot"><span id="v43SelectionCount" role="status"></span><button class="ref-green" type="button" id="v43VoucherDone">Selesai</button></footer></div>',root=>{
   const selectedCount=Object.values(chosen).filter(Boolean).length;
   root.querySelector('#v43SelectionCount').textContent=selectedCount?selectedCount+' voucher dipilih':'Belum ada voucher dipilih';
@@ -288,22 +343,23 @@ function openVoucher(){
   const list=root.querySelector('#v43VoucherList');
   vouchers.forEach(v=>{
    const slot=slotOf(v),active=chosen[slot]?.id===v.id,ok=eligible(v,sum);
-   const row=document.createElement('div');row.className='ref-v43-voucher v43-voucher-item'+(active?' is-selected':'')+(!ok?' is-disabled':'');
+   const row=document.createElement('div');row.className='ref-v43-voucher v43-voucher-item'+(active?' is-selected':'')+(!ok?' is-disabled':'');row.dataset.voucherCode=v.id;row.dataset.isActive=String(active);row.dataset.eligible=String(ok);
    row.innerHTML='<span class="ref-v43-voucher-icon"></span><div class="ref-v43-voucher-main"><b></b><small></small><span class="v43-voucher-state" aria-live="polite"></span></div><div class="ref-v43-voucher-actions"><button type="button" class="ref-v43-choose"></button><button type="button" class="ref-v43-terms">S&K</button></div>';
    row.querySelector('.ref-v43-voucher-icon').innerHTML='<i class="fa-solid '+v.icon+'" aria-hidden="true"></i>';
    const title=row.querySelector('b'); title.textContent=v.name+' · '+(v.type==='product_percent'?v.discount+'%':money(v.discount));
    const expiry=v.expired?new Date(v.expired+'T00:00:00').toLocaleDateString('id-ID',{day:'2-digit',month:'short',year:'numeric'}):'Tidak dibatasi';
    row.querySelector('small').textContent='Min. '+money(v.min)+' · Sampai '+expiry;
    const stateLabel=row.querySelector('.v43-voucher-state');
-   stateLabel.textContent=active?(slot==='shipping'?'✓ Dipilih · Menunggu ongkir':'✓ Potongan diterapkan'):(!ok?(sum<Number(v.min||0)?'Tambah belanja '+money(Number(v.min||0)-sum):'Masa berlaku berakhir'):'Bisa dipilih untuk pesanan ini');
+   stateLabel.textContent=active?'✓ Dipilih · Memeriksa sisa penggunaan…':'Memeriksa sisa penggunaan…';
    const btn=row.querySelector('.ref-v43-choose');
-   btn.textContent=active?'Batalkan':ok?'Gunakan':'Belum sesuai';btn.disabled=!ok&&!active;btn.dataset.allowed=String(ok||active);
+   btn.textContent=active?'Batalkan':ok?'Gunakan':'Belum sesuai';btn.disabled=!active;btn.dataset.allowed=String(active);
    btn.setAttribute('aria-pressed',String(active));
    btn.setAttribute('aria-label',(active?'Batalkan':'Gunakan')+' '+v.name);
    btn.onclick=()=>chooseVoucher(v,currentScope(),active,btn);
    row.querySelector('.ref-v43-terms').onclick=()=>terms(v);
    list.append(row);
   });
+  refreshVoucherUsage(root,sum,chosen);
  });
 }
 function openProduct(line){const id=String(line.id);const cart=$('s5Cart');cart?.classList.remove('open');document.body.classList.remove('stage4-detail-open');document.dispatchEvent(new CustomEvent('imamstore:open-product',{detail:{id}}));}

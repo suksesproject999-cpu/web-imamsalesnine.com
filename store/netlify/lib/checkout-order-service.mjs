@@ -8,6 +8,7 @@
 import {createHash} from 'node:crypto';
 import {quoteCheckout,CheckoutQuoteError,MAX_CHECKOUT_LINES} from './checkout-quote.mjs';
 import {CHECKOUT_VOUCHERS} from './checkout-vouchers.mjs';
+import {usageForVoucher} from './checkout-voucher-usage.mjs';
 import {allocationPlan,stockPatches} from './checkout-stock.mjs';
 
 const ID=/^[A-Za-z0-9_-]{1,120}$/;
@@ -130,30 +131,29 @@ async function readVoucherHistory(db,uid,codes){
  }
  return result;
 }
-async function claimOrderStates(db,refs,snapshots,tx=null){
+async function usageForClaims({db,uid,claims,ledger,history,voucherLedgerReady=false,readOrder}){
  const result=new Map();
- for(let i=0;i<refs.length;i++){
-  const snap=snapshots[i];if(!snap?.exists)continue;
-  const orderId=snap.data()?.orderId;
-  if(typeof orderId!=='string'||!/^ORD-[A-Za-z0-9_-]{16,100}$/.test(orderId)){result.set(refs[i].code,'used');continue}
-  const ref=db.collection('orders').doc(orderId),old=tx?await tx.get(ref):await ref.get();
-  result.set(refs[i].code,old.exists?statusUsage(old.data()):'used');
+ for(let i=0;i<claims.length;i++){
+  const {code}=claims[i];
+  const policy=CHECKOUT_VOUCHERS.find(v=>v.code===code);
+  if(!policy||!Number.isSafeInteger(policy.maxUsesPerAccount))fail('TRUSTED_VOUCHERS_INVALID');
+  let usage;
+  try{usage=await usageForVoucher({db,uid,code,maxUses:policy.maxUsesPerAccount,
+    ledger:ledger[i],history,ledgerReady:voucherLedgerReady,readOrder})}
+  catch(err){fail(err?.code||'VOUCHER_USAGE_UNVERIFIED',503)}
+  result.set(code,usage);
  }
  return result;
 }
-function entitlements(refs,snapshots,enabled,history,claimStates){
+function entitlementsFromUsage(usages){
  const result=new Map();
- for(let i=0;i<refs.length;i++){
-  const code=refs[i].code,historyState=history?.get(code)?.state;
-  if(historyState==='used'){result.set(code,'used');continue}
-  if(historyState==='reserved'){result.set(code,'reserved');continue}
-  if(snapshots[i]?.exists){
-   const state=claimStates?.get(code)||'used';
-   result.set(code,state==='cancelled'?true:state);
-   continue;
+ for(const [code,usage] of usages){
+  // Quotes cannot grant a voucher based on browser input.
+  if(usage.remaining===0){
+   if(usage.reserved>0)fail('VOUCHER_RESERVED',409);
+   fail('VOUCHER_LIMIT_REACHED',409);
   }
-  // Valid history scan proves no past use, even when older ledger readiness flag is OFF.
-  result.set(code,history?true:(enabled?true:'unverified'));
+  result.set(code,true);
  }
  return result;
 }
@@ -209,11 +209,32 @@ export async function quoteForUser({db,seedCatalog,uid,body,now=Date.now(),vouch
  const docs=await Promise.all(productRefs.map(x=>x.ref.get()));
  const ledger=await Promise.all(claims.map(x=>x.ref.get()));
  const history=await readVoucherHistory(db,uid,claims.map(x=>x.code));
- const claimStates=await claimOrderStates(db,claims,ledger);
+ const usages=await usageForClaims({db,uid,claims,ledger,history,voucherLedgerReady,
+  readOrder:ref=>ref.get()});
  const map=new Map(productRefs.map((x,i)=>[x.id,docs[i]]));
  const products=prepareProducts(req.items,seed,map);
- const quote=quoteFor(req,products,entitlements(claims,ledger,voucherLedgerReady,history,claimStates),now);
- return summary(quote);
+ const quote=quoteFor(req,products,entitlementsFromUsage(usages),now);
+ return {...summary(quote),voucherUsage:Object.fromEntries(usages)};
+}
+/** Read-only, authenticated voucher balance for the customer's voucher sheet. */
+export async function voucherStatusForUser({db,uid,now=Date.now(),voucherLedgerReady=false}){
+ verifiedUser(uid);
+ if(!db||typeof db.collection!=='function')fail('SERVER_CONFIG_INVALID',503);
+ const policies=CHECKOUT_VOUCHERS.filter(v=>v.maxUsesPerAccount!=null);
+ const claims=claimsFor(db,uid,policies.map(v=>v.code));
+ const ledger=await Promise.all(claims.map(x=>x.ref.get()));
+ const history=await readVoucherHistory(db,uid,claims.map(x=>x.code));
+ const usages=await usageForClaims({db,uid,claims,ledger,history,voucherLedgerReady,
+  readOrder:ref=>ref.get()});
+ const vouchers={};
+ for(const policy of policies){
+  const usage=usages.get(policy.code);
+  const expired=Number.isFinite(Date.parse(policy.expiresOn+'T23:59:59.999+07:00'))&&
+   now>Date.parse(policy.expiresOn+'T23:59:59.999+07:00');
+  vouchers[policy.code]={limit:usage.limit,used:usage.used,reserved:usage.reserved,
+   remaining:usage.remaining,status:expired?'expired':usage.status};
+ }
+ return {vouchers};
 }
 /** Server-only write, OFF in HTTP handler unless explicit gate enabled.
  * Firestore transaction reads all catalog/ledger/idempotency/rate docs before writes.
@@ -245,9 +266,11 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
   const products=prepareProducts(req.items,seed,cms);
   const firstClaim=1+productRefs.length;
   const claimSnapshots=snapshots.slice(firstClaim,firstClaim+claims.length);
-  // Firestore transaction rechecks the order belonging to every prior claim before a reuse.
-  const claimStates=await claimOrderStates(db,claims,claimSnapshots,tx);
-  const quote=quoteFor(req,products,entitlements(claims,claimSnapshots,voucherLedgerReady,history,claimStates),Date.now());
+  // Re-read every historical and current claim order inside the transaction.
+  // The shared claim document serializes concurrent orders for the same UID/code.
+  const usages=await usageForClaims({db,uid,claims,ledger:claimSnapshots,history,
+   voucherLedgerReady,readOrder:ref=>tx.get(ref)});
+  const quote=quoteFor(req,products,entitlementsFromUsage(usages),Date.now());
   // Prevent price / voucher / variant changes between quote and order creation.
   if(quoteHash(quote)!==req.quoteHash)fail('QUOTE_CHANGED',409);
   const rateSnap=snapshots[snapshots.length-1];
@@ -278,12 +301,12 @@ export async function createForUser({db,seedCatalog,uid,body,now=Date.now(),
    createdAt:timestamp});
   tx.create(meta.attempt,{uid,orderId:meta.order.id,payloadDigest:digest,createdAt:timestamp});
   for(let i=0;i<claims.length;i++){
-   const x=claims[i],payload={uid,code:x.code,orderId:meta.order.id,state:'reserved',createdAt:timestamp};
-   if(claimSnapshots[i].exists){
-    // Only a cancelled order may release its previous voucher reservation.
-    if(claimStates.get(x.code)!=='cancelled')fail('VOUCHER_RESERVED',409);
-    tx.set(x.ref,payload);
-   }else tx.create(x.ref,payload);
+   const x=claims[i],usage=usages.get(x.code);
+   // Keep the legacy orderId field for older readers, and record all active/used claims.
+   const payload={uid,code:x.code,orderId:meta.order.id,
+    orderIds:[...usage.liveLedgerIds,meta.order.id],state:'reserved',updatedAt:timestamp};
+   if(claimSnapshots[i].exists)tx.set(x.ref,payload,{merge:true});
+   else tx.create(x.ref,{...payload,createdAt:timestamp});
   }
   tx.set(meta.rate,{count:count+1,updatedAt:timestamp});
   return receipt(order,false);
